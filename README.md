@@ -10,7 +10,7 @@ You only need to manually setup a few things:
 - Google Cloud Build
     - Special service account with access to create/modify/delete GCP resources
 
-The Google Cloud Bucket is used as a backing store for Terraform, and needs to be manually setup.
+The Google Cloud Bucket is used as a backing store for Terraform, so must be manually setup.
 
 Google Cloud Build is used for a various automatic actions triggered by pushes to the main Github branch:
 - Run Terraform to build any new infrastructure
