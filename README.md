@@ -8,7 +8,7 @@ You only need to manually setup a few things:
 - GCP Project
 - Google Cloud Bucket
 - Google Cloud Build
- - Special service account with access to control GCP resource
+    - Special service account with access to control GCP resource
 
 The Google Cloud Bucket is used as a backing store for Terraform, and needs to be manually setup.
 
@@ -21,5 +21,5 @@ Once those two things are setup, everything else can be configured with Infrastr
 including:
 - Google Cloud Repository bucket
 - Cloud Run services
- - Includes setting any environment variables and Cloud SQL connections
+    - Includes setting any environment variables and Cloud SQL connections
 - Cloud SQL instances
