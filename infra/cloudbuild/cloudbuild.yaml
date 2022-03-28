@@ -1,7 +1,7 @@
 steps:
 - id: tf-init
   name: hashicorp/terraform:1.0.0
-  entrypoint: bash
+  entrypoint: sh
   dir: 'infra/terraform'
   args: 
   - '-c'
@@ -9,7 +9,7 @@ steps:
 
 - id: tf-plan
   name: 'hashicorp/terraform:1.0.0'
-  entrypoint: bash
+  entrypoint: sh
   dir: 'infra/terraform'
   args: 
   - '-c'
@@ -18,7 +18,7 @@ steps:
 
 - id: tf-apply
   name: 'hashicorp/terraform:1.0.0'
-  entrypoint: bash
+  entrypoint: sh
   dir: 'infra/terraform'
   args: 
   - '-c'
@@ -40,3 +40,7 @@ steps:
   entrypoint: gcloud
   args: ['run', 'deploy', 'feedback', '--image', 'gcr.io/fabra-344902/fabra:$COMMIT_SHA', '--region', 'us-west1', '--platform', 'managed']
   waitFor: ['push-backend']
+
+options:
+  pool:
+    name: 'projects/fabra-344902/locations/us-west1/workerPools/fabra-pool'
