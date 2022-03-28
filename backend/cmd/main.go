@@ -24,5 +24,5 @@ func main() {
 
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	router.RunServer()
+	router.RunServer(db)
 }

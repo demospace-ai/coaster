@@ -6,11 +6,14 @@ import (
 	"fabra/internal/handlers"
 )
 
+type EnvHandlerFunc func(http.ResponseWriter, *http.Request) error
+type BaseHandlerFunc func(handlers.Env, http.ResponseWriter, *http.Request) error
+
 type Route struct {
 	Name        string
 	Method      string
 	Pattern     string
-	HandlerFunc http.HandlerFunc
+	HandlerFunc BaseHandlerFunc
 }
 
 var Routes = []Route{
