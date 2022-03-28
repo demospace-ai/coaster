@@ -156,8 +156,29 @@ resource "google_cloud_run_service" "fabra" {
     }
   }
 
+  metadata {
+    annotations = {
+      # Limit scale up to prevent any cost blow outs!
+      "autoscaling.knative.dev/maxScale" = "5"
+      # Use the VPC Connector
+      "run.googleapis.com/vpc-access-connector" = google_vpc_access_connector.connector.name
+      # all egress from the service should go through the VPC Connector
+      "run.googleapis.com/vpc-access-egress" = "all"
+      "run.googleapis.com/ingress"           = "all"
+    }
+  }
+
   traffic {
     percent         = 100
     latest_revision = true
   }
 }
+
+resource "google_vpc_access_connector" "connector" {
+  name          = "vpcconn"
+  region        = "us-west1"
+  ip_cidr_range = "10.8.0.0/28"
+  network       = google_compute_network.vpc.name
+}
+
+
