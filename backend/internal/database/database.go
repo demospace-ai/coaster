@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
-	"feedback/internal/application"
-	"feedback/internal/config"
+	"fabra/internal/application"
+	"fabra/internal/config"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
