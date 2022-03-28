@@ -88,7 +88,7 @@ resource "google_cloudbuild_worker_pool" "builder_pool" {
   }
 }
 
-resource "google_cloudbuild_trigger" "build-trigger" {
+resource "google_cloudbuild_trigger" "terraform-build-trigger" {
   github {
     name  = "Fabra"
     owner = "nfiacco"
@@ -99,5 +99,19 @@ resource "google_cloudbuild_trigger" "build-trigger" {
     }
   }
 
-  filename = "infra/cloudbuild/cloudbuild.yaml"
+  filename = "infra/cloudbuild/terraform.yaml"
+}
+
+resource "google_cloudbuild_trigger" "backend-build-trigger" {
+  github {
+    name  = "Fabra"
+    owner = "nfiacco"
+
+    push {
+      branch       = "main"
+      invert_regex = false
+    }
+  }
+
+  filename = "infra/cloudbuild/backend.yaml"
 }

@@ -1,0 +1,4 @@
+steps:
+options:
+  pool:
+    name: 'projects/fabra-344902/locations/us-west1/workerPools/fabra-pool'

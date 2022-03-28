@@ -1,30 +1,4 @@
 steps:
-- id: tf-init
-  name: hashicorp/terraform:1.0.0
-  entrypoint: sh
-  dir: 'infra/terraform'
-  args: 
-  - '-c'
-  - 'terraform init'
-
-- id: tf-plan
-  name: 'hashicorp/terraform:1.0.0'
-  entrypoint: sh
-  dir: 'infra/terraform'
-  args: 
-  - '-c'
-  - 'terraform plan'
-  waitFor: ['tf-init']
-
-- id: tf-apply
-  name: 'hashicorp/terraform:1.0.0'
-  entrypoint: sh
-  dir: 'infra/terraform'
-  args: 
-  - '-c'
-  - 'terraform apply -auto-approve'
-  waitFor: ['tf-plan']
-
 - id: build-backend
   name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'gcr.io/fabra-344902/fabra:$COMMIT_SHA', 'backend/']
@@ -40,7 +14,3 @@ steps:
   entrypoint: gcloud
   args: ['run', 'deploy', 'feedback', '--image', 'gcr.io/fabra-344902/fabra:$COMMIT_SHA', '--region', 'us-west1', '--platform', 'managed']
   waitFor: ['push-backend']
-
-options:
-  pool:
-    name: 'projects/fabra-344902/locations/us-west1/workerPools/fabra-pool'
