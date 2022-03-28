@@ -91,6 +91,8 @@ resource "google_cloudbuild_worker_pool" "builder_pool" {
 resource "google_cloudbuild_trigger" "terraform-build-trigger" {
   name = "terraform-trigger"
 
+  included_files = "infra/terraform/**"
+
   github {
     name  = "Fabra"
     owner = "nfiacco"
@@ -106,6 +108,8 @@ resource "google_cloudbuild_trigger" "terraform-build-trigger" {
 
 resource "google_cloudbuild_trigger" "backend-build-trigger" {
   name = "backend-trigger"
+
+  included_files = "backend/**"
 
   github {
     name  = "Fabra"
@@ -127,7 +131,7 @@ resource "google_cloud_run_service" "fabra" {
   template {
     spec {
       containers {
-        image = "gcr.io/fabra-344902/fabra"
+        image = "gcr.io/fabra-344902/fabra:latest"
         env {
           name = "DB_USER"
           value = google_sql_user.db_user.name
