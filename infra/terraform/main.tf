@@ -119,3 +119,41 @@ resource "google_cloudbuild_trigger" "backend-build-trigger" {
 
   filename = "infra/cloudbuild/backend.yaml"
 }
+
+resource "google_cloud_run_service" "fabra" {
+  name     = "fabra"
+  location = "us-west1"
+
+  template {
+    spec {
+      containers {
+        image = "gcr.io/fabra-344902/fabra"
+        env {
+          name = "DB_USER"
+          value = google_sql_user.db_user.name
+        }
+        env {
+          name = "DB_NAME"
+          value = google_sql_database.main_database.name
+        }
+        env {
+          name = "DB_HOST"
+          value = google_sql_database_instance.main_instance.private_ip_address
+        }
+        env {
+          name = "DB_PORT"
+          value = "3306"
+        }
+        env {
+          name = "IS_PROD"
+          value = "true"
+        }
+      }
+    }
+  }
+
+  traffic {
+    percent         = 100
+    latest_revision = true
+  }
+}
