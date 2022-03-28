@@ -61,6 +61,8 @@ resource "google_sql_database_instance" "main_instance" {
   }
 
   deletion_protection  = "true"
+
+  depends_on = [google_service_networking_connection.private_vpc_connection]
 }
 
 data "google_secret_manager_secret_version" "db_password" {
@@ -78,8 +80,24 @@ resource "google_cloudbuild_worker_pool" "builder_pool" {
   location = "us-west1"
   worker_config {
     no_external_ip = true
+    disk_size_gb   = 100
+    machine_type   = "e2-medium"
   }
   network_config {
-    peered_network = google_compute_network.network.id
+    peered_network = google_compute_network.vpc.id
   }
+}
+
+resource "google_cloudbuild_trigger" "build-trigger" {
+  github {
+    name  = "Fabra"
+    owner = "nfiacco"
+
+    push {
+      branch       = "main"
+      invert_regex = false
+    }
+  }
+
+  filename = "infra/build/cloudbuild.yaml"
 }
