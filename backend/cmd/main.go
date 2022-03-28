@@ -2,6 +2,7 @@ package main
 
 import (
 	"fabra/internal/config"
+    "fabra/internal/database"
 	"fabra/internal/router"
 	"log"
 	"math/rand"
@@ -15,12 +16,11 @@ func main() {
 		return
 	}
 
-    // TODO
-	//db, err := database.InitDatabase()
-	//if err != nil {
-	//	log.Fatal(err)
-	//	return
-	//}
+	db, err := database.InitDatabase()
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
 
 	rand.Seed(time.Now().UTC().UnixNano())
 

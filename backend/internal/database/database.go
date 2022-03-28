@@ -34,18 +34,14 @@ func initDatabaseDev() (*gorm.DB, error) {
 
 func initDatabaseProd() (*gorm.DB, error) {
 	var (
-		dbUser                 = mustGetenv("DB_USER")
-		dbPwd                  = config.GetDbPassword()
-		instanceConnectionName = mustGetenv("INSTANCE_CONNECTION_NAME")
-		dbName                 = mustGetenv("DB_NAME")
+		dbUser    = mustGetenv("DB_USER")
+		dbPwd     = config.GetDbPassword()
+        dbTCPHost = mustGetenv("DB_HOST")
+        dbPort    = mustGetenv("DB_PORT")
+        dbName    = mustGetenv("DB_NAME")
 	)
 
-	socketDir, isSet := os.LookupEnv("DB_SOCKET_DIR")
-	if !isSet {
-		socketDir = "/cloudsql"
-	}
-
-	dbURI := fmt.Sprintf("user=%s password=%s database=%s host=%s/%s", dbUser, dbPwd, dbName, socketDir, instanceConnectionName)
+    dbURI := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", dbUser, dbPwd, dbTCPHost, dbPort, dbName)
 
 	db, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
