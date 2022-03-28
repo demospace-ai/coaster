@@ -131,7 +131,7 @@ resource "google_cloud_run_service" "fabra" {
   template {
     spec {
       containers {
-        image = "gcr.io/fabra-344902/fabra:latest"
+        image = "gcr.io/fabra-344902/fabra"
         env {
           name = "DB_USER"
           value = google_sql_user.db_user.name

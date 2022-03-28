@@ -42,6 +42,7 @@ func initDatabaseProd() (*gorm.DB, error) {
 	)
 
     dbURI := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", dbUser, dbPwd, dbTCPHost, dbPort, dbName)
+    log.Printf("%s", dbURI)
 
 	db, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
