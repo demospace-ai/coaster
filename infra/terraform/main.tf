@@ -99,5 +99,5 @@ resource "google_cloudbuild_trigger" "build-trigger" {
     }
   }
 
-  filename = "infra/build/cloudbuild.yaml"
+  filename = "infra/cloudbuild/cloudbuild.yaml"
 }
