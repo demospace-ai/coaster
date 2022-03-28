@@ -89,6 +89,8 @@ resource "google_cloudbuild_worker_pool" "builder_pool" {
 }
 
 resource "google_cloudbuild_trigger" "terraform-build-trigger" {
+  name = "terraform-trigger"
+
   github {
     name  = "Fabra"
     owner = "nfiacco"
@@ -103,6 +105,8 @@ resource "google_cloudbuild_trigger" "terraform-build-trigger" {
 }
 
 resource "google_cloudbuild_trigger" "backend-build-trigger" {
+  name = "backend-trigger"
+
   github {
     name  = "Fabra"
     owner = "nfiacco"
