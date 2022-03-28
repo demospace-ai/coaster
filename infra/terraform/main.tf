@@ -146,7 +146,7 @@ resource "google_cloud_run_service" "fabra" {
         }
         env {
           name = "DB_PORT"
-          value = "3306"
+          value = "5432"
         }
         env {
           name = "IS_PROD"
@@ -171,6 +171,13 @@ resource "google_cloud_run_service" "fabra" {
   traffic {
     percent         = 100
     latest_revision = true
+  }
+
+  lifecycle {
+    ignore_changes = [
+        template.0.spec.0.containers.0.image,
+        metadata.0.annotations,
+    ]
   }
 }
 
