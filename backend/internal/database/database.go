@@ -41,7 +41,7 @@ func initDatabaseProd() (*gorm.DB, error) {
         dbName    = mustGetenv("DB_NAME")
 	)
 
-    dbURI := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", dbUser, dbPwd, dbTCPHost, dbPort, dbName)
+    dbURI := fmt.Sprintf("host=%s user=%s password=%s port=%s database=%s", dbTCPHost, dbUser, dbPwd, dbPort, dbName)
     log.Printf("%s", dbURI)
 
 	db, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{
