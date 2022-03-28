@@ -91,7 +91,7 @@ resource "google_cloudbuild_worker_pool" "builder_pool" {
 resource "google_cloudbuild_trigger" "terraform-build-trigger" {
   name = "terraform-trigger"
 
-  included_files = "infra/terraform/**"
+  included_files = ["infra/terraform/**"]
 
   github {
     name  = "Fabra"
@@ -109,7 +109,7 @@ resource "google_cloudbuild_trigger" "terraform-build-trigger" {
 resource "google_cloudbuild_trigger" "backend-build-trigger" {
   name = "backend-trigger"
 
-  included_files = "backend/**"
+  included_files = ["backend/**"]
 
   github {
     name  = "Fabra"
