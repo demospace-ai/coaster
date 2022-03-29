@@ -179,6 +179,8 @@ resource "google_cloud_run_service" "fabra" {
         metadata.0.annotations,
     ]
   }
+
+  autogenerate_revision_name = true
 }
 
 resource "google_vpc_access_connector" "connector" {
