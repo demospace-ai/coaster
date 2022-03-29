@@ -154,17 +154,17 @@ resource "google_cloud_run_service" "fabra" {
         }
       }
     }
-  }
 
-  metadata {
-    annotations = {
-      # Limit scale up to prevent any cost blow outs!
-      "autoscaling.knative.dev/maxScale" = "5"
-      # Use the VPC Connector
-      "run.googleapis.com/vpc-access-connector" = google_vpc_access_connector.connector.name
-      # all egress from the service should go through the VPC Connector
-      "run.googleapis.com/vpc-access-egress" = "all"
-      "run.googleapis.com/ingress"           = "all"
+    metadata {
+      annotations = {
+        # Limit scale up to prevent any cost blow outs!
+        "autoscaling.knative.dev/maxScale" = 5
+        # Use the VPC Connector
+        "run.googleapis.com/vpc-access-connector" = google_vpc_access_connector.connector.id
+        # all egress from the service should go through the VPC Connector
+        "run.googleapis.com/vpc-access-egress" = "private-ranges-only"
+        "run.googleapis.com/client-name"       = "cloud-console"
+      }
     }
   }
 
@@ -175,8 +175,8 @@ resource "google_cloud_run_service" "fabra" {
 
   lifecycle {
     ignore_changes = [
-        template.0.spec.0.containers.0.image,
-        metadata.0.annotations,
+      metadata.0.annotations,
+      template.0.spec.0.containers.0.image,
     ]
   }
 
