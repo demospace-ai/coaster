@@ -190,4 +190,10 @@ resource "google_vpc_access_connector" "connector" {
   network       = google_compute_network.vpc.name
 }
 
-
+resource "google_cloud_run_service_iam_member" "all_users_member" {
+  location = google_cloud_run_service.fabra.location
+  project = google_cloud_run_service.fabra.project
+  service = google_cloud_run_service.fabra.name
+  role = "roles/run.invoker"
+  member = "allUsers"
+}

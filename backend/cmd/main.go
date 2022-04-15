@@ -16,14 +16,12 @@ func main() {
 		return
 	}
 
-    log.Info("starting")
 	db, err := database.InitDatabase()
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
-    log.Info("started DB")
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	router.RunServer(db)
