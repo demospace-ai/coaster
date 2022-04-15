@@ -12,5 +12,5 @@ steps:
 - id: deploy-backend
   name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: gcloud
-  args: ['run', 'deploy', 'fabra', '--image', 'gcr.io/fabra-344902/fabra:$COMMIT_SHA', '--region', 'us-west1', '--platform', 'managed']
+  args: ['run', 'deploy', 'fabra', '--image', 'gcr.io/fabra-344902/fabra:latest', '--region', 'us-west1', '--platform', 'managed']
   waitFor: ['push-backend']
