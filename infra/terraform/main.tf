@@ -110,6 +110,7 @@ resource "google_cloudbuild_trigger" "backend-build-trigger" {
   name = "backend-trigger"
 
   included_files = ["backend/**"]
+  ignored_files = ["backend/migrations/**"]
 
   github {
     name  = "Fabra"
