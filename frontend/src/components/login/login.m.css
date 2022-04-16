@@ -1,0 +1,117 @@
+.center {
+    text-align: center;
+}
+
+.loginContainer {
+    margin: 50px 30px;
+    width: 350px;
+    height: 280px;
+}
+
+.loadingContainer {
+    margin: 50px 30px;
+    width: 350px;
+    height: 280px;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+.spinner {
+    color: black !important;
+}
+
+.header {
+    margin-top: 10px;
+}
+
+.loginLabel {
+    margin-top: 25px;
+}
+
+.loginGroup {
+    width: 320px;
+    margin: 40px auto;
+}
+
+.marginTop {
+    margin-top: 20px;
+}
+
+.extraMarginTop {
+    margin-top: 70px;
+}
+
+.input {
+    border: 2px solid black;
+    border-radius: 3px;
+    padding: 8px 12px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.invalidBorder {
+    border-color: red;
+    outline: none;
+}
+
+.invalidLabel {
+    color: red;
+    margin-top: 5px;
+    margin-bottom: -5px;
+    font-size: 15px;
+    text-align: left;
+}
+
+.submit {
+    margin-top: 20px;
+    border: 1px solid black;
+    border-radius: 3px;
+    padding: 8px 10px;
+    background-color: black;
+    color: white;
+    font-weight: 600;
+    width: 100%;
+    box-sizing: border-box;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all .1s ease-in-out;
+}
+
+.submit:hover {
+    transform: scale(1.03);
+}
+
+.loginButton {
+    color: #404040;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    padding: 10px 16px;
+    border-radius: 5px;
+    border-width: 2px;
+    border-color: #303030;
+    font-weight: 550;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: none;
+    background-color: whitesmoke;
+    transition: all .1s ease-in-out;
+}
+
+.loginButton:hover {
+    transform: scale(1.03);
+}
+
+.buttonContentWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.iconWrapper {
+    width: 18px;
+    height: 18px;
+    display: inline-block;
+    margin-right: 12px;
+}
