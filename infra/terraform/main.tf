@@ -79,7 +79,7 @@ resource "google_cloudbuild_worker_pool" "builder_pool" {
   name = "fabra-pool"
   location = "us-west1"
   worker_config {
-    no_external_ip = true
+    no_external_ip = false
     disk_size_gb   = 100
     machine_type   = "e2-medium"
   }
