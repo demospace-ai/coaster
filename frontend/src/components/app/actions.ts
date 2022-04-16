@@ -9,7 +9,6 @@ export function useStart() {
       const checkSessionResponse = await sendRequest(CheckSession);
       dispatch({
         type: "login.authenticated",
-        feedbackKey: checkSessionResponse.feedback_key,
       });
     } catch (e) {
     }

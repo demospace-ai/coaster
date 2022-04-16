@@ -23,11 +23,6 @@ export interface ValidationCodeRequest {
     email: string;
 }
 
-export interface SendRequest {
-    feedback_key: string;
-    escaped_content: string;
-}
-
 export interface EmailAuthentication {
     email: string;
     validation_code: string;

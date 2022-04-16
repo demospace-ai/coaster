@@ -22,7 +22,6 @@ export function useHandleGoogleResponse(): GoogleLoginHandler {
       const loginResponse = await sendRequest(Login, payload);
       dispatch({
         type: "login.authenticated",
-        feedbackKey: loginResponse.feedback_key,
       });
     } catch (e) {
     }
@@ -57,7 +56,6 @@ export function useEmailLogin() {
       const loginResponse = await sendRequest(Login, payload);
       dispatch({
         type: "login.authenticated",
-        feedbackKey: loginResponse.feedback_key,
       });
     } catch (e) {
     }
