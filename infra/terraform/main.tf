@@ -197,3 +197,21 @@ resource "google_cloud_run_service_iam_member" "all_users_member" {
   role = "roles/run.invoker"
   member = "allUsers"
 }
+
+resource "google_cloudbuild_trigger" "database-migration-trigger" {
+  name = "database-migration-trigger"
+
+  included_files = ["backend/migrations/**"]
+
+  github {
+    name  = "Fabra"
+    owner = "nfiacco"
+
+    push {
+      branch       = "main"
+      invert_regex = false
+    }
+  }
+
+  filename = "infra/cloudbuild/database-migration.yaml"
+}
