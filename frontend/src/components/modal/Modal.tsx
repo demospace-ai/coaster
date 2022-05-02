@@ -5,6 +5,7 @@ import styles from './modal.m.css';
 interface ModalProps {
   show: boolean;
   close: () => void;
+  children: React.ReactNode;
 }
 
 export const Modal: React.FC<ModalProps> = props => {

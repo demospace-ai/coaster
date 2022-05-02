@@ -1,4 +1,3 @@
-import { CircularProgress } from "@material-ui/core";
 import classNames from "classnames";
 import React, { FormEvent, useState } from "react";
 import GoogleLogin, { GoogleLoginResponse, GoogleLoginResponseOffline } from "react-google-login";
@@ -30,7 +29,7 @@ export const Login: React.FC<LoginProps> = props => {
   if (loading) {
     return (
       <div className={styles.loadingContainer}>
-        <CircularProgress className={styles.spinner}/>
+        <div className={styles.spinner}/>
       </div>
     )
   }
