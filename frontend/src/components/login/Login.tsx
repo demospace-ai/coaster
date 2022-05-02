@@ -140,7 +140,7 @@ const EmailLogin: React.FC<EmailLoginProps> = props => {
         onChange={e => setEmail(e.target.value)}
         onBlur={validateEmail}
       />
-      {!isValid && <div className={styles.invalidLabel}>Please check your email.</div>}
+      {!isValid && <div className={styles.invalidLabel}>Please enter a valid email.</div>}
       <input type="submit" value="Continue" className={styles.submit}/>
     </form>
   );
