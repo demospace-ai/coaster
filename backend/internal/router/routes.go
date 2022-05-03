@@ -36,6 +36,12 @@ var Routes = []Route{
 		HandlerFunc: handlers.Login,
 	},
 	{
+		Name:        "Search",
+		Method:      "POST",
+		Pattern:     "/search",
+		HandlerFunc: handlers.Search,
+	},
+	{
 		Name:        "Send validation code",
 		Method:      "POST",
 		Pattern:     "/validation_code",

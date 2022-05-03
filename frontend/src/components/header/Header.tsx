@@ -15,7 +15,6 @@ export const Header: React.FC = () => {
     <div className={styles.headerContainer}>
       <div>
         <Link className={classNames(styles.route, styles.padRight)} to={"/"}>Home</Link>
-        <Link className={classNames(styles.route, styles.padRight)} to={"/about"}>About</Link>
       </div>
       <div >
         <div className={styles.rightNavWrapper}>
