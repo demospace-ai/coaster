@@ -14,15 +14,15 @@ func RunServer(db *gorm.DB) {
 
 	generateRoutes(db, router)
 
-    router.Use(CORSMiddleware)
+	router.Use(CORSMiddleware)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
 func generateRoutes(db *gorm.DB, r *mux.Router) {
 	for _, route := range Routes {
-        withEnv := WrapWithEnv(db, route.HandlerFunc)
-        withErrorHandling := WrapWithErrorHandling(withEnv)
+		withEnv := WrapWithEnv(db, route.HandlerFunc)
+		withErrorHandling := WrapWithErrorHandling(withEnv)
 		r.Handle(route.Pattern, withErrorHandling).Methods(route.Method, "OPTIONS")
 	}
 }

@@ -1,7 +1,7 @@
 package config
 
 import (
-    "context"
+	"context"
 	"fmt"
 
 	secretmanager "cloud.google.com/go/secretmanager/apiv1"
@@ -32,7 +32,6 @@ func InitConfig() error {
 func GetDbPassword() string {
 	return viper.GetString(databasePassword.configKey)
 }
-
 
 func addSecretToConfig(secretConfig secretConfigType) error {
 	secret, err := fetchSecret(secretConfig.secretKey)

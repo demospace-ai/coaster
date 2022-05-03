@@ -12,6 +12,13 @@ require (
 )
 
 require (
+	github.com/gobuffalo/envy v1.10.1 // indirect
+	github.com/joho/godotenv v1.4.0 // indirect
+	github.com/pkg/errors v0.8.1 // indirect
+	github.com/rogpeppe/go-internal v1.8.0 // indirect
+)
+
+require (
 	cloud.google.com/go v0.100.2 // indirect
 	cloud.google.com/go/compute v1.3.0 // indirect
 	cloud.google.com/go/iam v0.1.0 // indirect
@@ -32,6 +39,7 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
+	github.com/mailgun/mailgun-go v2.0.0+incompatible
 	github.com/mitchellh/mapstructure v1.4.3 // indirect
 	github.com/pelletier/go-toml v1.9.4 // indirect
 	github.com/spf13/afero v1.6.0 // indirect

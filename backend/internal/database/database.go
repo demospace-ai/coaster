@@ -36,12 +36,12 @@ func initDatabaseProd() (*gorm.DB, error) {
 	var (
 		dbUser    = mustGetenv("DB_USER")
 		dbPwd     = config.GetDbPassword()
-        dbTCPHost = mustGetenv("DB_HOST")
-        dbPort    = mustGetenv("DB_PORT")
-        dbName    = mustGetenv("DB_NAME")
+		dbTCPHost = mustGetenv("DB_HOST")
+		dbPort    = mustGetenv("DB_PORT")
+		dbName    = mustGetenv("DB_NAME")
 	)
 
-    dbURI := fmt.Sprintf("host=%s user=%s password=%s port=%s database=%s", dbTCPHost, dbUser, dbPwd, dbPort, dbName)
+	dbURI := fmt.Sprintf("host=%s user=%s password=%s port=%s database=%s", dbTCPHost, dbUser, dbPwd, dbPort, dbName)
 
 	db, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),

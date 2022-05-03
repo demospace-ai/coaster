@@ -17,7 +17,7 @@ type Route struct {
 }
 
 var Routes = []Route{
-	Route{
+	{
 		Name:        "Hello",
 		Method:      "GET",
 		Pattern:     "/hello",

@@ -2,6 +2,7 @@ package router
 
 import (
 	"fabra/internal/application"
+	"fabra/internal/auth"
 	"fabra/internal/errors"
 	"fabra/internal/handlers"
 	"log"
@@ -11,13 +12,19 @@ import (
 	"gorm.io/gorm"
 )
 
-var ALLOWED_ORIGINS = []string{"https://fabra.io", "https://www.fabra.io"}
+var ALLOWED_ORIGINS = []string{"https://app.fabra.io"}
 var ALLOWED_HEADERS = []string{"Content-Type"}
 
 func WrapWithEnv(db *gorm.DB, handler BaseHandlerFunc) EnvHandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
+		auth, err := auth.GetAuthentication(db, r)
+		if err != nil {
+			return err
+		}
+
 		env := handlers.Env{
-			Db: db,
+			Db:   db,
+			Auth: *auth,
 		}
 		return handler(env, w, r)
 	}

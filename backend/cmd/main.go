@@ -2,7 +2,7 @@ package main
 
 import (
 	"fabra/internal/config"
-    "fabra/internal/database"
+	"fabra/internal/database"
 	"fabra/internal/router"
 	"log"
 	"math/rand"
