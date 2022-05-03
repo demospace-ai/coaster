@@ -22,7 +22,7 @@ func InitDatabase() (*gorm.DB, error) {
 }
 
 func initDatabaseDev() (*gorm.DB, error) {
-	dbURI := "user=postgres database=feedback host=localhost"
+	dbURI := "user=fabra password=fabra database=fabra host=localhost"
 
 	db, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{})
 	if err != nil {

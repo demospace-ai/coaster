@@ -23,4 +23,22 @@ var Routes = []Route{
 		Pattern:     "/hello",
 		HandlerFunc: handlers.Hello,
 	},
+	{
+		Name:        "Check session",
+		Method:      "GET",
+		Pattern:     "/check_session",
+		HandlerFunc: handlers.CheckSession,
+	},
+	{
+		Name:        "Login",
+		Method:      "POST",
+		Pattern:     "/login",
+		HandlerFunc: handlers.Login,
+	},
+	{
+		Name:        "Send validation code",
+		Method:      "POST",
+		Pattern:     "/validation_code",
+		HandlerFunc: handlers.ValidationCode,
+	},
 }

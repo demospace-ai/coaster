@@ -16,7 +16,7 @@ import (
 	"gorm.io/gorm"
 )
 
-const CLIENT_ID = "621422061156-f3f0o58fonsm9ohnqq5ngpa981c6k3hc.apps.googleusercontent.com"
+const CLIENT_ID = "932264813910-egpk1omo3v2cedd89k8go851uko6djpa.apps.googleusercontent.com"
 
 type EmailAuthentication struct {
 	Email          string `json:"email"`

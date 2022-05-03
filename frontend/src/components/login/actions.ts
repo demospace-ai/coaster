@@ -1,25 +1,20 @@
-import { GoogleLoginResponse, GoogleLoginResponseOffline } from "react-google-login";
 import { useDispatch } from "src/root/model";
 import { sendRequest } from 'src/rpc/ajax';
 import { Login, ValidationCode } from "src/rpc/api";
 
-function isGoogleLoginResponse(response: GoogleLoginResponse | GoogleLoginResponseOffline): response is GoogleLoginResponse {
-  return (response as GoogleLoginResponse).googleId !== undefined;
+export type GoogleLoginResponse = {
+  credential: string;
 }
 
-export type GoogleLoginHandler = (response: GoogleLoginResponse | GoogleLoginResponseOffline) => void;
+export type GoogleLoginHandler = (response: GoogleLoginResponse) => void;
 
 export function useHandleGoogleResponse(): GoogleLoginHandler {
   const dispatch = useDispatch();
-  return async (response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
-    if (!isGoogleLoginResponse(response)) {
-      return;
-    }
-
-    const id_token = response.getAuthResponse().id_token;
+  return async (response: GoogleLoginResponse) => {
+    const id_token = response.credential;
     const payload = {"id_token": id_token};
     try {
-      const loginResponse = await sendRequest(Login, payload);
+      await sendRequest(Login, payload);
       dispatch({
         type: "login.authenticated",
       });
