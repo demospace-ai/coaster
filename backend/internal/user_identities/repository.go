@@ -24,7 +24,7 @@ func LoadByUserID(db *gorm.DB, userID int64) (*models.UserIdentity, error) {
 	var user models.UserIdentity
 	result := db.Table("user_identities").
 		Select("user_identities.*").
-		Where("user_identity.user_id = ?", userID).
+		Where("user_identities.user_id = ?", userID).
 		Take(&user)
 	if result.Error != nil {
 		return nil, result.Error
