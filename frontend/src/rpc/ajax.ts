@@ -2,7 +2,7 @@ import { compile } from 'path-to-regexp';
 import { IEndpoint } from 'src/rpc/api';
 
 const IS_PROD = process.env.NODE_ENV === "production";
-const ROOT_DOMAIN = IS_PROD ? "https://api.fabra.io" : "http://localhost:8080";
+const ROOT_DOMAIN = IS_PROD ? "https://app.fabra.io/api" : "http://localhost:8080";
 
 export async function sendRequest<RequestType extends object, ResponseType>(
     endpoint: IEndpoint<RequestType, ResponseType>,
