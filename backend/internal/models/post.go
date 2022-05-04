@@ -1,6 +1,6 @@
 package models
 
-import "database/sql"
+import "fabra/internal/database"
 
 type PostType string
 
@@ -9,13 +9,13 @@ const (
 	PostTypeAnswer   PostType = "answer"
 )
 
-// TODO: add tsvector and company columns
+// TODO: marshal to externally-friendly json
 type Post struct {
-	PostType     PostType
-	Title        sql.NullString
-	Body         string
-	UserID       int64
-	ParentPostID sql.NullInt64
+	PostType     PostType            `json:"post_type"`
+	Title        database.NullString `json:"title,omitempty"`
+	Body         string              `json:"body"`
+	UserID       int64               `json:"user_id"`
+	ParentPostID database.NullInt64  `json:"parent_post_id,omitempty"`
 
 	BaseModel
 }

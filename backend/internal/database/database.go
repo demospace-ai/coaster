@@ -1,6 +1,8 @@
 package database
 
 import (
+	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -12,6 +14,24 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
+
+type NullString struct { sql.NullString }
+
+func (s NullString) MarshalJSON() ([]byte, error) {
+	if s.Valid {
+		return json.Marshal(s.String)
+	}
+	return []byte(`null`), nil
+}
+
+type NullInt64 struct{ sql.NullInt64 }
+
+func (i NullInt64) MarshalJSON() ([]byte, error) {
+	if i.Valid {
+		return json.Marshal(i.Int64)
+	}
+	return []byte(`null`), nil
+}
 
 func InitDatabase() (*gorm.DB, error) {
 	if application.IsProd() {

@@ -6,7 +6,8 @@ import (
 )
 
 type BaseModel struct {
-	ID            int64
+	// TODO: don't expose internal database ID to public
+	ID            int64 `json:"id"`
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
 	DeactivatedAt sql.NullTime

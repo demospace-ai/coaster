@@ -7,6 +7,7 @@ import { Header } from "src/components/header/Header";
 import { Home } from 'src/components/home/Home';
 import { NotFound } from 'src/components/notfound/NotFound';
 import { useSelector } from "src/root/model";
+import { Question } from "../question/Question";
 
 export const App: React.FC = () => {
   const loading = useSelector(state => state.app.loading);
@@ -26,6 +27,9 @@ export const App: React.FC = () => {
       <Switch>
         <Route exact path='/'>
           <Home/>
+        </Route>
+        <Route exact path='/question/:id'>
+          <Question/>
         </Route>
         <Route path='*'>
           <NotFound/>

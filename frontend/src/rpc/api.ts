@@ -15,7 +15,7 @@ export const CheckSession: IEndpoint<undefined, CheckSessionResponse> = {
 };
 
 
-export const Search: IEndpoint<undefined, SearchResponse> = {
+export const Search: IEndpoint<SearchRequest, SearchResponse> = {
     method: "POST",
     path: "/search",
 };
@@ -45,5 +45,18 @@ export interface LoginResponse {
 export interface CheckSessionResponse {
 }
 
+export interface SearchRequest {
+    search_query: string;
+}
+
 export interface SearchResponse {
+    posts: Post[];
+}
+
+export interface Post {
+    id: number;
+    post_type: string;
+    title: string | undefined;
+    body: string;
+    user_id: number;
 }

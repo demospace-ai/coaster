@@ -2,6 +2,7 @@ package posts
 
 import (
 	"database/sql"
+	"fabra/internal/database"
 	"fabra/internal/models"
 
 	"gorm.io/gorm"
@@ -10,7 +11,7 @@ import (
 func CreateQuestion(db *gorm.DB, questionTitle string, questionBody string, userID int64) (*models.Post, error) {
 	post := models.Post{
 		PostType: models.PostTypeQuestion,
-		Title:    sql.NullString{String: questionTitle},
+		Title:    database.NullString{sql.NullString{String: questionTitle}},
 		Body:     questionBody,
 		UserID:   userID,
 	}
@@ -26,7 +27,7 @@ func CreateQuestion(db *gorm.DB, questionTitle string, questionBody string, user
 func CreateAnswer(db *gorm.DB, questionID int64, answerBody string, userID int64) (*models.Post, error) {
 	post := models.Post{
 		PostType:     models.PostTypeQuestion,
-		ParentPostID: sql.NullInt64{Int64: questionID},
+		ParentPostID: database.NullInt64{sql.NullInt64{Int64: questionID}},
 		Body:         answerBody,
 		UserID:       userID,
 	}

@@ -1,0 +1,28 @@
+.search {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.postTitle {
+    text-align: left;
+    display: block;
+}
+
+.postBody {
+    text-align: left;
+}
+
+.result {
+    padding-bottom: 20px;
+    border-bottom: 1px solid lightgray;
+}
+
+.searchButton {
+    height: 30px;
+    box-sizing: content-box;
+}
+
+.searchInput {
+    width: 400px;
+    height: 30px;
+}
