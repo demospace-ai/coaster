@@ -330,10 +330,10 @@ resource "google_storage_bucket" "fabra_frontend_bucket" {
   uniform_bucket_level_access = true
 }
 
-resource "google_storage_bucket_access_control" "public_rule" {
+resource "google_storage_bucket_iam_member" "public_member_read_access" {
   bucket = google_storage_bucket.fabra_frontend_bucket.name
-  role   = "READER"
-  entity = "allUsers"
+  role = "roles/storage.objectViewer"
+  member = "allUsers"
 }
 
 resource "google_compute_backend_bucket" "frontend_backend" {
