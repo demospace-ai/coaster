@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fabra/internal/models"
+	"fabra/internal/posts"
 	"net/http"
 )
 
@@ -30,12 +30,12 @@ func Search(env Env, w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	var posts []models.Post
-	env.Db.Raw(
-		"SELECT *, ts_rank((setweight(to_tsvector('english', coalesce(title, '')), 'A') || setweight(to_tsvector('english', body), 'B')), @query) as rank FROM posts WHERE (setweight(to_tsvector('english', coalesce(title, '')), 'A') || setweight(to_tsvector('english', body), 'B')) @@ to_tsquery('english', @query) ORDER BY rank desc",
-		sql.Named("query", searchRequest.SearchQuery)).
-		Scan(&posts)
+	posts, err := posts.Search(env.Db, searchRequest.SearchQuery)
+	if err != nil {
+		return err
+	}
 
+	// TODO: don't just return the raw post list
 	return json.NewEncoder(w).Encode(SearchResponse{
 		Posts: posts,
 	})
