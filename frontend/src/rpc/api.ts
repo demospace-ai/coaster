@@ -14,6 +14,12 @@ export const CheckSession: IEndpoint<undefined, CheckSessionResponse> = {
     path: "/check_session",
 };
 
+
+export const Search: IEndpoint<undefined, SearchResponse> = {
+    method: "GET",
+    path: "/check_session",
+};
+
 export const ValidationCode: IEndpoint<ValidationCodeRequest, undefined> = {
     method: "POST",
     path: "/validation_code",
@@ -37,4 +43,7 @@ export interface LoginResponse {
 }
 
 export interface CheckSessionResponse {
+}
+
+export interface SearchResponse {
 }
