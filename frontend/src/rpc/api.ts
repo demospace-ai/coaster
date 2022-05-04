@@ -16,8 +16,8 @@ export const CheckSession: IEndpoint<undefined, CheckSessionResponse> = {
 
 
 export const Search: IEndpoint<undefined, SearchResponse> = {
-    method: "GET",
-    path: "/check_session",
+    method: "POST",
+    path: "/search",
 };
 
 export const ValidationCode: IEndpoint<ValidationCodeRequest, undefined> = {
