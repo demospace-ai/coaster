@@ -217,40 +217,95 @@ resource "google_cloudbuild_trigger" "database-migration-trigger" {
   filename = "infra/cloudbuild/database-migration.yaml"
 }
 
-module "lb-http" {
-  source  = "GoogleCloudPlatform/lb-http/google//modules/serverless_negs"
-  version = "~> 6.2.0"
-  name    = "fabra-lb"
-  project = "fabra-344902"
+resource "google_compute_backend_service" "default" {
+    affinity_cookie_ttl_sec         = 0
+    connection_draining_timeout_sec = 300
+    enable_cdn                      = false
+    load_balancing_scheme           = "EXTERNAL"
+    name                            = "fabra-lb-backend-default"
+    port_name                       = "http"
+    protocol                        = "HTTP"
+    session_affinity                = "NONE"
+    timeout_sec                     = 30
 
-  ssl                             = true
-  managed_ssl_certificate_domains = ["app.fabra.io."]
-  https_redirect                  = true
-
-  backends = {
-    default = {
-      description = null
-      groups = [
-        {
-          group = google_compute_region_network_endpoint_group.fabra_neg.id
-        }
-      ]
-      enable_cdn              = false
-      security_policy         = null
-      custom_request_headers  = null
-      custom_response_headers = null
-
-      iap_config = {
-        enable               = false
-        oauth2_client_id     = ""
-        oauth2_client_secret = ""
-      }
-      log_config = {
-        enable      = false
-        sample_rate = null
-      }
+    backend {
+        balancing_mode               = "UTILIZATION"
+        capacity_scaler              = 1
+        group                        = "https://www.googleapis.com/compute/v1/projects/fabra-344902/regions/us-west1/networkEndpointGroups/fabra-neg"
+        max_connections              = 0
+        max_connections_per_endpoint = 0
+        max_connections_per_instance = 0
+        max_rate                     = 0
+        max_rate_per_endpoint        = 0
+        max_rate_per_instance        = 0
+        max_utilization              = 0
     }
-  }
+}
+
+resource "google_compute_global_address" "default" {
+    address_type       = "EXTERNAL"
+    name               = "fabra-lb-address"
+    prefix_length      = 0
+}
+
+resource "google_compute_global_forwarding_rule" "http" {
+    ip_address            = google_compute_global_address.default.id
+    ip_protocol           = "TCP"
+    load_balancing_scheme = "EXTERNAL"
+    name                  = "fabra-lb"
+    port_range            = "80"
+    target                = google_compute_target_http_proxy.default.id
+}
+
+resource "google_compute_global_forwarding_rule" "https" {
+    ip_address            = google_compute_global_address.default.id
+    ip_protocol           = "TCP"
+    load_balancing_scheme = "EXTERNAL"
+    name                  = "fabra-lb-https"
+    port_range            = "443"
+    target                = google_compute_target_https_proxy.default.id
+}
+
+resource "google_compute_managed_ssl_certificate" "default" {
+    name                      = "fabra-lb-cert"
+    type                      = "MANAGED"
+
+    managed {
+        domains = [
+            "app.fabra.io",
+        ]
+    }
+}
+
+resource "google_compute_url_map" "default" {
+    default_service    = google_compute_backend_service.default.id
+    name               = "fabra-lb-url-map"
+}
+
+resource "google_compute_url_map" "https_redirect" {
+    name = "fabra-lb-https-redirect"
+
+    default_url_redirect {
+        https_redirect         = true
+        redirect_response_code = "MOVED_PERMANENTLY_DEFAULT"
+        strip_query            = false
+    }
+}
+
+resource "google_compute_target_http_proxy" "default" {
+    name               = "fabra-lb-http-proxy"
+    proxy_bind         = false
+    url_map            = google_compute_url_map.https_redirect.id
+}
+
+resource "google_compute_target_https_proxy" "default" {
+    name               = "fabra-lb-https-proxy"
+    proxy_bind         = false
+    quic_override      = "NONE"
+    ssl_certificates   = [
+        google_compute_managed_ssl_certificate.default.id,
+    ]
+    url_map            = google_compute_url_map.default.id
 }
 
 resource "google_compute_region_network_endpoint_group" "fabra_neg" {
