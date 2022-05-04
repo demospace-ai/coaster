@@ -11,6 +11,10 @@ terraform {
   }
 }
 
+provider "google-beta" {
+  project     = "fabra-344902"
+}
+
 provider "google" {
   project = "fabra-344902"
 }
