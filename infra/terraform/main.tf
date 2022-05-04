@@ -217,16 +217,47 @@ resource "google_cloudbuild_trigger" "database-migration-trigger" {
   filename = "infra/cloudbuild/database-migration.yaml"
 }
 
-resource "google_compute_managed_ssl_certificate" "default" {
-  name = "fabra-cert"
+module "lb-http" {
+  source  = "GoogleCloudPlatform/lb-http/google//modules/serverless_negs"
+  version = "~> 6.2.0"
+  name    = "fabra-lb"
 
-  managed {
-    domains = ["app.fabra.io."]
+  ssl                             = true
+  managed_ssl_certificate_domains = ["app.fabra.io."]
+  https_redirect                  = true
+
+  backends = {
+    default = {
+      description = null
+      groups = [
+        {
+          group = google_compute_region_network_endpoint_group.fabra_neg.id
+        }
+      ]
+      enable_cdn              = false
+      security_policy         = null
+      custom_request_headers  = null
+      custom_response_headers = null
+
+      iap_config = {
+        enable               = false
+        oauth2_client_id     = ""
+        oauth2_client_secret = ""
+      }
+      log_config = {
+        enable      = false
+        sample_rate = null
+      }
+    }
   }
 }
 
-resource "google_compute_global_address" "default" {
-  name         = "fabra-external-address"
-  address_type = "EXTERNAL"
-  ip_version   = "IPV4"
+resource "google_compute_region_network_endpoint_group" "fabra_neg" {
+  provider              = google
+  name                  = "fabra-neg"
+  network_endpoint_type = "SERVERLESS"
+  region                = "us-west1"
+  cloud_run {
+    service = google_cloud_run_service.fabra.name
+  }
 }
