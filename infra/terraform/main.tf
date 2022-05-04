@@ -293,6 +293,7 @@ resource "google_compute_url_map" "default" {
     
     path_matcher {
         name            = "fabra-lb-path-matcher"
+        default_service = google_compute_backend_bucket.frontend_backend.id
 
         path_rule {
             paths   = [
