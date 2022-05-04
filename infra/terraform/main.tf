@@ -282,8 +282,26 @@ resource "google_compute_managed_ssl_certificate" "default" {
 }
 
 resource "google_compute_url_map" "default" {
-    default_service    = google_compute_backend_service.default.id
     name               = "fabra-lb-url-map"
+    default_service    = google_compute_backend_bucket.frontend_backend.id
+    host_rule {
+        hosts = [
+            "app.fabra.io",
+        ]
+        path_matcher = "fabra-lb-path-matcher"
+    }
+    
+    path_matcher {
+        default_service = google_compute_backend_bucket.frontend_backend.id
+        name            = "fabra-lb-path-matcher"
+
+        path_rule {
+            paths   = [
+              "/api/*",
+            ]
+            service = google_compute_backend_service.default.id
+        }
+    }
 }
 
 resource "google_compute_url_map" "https_redirect" {
