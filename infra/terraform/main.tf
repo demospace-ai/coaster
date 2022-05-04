@@ -262,3 +262,24 @@ resource "google_compute_region_network_endpoint_group" "fabra_neg" {
     service = google_cloud_run_service.fabra.name
   }
 }
+
+resource "google_storage_bucket" "fabra_frontend_bucket" {
+  name          = "fabra-frontend-bucket"
+  location      = "US"
+  storage_class = "STANDARD"
+
+  uniform_bucket_level_access = true
+}
+
+resource "google_storage_bucket_access_control" "public_rule" {
+  bucket = google_storage_bucket.fabra_frontend_bucket.name
+  role   = "READER"
+  entity = "allUsers"
+}
+
+resource "google_compute_backend_bucket" "frontend_backend" {
+  name        = "frontend-backend-bucket"
+  description = "Static react web app"
+  bucket_name = google_storage_bucket.fabra_frontend_bucket.name
+  enable_cdn  = true
+}
