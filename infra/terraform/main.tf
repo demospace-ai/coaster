@@ -216,3 +216,11 @@ resource "google_cloudbuild_trigger" "database-migration-trigger" {
 
   filename = "infra/cloudbuild/database-migration.yaml"
 }
+
+resource "google_compute_managed_ssl_certificate" "default" {
+  name = "fabra-cert"
+
+  managed {
+    domains = ["app.fabra.io."]
+  }
+}
