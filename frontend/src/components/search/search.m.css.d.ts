@@ -3,6 +3,8 @@ declare const styles: {
   readonly "postTitle": string;
   readonly "postBody": string;
   readonly "result": string;
+  readonly "results": string;
+  readonly "searchBar": string;
   readonly "searchButton": string;
   readonly "searchInput": string;
 };

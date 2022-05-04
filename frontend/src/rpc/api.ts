@@ -25,6 +25,11 @@ export const ValidationCode: IEndpoint<ValidationCodeRequest, undefined> = {
     path: "/validation_code",
 };
 
+export const GetQuestion: IEndpoint<{questionID: string}, GetQuestionResponse> = {
+    method: "GET",
+    path: "/get_question/:questionID",
+}
+
 export interface ValidationCodeRequest {
     email: string;
 }
@@ -51,6 +56,11 @@ export interface SearchRequest {
 
 export interface SearchResponse {
     posts: Post[];
+}
+
+export interface GetQuestionResponse {
+    question: Post;
+    answers: Post[];
 }
 
 export interface Post {

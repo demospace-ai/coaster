@@ -24,6 +24,34 @@ func CreateQuestion(db *gorm.DB, questionTitle string, questionBody string, user
 	return &post, nil
 }
 
+func LoadQuestionByID(db *gorm.DB, questionID int64) (*models.Post, error) {
+	var question models.Post
+	result := db.Table("posts").
+		Select("posts.*").
+		Where("posts.id = ?", questionID).
+		Take(&question)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &question, nil
+}
+
+func LoadAnswersByQuestionID(db *gorm.DB, questionID int64) ([]models.Post, error) {
+	var answers []models.Post
+	result := db.Table("posts").
+		Select("posts.*").
+		Where("posts.parent_post_id = ?", questionID).
+		Find(&answers)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return answers, nil
+}
+
 func CreateAnswer(db *gorm.DB, questionID int64, answerBody string, userID int64) (*models.Post, error) {
 	post := models.Post{
 		PostType:     models.PostTypeQuestion,

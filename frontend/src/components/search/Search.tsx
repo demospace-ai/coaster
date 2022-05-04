@@ -27,18 +27,16 @@ const SearchBar: React.FC = () => {
   }
 
   return (
-    <div>
-      <form onSubmit={onSubmit}>
-          <input
-              type="text"
-              className={styles.searchInput}
-              id="question-search"
-              placeholder="Find an answer"
-              onChange={e => setQuery(e.target.value)}
-          />
-          <button className={styles.searchButton} type="submit">Search</button>
-      </form>
-    </div>
+    <form className={styles.searchBar} onSubmit={onSubmit}>
+        <input
+            type="text"
+            className={styles.searchInput}
+            id="question-search"
+            placeholder="Find an answer"
+            onChange={e => setQuery(e.target.value)}
+        />
+        <button className={styles.searchButton} type="submit">Search</button>
+    </form>
   )
 };
 
@@ -54,7 +52,7 @@ const SearchResults: React.FC<SearchResultsProps> = props => {
   return (
     <div>
       <h2>Results</h2>
-      <ul style={{listStyleType: "none"}}>
+      <ul className={styles.results}>
         {props.results.map((result, index) => (
           <li key={index} className={styles.result}>
             <h3>

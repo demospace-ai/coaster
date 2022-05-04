@@ -1,6 +1,7 @@
 .search {
     text-align: center;
-    margin-top: 20px;
+    margin: 20px auto 0;
+    width: 70vw;
 }
 
 .postTitle {
@@ -17,12 +18,36 @@
     border-bottom: 1px solid lightgray;
 }
 
+.results {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.searchBar {
+    display: flex;
+    width: 100%;
+}
+
 .searchButton {
     height: 30px;
     box-sizing: content-box;
+    border: 2px solid black;
+    border-radius: 3px;
+    background-color: black;
+    margin-left: 5px;
+    color: white;
+    font-weight: 600;
+    letter-spacing: 1px;
+    cursor: pointer;
+}
+
+.searchButton:hover {
+    background-color: gray;
+
 }
 
 .searchInput {
-    width: 400px;
+    width: 100%;
     height: 30px;
 }
