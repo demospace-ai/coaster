@@ -346,6 +346,10 @@ resource "google_storage_bucket" "fabra_frontend_bucket" {
   storage_class = "STANDARD"
 
   uniform_bucket_level_access = true
+
+  website {
+    main_page_suffix = "index.html"
+  }
 }
 
 resource "google_storage_bucket_iam_member" "public_member_read_access" {
@@ -359,4 +363,22 @@ resource "google_compute_backend_bucket" "frontend_backend" {
   description = "Static react web app"
   bucket_name = google_storage_bucket.fabra_frontend_bucket.name
   enable_cdn  = true
+}
+
+resource "google_cloudbuild_trigger" "frontend-build-trigger" {
+  name = "frontend-trigger"
+
+  included_files = ["frontend/**"]
+
+  github {
+    name  = "Fabra"
+    owner = "nfiacco"
+
+    push {
+      branch       = "main"
+      invert_regex = false
+    }
+  }
+
+  filename = "infra/cloudbuild/frontend.yaml"
 }
