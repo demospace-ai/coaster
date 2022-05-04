@@ -224,3 +224,9 @@ resource "google_compute_managed_ssl_certificate" "default" {
     domains = ["app.fabra.io."]
   }
 }
+
+resource "google_compute_global_address" "default" {
+  name         = "fabra-external-address"
+  address_type = "EXTERNAL"
+  ip_version   = "IPV4"
+}
