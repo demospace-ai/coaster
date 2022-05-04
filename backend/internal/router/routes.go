@@ -42,6 +42,18 @@ var Routes = []Route{
 		HandlerFunc: handlers.Search,
 	},
 	{
+		Name:        "Create question",
+		Method:      "POST",
+		Pattern:     "/create_question",
+		HandlerFunc: handlers.CreateQuestion,
+	},
+	{
+		Name:        "Slack event webhook",
+		Method:      "POST",
+		Pattern:     "/slack_event_webhook",
+		HandlerFunc: handlers.SlackEvent,
+	},
+	{
 		Name:        "Send validation code",
 		Method:      "POST",
 		Pattern:     "/validation_code",

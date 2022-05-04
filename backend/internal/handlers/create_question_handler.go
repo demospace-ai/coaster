@@ -32,7 +32,7 @@ func CreateQuestion(env Env, w http.ResponseWriter, r *http.Request) error {
 	post, err := posts.CreateQuestion(env.Db, createQuestionRequest.QuestionTitle, createQuestionRequest.QuestionBody, env.Auth.Session.UserID)
 	if err != nil {
 		return err
-	}g
+	}
 
 	// TODO: don't just return the raw post
 	return json.NewEncoder(w).Encode(CreateQuestionResponse{
