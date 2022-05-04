@@ -22,7 +22,5 @@ func SlackEvent(env Env, w http.ResponseWriter, r *http.Request) error {
 	}
 
 	// TODO: don't just return the raw post
-	return json.NewEncoder(w).Encode(SlackEventResponse{
-		Challenge: slackEventRequest.Challenge,
-	})
+	return json.NewEncoder(w).Encode()
 }

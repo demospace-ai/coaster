@@ -48,6 +48,12 @@ var Routes = []Route{
 		HandlerFunc: handlers.CreateQuestion,
 	},
 	{
+		Name:        "Create answer",
+		Method:      "POST",
+		Pattern:     "/api/create_answer",
+		HandlerFunc: handlers.CreateAnswer,
+	},
+	{
 		Name:        "Slack event webhook",
 		Method:      "POST",
 		Pattern:     "/api/slack_event_webhook",

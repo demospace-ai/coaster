@@ -23,6 +23,22 @@ func CreateQuestion(db *gorm.DB, questionTitle string, questionBody string, user
 	return &post, nil
 }
 
+func CreateAnswer(db *gorm.DB, questionID int64, answerBody string, userID int64) (*models.Post, error) {
+	post := models.Post{
+		PostType:     models.PostTypeQuestion,
+		ParentPostID: sql.NullInt64{Int64: questionID},
+		Body:         answerBody,
+		UserID:       userID,
+	}
+
+	result := db.Create(&post)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &post, nil
+}
+
 func Search(db *gorm.DB, searchQuery string) ([]models.Post, error) {
 	var posts []models.Post
 	result := db.Raw(

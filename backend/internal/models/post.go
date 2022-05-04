@@ -11,10 +11,11 @@ const (
 
 // TODO: add tsvector and company columns
 type Post struct {
-	PostType PostType
-	Title    sql.NullString
-	Body     string
-	UserID   int64
+	PostType     PostType
+	Title        sql.NullString
+	Body         string
+	UserID       int64
+	ParentPostID sql.NullInt64
 
 	BaseModel
 }

@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import React, { FormEvent, useEffect, useRef, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import { useSelector } from "src/root/model";
 import isEmail from 'validator/lib/isEmail';
 import { GoogleLoginResponse, useEmailLogin, useHandleGoogleResponse, useRequestValidationCode } from "./actions";
