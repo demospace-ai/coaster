@@ -19,7 +19,7 @@ export const Header: React.FC = () => {
       <div >
         <div className={styles.rightNavWrapper}>
           {isAuthenticated ? (
-            <h1>Account</h1>
+            <div>Account</div>
           ): (
             <button type="button" className={styles.loginButton} onClick={()=>setShowLoginModal(true)}>Login</button>
           )}
