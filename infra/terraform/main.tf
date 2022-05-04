@@ -221,6 +221,7 @@ module "lb-http" {
   source  = "GoogleCloudPlatform/lb-http/google//modules/serverless_negs"
   version = "~> 6.2.0"
   name    = "fabra-lb"
+  project = "fabra-344902"
 
   ssl                             = true
   managed_ssl_certificate_domains = ["app.fabra.io."]
