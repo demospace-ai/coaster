@@ -13,7 +13,8 @@ type CreateAnswerRequest struct {
 }
 
 type CreateAnswerResponse struct {
-	Post models.Post `json:"post"`
+	Question models.Post   `json:"question"`
+	Answers  []models.Post `json:"answers"`
 }
 
 func CreateAnswer(env Env, w http.ResponseWriter, r *http.Request) error {
@@ -29,13 +30,25 @@ func CreateAnswer(env Env, w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	post, err := posts.CreateAnswer(env.Db, createAnswerRequest.QuestionID, createAnswerRequest.AnswerBody, env.Auth.Session.UserID)
+	_, err = posts.CreateAnswer(env.Db, createAnswerRequest.QuestionID, createAnswerRequest.AnswerBody, env.Auth.Session.UserID)
+	if err != nil {
+		return err
+	}
+
+	// refetch the question and answers now
+	question, err := posts.LoadQuestionByID(env.Db, createAnswerRequest.QuestionID)
+	if err != nil {
+		return err
+	}
+
+	answers, err := posts.LoadAnswersByQuestionID(env.Db, createAnswerRequest.QuestionID)
 	if err != nil {
 		return err
 	}
 
 	// TODO: don't just return the raw post
 	return json.NewEncoder(w).Encode(CreateAnswerResponse{
-		Post: *post,
+		Question: *question,
+		Answers:  answers,
 	})
 }

@@ -15,13 +15,17 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-type NullString struct { sql.NullString }
+type NullString struct{ sql.NullString }
 
 func (s NullString) MarshalJSON() ([]byte, error) {
 	if s.Valid {
 		return json.Marshal(s.String)
 	}
 	return []byte(`null`), nil
+}
+
+func NewNullString(s string) NullString {
+	return NullString{sql.NullString{String: s, Valid: true}}
 }
 
 type NullInt64 struct{ sql.NullInt64 }
@@ -31,6 +35,10 @@ func (i NullInt64) MarshalJSON() ([]byte, error) {
 		return json.Marshal(i.Int64)
 	}
 	return []byte(`null`), nil
+}
+
+func NewNullInt64(i int64) NullInt64 {
+	return NullInt64{sql.NullInt64{Int64: i, Valid: true}}
 }
 
 func InitDatabase() (*gorm.DB, error) {

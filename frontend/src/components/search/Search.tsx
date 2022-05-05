@@ -7,6 +7,7 @@ import styles from './search.m.css';
 
 
 export const Search: React.FC = () => {
+  // TODO: no need for redux here
   const searchResults = useSelector(state => state.search.results)
 
   return (

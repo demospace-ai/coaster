@@ -30,6 +30,11 @@ export const GetQuestion: IEndpoint<{questionID: string}, GetQuestionResponse> =
     path: "/get_question/:questionID",
 }
 
+export const CreateAnswer: IEndpoint<CreateAnswerRequest, CreateAnswerResponse> = {
+    method: "POST",
+    path: "/create_answer",
+}
+
 export interface ValidationCodeRequest {
     email: string;
 }
@@ -48,6 +53,16 @@ export interface LoginResponse {
 }
 
 export interface CheckSessionResponse {
+}
+
+export interface CreateAnswerRequest {
+    question_id: number;
+    answer_body: string;
+}
+
+export interface CreateAnswerResponse {
+    question: Post;
+    answers: Post[];
 }
 
 export interface SearchRequest {

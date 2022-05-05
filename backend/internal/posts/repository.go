@@ -11,7 +11,7 @@ import (
 func CreateQuestion(db *gorm.DB, questionTitle string, questionBody string, userID int64) (*models.Post, error) {
 	post := models.Post{
 		PostType: models.PostTypeQuestion,
-		Title:    database.NullString{sql.NullString{String: questionTitle}},
+		Title:    database.NewNullString(questionTitle),
 		Body:     questionBody,
 		UserID:   userID,
 	}
@@ -54,8 +54,8 @@ func LoadAnswersByQuestionID(db *gorm.DB, questionID int64) ([]models.Post, erro
 
 func CreateAnswer(db *gorm.DB, questionID int64, answerBody string, userID int64) (*models.Post, error) {
 	post := models.Post{
-		PostType:     models.PostTypeQuestion,
-		ParentPostID: database.NullInt64{sql.NullInt64{Int64: questionID}},
+		PostType:     models.PostTypeAnswer,
+		ParentPostID: database.NewNullInt64(questionID),
 		Body:         answerBody,
 		UserID:       userID,
 	}
