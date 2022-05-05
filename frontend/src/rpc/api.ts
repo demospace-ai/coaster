@@ -35,6 +35,11 @@ export const CreateAnswer: IEndpoint<CreateAnswerRequest, CreateAnswerResponse> 
     path: "/create_answer",
 }
 
+export const CreateQuestion: IEndpoint<CreateQuestionRequest, CreateQuestionResponse> = {
+    method: "POST",
+    path: "/create_question",
+}
+
 export interface ValidationCodeRequest {
     email: string;
 }
@@ -53,6 +58,15 @@ export interface LoginResponse {
 }
 
 export interface CheckSessionResponse {
+}
+
+export interface CreateQuestionRequest {
+    question_title: string;
+    question_body: string;
+}
+
+export interface CreateQuestionResponse {
+    question: Post;
 }
 
 export interface CreateAnswerRequest {

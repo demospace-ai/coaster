@@ -13,7 +13,7 @@ type CreateQuestionRequest struct {
 }
 
 type CreateQuestionResponse struct {
-	Post models.Post `json:"post"`
+	Question models.Post `json:"question"`
 }
 
 func CreateQuestion(env Env, w http.ResponseWriter, r *http.Request) error {
@@ -36,6 +36,6 @@ func CreateQuestion(env Env, w http.ResponseWriter, r *http.Request) error {
 
 	// TODO: don't just return the raw post
 	return json.NewEncoder(w).Encode(CreateQuestionResponse{
-		Post: *post,
+		Question: *post,
 	})
 }

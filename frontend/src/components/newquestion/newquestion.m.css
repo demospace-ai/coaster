@@ -1,0 +1,45 @@
+.loadingContainer {
+    margin: 50px 30px;
+    width: 350px;
+    height: 280px;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+.spinner {
+    color: black !important;
+}
+
+.questionContainer {
+    margin: 50px auto 0;
+    width: 70vw;
+}
+
+.submitAnswerButton {
+    margin-top: 20px;
+    border: 1px solid black;
+    border-radius: 3px;
+    padding: 8px 10px;
+    background-color: black;
+    color: white;
+    font-weight: 600;
+    width: 100%;
+    box-sizing: border-box;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all .1s ease-in-out;
+}
+
+.titleContainer {
+    height: 80px;
+}
+
+.bodyContainer {
+    height: 300px;
+    margin-bottom: 40px;
+}
+
+.noResize { 
+    resize: none;
+}

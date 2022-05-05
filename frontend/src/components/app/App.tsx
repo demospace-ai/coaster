@@ -7,6 +7,7 @@ import { Header } from "src/components/header/Header";
 import { Home } from 'src/components/home/Home';
 import { NotFound } from 'src/components/notfound/NotFound';
 import { useSelector } from "src/root/model";
+import { NewQuestion } from "../newquestion/NewQuestion";
 import { Question } from "../question/Question";
 
 export const App: React.FC = () => {
@@ -30,6 +31,9 @@ export const App: React.FC = () => {
         </Route>
         <Route exact path='/question/:id'>
           <Question/>
+        </Route>
+        <Route exact path='/new'>
+          <NewQuestion/>
         </Route>
         <Route path='*'>
           <NotFound/>

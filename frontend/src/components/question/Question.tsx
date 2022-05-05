@@ -51,10 +51,7 @@ export const Question: React.FC = () => {
   const onCreateAnswer = () => {
     createAnswer(id, answerDraft, setLoading, setQuestionResponse);
   }
-const initialValue = [{
-  type: 'paragraph',
-  children: [{ text: 'A line of text in a paragraph.' }],
-}];
+
   return (
     <div className={styles.questionContainer}>
       <div className={styles.question}>
@@ -77,7 +74,7 @@ const initialValue = [{
       <div>
         {/* TODO: actually provide a way to tag someone. */}
         <div style={{paddingBottom: "20px"}}>Know someone who can answer? Tag them here!</div>
-        <div className="container">
+        <div>
           <MDEditor
             value={answerDraft}
             onChange={(value) => {setAnswerDraft(value!)}}

@@ -29,6 +29,25 @@
     width: 100%;
 }
 
+.newQuestionPrompt {
+    margin-top: 20px;
+    display: flex;
+    width: 100%;
+}
+
+.newQuestionButton {
+    height: 30px;
+    box-sizing: content-box;
+    border: 2px solid black;
+    border-radius: 3px;
+    background-color: gray;
+    margin: auto 10px auto;
+    color: white;
+    font-weight: 600;
+    letter-spacing: 1px;
+    cursor: pointer;
+}
+
 .searchButton {
     height: 30px;
     box-sizing: content-box;
