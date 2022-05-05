@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search } from '../search/Search';
+import { SearchComponent } from '../search/Search';
 import styles from './home.m.css';
 
 export const Home: React.FC = () => {
@@ -8,7 +8,7 @@ export const Home: React.FC = () => {
       <div className={styles.title}>
         Welcome to Fabra!
       </div>
-      <Search/>
+      <SearchComponent/>
     </div>
   );
 }

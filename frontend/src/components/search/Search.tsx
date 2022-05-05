@@ -1,30 +1,43 @@
 import React, { FormEvent, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
-import { useSelector } from "src/root/model";
-import { Post } from "src/rpc/api";
-import { useSearch } from "./actions";
+import { sendRequest } from "src/rpc/ajax";
+import { Post, Search } from "src/rpc/api";
 import styles from './search.m.css';
 
 
-export const Search: React.FC = () => {
+export const SearchComponent: React.FC = () => {
   // TODO: no need for redux here
-  const searchResults = useSelector(state => state.search.results)
+  const [results, setResults] = useState<Post[] | undefined>(undefined);
 
   return (
     <div className={styles.search}>
-      <SearchBar/>
-      <SearchResults results={searchResults}/>
+      <SearchBar setResults={setResults}/>
+      <SearchResults results={results}/>
     </div>
   )
 }
 
-const SearchBar: React.FC = () => {
+const search = async (query: string, setLoading: (loading: boolean) => void, setResults: (results: Post[]) => void) => {
+    const payload = {"search_query": query};
+    try {
+      setLoading(true);
+      const response = await sendRequest(Search, payload);
+      setResults(response.posts);
+    } catch (e) {
+    }
+};
+
+type SearchBarProps = {
+  setResults: (results: Post[]) => void;
+}
+
+const SearchBar: React.FC<SearchBarProps> = props => {
   const [ query, setQuery ] = useState("");
-  const search = useSearch();
+  const [loading, setLoading] = useState(true);
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    await search(query);
+    await search(query, setLoading, props.setResults);
   }
 
   return (

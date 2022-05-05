@@ -14,7 +14,7 @@ type SearchRequest struct {
 }
 
 type SearchResponse struct {
-	Posts []models.Post `json:"posts,omitempty"`
+	Posts []models.Post `json:"posts"`
 }
 
 func Search(env Env, w http.ResponseWriter, r *http.Request) error {
@@ -34,6 +34,11 @@ func Search(env Env, w http.ResponseWriter, r *http.Request) error {
 	posts, err := posts.Search(env.Db, searchRequest.SearchQuery)
 	if err != nil {
 		return err
+	}
+
+	// Make JSON encode an empty string rather than null
+	if len(posts) == 0 {
+		posts = []models.Post{}
 	}
 
 	// TODO: don't just return the raw post list
