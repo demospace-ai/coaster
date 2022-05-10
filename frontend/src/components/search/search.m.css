@@ -1,6 +1,6 @@
 .search {
     text-align: center;
-    margin: 20px auto 0;
+    margin: 40px auto 0;
     width: 70vw;
     max-width: 800px;
 }
@@ -40,8 +40,8 @@
     height: 30px;
     box-sizing: content-box;
     border: 2px solid black;
-    border-radius: 3px;
-    background-color: gray;
+    border-radius: 5px;
+    background-color: black;
     margin: auto 10px auto;
     color: white;
     font-weight: 600;
@@ -49,11 +49,15 @@
     cursor: pointer;
 }
 
+.newQuestionButton:hover {
+    background-color: gray;
+}
+
 .searchButton {
-    height: 30px;
+    height: 40px;
     box-sizing: content-box;
     border: 2px solid black;
-    border-radius: 3px;
+    border-radius: 5px;
     background-color: black;
     margin-left: 5px;
     color: white;
@@ -64,10 +68,17 @@
 
 .searchButton:hover {
     background-color: gray;
-
 }
 
 .searchInput {
     width: 100%;
-    height: 30px;
+    height: 40px;
+    padding-left: 10px;
+    border-radius: 5px;
+    border-style: solid;
+}
+
+.noResults {
+    width: fit-content;
+    margin: 0;
 }

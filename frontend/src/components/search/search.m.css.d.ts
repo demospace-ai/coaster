@@ -9,6 +9,7 @@ declare const styles: {
   readonly "newQuestionButton": string;
   readonly "searchButton": string;
   readonly "searchInput": string;
+  readonly "noResults": string;
 };
 export = styles;
 

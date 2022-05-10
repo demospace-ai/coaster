@@ -46,7 +46,7 @@ const SearchBar: React.FC<SearchBarProps> = props => {
             type="text"
             className={styles.searchInput}
             id="question-search"
-            placeholder="Find an answer"
+            placeholder="Find an answer..."
             onChange={e => setQuery(e.target.value)}
         />
         <button className={styles.searchButton} type="submit">Search</button>
@@ -68,6 +68,7 @@ const SearchResults: React.FC<SearchResultsProps> = props => {
   return (
     <div>
       <h2>Results</h2>
+      {props.results.length === 0 && <h3 className={styles.noResults}>No answers found!</h3>}
       <ul className={styles.results}>
         {props.results.map((result, index) => (
           <li key={index} className={styles.result}>
