@@ -49,6 +49,7 @@ export const Question: React.FC = () => {
   }
 
   const onCreateAnswer = () => {
+    setAnswerDraft('');
     createAnswer(id, answerDraft, setLoading, setQuestionResponse);
   }
 
