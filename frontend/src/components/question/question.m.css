@@ -40,20 +40,9 @@
 }
 
 .answerInput {
-    background-color: lightblue;
+    height: 100px;
 }
 
-.submitAnswerButton {
+.answerButton {
     margin-top: 20px;
-    border: 1px solid black;
-    border-radius: 3px;
-    padding: 8px 10px;
-    background-color: black;
-    color: white;
-    font-weight: 600;
-    width: 100%;
-    box-sizing: border-box;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: all .1s ease-in-out;
 }

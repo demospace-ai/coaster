@@ -7,7 +7,7 @@ declare const styles: {
   readonly "answer": string;
   readonly "answersContainer": string;
   readonly "answerInput": string;
-  readonly "submitAnswerButton": string;
+  readonly "answerButton": string;
 };
 export = styles;
 

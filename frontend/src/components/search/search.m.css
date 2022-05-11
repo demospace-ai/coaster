@@ -28,6 +28,30 @@
 .searchBar {
     display: flex;
     width: 100%;
+    height: 40px;
+    border-radius: 30px;
+    border: 2px black solid;
+    background: white;
+}
+
+.searchIconContainer {
+    margin: 8px 10px;
+}
+
+.searchIcon {
+    width: 24px;
+    height: 24px;
+    fill: gray;
+}
+
+.searchInput {
+    width: 100%;
+    background: none;
+    border: none;
+}
+
+.searchInput:focus {
+    outline: none;
 }
 
 .newQuestionPrompt {
@@ -37,45 +61,8 @@
 }
 
 .newQuestionButton {
-    height: 30px;
-    box-sizing: content-box;
-    border: 2px solid black;
-    border-radius: 5px;
-    background-color: black;
-    margin: auto 10px auto;
-    color: white;
-    font-weight: 600;
-    letter-spacing: 1px;
-    cursor: pointer;
-}
-
-.newQuestionButton:hover {
-    background-color: gray;
-}
-
-.searchButton {
     height: 40px;
-    box-sizing: content-box;
-    border: 2px solid black;
-    border-radius: 5px;
-    background-color: black;
-    margin-left: 5px;
-    color: white;
-    font-weight: 600;
-    letter-spacing: 1px;
-    cursor: pointer;
-}
-
-.searchButton:hover {
-    background-color: gray;
-}
-
-.searchInput {
-    width: 100%;
-    height: 40px;
-    padding-left: 10px;
-    border-radius: 5px;
-    border-style: solid;
+    margin: auto 20px;
 }
 
 .noResults {

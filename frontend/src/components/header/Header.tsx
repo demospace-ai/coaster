@@ -2,6 +2,7 @@ import classNames from 'classnames';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'src/root/model';
+import { Button } from '../button/Button';
 import { Login } from '../login/Login';
 import { Modal } from '../modal/Modal';
 import styles from "./header.m.css";
@@ -21,7 +22,7 @@ export const Header: React.FC = () => {
           {isAuthenticated ? (
             <div className={styles.route}>My Account</div>
           ): (
-            <button type="button" className={styles.loginButton} onClick={()=>setShowLoginModal(true)}>Login</button>
+            <Button onClick={()=>setShowLoginModal(true)}>Login</Button>
           )}
         </div>
       </div>

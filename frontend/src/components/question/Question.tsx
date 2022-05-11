@@ -4,6 +4,8 @@ import { sendRequest } from "src/rpc/ajax";
 import { CreateAnswer, GetQuestion, GetQuestionResponse } from "src/rpc/api";
 import styles from "./question.m.css";
 import MDEditor, { codeEdit, codePreview } from '@uiw/react-md-editor';
+import { Button } from "../button/Button";
+import { Editor } from "../editor/Editor";
 
 
 type QuestionParams = {
@@ -75,15 +77,11 @@ export const Question: React.FC = () => {
       <div>
         {/* TODO: actually provide a way to tag someone. */}
         <div style={{paddingBottom: "20px"}}>Know someone who can answer? Tag them here!</div>
-        <div>
-          <MDEditor
-            value={answerDraft}
-            onChange={(value) => {setAnswerDraft(value!)}}
-            extraCommands={[codeEdit, codePreview]}
-            preview={'edit'}
-          />
-        </div>
-        <button className={styles.submitAnswerButton} onClick={onCreateAnswer}>Post your answer</button>
+        <Editor
+          className={styles.answerInput}
+          onChange={value => {setAnswerDraft(JSON.stringify(value))}}
+        />
+        <Button className={styles.answerButton} onClick={onCreateAnswer}>Post your answer</Button>
       </div>
     </div>
   )

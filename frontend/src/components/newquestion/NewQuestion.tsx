@@ -4,6 +4,8 @@ import { useHistory } from "react-router-dom";
 import { CreateQuestion, CreateQuestionResponse } from "src/rpc/api";
 import { sendRequest } from "src/rpc/ajax";
 import styles from "./newquestion.m.css";
+import { Button } from "../button/Button";
+import { Editor } from "../editor/Editor";
 
 
 const createQuestion = async (questionTitle: string, questionBody: string, setLoading: (loading: boolean) => void, setCreateQuestionResponse: (question: CreateQuestionResponse) => void) => {
@@ -42,31 +44,16 @@ export const NewQuestion: React.FC = () => {
   return (
     <div className={styles.questionContainer}>
       <div style={{paddingBottom: "20px"}}>Question Title</div>
-      <div className={styles.titleContainer}>
-        <MDEditor
-          value={titleDraft}
-          onChange={(value) => {setTitleDraft(value!)}}
-          extraCommands={[codeEdit, codePreview]}
-          preview={'edit'}
-          overflow={false}
-          enableScroll={false}
-          hideToolbar={true}
-          height={70}
-          textareaProps={{className: styles.noResize}}
-        />
-      </div>
+      <input
+        className={styles.titleContainer}
+        onChange={e => {setTitleDraft(e.target.value)}}
+      />
       <div style={{paddingBottom: "20px"}}>Question Content</div>
-      <div className={styles.bodyContainer}>
-        <MDEditor
-          value={bodyDraft}
-          onChange={(value) => {setBodyDraft(value!)}}
-          extraCommands={[codeEdit, codePreview]}
-          preview={'edit'}
-          height={300}
-          textareaProps={{className: styles.noResize}}
-        />
-      </div>
-      <button className={styles.submitAnswerButton} onClick={onCreateQuestion}>Ask your question</button>
+      <Editor
+        className={styles.bodyContainer}
+        onChange={value => {setBodyDraft(JSON.stringify(value))}}
+      />
+      <Button className={styles.submitQuestionButton} onClick={onCreateQuestion}>Ask your question</Button>
     </div>
   )
 }

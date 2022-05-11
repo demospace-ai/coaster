@@ -5,10 +5,11 @@ declare const styles: {
   readonly "result": string;
   readonly "results": string;
   readonly "searchBar": string;
+  readonly "searchIconContainer": string;
+  readonly "searchIcon": string;
+  readonly "searchInput": string;
   readonly "newQuestionPrompt": string;
   readonly "newQuestionButton": string;
-  readonly "searchButton": string;
-  readonly "searchInput": string;
   readonly "noResults": string;
 };
 export = styles;
