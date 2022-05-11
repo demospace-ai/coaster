@@ -1,4 +1,3 @@
-import MDEditor, { codeEdit, codePreview } from "@uiw/react-md-editor";
 import { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { CreateQuestion, CreateQuestionResponse } from "src/rpc/api";

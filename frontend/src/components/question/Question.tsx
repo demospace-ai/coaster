@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import { sendRequest } from "src/rpc/ajax";
 import { CreateAnswer, GetQuestion, GetQuestionResponse } from "src/rpc/api";
 import styles from "./question.m.css";
-import MDEditor, { codeEdit, codePreview } from '@uiw/react-md-editor';
 import { Button } from "../button/Button";
 import { Editor } from "../editor/Editor";
 
