@@ -14,9 +14,11 @@ export function useHandleGoogleResponse(): GoogleLoginHandler {
     const id_token = response.credential;
     const payload = {"id_token": id_token};
     try {
-      await sendRequest(Login, payload);
+      const loginResponse = await sendRequest(Login, payload);
       dispatch({
         type: "login.authenticated",
+        firstName: loginResponse.first_name,
+        lastName: loginResponse.last_name,
       });
     } catch (e) {
     }
@@ -51,6 +53,8 @@ export function useEmailLogin() {
       const loginResponse = await sendRequest(Login, payload);
       dispatch({
         type: "login.authenticated",
+        firstName: loginResponse.first_name,
+        lastName: loginResponse.last_name,
       });
     } catch (e) {
     }

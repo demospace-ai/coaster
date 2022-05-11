@@ -1,3 +1,5 @@
+import { stringify } from "querystring";
+
 const INITIAL_LOGIN_STATE: LoginState = {
   authenticated: false,
   validatingCode: false,
@@ -6,12 +8,16 @@ const INITIAL_LOGIN_STATE: LoginState = {
 export interface LoginState {
   authenticated: boolean;
   validatingCode: boolean;
+  firstName?: string;
+  lastName?: string;
   email?: string;
 }
 
 export type LoginAction = 
 | {
   type: "login.authenticated",
+  firstName: string,
+  lastName: string,
 }
 | {
   type: "login.validateCode",
@@ -24,6 +30,8 @@ export function loginReducer(state: LoginState = INITIAL_LOGIN_STATE, action: Lo
     return {
       ...state,
       authenticated: true,
+      firstName: action.firstName,
+      lastName: action.lastName, 
     }
     case "login.validateCode":
     return {

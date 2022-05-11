@@ -88,8 +88,8 @@ func validateAndParseIdToken(ctx context.Context, idToken string) (*users.Extern
 	return &users.ExternalUserInfo{
 		ExternalID: payload.Subject,
 		Email:      payload.Claims["email"].(string),
-		FirstName:  payload.Claims["family_name"].(string),
-		LastName:   payload.Claims["given_name"].(string),
+		FirstName:  payload.Claims["given_name"].(string),
+		LastName:   payload.Claims["family_name"].(string),
 	}, nil
 }
 

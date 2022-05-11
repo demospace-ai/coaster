@@ -55,9 +55,13 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
+    first_name: string;
+    last_name: string;
 }
 
 export interface CheckSessionResponse {
+    first_name: string;
+    last_name: string;
 }
 
 export interface CreateQuestionRequest {
