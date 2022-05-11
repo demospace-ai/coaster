@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { Button } from 'src/components/button/Button';
+import { Editor } from 'src/components/editor/Editor';
 import { sendRequest } from 'src/rpc/ajax';
 import { CreateAnswer, GetQuestion, GetQuestionResponse } from 'src/rpc/api';
-import { Button } from '../button/Button';
-import { Editor } from '../editor/Editor';
 import styles from './question.m.css';
 
 

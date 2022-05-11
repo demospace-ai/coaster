@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button } from 'src/components/button/Button';
+import { Editor } from 'src/components/editor/Editor';
 import { sendRequest } from 'src/rpc/ajax';
 import { CreateQuestion, CreateQuestionResponse } from 'src/rpc/api';
-import { Button } from '../button/Button';
-import { Editor } from '../editor/Editor';
 import styles from './newquestion.m.css';
 
 

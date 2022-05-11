@@ -1,8 +1,8 @@
 import React, { FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Button } from 'src/components/button/Button';
 import { sendRequest } from 'src/rpc/ajax';
 import { Post, Search } from 'src/rpc/api';
-import { Button } from '../button/Button';
 import styles from './search.m.css';
 
 

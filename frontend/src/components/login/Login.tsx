@@ -1,8 +1,10 @@
 import classNames from 'classnames';
 import React, { FormEvent, useEffect, useState } from 'react';
+import {
+  GoogleLoginResponse, useEmailLogin, useHandleGoogleResponse, useRequestValidationCode
+} from 'src/components/login/actions';
 import { useSelector } from 'src/root/model';
 import isEmail from 'validator/lib/isEmail';
-import { GoogleLoginResponse, useEmailLogin, useHandleGoogleResponse, useRequestValidationCode } from './actions';
 import styles from './login.m.css';
 
 const GOOGLE_CLIENT_ID = '932264813910-egpk1omo3v2cedd89k8go851uko6djpa.apps.googleusercontent.com';
