@@ -1,14 +1,14 @@
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
 import {
-  BrowserRouter, Route, Switch
-} from "react-router-dom";
-import { useStart } from "src/components/app/actions";
-import { Header } from "src/components/header/Header";
+  BrowserRouter, Outlet, Route, Routes
+} from 'react-router-dom';
+import { useStart } from 'src/components/app/actions';
+import { Header } from 'src/components/header/Header';
 import { Home } from 'src/components/home/Home';
+import { NewQuestion } from 'src/components/newquestion/NewQuestion';
 import { NotFound } from 'src/components/notfound/NotFound';
-import { useSelector } from "src/root/model";
-import { NewQuestion } from "../newquestion/NewQuestion";
-import { Question } from "../question/Question";
+import { Question } from 'src/components/question/Question';
+import { useSelector } from 'src/root/model';
 
 export const App: React.FC = () => {
   const loading = useSelector(state => state.app.loading);
@@ -19,26 +19,28 @@ export const App: React.FC = () => {
   }, [start]);
 
   if (loading) {
-    return <div data-testid="loading"/>
+    return <div data-testid='loading' />
   }
 
   return (
     <BrowserRouter>
-      <Header/>
-      <Switch>
-        <Route exact path='/'>
-          <Home/>
+      <Routes>
+        <Route element={<AppLayout />}>
+          <Route path='/' element={<Home />} />
+          <Route path='/question/:id' element={<Question />} />
+          <Route path='/new' element={<NewQuestion />} />
+          <Route path='*' element={<NotFound />} />
         </Route>
-        <Route exact path='/question/:id'>
-          <Question/>
-        </Route>
-        <Route exact path='/new'>
-          <NewQuestion/>
-        </Route>
-        <Route path='*'>
-          <NotFound/>
-        </Route>
-      </Switch>
+      </Routes>
     </BrowserRouter>
   );
+}
+
+const AppLayout: React.FC = () => {
+  return (
+    <>
+      <Header />
+      <Outlet />
+    </>
+  )
 }

@@ -11,13 +11,13 @@ interface ModalProps {
 export const Modal: React.FC<ModalProps> = props => {
   useEffect(() => {
     const escFunction = (event: KeyboardEvent) => {
-      if(event.key === "Escape") {
+      if (event.key === 'Escape') {
         props.close();
-        document.removeEventListener("keydown", escFunction);
+        document.removeEventListener('keydown', escFunction);
       }
     };
 
-    document.addEventListener("keydown", escFunction);
+    document.addEventListener('keydown', escFunction);
   })
 
   const showHideClassName = props.show ? styles.displayBlock : styles.displayNone;

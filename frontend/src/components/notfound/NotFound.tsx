@@ -1,6 +1,6 @@
-import React from "react";
-import styles from "./notfound.m.css";
-import image from "./travolta.gif";
+import React from 'react';
+import styles from './notfound.m.css';
+import image from './travolta.gif';
 
 export const NotFound: React.FC = () => {
   return (
@@ -9,7 +9,7 @@ export const NotFound: React.FC = () => {
         <h3>Not Found!</h3>
       </div>
       <div className={styles.body}>
-        <img className={styles.image} src={image} alt="loading..." />
+        <img className={styles.image} src={image} alt='loading...' />
       </div>
     </>
   );

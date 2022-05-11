@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { SearchComponent } from 'src/components/search/Search';
 import { useSelector } from 'src/root/model';
-import { SearchComponent } from '../search/Search';
 import styles from './home.m.css';
 
 export const Home: React.FC = () => {
@@ -11,7 +11,7 @@ export const Home: React.FC = () => {
       <div className={styles.title}>
         Welcome, {firstName}!
       </div>
-      <SearchComponent/>
+      <SearchComponent />
     </div>
   );
 }

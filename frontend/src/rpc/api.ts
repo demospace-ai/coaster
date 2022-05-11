@@ -1,43 +1,43 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export interface IEndpoint<RequestType, ResponseType> {
-    method: "GET" | "POST" | "DELETE" | "PUT";
+    method: 'GET' | 'POST' | 'DELETE' | 'PUT';
     path: string;
 }
 
 export const Login: IEndpoint<LoginRequest, LoginResponse> = {
-    method: "POST",
-    path: "/login",
+    method: 'POST',
+    path: '/login',
 };
 
 export const CheckSession: IEndpoint<undefined, CheckSessionResponse> = {
-    method: "GET",
-    path: "/check_session",
+    method: 'GET',
+    path: '/check_session',
 };
 
 
 export const Search: IEndpoint<SearchRequest, SearchResponse> = {
-    method: "POST",
-    path: "/search",
+    method: 'POST',
+    path: '/search',
 };
 
 export const ValidationCode: IEndpoint<ValidationCodeRequest, undefined> = {
-    method: "POST",
-    path: "/validation_code",
+    method: 'POST',
+    path: '/validation_code',
 };
 
-export const GetQuestion: IEndpoint<{questionID: string}, GetQuestionResponse> = {
-    method: "GET",
-    path: "/get_question/:questionID",
+export const GetQuestion: IEndpoint<{ questionID: string }, GetQuestionResponse> = {
+    method: 'GET',
+    path: '/get_question/:questionID',
 }
 
 export const CreateAnswer: IEndpoint<CreateAnswerRequest, CreateAnswerResponse> = {
-    method: "POST",
-    path: "/create_answer",
+    method: 'POST',
+    path: '/create_answer',
 }
 
 export const CreateQuestion: IEndpoint<CreateQuestionRequest, CreateQuestionResponse> = {
-    method: "POST",
-    path: "/create_question",
+    method: 'POST',
+    path: '/create_question',
 }
 
 export interface ValidationCodeRequest {

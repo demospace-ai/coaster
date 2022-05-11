@@ -1,11 +1,11 @@
-import classNames from "classnames";
-import React, { FormEvent, useEffect, useState } from "react";
-import { useSelector } from "src/root/model";
+import classNames from 'classnames';
+import React, { FormEvent, useEffect, useState } from 'react';
+import { useSelector } from 'src/root/model';
 import isEmail from 'validator/lib/isEmail';
-import { GoogleLoginResponse, useEmailLogin, useHandleGoogleResponse, useRequestValidationCode } from "./actions";
-import styles from "./login.m.css";
+import { GoogleLoginResponse, useEmailLogin, useHandleGoogleResponse, useRequestValidationCode } from './actions';
+import styles from './login.m.css';
 
-const GOOGLE_CLIENT_ID = "932264813910-egpk1omo3v2cedd89k8go851uko6djpa.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = '932264813910-egpk1omo3v2cedd89k8go851uko6djpa.apps.googleusercontent.com';
 const CODE_LENGTH = 6;
 
 interface LoginProps {
@@ -13,7 +13,7 @@ interface LoginProps {
 }
 
 export const Login: React.FC<LoginProps> = props => {
-  const [ loading, setLoading ] = useState(false);
+  const [loading, setLoading] = useState(false);
   const validatingCode = useSelector(state => state.login.validatingCode);
   const authenticated = useSelector(state => state.login.authenticated);
   const handleGoogleResponse = useHandleGoogleResponse();
@@ -25,18 +25,18 @@ export const Login: React.FC<LoginProps> = props => {
   if (loading) {
     return (
       <div className={styles.loadingContainer}>
-        <div className={styles.spinner}/>
+        <div className={styles.spinner} />
       </div>
     )
   }
 
   const loginOptions = (
     <>
-      <GoogleLogin onGoogleSignIn={handleGoogleResponse}/>
+      <GoogleLogin onGoogleSignIn={handleGoogleResponse} />
       <div className={styles.marginTop}>
         or
       </div>
-      <EmailLogin setLoading={setLoading}/>
+      <EmailLogin setLoading={setLoading} />
     </>
   );
 
@@ -44,7 +44,7 @@ export const Login: React.FC<LoginProps> = props => {
     <div className={styles.loginContainer}>
       <h2 className={classNames(styles.center, styles.header)}>Fabra</h2>
       <div className={classNames(styles.center, styles.loginGroup)}>
-        {validatingCode ? (<ValidationCodeInput/>) : loginOptions}
+        {validatingCode ? (<ValidationCodeInput />) : loginOptions}
       </div>
     </div>
   );
@@ -52,7 +52,7 @@ export const Login: React.FC<LoginProps> = props => {
 
 const useScript = (url: string, onload: () => void) => {
   useEffect(() => {
-    const script = document.createElement("script");
+    const script = document.createElement('script');
 
     script.src = url;
     script.onload = onload;
@@ -66,23 +66,23 @@ const useScript = (url: string, onload: () => void) => {
 };
 
 function GoogleLogin({
-  onGoogleSignIn = (response: GoogleLoginResponse) => {},
-  text = "continue_with",
+  onGoogleSignIn = (response: GoogleLoginResponse) => { },
+  text = 'continue_with',
 }) {
   const googleSignInButton = React.createRef<HTMLDivElement>();
 
-  useScript("https://accounts.google.com/gsi/client", () => {
+  useScript('https://accounts.google.com/gsi/client', () => {
     window.google.accounts.id.initialize({
       client_id: GOOGLE_CLIENT_ID,
       callback: onGoogleSignIn,
     });
     window.google.accounts.id.renderButton(
       googleSignInButton.current!,
-      { theme: "filled_blue", size: "large", text, width: "320", } // customization attributes
+      { theme: 'filled_blue', size: 'large', text, width: '320', } // customization attributes
     );
   });
 
-  return <div className="google-login" ref={googleSignInButton}></div>;
+  return <div className='google-login' ref={googleSignInButton}></div>;
 }
 
 interface EmailLoginProps {
@@ -90,13 +90,13 @@ interface EmailLoginProps {
 }
 
 const EmailLogin: React.FC<EmailLoginProps> = props => {
-  const [ email, setEmail ] = useState("");
-  const [ isValid, setIsValid ] = useState(true);
+  const [email, setEmail] = useState('');
+  const [isValid, setIsValid] = useState(true);
   const requestValidationCode = useRequestValidationCode();
 
   const onKeydown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     event.stopPropagation();
-    if(event.key === "Escape") {
+    if (event.key === 'Escape') {
       event.currentTarget.blur();
     }
   }
@@ -126,18 +126,18 @@ const EmailLogin: React.FC<EmailLoginProps> = props => {
   return (
     <form className={styles.marginTop} onSubmit={onSubmit}>
       <input
-        type="text"
-        id="email"
-        name="email"
-        autoComplete="email"
-        placeholder="Email"
+        type='text'
+        id='email'
+        name='email'
+        autoComplete='email'
+        placeholder='Email'
         className={classNames(classes)}
         onKeyDown={onKeydown}
         onChange={e => setEmail(e.target.value)}
         onBlur={validateEmail}
       />
       {!isValid && <div className={styles.invalidLabel}>Please enter a valid email.</div>}
-      <input type="submit" value="Continue" className={styles.submit}/>
+      <input type='submit' value='Continue' className={styles.submit} />
     </form>
   );
 };
@@ -145,13 +145,13 @@ const EmailLogin: React.FC<EmailLoginProps> = props => {
 
 const ValidationCodeInput: React.FC = () => {
   const email = useSelector(state => state.login.email);
-  const [ code, setCode ] = useState("");
-  const [ isValid, setIsValid ] = useState(true);
+  const [code, setCode] = useState('');
+  const [isValid, setIsValid] = useState(true);
   const emailLogin = useEmailLogin();
 
   const onKeydown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     event.stopPropagation();
-    if(event.key === "Escape") {
+    if (event.key === 'Escape') {
       event.currentTarget.blur();
     }
   }
@@ -164,7 +164,7 @@ const ValidationCodeInput: React.FC = () => {
 
   const updateCode = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value;
-    const cleaned = raw.replace(/\D/g,'');
+    const cleaned = raw.replace(/\D/g, '');
     setCode(cleaned);
   }
 
@@ -175,7 +175,7 @@ const ValidationCodeInput: React.FC = () => {
     }
 
     if (!email) {
-      console.log("Something went wrong.");
+      console.log('Something went wrong.');
       return;
     }
 
@@ -190,11 +190,11 @@ const ValidationCodeInput: React.FC = () => {
   return (
     <form className={styles.extraMarginTop} onSubmit={onSubmit}>
       <input
-        type="text"
-        id="code"
-        name="code"
-        autoComplete="one-time-code"
-        placeholder="Code"
+        type='text'
+        id='code'
+        name='code'
+        autoComplete='one-time-code'
+        placeholder='Code'
         className={classNames(classes)}
         onKeyDown={onKeydown}
         onChange={updateCode}
@@ -202,7 +202,7 @@ const ValidationCodeInput: React.FC = () => {
         value={code}
       />
       {!isValid && <div className={styles.invalidLabel}>Invalid code.</div>}
-      <input type="submit" value="Continue" className={styles.submit}/>
+      <input type='submit' value='Continue' className={styles.submit} />
     </form>
   );
 };

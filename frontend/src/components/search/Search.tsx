@@ -1,8 +1,8 @@
-import React, { FormEvent, useState } from "react";
-import { Link, useHistory } from "react-router-dom";
-import { sendRequest } from "src/rpc/ajax";
-import { Post, Search } from "src/rpc/api";
-import { Button } from "../button/Button";
+import React, { FormEvent, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { sendRequest } from 'src/rpc/ajax';
+import { Post, Search } from 'src/rpc/api';
+import { Button } from '../button/Button';
 import styles from './search.m.css';
 
 
@@ -12,20 +12,20 @@ export const SearchComponent: React.FC = () => {
 
   return (
     <div className={styles.search}>
-      <SearchBar setResults={setResults}/>
-      <SearchResults results={results}/>
+      <SearchBar setResults={setResults} />
+      <SearchResults results={results} />
     </div>
   )
 }
 
 const search = async (query: string, setLoading: (loading: boolean) => void, setResults: (results: Post[]) => void) => {
-    const payload = {"search_query": query};
-    try {
-      setLoading(true);
-      const response = await sendRequest(Search, payload);
-      setResults(response.posts);
-    } catch (e) {
-    }
+  const payload = { 'search_query': query };
+  try {
+    setLoading(true);
+    const response = await sendRequest(Search, payload);
+    setResults(response.posts);
+  } catch (e) {
+  }
 };
 
 type SearchBarProps = {
@@ -33,7 +33,7 @@ type SearchBarProps = {
 }
 
 const SearchBar: React.FC<SearchBarProps> = props => {
-  const [ query, setQuery ] = useState("");
+  const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(true);
 
   const onSubmit = async (e: FormEvent) => {
@@ -43,18 +43,18 @@ const SearchBar: React.FC<SearchBarProps> = props => {
 
   return (
     <form className={styles.searchBar} onSubmit={onSubmit}>
-        <span className={styles.searchIconContainer}>
-          <svg className={styles.searchIcon}>
-            <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
-          </svg>
-        </span>
-        <input
-          className={styles.searchInput}
-          type="text"
-          id="question-search"
-          placeholder="Find an answer..."
-          onChange={e => setQuery(e.target.value)}
-        />
+      <span className={styles.searchIconContainer}>
+        <svg className={styles.searchIcon}>
+          <path d='M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'></path>
+        </svg>
+      </span>
+      <input
+        className={styles.searchInput}
+        type='text'
+        id='question-search'
+        placeholder='Find an answer...'
+        onChange={e => setQuery(e.target.value)}
+      />
     </form>
   )
 };
@@ -64,7 +64,7 @@ type SearchResultsProps = {
 }
 
 const SearchResults: React.FC<SearchResultsProps> = props => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   if (props.results === undefined) {
     return <></>
@@ -86,10 +86,9 @@ const SearchResults: React.FC<SearchResultsProps> = props => {
       </ul>
       <div className={styles.newQuestionPrompt}>
         <h3>Not finding what you're looking for?</h3>
-        <Button className={styles.newQuestionButton} onClick={() => {history.push("/new")}}>Ask a question</Button>
+        <Button className={styles.newQuestionButton} onClick={() => { navigate('/new') }}>Ask a question</Button>
       </div>
     </div>
   );
 };
-  
-  
+

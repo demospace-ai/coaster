@@ -1,10 +1,10 @@
-export type AppAction = 
-| {
-  type: "loading"
-}
-| {
-  type: "done"
-};
+export type AppAction =
+  | {
+    type: 'loading'
+  }
+  | {
+    type: 'done'
+  };
 
 const INITIAL_APP_STATE: AppState = {
   loading: true,
@@ -16,17 +16,17 @@ export interface AppState {
 
 export function appReducer(state: AppState = INITIAL_APP_STATE, action: AppAction): AppState {
   switch (action.type) {
-    case "loading":
-    return {
-      ...state,
-      loading: true,
-    }
-    case "done":
-    return {
-      ...state,
-      loading: false,
-    }
+    case 'loading':
+      return {
+        ...state,
+        loading: true,
+      }
+    case 'done':
+      return {
+        ...state,
+        loading: false,
+      }
     default:
-    return state;
+      return state;
   }
 }

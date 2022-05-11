@@ -1,7 +1,7 @@
-import { render } from "@testing-library/react";
-import { ReactElement } from "react";
-import { Provider } from "react-redux";
-import createMockStore, { MockStore } from "redux-mock-store";
+import { render } from '@testing-library/react';
+import { ReactElement } from 'react';
+import { Provider } from 'react-redux';
+import createMockStore, { MockStore } from 'redux-mock-store';
 
 export const mockStore = createMockStore();
 

@@ -8,13 +8,13 @@ export function useStart() {
     try {
       const checkSessionResponse = await sendRequest(CheckSession);
       dispatch({
-        type: "login.authenticated",
+        type: 'login.authenticated',
         firstName: checkSessionResponse.first_name,
         lastName: checkSessionResponse.last_name,
       });
     } catch (e) {
     }
 
-    dispatch({type: "done"});
+    dispatch({ type: 'done' });
   };
 }
