@@ -81,6 +81,6 @@ export const Question: React.FC = () => {
         />
         <Button className={styles.answerButton} onClick={onCreateAnswer}>Post your answer</Button>
       </div>
-    </div>
+    </div >
   );
 };

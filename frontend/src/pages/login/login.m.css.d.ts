@@ -6,7 +6,6 @@ declare const styles: {
   readonly "center": string;
   readonly "loginPane": string;
   readonly "loginLabel": string;
-  readonly "fabraIcon": string;
   readonly "loginGroup": string;
   readonly "marginTop": string;
   readonly "extraMarginTop": string;

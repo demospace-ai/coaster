@@ -2,14 +2,14 @@ import React, { useEffect } from 'react';
 import {
   BrowserRouter, Outlet, Route, Routes
 } from 'react-router-dom';
-import { useStart } from 'src/components/app/actions';
+import { useStart } from 'src/app/actions';
 import { Header } from 'src/components/header/Header';
-import { Home } from 'src/components/home/Home';
 import { Loading } from 'src/components/loading/Loading';
-import { Login } from 'src/components/login/Login';
-import { NewQuestion } from 'src/components/newquestion/NewQuestion';
-import { NotFound } from 'src/components/notfound/NotFound';
-import { Question } from 'src/components/question/Question';
+import { Home } from 'src/pages/home/Home';
+import { Login } from 'src/pages/login/Login';
+import { NewQuestion } from 'src/pages/newquestion/NewQuestion';
+import { NotFound } from 'src/pages/notfound/NotFound';
+import { Question } from 'src/pages/question/Question';
 import { useSelector } from 'src/root/model';
 
 export const App: React.FC = () => {
@@ -39,7 +39,7 @@ export const App: React.FC = () => {
       </Routes>
     </BrowserRouter>
   );
-}
+};
 
 const AppLayout: React.FC = () => {
   return (
@@ -47,5 +47,5 @@ const AppLayout: React.FC = () => {
       <Header />
       <Outlet />
     </>
-  )
-}
+  );
+};

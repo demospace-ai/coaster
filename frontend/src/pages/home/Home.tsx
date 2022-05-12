@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SearchComponent } from 'src/components/search/Search';
+import { SearchComponent } from 'src/pages/search/Search';
 import { useSelector } from 'src/root/model';
 import styles from './home.m.css';
 
@@ -16,7 +16,7 @@ export const Home: React.FC = () => {
   });
 
   return (
-    <div>
+    <div className={styles.home}>
       <div className={styles.title}>
         Welcome, {firstName}!
       </div>

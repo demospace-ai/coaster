@@ -5,8 +5,8 @@ import { FormButton } from 'src/components/button/Button';
 import { Loading } from 'src/components/loading/Loading';
 import {
   GoogleLoginResponse, useEmailLogin, useHandleGoogleResponse, useRequestValidationCode
-} from 'src/components/login/actions';
-import loginImage from 'src/components/login/login.png';
+} from 'src/pages/login/actions';
+import loginImage from 'src/pages/login/login.png';
 import { useSelector } from 'src/root/model';
 import isEmail from 'validator/lib/isEmail';
 import styles from './login.m.css';

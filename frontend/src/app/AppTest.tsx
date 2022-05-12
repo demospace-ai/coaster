@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react';
 import React from 'react';
-import { App } from 'src/components/app/App';
+import { App } from 'src/app/App';
 import { mockStore, renderWithProvider } from 'src/test/utils';
 
 test('renders loading when loading', async () => {
