@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button } from 'src/components/button/Button';
 import { Editor } from 'src/components/editor/Editor';
+import { Loading } from 'src/components/loading/Loading';
 import { sendRequest } from 'src/rpc/ajax';
 import { CreateAnswer, GetQuestion, GetQuestionResponse } from 'src/rpc/api';
 import styles from './question.m.css';
@@ -19,7 +20,7 @@ const getQuestion = async (id: string, setLoading: (loading: boolean) => void, s
     setLoading(false);
   } catch (e) {
   }
-}
+};
 
 const createAnswer = async (questionID: string, answerBody: string, setLoading: (loading: boolean) => void, setQuestionResponse: (question: GetQuestionResponse) => void) => {
   setLoading(true);
@@ -30,7 +31,7 @@ const createAnswer = async (questionID: string, answerBody: string, setLoading: 
     setLoading(false);
   } catch (e) {
   }
-}
+};
 
 export const Question: React.FC = () => {
   const { id } = useParams<QuestionParams>();
@@ -43,16 +44,14 @@ export const Question: React.FC = () => {
 
   if (loading) {
     return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.spinner} />
-      </div>
-    )
+      <Loading />
+    );
   }
 
   const onCreateAnswer = () => {
     setAnswerDraft('');
     createAnswer(id!, answerDraft, setLoading, setQuestionResponse);
-  }
+  };
 
   return (
     <div className={styles.questionContainer}>
@@ -78,10 +77,10 @@ export const Question: React.FC = () => {
         <div style={{ paddingBottom: '20px' }}>Know someone who can answer? Tag them here!</div>
         <Editor
           className={styles.answerInput}
-          onChange={value => { setAnswerDraft(JSON.stringify(value)) }}
+          onChange={value => { setAnswerDraft(JSON.stringify(value)); }}
         />
         <Button className={styles.answerButton} onClick={onCreateAnswer}>Post your answer</Button>
       </div>
     </div>
-  )
-}
+  );
+};

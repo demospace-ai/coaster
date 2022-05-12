@@ -1,10 +1,12 @@
 declare const styles: {
+  readonly "loginPage": string;
+  readonly "imageTitle": string;
+  readonly "infoPane": string;
+  readonly "loginImage": string;
   readonly "center": string;
-  readonly "loginContainer": string;
-  readonly "loadingContainer": string;
-  readonly "spinner": string;
-  readonly "header": string;
+  readonly "loginPane": string;
   readonly "loginLabel": string;
+  readonly "fabraIcon": string;
   readonly "loginGroup": string;
   readonly "marginTop": string;
   readonly "extraMarginTop": string;
@@ -12,9 +14,6 @@ declare const styles: {
   readonly "invalidBorder": string;
   readonly "invalidLabel": string;
   readonly "submit": string;
-  readonly "loginButton": string;
-  readonly "buttonContentWrapper": string;
-  readonly "iconWrapper": string;
 };
 export = styles;
 

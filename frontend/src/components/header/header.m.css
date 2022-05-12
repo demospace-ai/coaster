@@ -19,6 +19,7 @@
     font-size: 20px;
     font-weight: 550;
     transition: all .2s ease-in-out;
+    cursor: pointer;
 }
 
 .route:hover {

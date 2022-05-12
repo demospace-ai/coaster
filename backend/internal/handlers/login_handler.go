@@ -56,12 +56,13 @@ func Login(env Env, w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
 
 	var token *string
+	var userIdentity *models.UserIdentity
 	switch {
 	case loginRequest.IdToken != nil:
-		_, token, err = googleLogin(ctx, env.Db, *loginRequest.IdToken)
+		userIdentity, token, err = googleLogin(ctx, env.Db, *loginRequest.IdToken)
 	case loginRequest.EmailAuthentication != nil:
 		// TODO: need to collect names when creating an account via email
-		_, token, err = emailLogin(env.Db, *loginRequest.EmailAuthentication)
+		userIdentity, token, err = emailLogin(env.Db, *loginRequest.EmailAuthentication)
 	default:
 		return errors.BadRequest
 	}
@@ -71,7 +72,10 @@ func Login(env Env, w http.ResponseWriter, r *http.Request) error {
 	}
 
 	auth.AddSessionCookie(w, *token)
-	return json.NewEncoder(w).Encode(LoginResponse{})
+	return json.NewEncoder(w).Encode(LoginResponse{
+		FirstName: userIdentity.FirstName,
+		LastName:  userIdentity.LastName,
+	})
 }
 
 func validateAndParseIdToken(ctx context.Context, idToken string) (*users.ExternalUserInfo, error) {
@@ -99,7 +103,7 @@ func googleLogin(ctx context.Context, db *gorm.DB, idToken string) (*models.User
 		return nil, nil, err
 	}
 
-	user, err := users.GetOrCreateForExternalInfo(db, externalUserInfo)
+	user, userIdentity, err := users.GetOrCreateForExternalInfo(db, externalUserInfo)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -109,7 +113,7 @@ func googleLogin(ctx context.Context, db *gorm.DB, idToken string) (*models.User
 		return nil, nil, err
 	}
 
-	return nil, token, nil
+	return userIdentity, token, nil
 }
 
 func emailLogin(db *gorm.DB, emailAuthentication EmailAuthentication) (*models.UserIdentity, *string, error) {

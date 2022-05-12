@@ -72,44 +72,49 @@ func create(db *gorm.DB) (*models.User, error) {
 	return &user, nil
 }
 
-func CreateUserForExternalInfo(db *gorm.DB, externalUserInfo *ExternalUserInfo) (*models.User, error) {
+func CreateUserForExternalInfo(db *gorm.DB, externalUserInfo *ExternalUserInfo) (*models.User, *models.UserIdentity, error) {
 	user, err := create(db)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	_, err = external_profiles.Create(db, externalUserInfo.ExternalID, user.ID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	_, err = emails.Create(db, externalUserInfo.Email, user.ID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	_, err = user_identities.Create(db, externalUserInfo.FirstName, externalUserInfo.LastName, user.ID)
+	userIdentity, err := user_identities.Create(db, externalUserInfo.FirstName, externalUserInfo.LastName, user.ID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return user, nil
+	return user, userIdentity, nil
 }
 
-func GetOrCreateForExternalInfo(db *gorm.DB, externalUserInfo *ExternalUserInfo) (*models.User, error) {
+func GetOrCreateForExternalInfo(db *gorm.DB, externalUserInfo *ExternalUserInfo) (*models.User, *models.UserIdentity, error) {
 	existingUser, err := LoadByExternalID(db, externalUserInfo.ExternalID)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, err
+		return nil, nil, err
 	} else if err == nil {
-		return existingUser, nil
+		userIdentity, err := user_identities.LoadByUserID(db, existingUser.ID)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		return existingUser, userIdentity, nil
 	}
 
-	user, err := CreateUserForExternalInfo(db, externalUserInfo)
+	user, userIdentity, err := CreateUserForExternalInfo(db, externalUserInfo)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return user, nil
+	return user, userIdentity, nil
 }
 
 func CreateUserForEmail(db *gorm.DB, email string) (*models.User, error) {

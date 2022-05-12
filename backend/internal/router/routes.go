@@ -30,6 +30,12 @@ var Routes = []Route{
 		HandlerFunc: handlers.CheckSession,
 	},
 	{
+		Name:        "Logout",
+		Method:      "DELETE",
+		Pattern:     "/api/logout",
+		HandlerFunc: handlers.Logout,
+	},
+	{
 		Name:        "Login",
 		Method:      "POST",
 		Pattern:     "/api/login",

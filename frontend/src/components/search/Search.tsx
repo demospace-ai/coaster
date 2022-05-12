@@ -15,8 +15,8 @@ export const SearchComponent: React.FC = () => {
       <SearchBar setResults={setResults} />
       <SearchResults results={results} />
     </div>
-  )
-}
+  );
+};
 
 const search = async (query: string, setLoading: (loading: boolean) => void, setResults: (results: Post[]) => void) => {
   const payload = { 'search_query': query };
@@ -30,16 +30,16 @@ const search = async (query: string, setLoading: (loading: boolean) => void, set
 
 type SearchBarProps = {
   setResults: (results: Post[]) => void;
-}
+};
 
 const SearchBar: React.FC<SearchBarProps> = props => {
   const [query, setQuery] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     await search(query, setLoading, props.setResults);
-  }
+  };
 
   return (
     <form className={styles.searchBar} onSubmit={onSubmit}>
@@ -56,18 +56,18 @@ const SearchBar: React.FC<SearchBarProps> = props => {
         onChange={e => setQuery(e.target.value)}
       />
     </form>
-  )
+  );
 };
 
 type SearchResultsProps = {
   results?: Post[];
-}
+};
 
 const SearchResults: React.FC<SearchResultsProps> = props => {
   const navigate = useNavigate();
 
   if (props.results === undefined) {
-    return <></>
+    return <></>;
   }
 
   return (
@@ -86,7 +86,7 @@ const SearchResults: React.FC<SearchResultsProps> = props => {
       </ul>
       <div className={styles.newQuestionPrompt}>
         <h3>Not finding what you're looking for?</h3>
-        <Button className={styles.newQuestionButton} onClick={() => { navigate('/new') }}>Ask a question</Button>
+        <Button className={styles.newQuestionButton} onClick={() => { navigate('/new'); }}>Ask a question</Button>
       </div>
     </div>
   );

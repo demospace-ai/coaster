@@ -5,14 +5,30 @@ type ButtonProps = {
   onClick: () => void;
   children: React.ReactNode;
   className?: string;
-}
+};
 
 export const Button: React.FC<ButtonProps> = props => {
   return (
     <button
       className={classNames(styles.button, props.className)}
       type='button'
-      onClick={props.onClick}>{props.children}
+      onClick={props.onClick}>
+      {props.children}
     </button>
-  )
-}
+  );
+};
+
+type FormButtonProps = {
+  value: string;
+  className?: string;
+};
+
+export const FormButton: React.FC<FormButtonProps> = props => {
+  return (
+    <input
+      className={classNames(styles.button, props.className)}
+      type='submit'
+      value={props.value}>
+    </input>
+  );
+};

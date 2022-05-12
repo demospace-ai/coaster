@@ -4,7 +4,7 @@ import { Login, ValidationCode } from 'src/rpc/api';
 
 export type GoogleLoginResponse = {
   credential: string;
-}
+};
 
 export type GoogleLoginHandler = (response: GoogleLoginResponse) => void;
 

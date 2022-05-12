@@ -1,8 +1,12 @@
 import classNames from 'classnames';
 import React, { FormEvent, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FormButton } from 'src/components/button/Button';
+import { Loading } from 'src/components/loading/Loading';
 import {
   GoogleLoginResponse, useEmailLogin, useHandleGoogleResponse, useRequestValidationCode
 } from 'src/components/login/actions';
+import loginImage from 'src/components/login/login.png';
 import { useSelector } from 'src/root/model';
 import isEmail from 'validator/lib/isEmail';
 import styles from './login.m.css';
@@ -10,26 +14,23 @@ import styles from './login.m.css';
 const GOOGLE_CLIENT_ID = '932264813910-egpk1omo3v2cedd89k8go851uko6djpa.apps.googleusercontent.com';
 const CODE_LENGTH = 6;
 
-interface LoginProps {
-  closeModal: () => void;
-}
-
-export const Login: React.FC<LoginProps> = props => {
+export const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const validatingCode = useSelector(state => state.login.validatingCode);
-  const authenticated = useSelector(state => state.login.authenticated);
+  const isAuthenticated = useSelector(state => state.login.authenticated);
   const handleGoogleResponse = useHandleGoogleResponse();
+  const navigate = useNavigate();
 
-  if (authenticated) {
-    props.closeModal();
-  }
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    }
+  });
 
   if (loading) {
     return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.spinner} />
-      </div>
-    )
+      <Loading />
+    );
   }
 
   const loginOptions = (
@@ -43,10 +44,17 @@ export const Login: React.FC<LoginProps> = props => {
   );
 
   return (
-    <div className={styles.loginContainer}>
-      <h2 className={classNames(styles.center, styles.header)}>Fabra</h2>
-      <div className={classNames(styles.center, styles.loginGroup)}>
-        {validatingCode ? (<ValidationCodeInput />) : loginOptions}
+    <div className={styles.loginPage}>
+      <div className={styles.infoPane}>
+        <h1 className={styles.imageTitle}>Find the answer to every question</h1>
+        <img className={styles.loginImage} src={loginImage} alt='A rocket ship' />
+      </div>
+      <div className={styles.loginPane}>
+
+        <h1 className={styles.center}>Welcome to Fabra!</h1>
+        <div className={classNames(styles.center, styles.loginGroup)}>
+          {validatingCode ? (<ValidationCodeInput />) : loginOptions}
+        </div>
       </div>
     </div>
   );
@@ -68,7 +76,7 @@ const useScript = (url: string, onload: () => void) => {
 };
 
 function GoogleLogin({
-  onGoogleSignIn = (response: GoogleLoginResponse) => { },
+  onGoogleSignIn = (_: GoogleLoginResponse) => { },
   text = 'continue_with',
 }) {
   const googleSignInButton = React.createRef<HTMLDivElement>();
@@ -80,11 +88,11 @@ function GoogleLogin({
     });
     window.google.accounts.id.renderButton(
       googleSignInButton.current!,
-      { theme: 'filled_blue', size: 'large', text, width: '320', } // customization attributes
+      { theme: 'filled_blue', size: 'large', text, width: 400 }
     );
   });
 
-  return <div className='google-login' ref={googleSignInButton}></div>;
+  return <div ref={googleSignInButton}></div>;
 }
 
 interface EmailLoginProps {
@@ -101,13 +109,13 @@ const EmailLogin: React.FC<EmailLoginProps> = props => {
     if (event.key === 'Escape') {
       event.currentTarget.blur();
     }
-  }
+  };
 
   const validateEmail = (): boolean => {
     const valid = isEmail(email);
     setIsValid(valid);
     return valid;
-  }
+  };
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -118,7 +126,7 @@ const EmailLogin: React.FC<EmailLoginProps> = props => {
 
     await requestValidationCode(email);
     props.setLoading(false);
-  }
+  };
 
   let classes = [styles.input];
   if (!isValid) {
@@ -139,7 +147,7 @@ const EmailLogin: React.FC<EmailLoginProps> = props => {
         onBlur={validateEmail}
       />
       {!isValid && <div className={styles.invalidLabel}>Please enter a valid email.</div>}
-      <input type='submit' value='Continue' className={styles.submit} />
+      <FormButton className={styles.submit} value='Continue' />
     </form>
   );
 };
@@ -156,19 +164,19 @@ const ValidationCodeInput: React.FC = () => {
     if (event.key === 'Escape') {
       event.currentTarget.blur();
     }
-  }
+  };
 
   const validateCode = (): boolean => {
     const valid = code.length === CODE_LENGTH;
     setIsValid(valid);
     return valid;
-  }
+  };
 
   const updateCode = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value;
     const cleaned = raw.replace(/\D/g, '');
     setCode(cleaned);
-  }
+  };
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -182,7 +190,7 @@ const ValidationCodeInput: React.FC = () => {
     }
 
     emailLogin(email, code);
-  }
+  };
 
   let classes = [styles.input];
   if (!isValid) {
@@ -204,7 +212,7 @@ const ValidationCodeInput: React.FC = () => {
         value={code}
       />
       {!isValid && <div className={styles.invalidLabel}>Invalid code.</div>}
-      <input type='submit' value='Continue' className={styles.submit} />
+      <FormButton className={styles.submit} value='Continue' />
     </form>
   );
 };

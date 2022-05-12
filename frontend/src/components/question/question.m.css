@@ -1,18 +1,6 @@
-.loadingContainer {
-    margin: 50px 30px;
-    width: 350px;
-    height: 280px;
-    align-items: center;
-    display: flex;
-    justify-content: center;
-}
-
-.spinner {
-    color: black !important;
-}
-
 .questionContainer {
-    margin: 50px auto 150px;;
+    margin: 50px auto 150px;
+    ;
     width: 70vw;
     max-width: 800px;
 }

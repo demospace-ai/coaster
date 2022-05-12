@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/gorilla/mux"
 	"gorm.io/gorm"
 )
 
@@ -72,7 +73,13 @@ func CORSMiddleware(next http.Handler) http.Handler {
 
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		w.Header().Set("Access-Control-Allow-Headers", strings.Join(ALLOWED_HEADERS, ","))
-		w.Header().Set("Access-Control-Allow-Methods", "POST")
+		route := mux.CurrentRoute(r)
+		methods, err := route.GetMethods()
+		if err != nil {
+			return
+		}
+
+		w.Header().Set("Access-Control-Allow-Methods", strings.Join(methods, ","))
 
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)

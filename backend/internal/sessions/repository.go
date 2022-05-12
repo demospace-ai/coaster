@@ -65,12 +65,22 @@ func Refresh(db *gorm.DB, session *models.Session) (*models.Session, error) {
 	return session, nil
 }
 
+func Clear(db *gorm.DB, session *models.Session) error {
+	currentTime := time.Now()
+	result := db.Model(session).Update("deactivated_at", currentTime)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
 func LoadValidByToken(db *gorm.DB, rawToken string) (*models.Session, error) {
 	// we store hashed tokens in case the DB is leaked
 	token := hashToken(rawToken)
 
 	var session models.Session
-	result := db.Take(&session, "token = ? AND expiration >= ?", token, time.Now())
+	result := db.Take(&session, "token = ? AND expiration >= ? AND deactivated_at IS NULL", token, time.Now())
 	if result.Error != nil {
 		return nil, result.Error
 	}

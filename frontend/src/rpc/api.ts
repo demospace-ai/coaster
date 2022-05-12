@@ -14,6 +14,10 @@ export const CheckSession: IEndpoint<undefined, CheckSessionResponse> = {
     path: '/check_session',
 };
 
+export const Logout: IEndpoint<undefined, undefined> = {
+    method: 'DELETE',
+    path: '/logout',
+};
 
 export const Search: IEndpoint<SearchRequest, SearchResponse> = {
     method: 'POST',

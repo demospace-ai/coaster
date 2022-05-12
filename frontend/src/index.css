@@ -1,12 +1,20 @@
+html {
+  height: 100%;
+}
+
 body {
   margin: 0;
+  padding: 0;
+  height: 100%;
   font-family: "Inter", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(90deg, rgba(226,238,255,1) 0%, rgba(147,194,255,1) 100%);
+  background: linear-gradient(90deg, rgba(226, 238, 255, 1) 0%, rgba(147, 194, 255, 1) 100%);
 }
 
-input, textarea, button {
+input,
+textarea,
+button {
   font-family: inherit;
   font-size: inherit;
 }
