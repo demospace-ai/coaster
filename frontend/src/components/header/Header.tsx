@@ -1,6 +1,6 @@
-import classNames from 'classnames';
 import React from 'react';
 import { Link, useMatch } from 'react-router-dom';
+import { SearchBar } from 'src/components/search/Search';
 import { useDispatch, useSelector } from 'src/root/model';
 import { sendRequest } from 'src/rpc/ajax';
 import { Logout } from 'src/rpc/api';
@@ -30,12 +30,15 @@ export const Header: React.FC<HeaderProps> = props => {
     <>
       <div className={styles.headerContainer}>
         <div>
-          <Link className={classNames(styles.route, styles.padRight)} to={'/'}>Home</Link>
+          <Link className={styles.route} to={'/'}>Home</Link>
         </div>
-        <div >
-          <div className={styles.rightNavWrapper}>
-            <div className={styles.route} onClick={logout}>Logout</div>
+        {isHome ? <></> :
+          <div className={styles.searchBarContainer}>
+            <SearchBar />
           </div>
+        }
+        <div className={styles.profileContainer}>
+          <div className={styles.route} onClick={logout}>Logout</div>
         </div>
       </div>
     </>

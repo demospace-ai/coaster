@@ -1,6 +1,7 @@
 .headerContainer {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    flex-direction: row;
+    height: 50px;
     padding: 20px 72px;
     font-size: 18px;
     align-items: center;
@@ -27,10 +28,12 @@
     color: gray;
 }
 
-.padRight {
-    margin-right: 40px;
+.searchBarContainer {
+    margin-left: auto;
+    width: 50vw;
+    max-width: 800px;
 }
 
-.rightNavWrapper {
-    float: right;
+.profileContainer {
+    margin-left: auto;
 }

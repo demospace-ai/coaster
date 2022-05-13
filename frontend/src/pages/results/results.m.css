@@ -1,8 +1,12 @@
-.search {
+.resultsContainer {
     text-align: center;
     margin: 40px auto 0;
     width: 70vw;
     max-width: 800px;
+}
+
+.resultsTitle {
+    margin-bottom: 40px;
 }
 
 .postTitle {
@@ -25,33 +29,9 @@
     padding: 0;
 }
 
-.searchBar {
-    display: flex;
-    width: 100%;
-    height: 40px;
-    border-radius: 30px;
-    border: 2px black solid;
-    background: white;
-}
-
-.searchIconContainer {
-    margin: 8px 10px;
-}
-
-.searchIcon {
-    width: 24px;
-    height: 24px;
-    fill: gray;
-}
-
-.searchInput {
-    width: 100%;
-    background: none;
-    border: none;
-}
-
-.searchInput:focus {
-    outline: none;
+.noResults {
+    width: fit-content;
+    margin: 0;
 }
 
 .newQuestionPrompt {
@@ -63,9 +43,4 @@
 .newQuestionButton {
     height: 40px;
     margin: auto 20px;
-}
-
-.noResults {
-    width: fit-content;
-    margin: 0;
 }

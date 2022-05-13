@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Button } from 'src/components/button/Button';
+import { useNavigate, useParams } from 'react-router-dom';
+import { BackButton, Button } from 'src/components/button/Button';
 import { Editor } from 'src/components/editor/Editor';
 import { Loading } from 'src/components/loading/Loading';
 import { sendRequest } from 'src/rpc/ajax';
@@ -38,6 +38,7 @@ export const Question: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [questionResponse, setQuestionResponse] = useState<GetQuestionResponse | undefined>(undefined);
   const [answerDraft, setAnswerDraft] = useState<string>('');
+  const navigate = useNavigate();
   useEffect(() => {
     getQuestion(id!, setLoading, setQuestionResponse);
   }, [id]);
@@ -55,6 +56,7 @@ export const Question: React.FC = () => {
 
   return (
     <div className={styles.questionContainer}>
+      <BackButton />
       <div className={styles.question}>
         <h1>{questionResponse!.question.title}</h1>
         <div>{questionResponse!.question.body}</div>

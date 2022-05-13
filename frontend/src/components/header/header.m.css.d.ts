@@ -1,8 +1,8 @@
 declare const styles: {
   readonly "headerContainer": string;
   readonly "route": string;
-  readonly "padRight": string;
-  readonly "rightNavWrapper": string;
+  readonly "searchBarContainer": string;
+  readonly "profileContainer": string;
 };
 export = styles;
 

@@ -10,6 +10,7 @@ import { Login } from 'src/pages/login/Login';
 import { NewQuestion } from 'src/pages/newquestion/NewQuestion';
 import { NotFound } from 'src/pages/notfound/NotFound';
 import { Question } from 'src/pages/question/Question';
+import { SearchResults } from 'src/pages/results/Results';
 import { useSelector } from 'src/root/model';
 
 export const App: React.FC = () => {
@@ -33,6 +34,8 @@ export const App: React.FC = () => {
           <Route path='/' element={<Home />} />
           <Route path='/login' element={<Login />} />
           <Route path='/question/:id' element={<Question />} />
+          <Route path='/results' element={<SearchResults />} />
+          <Route path='/results/:query' element={<SearchResults />} />
           <Route path='/new' element={<NewQuestion />} />
           <Route path='*' element={<NotFound />} />
         </Route>

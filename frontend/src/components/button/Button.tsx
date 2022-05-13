@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import { useNavigate } from 'react-router-dom';
 import styles from './button.m.css';
 
 type ButtonProps = {
@@ -30,5 +31,13 @@ export const FormButton: React.FC<FormButtonProps> = props => {
       type='submit'
       value={props.value}>
     </input>
+  );
+};
+
+export const BackButton: React.FC = () => {
+  const navigate = useNavigate();
+
+  return (
+    <div className={styles.backButton} onClick={() => navigate(-1)}>{String.fromCharCode(8592)} Back</div>
   );
 };

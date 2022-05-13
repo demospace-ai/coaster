@@ -1,16 +1,13 @@
 declare const styles: {
-  readonly "search": string;
+  readonly "resultsContainer": string;
+  readonly "resultsTitle": string;
   readonly "postTitle": string;
   readonly "postBody": string;
   readonly "result": string;
   readonly "results": string;
-  readonly "searchBar": string;
-  readonly "searchIconContainer": string;
-  readonly "searchIcon": string;
-  readonly "searchInput": string;
+  readonly "noResults": string;
   readonly "newQuestionPrompt": string;
   readonly "newQuestionButton": string;
-  readonly "noResults": string;
 };
 export = styles;
 
