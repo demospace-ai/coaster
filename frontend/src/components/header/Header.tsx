@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useMatch } from 'react-router-dom';
-import { SearchBar } from 'src/components/search/Search';
+import { SearchBar } from 'src/components/searchbar/SearchBar';
 import { useDispatch, useSelector } from 'src/root/model';
 import { sendRequest } from 'src/rpc/ajax';
 import { Logout } from 'src/rpc/api';

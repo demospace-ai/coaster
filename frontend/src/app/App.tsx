@@ -10,7 +10,7 @@ import { Login } from 'src/pages/login/Login';
 import { NewQuestion } from 'src/pages/newquestion/NewQuestion';
 import { NotFound } from 'src/pages/notfound/NotFound';
 import { Question } from 'src/pages/question/Question';
-import { SearchResults } from 'src/pages/results/Results';
+import { SearchResults } from 'src/pages/search/Search';
 import { useSelector } from 'src/root/model';
 
 export const App: React.FC = () => {

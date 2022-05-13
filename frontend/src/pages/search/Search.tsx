@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "src/components/button/Button";
 import { Loading } from "src/components/loading/Loading";
-import { useSearch, useSetResults } from "src/components/search/actions";
-import styles from "src/pages/results/results.m.css";
+import { useSearch, useSetResults } from "src/pages/search/actions";
+import styles from "src/pages/search/search.m.css";
 import { useSelector } from "src/root/model";
 
 const doSearch = async (query: string, setLoading: (loading: boolean) => void, search: (query: string) => Promise<void>) => {

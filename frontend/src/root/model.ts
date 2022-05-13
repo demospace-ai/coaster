@@ -3,8 +3,8 @@ import { Dispatch } from 'react';
 import { createSelectorHook, useDispatch as useReactDispatch } from 'react-redux';
 import { combineReducers } from 'redux';
 import { AppAction, appReducer, AppState } from 'src/app/model';
-import { SearchAction, searchReducer, SearchState } from 'src/components/search/model';
 import { LoginAction, loginReducer, LoginState } from 'src/pages/login/model';
+import { SearchAction, searchReducer, SearchState } from 'src/pages/search/model';
 
 
 export type RootAction = AppAction | LoginAction | SearchAction;

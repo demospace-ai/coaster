@@ -1,6 +1,6 @@
 import React, { FormEvent, useState } from 'react';
 import { createSearchParams, useNavigate, useSearchParams } from 'react-router-dom';
-import styles from './search.m.css';
+import styles from './searchbar.m.css';
 
 export const SearchBar: React.FC = () => {
   const [params, setSearchParams] = useSearchParams();
