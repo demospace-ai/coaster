@@ -1,14 +1,10 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "src/components/button/Button";
 import { Loading } from "src/components/loading/Loading";
 import { useSearch, useSetResults } from "src/components/search/actions";
 import styles from "src/pages/results/results.m.css";
 import { useSelector } from "src/root/model";
-
-type SearchResultsParams = {
-  query: string;
-};
 
 const doSearch = async (query: string, setLoading: (loading: boolean) => void, search: (query: string) => Promise<void>) => {
   await search(query);
@@ -16,7 +12,8 @@ const doSearch = async (query: string, setLoading: (loading: boolean) => void, s
 };
 
 export const SearchResults: React.FC = () => {
-  const { query } = useParams<SearchResultsParams>();
+  const [params] = useSearchParams();
+  const query = params.get('q');
   const results = useSelector(state => state.search.results);
   const search = useSearch();
   const setResults = useSetResults();

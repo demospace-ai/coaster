@@ -1,17 +1,17 @@
-import React, { FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useSetQuery } from 'src/components/search/actions';
-import { useSelector } from 'src/root/model';
+import React, { FormEvent, useState } from 'react';
+import { createSearchParams, useNavigate, useSearchParams } from 'react-router-dom';
 import styles from './search.m.css';
 
 export const SearchBar: React.FC = () => {
-  const setQuery = useSetQuery();
-  const query = useSelector(state => state.search.query);
+  const [params, setSearchParams] = useSearchParams();
+  const queryFromParams = params.get('q') ? params.get('q')! : '';
+  const [query, setQuery] = useState(queryFromParams);
   const navigate = useNavigate();
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    navigate('/results/' + query);
+    setSearchParams({ q: query });
+    navigate({ pathname: '/search', search: createSearchParams({ 'q': query }).toString() });
   };
 
   return (

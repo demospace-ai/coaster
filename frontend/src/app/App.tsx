@@ -34,8 +34,7 @@ export const App: React.FC = () => {
           <Route path='/' element={<Home />} />
           <Route path='/login' element={<Login />} />
           <Route path='/question/:id' element={<Question />} />
-          <Route path='/results' element={<SearchResults />} />
-          <Route path='/results/:query' element={<SearchResults />} />
+          <Route path='/search' element={<SearchResults />} />
           <Route path='/new' element={<NewQuestion />} />
           <Route path='*' element={<NotFound />} />
         </Route>
