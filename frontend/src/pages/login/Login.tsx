@@ -8,6 +8,7 @@ import {
 } from 'src/pages/login/actions';
 import loginImage from 'src/pages/login/login.png';
 import { useSelector } from 'src/root/model';
+import useWindowDimensions from 'src/utils/window';
 import isEmail from 'validator/lib/isEmail';
 import styles from './login.m.css';
 
@@ -20,12 +21,15 @@ export const Login: React.FC = () => {
   const isAuthenticated = useSelector(state => state.login.authenticated);
   const handleGoogleResponse = useHandleGoogleResponse();
   const navigate = useNavigate();
+  const { width } = useWindowDimensions();
+  // Adjust for mobile
+  const googleButtonWidth = width > 600 ? 400 : 300;
 
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/');
     }
-  });
+  }, [isAuthenticated, navigate]);
 
   if (loading) {
     return (
@@ -35,7 +39,7 @@ export const Login: React.FC = () => {
 
   const loginOptions = (
     <>
-      <GoogleLogin onGoogleSignIn={handleGoogleResponse} />
+      <GoogleLogin onGoogleSignIn={handleGoogleResponse} width={googleButtonWidth} />
       <div className={styles.marginTop}>
         or
       </div>
@@ -75,25 +79,27 @@ const useScript = (url: string, onload: () => void) => {
   }, [url, onload]);
 };
 
-function GoogleLogin({
-  onGoogleSignIn = (_: GoogleLoginResponse) => { },
-  text = 'continue_with',
-}) {
+type GoogleLoginProps = {
+  onGoogleSignIn: (_: GoogleLoginResponse) => void,
+  width: number,
+};
+
+const GoogleLogin: React.FC<GoogleLoginProps> = props => {
   const googleSignInButton = React.createRef<HTMLDivElement>();
 
   useScript('https://accounts.google.com/gsi/client', () => {
     window.google.accounts.id.initialize({
       client_id: GOOGLE_CLIENT_ID,
-      callback: onGoogleSignIn,
+      callback: props.onGoogleSignIn,
     });
     window.google.accounts.id.renderButton(
       googleSignInButton.current!,
-      { theme: 'filled_blue', size: 'large', text, width: 400 }
+      { theme: 'filled_blue', size: 'large', text: 'continue_with', width: props.width }
     );
   });
 
   return <div ref={googleSignInButton}></div>;
-}
+};
 
 interface EmailLoginProps {
   setLoading: (loading: boolean) => void;
