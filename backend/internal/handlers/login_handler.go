@@ -7,7 +7,6 @@ import (
 	"fabra/internal/errors"
 	"fabra/internal/models"
 	"fabra/internal/sessions"
-	"fabra/internal/user_identities"
 	"fabra/internal/users"
 	"fabra/internal/verifications"
 	"net/http"
@@ -35,14 +34,9 @@ type LoginResponse struct {
 
 func Login(env Env, w http.ResponseWriter, r *http.Request) error {
 	if env.Auth.IsAuthenticated {
-		userIdentity, err := user_identities.LoadByUserID(env.Db, env.Auth.Session.UserID)
-		if err != nil {
-			return err
-		}
-
 		return json.NewEncoder(w).Encode(LoginResponse{
-			FirstName: userIdentity.FirstName,
-			LastName:  userIdentity.LastName,
+			FirstName: env.Auth.User.FirstName,
+			LastName:  env.Auth.User.LastName,
 		})
 	}
 
@@ -56,13 +50,13 @@ func Login(env Env, w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
 
 	var token *string
-	var userIdentity *models.UserIdentity
+	var user *models.User
 	switch {
 	case loginRequest.IdToken != nil:
-		userIdentity, token, err = googleLogin(ctx, env.Db, *loginRequest.IdToken)
+		user, token, err = googleLogin(ctx, env.Db, *loginRequest.IdToken)
 	case loginRequest.EmailAuthentication != nil:
 		// TODO: need to collect names when creating an account via email
-		userIdentity, token, err = emailLogin(env.Db, *loginRequest.EmailAuthentication)
+		user, token, err = emailLogin(env.Db, *loginRequest.EmailAuthentication)
 	default:
 		return errors.BadRequest
 	}
@@ -73,8 +67,8 @@ func Login(env Env, w http.ResponseWriter, r *http.Request) error {
 
 	auth.AddSessionCookie(w, *token)
 	return json.NewEncoder(w).Encode(LoginResponse{
-		FirstName: userIdentity.FirstName,
-		LastName:  userIdentity.LastName,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
 	})
 }
 
@@ -97,13 +91,13 @@ func validateAndParseIdToken(ctx context.Context, idToken string) (*users.Extern
 	}, nil
 }
 
-func googleLogin(ctx context.Context, db *gorm.DB, idToken string) (*models.UserIdentity, *string, error) {
+func googleLogin(ctx context.Context, db *gorm.DB, idToken string) (*models.User, *string, error) {
 	externalUserInfo, err := validateAndParseIdToken(ctx, idToken)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	user, userIdentity, err := users.GetOrCreateForExternalInfo(db, externalUserInfo)
+	user, err := users.GetOrCreateForExternalInfo(db, externalUserInfo)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -113,10 +107,10 @@ func googleLogin(ctx context.Context, db *gorm.DB, idToken string) (*models.User
 		return nil, nil, err
 	}
 
-	return userIdentity, token, nil
+	return user, token, nil
 }
 
-func emailLogin(db *gorm.DB, emailAuthentication EmailAuthentication) (*models.UserIdentity, *string, error) {
+func emailLogin(db *gorm.DB, emailAuthentication EmailAuthentication) (*models.User, *string, error) {
 	// the user is created when the validation code is sent
 	user, err := users.LoadByEmail(db, emailAuthentication.Email)
 	if err != nil {
@@ -137,5 +131,5 @@ func emailLogin(db *gorm.DB, emailAuthentication EmailAuthentication) (*models.U
 		return nil, nil, err
 	}
 
-	return nil, token, nil
+	return user, token, nil
 }

@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fabra/internal/user_identities"
 	"net/http"
 )
 
@@ -17,13 +16,8 @@ func CheckSession(env Env, w http.ResponseWriter, r *http.Request) error {
 		return nil
 	}
 
-	userIdentity, err := user_identities.LoadByUserID(env.Db, env.Auth.Session.UserID)
-	if err != nil {
-		return err
-	}
-
 	return json.NewEncoder(w).Encode(CheckSessionResponse{
-		FirstName: userIdentity.FirstName,
-		LastName:  userIdentity.LastName,
+		FirstName: env.Auth.User.FirstName,
+		LastName:  env.Auth.User.LastName,
 	})
 }

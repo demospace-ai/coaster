@@ -22,7 +22,7 @@ export const Login: React.FC = () => {
   const handleGoogleResponse = useHandleGoogleResponse();
   const navigate = useNavigate();
   const { width } = useWindowDimensions();
-  // Adjust for mobile
+  // Hack to adjust Google login button width for mobile since CSS is not supported
   const googleButtonWidth = width > 600 ? 400 : 300;
 
   useEffect(() => {

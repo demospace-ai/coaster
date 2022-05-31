@@ -15,7 +15,9 @@ const mailgunDomain = "app.fabra.io"
 const emailRegex = "^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
 
 type ValidationCodeRequest struct {
-	Email string `json:"email"`
+	Email     string `json:"email"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
 }
 
 func ValidationCode(env Env, w http.ResponseWriter, r *http.Request) error {
@@ -36,7 +38,7 @@ func ValidationCode(env Env, w http.ResponseWriter, r *http.Request) error {
 		return errors.BadRequest
 	}
 
-	user, err := users.GetOrCreateForEmail(env.Db, request.Email)
+	user, err := users.GetOrCreateForEmail(env.Db, request.Email, request.FirstName, request.LastName)
 	if err != nil {
 		return err
 	}
