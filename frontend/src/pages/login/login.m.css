@@ -2,19 +2,7 @@
     display: flex;
     flex-direction: row;
     height: 100vh;
-    background: white;
-}
-
-.imageTitle {
-    color: white;
-    margin: 250px auto 40px;
-}
-
-.infoPane {
-    display: flex;
-    flex: 1 1 0%;
-    flex-direction: column;
-    background: linear-gradient(0deg, rgb(0, 81, 195) 0%, rgb(1, 15, 88) 100%);
+    background: #fffefc;
 }
 
 .loginImage {
@@ -22,15 +10,18 @@
     width: 450px;
 }
 
-.center {
+.title {
     text-align: center;
+    margin-bottom: 30px;
 }
 
 .loginPane {
-    display: flex;
-    flex: 1 1 0%;
-    flex-direction: column;
-    margin: 300px auto;
+    margin: auto;
+    width: 400px;
+    padding: 30px 30px 100px;
+    border-radius: 5px;
+    box-shadow: rgb(99 99 99 / 20%) 0px 2px 8px 0px;
+    background-color: white;
 }
 
 .loginLabel {
@@ -38,8 +29,9 @@
 }
 
 .loginGroup {
-    width: 400px;
+    width: 350px;
     margin: 10px auto;
+    text-align: center;
 }
 
 .marginTop {
@@ -77,16 +69,10 @@
     height: 40px;
 }
 
-@media screen and (max-width: 1200px) {
-    .infoPane {
-        display: none;
-    }
-}
-
 @media screen and (max-width: 600px) {
-
     .loginPane {
-        margin: 200px auto;
+        box-shadow: none;
+        width: 100%;
     }
 
     .loginGroup {

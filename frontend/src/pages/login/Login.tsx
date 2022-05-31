@@ -6,7 +6,6 @@ import { Loading } from 'src/components/loading/Loading';
 import {
   GoogleLoginResponse, useEmailLogin, useHandleGoogleResponse, useRequestValidationCode
 } from 'src/pages/login/actions';
-import loginImage from 'src/pages/login/login.png';
 import { useSelector } from 'src/root/model';
 import useWindowDimensions from 'src/utils/window';
 import isEmail from 'validator/lib/isEmail';
@@ -23,7 +22,7 @@ export const Login: React.FC = () => {
   const navigate = useNavigate();
   const { width } = useWindowDimensions();
   // Hack to adjust Google login button width for mobile since CSS is not supported
-  const googleButtonWidth = width > 600 ? 400 : 300;
+  const googleButtonWidth = width > 600 ? 350 : 300;
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -49,14 +48,10 @@ export const Login: React.FC = () => {
 
   return (
     <div className={styles.loginPage}>
-      <div className={styles.infoPane}>
-        <h1 className={styles.imageTitle}>Find the answer to every question</h1>
-        <img className={styles.loginImage} src={loginImage} alt='A rocket ship' />
-      </div>
       <div className={styles.loginPane}>
-
-        <h1 className={styles.center}>Welcome to Fabra!</h1>
-        <div className={classNames(styles.center, styles.loginGroup)}>
+        <h1 className={styles.title}>fabra</h1>
+        <div className={styles.title}>Sign in to your account</div>
+        <div className={styles.loginGroup}>
           {validatingCode ? (<ValidationCodeInput />) : loginOptions}
         </div>
       </div>

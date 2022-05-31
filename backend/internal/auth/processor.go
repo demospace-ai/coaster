@@ -4,6 +4,7 @@ import (
 	"fabra/internal/errors"
 	"fabra/internal/models"
 	"fabra/internal/sessions"
+	"fabra/internal/users"
 	"net/http"
 
 	"gorm.io/gorm"
@@ -47,12 +48,29 @@ func authenticate(db *gorm.DB, r *http.Request) (*models.Session, error) {
 
 func GetAuthentication(db *gorm.DB, r *http.Request) (*Authentication, error) {
 	session, err := authenticate(db, r)
-	if err != nil && !errors.IsRecordNotFound(err) && !errors.IsCookieNotFound(err) {
+
+	// no session found
+	if errors.IsRecordNotFound(err) || errors.IsCookieNotFound(err) {
+		return &Authentication{
+			Session:         nil,
+			User:            nil,
+			IsAuthenticated: false,
+		}, nil
+	}
+
+	// other unexpected error
+	if err != nil {
 		return nil, errors.Wrap(err, "Unexpected error checking authentication")
+	}
+
+	user, err := users.LoadUserByID(db, session.UserID)
+	if err != nil {
+		return nil, errors.Wrap(err, "Unexpected error fetching user")
 	}
 
 	return &Authentication{
 		Session:         session,
+		User:            user,
 		IsAuthenticated: err == nil,
 	}, nil
 }
