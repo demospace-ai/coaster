@@ -1,19 +1,26 @@
+@import "src/styles/colors";
+
 .searchBar {
     display: flex;
     width: 100%;
-    height: 40px;
+    height: 30px;
     border-radius: 30px;
-    box-shadow: 0px 0px 3px black;
+    border: 1px solid var(--border-color);
     background: white;
+    font-size: 16px;
+}
+
+.searchBar:focus-within {
+    border: 2px solid rgb(120, 120, 255);
 }
 
 .searchIconContainer {
-    margin: 8px 10px;
+    margin: 5px 10px;
 }
 
 .searchIcon {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     fill: gray;
 }
 
@@ -21,6 +28,10 @@
     width: 100%;
     background: none;
     border: none;
+}
+
+.searchInput::placeholder {
+    color: gray;
 }
 
 .searchInput:focus {

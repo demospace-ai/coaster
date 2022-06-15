@@ -5,6 +5,7 @@ import {
 import { useStart } from 'src/app/actions';
 import { Header } from 'src/components/header/Header';
 import { Loading } from 'src/components/loading/Loading';
+import { NavigationBar } from 'src/components/navigationBar/NavigationBar';
 import { Home } from 'src/pages/home/Home';
 import { Login } from 'src/pages/login/Login';
 import { NewQuestion } from 'src/pages/newquestion/NewQuestion';
@@ -12,6 +13,7 @@ import { NotFound } from 'src/pages/notfound/NotFound';
 import { Question } from 'src/pages/question/Question';
 import { SearchResults } from 'src/pages/search/Search';
 import { useSelector } from 'src/root/model';
+import styles from './app.m.css';
 
 export const App: React.FC = () => {
   const loading = useSelector(state => state.app.loading);
@@ -46,8 +48,11 @@ export const App: React.FC = () => {
 const AppLayout: React.FC = () => {
   return (
     <>
-      <Header />
-      <Outlet />
+      <NavigationBar />
+      <div className={styles.content}>
+        <Header />
+        <Outlet />
+      </div>
     </>
   );
 };

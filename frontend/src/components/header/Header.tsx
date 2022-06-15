@@ -1,27 +1,13 @@
 import React from 'react';
-import { Link, useMatch } from 'react-router-dom';
 import { SearchBar } from 'src/components/searchbar/SearchBar';
-import { useDispatch, useSelector } from 'src/root/model';
-import { sendRequest } from 'src/rpc/ajax';
-import { Logout } from 'src/rpc/api';
+import { useSelector } from 'src/root/model';
 import styles from './header.m.css';
 
-type HeaderProps = {
-  searchBar?: boolean;
-};
-
-export const Header: React.FC<HeaderProps> = props => {
+export const Header: React.FC = () => {
   const isAuthenticated = useSelector(state => state.login.authenticated);
-  const dispatch = useDispatch();
-  const isHome = useMatch('/'); // Don't render search bar in header for home page
-  const logout = async () => {
-    await sendRequest(Logout);
-    dispatch({
-      type: 'login.logout',
-    });
-  };
+  const firstName = useSelector(state => state.login.firstName);
 
-  // No header whatsoever for login page
+  // No header whatsoever for login and home page
   if (!isAuthenticated) {
     return <></>;
   };
@@ -29,17 +15,10 @@ export const Header: React.FC<HeaderProps> = props => {
   return (
     <>
       <div className={styles.headerContainer}>
-        <div>
-          <Link className={styles.route} to={'/'}>Home</Link>
+        <div className={styles.searchBarContainer}>
+          <SearchBar />
         </div>
-        {isHome ? <></> :
-          <div className={styles.searchBarContainer}>
-            <SearchBar />
-          </div>
-        }
-        <div className={styles.profileContainer}>
-          <div className={styles.route} onClick={logout}>Logout</div>
-        </div>
+        <div className={styles.profileIcon}>{firstName ? firstName.charAt(0) : null}</div>
       </div>
     </>
   );

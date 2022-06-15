@@ -1,13 +1,15 @@
+@import "src/styles/colors";
+
 .headerContainer {
     display: flex;
     flex-direction: row;
-    min-height: 40px;
-    max-height: 40px;
-    padding: 20px 72px;
+    box-sizing: border-box;
+    min-height: 60px;
+    height: 60px;
+    padding: 10px 30px;
     font-size: 18px;
+    border-bottom: 1px solid var(--border-color);
     align-items: center;
-    background: linear-gradient(90deg, rgba(226, 238, 255, 1) 0%, rgba(147, 194, 255, 1) 100%);
-    box-shadow: 0 -2px 4px black;
 }
 
 @media (max-width: 600px) {
@@ -16,25 +18,19 @@
     }
 }
 
-.route {
-    color: black;
-    text-decoration: none;
-    font-size: 20px;
-    font-weight: 550;
-    transition: all .2s ease-in-out;
-    cursor: pointer;
-}
-
-.route:hover {
-    color: gray;
-}
-
 .searchBarContainer {
-    margin-left: auto;
-    width: 50vw;
-    max-width: 800px;
+    margin: auto;
+    width: 500px;
 }
 
-.profileContainer {
-    margin-left: auto;
+.profileIcon {
+    background-color: #EC8B45;
+    font-size: 16px;
+    color: white;
+    border-radius: 50%;
+    line-height: 30px;
+    text-align: center;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
 }

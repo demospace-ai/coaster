@@ -1,7 +1,8 @@
 declare const styles: {
-  readonly "title": string;
   readonly "home": string;
-  readonly "searchContainer": string;
+  readonly "title": string;
+  readonly "date": string;
+  readonly "pageTitle": string;
 };
 export = styles;
 

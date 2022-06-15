@@ -1,8 +1,7 @@
 declare const styles: {
   readonly "headerContainer": string;
-  readonly "route": string;
   readonly "searchBarContainer": string;
-  readonly "profileContainer": string;
+  readonly "profileIcon": string;
 };
 export = styles;
 

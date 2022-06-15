@@ -50,7 +50,7 @@ export const Login: React.FC = () => {
     <div className={styles.loginPage}>
       <div className={styles.loginPane}>
         <h1 className={styles.title}>fabra</h1>
-        <div className={styles.title}>Sign in to your account</div>
+        <div className={styles.signInText}>Sign in to your account</div>
         <div className={styles.loginGroup}>
           {validatingCode ? (<ValidationCodeInput />) : loginOptions}
         </div>

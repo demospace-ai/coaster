@@ -1,7 +1,7 @@
 declare const styles: {
   readonly "loginPage": string;
-  readonly "loginImage": string;
   readonly "title": string;
+  readonly "signInText": string;
   readonly "loginPane": string;
   readonly "loginLabel": string;
   readonly "loginGroup": string;

@@ -52,6 +52,7 @@ export const NewQuestion: React.FC = () => {
       <input
         className={styles.titleContainer}
         onChange={e => { setTitleDraft(e.target.value); }}
+        autoFocus
       />
       <div style={{ paddingBottom: '20px' }}>Question Content</div>
       <Editor
