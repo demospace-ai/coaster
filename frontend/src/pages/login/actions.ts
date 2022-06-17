@@ -27,6 +27,7 @@ export function useHandleGoogleResponse(): GoogleLoginHandler {
         suggestedOrganizations: loginResponse.suggested_organizations,
       });
 
+      // If there's no organization, stay on the login page so the user can set it
       if (loginResponse.organization) {
         navigate("/");
       }
@@ -41,10 +42,19 @@ export interface OrganizationArgs {
 }
 
 export function useSetOrganization() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   return async (args: OrganizationArgs) => {
     const payload = { 'organization_name': args.organizationName, 'organization_id': args.organizationID };
     try {
-      await sendRequest(SetOrganization, payload);
+      const response = await sendRequest(SetOrganization, payload);
+      dispatch({
+        type: 'login.organizationSet',
+        organization: response.organization,
+      });
+
+      navigate("/");
     } catch (e) {
     }
   };

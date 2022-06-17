@@ -32,6 +32,10 @@ func SetOrganization(env Env, w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
+	if env.Auth.User.OrganizationID.Valid {
+		return errors.New("user already has an organization")
+	}
+
 	var userEmailDomain = strings.Split(env.Auth.User.Email, "@")[1]
 
 	if setOrganizationRequest.OrganizationName == nil && setOrganizationRequest.OrganizationID == nil {

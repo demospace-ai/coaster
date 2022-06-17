@@ -219,10 +219,9 @@ const OrganizationInput: React.FC<OrganizationInputProps> = props => {
     props.setLoading(true);
     // TODO how to specify positional arg with name
     await setOrganization({ organizationID: organizationID });
-    props.setLoading(false);
   };
 
-  if (!suggestedOrganizations || overrideCreate) {
+  if (!suggestedOrganizations || suggestedOrganizations.length === 0 || overrideCreate) {
     return (
       <form className={styles.marginTop} onSubmit={createNewOrganization}>
         <div className={styles.organizationMessage}>Welcome, {user!.first_name}! Let's build out your team.</div>

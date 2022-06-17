@@ -27,6 +27,10 @@ export type LoginAction =
   }
   | {
     type: 'login.logout';
+  }
+  | {
+    type: 'login.organizationSet',
+    organization: Organization,
   };
 
 export function loginReducer(state: LoginState = INITIAL_LOGIN_STATE, action: LoginAction): LoginState {
@@ -49,6 +53,11 @@ export function loginReducer(state: LoginState = INITIAL_LOGIN_STATE, action: Lo
       return {
         ...state,
         authenticated: false,
+      };
+    case 'login.organizationSet':
+      return {
+        ...state,
+        organization: action.organization,
       };
     default:
       return state;
