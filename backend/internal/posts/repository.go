@@ -29,6 +29,7 @@ func LoadQuestionByID(db *gorm.DB, questionID int64) (*models.Post, error) {
 	result := db.Table("posts").
 		Select("posts.*").
 		Where("posts.id = ?", questionID).
+		Where("posts.deactivated_at IS NULL").
 		Take(&question)
 
 	if result.Error != nil {
@@ -43,6 +44,7 @@ func LoadAnswersByQuestionID(db *gorm.DB, questionID int64) ([]models.Post, erro
 	result := db.Table("posts").
 		Select("posts.*").
 		Where("posts.parent_post_id = ?", questionID).
+		Where("posts.deactivated_at IS NULL").
 		Find(&answers)
 
 	if result.Error != nil {
@@ -71,7 +73,7 @@ func CreateAnswer(db *gorm.DB, questionID int64, answerBody string, userID int64
 func Search(db *gorm.DB, searchQuery string) ([]models.Post, error) {
 	var posts []models.Post
 	result := db.Raw(
-		"SELECT *, ts_rank((setweight(to_tsvector('english', coalesce(title, '')), 'A') || setweight(to_tsvector('english', body), 'B')), @query) as rank FROM posts WHERE (setweight(to_tsvector('english', coalesce(title, '')), 'A') || setweight(to_tsvector('english', body), 'B')) @@ to_tsquery('english', @query) ORDER BY rank desc",
+		"SELECT *, ts_rank((setweight(to_tsvector('english', coalesce(title, '')), 'A') || setweight(to_tsvector('english', body), 'B')), @query) as rank FROM posts WHERE posts.deactivated_at IS NULL && (setweight(to_tsvector('english', coalesce(title, '')), 'A') || setweight(to_tsvector('english', body), 'B')) @@ to_tsquery('english', @query) ORDER BY rank desc",
 		sql.Named("query", searchQuery)).
 		Scan(&posts)
 

@@ -16,10 +16,9 @@
 }
 
 .loginPane {
-    margin: auto;
+    margin: 200px auto auto;
     width: 400px;
-    height: 400px;
-    padding: 50px 30px;
+    padding: 80px 30px;
     border-radius: 10px;
     box-shadow: rgba(99, 99, 99, 0.2) 0 0 10px;
     background-color: white;
@@ -33,6 +32,51 @@
     width: 350px;
     margin: 10px auto;
     text-align: center;
+}
+
+.organizationMessage {
+    margin-bottom: 20px;
+}
+
+.suggestion {
+    border: 1px solid black;
+    border-radius: 5px;
+    list-style-type: none;
+    padding: 30px 30px;
+    text-align: left;
+    display: flex;
+    flex-direction: row;
+}
+
+.joinButton {
+    margin-right: 30px;
+    height: 40px;
+    width: 50%;
+}
+
+.teamInfo {
+    display: inline-block;
+    height: 40px;
+    width: 50%;
+    text-align: center;
+}
+
+.teamName {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.teamSize {
+    margin-top: 2px;
+    font-size: 12px;
+}
+
+.orDivider {
+    margin: 20px 0;
+}
+
+.createNewButton {
+    width: 100%;
 }
 
 .marginTop {

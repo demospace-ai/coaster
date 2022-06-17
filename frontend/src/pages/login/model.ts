@@ -1,3 +1,4 @@
+import { Organization, User } from "src/rpc/api";
 
 const INITIAL_LOGIN_STATE: LoginState = {
   authenticated: false,
@@ -7,16 +8,18 @@ const INITIAL_LOGIN_STATE: LoginState = {
 export interface LoginState {
   authenticated: boolean;
   validatingCode: boolean;
-  firstName?: string;
-  lastName?: string;
+  user?: User;
+  organization?: Organization;
+  suggestedOrganizations?: Organization[];
   email?: string;
 }
 
 export type LoginAction =
   | {
     type: 'login.authenticated',
-    firstName: string,
-    lastName: string,
+    user: User,
+    organization?: Organization,
+    suggestedOrganizations?: Organization[],
   }
   | {
     type: 'login.validateCode',
@@ -32,8 +35,9 @@ export function loginReducer(state: LoginState = INITIAL_LOGIN_STATE, action: Lo
       return {
         ...state,
         authenticated: true,
-        firstName: action.firstName,
-        lastName: action.lastName,
+        user: action.user,
+        organization: action.organization,
+        suggestedOrganizations: action.suggestedOrganizations,
       };
     case 'login.validateCode':
       return {

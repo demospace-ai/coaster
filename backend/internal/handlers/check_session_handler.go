@@ -2,12 +2,13 @@ package handlers
 
 import (
 	"encoding/json"
+	"fabra/internal/models"
 	"net/http"
 )
 
 type CheckSessionResponse struct {
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
+	User         models.User          `json:"user"`
+	Organization *models.Organization `json:"organization"`
 }
 
 func CheckSession(env Env, w http.ResponseWriter, r *http.Request) error {
@@ -17,7 +18,7 @@ func CheckSession(env Env, w http.ResponseWriter, r *http.Request) error {
 	}
 
 	return json.NewEncoder(w).Encode(CheckSessionResponse{
-		FirstName: env.Auth.User.FirstName,
-		LastName:  env.Auth.User.LastName,
+		User:         *env.Auth.User,
+		Organization: env.Auth.Organization,
 	})
 }

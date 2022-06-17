@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 import {
-  BrowserRouter, Outlet, Route, Routes
+  BrowserRouter, Navigate, Outlet, Route, Routes
 } from 'react-router-dom';
 import { useStart } from 'src/app/actions';
 import { Header } from 'src/components/header/Header';
@@ -33,15 +33,29 @@ export const App: React.FC = () => {
     <BrowserRouter>
       <Routes>
         <Route element={<AppLayout />}>
-          <Route path='/' element={<Home />} />
           <Route path='/login' element={<Login />} />
-          <Route path='/question/:id' element={<Question />} />
-          <Route path='/search' element={<SearchResults />} />
-          <Route path='/new' element={<NewQuestion />} />
+          <Route path='/' element={<RequireAuth element={<Home />} />} />
+          <Route path='/question/:id' element={<RequireAuth element={<Question />} />} />
+          <Route path='/search' element={<RequireAuth element={<SearchResults />} />} />
+          <Route path='/new' element={<RequireAuth element={<NewQuestion />} />} />
           <Route path='*' element={<NotFound />} />
         </Route>
       </Routes>
     </BrowserRouter>
+  );
+};
+
+type AuthenticationProps = {
+  element: ReactNode;
+};
+
+const RequireAuth: React.FC<AuthenticationProps> = props => {
+  const isAuthenticated = useSelector(state => state.login.authenticated);
+  const organization = useSelector(state => state.login.organization); // no organization set means user still needs to do this
+  return (
+    <>
+      {isAuthenticated && organization ? props.element : <Navigate to="/login" replace />}
+    </>
   );
 };
 

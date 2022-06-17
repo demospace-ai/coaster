@@ -5,10 +5,11 @@ import styles from './header.m.css';
 
 export const Header: React.FC = () => {
   const isAuthenticated = useSelector(state => state.login.authenticated);
-  const firstName = useSelector(state => state.login.firstName);
+  const organization = useSelector(state => state.login.organization);
+  const user = useSelector(state => state.login.user);
 
   // No header whatsoever for login and home page
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !organization) {
     return <></>;
   };
 
@@ -18,7 +19,7 @@ export const Header: React.FC = () => {
         <div className={styles.searchBarContainer}>
           <SearchBar />
         </div>
-        <div className={styles.profileIcon}>{firstName ? firstName.charAt(0) : null}</div>
+        <div className={styles.profileIcon}>{user!.first_name.charAt(0)}</div>
       </div>
     </>
   );

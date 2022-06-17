@@ -8,7 +8,7 @@ import (
 
 func LoadByUserID(db *gorm.DB, userID int64) (*models.Email, error) {
 	var email models.Email
-	result := db.Take(&email, "user_id = ?", userID)
+	result := db.Take(&email, "user_id = ? AND deactivated_at IS NULL", userID)
 	if result.Error != nil {
 		return nil, result.Error
 	}

@@ -2,7 +2,6 @@ package users
 
 import (
 	"errors"
-	"fabra/internal/emails"
 	"fabra/internal/external_profiles"
 	"fabra/internal/models"
 
@@ -24,6 +23,7 @@ func LoadByExternalID(db *gorm.DB, externalID string) (*models.User, error) {
 	result := db.Table("users").
 		Joins("JOIN external_profiles ON external_profiles.user_id = users.id").
 		Where("external_profiles.external_id = ?", externalID).
+		Where("users.deactivated_at IS NULL").
 		Take(&user)
 
 	if result.Error != nil {
@@ -38,6 +38,7 @@ func LoadByEmail(db *gorm.DB, email string) (*models.User, error) {
 	result := db.Table("users").
 		Joins("JOIN emails ON emails.user_id = users.id").
 		Where("emails.email = ?", email).
+		Where("users.deactivated_at IS NULL").
 		Take(&user)
 
 	if result.Error != nil {
@@ -52,6 +53,7 @@ func LoadUserByID(db *gorm.DB, userID int64) (*models.User, error) {
 	result := db.Table("users").
 		Select("users.*").
 		Where("users.id = ?", userID).
+		Where("users.deactivated_at IS NULL").
 		Take(&user)
 	if result.Error != nil {
 		return nil, result.Error
@@ -60,10 +62,11 @@ func LoadUserByID(db *gorm.DB, userID int64) (*models.User, error) {
 	return &user, nil
 }
 
-func create(db *gorm.DB, firstName string, lastName string) (*models.User, error) {
+func create(db *gorm.DB, firstName string, lastName string, email string) (*models.User, error) {
 	user := models.User{
 		FirstName: firstName,
 		LastName:  lastName,
+		Email:     email,
 	}
 
 	result := db.Create(&user)
@@ -75,7 +78,7 @@ func create(db *gorm.DB, firstName string, lastName string) (*models.User, error
 }
 
 func CreateUserForExternalInfo(db *gorm.DB, externalUserInfo *ExternalUserInfo) (*models.User, error) {
-	user, err := create(db, externalUserInfo.FirstName, externalUserInfo.LastName)
+	user, err := create(db, externalUserInfo.FirstName, externalUserInfo.LastName, externalUserInfo.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -85,9 +88,13 @@ func CreateUserForExternalInfo(db *gorm.DB, externalUserInfo *ExternalUserInfo) 
 		return nil, err
 	}
 
-	_, err = emails.Create(db, externalUserInfo.Email, user.ID)
-	if err != nil {
-		return nil, err
+	return user, nil
+}
+
+func SetOrganization(db *gorm.DB, user *models.User, organizationID int64) (*models.User, error) {
+	result := db.Model(user).Update("organization_id", organizationID)
+	if result.Error != nil {
+		return nil, result.Error
 	}
 
 	return user, nil
@@ -107,15 +114,11 @@ func GetOrCreateForExternalInfo(db *gorm.DB, externalUserInfo *ExternalUserInfo)
 	}
 
 	return user, nil
+
 }
 
 func CreateUserForEmail(db *gorm.DB, email string, firstName string, lastName string) (*models.User, error) {
-	user, err := create(db, firstName, lastName)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = emails.Create(db, email, user.ID)
+	user, err := create(db, firstName, lastName, email)
 	if err != nil {
 		return nil, err
 	}

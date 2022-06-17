@@ -3,6 +3,7 @@ package auth
 import (
 	"fabra/internal/errors"
 	"fabra/internal/models"
+	"fabra/internal/organizations"
 	"fabra/internal/sessions"
 	"fabra/internal/users"
 	"net/http"
@@ -68,9 +69,19 @@ func GetAuthentication(db *gorm.DB, r *http.Request) (*Authentication, error) {
 		return nil, errors.Wrap(err, "Unexpected error fetching user")
 	}
 
+	// If organization is null, this means the user still needs to set their organization
+	var organization *models.Organization
+	if user.OrganizationID.Valid {
+		organization, err = organizations.LoadOrganizationByID(db, user.OrganizationID.Int64)
+		if err != nil {
+			return nil, errors.Wrap(err, "Unexpected error fetching organization")
+		}
+	}
+
 	return &Authentication{
 		Session:         session,
 		User:            user,
+		Organization:    organization,
 		IsAuthenticated: err == nil,
 	}, nil
 }

@@ -41,7 +41,7 @@ func generateCode() string {
 
 func VerifyCode(db *gorm.DB, code string, userID int64) (*models.Verification, error) {
 	var verification models.Verification
-	result := db.Take(&verification, "code = ? AND user_id = ? AND expiration >= ? AND used = ?", code, userID, time.Now(), false)
+	result := db.Take(&verification, "code = ? AND user_id = ? AND expiration >= ? AND used = ? AND deactivated_at IS NULL", code, userID, time.Now(), false)
 	if result.Error != nil {
 		return nil, result.Error
 	}

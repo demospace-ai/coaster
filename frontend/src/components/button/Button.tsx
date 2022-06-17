@@ -6,12 +6,13 @@ type ButtonProps = {
   onClick: () => void;
   children: React.ReactNode;
   className?: string;
+  secondary?: boolean;
 };
 
 export const Button: React.FC<ButtonProps> = props => {
   return (
     <button
-      className={classNames(styles.button, props.className)}
+      className={classNames(styles.button, props.secondary ? styles.secondary : null, props.className)}
       type='button'
       onClick={props.onClick}>
       {props.children}

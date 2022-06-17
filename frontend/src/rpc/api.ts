@@ -29,19 +29,33 @@ export const ValidationCode: IEndpoint<ValidationCodeRequest, undefined> = {
     path: '/validation_code',
 };
 
-export const GetQuestion: IEndpoint<{ questionID: string }, GetQuestionResponse> = {
+export const SetOrganization: IEndpoint<SetOrganizationRequest, SetOrganizationResponse> = {
+    method: 'POST',
+    path: '/set_organization',
+};
+
+export const GetQuestion: IEndpoint<{ questionID: string; }, GetQuestionResponse> = {
     method: 'GET',
     path: '/get_question/:questionID',
-}
+};
 
 export const CreateAnswer: IEndpoint<CreateAnswerRequest, CreateAnswerResponse> = {
     method: 'POST',
     path: '/create_answer',
-}
+};
 
 export const CreateQuestion: IEndpoint<CreateQuestionRequest, CreateQuestionResponse> = {
     method: 'POST',
     path: '/create_question',
+};
+
+export interface SetOrganizationRequest {
+    organization_name?: string;
+    organization_id?: number;
+}
+
+export interface SetOrganizationResponse {
+    organization: Organization;
 }
 
 export interface ValidationCodeRequest {
@@ -56,16 +70,30 @@ export interface EmailAuthentication {
 export interface LoginRequest {
     id_token?: string;
     email_authentication?: EmailAuthentication;
+    organization_name?: string;
+    organization_id?: string;
+}
+
+export interface User {
+    first_name: string;
+    last_name: string;
+    email: string;
 }
 
 export interface LoginResponse {
-    first_name: string;
-    last_name: string;
+    user: User;
+    organization?: Organization;
+    suggested_organizations?: Organization[];
+}
+
+export interface Organization {
+    id: number;
+    name: string;
 }
 
 export interface CheckSessionResponse {
-    first_name: string;
-    last_name: string;
+    user: User;
+    organization?: Organization,
 }
 
 export interface CreateQuestionRequest {

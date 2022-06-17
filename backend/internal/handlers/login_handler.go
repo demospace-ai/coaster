@@ -6,6 +6,7 @@ import (
 	"fabra/internal/auth"
 	"fabra/internal/errors"
 	"fabra/internal/models"
+	"fabra/internal/organizations"
 	"fabra/internal/sessions"
 	"fabra/internal/users"
 	"fabra/internal/verifications"
@@ -28,15 +29,16 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
+	User                   models.User           `json:"user"`
+	Organization           *models.Organization  `json:"organization"`
+	SuggestedOrganizations []models.Organization `json:"suggested_organizations"`
 }
 
 func Login(env Env, w http.ResponseWriter, r *http.Request) error {
 	if env.Auth.IsAuthenticated {
 		return json.NewEncoder(w).Encode(LoginResponse{
-			FirstName: env.Auth.User.FirstName,
-			LastName:  env.Auth.User.LastName,
+			User:         *env.Auth.User,
+			Organization: env.Auth.Organization,
 		})
 	}
 
@@ -65,10 +67,25 @@ func Login(env Env, w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
+	var organization *models.Organization
+	var suggestedOrganizations []models.Organization
+	if user.OrganizationID.Valid {
+		organization, err = organizations.LoadOrganizationByID(env.Db, user.OrganizationID.Int64)
+		if err != nil {
+			return err
+		}
+	} else {
+		suggestedOrganizations, err = organizations.LoadOrganizationsByEmailDomain(env.Db, user.Email)
+		if err != nil {
+			return err
+		}
+	}
+
 	auth.AddSessionCookie(w, *token)
 	return json.NewEncoder(w).Encode(LoginResponse{
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
+		User:                   *user,
+		Organization:           organization,
+		SuggestedOrganizations: suggestedOrganizations,
 	})
 }
 

@@ -1,10 +1,10 @@
 import classNames from 'classnames';
 import React, { FormEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FormButton } from 'src/components/button/Button';
+import { Button, FormButton } from 'src/components/button/Button';
 import { Loading } from 'src/components/loading/Loading';
 import {
-  GoogleLoginResponse, useEmailLogin, useHandleGoogleResponse, useRequestValidationCode
+  GoogleLoginResponse, useEmailLogin, useHandleGoogleResponse, useRequestValidationCode, useSetOrganization
 } from 'src/pages/login/actions';
 import { useSelector } from 'src/root/model';
 import useWindowDimensions from 'src/utils/window';
@@ -14,21 +14,24 @@ import styles from './login.m.css';
 const GOOGLE_CLIENT_ID = '932264813910-egpk1omo3v2cedd89k8go851uko6djpa.apps.googleusercontent.com';
 const CODE_LENGTH = 6;
 
+export enum LoginStep {
+  Start = 1,
+  ValidateCode,
+  Organization,
+}
+
 export const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
-  const validatingCode = useSelector(state => state.login.validatingCode);
-  const isAuthenticated = useSelector(state => state.login.authenticated);
   const handleGoogleResponse = useHandleGoogleResponse();
+  const isAuthenticated = useSelector(state => state.login.authenticated);
+  const organization = useSelector(state => state.login.organization);
   const navigate = useNavigate();
-  const { width } = useWindowDimensions();
-  // Hack to adjust Google login button width for mobile since CSS is not supported
-  const googleButtonWidth = width > 600 ? 350 : 300;
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && organization) {
       navigate('/');
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, organization, navigate]);
 
   if (loading) {
     return (
@@ -36,23 +39,19 @@ export const Login: React.FC = () => {
     );
   }
 
-  const loginOptions = (
-    <>
-      <GoogleLogin onGoogleSignIn={handleGoogleResponse} width={googleButtonWidth} />
-      <div className={styles.marginTop}>
-        or
-      </div>
-      <EmailLogin setLoading={setLoading} />
-    </>
-  );
+  let loginContent;
+  if (!isAuthenticated) {
+    loginContent = <StartContent onGoogleSignIn={handleGoogleResponse} />;
+  } else if (!organization) {
+    loginContent = <OrganizationInput setLoading={setLoading} />;
+  }
 
   return (
     <div className={styles.loginPage}>
       <div className={styles.loginPane}>
         <h1 className={styles.title}>fabra</h1>
-        <div className={styles.signInText}>Sign in to your account</div>
         <div className={styles.loginGroup}>
-          {validatingCode ? (<ValidationCodeInput />) : loginOptions}
+          {loginContent}
         </div>
       </div>
     </div>
@@ -72,6 +71,27 @@ const useScript = (url: string, onload: () => void) => {
       document.head.removeChild(script);
     };
   }, [url, onload]);
+};
+
+type StartContentProps = {
+  onGoogleSignIn: (_: GoogleLoginResponse) => void,
+};
+
+const StartContent: React.FC<StartContentProps> = props => {
+  // Hack to adjust Google login button width for mobile since CSS is not supported
+  const { width } = useWindowDimensions();
+  const googleButtonWidth = width > 600 ? 350 : 300;
+
+  return (
+    <>
+      <div className={styles.signInText}>Sign in to your account</div>
+      <GoogleLogin onGoogleSignIn={props.onGoogleSignIn} width={googleButtonWidth} />
+      {/* <div className={styles.marginTop}>
+      or
+    </div>
+    <EmailLogin setLoading={setLoading} setStep={setStep} /> */}
+    </>
+  );
 };
 
 type GoogleLoginProps = {
@@ -98,12 +118,13 @@ const GoogleLogin: React.FC<GoogleLoginProps> = props => {
 
 interface EmailLoginProps {
   setLoading: (loading: boolean) => void;
+  setStep: React.Dispatch<React.SetStateAction<LoginStep>>;
 }
 
 const EmailLogin: React.FC<EmailLoginProps> = props => {
   const [email, setEmail] = useState('');
   const [isValid, setIsValid] = useState(true);
-  const requestValidationCode = useRequestValidationCode();
+  const requestValidationCode = useRequestValidationCode(props.setStep);
 
   const onKeydown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     event.stopPropagation();
@@ -153,6 +174,92 @@ const EmailLogin: React.FC<EmailLoginProps> = props => {
   );
 };
 
+type OrganizationInputProps = {
+  setLoading: (loading: boolean) => void;
+};
+
+const OrganizationInput: React.FC<OrganizationInputProps> = props => {
+  const user = useSelector(state => state.login.user);
+  const suggestedOrganizations = useSelector(state => state.login.suggestedOrganizations);
+  const [organizationInput, setOrganizationInput] = useState('');
+  const setOrganization = useSetOrganization();
+  const [isValid, setIsValid] = useState(true);
+  const [overrideCreate, setOverrideCreate] = useState(false);
+
+  let classes = [styles.input];
+  if (!isValid) {
+    classes.push(styles.invalidBorder);
+  }
+
+  const validateOrganization = (): boolean => {
+    const valid = organizationInput.length > 0;
+    setIsValid(valid);
+    return valid;
+  };
+
+  const onKeydown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    event.stopPropagation();
+    if (event.key === 'Escape') {
+      event.currentTarget.blur();
+    }
+  };
+
+  const createNewOrganization = async (e: FormEvent) => {
+    e.preventDefault();
+    props.setLoading(true);
+    if (!validateOrganization()) {
+      return;
+    }
+
+    await setOrganization({ organizationName: organizationInput });
+    props.setLoading(false);
+  };
+
+  const joinOrganization = async (organizationID: number) => {
+    props.setLoading(true);
+    // TODO how to specify positional arg with name
+    await setOrganization({ organizationID: organizationID });
+    props.setLoading(false);
+  };
+
+  if (!suggestedOrganizations || overrideCreate) {
+    return (
+      <form className={styles.marginTop} onSubmit={createNewOrganization}>
+        <div className={styles.organizationMessage}>Welcome, {user!.first_name}! Let's build out your team.</div>
+        <input
+          type='text'
+          id='organization'
+          name='organization'
+          autoComplete='organization'
+          placeholder='Organization Name'
+          className={classNames(classes)}
+          onKeyDown={onKeydown}
+          onChange={e => setOrganizationInput(e.target.value)}
+          onBlur={validateOrganization}
+        />
+        {!isValid && <div className={styles.invalidLabel}>Please enter a valid organization name.</div>}
+        <FormButton className={styles.submit} value='Continue' />
+      </form>
+    );
+  }
+
+  return (
+    <div className={styles.marginTop} >
+      <div className={styles.organizationMessage}>Welcome, {user!.first_name}! Join your team.</div>
+      {suggestedOrganizations.map((suggestion, index) => (
+        <li key={index} className={styles.suggestion}>
+          <Button className={styles.joinButton} onClick={() => joinOrganization(suggestion.id)}>Join</Button>
+          <div className={styles.teamInfo}>
+            <div className={styles.teamName}>{suggestion.name}</div>
+            {/* TODO: add team size */}
+          </div>
+        </li>
+      ))}
+      <div className={styles.orDivider}>or</div>
+      <Button className={styles.createNewButton} onClick={() => setOverrideCreate(true)} secondary={true}>Create new organization</Button>
+    </div>
+  );
+};
 
 const ValidationCodeInput: React.FC = () => {
   const email = useSelector(state => state.login.email);

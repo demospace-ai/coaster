@@ -77,4 +77,10 @@ var Routes = []Route{
 		Pattern:     "/api/validation_code",
 		HandlerFunc: handlers.ValidationCode,
 	},
+	{
+		Name:        "Set organization for user",
+		Method:      "POST",
+		Pattern:     "/api/set_organization",
+		HandlerFunc: handlers.SetOrganization,
+	},
 }

@@ -6,6 +6,7 @@ import styles from './navigationBar.m.css';
 
 export const NavigationBar: React.FC = () => {
   const isAuthenticated = useSelector(state => state.login.authenticated);
+  const organization = useSelector(state => state.login.organization);
   const dispatch = useDispatch();
   const logout = async () => {
     await sendRequest(Logout);
@@ -16,7 +17,7 @@ export const NavigationBar: React.FC = () => {
 
 
   // No navigation bar whatsoever for login page
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !organization) {
     return <></>;
   };
 

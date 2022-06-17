@@ -1,7 +1,7 @@
 .button {
     color: white;
     padding: 5px 20px;
-    font-weight: 550;
+    font-weight: bold;
     cursor: pointer;
     box-shadow: none;
     border-radius: 5px;
@@ -9,6 +9,12 @@
     background-color: black;
     letter-spacing: 1px;
     transition: all .1s ease-in-out;
+}
+
+.secondary {
+    background-color: white;
+    color: black;
+    font-weight: normal;
 }
 
 .button:hover {
