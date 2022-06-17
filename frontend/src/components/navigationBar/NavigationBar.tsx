@@ -26,10 +26,10 @@ export const NavigationBar: React.FC = () => {
       <div className={styles.navigationBar}>
         <div className={styles.organizationContainer}>
           <div className={styles.organizationIcon}>
-            M
+            {organization!.name.charAt(0)}
           </div>
           <div className={styles.organizationName}>
-            My Organization
+            {organization!.name}
           </div>
           <svg className={styles.caret}>
             <path xmlns="http://www.w3.org/2000/svg" d="M11 15L6 9.91166L6.89583 9L11 13.1979L15.1042 9.0212L16 9.93286L11 15Z" />
