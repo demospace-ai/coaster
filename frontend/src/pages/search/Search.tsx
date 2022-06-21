@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "src/components/button/Button";
+import { Editor } from "src/components/editor/Editor";
 import { Loading } from "src/components/loading/Loading";
 import { useSearch, useSetResults } from "src/pages/search/actions";
 import styles from "src/pages/search/search.m.css";
@@ -45,7 +46,13 @@ export const SearchResults: React.FC = () => {
             <h3>
               <Link className={styles.postTitle} to={`/question/${result.id}`}>Q: {result.title}</Link>
             </h3>
-            <div className={styles.postBody}>{result.body}</div>
+            <div className={styles.postBody}>
+              <Editor
+                readonly={true}
+                onChange={() => undefined}
+                initialValue={JSON.parse(result.body)}
+              />
+            </div>
           </li>
         ))}
       </ul>

@@ -8,12 +8,13 @@ import (
 	"gorm.io/gorm"
 )
 
-func CreateQuestion(db *gorm.DB, questionTitle string, questionBody string, userID int64) (*models.Post, error) {
+func CreateQuestion(db *gorm.DB, questionTitle string, questionBody string, userID int64, organizationID int64) (*models.Post, error) {
 	post := models.Post{
-		PostType: models.PostTypeQuestion,
-		Title:    database.NewNullString(questionTitle),
-		Body:     questionBody,
-		UserID:   userID,
+		PostType:       models.PostTypeQuestion,
+		Title:          database.NewNullString(questionTitle),
+		Body:           questionBody,
+		UserID:         userID,
+		OrganizationID: organizationID,
 	}
 
 	result := db.Create(&post)
@@ -24,7 +25,7 @@ func CreateQuestion(db *gorm.DB, questionTitle string, questionBody string, user
 	return &post, nil
 }
 
-func LoadQuestionByID(db *gorm.DB, questionID int64) (*models.Post, error) {
+func LoadQuestionByID(db *gorm.DB, questionID int64, organizationID int64) (*models.Post, error) {
 	var question models.Post
 	result := db.Table("posts").
 		Select("posts.*").
@@ -39,7 +40,7 @@ func LoadQuestionByID(db *gorm.DB, questionID int64) (*models.Post, error) {
 	return &question, nil
 }
 
-func LoadAnswersByQuestionID(db *gorm.DB, questionID int64) ([]models.Post, error) {
+func LoadAnswersByQuestionID(db *gorm.DB, questionID int64, organizationID int64) ([]models.Post, error) {
 	var answers []models.Post
 	result := db.Table("posts").
 		Select("posts.*").
@@ -54,12 +55,13 @@ func LoadAnswersByQuestionID(db *gorm.DB, questionID int64) ([]models.Post, erro
 	return answers, nil
 }
 
-func CreateAnswer(db *gorm.DB, questionID int64, answerBody string, userID int64) (*models.Post, error) {
+func CreateAnswer(db *gorm.DB, questionID int64, answerBody string, userID int64, organizationID int64) (*models.Post, error) {
 	post := models.Post{
-		PostType:     models.PostTypeAnswer,
-		ParentPostID: database.NewNullInt64(questionID),
-		Body:         answerBody,
-		UserID:       userID,
+		PostType:       models.PostTypeAnswer,
+		ParentPostID:   database.NewNullInt64(questionID),
+		Body:           answerBody,
+		UserID:         userID,
+		OrganizationID: organizationID,
 	}
 
 	result := db.Create(&post)
@@ -70,11 +72,11 @@ func CreateAnswer(db *gorm.DB, questionID int64, answerBody string, userID int64
 	return &post, nil
 }
 
-func Search(db *gorm.DB, searchQuery string) ([]models.Post, error) {
+func Search(db *gorm.DB, searchQuery string, organizationID int64) ([]models.Post, error) {
 	var posts []models.Post
 	result := db.Raw(
-		"SELECT *, ts_rank((setweight(to_tsvector('english', coalesce(title, '')), 'A') || setweight(to_tsvector('english', body), 'B')), @query) as rank FROM posts WHERE posts.deactivated_at IS NULL && (setweight(to_tsvector('english', coalesce(title, '')), 'A') || setweight(to_tsvector('english', body), 'B')) @@ to_tsquery('english', @query) ORDER BY rank desc",
-		sql.Named("query", searchQuery)).
+		"SELECT *, ts_rank((setweight(to_tsvector('english', coalesce(title, '')), 'A') || setweight(to_tsvector('english', body), 'B')), @query) as rank FROM posts WHERE posts.organization_id = @organizationID AND posts.deactivated_at IS NULL AND (setweight(to_tsvector('english', coalesce(title, '')), 'A') || setweight(to_tsvector('english', body), 'B')) @@ to_tsquery('english', @query) ORDER BY rank desc",
+		sql.Named("organizationID", organizationID), sql.Named("query", searchQuery)).
 		Scan(&posts)
 
 	if result.Error != nil {

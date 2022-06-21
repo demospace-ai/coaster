@@ -30,18 +30,18 @@ func CreateAnswer(env Env, w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	_, err = posts.CreateAnswer(env.Db, createAnswerRequest.QuestionID, createAnswerRequest.AnswerBody, env.Auth.Session.UserID)
+	_, err = posts.CreateAnswer(env.Db, createAnswerRequest.QuestionID, createAnswerRequest.AnswerBody, env.Auth.User.ID, env.Auth.Organization.ID)
 	if err != nil {
 		return err
 	}
 
 	// refetch the question and answers now
-	question, err := posts.LoadQuestionByID(env.Db, createAnswerRequest.QuestionID)
+	question, err := posts.LoadQuestionByID(env.Db, createAnswerRequest.QuestionID, env.Auth.Organization.ID)
 	if err != nil {
 		return err
 	}
 
-	answers, err := posts.LoadAnswersByQuestionID(env.Db, createAnswerRequest.QuestionID)
+	answers, err := posts.LoadAnswersByQuestionID(env.Db, createAnswerRequest.QuestionID, env.Auth.Organization.ID)
 	if err != nil {
 		return err
 	}

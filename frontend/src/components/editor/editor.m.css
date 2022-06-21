@@ -1,6 +1,44 @@
 .editor {
-    background: white;
-    border: 2px gray solid;
-    border-radius: 5px;
-    padding: 10px;
+    
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.italic {
+    font-style: italic;
+}
+
+.title {
+    display: inline-block;
+    font-weight: bold;
+    font-size: 20px;
+    margin: 20px 0 10px 0;
+}
+
+.list {
+    padding-left: 10px;
+    font-size: 20px;
+    line-height: 10px;
+}
+
+.heading {
+    display: block;
+    text-align: center;
+    border-bottom: 2px solid #ddd;
+}
+
+.blockquote {
+    display: inline-block;
+    border-left: 2px solid #ddd;
+    padding-left: 10px;
+    color: #aaa;
+    font-style: italic;
+}
+
+.code {
+    font-family: monospace;
+    background-color: #eee;
+    padding: 3px;
 }

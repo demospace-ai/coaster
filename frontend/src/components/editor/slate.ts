@@ -1,13 +1,50 @@
-import { BaseEditor } from 'slate';
+import { BaseEditor, Descendant } from 'slate';
 import { ReactEditor } from 'slate-react';
 
-type CustomElement = { type: 'paragraph'; children: CustomText[] }
-type CustomText = { text: string }
+type BlockQuoteElement = {
+  type: 'block-quote';
+  align?: string;
+  children: Descendant[];
+};
+
+type BulletedListElement = {
+  type: 'bulleted-list';
+  align?: string;
+  children: Descendant[];
+};
+
+type HeadingElement = {
+  type: 'heading';
+  align?: string;
+  children: Descendant[];
+};
+
+type HeadingTwoElement = {
+  type: 'heading-two';
+  align?: string;
+  children: Descendant[];
+};
+
+type ParagraphElement = {
+  type: 'paragraph';
+  align?: string;
+  children: Descendant[];
+};
+
+type TitleElement = { type: 'title'; children: Descendant[]; };
+
+type CustomText = {
+  text: string,
+  bold?: boolean;
+  italic?: boolean;
+};
+
+type CustomElement = ParagraphElement | TitleElement;
 
 declare module 'slate' {
   interface CustomTypes {
-    Editor: BaseEditor & ReactEditor
-    Element: CustomElement
-    Text: CustomText
+    Editor: BaseEditor & ReactEditor;
+    Element: CustomElement;
+    Text: CustomText;
   }
 }

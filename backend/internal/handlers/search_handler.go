@@ -31,7 +31,7 @@ func Search(env Env, w http.ResponseWriter, r *http.Request) error {
 	}
 
 	// TODO: should only return questions, even if a result was found via the answer
-	posts, err := posts.Search(env.Db, searchRequest.SearchQuery)
+	posts, err := posts.Search(env.Db, searchRequest.SearchQuery, env.Auth.Organization.ID)
 	if err != nil {
 		return err
 	}

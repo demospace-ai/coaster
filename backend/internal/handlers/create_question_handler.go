@@ -29,7 +29,7 @@ func CreateQuestion(env Env, w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	post, err := posts.CreateQuestion(env.Db, createQuestionRequest.QuestionTitle, createQuestionRequest.QuestionBody, env.Auth.Session.UserID)
+	post, err := posts.CreateQuestion(env.Db, createQuestionRequest.QuestionTitle, createQuestionRequest.QuestionBody, env.Auth.User.ID, env.Auth.Organization.ID)
 	if err != nil {
 		return err
 	}

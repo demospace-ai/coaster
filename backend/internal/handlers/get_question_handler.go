@@ -37,12 +37,12 @@ func GetQuestion(env Env, w http.ResponseWriter, r *http.Request) error {
 		return nil
 	}
 
-	question, err := posts.LoadQuestionByID(env.Db, questionID)
+	question, err := posts.LoadQuestionByID(env.Db, questionID, env.Auth.Organization.ID)
 	if err != nil {
 		return err
 	}
 
-	answers, err := posts.LoadAnswersByQuestionID(env.Db, questionID)
+	answers, err := posts.LoadAnswersByQuestionID(env.Db, questionID, env.Auth.Organization.ID)
 	if err != nil {
 		return err
 	}

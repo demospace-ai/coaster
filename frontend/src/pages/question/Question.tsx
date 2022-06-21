@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { BackButton, Button } from 'src/components/button/Button';
 import { Editor } from 'src/components/editor/Editor';
 import { Loading } from 'src/components/loading/Loading';
@@ -38,7 +38,6 @@ export const Question: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [questionResponse, setQuestionResponse] = useState<GetQuestionResponse | undefined>(undefined);
   const [answerDraft, setAnswerDraft] = useState<string>('');
-  const navigate = useNavigate();
   useEffect(() => {
     getQuestion(id!, setLoading, setQuestionResponse);
   }, [id]);
@@ -59,7 +58,13 @@ export const Question: React.FC = () => {
       <BackButton />
       <div className={styles.question}>
         <h1>{questionResponse!.question.title}</h1>
-        <div>{questionResponse!.question.body}</div>
+        <div>
+          <Editor
+            readonly={true}
+            onChange={() => undefined}
+            initialValue={JSON.parse(questionResponse!.question.body)}
+          />
+        </div>
       </div>
       {questionResponse!.answers.length > 0 &&
         <div className={styles.answersContainer}>
@@ -68,7 +73,11 @@ export const Question: React.FC = () => {
           <ul className={styles.answers}>
             {questionResponse!.answers.map((answer, index) => (
               <li key={index} className={styles.answer}>
-                {answer.body}
+                <Editor
+                  readonly={true}
+                  onChange={() => undefined}
+                  initialValue={JSON.parse(answer.body)}
+                />
               </li>
             ))}
           </ul>
