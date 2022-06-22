@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LoginStep } from 'src/pages/login/Login';
 import { useDispatch } from 'src/root/model';
@@ -15,7 +15,7 @@ export function useHandleGoogleResponse(): GoogleLoginHandler {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  return async (response: GoogleLoginResponse) => {
+  return useCallback(async (response: GoogleLoginResponse) => {
     const id_token = response.credential;
     const payload = { 'id_token': id_token };
     try {
@@ -33,7 +33,7 @@ export function useHandleGoogleResponse(): GoogleLoginHandler {
       }
     } catch (e) {
     }
-  };
+  }, [dispatch, navigate]);
 }
 
 export interface OrganizationArgs {
@@ -61,19 +61,19 @@ export function useSetOrganization() {
 }
 
 export function useRequestValidationCode(setStep: React.Dispatch<React.SetStateAction<LoginStep>>) {
-  return async (email: string) => {
+  return useCallback(async (email: string) => {
     const payload = { 'email': email };
     try {
       await sendRequest(ValidationCode, payload);
       setStep(LoginStep.ValidateCode);
     } catch (e) {
     }
-  };
+  }, [setStep]);
 }
 
 export function useEmailLogin() {
   const dispatch = useDispatch();
-  return async (email: string, code: string) => {
+  return useCallback(async (email: string, code: string) => {
     const payload = {
       'email_authentication': {
         'email': email,
@@ -90,5 +90,5 @@ export function useEmailLogin() {
       });
     } catch (e) {
     }
-  };
+  }, [dispatch]);
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { BackButton, Button } from 'src/components/button/Button';
-import { Editor } from 'src/components/editor/Editor';
+import { Display, Editor } from 'src/components/editor/Editor';
 import { Loading } from 'src/components/loading/Loading';
 import { sendRequest } from 'src/rpc/ajax';
 import { CreateAnswer, GetQuestion, GetQuestionResponse } from 'src/rpc/api';
@@ -49,7 +49,6 @@ export const Question: React.FC = () => {
   }
 
   const onCreateAnswer = () => {
-    setAnswerDraft('');
     createAnswer(id!, answerDraft, setLoading, setQuestionResponse);
   };
 
@@ -59,9 +58,7 @@ export const Question: React.FC = () => {
       <div className={styles.question}>
         <h1>{questionResponse!.question.title}</h1>
         <div>
-          <Editor
-            readonly={true}
-            onChange={() => undefined}
+          <Display
             initialValue={JSON.parse(questionResponse!.question.body)}
           />
         </div>
@@ -73,9 +70,7 @@ export const Question: React.FC = () => {
           <ul className={styles.answers}>
             {questionResponse!.answers.map((answer, index) => (
               <li key={index} className={styles.answer}>
-                <Editor
-                  readonly={true}
-                  onChange={() => undefined}
+                <Display
                   initialValue={JSON.parse(answer.body)}
                 />
               </li>
@@ -88,7 +83,7 @@ export const Question: React.FC = () => {
         <div style={{ paddingBottom: '20px' }}>Know someone who can answer? Tag them here!</div>
         <Editor
           className={styles.answerInput}
-          onChange={value => { setAnswerDraft(JSON.stringify(value)); }}
+          onChange={(remirrorJson) => { setAnswerDraft(JSON.stringify(remirrorJson)); }}
         />
         <Button className={styles.answerButton} onClick={onCreateAnswer}>Post your answer</Button>
       </div>

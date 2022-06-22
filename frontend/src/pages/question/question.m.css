@@ -32,7 +32,12 @@
     background: white;
     border: 2px gray solid;
     border-radius: 5px;
-    padding: 10px;
+    padding: 10px !important;
+    box-shadow: none !important;
+}
+
+.answerInput:focus {
+    border: 2px blue solid;
 }
 
 .answerButton {

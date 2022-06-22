@@ -28,7 +28,7 @@ export const NewQuestion: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [createQuestionResponse, setCreateQuestionResponse] = useState<CreateQuestionResponse | undefined>(undefined);
   const [titleDraft, setTitleDraft] = useState<string>('');
-  const [bodyDraft, setBodyDraft] = useState<string>('');
+  const [questionDraft, setQuestionDraft] = useState<string>('');
 
   useEffect(() => {
     if (createQuestionResponse) {
@@ -43,7 +43,7 @@ export const NewQuestion: React.FC = () => {
   }
 
   const onCreateQuestion = () => {
-    createQuestion(titleDraft, bodyDraft, setLoading, setCreateQuestionResponse);
+    createQuestion(titleDraft, questionDraft, setLoading, setCreateQuestionResponse);
   };
 
   return (
@@ -57,7 +57,7 @@ export const NewQuestion: React.FC = () => {
       <div style={{ paddingBottom: '20px' }}>Question Content</div>
       <Editor
         className={styles.bodyContainer}
-        onChange={value => { setBodyDraft(JSON.stringify(value)); }}
+        onChange={(remirrorJson) => setQuestionDraft(JSON.stringify(remirrorJson))}
       />
       <Button className={styles.submitQuestionButton} onClick={onCreateQuestion}>Ask your question</Button>
     </div>

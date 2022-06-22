@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { RemirrorJSON } from "remirror";
 import { Button } from "src/components/button/Button";
-import { Editor } from "src/components/editor/Editor";
+import { Display } from "src/components/editor/Editor";
 import { Loading } from "src/components/loading/Loading";
 import { useSearch, useSetResults } from "src/pages/search/actions";
 import styles from "src/pages/search/search.m.css";
@@ -43,14 +44,12 @@ export const SearchResults: React.FC = () => {
       <ul className={styles.results}>
         {results.map((result, index) => (
           <li key={index} className={styles.result}>
-            <h3>
+            <h3 className={styles.postTitleContainer}>
               <Link className={styles.postTitle} to={`/question/${result.id}`}>Q: {result.title}</Link>
             </h3>
             <div className={styles.postBody}>
-              <Editor
-                readonly={true}
-                onChange={() => undefined}
-                initialValue={JSON.parse(result.body)}
+              <Display
+                initialValue={toPlaintext(JSON.parse(result.body)).trim()}
               />
             </div>
           </li>
@@ -62,4 +61,29 @@ export const SearchResults: React.FC = () => {
       </div>
     </div>
   );
+};
+
+const toPlaintext = (json: RemirrorJSON) => {
+  let plaintext = '';
+
+  if (['paragraph', 'heading'].includes(json.type)) {
+    plaintext += ' ';
+  }
+
+  if (json.content) {
+    plaintext += json.content?.map((innerJson) => {
+      let innerPlaintext = '';
+      if (innerJson.text) {
+        innerPlaintext += innerJson.text;
+      }
+
+      if (innerJson.content) {
+        innerPlaintext += toPlaintext(innerJson);
+      }
+
+      return innerPlaintext;
+    }).join('');
+  }
+
+  return plaintext;
 };

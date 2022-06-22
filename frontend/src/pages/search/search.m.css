@@ -9,6 +9,10 @@
     margin-bottom: 40px;
 }
 
+.postTitleContainer {
+    margin-bottom: 10px;
+}
+
 .postTitle {
     text-align: left;
     display: block;
