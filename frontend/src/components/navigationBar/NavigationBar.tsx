@@ -1,20 +1,10 @@
 import { NavLink } from "react-router-dom";
-import { useDispatch, useSelector } from "src/root/model";
-import { sendRequest } from "src/rpc/ajax";
-import { Logout } from "src/rpc/api";
+import { useSelector } from "src/root/model";
 import styles from './navigationBar.m.css';
 
 export const NavigationBar: React.FC = () => {
   const isAuthenticated = useSelector(state => state.login.authenticated);
   const organization = useSelector(state => state.login.organization);
-  const dispatch = useDispatch();
-  const logout = async () => {
-    await sendRequest(Logout);
-    dispatch({
-      type: 'login.logout',
-    });
-  };
-
 
   // No navigation bar whatsoever for login page
   if (!isAuthenticated || !organization) {
@@ -67,7 +57,7 @@ export const NavigationBar: React.FC = () => {
           <div className={styles.route}>All Questions</div>
         </NavLink>
         <div className={styles.profileContainer}>
-          <div className={styles.route} onClick={logout}>Logout</div>
+          <div className={styles.route} >Help</div>
         </div>
       </div>
     </>

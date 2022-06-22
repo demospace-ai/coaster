@@ -11,11 +11,12 @@ export type GoogleLoginResponse = {
 
 export type GoogleLoginHandler = (response: GoogleLoginResponse) => void;
 
-export function useHandleGoogleResponse(): GoogleLoginHandler {
+export function useHandleGoogleResponse(setLoading: (loading: boolean) => void): GoogleLoginHandler {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   return useCallback(async (response: GoogleLoginResponse) => {
+    setLoading(true);
     const id_token = response.credential;
     const payload = { 'id_token': id_token };
     try {
@@ -31,9 +32,10 @@ export function useHandleGoogleResponse(): GoogleLoginHandler {
       if (loginResponse.organization) {
         navigate("/");
       }
+      setLoading(false);
     } catch (e) {
     }
-  }, [dispatch, navigate]);
+  }, [dispatch, navigate, setLoading]);
 }
 
 export interface OrganizationArgs {

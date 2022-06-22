@@ -22,7 +22,7 @@ export enum LoginStep {
 
 export const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
-  const handleGoogleResponse = useHandleGoogleResponse();
+  const handleGoogleResponse = useHandleGoogleResponse(setLoading);
   const isAuthenticated = useSelector(state => state.login.authenticated);
   const organization = useSelector(state => state.login.organization);
   const navigate = useNavigate();

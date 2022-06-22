@@ -23,7 +23,7 @@
 
 .titleContainer:focus {
     outline: none;
-    border: 2px blue solid;
+    border: 2px solid rgb(130, 178, 255);
 }
 
 .bodyContainer {
@@ -37,7 +37,7 @@
 }
 
 .bodyContainer:focus {
-    border: 2px blue solid;
+    border: 2px solid rgb(130, 178, 255);
 }
 
 .noResize {

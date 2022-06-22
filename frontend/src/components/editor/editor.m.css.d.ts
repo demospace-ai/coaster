@@ -1,5 +1,4 @@
 declare const styles: {
-  readonly "editor": string;
   readonly "bold": string;
   readonly "italic": string;
   readonly "title": string;

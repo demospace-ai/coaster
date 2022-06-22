@@ -34,3 +34,34 @@
     height: 30px;
     cursor: pointer;
 }
+
+.profileDropdown {
+    position: absolute;
+    right: 20px;
+    top: 50px;
+    border: 1px solid lightgray;
+    border-radius: 4px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0 0 10px;
+    background: white;
+    width: 200px;
+    padding: 10px 0;
+}
+
+.hidden {
+    display: none;
+}
+
+.dropdownItem {
+    font-size: 16px;
+    padding: 5px 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.dropdownItem:hover {
+    background: lightgray;
+}
+
+.dropdownItem:last-child {
+    margin-bottom: 0;
+}
