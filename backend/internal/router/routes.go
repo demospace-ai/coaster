@@ -54,6 +54,12 @@ var Routes = []Route{
 		HandlerFunc: handlers.CreateQuestion,
 	},
 	{
+		Name:        "Get all users in an organization",
+		Method:      "GET",
+		Pattern:     "/api/get_all_users",
+		HandlerFunc: handlers.GetAllUsers,
+	},
+	{
 		Name:        "Create answer",
 		Method:      "POST",
 		Pattern:     "/api/create_answer",

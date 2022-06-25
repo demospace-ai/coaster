@@ -8,13 +8,17 @@ import (
 	"gorm.io/gorm"
 )
 
-func CreateQuestion(db *gorm.DB, questionTitle string, questionBody string, userID int64, organizationID int64) (*models.Post, error) {
+func CreateQuestion(db *gorm.DB, questionTitle string, questionBody string, userID int64, organizationID int64, assignedUserID *int64) (*models.Post, error) {
 	post := models.Post{
 		PostType:       models.PostTypeQuestion,
 		Title:          database.NewNullString(questionTitle),
 		Body:           questionBody,
 		UserID:         userID,
 		OrganizationID: organizationID,
+	}
+
+	if assignedUserID != nil {
+		post.AssignedUserID = database.NewNullInt64(*assignedUserID)
 	}
 
 	result := db.Create(&post)

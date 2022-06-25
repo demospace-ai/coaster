@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { onSuccessfulAuthentication } from 'src/pages/login/actions';
 import { useDispatch } from 'src/root/model';
 import { sendRequest } from 'src/rpc/ajax';
 import { CheckSession } from 'src/rpc/api';
@@ -13,6 +14,8 @@ export function useStart() {
         user: checkSessionResponse.user,
         organization: checkSessionResponse.organization,
       });
+
+      onSuccessfulAuthentication(dispatch);
     } catch (e) {
     }
 

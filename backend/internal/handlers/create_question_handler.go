@@ -8,8 +8,9 @@ import (
 )
 
 type CreateQuestionRequest struct {
-	QuestionTitle string `json:"question_title"`
-	QuestionBody  string `json:"question_body"`
+	QuestionTitle  string `json:"question_title"`
+	QuestionBody   string `json:"question_body"`
+	AssignedUserID *int64 `json:"assigned_user_id,omitempty"`
 }
 
 type CreateQuestionResponse struct {
@@ -29,7 +30,14 @@ func CreateQuestion(env Env, w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	post, err := posts.CreateQuestion(env.Db, createQuestionRequest.QuestionTitle, createQuestionRequest.QuestionBody, env.Auth.User.ID, env.Auth.Organization.ID)
+	post, err := posts.CreateQuestion(
+		env.Db,
+		createQuestionRequest.QuestionTitle,
+		createQuestionRequest.QuestionBody,
+		env.Auth.User.ID,
+		env.Auth.Organization.ID,
+		createQuestionRequest.AssignedUserID,
+	)
 	if err != nil {
 		return err
 	}

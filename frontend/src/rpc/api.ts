@@ -9,6 +9,11 @@ export const Login: IEndpoint<LoginRequest, LoginResponse> = {
     path: '/login',
 };
 
+export const GetAllUsers: IEndpoint<undefined, GetAllUsersResponse> = {
+    method: 'GET',
+    path: '/get_all_users',
+};
+
 export const CheckSession: IEndpoint<undefined, CheckSessionResponse> = {
     method: 'GET',
     path: '/check_session',
@@ -75,9 +80,14 @@ export interface LoginRequest {
 }
 
 export interface User {
+    id: number;
     first_name: string;
     last_name: string;
     email: string;
+}
+
+export interface GetAllUsersResponse {
+    users: User[];
 }
 
 export interface LoginResponse {
@@ -99,6 +109,7 @@ export interface CheckSessionResponse {
 export interface CreateQuestionRequest {
     question_title: string;
     question_body: string;
+    assigned_user_id?: number;
 }
 
 export interface CreateQuestionResponse {

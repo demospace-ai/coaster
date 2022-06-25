@@ -1,9 +1,9 @@
-import React, { useCallback } from 'react';
+import React, { Dispatch, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LoginStep } from 'src/pages/login/Login';
-import { useDispatch } from 'src/root/model';
+import { RootAction, useDispatch } from 'src/root/model';
 import { sendRequest } from 'src/rpc/ajax';
-import { Login, SetOrganization, ValidationCode } from 'src/rpc/api';
+import { GetAllUsers, Login, SetOrganization, ValidationCode } from 'src/rpc/api';
 
 export type GoogleLoginResponse = {
   credential: string;
@@ -30,8 +30,11 @@ export function useHandleGoogleResponse(setLoading: (loading: boolean) => void):
 
       // If there's no organization, stay on the login page so the user can set it
       if (loginResponse.organization) {
+        onSuccessfulAuthentication(dispatch);
+
         navigate("/");
       }
+
       setLoading(false);
     } catch (e) {
     }
@@ -55,6 +58,8 @@ export function useSetOrganization() {
         type: 'login.organizationSet',
         organization: response.organization,
       });
+
+      onSuccessfulAuthentication(dispatch);
 
       navigate("/");
     } catch (e) {
@@ -93,4 +98,15 @@ export function useEmailLogin() {
     } catch (e) {
     }
   }, [dispatch]);
+}
+
+export async function onSuccessfulAuthentication(dispatch: Dispatch<RootAction>) {
+  try {
+    const response = await sendRequest(GetAllUsers);
+    dispatch({
+      type: 'login.allUsers',
+      users: response.users,
+    });
+  } catch (e) {
+  }
 }

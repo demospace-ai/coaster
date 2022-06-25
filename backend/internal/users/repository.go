@@ -141,3 +141,18 @@ func GetOrCreateForEmail(db *gorm.DB, email string, firstName string, lastName s
 
 	return user, nil
 }
+
+func LoadAllByOrganizationID(db *gorm.DB, organizationID int64) ([]models.User, error) {
+	var users []models.User
+	result := db.Table("users").
+		Where("users.organization_id = ?", organizationID).
+		Where("users.deactivated_at IS NULL").
+		Find(&users)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return users, nil
+
+}
