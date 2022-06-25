@@ -34,6 +34,7 @@ func LoadQuestionByID(db *gorm.DB, questionID int64, organizationID int64) (*mod
 	result := db.Table("posts").
 		Select("posts.*").
 		Where("posts.id = ?", questionID).
+		Where("posts.organization_id = ?", organizationID).
 		Where("posts.deactivated_at IS NULL").
 		Take(&question)
 
@@ -44,11 +45,30 @@ func LoadQuestionByID(db *gorm.DB, questionID int64, organizationID int64) (*mod
 	return &question, nil
 }
 
+func LoadAssignedQuestions(db *gorm.DB, userID int64, organizationID int64) ([]models.Post, error) {
+	var questions []models.Post
+	result := db.Table("posts").
+		Select("posts.*").
+		Where("posts.assigned_user_id = ?", userID).
+		Where("posts.organization_id = ?", organizationID).
+		Where("posts.organization_id = ?", organizationID).
+		Where("posts.post_type = ?", models.PostTypeQuestion).
+		Where("posts.deactivated_at IS NULL").
+		Find(&questions)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return questions, nil
+}
+
 func LoadAnswersByQuestionID(db *gorm.DB, questionID int64, organizationID int64) ([]models.Post, error) {
 	var answers []models.Post
 	result := db.Table("posts").
 		Select("posts.*").
 		Where("posts.parent_post_id = ?", questionID).
+		Where("posts.organization_id = ?", organizationID).
 		Where("posts.deactivated_at IS NULL").
 		Find(&answers)
 

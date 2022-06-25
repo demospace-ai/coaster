@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { LoginStep } from 'src/pages/login/Login';
 import { RootAction, useDispatch } from 'src/root/model';
 import { sendRequest } from 'src/rpc/ajax';
-import { GetAllUsers, Login, SetOrganization, ValidationCode } from 'src/rpc/api';
+import { GetAllUsers, GetAssignedQuestions, Login, SetOrganization, ValidationCode } from 'src/rpc/api';
 
 export type GoogleLoginResponse = {
   credential: string;
@@ -102,10 +102,16 @@ export function useEmailLogin() {
 
 export async function onSuccessfulAuthentication(dispatch: Dispatch<RootAction>) {
   try {
-    const response = await sendRequest(GetAllUsers);
+    const allUsers = await sendRequest(GetAllUsers);
     dispatch({
       type: 'login.allUsers',
-      users: response.users,
+      users: allUsers.users,
+    });
+
+    const assignedQuestions = await sendRequest(GetAssignedQuestions);
+    dispatch({
+      type: 'login.assignedQuestions',
+      assignedQuestions: assignedQuestions.questions,
     });
   } catch (e) {
   }

@@ -1,7 +1,12 @@
+import classNames from "classnames";
 import styles from "./loading.m.css";
 
-export const Loading: React.FC = () => {
+type LoadingProps = {
+  className?: string;
+};
+
+export const Loading: React.FC<LoadingProps> = props => {
   return (
-    <div className={styles.loading} />
+    <div className={classNames(styles.loading, props.className)} />
   );
 };

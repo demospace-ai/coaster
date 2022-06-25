@@ -14,6 +14,11 @@ export const GetAllUsers: IEndpoint<undefined, GetAllUsersResponse> = {
     path: '/get_all_users',
 };
 
+export const GetAssignedQuestions: IEndpoint<undefined, GetAssignedQuestionsResponse> = {
+    method: 'GET',
+    path: '/get_assigned_questions',
+};
+
 export const CheckSession: IEndpoint<undefined, CheckSessionResponse> = {
     method: 'GET',
     path: '/check_session',
@@ -88,6 +93,11 @@ export interface User {
 
 export interface GetAllUsersResponse {
     users: User[];
+}
+
+
+export interface GetAssignedQuestionsResponse {
+    questions: Post[];
 }
 
 export interface LoginResponse {
