@@ -58,9 +58,11 @@ export const Question: React.FC = () => {
       <div className={styles.question}>
         <h1>{questionResponse!.question.title}</h1>
         <div>
-          <Display
-            initialValue={JSON.parse(questionResponse!.question.body)}
-          />
+          {questionResponse!.question.body &&
+            // The question might not actually have a body
+            <Display
+              initialValue={JSON.parse(questionResponse!.question.body)}
+            />}
         </div>
       </div>
       {questionResponse!.answers.length > 0 &&
