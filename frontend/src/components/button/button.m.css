@@ -5,8 +5,8 @@
     cursor: pointer;
     box-shadow: none;
     border-radius: 5px;
-    border: 2px solid black;
-    background-color: black;
+    border: none;
+    background: #449e6e;
     letter-spacing: 1px;
     transition: all .1s ease-in-out;
 }
@@ -18,7 +18,7 @@
 }
 
 .button:hover {
-    background-color: gray;
+    background: #378159;
 }
 
 .backButton {
