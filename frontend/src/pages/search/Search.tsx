@@ -47,11 +47,13 @@ export const SearchResults: React.FC = () => {
             <h3 className={styles.postTitleContainer}>
               <Link className={styles.postTitle} to={`/question/${result.id}`}>Q: {result.title}</Link>
             </h3>
-            <div className={styles.postBody}>
-              <Display
-                initialValue={toPlaintext(JSON.parse(result.body)).trim()}
-              />
-            </div>
+            {result.body &&
+              <div className={styles.postBody}>
+                <Display
+                  initialValue={toPlaintext(JSON.parse(result.body)).trim()}
+                />
+              </div>
+            }
           </li>
         ))}
       </ul>
