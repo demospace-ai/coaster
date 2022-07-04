@@ -35,7 +35,7 @@ export const Home: React.FC = () => {
           {loading ? <Loading className={styles.loading} /> : (
             <ul>
               {assignedQuestions.map((question, index) =>
-                <li key={index}>
+                <li key={index} className={styles.questionListItem}>
                   <Link className={styles.questionLink} to={`/question/${question.id}`}>{question.title}</Link>
                 </li>
               )}

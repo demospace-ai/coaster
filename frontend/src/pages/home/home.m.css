@@ -56,6 +56,10 @@
     margin-top: 120px;
 }
 
+.questionListItem {
+    margin-bottom: 10px;
+}
+
 .questionLink {
     color: blue;
 }

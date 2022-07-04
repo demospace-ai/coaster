@@ -68,7 +68,7 @@ export const NewQuestion: React.FC = () => {
         className={styles.bodyContainer}
         onChange={(remirrorJson) => setQuestionDraft(JSON.stringify(remirrorJson))}
       />
-      <div style={{ paddingBottom: '20px' }}>Assignee</div>
+      <div style={{ paddingBottom: '20px' }}>Assigned Owner</div>
       <AssigneeInput setAssignee={setAssignee} />
       <Button className={styles.submitQuestionButton} onClick={onCreateQuestion}>Ask your question</Button>
     </div>

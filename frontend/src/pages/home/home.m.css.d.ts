@@ -9,6 +9,7 @@ declare const styles: {
   readonly "tasksSubtitle": string;
   readonly "tasksContentContainer": string;
   readonly "loading": string;
+  readonly "questionListItem": string;
   readonly "questionLink": string;
 };
 export = styles;
