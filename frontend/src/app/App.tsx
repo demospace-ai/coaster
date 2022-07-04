@@ -6,8 +6,9 @@ import { useStart } from 'src/app/actions';
 import { Header } from 'src/components/header/Header';
 import { Loading } from 'src/components/loading/Loading';
 import { NavigationBar } from 'src/components/navigationBar/NavigationBar';
-import { Home } from 'src/pages/home/Home';
+import { Inbox } from 'src/pages/inbox/Inbox';
 import { Login } from 'src/pages/login/Login';
+import { MyTasks } from 'src/pages/mytasks/MyTasks';
 import { NewQuestion } from 'src/pages/newquestion/NewQuestion';
 import { NotFound } from 'src/pages/notfound/NotFound';
 import { Question } from 'src/pages/question/Question';
@@ -34,7 +35,8 @@ export const App: React.FC = () => {
       <Routes>
         <Route element={<AppLayout />}>
           <Route path='/login' element={<Login />} />
-          <Route path='/' element={<RequireAuth element={<Home />} />} />
+          <Route path='/' element={<RequireAuth element={<Inbox />} />} />
+          <Route path='/tasks' element={<RequireAuth element={<MyTasks />} />} />
           <Route path='/question/:id' element={<RequireAuth element={<Question />} />} />
           <Route path='/search' element={<RequireAuth element={<SearchResults />} />} />
           <Route path='/new' element={<RequireAuth element={<NewQuestion />} />} />

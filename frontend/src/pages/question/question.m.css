@@ -37,7 +37,7 @@
 }
 
 .answerInput:focus {
-    border: 2px solid rgb(130, 178, 255);
+    border: 2px solid #44749e;
 }
 
 .answerButton {

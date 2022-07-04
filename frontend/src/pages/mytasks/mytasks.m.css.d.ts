@@ -3,14 +3,13 @@ declare const styles: {
   readonly "title": string;
   readonly "date": string;
   readonly "pageTitle": string;
-  readonly "tasksContainer": string;
-  readonly "tasksHeaderContainer": string;
-  readonly "tasksTitle": string;
-  readonly "tasksSubtitle": string;
+  readonly "tasksFilterContainer": string;
+  readonly "tasksFilter": string;
   readonly "tasksContentContainer": string;
   readonly "loading": string;
+  readonly "questionList": string;
   readonly "questionListItem": string;
-  readonly "questionLink": string;
+  readonly "questionTitle": string;
 };
 export = styles;
 
