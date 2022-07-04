@@ -52,12 +52,12 @@ export const Editor: React.FC<EditorProps> = props => {
     color: {
       ...originalTheme.theme.color,
       hover: {
-        primary: '#44749e',
+        primary: '#5fc58f',
       },
       active: {
-        primary: 'rgb(80, 145, 248)',
+        primary: '#449e6e',
       },
-      primary: 'rgb(80, 145, 248)',
+      primary: '#449e6e',
       outline: 'none',
     }
   };
