@@ -1,11 +1,10 @@
 import {
-  ComponentItem,
   EditorComponent,
   OnChangeJSON,
   Remirror,
   ThemeProvider,
-  Toolbar,
-  ToolbarItemUnion, useRemirror
+  useRemirror,
+  useTheme
 } from '@remirror/react';
 import { AllStyledComponent } from '@remirror/styles/emotion';
 import React, { useCallback } from 'react';
@@ -30,6 +29,12 @@ import {
   TableExtension,
   TrailingNodeExtension
 } from 'remirror/extensions';
+import {
+  ComponentItem,
+  Toolbar,
+  ToolbarItemUnion
+} from 'src/components/remirror/react-components';
+
 
 type EditorProps = {
   onChange: (value: RemirrorJSON) => void;
@@ -41,10 +46,25 @@ type EditorProps = {
 
 export const Editor: React.FC<EditorProps> = props => {
   const { manager } = useMarkdownEditor();
+  const originalTheme = useTheme();
+  const theme = {
+    ...originalTheme.theme,
+    color: {
+      ...originalTheme.theme.color,
+      hover: {
+        primary: 'rgb(130, 178, 255)',
+      },
+      active: {
+        primary: 'rgb(80, 145, 248)',
+      },
+      primary: 'rgb(80, 145, 248)',
+      outline: 'none',
+    }
+  };
 
   return (
     <AllStyledComponent>
-      <ThemeProvider>
+      <ThemeProvider theme={theme}>
         <Remirror manager={manager} editable={props.editable} initialContent={props.initialValue} classNames={[props.className]}>
           <Toolbar items={toolbarItems} refocusEditor label='Top Toolbar' />
           <EditorComponent />
@@ -98,36 +118,10 @@ const toolbarItems: ToolbarItemUnion[] = [
         attrs: { level: 2 },
       },
       {
-        type: ComponentItem.ToolbarMenu,
-
-        items: [
-          {
-            type: ComponentItem.MenuGroup,
-            role: 'radio',
-            items: [
-              {
-                type: ComponentItem.MenuCommandPane,
-                commandName: 'toggleHeading',
-                attrs: { level: 3 },
-              },
-              {
-                type: ComponentItem.MenuCommandPane,
-                commandName: 'toggleHeading',
-                attrs: { level: 4 },
-              },
-              {
-                type: ComponentItem.MenuCommandPane,
-                commandName: 'toggleHeading',
-                attrs: { level: 5 },
-              },
-              {
-                type: ComponentItem.MenuCommandPane,
-                commandName: 'toggleHeading',
-                attrs: { level: 6 },
-              },
-            ],
-          },
-        ],
+        type: ComponentItem.ToolbarCommandButton,
+        commandName: 'toggleHeading',
+        display: 'icon',
+        attrs: { level: 3 },
       },
     ],
     separator: 'end',

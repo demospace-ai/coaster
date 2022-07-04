@@ -81,8 +81,8 @@ export const Question: React.FC = () => {
         </div>
       }
       <div>
-        {/* TODO: actually provide a way to tag someone. */}
-        <div style={{ paddingBottom: '20px' }}>Know someone who can answer? Tag them here!</div>
+        {/* TODO: provide a way to tag someone. */}
+        <div style={{ paddingBottom: '20px' }}>Reply with an answer!</div>
         <Editor
           className={styles.answerInput}
           onChange={(remirrorJson) => { setAnswerDraft(JSON.stringify(remirrorJson)); }}
