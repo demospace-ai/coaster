@@ -11,6 +11,7 @@ import (
 	"fabra/internal/users"
 	"fabra/internal/verifications"
 	"net/http"
+	"strings"
 
 	"google.golang.org/api/idtoken"
 	"gorm.io/gorm"
@@ -75,7 +76,8 @@ func Login(env Env, w http.ResponseWriter, r *http.Request) error {
 			return err
 		}
 	} else {
-		suggestedOrganizations, err = organizations.LoadOrganizationsByEmailDomain(env.Db, user.Email)
+		var userEmailDomain = strings.Split(env.Auth.User.Email, "@")[1]
+		suggestedOrganizations, err = organizations.LoadOrganizationsByEmailDomain(env.Db, userEmailDomain)
 		if err != nil {
 			return err
 		}

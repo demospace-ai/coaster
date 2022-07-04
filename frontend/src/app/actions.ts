@@ -13,6 +13,7 @@ export function useStart() {
         type: 'login.authenticated',
         user: checkSessionResponse.user,
         organization: checkSessionResponse.organization,
+        suggestedOrganizations: checkSessionResponse.suggested_organizations,
       });
 
       onSuccessfulAuthentication(dispatch);

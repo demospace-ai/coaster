@@ -114,6 +114,7 @@ export interface Organization {
 export interface CheckSessionResponse {
     user: User;
     organization?: Organization,
+    suggested_organizations?: Organization[];
 }
 
 export interface CreateQuestionRequest {
