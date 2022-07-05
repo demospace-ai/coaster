@@ -1,3 +1,5 @@
+@import "/src/styles/colors.css";
+
 .button {
     color: white;
     padding: 5px 20px;
@@ -6,7 +8,7 @@
     box-shadow: none;
     border-radius: 5px;
     border: none;
-    background: #449e6e;
+    background: var(--primary-color);
     letter-spacing: 1px;
     transition: all .1s ease-in-out;
 }
@@ -18,7 +20,7 @@
 }
 
 .button:hover {
-    background: #378159;
+    background: var(--primary-highlight-color);
 }
 
 .backButton {

@@ -1,4 +1,4 @@
-@import "src/styles/colors";
+@import "/src/styles/colors.css";
 
 .headerContainer {
     display: flex;
@@ -39,7 +39,7 @@
     position: absolute;
     right: 20px;
     top: 50px;
-    border: 1px solid lightgray;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     box-shadow: rgba(0, 0, 0, 0.1) 0 0 10px;
     background: white;
@@ -59,7 +59,7 @@
 }
 
 .dropdownItem:hover {
-    background: lightgray;
+    background: var(--navigation-highlight-color);
 }
 
 .dropdownItem:last-child {

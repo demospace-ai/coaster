@@ -1,3 +1,5 @@
+@import "/src/styles/colors.css";
+
 .home {
     height: 100%;
 }
@@ -29,7 +31,7 @@
 }
 
 .tasksContentContainer {
-    border-top: 1px solid lightgray;
+    border-top: 1px solid var(--border-color);
     width: 100%;
 }
 
@@ -47,14 +49,14 @@
 
 .questionListItem {
     width: 100%;
-    border-bottom: 1px solid lightgray;
+    border-bottom: 1px solid var(--border-color);
     padding: 15px 20px;
     cursor: pointer;
     display: flex;
 }
 
 .questionListItem:hover {
-    background: #f1f1f1;
+    background: var(--navigation-highlight-color);
 }
 
 .questionTitle {

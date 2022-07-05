@@ -1,4 +1,4 @@
-@import "src/styles/colors";
+@import "/src/styles/colors.css";
 
 .searchBar {
     display: flex;
@@ -12,6 +12,7 @@
 
 .searchBar:focus-within {
     border: 2px solid #44749e;
+    margin: -1px;
 }
 
 .searchIconContainer {
