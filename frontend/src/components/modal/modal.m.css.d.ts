@@ -3,7 +3,7 @@ declare const styles: {
   readonly "modalMain": string;
   readonly "displayBlock": string;
   readonly "displayNone": string;
-  readonly "center": string;
+  readonly "title": string;
   readonly "closeButton": string;
 };
 export = styles;

@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 import { Button } from "src/components/button/Button";
 import { Display } from "src/components/editor/Editor";
 import { Loading } from "src/components/loading/Loading";
 import { useSearch, useSetResults } from "src/pages/search/actions";
 import styles from "src/pages/search/search.m.css";
-import { useSelector } from "src/root/model";
+import { useDispatch, useSelector } from "src/root/model";
 
 const doSearch = async (query: string, setLoading: (loading: boolean) => void, search: (query: string) => Promise<void>) => {
   await search(query);
@@ -20,7 +20,10 @@ export const SearchResults: React.FC = () => {
   const search = useSearch();
   const setResults = useSetResults();
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const showNewQuestionModal = () => {
+    dispatch({ type: "showNewQuestionModal", showNewQuestionModal: true });
+  };
 
   useEffect(() => {
     // No query, no need to search
@@ -59,7 +62,7 @@ export const SearchResults: React.FC = () => {
       </ul>
       <div className={styles.newQuestionPrompt}>
         <h3>Not finding what you're looking for?</h3>
-        <Button className={styles.newQuestionButton} onClick={() => { navigate('/new'); }}>Ask a question</Button>
+        <Button className={styles.newQuestionButton} onClick={showNewQuestionModal}>Ask a question</Button>
       </div>
     </div>
   );

@@ -57,18 +57,17 @@ export const NewQuestion: React.FC = () => {
 
   return (
     <div className={styles.questionContainer}>
-      <div style={{ paddingBottom: '20px' }}>Question Title</div>
       <input
         className={styles.titleContainer}
         onChange={e => { setTitleDraft(e.target.value); }}
+        placeholder={"Question Title"}
         autoFocus
       />
-      <div style={{ paddingBottom: '20px' }}>Question Content</div>
       <Editor
         className={styles.bodyContainer}
         onChange={(remirrorJson) => setQuestionDraft(JSON.stringify(remirrorJson))}
+        placeholder="Add description..."
       />
-      <div style={{ paddingBottom: '20px' }}>Assigned Owner</div>
       <AssigneeInput setAssignee={setAssignee} />
       <Button className={styles.submitQuestionButton} onClick={onCreateQuestion}>Submit</Button>
     </div>
@@ -102,6 +101,10 @@ const AssigneeInput: React.FC<AssigneeInputProps> = props => {
             "box-sizing": "border-box",
             "padding-left": "10px",
           },
+          "& .MuiAutocomplete-input::placeholder": {
+            fontStyle: "italic",
+            color: "#aaa",
+          },
         }}
         onMouseDownCapture={(e) => { if (inputValue.length === 0) { e.stopPropagation(); } }}
         inputValue={inputValue}
@@ -113,7 +116,7 @@ const AssigneeInput: React.FC<AssigneeInputProps> = props => {
         }}
         renderInput={(props) => (
           <div className={styles.assigneeContainer} ref={props.InputProps.ref}>
-            <input type="text" {...props.inputProps} />
+            <input type="text" {...props.inputProps} placeholder="Assigned owner" />
           </div>
         )}
       />

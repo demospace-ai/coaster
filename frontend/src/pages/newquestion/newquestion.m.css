@@ -1,7 +1,15 @@
 .questionContainer {
-    margin: 50px auto 0;
-    width: 70vw;
+    margin: 50px;
+    margin-top: 10px;
+    width: 700px;
     max-width: 800px;
+}
+
+
+@media (max-width: 900px) {
+    .questionContainer {
+        width: 70vw;
+    }
 }
 
 .submitQuestionButton {
@@ -21,13 +29,18 @@
     box-sizing: border-box;
 }
 
+.titleContainer::placeholder {
+    font-size: 16px;
+}
+
 .titleContainer:focus {
     outline: none;
     border: 2px solid #44749e;
 }
 
 .bodyContainer {
-    height: 300px;
+    min-height: 100px;
+    max-height: 400px;
     margin-bottom: 20px;
     background: white;
     border: 2px gray solid;
@@ -55,4 +68,8 @@
 
 .assigneeContainer:focus-within {
     border: 2px solid #44749e !important;
+}
+
+.assigneeContainer::placeholder {
+    font-style: italic;
 }

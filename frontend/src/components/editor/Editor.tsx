@@ -30,9 +30,7 @@ import {
   TrailingNodeExtension
 } from 'remirror/extensions';
 import {
-  ComponentItem,
-  Toolbar,
-  ToolbarItemUnion
+  ComponentItem, ToolbarItemUnion
 } from 'src/components/remirror/react-components';
 
 
@@ -45,7 +43,7 @@ type EditorProps = {
 };
 
 export const Editor: React.FC<EditorProps> = props => {
-  const { manager } = useMarkdownEditor();
+  const { manager } = useMarkdownEditor({ placeholder: props.placeholder });
   const originalTheme = useTheme();
   const theme = {
     ...originalTheme.theme,
@@ -59,14 +57,20 @@ export const Editor: React.FC<EditorProps> = props => {
       },
       primary: '#449e6e',
       outline: 'none',
+    },
+    space: {
+      3: 0,
+    },
+    fontFamily: {
+      default: 'Inter',
     }
   };
 
   return (
     <AllStyledComponent>
-      <ThemeProvider theme={theme}>
+      <ThemeProvider theme={theme} >
         <Remirror manager={manager} editable={props.editable} initialContent={props.initialValue} classNames={[props.className]}>
-          <Toolbar items={toolbarItems} refocusEditor label='Top Toolbar' />
+          {/*<Toolbar items={toolbarItems} refocusEditor label='Top Toolbar' />*/}
           <EditorComponent />
           <OnChangeJSON onChange={props.onChange} />
         </Remirror>

@@ -1,10 +1,12 @@
 import React, { ReactNode, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import {
   BrowserRouter, Navigate, Outlet, Route, Routes
 } from 'react-router-dom';
 import { useStart } from 'src/app/actions';
 import { Header } from 'src/components/header/Header';
 import { Loading } from 'src/components/loading/Loading';
+import { Modal } from 'src/components/modal/Modal';
 import { NavigationBar } from 'src/components/navigationBar/NavigationBar';
 import { Inbox } from 'src/pages/inbox/Inbox';
 import { Login } from 'src/pages/login/Login';
@@ -18,7 +20,12 @@ import styles from './app.m.css';
 
 export const App: React.FC = () => {
   const loading = useSelector(state => state.app.loading);
+  const showNewQuestionModal = useSelector(state => state.app.showNewQuestionModal);
   const start = useStart();
+  const dispatch = useDispatch();
+  const closeNewQuestionModal = () => {
+    dispatch({ type: 'showNewQuestionModal', showNewQuestionModal: false });
+  };
 
   useEffect(() => {
     start();
@@ -31,19 +38,23 @@ export const App: React.FC = () => {
   }
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route element={<AppLayout />}>
-          <Route path='/login' element={<Login />} />
-          <Route path='/' element={<RequireAuth element={<Inbox />} />} />
-          <Route path='/tasks' element={<RequireAuth element={<MyTasks />} />} />
-          <Route path='/question/:id' element={<RequireAuth element={<Question />} />} />
-          <Route path='/search' element={<RequireAuth element={<SearchResults />} />} />
-          <Route path='/new' element={<RequireAuth element={<NewQuestion />} />} />
-          <Route path='*' element={<NotFound />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <>
+      <BrowserRouter>
+        <Modal show={showNewQuestionModal} close={closeNewQuestionModal} title="New Question">
+          <NewQuestion />
+        </Modal>
+        <Routes>
+          <Route element={<AppLayout />}>
+            <Route path='/login' element={<Login />} />
+            <Route path='/' element={<RequireAuth element={<Inbox />} />} />
+            <Route path='/tasks' element={<RequireAuth element={<MyTasks />} />} />
+            <Route path='/question/:id' element={<RequireAuth element={<Question />} />} />
+            <Route path='/search' element={<RequireAuth element={<SearchResults />} />} />
+            <Route path='*' element={<NotFound />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </>
   );
 };
 
