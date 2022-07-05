@@ -11,9 +11,6 @@ export const MyTasks: React.FC = () => {
 
   return (
     <div className={styles.home}>
-      <div className={styles.pageTitle}>
-        My Tasks
-      </div>
       <div className={styles.tasksFilterContainer}>
         <div className={styles.tasksFilter}>Assigned</div>
         <div className={styles.tasksFilter}>Created</div>

@@ -1,8 +1,5 @@
 declare const styles: {
   readonly "home": string;
-  readonly "title": string;
-  readonly "date": string;
-  readonly "pageTitle": string;
   readonly "tasksFilterContainer": string;
   readonly "tasksFilter": string;
   readonly "tasksContentContainer": string;

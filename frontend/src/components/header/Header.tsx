@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { SearchBar } from 'src/components/searchbar/SearchBar';
 import { useDispatch, useSelector } from 'src/root/model';
 import { sendRequest } from 'src/rpc/ajax';
@@ -7,6 +8,7 @@ import { Logout } from 'src/rpc/api';
 import styles from './header.m.css';
 
 export const Header: React.FC = () => {
+  const location = useLocation();
   const isAuthenticated = useSelector(state => state.login.authenticated);
   const organization = useSelector(state => state.login.organization);
   const user = useSelector(state => state.login.user);
@@ -20,6 +22,18 @@ export const Header: React.FC = () => {
     setDropdownActive(false);
   };
 
+  let page: string;
+  switch (location.pathname) {
+    case '/':
+      page = 'Inbox';
+      break;
+    case '/tasks':
+      page = 'My Tasks';
+      break;
+    default:
+      page = '';
+  }
+
   // No header whatsoever for login and home page
   if (!isAuthenticated || !organization) {
     return <></>;
@@ -28,6 +42,7 @@ export const Header: React.FC = () => {
   return (
     <>
       <div className={styles.headerContainer}>
+        <div className={styles.pageTitle}>{page}</div>
         <div className={styles.searchBarContainer}>
           <SearchBar />
         </div>

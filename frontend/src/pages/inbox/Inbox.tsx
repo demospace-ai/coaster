@@ -8,9 +8,6 @@ export const Inbox: React.FC = () => {
 
   return (
     <div className={styles.home}>
-      <div className={styles.pageTitle}>
-        Inbox
-      </div>
       <div className={styles.date}>
         {dateString}
       </div>

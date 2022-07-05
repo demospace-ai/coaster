@@ -1,8 +1,8 @@
 @import "/src/styles/colors.css";
 
 .headerContainer {
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     box-sizing: border-box;
     min-height: 60px;
     height: 60px;
@@ -16,6 +16,10 @@
     .headerContainer {
         padding: 24px 48px;
     }
+}
+
+.pageTitle {
+    font-size: 14px;
 }
 
 .searchBarContainer {
@@ -33,6 +37,7 @@
     width: 30px;
     height: 30px;
     cursor: pointer;
+    margin-left: auto;
 }
 
 .profileDropdown {
