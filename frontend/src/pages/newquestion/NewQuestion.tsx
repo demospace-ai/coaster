@@ -70,7 +70,7 @@ export const NewQuestion: React.FC = () => {
       />
       <div style={{ paddingBottom: '20px' }}>Assigned Owner</div>
       <AssigneeInput setAssignee={setAssignee} />
-      <Button className={styles.submitQuestionButton} onClick={onCreateQuestion}>Ask your question</Button>
+      <Button className={styles.submitQuestionButton} onClick={onCreateQuestion}>Submit</Button>
     </div>
   );
 };

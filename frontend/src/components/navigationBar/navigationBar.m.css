@@ -1,13 +1,14 @@
 @import "/src/styles/colors.css";
 
 .navigationBar {
-    min-width: 250px;
-    width: 250px;
+    min-width: 240px;
+    width: 240px;
     height: 100%;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
     border-right: 1px solid var(--border-color);
+    background: #efefef;
 }
 
 .organizationContainer {
@@ -57,11 +58,11 @@
 }
 
 .newQuestion {
-    margin: 30px auto 20px 20px;
+    margin: 20px auto 20px 20px;
     height: 40px;
     display: flex;
     flex-direction: row;
-    border-radius: 50px;
+    border-radius: 5px;
     background: var(--primary-color);
     color: white;
     text-decoration: none;
@@ -69,6 +70,7 @@
     padding: 0 24px 0 14px;
     font-size: 14px;
     font-weight: 600;
+    box-shadow: rgb(0 0 0 / 7%) 0px 1px 1px;
 }
 
 .newQuestion:hover {
@@ -81,7 +83,7 @@
 }
 
 .activeRouteContainer {
-    background: var(--navigation-highlight-color);
+    background: #d6d6d6;
     padding: 10px 28px;
     display: flex;
     flex-direction: row;
@@ -89,7 +91,7 @@
     box-sizing: border-box;
     cursor: pointer;
     align-items: center;
-    color: black;
+    color: var(--primary-text-color);
     text-decoration: none;
 }
 
@@ -101,18 +103,19 @@
     box-sizing: border-box;
     cursor: pointer;
     align-items: center;
-    color: black;
+    color: var(--primary-text-color);
     text-decoration: none;
 }
 
 .routeContainer:hover {
-    background: var(--navigation-highlight-color);
+    background: #d6d6d6;
 }
 
 .route {
     padding-top: 1px;
     display: inline-block;
     margin-left: 10px;
+    font-size: 14px;
 }
 
 .routeIcon {

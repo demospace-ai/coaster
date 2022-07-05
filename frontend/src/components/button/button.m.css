@@ -15,7 +15,7 @@
 
 .secondary {
     background-color: white;
-    color: black;
+    color: var(--primary-text-color);
     font-weight: normal;
 }
 

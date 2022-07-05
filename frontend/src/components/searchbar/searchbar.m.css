@@ -7,7 +7,7 @@
     border-radius: 30px;
     border: 1px solid var(--border-color);
     background: white;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .searchBar:focus-within {
@@ -20,8 +20,8 @@
 }
 
 .searchIcon {
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     fill: gray;
 }
 

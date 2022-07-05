@@ -6,10 +6,11 @@ body {
   margin: 0;
   padding: 0;
   height: 100%;
-  font-family: "Montserrat", sans-serif;
+  font-family: "Inter", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: white;
+  color: #323232;
 }
 
 input,
