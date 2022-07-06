@@ -1,17 +1,10 @@
+@import "/src/styles/colors.css";
+
 .home {
     height: 100%;
-}
-
-.title {
-    margin-top: 10px;
-    font-size: 32px;
-    text-align: center;
-}
-
-.date {
-    margin-top: 50px;
-    font-size: 20px;
-    text-align: center;
+    display: flex;
+    align-items: stretch;
+    place-content: stretch;
 }
 
 .loading {
@@ -20,7 +13,21 @@
     margin-top: 120px;
 }
 
+.inboxList {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border-color);
+    width: 400px;
+    min-width: 400px;
+}
+
 .inboxBody {
-    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.inboxBodyPlaceholder {
+    margin-top: 350px;
     text-align: center;
 }

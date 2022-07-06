@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fabra/internal/errors"
 	"fabra/internal/models"
 	"fabra/internal/posts"
 	"net/http"
@@ -28,6 +29,10 @@ func CreateAnswer(env Env, w http.ResponseWriter, r *http.Request) error {
 	err := decoder.Decode(&createAnswerRequest)
 	if err != nil {
 		return err
+	}
+
+	if len(createAnswerRequest.AnswerBody) == 0 {
+		return errors.NewBadRequest("must provide answer body")
 	}
 
 	_, err = posts.CreateAnswer(env.Db, createAnswerRequest.QuestionID, createAnswerRequest.AnswerBody, env.Auth.User.ID, env.Auth.Organization.ID)

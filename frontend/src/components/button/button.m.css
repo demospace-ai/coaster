@@ -2,8 +2,8 @@
 
 .button {
     color: white;
-    padding: 5px 20px;
-    font-weight: bold;
+    padding: 5px 10px;
+    font-weight: 700;
     cursor: pointer;
     box-shadow: none;
     border-radius: 5px;
@@ -11,6 +11,7 @@
     background: var(--primary-color);
     letter-spacing: 1px;
     transition: all .1s ease-in-out;
+    border: 1px solid #508368;
 }
 
 .secondary {

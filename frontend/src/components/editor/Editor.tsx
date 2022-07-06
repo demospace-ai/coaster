@@ -60,6 +60,7 @@ export const Editor: React.FC<EditorProps> = props => {
     },
     space: {
       3: 0,
+      6: "50px",
     },
     fontFamily: {
       default: 'Inter',

@@ -1,9 +1,9 @@
 declare const styles: {
   readonly "home": string;
-  readonly "title": string;
-  readonly "date": string;
   readonly "loading": string;
+  readonly "inboxList": string;
   readonly "inboxBody": string;
+  readonly "inboxBodyPlaceholder": string;
 };
 export = styles;
 

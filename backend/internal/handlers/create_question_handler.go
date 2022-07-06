@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fabra/internal/errors"
 	"fabra/internal/models"
 	"fabra/internal/posts"
 	"net/http"
@@ -28,6 +29,10 @@ func CreateQuestion(env Env, w http.ResponseWriter, r *http.Request) error {
 	err := decoder.Decode(&createQuestionRequest)
 	if err != nil {
 		return err
+	}
+
+	if len(createQuestionRequest.QuestionTitle) == 0 {
+		return errors.NewBadRequest("must provide question title")
 	}
 
 	post, err := posts.CreateQuestion(

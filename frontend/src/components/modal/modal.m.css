@@ -5,7 +5,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.2);
 }
 
 .modalMain {
@@ -17,6 +17,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     border-radius: 10px;
+    box-shadow: rgb(0 0 0 / 50%) 0px 16px 70px;
 }
 
 .displayBlock {
@@ -28,15 +29,17 @@
 }
 
 .title {
-    font-size: 16px;
+    font-size: 14px;
     display: inline;
     margin: 20px;
+    margin-bottom: 10px;
 }
 
 .closeButton {
     display: inline;
     margin: 20px;
     margin-left: auto;
+    margin-bottom: 10px;
     background-color: transparent;
     border: none;
     cursor: pointer;

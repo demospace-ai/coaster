@@ -32,6 +32,13 @@ var Unauthorized = HttpError{
 	ClientVisibleData: http.StatusText(http.StatusUnauthorized),
 }
 
+func NewBadRequest(clientVisibleData string) error {
+	return HttpError{
+		Code:              http.StatusBadRequest,
+		ClientVisibleData: clientVisibleData,
+	}
+}
+
 func Wrap(err error, message string) error {
 	return fmt.Errorf("%s: %w", message, err)
 }
