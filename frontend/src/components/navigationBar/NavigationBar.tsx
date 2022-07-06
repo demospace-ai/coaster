@@ -48,7 +48,7 @@ export const NavigationBar: React.FC = () => {
           </svg>
           <div className={styles.route}>My Tasks</div>
         </NavLink>
-        <NavLink className={({ isActive }) => isActive ? styles.activeRouteContainer : styles.routeContainer} to={'/fixme'}>
+        <NavLink className={({ isActive }) => isActive ? styles.activeRouteContainer : styles.routeContainer} to={'/allquestions'}>
           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13" fill="none">
             <path d="M8.45 1.3V5.85H2.0605L1.677 6.2335L1.3 6.6105V1.3H8.45ZM9.1 0H0.65C0.2925 0 0 0.2925 0 0.65V9.75L2.6 7.15H9.1C9.4575 7.15 9.75 6.8575 9.75 6.5V0.65C9.75 0.2925 9.4575 0 9.1 0ZM12.35 2.6H11.05V8.45H2.6V9.75C2.6 10.1075 2.8925 10.4 3.25 10.4H10.4L13 13V3.25C13 2.8925 12.7075 2.6 12.35 2.6Z" fill="#323232" />
           </svg>

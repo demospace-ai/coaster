@@ -8,6 +8,8 @@ import (
 	"gorm.io/gorm"
 )
 
+const PAGE_SIZE = 20
+
 func CreateQuestion(db *gorm.DB, questionTitle string, questionBody string, userID int64, organizationID int64, assignedUserID *int64) (*models.Post, error) {
 	post := models.Post{
 		PostType:       models.PostTypeQuestion,
@@ -54,6 +56,27 @@ func LoadAssignedQuestions(db *gorm.DB, userID int64, organizationID int64) ([]m
 		Where("posts.organization_id = ?", organizationID).
 		Where("posts.post_type = ?", models.PostTypeQuestion).
 		Where("posts.deactivated_at IS NULL").
+		Find(&questions)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return questions, nil
+}
+
+func LoadAllQuestions(db *gorm.DB, page int, organizationID int64) ([]models.Post, error) {
+	offset := page * PAGE_SIZE
+	var questions []models.Post
+	result := db.Table("posts").
+		Select("posts.*").
+		Where("posts.organization_id = ?", organizationID).
+		Where("posts.organization_id = ?", organizationID).
+		Where("posts.post_type = ?", models.PostTypeQuestion).
+		Where("posts.deactivated_at IS NULL").
+		Offset(offset).
+		Limit(PAGE_SIZE).
+		Order("posts.created_at ASC").
 		Find(&questions)
 
 	if result.Error != nil {

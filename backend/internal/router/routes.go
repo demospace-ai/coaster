@@ -66,6 +66,12 @@ var Routes = []Route{
 		HandlerFunc: handlers.GetAssignedQuestions,
 	},
 	{
+		Name:        "Get all questions for an organization. Paginated",
+		Method:      "GET",
+		Pattern:     "/api/get_all_questions",
+		HandlerFunc: handlers.GetAllQuestions,
+	},
+	{
 		Name:        "Create answer",
 		Method:      "POST",
 		Pattern:     "/api/create_answer",

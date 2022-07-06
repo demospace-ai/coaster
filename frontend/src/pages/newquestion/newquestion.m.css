@@ -55,7 +55,7 @@
     border: 2px solid var(--border-color);
     border-radius: 5px;
     box-sizing: border-box;
-    width: 160px;
+    width: 150px;
     display: flex;
 }
 

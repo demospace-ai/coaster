@@ -8,6 +8,7 @@ import { Header } from 'src/components/header/Header';
 import { Loading } from 'src/components/loading/Loading';
 import { Modal } from 'src/components/modal/Modal';
 import { NavigationBar } from 'src/components/navigationBar/NavigationBar';
+import { AllQuestions } from 'src/pages/allquestions/AllQuestions';
 import { Inbox } from 'src/pages/inbox/Inbox';
 import { Login } from 'src/pages/login/Login';
 import { MyTasks } from 'src/pages/mytasks/MyTasks';
@@ -48,6 +49,7 @@ export const App: React.FC = () => {
             <Route path='/login' element={<Login />} />
             <Route path='/' element={<RequireAuth element={<Inbox />} />} />
             <Route path='/tasks' element={<RequireAuth element={<MyTasks />} />} />
+            <Route path='/allquestions' element={<RequireAuth element={<AllQuestions />} />} />
             <Route path='/question/:id' element={<RequireAuth element={<Question />} />} />
             <Route path='/search' element={<RequireAuth element={<SearchResults />} />} />
             <Route path='*' element={<NotFound />} />
