@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from 'src/components/button/Button';
 import { Editor } from 'src/components/editor/Editor';
 import { Loading } from 'src/components/loading/Loading';
-import { useSelector } from 'src/root/model';
+import { useDispatch, useSelector } from 'src/root/model';
 import { sendRequest } from 'src/rpc/ajax';
 import { CreateQuestion, CreateQuestionRequest, CreateQuestionResponse, User } from 'src/rpc/api';
 import styles from './newquestion.m.css';
@@ -29,33 +29,58 @@ const createQuestion = async (
   }
 };
 
+type NewQuestionState = {
+  loading: boolean;
+  createQuestionResponse?: CreateQuestionResponse;
+  titleDraft: string;
+  questionDraft: string;
+  assignee?: User;
+};
+
 export const NewQuestion: React.FC = () => {
   let navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [createQuestionResponse, setCreateQuestionResponse] = useState<CreateQuestionResponse | undefined>(undefined);
-  const [titleDraft, setTitleDraft] = useState<string>('');
-  const [questionDraft, setQuestionDraft] = useState<string>('');
-  const [assignee, setAssignee] = useState<User>();
+  const [state, setState] = useState<NewQuestionState>({
+    loading: false,
+    titleDraft: "",
+    questionDraft: "",
+  });
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    if (createQuestionResponse) {
-      navigate('/question/' + createQuestionResponse.question.id);
+    if (state.createQuestionResponse) {
+      navigate('/question/' + state.createQuestionResponse.question.id);
+      dispatch({ type: 'showNewQuestionModal', showNewQuestionModal: false });
+      setState({
+        loading: false,
+        titleDraft: "",
+        questionDraft: "",
+      });
     }
-  });
+  }, [dispatch, navigate, state, setState]);
 
-  if (loading) {
+  if (state.loading) {
     return (
-      <Loading />
+      <div style={{ width: "200px", height: "100px" }}>
+        <Loading style={{ position: "inherit", margin: "auto", marginTop: "20px" }} />
+      </div>
     );
   }
 
   const onCreateQuestion = () => {
-    if (titleDraft.length === 0) {
+    if (!state.titleDraft || state.titleDraft.length === 0) {
       // TODO: show toast here
       return;
     }
 
-    createQuestion(titleDraft, questionDraft, assignee, setLoading, setCreateQuestionResponse);
+    const setLoading = (loading: boolean) => {
+      setState({ ...state, loading });
+    };
+
+    const setCreateQuestionResponse = (createQuestionResponse: CreateQuestionResponse) => {
+      setState({ ...state, createQuestionResponse });
+    };
+
+    createQuestion(state.titleDraft, state.questionDraft, state.assignee, setLoading, setCreateQuestionResponse);
   };
 
   return (
@@ -63,16 +88,16 @@ export const NewQuestion: React.FC = () => {
       <div className={styles.questionContainer}>
         <input
           className={styles.titleContainer}
-          onChange={e => { setTitleDraft(e.target.value); }}
+          onChange={e => { setState({ ...state, titleDraft: e.target.value }); }}
           placeholder={"Question Title"}
           autoFocus
         />
         <Editor
           className={styles.bodyContainer}
-          onChange={(remirrorJson) => setQuestionDraft(JSON.stringify(remirrorJson))}
+          onChange={(remirrorJson) => setState({ ...state, questionDraft: JSON.stringify(remirrorJson) })}
           placeholder="Add description..."
         />
-        <AssigneeInput setAssignee={setAssignee} />
+        <AssigneeInput setAssignee={(assignee: User) => { setState({ ...state, assignee: assignee }); }} />
       </div>
       <div className={styles.submitContainer}>
         <Button className={styles.submitQuestionButton} onClick={onCreateQuestion}>Submit</Button>

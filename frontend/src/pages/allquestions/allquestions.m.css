@@ -1,0 +1,40 @@
+@import "/src/styles/colors.css";
+
+.home {
+    height: 100%;
+}
+
+.contentContainer {
+    width: 100%;
+}
+
+.loading {
+    position: inherit;
+    margin: auto;
+    margin-top: 120px;
+}
+
+.questionList {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.questionListItem {
+    width: 100%;
+    box-sizing: border-box;
+    border-bottom: 1px solid var(--border-color);
+    padding: 15px 30px;
+    cursor: pointer;
+    display: flex;
+    font-size: 14px;
+}
+
+.questionListItem:hover {
+    background: var(--navigation-highlight-color);
+}
+
+.questionTitle {
+    display: inline;
+    margin-top: 2px;
+}
