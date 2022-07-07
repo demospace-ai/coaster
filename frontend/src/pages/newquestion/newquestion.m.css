@@ -4,7 +4,6 @@
     width: 640px;
 }
 
-
 @media (max-width: 900px) {
     .questionContainer {
         width: 70vw;
@@ -20,6 +19,7 @@
     box-sizing: border-box;
     font-size: 18px;
     padding: 0;
+    user-select: none;
 }
 
 .titleContainer::placeholder {
@@ -57,6 +57,7 @@
     box-sizing: border-box;
     width: 150px;
     display: flex;
+    user-select: none;
 }
 
 .assigneeContainer:hover {

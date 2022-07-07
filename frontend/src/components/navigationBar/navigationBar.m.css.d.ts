@@ -10,7 +10,7 @@ declare const styles: {
   readonly "routeContainer": string;
   readonly "route": string;
   readonly "routeIcon": string;
-  readonly "profileContainer": string;
+  readonly "helpContainer": string;
 };
 export = styles;
 

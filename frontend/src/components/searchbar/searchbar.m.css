@@ -33,6 +33,7 @@
 
 .searchInput::placeholder {
     color: gray;
+    user-select: none;
 }
 
 .searchInput:focus {

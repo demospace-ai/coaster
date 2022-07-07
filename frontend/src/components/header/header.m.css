@@ -20,6 +20,7 @@
 
 .pageTitle {
     font-size: 14px;
+    user-select: none;
 }
 
 .searchBarContainer {
@@ -38,6 +39,7 @@
     height: 25px;
     cursor: pointer;
     margin-left: auto;
+    user-select: none;
 }
 
 .profileDropdown {
@@ -50,6 +52,7 @@
     background: white;
     width: 200px;
     padding: 10px 0;
+    user-select: none;
 }
 
 .hidden {

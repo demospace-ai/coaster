@@ -12,6 +12,7 @@
     letter-spacing: 1px;
     transition: all .1s ease-in-out;
     border: 1px solid #508368;
+    user-select: none;
 }
 
 .secondary {
@@ -26,4 +27,5 @@
 
 .backButton {
     cursor: pointer;
+    user-select: none;
 }

@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { SearchBar } from 'src/components/searchbar/SearchBar';
 import { useDispatch, useSelector } from 'src/root/model';
@@ -21,6 +21,19 @@ export const Header: React.FC = () => {
     });
     setDropdownActive(false);
   };
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handleClick = (event: any) => {
+      if (ref.current && !ref.current.contains(event.target)) {
+        setDropdownActive(false);
+      }
+    };
+
+    document.addEventListener('click', handleClick, true);
+    return () => {
+      document.removeEventListener('click', handleClick, true);
+    };
+  }, [ref]);
 
   let page: string;
   switch (location.pathname) {
@@ -47,7 +60,7 @@ export const Header: React.FC = () => {
           <SearchBar />
         </div>
         <div className={styles.profileIcon} onClick={() => setDropdownActive(!dropdownActive)}>{user!.first_name.charAt(0)}</div>
-        <div className={classNames(styles.profileDropdown, dropdownActive ? null : styles.hidden)}>
+        <div className={classNames(styles.profileDropdown, dropdownActive ? null : styles.hidden)} ref={ref}>
           <div className={styles.dropdownItem}>My Profile</div>
           <div className={styles.dropdownItem} onClick={logout}>Logout</div>
         </div>

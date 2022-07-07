@@ -54,7 +54,7 @@ export const NavigationBar: React.FC = () => {
           </svg>
           <div className={styles.route}>All Questions</div>
         </NavLink>
-        <div className={styles.profileContainer}>
+        <div className={styles.helpContainer}>
           <div className={styles.route} >Help</div>
         </div>
       </div>

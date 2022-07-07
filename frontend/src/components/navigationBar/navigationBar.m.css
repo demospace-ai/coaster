@@ -49,6 +49,7 @@
     max-width: 150px;
     white-space: nowrap;
     overflow: hidden;
+    user-select: none;
 }
 
 .caret {
@@ -74,6 +75,7 @@
     box-shadow: rgb(0 0 0 / 7%) 0px 1px 1px;
     border: 1px solid #508368;
     cursor: pointer;
+    user-select: none;
 }
 
 .newQuestion:hover {
@@ -99,6 +101,7 @@
     margin: 0 20px;
     border-radius: 5px;
     margin-bottom: 5px;
+    user-select: none;
 }
 
 .routeContainer {
@@ -114,6 +117,7 @@
     margin: 0 20px;
     border-radius: 5px;
     margin-bottom: 5px;
+    user-select: none;
 }
 
 .routeContainer:hover {
@@ -133,7 +137,8 @@
     width: 30px;
 }
 
-.profileContainer {
+.helpContainer {
     margin: auto 20px 20px;
     cursor: pointer;
+    user-select: none;
 }
