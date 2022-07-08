@@ -1,3 +1,5 @@
+@import "/src/styles/colors.css";
+
 .resultsContainer {
     text-align: center;
     margin: 40px auto 0;
@@ -7,10 +9,13 @@
 
 .resultsTitle {
     margin-bottom: 40px;
+    font-size: 20px;
 }
 
 .postTitleContainer {
-    margin-bottom: 10px;
+    margin: 10px 0;
+    font-size: 20px;
+    font-weight: 500;
 }
 
 .postTitle {
@@ -18,13 +23,18 @@
     display: block;
 }
 
+.postTitle:hover {
+    color: var(--primary-highlight-color);
+}
+
 .postBody {
     text-align: left;
 }
 
 .result {
-    padding-bottom: 20px;
     border-bottom: 1px solid lightgray;
+    padding-bottom: 20px;
+    height: 80px;
 }
 
 .results {
@@ -39,12 +49,13 @@
 }
 
 .newQuestionPrompt {
-    margin-top: 20px;
+    margin-top: 40px;
     display: flex;
     width: 100%;
+    margin-bottom: 100px;
 }
 
 .newQuestionButton {
-    height: 40px;
-    margin: auto 20px;
+    height: 36px;
+    margin-left: 24px;
 }

@@ -1,5 +1,5 @@
 import { Combobox, Transition } from '@headlessui/react';
-import { Fragment, useEffect, useRef, useState } from 'react';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'src/components/button/Button';
 import { Editor } from 'src/components/editor/Editor';
@@ -37,7 +37,11 @@ type NewQuestionState = {
   assignee?: User;
 };
 
-export const NewQuestion: React.FC = () => {
+type NewQuestionProps = {
+  visible: boolean;
+};
+
+export const NewQuestion: React.FC<NewQuestionProps> = props => {
   let navigate = useNavigate();
   const [state, setState] = useState<NewQuestionState>({
     loading: false,
@@ -58,14 +62,6 @@ export const NewQuestion: React.FC = () => {
     }
   }, [dispatch, navigate, state, setState]);
 
-  if (state.loading) {
-    return (
-      <div style={{ width: "200px", height: "100px" }}>
-        <Loading style={{ position: "inherit", margin: "auto", marginTop: "20px" }} />
-      </div>
-    );
-  }
-
   const onCreateQuestion = () => {
     if (!state.titleDraft || state.titleDraft.length === 0) {
       // TODO: show toast here
@@ -82,6 +78,20 @@ export const NewQuestion: React.FC = () => {
 
     createQuestion(state.titleDraft, state.questionDraft, state.assignee, setLoading, setCreateQuestionResponse);
   };
+
+  const onKeyDown = (e: KeyboardEvent) => {
+    if (props.visible && e.metaKey && e.key === 'Enter') {
+      onCreateQuestion();
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  });
 
   return (
     <>
@@ -100,7 +110,7 @@ export const NewQuestion: React.FC = () => {
         <AssigneeInput assignee={state.assignee} setAssignee={(assignee: User) => { setState({ ...state, assignee: assignee }); }} />
       </div>
       <div className={styles.submitContainer}>
-        <Button className={styles.submitQuestionButton} onClick={onCreateQuestion}>Submit</Button>
+        <Button className={styles.submitQuestionButton} onClick={onCreateQuestion}>{state.loading ? <Loading style={{ position: "static", margin: "auto" }} /> : "Submit"}</Button>
       </div>
     </>
   );

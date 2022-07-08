@@ -103,10 +103,10 @@ const QuestionDropdown: React.FC = () => {
     <Menu as="div" className="tw-relative tw-inline-block tw-text-left tw-ml-auto">
       <div>
         <Menu.Button>
-          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 15 15" fill="none">
-            <circle cx="2.5" cy="7.5" r="1.5" fill="black" />
-            <circle cx="12.5" cy="7.5" r="1.5" fill="black" />
-            <circle cx="7.5" cy="7.5" r="1.5" fill="black" />
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 15 15" fill="black" className="hover:tw-fill-primary-highlight" >
+            <circle cx="2.5" cy="7.5" r="1.5" fill="inherit" />
+            <circle cx="12.5" cy="7.5" r="1.5" fill="inherit" />
+            <circle cx="7.5" cy="7.5" r="1.5" fill="inherit" />
           </svg>
         </Menu.Button>
       </div>

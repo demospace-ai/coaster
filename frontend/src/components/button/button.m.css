@@ -32,3 +32,7 @@
     font-size: 14px;
     font-weight: 500;
 }
+
+.backButton:hover {
+    color: var(--primary-highlight-color);
+}

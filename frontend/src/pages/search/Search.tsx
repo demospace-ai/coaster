@@ -41,28 +41,30 @@ export const SearchResults: React.FC = () => {
   }
 
   return (
-    <div className={styles.resultsContainer}>
-      <h1 className={styles.resultsTitle}>Results for "{query}"</h1>
-      {results.length === 0 && <h3 className={styles.noResults}>No answers found!</h3>}
-      <ul className={styles.results}>
-        {results.map((result, index) => (
-          <li key={index} className={styles.result}>
-            <h3 className={styles.postTitleContainer}>
-              <Link className={styles.postTitle} to={`/question/${result.id}`}>Q: {result.title}</Link>
-            </h3>
-            {result.body &&
-              <div className={styles.postBody}>
-                <Display
-                  initialValue={toPlaintext(JSON.parse(result.body)).trim()}
-                />
+    <div className="tw-overflow-scroll">
+      <div className={styles.resultsContainer}>
+        <div className={styles.resultsTitle}>Results for "{query}"</div>
+        {results.length === 0 && <h3 className={styles.noResults}>No answers found!</h3>}
+        <ul className={styles.results}>
+          {results.map((result, index) => (
+            <li key={index} className={styles.result} >
+              <div className={styles.postTitleContainer}>
+                <Link className={styles.postTitle} to={`/question/${result.id}`}>Q: {result.title}</Link>
               </div>
-            }
-          </li>
-        ))}
-      </ul>
-      <div className={styles.newQuestionPrompt}>
-        <h3>Not finding what you're looking for?</h3>
-        <Button className={styles.newQuestionButton} onClick={showNewQuestionModal}>Ask a question</Button>
+              {result.body &&
+                <div className={styles.postBody}>
+                  <Display
+                    initialValue={toPlaintext(JSON.parse(result.body)).trim()}
+                  />
+                </div>
+              }
+            </li>
+          ))}
+        </ul>
+        <div className={styles.newQuestionPrompt}>
+          <div className="tw-text-lg tw-my-auto tw-font-semibold">Not finding what you're looking for?</div>
+          <Button className={styles.newQuestionButton} onClick={showNewQuestionModal}>Ask a question</Button>
+        </div>
       </div>
     </div>
   );

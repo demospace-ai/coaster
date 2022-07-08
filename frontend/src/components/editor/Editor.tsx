@@ -3,6 +3,7 @@ import {
   OnChangeJSON,
   Remirror,
   ThemeProvider,
+  useKeymap,
   useRemirror,
   useTheme
 } from '@remirror/react';
@@ -33,6 +34,16 @@ import {
   ComponentItem, ToolbarItemUnion
 } from 'src/components/remirror/react-components';
 
+const HOOKS = [
+  () => {
+    const ignoreModEnter = useCallback(
+      () => {
+        return true; // Prevents any further key handlers from being run.
+      }, []);
+
+    useKeymap('Mod-Enter', ignoreModEnter);
+  },
+];
 
 type EditorProps = {
   onChange: (value: RemirrorJSON) => void;
@@ -70,7 +81,7 @@ export const Editor: React.FC<EditorProps> = props => {
   return (
     <AllStyledComponent>
       <ThemeProvider theme={theme} >
-        <Remirror manager={manager} editable={props.editable} initialContent={props.initialValue} classNames={[props.className]}>
+        <Remirror manager={manager} editable={props.editable} initialContent={props.initialValue} classNames={[props.className]} hooks={HOOKS}>
           {/*<Toolbar items={toolbarItems} refocusEditor label='Top Toolbar' />*/}
           <EditorComponent />
           <OnChangeJSON onChange={props.onChange} />

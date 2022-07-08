@@ -42,7 +42,7 @@ export const App: React.FC = () => {
     <>
       <BrowserRouter>
         <Modal show={showNewQuestionModal} close={closeNewQuestionModal} title="New Question">
-          <NewQuestion />
+          <NewQuestion visible={showNewQuestionModal} />
         </Modal>
         <Routes>
           <Route element={<AppLayout />}>
