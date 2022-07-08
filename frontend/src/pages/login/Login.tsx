@@ -49,7 +49,7 @@ export const Login: React.FC = () => {
   return (
     <div className={styles.loginPage}>
       <div className={styles.loginPane}>
-        <h1 className={styles.title}>fabra</h1>
+        <div className={classNames(styles.title, "tw-text-3xl", "tw-font-bold")}>fabra</div>
         <div className={styles.loginGroup}>
           {loginContent}
         </div>

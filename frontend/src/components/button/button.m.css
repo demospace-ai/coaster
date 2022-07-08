@@ -26,6 +26,9 @@
 }
 
 .backButton {
+    display: inline;
     cursor: pointer;
     user-select: none;
+    font-size: 14px;
+    font-weight: 500;
 }

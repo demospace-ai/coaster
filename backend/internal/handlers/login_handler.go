@@ -76,7 +76,7 @@ func Login(env Env, w http.ResponseWriter, r *http.Request) error {
 			return err
 		}
 	} else {
-		var userEmailDomain = strings.Split(env.Auth.User.Email, "@")[1]
+		var userEmailDomain = strings.Split(user.Email, "@")[1]
 		suggestedOrganizations, err = organizations.LoadOrganizationsByEmailDomain(env.Db, userEmailDomain)
 		if err != nil {
 			return err

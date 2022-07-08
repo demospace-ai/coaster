@@ -5,7 +5,7 @@ export const NotFound: React.FC = () => {
   return (
     <>
       <div className={styles.title}>
-        <h1>Not Found!</h1>
+        <div>Not Found!</div>
       </div>
       <div className={styles.body}>
       </div>
