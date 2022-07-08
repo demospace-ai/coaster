@@ -2,6 +2,7 @@
 
 .home {
     height: 100%;
+    overflow: scroll;
 }
 
 .contentContainer {
@@ -18,6 +19,7 @@
     list-style-type: none;
     padding: 0;
     margin: 0;
+    padding-bottom: 100px;
 }
 
 .questionListItem {
