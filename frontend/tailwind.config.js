@@ -10,6 +10,7 @@ module.exports = {
         'dark-hover': "#b6b6b6",
         'dark-text': '#696969',
         'primary-highlight': '#378159',
+        'navigation-highlight': "#d6d6d6",
       },
     }
   },

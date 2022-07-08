@@ -19,10 +19,7 @@
     box-sizing: border-box;
     border-bottom: 1px solid var(--border-color);
     cursor: pointer;
-}
-
-.organizationContainer:hover {
-    background: var(--navigation-highlight-color);
+    width: 100%;
 }
 
 .organizationIcon {

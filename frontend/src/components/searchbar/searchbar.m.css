@@ -11,8 +11,7 @@
 }
 
 .searchBar:focus-within {
-    border: 2px solid #44749e;
-    margin: -1px;
+    box-shadow: rgb(0 0 0 / 20%) 0px 0px 7px;
 }
 
 .searchIconContainer {

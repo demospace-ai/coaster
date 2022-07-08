@@ -1,5 +1,9 @@
+import { Menu, Transition } from "@headlessui/react";
+import classNames from "classnames";
+import { Fragment } from "react";
 import { NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from "src/root/model";
+import { Organization } from "src/rpc/api";
 import styles from './navigationBar.m.css';
 
 export const NavigationBar: React.FC = () => {
@@ -18,17 +22,7 @@ export const NavigationBar: React.FC = () => {
   return (
     <>
       <div className={styles.navigationBar}>
-        <div className={styles.organizationContainer}>
-          <div className={styles.organizationIcon}>
-            {organization!.name.charAt(0)}
-          </div>
-          <div className={styles.organizationName}>
-            {organization!.name}
-          </div>
-          <svg className={styles.caret}>
-            <path xmlns="http://www.w3.org/2000/svg" d="M11 15L6 9.91166L6.89583 9L11 13.1979L15.1042 9.0212L16 9.93286L11 15Z" />
-          </svg>
-        </div>
+        <OrganizationButton organization={organization} />
         <div className={styles.newQuestion} onClick={showNewQuestionModal}>
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
             <path d="M11.3125 6.5H6.5C6.13533 6.5 5.78559 6.64487 5.52773 6.90273C5.26987 7.16059 5.125 7.51033 5.125 7.875V17.5C5.125 17.8647 5.26987 18.2144 5.52773 18.4723C5.78559 18.7301 6.13533 18.875 6.5 18.875H16.125C16.4897 18.875 16.8394 18.7301 17.0973 18.4723C17.3551 18.2144 17.5 17.8647 17.5 17.5V12.6875" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -59,5 +53,58 @@ export const NavigationBar: React.FC = () => {
         </div>
       </div>
     </>
+  );
+};
+
+type OrganizationButtonProps = {
+  organization: Organization;
+};
+
+const OrganizationButton: React.FC<OrganizationButtonProps> = props => {
+  return (
+    <Menu as="div" >
+      <Menu.Button className="tw-w-full">
+        {({ open }) => (
+          <div className={classNames(styles.organizationContainer, "hover:tw-bg-navigation-highlight", open && "tw-bg-navigation-highlight")}>
+            <div className={styles.organizationIcon}>
+              {props.organization!.name.charAt(0)}
+            </div>
+            <div className={styles.organizationName}>
+              {props.organization!.name}
+            </div>
+            <svg className={styles.caret}>
+              <path xmlns="http://www.w3.org/2000/svg" d="M11 15L6 9.91166L6.89583 9L11 13.1979L15.1042 9.0212L16 9.93286L11 15Z" />
+            </svg>
+          </div>
+        )}
+      </Menu.Button>
+
+      <Transition
+        as={Fragment}
+        enter="transition ease-out duration-100"
+        enterFrom="transform opacity-0 scale-95"
+        enterTo="transform opacity-100 scale-100"
+        leave="transition ease-in duration-75"
+        leaveFrom="transform opacity-100 scale-100"
+        leaveTo="transform opacity-0 scale-95"
+      >
+        <Menu.Items className="tw-origin-top-left tw-absolute tw-left-3 tw-mt-2 tw-w-56 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none">
+          <div className="tw-py-1">
+            <Menu.Item>
+              {({ active }) => (
+                <div
+                  className={classNames(
+                    active ? 'tw-bg-gray-100 tw-text-gray-900' : 'tw-text-gray-700',
+                    'tw-block tw-px-4 tw-py-2 tw-text-sm', "tw-cursor-pointer"
+                  )}
+                >
+                  Settings
+                </div>
+              )}
+            </Menu.Item>
+          </div>
+        </Menu.Items>
+      </Transition>
+    </Menu >
   );
 };
