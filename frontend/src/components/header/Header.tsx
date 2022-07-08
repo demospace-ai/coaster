@@ -57,12 +57,10 @@ const ProfileDropdown: React.FC = () => {
     });
   };
   return (
-    <Menu as="div" className="tw-relative tw-inline-block tw-text-left tw-ml-auto tw-z-10">
-      <div>
-        <Menu.Button className={styles.profileIcon}>
-          {user!.first_name.charAt(0)}
-        </Menu.Button>
-      </div>
+    <Menu as="div" className="tw-inline-block tw-text-left tw-ml-auto tw-z-10" style={{ marginTop: "-4px" }}>
+      <Menu.Button className={styles.profileIcon}>
+        {user!.first_name.charAt(0)}
+      </Menu.Button>
 
       <Transition
         as={Fragment}
@@ -73,7 +71,7 @@ const ProfileDropdown: React.FC = () => {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="tw-origin-top-right tw-absolute tw-right-0 tw-mt-2 tw-w-56 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none">
+        <Menu.Items className="tw-origin-top-right tw-absolute tw-right-5 tw-mt-2 tw-w-40 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none">
           <div className="tw-py-1">
             <Menu.Item>
               {({ active }) => (

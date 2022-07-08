@@ -87,10 +87,10 @@ export const Question: React.FC = () => {
       }
       <div>
         {/* TODO: provide a way to tag someone. */}
-        <div className="tw-pb-5 tw-font-bold tw-text-base">Reply with an answer!</div>
         <Editor
           className={styles.answerInput}
           onChange={(remirrorJson) => { setAnswerDraft(JSON.stringify(remirrorJson)); }}
+          placeholder="Leave an answer..."
         />
         <Button className={styles.answerButton} onClick={onCreateAnswer}>Post your answer</Button>
       </div>

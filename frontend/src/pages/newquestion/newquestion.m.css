@@ -49,22 +49,6 @@
     resize: none;
 }
 
-.assigneeContainer {
-    height: 30px;
-    background: var(--border-color);
-    border: 2px solid var(--border-color);
-    border-radius: 5px;
-    box-sizing: border-box;
-    width: 150px;
-    display: flex;
-    user-select: none;
-}
-
-.assigneeContainer:hover {
-    background: #b6b6b6;
-    border-color: #b6b6b6;
-}
-
 .submitContainer {
     display: flex;
     width: 100%;
