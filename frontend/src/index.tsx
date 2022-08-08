@@ -1,5 +1,7 @@
 import './index.css';
 
+import { ErrorBoundary } from '@highlight-run/react';
+import { H } from 'highlight.run';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
@@ -8,11 +10,15 @@ import { createStore } from 'src/root/model';
 
 const store = createStore();
 
+H.init('7e3vw5g1');
+
 ReactDOM.render(
   <React.StrictMode>
-    <Provider store={store}>
-      <App />
-    </Provider>
+    <ErrorBoundary showDialog>
+      <Provider store={store}>
+        <App />
+      </Provider>
+    </ErrorBoundary>
   </React.StrictMode>,
   document.getElementById('root')
 );
