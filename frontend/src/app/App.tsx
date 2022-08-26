@@ -1,8 +1,6 @@
 import React, { ReactNode, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import {
-  BrowserRouter, Navigate, Outlet, Route, Routes
-} from 'react-router-dom';
+import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import { useStart } from 'src/app/actions';
 import { Header } from 'src/components/header/Header';
 import { Loading } from 'src/components/loading/Loading';
@@ -30,7 +28,7 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     start();
-  }, [start]);
+  }, []);
 
   if (loading) {
     return (
@@ -40,22 +38,20 @@ export const App: React.FC = () => {
 
   return (
     <>
-      <BrowserRouter>
-        <Modal show={showNewQuestionModal} close={closeNewQuestionModal} title="New Question">
-          <NewQuestion visible={showNewQuestionModal} />
-        </Modal>
-        <Routes>
-          <Route element={<AppLayout />}>
-            <Route path='/login' element={<Login />} />
-            <Route path='/' element={<RequireAuth element={<Inbox />} />} />
-            <Route path='/tasks' element={<RequireAuth element={<MyTasks />} />} />
-            <Route path='/allquestions' element={<RequireAuth element={<AllQuestions />} />} />
-            <Route path='/question/:id' element={<RequireAuth element={<Question />} />} />
-            <Route path='/search' element={<RequireAuth element={<SearchResults />} />} />
-            <Route path='*' element={<NotFound />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+      <Modal show={showNewQuestionModal} close={closeNewQuestionModal} title="New Question">
+        <NewQuestion visible={showNewQuestionModal} />
+      </Modal>
+      <Routes>
+        <Route element={<AppLayout />}>
+          <Route path='/login' element={<Login />} />
+          <Route path='/' element={<RequireAuth element={<Inbox />} />} />
+          <Route path='/tasks' element={<RequireAuth element={<MyTasks />} />} />
+          <Route path='/allquestions' element={<RequireAuth element={<AllQuestions />} />} />
+          <Route path='/question/:id' element={<RequireAuth element={<Question />} />} />
+          <Route path='/search' element={<RequireAuth element={<SearchResults />} />} />
+          <Route path='*' element={<NotFound />} />
+        </Route>
+      </Routes>
     </>
   );
 };
@@ -66,10 +62,9 @@ type AuthenticationProps = {
 
 const RequireAuth: React.FC<AuthenticationProps> = props => {
   const isAuthenticated = useSelector(state => state.login.authenticated);
-  const organization = useSelector(state => state.login.organization); // no organization set means user still needs to do this
   return (
     <>
-      {isAuthenticated && organization ? props.element : <Navigate to="/login" replace />}
+      {isAuthenticated ? props.element : <Navigate to="/login" replace />}
     </>
   );
 };

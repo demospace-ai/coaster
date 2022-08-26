@@ -3,9 +3,8 @@ import classNames from 'classnames';
 import React, { Fragment } from 'react';
 import { useLocation } from 'react-router-dom';
 import { SearchBar } from 'src/components/searchbar/SearchBar';
-import { useDispatch, useSelector } from 'src/root/model';
-import { sendRequest } from 'src/rpc/ajax';
-import { Logout } from 'src/rpc/api';
+import { useLogout } from 'src/pages/login/actions';
+import { useSelector } from 'src/root/model';
 import styles from './header.m.css';
 
 export const Header: React.FC = () => {
@@ -48,14 +47,8 @@ export const Header: React.FC = () => {
 
 const ProfileDropdown: React.FC = () => {
   const user = useSelector(state => state.login.user);
-  const dispatch = useDispatch();
+  const logout = useLogout();
 
-  const logout = async () => {
-    await sendRequest(Logout);
-    dispatch({
-      type: 'login.logout',
-    });
-  };
   return (
     <Menu as="div" className="tw-inline-block tw-text-left tw-ml-auto tw-z-10" style={{ marginTop: "-4px" }}>
       <Menu.Button className={styles.profileIcon}>

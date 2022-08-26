@@ -60,10 +60,8 @@ export function loginReducer(state: LoginState = INITIAL_LOGIN_STATE, action: Lo
         email: action.email,
       };
     case 'login.logout':
-      return {
-        ...state,
-        authenticated: false,
-      };
+      // simplify by just going back to initial state
+      return INITIAL_LOGIN_STATE;
     case 'login.organizationSet':
       return {
         ...state,

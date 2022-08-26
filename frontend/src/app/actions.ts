@@ -1,11 +1,13 @@
 import { useCallback } from 'react';
-import { onSuccessfulAuthentication } from 'src/pages/login/actions';
+import { useHandleLoginSuccess } from 'src/pages/login/actions';
 import { useDispatch } from 'src/root/model';
 import { sendRequest } from 'src/rpc/ajax';
 import { CheckSession } from 'src/rpc/api';
 
 export function useStart() {
   const dispatch = useDispatch();
+  const handleLoginSuccess = useHandleLoginSuccess();
+
   return useCallback(async () => {
     try {
       const checkSessionResponse = await sendRequest(CheckSession);
@@ -16,10 +18,10 @@ export function useStart() {
         suggestedOrganizations: checkSessionResponse.suggested_organizations,
       });
 
-      onSuccessfulAuthentication(dispatch);
+      handleLoginSuccess();
     } catch (e) {
     }
 
     dispatch({ type: 'done' });
-  }, [dispatch]);
+  }, [dispatch, handleLoginSuccess]);
 }
