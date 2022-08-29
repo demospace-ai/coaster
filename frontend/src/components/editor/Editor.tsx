@@ -5,10 +5,11 @@ import {
   ThemeProvider,
   useKeymap,
   useRemirror,
+  useRemirrorContext,
   useTheme
 } from '@remirror/react';
 import { AllStyledComponent } from '@remirror/styles/emotion';
-import React, { useCallback } from 'react';
+import React, { forwardRef, Ref, useCallback, useImperativeHandle } from 'react';
 import jsx from 'refractor/lang/jsx.js';
 import typescript from 'refractor/lang/typescript.js';
 import { ExtensionPriority, RemirrorJSON } from 'remirror';
@@ -51,6 +52,7 @@ type EditorProps = {
   editable?: boolean;
   placeholder?: string;
   initialValue?: string;
+  editorRef?: Ref<EditorRef>;
 };
 
 export const Editor: React.FC<EditorProps> = props => {
@@ -84,6 +86,7 @@ export const Editor: React.FC<EditorProps> = props => {
         <Remirror manager={manager} editable={props.editable} initialContent={props.initialValue} classNames={[props.className]} hooks={HOOKS}>
           {/*<Toolbar items={toolbarItems} refocusEditor label='Top Toolbar' />*/}
           <EditorComponent />
+          <ImperativeHandle ref={props.editorRef} />
           <OnChangeJSON onChange={props.onChange} />
         </Remirror>
       </ThemeProvider>
@@ -94,6 +97,21 @@ export const Editor: React.FC<EditorProps> = props => {
 type DisplayProps = {
   initialValue: string;
 };
+
+export interface EditorRef {
+  setContent: (content: any) => void;
+}
+
+const ImperativeHandle = forwardRef((_: unknown, ref: Ref<EditorRef>) => {
+  const { setContent } = useRemirrorContext({
+    autoUpdate: true,
+  });
+
+  // Expose content handling to outside
+  useImperativeHandle(ref, () => ({ setContent }));
+
+  return <></>;
+});
 
 export const Display: React.FC<DisplayProps> = ({ initialValue }) => {
   const { manager } = useMarkdownEditor();

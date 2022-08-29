@@ -2,7 +2,7 @@ import { Combobox, Transition } from '@headlessui/react';
 import React, { Fragment, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'src/components/button/Button';
-import { Editor } from 'src/components/editor/Editor';
+import { Editor, EditorRef } from 'src/components/editor/Editor';
 import { Loading } from 'src/components/loading/Loading';
 import { useDispatch, useSelector } from 'src/root/model';
 import { sendRequest } from 'src/rpc/ajax';
@@ -41,26 +41,24 @@ type NewQuestionProps = {
   visible: boolean;
 };
 
+const INITIAL_STATE: NewQuestionState = {
+  loading: false,
+  titleDraft: "",
+  questionDraft: "",
+};
+
 export const NewQuestion: React.FC<NewQuestionProps> = props => {
   let navigate = useNavigate();
-  const [state, setState] = useState<NewQuestionState>({
-    loading: false,
-    titleDraft: "",
-    questionDraft: "",
-  });
+  const [state, setState] = useState<NewQuestionState>(INITIAL_STATE);
   const dispatch = useDispatch();
+  const editorRef = useRef<EditorRef | null>(null);
 
-  useEffect(() => {
-    if (state.createQuestionResponse) {
-      navigate('/question/' + state.createQuestionResponse.question.id);
-      dispatch({ type: 'showNewQuestionModal', showNewQuestionModal: false });
-      setState({
-        loading: false,
-        titleDraft: "",
-        questionDraft: "",
-      });
-    }
-  }, [dispatch, navigate, state, setState]);
+  if (state.createQuestionResponse) {
+    navigate('/question/' + state.createQuestionResponse.question.id);
+    dispatch({ type: 'showNewQuestionModal', showNewQuestionModal: false });
+    setState(INITIAL_STATE);
+    editorRef.current!.setContent('');
+  }
 
   const onCreateQuestion = () => {
     if (!state.titleDraft || state.titleDraft.length === 0) {
@@ -100,12 +98,14 @@ export const NewQuestion: React.FC<NewQuestionProps> = props => {
           className={styles.titleContainer}
           onChange={e => { setState({ ...state, titleDraft: e.target.value }); }}
           placeholder={"Question Title"}
+          value={state.titleDraft}
           autoFocus
         />
         <Editor
           className={styles.bodyContainer}
           onChange={(remirrorJson) => setState({ ...state, questionDraft: JSON.stringify(remirrorJson) })}
           placeholder="Add description..."
+          editorRef={editorRef}
         />
         <AssigneeInput assignee={state.assignee} setAssignee={(assignee: User) => { setState({ ...state, assignee: assignee }); }} />
       </div>

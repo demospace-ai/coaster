@@ -51,6 +51,11 @@ export const Question: React.FC = () => {
   }
 
   const onCreateAnswer = () => {
+    if (!answerDraft || answerDraft.length === 0) {
+      // TODO: show toast here
+      return;
+    }
+
     createAnswer(id!, answerDraft, setLoading, setQuestionResponse);
   };
 
