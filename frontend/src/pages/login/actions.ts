@@ -1,10 +1,10 @@
-import React, { useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { Dispatch, useCallback } from 'react';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 import { rudderanalytics } from 'src/app/rudder';
 import { LoginStep } from 'src/pages/login/Login';
-import { useDispatch, useSelector } from 'src/root/model';
+import { RootAction, useDispatch, useSelector } from 'src/root/model';
 import { sendRequest } from 'src/rpc/ajax';
-import { GetAllUsers, GetAssignedQuestions, Login, Logout, SetOrganization, ValidationCode } from 'src/rpc/api';
+import { GetAllUsers, GetAssignedQuestions, Login, Logout, Organization, SetOrganization, User, ValidationCode } from 'src/rpc/api';
 
 export type GoogleLoginResponse = {
   credential: string;
@@ -14,7 +14,7 @@ export type GoogleLoginHandler = (response: GoogleLoginResponse) => void;
 
 export function useHandleGoogleResponse(setLoading: (loading: boolean) => void): GoogleLoginHandler {
   const dispatch = useDispatch();
-  const handleLoginSuccess = useHandleLoginSuccess();
+  const navigate = useNavigate();
 
   return useCallback(async (response: GoogleLoginResponse) => {
     setLoading(true);
@@ -29,7 +29,7 @@ export function useHandleGoogleResponse(setLoading: (loading: boolean) => void):
         suggestedOrganizations: loginResponse.suggested_organizations,
       });
 
-      handleLoginSuccess();
+      onLoginSuccess(loginResponse.user, loginResponse.organization, dispatch, navigate);
       setLoading(false);
     } catch (e) {
     }
@@ -44,7 +44,7 @@ export interface OrganizationArgs {
 export function useSetOrganization() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const handleLoginSuccess = useHandleLoginSuccess();
+  const user = useSelector(state => state.login.user);
 
   return useCallback(async (args: OrganizationArgs) => {
     const payload = { 'organization_name': args.organizationName, 'organization_id': args.organizationID };
@@ -55,7 +55,7 @@ export function useSetOrganization() {
         organization: response.organization,
       });
 
-      handleLoginSuccess();
+      onLoginSuccess(user!, response.organization, dispatch, navigate);
       navigate("/");
     } catch (e) {
     }
@@ -95,33 +95,27 @@ export function useEmailLogin() {
   }, []);
 }
 
-export function useHandleLoginSuccess() {
-  const organization = useSelector(state => state.login.organization); // no organization set means user still needs to do this
-  const user = useSelector(state => state.login.user);
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  return useCallback(async () => {
-    rudderanalytics.identify(user?.id.toString());
-    // If there's no organization, go to the login page so the user can set it
-    if (!organization) {
-      navigate("/login");
-    }
+export async function onLoginSuccess(user: User, organization: Organization | undefined, dispatch: Dispatch<RootAction>, navigate: NavigateFunction) {
+  rudderanalytics.identify(user.id.toString());
+  // If there's no organization, go to the login page so the user can set it
+  if (!organization) {
+    navigate("/login");
+  }
 
-    try {
-      const allUsers = await sendRequest(GetAllUsers);
-      dispatch({
-        type: 'login.allUsers',
-        users: allUsers.users,
-      });
+  try {
+    const allUsers = await sendRequest(GetAllUsers);
+    dispatch({
+      type: 'login.allUsers',
+      users: allUsers.users,
+    });
 
-      const assignedQuestions = await sendRequest(GetAssignedQuestions);
-      dispatch({
-        type: 'login.assignedQuestions',
-        assignedQuestions: assignedQuestions.questions,
-      });
-    } catch (e) {
-    }
-  }, []);
+    const assignedQuestions = await sendRequest(GetAssignedQuestions);
+    dispatch({
+      type: 'login.assignedQuestions',
+      assignedQuestions: assignedQuestions.questions,
+    });
+  } catch (e) {
+  }
 }
 
 export function useLogout() {

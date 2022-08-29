@@ -1,6 +1,7 @@
 import { Combobox, Transition } from '@headlessui/react';
 import React, { Fragment, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { rudderanalytics } from 'src/app/rudder';
 import { Button } from 'src/components/button/Button';
 import { Editor, EditorRef } from 'src/components/editor/Editor';
 import { Loading } from 'src/components/loading/Loading';
@@ -23,9 +24,12 @@ const createQuestion = async (
   }
 
   try {
+    rudderanalytics.track("create_question.start");
     const createQuestionResponse = await sendRequest(CreateQuestion, payload);
     setCreateQuestionResponse(createQuestionResponse);
+    rudderanalytics.track("create_question.success");
   } catch (e) {
+    rudderanalytics.track("create_question.error");
   }
 };
 

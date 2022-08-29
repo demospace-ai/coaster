@@ -1,12 +1,13 @@
 import { useCallback } from 'react';
-import { useHandleLoginSuccess } from 'src/pages/login/actions';
+import { useNavigate } from 'react-router-dom';
+import { onLoginSuccess } from 'src/pages/login/actions';
 import { useDispatch } from 'src/root/model';
 import { sendRequest } from 'src/rpc/ajax';
 import { CheckSession } from 'src/rpc/api';
 
 export function useStart() {
   const dispatch = useDispatch();
-  const handleLoginSuccess = useHandleLoginSuccess();
+  const navigate = useNavigate();
 
   return useCallback(async () => {
     try {
@@ -18,10 +19,10 @@ export function useStart() {
         suggestedOrganizations: checkSessionResponse.suggested_organizations,
       });
 
-      handleLoginSuccess();
+      onLoginSuccess(checkSessionResponse.user, checkSessionResponse.organization, dispatch, navigate);
     } catch (e) {
     }
 
     dispatch({ type: 'done' });
-  }, [dispatch, handleLoginSuccess]);
+  }, [dispatch, navigate]);
 }
