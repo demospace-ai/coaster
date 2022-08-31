@@ -54,7 +54,7 @@ export const SearchResults: React.FC = () => {
               {result.body &&
                 <div className={styles.postBody}>
                   <Display
-                    initialValue={toPlaintext(JSON.parse(result.body)).trim()}
+                    value={toPlaintext(JSON.parse(result.body)).trim()}
                   />
                 </div>
               }

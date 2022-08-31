@@ -1,0 +1,17 @@
+.editor {
+    width: 100%;
+    resize: none;
+}
+
+.editor:focus {
+    outline: none;
+}
+
+.display {
+    width: 100%;
+    resize: none;
+}
+
+.display:focus {
+    outline: none;
+}

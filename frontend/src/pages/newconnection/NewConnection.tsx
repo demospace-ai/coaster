@@ -1,26 +1,23 @@
 
 import classNames from "classnames";
-import { FormEvent, useState } from "react";
+import React, { FormEvent, useState } from "react";
+import { rudderanalytics } from "src/app/rudder";
 import { BackButton, Button, FormButton } from "src/components/button/Button";
 import { Loading } from "src/components/loading/Loading";
-import { DataConnectionType } from "src/rpc/api";
+import { sendRequest } from "src/rpc/ajax";
+import { CreateDataConnection, CreateDataConnectionRequest, DataConnectionType, TestDataConnection, TestDataConnectionRequest } from "src/rpc/api";
 
 import styles from './newconnection.m.css';
 
 
 export const NewConnection: React.FC = () => {
   const [connectionType, setConnectionType] = useState<DataConnectionType | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  if (loading) {
-    return <Loading />;
-  }
 
   return (
     <div className={styles.newConnectionPage}>
       <div className={styles.newConnectionPane}>
         {connectionType ?
-          <NewConnectionConfiguration connectionType={connectionType} setLoading={setLoading} setConnectionType={setConnectionType} />
+          <NewConnectionConfiguration connectionType={connectionType} setConnectionType={setConnectionType} />
           :
           <ConnectionTypeSelector setConnectionType={setConnectionType} />
         }
@@ -31,7 +28,6 @@ export const NewConnection: React.FC = () => {
 
 type NewConnectionConfigurationProps = {
   connectionType: DataConnectionType;
-  setLoading: (loading: boolean) => void;
   setConnectionType: (connectionType: DataConnectionType | null) => void;
 };
 
@@ -59,6 +55,13 @@ const INITIAL_CONNECTION_STATE: NewConnectionState = {
 
 const NewConnectionConfiguration: React.FC<NewConnectionConfigurationProps> = props => {
   const [state, setState] = useState<NewConnectionState>(INITIAL_CONNECTION_STATE);
+  const [loading, setLoading] = useState(false);
+  const [testConnectionSuccess, setTestConnectionSuccess] = useState<boolean | null>(null);
+  const [createConnectionSuccess, setCreateConnectionSuccess] = useState<boolean | null>(null);
+
+  if (loading) {
+    return <Loading style={{ "position": "initial", "margin": "100px auto" }} />;
+  }
 
   const validateAll = (): boolean => {
     switch (props.connectionType) {
@@ -75,15 +78,69 @@ const NewConnectionConfiguration: React.FC<NewConnectionConfigurationProps> = pr
     }
   };
 
-  const createNewDataConnection = async (e: FormEvent) => {
-    e.preventDefault();
-    props.setLoading(true);
+  const testConnection = async () => {
+    setLoading(true);
     if (!validateAll()) {
+      setLoading(false);
       return;
     }
 
-    // TODO: await setDataConnection({});
-    props.setLoading(false);
+    const payload: TestDataConnectionRequest = {
+      'display_name': state.displayName,
+      'connection_type': props.connectionType,
+      'credentials': state.credentials,
+      'username': state.username,
+      'password': state.password,
+      'database_name': state.databaseName,
+      'warehouse_name': state.warehouseName,
+      'role': state.role,
+      'account': state.account,
+    };
+
+    try {
+      rudderanalytics.track("test_connection.start");
+      await sendRequest(TestDataConnection, payload);
+      rudderanalytics.track("test_connection.success");
+      setTestConnectionSuccess(true);
+    } catch (e) {
+      rudderanalytics.track("test_connection.error");
+      setTestConnectionSuccess(false);
+    }
+
+    setLoading(false);
+  };
+
+  const createNewDataConnection = async (e: FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    if (!validateAll()) {
+      setLoading(false);
+      return;
+    }
+
+    const payload: CreateDataConnectionRequest = {
+      'display_name': state.displayName,
+      'connection_type': props.connectionType,
+      'credentials': state.credentials,
+      'username': state.username,
+      'password': state.password,
+      'database_name': state.databaseName,
+      'warehouse_name': state.warehouseName,
+      'role': state.role,
+      'account': state.account,
+    };
+
+    try {
+      rudderanalytics.track("create_data_connection.start");
+      await sendRequest(CreateDataConnection, payload);
+      rudderanalytics.track("create_data_connection.success");
+      setCreateConnectionSuccess(true);
+    } catch (e) {
+      rudderanalytics.track("create_data_connection.error");
+      setCreateConnectionSuccess(false);
+    }
+
+    setLoading(false);
   };
 
   let inputs: React.ReactElement;
@@ -102,9 +159,10 @@ const NewConnectionConfiguration: React.FC<NewConnectionConfigurationProps> = pr
       <div className={styles.connectionSelectorTitle}>Enter your data warehouse configuration:</div>
       <form onSubmit={createNewDataConnection}>
         {inputs}
-        <Button className={styles.testButton} onClick={() => {/*TODO: fill this in*/ }}>Test</Button>
+        <Button className={styles.testButton} onClick={testConnection}>Test</Button>
         <FormButton className={styles.submit} value='Continue' />
       </form >
+      {testConnectionSuccess !== null && <div>{testConnectionSuccess ? "success" : "failure"}</div>}
     </>
   );
 };
@@ -121,10 +179,10 @@ const SnowflakeInputs: React.FC<ConnectionConfigurationProps> = props => {
       <ValidatedInput id='displayName' value={state.displayName} setValue={(value) => { props.setState({ ...state, displayName: value }); }} placeholder='DisplayName' />
       <ValidatedInput id='username' value={state.username} setValue={(value) => { props.setState({ ...state, username: value }); }} placeholder='Username' />
       <ValidatedInput id='password' value={state.password} setValue={(value) => { props.setState({ ...state, password: value }); }} placeholder='Password' />
-      <ValidatedInput id='password' value={state.databaseName} setValue={(value) => { props.setState({ ...state, databaseName: value }); }} placeholder='Database Name' />
-      <ValidatedInput id='password' value={state.warehouseName} setValue={(value) => { props.setState({ ...state, warehouseName: value }); }} placeholder='Warehouse Name' />
-      <ValidatedInput id='password' value={state.role} setValue={(value) => { props.setState({ ...state, role: value }); }} placeholder='Role' />
-      <ValidatedInput id='password' value={state.account} setValue={(value) => { props.setState({ ...state, account: value }); }} placeholder='Account' />
+      <ValidatedInput id='databaseName' value={state.databaseName} setValue={(value) => { props.setState({ ...state, databaseName: value }); }} placeholder='Database Name' />
+      <ValidatedInput id='warehouseName' value={state.warehouseName} setValue={(value) => { props.setState({ ...state, warehouseName: value }); }} placeholder='Warehouse Name' />
+      <ValidatedInput id='role' value={state.role} setValue={(value) => { props.setState({ ...state, role: value }); }} placeholder='Role' />
+      <ValidatedInput id='account' value={state.account} setValue={(value) => { props.setState({ ...state, account: value }); }} placeholder='Account' />
     </>
   );
 };
@@ -134,7 +192,14 @@ const BigQueryInputs: React.FC<ConnectionConfigurationProps> = props => {
   return (
     <>
       <ValidatedInput id='displayName' value={state.displayName} setValue={(value) => { props.setState({ ...state, displayName: value }); }} placeholder='DisplayName' />
-      <ValidatedInput id='credentials' value={state.credentials} setValue={(value) => { props.setState({ ...state, credentials: value }); }} placeholder='Credentials' />
+      <ValidatedInput
+        className={styles.credentialsInput}
+        id='credentials'
+        value={state.credentials}
+        setValue={(value) => { props.setState({ ...state, credentials: value }); }}
+        placeholder='Credentials (paste JSON here)'
+        textarea={true}
+      />
     </>
   );
 };
@@ -144,16 +209,18 @@ type ValidatedInputProps = {
   placeholder?: string;
   value: string;
   setValue: (value: string) => void;
+  className?: string;
+  textarea?: boolean;
 };
 
 const ValidatedInput: React.FC<ValidatedInputProps> = props => {
   const [isValid, setIsValid] = useState(true);
-  let classes = [styles.input];
+  let classes = [styles.input, props.className];
   if (!isValid) {
     classes.push(styles.invalidBorder);
   }
 
-  const onKeydown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+  const onKeydown = (event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     event.stopPropagation();
     if (event.key === 'Escape') {
       event.currentTarget.blur();
@@ -167,19 +234,36 @@ const ValidatedInput: React.FC<ValidatedInputProps> = props => {
   };
 
   return (
-    <input
-      type='text'
-      id={props.id}
-      name={props.id}
-      autoComplete={props.id}
-      placeholder={props.placeholder}
-      className={classNames(classes)}
-      onKeyDown={onKeydown}
-      onFocus={() => setIsValid(true)}
-      onChange={e => props.setValue(e.target.value)}
-      onBlur={() => validateNotEmpty(props.value)}
-      value={props.value}
-    />
+    <>
+      {props.textarea ?
+        <textarea
+          id={props.id}
+          name={props.id}
+          autoComplete={props.id}
+          placeholder={props.placeholder}
+          className={classNames(classes)}
+          onKeyDown={onKeydown}
+          onFocus={() => setIsValid(true)}
+          onChange={e => props.setValue(e.target.value)}
+          onBlur={() => validateNotEmpty(props.value)}
+          value={props.value}
+        />
+        :
+        <input
+          type='text'
+          id={props.id}
+          name={props.id}
+          autoComplete={props.id}
+          placeholder={props.placeholder}
+          className={classNames(classes)}
+          onKeyDown={onKeydown}
+          onFocus={() => setIsValid(true)}
+          onChange={e => props.setValue(e.target.value)}
+          onBlur={() => validateNotEmpty(props.value)}
+          value={props.value}
+        />
+      }
+    </>
   );
 };
 

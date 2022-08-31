@@ -3,39 +3,43 @@ import React, { Fragment, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { rudderanalytics } from 'src/app/rudder';
 import { Button } from 'src/components/button/Button';
-import { Editor, EditorRef } from 'src/components/editor/Editor';
+import { Editor } from 'src/components/editor/Editor';
 import { Loading } from 'src/components/loading/Loading';
 import { useDispatch, useSelector } from 'src/root/model';
 import { sendRequest } from 'src/rpc/ajax';
-import { CreateQuestion, CreateQuestionRequest, CreateQuestionResponse, User } from 'src/rpc/api';
+import { CreateQuestion, CreateQuestionRequest, User } from 'src/rpc/api';
 import styles from './newquestion.m.css';
 
-const createQuestion = async (
-  questionTitle: string,
-  questionBody: string,
-  assignee: User | undefined,
-  setLoading: (loading: boolean) => void,
-  setCreateQuestionResponse: (question: CreateQuestionResponse) => void,
-) => {
-  setLoading(true);
-  const payload: CreateQuestionRequest = { 'question_title': questionTitle, 'question_body': questionBody };
-  if (assignee) {
-    payload.assigned_user_id = assignee.id;
-  }
+const useCreateQuestion = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  try {
-    rudderanalytics.track("create_question.start");
-    const createQuestionResponse = await sendRequest(CreateQuestion, payload);
-    setCreateQuestionResponse(createQuestionResponse);
-    rudderanalytics.track("create_question.success");
-  } catch (e) {
-    rudderanalytics.track("create_question.error");
-  }
+  return async (
+    state: NewQuestionState,
+    setState: (state: NewQuestionState) => void,
+  ) => {
+    setState({ ...state, loading: true });
+    const payload: CreateQuestionRequest = { 'question_title': state.titleDraft, 'question_body': state.questionDraft };
+    if (state.assignee) {
+      payload.assigned_user_id = state.assignee.id;
+    }
+
+    try {
+      rudderanalytics.track("create_question.start");
+      const createQuestionResponse = await sendRequest(CreateQuestion, payload);
+      navigate('/question/' + createQuestionResponse.question.id);
+      dispatch({ type: 'showNewQuestionModal', showNewQuestionModal: false });
+      setState(INITIAL_STATE);
+      rudderanalytics.track("create_question.success");
+    } catch (e) {
+      rudderanalytics.track("create_question.error");
+      setState({ ...state, loading: false });
+    }
+  };
 };
 
 type NewQuestionState = {
   loading: boolean;
-  createQuestionResponse?: CreateQuestionResponse;
   titleDraft: string;
   questionDraft: string;
   assignee?: User;
@@ -52,33 +56,16 @@ const INITIAL_STATE: NewQuestionState = {
 };
 
 export const NewQuestion: React.FC<NewQuestionProps> = props => {
-  let navigate = useNavigate();
   const [state, setState] = useState<NewQuestionState>(INITIAL_STATE);
-  const dispatch = useDispatch();
-  const editorRef = useRef<EditorRef | null>(null);
+  const createQuestion = useCreateQuestion();
 
-  if (state.createQuestionResponse) {
-    navigate('/question/' + state.createQuestionResponse.question.id);
-    dispatch({ type: 'showNewQuestionModal', showNewQuestionModal: false });
-    setState(INITIAL_STATE);
-    editorRef.current!.setContent('');
-  }
-
-  const onCreateQuestion = () => {
+  const onCreateQuestion = async () => {
     if (!state.titleDraft || state.titleDraft.length === 0) {
       // TODO: show toast here
       return;
     }
 
-    const setLoading = (loading: boolean) => {
-      setState({ ...state, loading });
-    };
-
-    const setCreateQuestionResponse = (createQuestionResponse: CreateQuestionResponse) => {
-      setState({ ...state, createQuestionResponse });
-    };
-
-    createQuestion(state.titleDraft, state.questionDraft, state.assignee, setLoading, setCreateQuestionResponse);
+    await createQuestion(state, setState);
   };
 
   const onKeyDown = (e: KeyboardEvent) => {
@@ -107,9 +94,9 @@ export const NewQuestion: React.FC<NewQuestionProps> = props => {
         />
         <Editor
           className={styles.bodyContainer}
-          onChange={(remirrorJson) => setState({ ...state, questionDraft: JSON.stringify(remirrorJson) })}
+          value={state.questionDraft}
+          onChange={(e) => { setState({ ...state, questionDraft: e.target.value }); }}
           placeholder="Add description..."
-          editorRef={editorRef}
         />
         <AssigneeInput assignee={state.assignee} setAssignee={(assignee: User) => { setState({ ...state, assignee: assignee }); }} />
       </div>

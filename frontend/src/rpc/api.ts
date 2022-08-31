@@ -64,6 +64,40 @@ export const CreateQuestion: IEndpoint<CreateQuestionRequest, CreateQuestionResp
     path: '/create_question',
 };
 
+export const TestDataConnection: IEndpoint<TestDataConnectionRequest, undefined> = {
+    method: 'POST',
+    path: '/test_data_connection',
+};
+
+export const CreateDataConnection: IEndpoint<CreateDataConnectionRequest, undefined> = {
+    method: 'POST',
+    path: '/create_data_connection',
+};
+
+export interface TestDataConnectionRequest {
+    display_name: string;
+    connection_type: DataConnectionType;
+    credentials?: string;
+    username?: string;
+    password?: string;
+    database_name?: string;
+    warehouse_name?: string;
+    role?: string;
+    account?: string;
+}
+
+export interface CreateDataConnectionRequest {
+    display_name: string;
+    connection_type: DataConnectionType;
+    credentials?: string;
+    username?: string;
+    password?: string;
+    database_name?: string;
+    warehouse_name?: string;
+    role?: string;
+    account?: string;
+}
+
 export interface SetOrganizationRequest {
     organization_name?: string;
     organization_id?: number;

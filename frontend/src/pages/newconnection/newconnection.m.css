@@ -43,7 +43,7 @@
     padding: 8px 12px;
     width: 100%;
     box-sizing: border-box;
-    margin: 5px;
+    margin: 5px 0;
 }
 
 .invalidBorder {
@@ -71,4 +71,8 @@
 .backButton {
     display: block;
     margin-bottom: 20px;
+}
+
+.credentialsInput {
+    height: 100px;
 }

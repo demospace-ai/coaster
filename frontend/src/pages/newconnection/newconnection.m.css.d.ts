@@ -10,6 +10,7 @@ declare const styles: {
   readonly "testButton": string;
   readonly "submit": string;
   readonly "backButton": string;
+  readonly "credentialsInput": string;
 };
 export = styles;
 

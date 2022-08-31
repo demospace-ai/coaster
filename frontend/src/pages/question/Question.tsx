@@ -57,6 +57,7 @@ export const Question: React.FC = () => {
     }
 
     createAnswer(id!, answerDraft, setLoading, setQuestionResponse);
+    setAnswerDraft("");
   };
 
   return (
@@ -71,7 +72,7 @@ export const Question: React.FC = () => {
           {questionResponse!.question.body &&
             // The question might not actually have a body
             <Display
-              initialValue={JSON.parse(questionResponse!.question.body)}
+              value={questionResponse!.question.body}
             />}
         </div>
       </div>
@@ -83,7 +84,7 @@ export const Question: React.FC = () => {
             {questionResponse!.answers.map((answer, index) => (
               <li key={index} className={styles.answer}>
                 <Display
-                  initialValue={JSON.parse(answer.body)}
+                  value={answer.body}
                 />
               </li>
             ))}
@@ -94,7 +95,8 @@ export const Question: React.FC = () => {
         {/* TODO: provide a way to tag someone. */}
         <Editor
           className={styles.answerInput}
-          onChange={(remirrorJson) => { setAnswerDraft(JSON.stringify(remirrorJson)); }}
+          value={answerDraft}
+          onChange={(e) => { setAnswerDraft(e.target.value); }}
           placeholder="Leave an answer..."
         />
         <Button className={styles.answerButton} onClick={onCreateAnswer}>Post your answer</Button>
