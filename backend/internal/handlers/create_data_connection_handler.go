@@ -53,7 +53,6 @@ func CreateDataConnection(env Env, w http.ResponseWriter, r *http.Request) error
 		dataConnection, err = dataconnections.CreateBigQueryDataConnection(
 			env.Db, env.Auth.Organization.ID, createDataConnectionRequest.DisplayName, *createDataConnectionRequest.Credentials,
 		)
-		break
 	case models.DataConnectionTypeSnowflake:
 		dataConnection, err = dataconnections.CreateSnowflakeDataConnection(
 			env.Db, env.Auth.Organization.ID,
@@ -65,7 +64,6 @@ func CreateDataConnection(env Env, w http.ResponseWriter, r *http.Request) error
 			*createDataConnectionRequest.Role,
 			*createDataConnectionRequest.Account,
 		)
-		break
 	}
 
 	if err != nil {
