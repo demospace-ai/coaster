@@ -35,10 +35,18 @@ export const FormButton: React.FC<FormButtonProps> = props => {
   );
 };
 
-export const BackButton: React.FC = () => {
+export const BackButton: React.FC<Partial<ButtonProps>> = props => {
   const navigate = useNavigate();
 
+  const onClick = () => {
+    if (props.onClick) {
+      props.onClick();
+    } else {
+      navigate(-1);
+    }
+  };
+
   return (
-    <div className={styles.backButton} onClick={() => navigate(-1)}>{String.fromCharCode(8592)} Back</div>
+    <div className={classNames(props.className, styles.backButton)} onClick={onClick}>{String.fromCharCode(8592)} Back</div>
   );
 };

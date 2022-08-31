@@ -92,14 +92,15 @@ const OrganizationButton: React.FC<OrganizationButtonProps> = props => {
           <div className="tw-py-1">
             <Menu.Item>
               {({ active }) => (
-                <div
+                <NavLink
+                  to={'/newconnection'}
                   className={classNames(
                     active ? 'tw-bg-gray-100 tw-text-gray-900' : 'tw-text-gray-700',
                     'tw-block tw-px-4 tw-py-2 tw-text-sm', "tw-cursor-pointer"
                   )}
                 >
                   Settings
-                </div>
+                </NavLink>
               )}
             </Menu.Item>
           </div>

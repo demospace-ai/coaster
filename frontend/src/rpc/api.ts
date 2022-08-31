@@ -165,3 +165,8 @@ export interface Post {
     body: string;
     user_id: number;
 }
+
+export enum DataConnectionType {
+    BigQuery = "bigquery",
+    Snowflake = "snowflake",
+}

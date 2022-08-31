@@ -4,15 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import { Button, FormButton } from 'src/components/button/Button';
 import { Loading } from 'src/components/loading/Loading';
 import {
-  GoogleLoginResponse, useEmailLogin, useHandleGoogleResponse, useRequestValidationCode, useSetOrganization
+  GoogleLoginResponse, useHandleGoogleResponse, useSetOrganization
 } from 'src/pages/login/actions';
 import { useSelector } from 'src/root/model';
 import useWindowDimensions from 'src/utils/window';
-import isEmail from 'validator/lib/isEmail';
 import styles from './login.m.css';
 
 const GOOGLE_CLIENT_ID = '932264813910-egpk1omo3v2cedd89k8go851uko6djpa.apps.googleusercontent.com';
-const CODE_LENGTH = 6;
 
 export enum LoginStep {
   Start = 1,
@@ -116,64 +114,6 @@ const GoogleLogin: React.FC<GoogleLoginProps> = props => {
   return <div ref={googleSignInButton}></div>;
 };
 
-interface EmailLoginProps {
-  setLoading: (loading: boolean) => void;
-  setStep: React.Dispatch<React.SetStateAction<LoginStep>>;
-}
-
-const EmailLogin: React.FC<EmailLoginProps> = props => {
-  const [email, setEmail] = useState('');
-  const [isValid, setIsValid] = useState(true);
-  const requestValidationCode = useRequestValidationCode(props.setStep);
-
-  const onKeydown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    event.stopPropagation();
-    if (event.key === 'Escape') {
-      event.currentTarget.blur();
-    }
-  };
-
-  const validateEmail = (): boolean => {
-    const valid = isEmail(email);
-    setIsValid(valid);
-    return valid;
-  };
-
-  const onSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    props.setLoading(true);
-    if (!validateEmail()) {
-      return;
-    }
-
-    await requestValidationCode(email);
-    props.setLoading(false);
-  };
-
-  let classes = [styles.input];
-  if (!isValid) {
-    classes.push(styles.invalidBorder);
-  }
-
-  return (
-    <form className={styles.marginTop} onSubmit={onSubmit}>
-      <input
-        type='text'
-        id='email'
-        name='email'
-        autoComplete='email'
-        placeholder='Email'
-        className={classNames(classes)}
-        onKeyDown={onKeydown}
-        onChange={e => setEmail(e.target.value)}
-        onBlur={validateEmail}
-      />
-      {!isValid && <div className={styles.invalidLabel}>Please enter a valid email.</div>}
-      <FormButton className={styles.submit} value='Continue' />
-    </form>
-  );
-};
-
 type OrganizationInputProps = {
   setLoading: (loading: boolean) => void;
 };
@@ -233,6 +173,7 @@ const OrganizationInput: React.FC<OrganizationInputProps> = props => {
           placeholder='Organization Name'
           className={classNames(classes)}
           onKeyDown={onKeydown}
+          onFocus={() => setIsValid(true)}
           onChange={e => setOrganizationInput(e.target.value)}
           onBlur={validateOrganization}
         />
@@ -257,69 +198,5 @@ const OrganizationInput: React.FC<OrganizationInputProps> = props => {
       <div className={styles.orDivider}>or</div>
       <Button className={styles.createNewButton} onClick={() => setOverrideCreate(true)} secondary={true}>Create new organization</Button>
     </div>
-  );
-};
-
-const ValidationCodeInput: React.FC = () => {
-  const email = useSelector(state => state.login.email);
-  const [code, setCode] = useState('');
-  const [isValid, setIsValid] = useState(true);
-  const emailLogin = useEmailLogin();
-
-  const onKeydown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    event.stopPropagation();
-    if (event.key === 'Escape') {
-      event.currentTarget.blur();
-    }
-  };
-
-  const validateCode = (): boolean => {
-    const valid = code.length === CODE_LENGTH;
-    setIsValid(valid);
-    return valid;
-  };
-
-  const updateCode = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value;
-    const cleaned = raw.replace(/\D/g, '');
-    setCode(cleaned);
-  };
-
-  const onSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (!validateCode()) {
-      return;
-    }
-
-    if (!email) {
-      console.log('Something went wrong.');
-      return;
-    }
-
-    emailLogin(email, code);
-  };
-
-  let classes = [styles.input];
-  if (!isValid) {
-    classes.push(styles.invalidBorder);
-  }
-
-  return (
-    <form className={styles.extraMarginTop} onSubmit={onSubmit}>
-      <input
-        type='text'
-        id='code'
-        name='code'
-        autoComplete='one-time-code'
-        placeholder='Code'
-        className={classNames(classes)}
-        onKeyDown={onKeydown}
-        onChange={updateCode}
-        onBlur={validateCode}
-        value={code}
-      />
-      {!isValid && <div className={styles.invalidLabel}>Invalid code.</div>}
-      <FormButton className={styles.submit} value='Continue' />
-    </form>
   );
 };
