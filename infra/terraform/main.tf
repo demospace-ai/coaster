@@ -383,3 +383,18 @@ resource "google_cloudbuild_trigger" "frontend-build-trigger" {
 
   filename = "infra/cloudbuild/frontend.yaml"
 }
+
+resource "google_kms_key_ring" "data-connection-keyring" {
+  name     = "data-connection-keyring"
+  location = "global"
+}
+
+resource "google_kms_crypto_key" "data-connection-key" {
+  name            = "data-connection-key"
+  key_ring        = google_kms_key_ring.data-connection-keyring.id
+  rotation_period = "100000s"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
