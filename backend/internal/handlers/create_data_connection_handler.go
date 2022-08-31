@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fabra/internal/dataconnections"
 	"fabra/internal/errors"
 	"fabra/internal/models"
 	"fmt"
@@ -46,14 +47,31 @@ func CreateDataConnection(env Env, w http.ResponseWriter, r *http.Request) error
 		return err
 	}
 
-	// TODO: load the encryption key
+	var dataConnection *models.DataConnection
+	switch createDataConnectionRequest.ConnectionType {
+	case models.DataConnectionTypeBigQuery:
+		dataConnection, err = dataconnections.CreateBigQueryDataConnection(
+			env.Db, env.Auth.Organization.ID, createDataConnectionRequest.DisplayName, *createDataConnectionRequest.Credentials,
+		)
+	case models.DataConnectionTypeSnowflake:
+		dataConnection, err = dataconnections.CreateSnowflakeDataConnection(
+			env.Db, env.Auth.Organization.ID,
+			createDataConnectionRequest.DisplayName,
+			*createDataConnectionRequest.Username,
+			*createDataConnectionRequest.Password,
+			*createDataConnectionRequest.DatabaseName,
+			*createDataConnectionRequest.WarehouseName,
+			*createDataConnectionRequest.Role,
+			*createDataConnectionRequest.Account,
+		)
+	}
 
-	// TODO: encrypt the credentials or password
-
-	// TODO: create the data connection
+	if err != nil {
+		return err
+	}
 
 	return json.NewEncoder(w).Encode(CreateDataConnectionResponse{
-		// TODO: put data connection in response
+		*dataConnection,
 	})
 }
 

@@ -12,6 +12,7 @@ require (
 )
 
 require (
+	cloud.google.com/go/kms v1.4.0 // indirect
 	github.com/gobuffalo/envy v1.10.1 // indirect
 	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/pkg/errors v0.8.1 // indirect

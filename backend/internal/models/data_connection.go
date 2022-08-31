@@ -10,8 +10,8 @@ const (
 )
 
 type DataConnection struct {
-	DisplayName    string `json:"display_name"`
 	OrganizationID int64
+	DisplayName    string `json:"display_name"`
 	ConnectionType DataConnectionType
 	Username       database.NullString
 	Password       database.NullString
