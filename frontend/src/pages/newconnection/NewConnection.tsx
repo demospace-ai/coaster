@@ -55,13 +55,10 @@ const INITIAL_CONNECTION_STATE: NewConnectionState = {
 
 const NewConnectionConfiguration: React.FC<NewConnectionConfigurationProps> = props => {
   const [state, setState] = useState<NewConnectionState>(INITIAL_CONNECTION_STATE);
-  const [loading, setLoading] = useState(false);
+  const [testLoading, setTestLoading] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false);
   const [testConnectionSuccess, setTestConnectionSuccess] = useState<boolean | null>(null);
   const [createConnectionSuccess, setCreateConnectionSuccess] = useState<boolean | null>(null);
-
-  if (loading) {
-    return <Loading style={{ "position": "initial", "margin": "100px auto" }} />;
-  }
 
   const validateAll = (): boolean => {
     switch (props.connectionType) {
@@ -79,9 +76,9 @@ const NewConnectionConfiguration: React.FC<NewConnectionConfigurationProps> = pr
   };
 
   const testConnection = async () => {
-    setLoading(true);
+    setTestLoading(true);
     if (!validateAll()) {
-      setLoading(false);
+      setTestLoading(false);
       return;
     }
 
@@ -107,14 +104,14 @@ const NewConnectionConfiguration: React.FC<NewConnectionConfigurationProps> = pr
       setTestConnectionSuccess(false);
     }
 
-    setLoading(false);
+    setTestLoading(false);
   };
 
   const createNewDataConnection = async (e: FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setSaveLoading(true);
     if (!validateAll()) {
-      setLoading(false);
+      setSaveLoading(false);
       return;
     }
 
@@ -140,7 +137,7 @@ const NewConnectionConfiguration: React.FC<NewConnectionConfigurationProps> = pr
       setCreateConnectionSuccess(false);
     }
 
-    setLoading(false);
+    setSaveLoading(false);
   };
 
   let inputs: React.ReactElement;
@@ -159,10 +156,13 @@ const NewConnectionConfiguration: React.FC<NewConnectionConfigurationProps> = pr
       <div className={styles.connectionSelectorTitle}>Enter your data warehouse configuration:</div>
       <form onSubmit={createNewDataConnection}>
         {inputs}
-        <Button className={styles.testButton} onClick={testConnection}>Test</Button>
-        <FormButton className={styles.submit} value='Continue' />
+        <Button className={styles.testButton} onClick={testConnection}>{testLoading ? <Loading style={{ position: "static", margin: "auto" }} /> : "Test"}</Button>
+        {testConnectionSuccess !== null &&
+          /* TODO: return error message here */
+          <div className={classNames(styles.result)}>{testConnectionSuccess ? "Success!" : "Failure"}</div>
+        }
+        <FormButton className={styles.submit}>{saveLoading ? <Loading style={{ position: "static", margin: "auto" }} /> : "Continue"}</FormButton>
       </form >
-      {testConnectionSuccess !== null && <div>{testConnectionSuccess ? "success" : "failure"}</div>}
     </>
   );
 };

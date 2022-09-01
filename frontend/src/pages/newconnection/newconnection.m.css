@@ -54,8 +54,9 @@
 .testButton {
     margin-top: 30px;
     background: gray;
-    border-color: black;
+    border-color: gray;
     width: 100%;
+    height: 40px;
 }
 
 .testButton:hover {
@@ -75,4 +76,11 @@
 
 .credentialsInput {
     height: 100px;
+    min-height: 40px;
+    max-height: 300px;
+}
+
+.result {
+    margin-top: 10px;
+    text-align: center;
 }

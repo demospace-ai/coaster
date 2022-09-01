@@ -11,6 +11,7 @@ declare const styles: {
   readonly "submit": string;
   readonly "backButton": string;
   readonly "credentialsInput": string;
+  readonly "result": string;
 };
 export = styles;
 

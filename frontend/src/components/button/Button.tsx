@@ -21,17 +21,18 @@ export const Button: React.FC<ButtonProps> = props => {
 };
 
 type FormButtonProps = {
-  value: string;
   className?: string;
+  children: React.ReactNode;
 };
 
 export const FormButton: React.FC<FormButtonProps> = props => {
   return (
-    <input
+    <button
       className={classNames(styles.button, props.className)}
       type='submit'
-      value={props.value}>
-    </input>
+    >
+      {props.children}
+    </button>
   );
 };
 

@@ -178,7 +178,7 @@ const OrganizationInput: React.FC<OrganizationInputProps> = props => {
           onBlur={validateOrganization}
         />
         {!isValid && <div className={styles.invalidLabel}>Please enter a valid organization name.</div>}
-        <FormButton className={styles.submit} value='Continue' />
+        <FormButton className={styles.submit}>Continue</FormButton>
       </form>
     );
   }
