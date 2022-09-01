@@ -14,16 +14,6 @@ type QuestionParams = {
   id: string;
 };
 
-const getQuestion = async (id: string, setLoading: (loading: boolean) => void, setQuestionResponse: (question: GetQuestionResponse) => void) => {
-  const payload = { 'questionID': id };
-  try {
-    const getQuestionResponse = await sendRequest(GetQuestion, payload);
-    setQuestionResponse(getQuestionResponse);
-    setLoading(false);
-  } catch (e) {
-  }
-};
-
 const createAnswer = async (questionID: string, answerBody: string, setLoading: (loading: boolean) => void, setQuestionResponse: (question: GetQuestionResponse) => void) => {
   setLoading(true);
   const payload = { 'question_id': parseInt(questionID, 10), 'answer_body': answerBody };
@@ -41,7 +31,21 @@ export const Question: React.FC = () => {
   const [questionResponse, setQuestionResponse] = useState<GetQuestionResponse | undefined>(undefined);
   const [answerDraft, setAnswerDraft] = useState<string>('');
   useEffect(() => {
-    getQuestion(id!, setLoading, setQuestionResponse);
+    let ignore = false;
+    const payload = { 'questionID': id };
+    try {
+      sendRequest(GetQuestion, payload).then((response) => {
+        if (!ignore) {
+          setQuestionResponse(response);
+        }
+        setLoading(false);
+      });
+    } catch (e) {
+    }
+
+    return () => {
+      ignore = true;
+    };
   }, [id]);
 
   if (loading) {

@@ -33,7 +33,7 @@ export function useHandleGoogleResponse(setLoading: (loading: boolean) => void):
       setLoading(false);
     } catch (e) {
     }
-  }, []);
+  }, [dispatch, navigate, setLoading]);
 }
 
 export interface OrganizationArgs {
@@ -92,7 +92,7 @@ export function useEmailLogin() {
       });
     } catch (e) {
     }
-  }, []);
+  }, [dispatch]);
 }
 
 export async function onLoginSuccess(user: User, organization: Organization | undefined, dispatch: Dispatch<RootAction>, navigate: NavigateFunction) {
@@ -127,5 +127,5 @@ export function useLogout() {
     dispatch({
       type: 'login.logout',
     });
-  }, []);
+  }, [dispatch]);
 }

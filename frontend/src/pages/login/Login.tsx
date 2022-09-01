@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import React, { FormEvent, useEffect, useState } from 'react';
+import React, { FormEvent, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, FormButton } from 'src/components/button/Button';
 import { Loading } from 'src/components/loading/Loading';
@@ -25,11 +25,12 @@ export const Login: React.FC = () => {
   const organization = useSelector(state => state.login.organization);
   const navigate = useNavigate();
 
+  // Use effect to navigate after render if authenticated
   useEffect(() => {
     if (isAuthenticated && organization) {
       navigate('/');
     }
-  }, [isAuthenticated, organization, navigate]);
+  }, [navigate, isAuthenticated, organization]);
 
   if (loading) {
     return (
@@ -56,21 +57,6 @@ export const Login: React.FC = () => {
   );
 };
 
-const useScript = (url: string, onload: () => void) => {
-  useEffect(() => {
-    const script = document.createElement('script');
-
-    script.src = url;
-    script.onload = onload;
-
-    document.head.appendChild(script);
-
-    return () => {
-      document.head.removeChild(script);
-    };
-  }, [url, onload]);
-};
-
 type StartContentProps = {
   onGoogleSignIn: (_: GoogleLoginResponse) => void,
 };
@@ -84,10 +70,6 @@ const StartContent: React.FC<StartContentProps> = props => {
     <>
       <div className={styles.signInText}>Sign in to your account</div>
       <GoogleLogin onGoogleSignIn={props.onGoogleSignIn} width={googleButtonWidth} />
-      {/* <div className={styles.marginTop}>
-      or
-    </div>
-    <EmailLogin setLoading={setLoading} setStep={setStep} /> */}
     </>
   );
 };
@@ -97,21 +79,37 @@ type GoogleLoginProps = {
   width: number,
 };
 
+let googleScriptLoaded = false;
+
 const GoogleLogin: React.FC<GoogleLoginProps> = props => {
-  const googleSignInButton = React.createRef<HTMLDivElement>();
+  const buttonRef = useRef<HTMLDivElement>(null);
+  // Use effect to wait until after the component is rendered
+  useEffect(() => {
+    const onLoad = () => {
+      window.google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: props.onGoogleSignIn,
+      });
+      window.google.accounts.id.renderButton(
+        buttonRef.current!,
+        { theme: 'filled_blue', size: 'large', text: 'continue_with', width: props.width }
+      );
+    };
 
-  useScript('https://accounts.google.com/gsi/client', () => {
-    window.google.accounts.id.initialize({
-      client_id: GOOGLE_CLIENT_ID,
-      callback: props.onGoogleSignIn,
-    });
-    window.google.accounts.id.renderButton(
-      googleSignInButton.current!,
-      { theme: 'filled_blue', size: 'large', text: 'continue_with', width: props.width }
-    );
-  });
+    if (googleScriptLoaded) {
+      onLoad();
+    } else {
+      const script = document.createElement('script');
 
-  return <div ref={googleSignInButton}></div>;
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.onload = onLoad;
+
+      document.head.appendChild(script);
+      googleScriptLoaded = true;
+    }
+  }, [props.onGoogleSignIn, props.width]);
+
+  return <div ref={buttonRef}></div>;
 };
 
 type OrganizationInputProps = {

@@ -83,3 +83,14 @@
     margin-top: 10px;
     text-align: center;
 }
+
+.successMessage {
+    margin-top: 40px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.successButton {
+    display: block;
+    margin: 30px auto 40px;
+}

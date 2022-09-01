@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-const CRYPTO_KEY_NAME = "data-connection-key"
+const CRYPTO_KEY_NAME = "projects/fabra-344902/locations/global/keyRings/data-connection-keyring/cryptoKeys/data-connection-key"
 
 func CreateBigQueryDataConnection(db *gorm.DB, organizationID int64, displayName string, credentials string) (*models.DataConnection, error) {
 	encryptedCredentials, err := crypto.Encrypt(CRYPTO_KEY_NAME, credentials)

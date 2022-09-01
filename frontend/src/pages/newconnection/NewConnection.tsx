@@ -1,6 +1,7 @@
 
 import classNames from "classnames";
 import React, { FormEvent, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { rudderanalytics } from "src/app/rudder";
 import { BackButton, Button, FormButton } from "src/components/button/Button";
 import { Loading } from "src/components/loading/Loading";
@@ -53,64 +54,31 @@ const INITIAL_CONNECTION_STATE: NewConnectionState = {
   account: "",
 };
 
+const validateAll = (connectionType: DataConnectionType, state: NewConnectionState): boolean => {
+  switch (connectionType) {
+    case DataConnectionType.Snowflake:
+      return state.displayName.length > 0
+        && state.username.length > 0
+        && state.password.length > 0
+        && state.databaseName.length > 0
+        && state.warehouseName.length > 0
+        && state.role.length > 0
+        && state.account.length > 0;
+    case DataConnectionType.BigQuery:
+      return state.displayName.length > 0 && state.credentials.length > 0;
+  }
+};
+
 const NewConnectionConfiguration: React.FC<NewConnectionConfigurationProps> = props => {
   const [state, setState] = useState<NewConnectionState>(INITIAL_CONNECTION_STATE);
-  const [testLoading, setTestLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
-  const [testConnectionSuccess, setTestConnectionSuccess] = useState<boolean | null>(null);
   const [createConnectionSuccess, setCreateConnectionSuccess] = useState<boolean | null>(null);
-
-  const validateAll = (): boolean => {
-    switch (props.connectionType) {
-      case DataConnectionType.Snowflake:
-        return state.displayName.length > 0
-          && state.username.length > 0
-          && state.password.length > 0
-          && state.databaseName.length > 0
-          && state.warehouseName.length > 0
-          && state.role.length > 0
-          && state.account.length > 0;
-      case DataConnectionType.BigQuery:
-        return state.displayName.length > 0 && state.credentials.length > 0;
-    }
-  };
-
-  const testConnection = async () => {
-    setTestLoading(true);
-    if (!validateAll()) {
-      setTestLoading(false);
-      return;
-    }
-
-    const payload: TestDataConnectionRequest = {
-      'display_name': state.displayName,
-      'connection_type': props.connectionType,
-      'credentials': state.credentials,
-      'username': state.username,
-      'password': state.password,
-      'database_name': state.databaseName,
-      'warehouse_name': state.warehouseName,
-      'role': state.role,
-      'account': state.account,
-    };
-
-    try {
-      rudderanalytics.track("test_connection.start");
-      await sendRequest(TestDataConnection, payload);
-      rudderanalytics.track("test_connection.success");
-      setTestConnectionSuccess(true);
-    } catch (e) {
-      rudderanalytics.track("test_connection.error");
-      setTestConnectionSuccess(false);
-    }
-
-    setTestLoading(false);
-  };
+  const navigate = useNavigate();
 
   const createNewDataConnection = async (e: FormEvent) => {
     e.preventDefault();
     setSaveLoading(true);
-    if (!validateAll()) {
+    if (!validateAll(props.connectionType, state)) {
       setSaveLoading(false);
       return;
     }
@@ -150,19 +118,76 @@ const NewConnectionConfiguration: React.FC<NewConnectionConfigurationProps> = pr
       break;
   };
 
+  if (createConnectionSuccess) {
+    return (
+      <div>
+        <div className={styles.successMessage}>🎉 Congratulations! Your connection is set up. 🎉</div>
+        <Button className={styles.successButton} onClick={() => { navigate("/"); }}>Return Home</Button>
+      </div>
+    );
+  }
+
   return (
     <>
       <BackButton className={styles.backButton} onClick={() => props.setConnectionType(null)} />
       <div className={styles.connectionSelectorTitle}>Enter your data warehouse configuration:</div>
       <form onSubmit={createNewDataConnection}>
         {inputs}
-        <Button className={styles.testButton} onClick={testConnection}>{testLoading ? <Loading style={{ position: "static", margin: "auto" }} /> : "Test"}</Button>
-        {testConnectionSuccess !== null &&
-          /* TODO: return error message here */
-          <div className={classNames(styles.result)}>{testConnectionSuccess ? "Success!" : "Failure"}</div>
-        }
+        <TestConnectionButton state={state} connectionType={props.connectionType} />
         <FormButton className={styles.submit}>{saveLoading ? <Loading style={{ position: "static", margin: "auto" }} /> : "Continue"}</FormButton>
+        {createConnectionSuccess !== null &&
+          /* TODO: return error message here */
+          <div className={classNames(styles.result)}>{createConnectionSuccess ? "Success!" : "Failure"}</div>
+        }
       </form >
+    </>
+  );
+};
+
+const TestConnectionButton: React.FC<{ state: NewConnectionState, connectionType: DataConnectionType; }> = props => {
+  const [testLoading, setTestLoading] = useState(false);
+  const [testConnectionSuccess, setTestConnectionSuccess] = useState<boolean | null>(null);
+  const state = props.state;
+
+  const testConnection = async () => {
+    setTestLoading(true);
+    if (!validateAll(props.connectionType, state)) {
+      setTestLoading(false);
+      return;
+    }
+
+    const payload: TestDataConnectionRequest = {
+      'display_name': state.displayName,
+      'connection_type': props.connectionType,
+      'credentials': state.credentials,
+      'username': state.username,
+      'password': state.password,
+      'database_name': state.databaseName,
+      'warehouse_name': state.warehouseName,
+      'role': state.role,
+      'account': state.account,
+    };
+
+    try {
+      rudderanalytics.track("test_connection.start");
+      await sendRequest(TestDataConnection, payload);
+      rudderanalytics.track("test_connection.success");
+      setTestConnectionSuccess(true);
+    } catch (e) {
+      rudderanalytics.track("test_connection.error");
+      setTestConnectionSuccess(false);
+    }
+
+    setTestLoading(false);
+  };
+
+  return (
+    <>
+      <Button className={styles.testButton} onClick={testConnection}>{testLoading ? <Loading style={{ position: "static", margin: "auto" }} /> : "Test"}</Button>
+      {testConnectionSuccess !== null &&
+        /* TODO: return error message here */
+        <div className={classNames(styles.result)}>{testConnectionSuccess ? "Success!" : "Failure"}</div>
+      }
     </>
   );
 };

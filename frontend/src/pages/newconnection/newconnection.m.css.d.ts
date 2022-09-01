@@ -12,6 +12,8 @@ declare const styles: {
   readonly "backButton": string;
   readonly "credentialsInput": string;
   readonly "result": string;
+  readonly "successMessage": string;
+  readonly "successButton": string;
 };
 export = styles;
 

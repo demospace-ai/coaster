@@ -5,18 +5,23 @@ import { sendRequest } from 'src/rpc/ajax';
 import { GetAllQuestions, Post } from 'src/rpc/api';
 import styles from './allquestions.m.css';
 
-const fetchQuestions = async (setQuestions: (questions: Post[]) => void, setLoading: (loading: boolean) => void) => {
-  const results = await sendRequest(GetAllQuestions);
-  setQuestions(results.questions);
-  setLoading(false);
-};
-
 export const AllQuestions: React.FC = () => {
   const navigate = useNavigate();
   const [questions, setQuestions] = useState<Post[]>();
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    fetchQuestions(setQuestions, setLoading);
+    let ignore = false;
+    sendRequest(GetAllQuestions).then((results) => {
+      if (!ignore) {
+        setQuestions(results.questions);
+      }
+
+      setLoading(false);
+    });
+
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   return (

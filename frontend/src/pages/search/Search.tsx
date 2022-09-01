@@ -8,11 +8,6 @@ import { useSearch, useSetResults } from "src/pages/search/actions";
 import styles from "src/pages/search/search.m.css";
 import { useDispatch, useSelector } from "src/root/model";
 
-const doSearch = async (query: string, setLoading: (loading: boolean) => void, search: (query: string) => Promise<void>) => {
-  await search(query);
-  setLoading(false);
-};
-
 export const SearchResults: React.FC = () => {
   const [params] = useSearchParams();
   const query = params.get('q');
@@ -33,7 +28,9 @@ export const SearchResults: React.FC = () => {
       return;
     }
 
-    doSearch(query, setLoading, search);
+    search(query).then(() => {
+      setLoading(false);
+    });
   }, [search, setResults, query]);
 
   if (loading) {

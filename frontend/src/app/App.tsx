@@ -18,6 +18,8 @@ import { SearchResults } from 'src/pages/search/Search';
 import { useSelector } from 'src/root/model';
 import styles from './app.m.css';
 
+let needsInit = true;
+
 export const App: React.FC = () => {
   const loading = useSelector(state => state.app.loading);
   const showNewQuestionModal = useSelector(state => state.app.showNewQuestionModal);
@@ -28,8 +30,12 @@ export const App: React.FC = () => {
   };
 
   useEffect(() => {
-    start();
-  }, []);
+    // Recommended way to run one-time initialization: https://beta.reactjs.org/learn/you-might-not-need-an-effect#initializing-the-application
+    if (needsInit) {
+      start();
+      needsInit = false;
+    }
+  }, [start]);
 
   if (loading) {
     return (

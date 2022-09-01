@@ -2,6 +2,7 @@ package crypto
 
 import (
 	"context"
+	"encoding/hex"
 	"fmt"
 	"hash/crc32"
 
@@ -37,13 +38,13 @@ func Encrypt(keyName string, plaintextString string) (*string, error) {
 		return nil, fmt.Errorf("failed to encrypt: %v", err)
 	}
 
-	if result.VerifiedPlaintextCrc32C == false {
+	if !result.VerifiedPlaintextCrc32C {
 		return nil, fmt.Errorf("Encrypt: request corrupted in-transit")
 	}
 	if int64(crc32c(result.Ciphertext)) != result.CiphertextCrc32C.Value {
 		return nil, fmt.Errorf("Encrypt: response corrupted in-transit")
 	}
 
-	ciphertext := string(result.Ciphertext)
+	ciphertext := hex.EncodeToString(result.Ciphertext)
 	return &ciphertext, nil
 }
