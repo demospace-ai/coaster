@@ -50,36 +50,54 @@ export const ConnectionSelector: React.FC<ConnectionSelectorProps> = props => {
           leaveTo="tw-transform tw-opacity-0 tw-scale-95"
         >
           <Listbox.Options className="tw-absolute tw-mt-1 tw-max-h-60 tw-w-full tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm">
-            {loading ?
-              <div className="tw-p-2">
-                <Loading className="tw-m-auto tw-block" />
-              </div>
-              :
-              connectionOptions!.map((connectionOption: DataConnection, index: number) => (
-                <Listbox.Option key={index} value={connectionOption} className={({ active }) =>
-                  `tw-relative tw-cursor-pointer tw-select-none tw-py-2 tw-pl-10 tw-pr-4 ${active ? 'tw-bg-green-100 tw-text-green-900' : 'tw-text-gray-900'
-                  }`
-                }>
-                  {({ selected }) => (
-                    <>
-                      <span
-                        className={`tw-block tw-truncate ${selected ? 'tw-font-medium' : 'tw-font-normal'
-                          }`}
-                      >
-                        {connectionOption.display_name}
-                      </span>
-                      {selected ? (
-                        <span className="tw-absolute tw-inset-y-0 tw-left-0 tw-flex tw-items-center tw-pl-3 tw-text-green-600">
-                          <CheckIcon className="tw-h-5 tw-w-5" aria-hidden="true" />
-                        </span>
-                      ) : null}
-                    </>
-                  )}
-                </Listbox.Option>
-              ))}
+            <ConnectionOptions loading={loading} connectionOptions={connectionOptions} />
           </Listbox.Options>
         </Transition>
       </div>
     </Listbox>
   );
+};
+
+const ConnectionOptions: React.FC<{ loading: boolean, connectionOptions: DataConnection[] | undefined; }> = props => {
+  if (props.loading) {
+    return (
+      <div className="tw-p-2">
+        <Loading className="tw-m-auto tw-block" />
+      </div>
+    );
+  }
+
+  if (props.connectionOptions && props.connectionOptions.length > 0) {
+    return (
+      <>
+        {props.connectionOptions!.map((connectionOption: DataConnection, index: number) => (
+          <Listbox.Option key={index} value={connectionOption} className={({ active }) =>
+            `tw-relative tw-cursor-pointer tw-select-none tw-py-2 tw-pl-10 tw-pr-4 ${active ? 'tw-bg-green-100 tw-text-green-900' : 'tw-text-gray-900'
+            }`
+          }>
+            {({ selected }) => (
+              <>
+                <span
+                  className={`tw-block tw-truncate ${selected ? 'tw-font-medium' : 'tw-font-normal'
+                    }`}
+                >
+                  {connectionOption.display_name}
+                </span>
+                {selected ? (
+                  <span className="tw-absolute tw-inset-y-0 tw-left-0 tw-flex tw-items-center tw-pl-3 tw-text-green-600">
+                    <CheckIcon className="tw-h-5 tw-w-5" aria-hidden="true" />
+                  </span>
+                ) : null}
+              </>
+            )}
+          </Listbox.Option>
+        ))
+        }
+      </>
+    );
+  } else {
+    return (
+      <div className="tw-p-2">No connections available!</div>
+    );
+  }
 };
