@@ -3,17 +3,13 @@ import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import classNames from "classnames";
 import { Fragment } from "react";
 import { NavLink } from "react-router-dom";
-import { useDispatch, useSelector } from "src/root/model";
+import { useSelector } from "src/root/model";
 import { Organization } from "src/rpc/api";
 import styles from './navigationBar.m.css';
 
 export const NavigationBar: React.FC = () => {
   const isAuthenticated = useSelector(state => state.login.authenticated);
   const organization = useSelector(state => state.login.organization);
-  const dispatch = useDispatch();
-  const showNewQuestionModal = () => {
-    dispatch({ type: 'showNewQuestionModal', showNewQuestionModal: true });
-  };
 
   // No navigation bar whatsoever for login page
   if (!isAuthenticated || !organization) {
