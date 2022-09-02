@@ -20,7 +20,7 @@ export enum LoginStep {
 
 export const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
-  const handleGoogleResponse = useHandleGoogleResponse(setLoading);
+  const handleGoogleResponse = useHandleGoogleResponse();
   const isAuthenticated = useSelector(state => state.login.authenticated);
   const organization = useSelector(state => state.login.organization);
   const navigate = useNavigate();
@@ -38,9 +38,15 @@ export const Login: React.FC = () => {
     );
   }
 
+  const onGoogleSignIn = async (response: GoogleLoginResponse) => {
+    setLoading(true);
+    await handleGoogleResponse(response);
+    setLoading(false);
+  };
+
   let loginContent;
   if (!isAuthenticated) {
-    loginContent = <StartContent onGoogleSignIn={handleGoogleResponse} />;
+    loginContent = <StartContent onGoogleSignIn={onGoogleSignIn} />;
   } else if (!organization) {
     loginContent = <OrganizationInput setLoading={setLoading} />;
   }
@@ -83,6 +89,7 @@ let googleScriptLoaded = false;
 
 const GoogleLogin: React.FC<GoogleLoginProps> = props => {
   const buttonRef = useRef<HTMLDivElement>(null);
+
   // Use effect to wait until after the component is rendered
   useEffect(() => {
     const onLoad = () => {
