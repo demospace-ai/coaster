@@ -10,7 +10,6 @@ import { CreateDataConnection, CreateDataConnectionRequest, DataConnectionType, 
 
 import styles from './newconnection.m.css';
 
-
 export const NewConnection: React.FC = () => {
   const [connectionType, setConnectionType] = useState<DataConnectionType | null>(null);
 

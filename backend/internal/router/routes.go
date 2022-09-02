@@ -66,6 +66,12 @@ var Routes = []Route{
 		HandlerFunc: handlers.TestDataConnection,
 	},
 	{
+		Name:        "Run query",
+		Method:      "POST",
+		Pattern:     "/api/run_query",
+		HandlerFunc: handlers.RunQuery,
+	},
+	{
 		Name:        "Get all users in an organization",
 		Method:      "GET",
 		Pattern:     "/api/get_all_users",

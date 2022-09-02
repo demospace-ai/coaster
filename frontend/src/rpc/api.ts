@@ -1,3 +1,4 @@
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export interface IEndpoint<RequestType, ResponseType> {
     method: 'GET' | 'POST' | 'DELETE' | 'PUT';
@@ -74,6 +75,12 @@ export const TestDataConnection: IEndpoint<TestDataConnectionRequest, undefined>
     path: '/test_data_connection',
 };
 
+
+export const RunQuery: IEndpoint<RunQueryRequest, RunQueryResponse> = {
+    method: 'POST',
+    path: '/run_query',
+};
+
 export const CreateDataConnection: IEndpoint<CreateDataConnectionRequest, undefined> = {
     method: 'POST',
     path: '/create_data_connection',
@@ -101,6 +108,36 @@ export interface CreateDataConnectionRequest {
     warehouse_name?: string;
     role?: string;
     account?: string;
+}
+
+export type JSONValue =
+    | string
+    | number
+    | boolean
+    | JSONObject
+    | JSONArray;
+
+export interface JSONObject {
+    [x: string]: JSONValue;
+}
+
+export interface JSONArray extends Array<JSONValue> { }
+
+export interface ColumnSchema {
+    name: string;
+    type: string;
+}
+
+export interface Schema extends Array<ColumnSchema> { }
+
+export interface RunQueryRequest {
+    connection_id: number;
+    query_string: string;
+}
+
+export interface RunQueryResponse {
+    schema: Schema;
+    query_results: JSONArray;
 }
 
 export interface SetOrganizationRequest {

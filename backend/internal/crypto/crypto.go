@@ -48,3 +48,41 @@ func Encrypt(keyName string, plaintextString string) (*string, error) {
 	ciphertext := hex.EncodeToString(result.Ciphertext)
 	return &ciphertext, nil
 }
+
+func Decrypt(keyName string, ciphertextString string) (*string, error) {
+	ciphertext, err := hex.DecodeString(ciphertextString)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx := context.Background()
+	client, err := kms.NewKeyManagementClient(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create kms client: %v", err)
+	}
+	defer client.Close()
+
+	crc32c := func(data []byte) uint32 {
+		t := crc32.MakeTable(crc32.Castagnoli)
+		return crc32.Checksum(data, t)
+	}
+	ciphertextCRC32C := crc32c(ciphertext)
+
+	req := &kmspb.DecryptRequest{
+		Name:             keyName,
+		Ciphertext:       ciphertext,
+		CiphertextCrc32C: wrapperspb.Int64(int64(ciphertextCRC32C)),
+	}
+
+	result, err := client.Decrypt(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decrypt ciphertext: %v", err)
+	}
+
+	if int64(crc32c(result.Plaintext)) != result.PlaintextCrc32C.Value {
+		return nil, fmt.Errorf("Decrypt: response corrupted in-transit")
+	}
+
+	plaintext := string(result.Plaintext)
+	return &plaintext, nil
+}

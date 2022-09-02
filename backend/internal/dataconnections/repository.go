@@ -5,10 +5,18 @@ import (
 	"fabra/internal/database"
 	"fabra/internal/models"
 
+	"cloud.google.com/go/bigquery"
 	"gorm.io/gorm"
 )
 
 const CRYPTO_KEY_NAME = "projects/fabra-344902/locations/global/keyRings/data-connection-keyring/cryptoKeys/data-connection-key"
+
+type Schema []ColumnSchema
+
+type ColumnSchema struct {
+	Name string `json:"name"`
+	Type string `json:"type"`
+}
 
 func GetDataConnections(db *gorm.DB, organizationID int64) ([]models.DataConnection, error) {
 	var connections []models.DataConnection
@@ -24,6 +32,22 @@ func GetDataConnections(db *gorm.DB, organizationID int64) ([]models.DataConnect
 	}
 
 	return connections, nil
+}
+
+func LoadDataConnectionByID(db *gorm.DB, connectionID int64, organizationID int64) (*models.DataConnection, error) {
+	var dataConnection models.DataConnection
+	result := db.Table("data_connections").
+		Select("data_connections.*").
+		Where("data_connections.id = ?", connectionID).
+		Where("data_connections.organization_id = ?", organizationID).
+		Where("data_connections.deactivated_at IS NULL").
+		Take(&dataConnection)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &dataConnection, nil
 }
 
 func CreateBigQueryDataConnection(db *gorm.DB, organizationID int64, displayName string, credentials string) (*models.DataConnection, error) {
@@ -81,4 +105,28 @@ func CreateSnowflakeDataConnection(
 	}
 
 	return &dataConnection, err
+}
+
+func DecryptBigQueryCredentials(dataConnection models.DataConnection) (*string, error) {
+	credentialsString, err := crypto.Decrypt(CRYPTO_KEY_NAME, dataConnection.Credentials.String)
+	if err != nil {
+		return nil, err
+	}
+
+	return credentialsString, nil
+}
+
+func ConvertBigQuerySchema(bigQuerySchema bigquery.Schema) Schema {
+	schema := Schema{}
+
+	for _, bigQuerySchemaField := range bigQuerySchema {
+		columnSchema := ColumnSchema{
+			Name: bigQuerySchemaField.Name,
+			Type: string(bigQuerySchemaField.Type),
+		}
+
+		schema = append(schema, columnSchema)
+	}
+
+	return schema
 }
