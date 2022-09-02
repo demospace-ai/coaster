@@ -149,14 +149,14 @@ const OrganizationInput: React.FC<OrganizationInputProps> = props => {
       return;
     }
 
-    await setOrganization({ organizationName: organizationInput });
+    await setOrganization(user!, { organizationName: organizationInput });
     props.setLoading(false);
   };
 
   const joinOrganization = async (organizationID: number) => {
     props.setLoading(true);
     // TODO how to specify positional arg with name
-    await setOrganization({ organizationID: organizationID });
+    await setOrganization(user!, { organizationID: organizationID });
   };
 
   if (!suggestedOrganizations || suggestedOrganizations.length === 0 || overrideCreate) {
