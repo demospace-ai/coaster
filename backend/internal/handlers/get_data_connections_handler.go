@@ -8,7 +8,7 @@ import (
 )
 
 type GetDataConnectionResponse struct {
-	DataConnections []models.DataConnection `json:"data_connection"`
+	DataConnections []models.DataConnection `json:"data_connections"`
 }
 
 func GetDataConnections(env Env, w http.ResponseWriter, r *http.Request) error {
