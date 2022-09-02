@@ -57,12 +57,12 @@ const ProfileDropdown: React.FC = () => {
 
       <Transition
         as={Fragment}
-        enter="transition ease-out duration-100"
-        enterFrom="transform opacity-0 scale-95"
-        enterTo="transform opacity-100 scale-100"
-        leave="transition ease-in duration-75"
-        leaveFrom="transform opacity-100 scale-100"
-        leaveTo="transform opacity-0 scale-95"
+        enter="tw-transition tw-ease-out tw-duration-100"
+        enterFrom="tw-transform tw-opacity-0 tw-scale-95"
+        enterTo="tw-transform tw-opacity-100 tw-scale-100"
+        leave="tw-transition tw-ease-in tw-duration-75"
+        leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
+        leaveTo="tw-transform tw-opacity-0 tw-scale-95"
       >
         <Menu.Items className="tw-origin-top-right tw-absolute tw-right-5 tw-mt-2 tw-w-40 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none">
           <div className="tw-py-1">

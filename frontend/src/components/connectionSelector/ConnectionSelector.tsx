@@ -42,9 +42,12 @@ export const ConnectionSelector: React.FC<ConnectionSelectorProps> = props => {
         </Listbox.Button>
         <Transition
           as={Fragment}
-          leave="transition ease-in duration-100"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
+          enter="tw-transition tw-ease-out tw-duration-100"
+          enterFrom="tw-transform tw-opacity-0 tw-scale-95"
+          enterTo="tw-transform tw-opacity-100 tw-scale-100"
+          leave="tw-transition tw-ease-in tw-duration-75"
+          leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
+          leaveTo="tw-transform tw-opacity-0 tw-scale-95"
         >
           <Listbox.Options className="tw-absolute tw-mt-1 tw-max-h-60 tw-w-full tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm">
             {loading ?

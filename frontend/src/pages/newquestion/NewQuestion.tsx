@@ -146,9 +146,12 @@ const AssigneeInput: React.FC<AssigneeInputProps> = props => {
           </Combobox.Button>
           <Transition
             as={Fragment}
-            leave="transition ease-in duration-100"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
+            enter="tw-transition tw-ease-out tw-duration-100"
+            enterFrom="tw-transform tw-opacity-0 tw-scale-95"
+            enterTo="tw-transform tw-opacity-100 tw-scale-100"
+            leave="tw-transition tw-ease-in tw-duration-75"
+            leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
+            leaveTo="tw-transform tw-opacity-0 tw-scale-95"
             afterLeave={() => {
               setInputValue('');
               if (inputRef.current) {
