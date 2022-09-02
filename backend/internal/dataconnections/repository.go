@@ -10,6 +10,22 @@ import (
 
 const CRYPTO_KEY_NAME = "projects/fabra-344902/locations/global/keyRings/data-connection-keyring/cryptoKeys/data-connection-key"
 
+func GetDataConnections(db *gorm.DB, organizationID int64) ([]models.DataConnection, error) {
+	var connections []models.DataConnection
+	result := db.Table("data_connections").
+		Select("data_connections.*").
+		Where("data_connections.organization_id = ?", organizationID).
+		Where("data_connections.deactivated_at IS NULL").
+		Order("data_connections.created_at ASC").
+		Find(&connections)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return connections, nil
+}
+
 func CreateBigQueryDataConnection(db *gorm.DB, organizationID int64, displayName string, credentials string) (*models.DataConnection, error) {
 	encryptedCredentials, err := crypto.Encrypt(CRYPTO_KEY_NAME, credentials)
 	if err != nil {

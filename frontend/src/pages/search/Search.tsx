@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { RemirrorJSON } from "remirror";
 import { Button } from "src/components/button/Button";
 import { Display } from "src/components/editor/Editor";
 import { Loading } from "src/components/loading/Loading";
@@ -51,7 +50,7 @@ export const SearchResults: React.FC = () => {
               {result.body &&
                 <div className={styles.postBody}>
                   <Display
-                    value={toPlaintext(JSON.parse(result.body)).trim()}
+                    value={result.body}
                   />
                 </div>
               }
@@ -65,29 +64,4 @@ export const SearchResults: React.FC = () => {
       </div>
     </div>
   );
-};
-
-const toPlaintext = (json: RemirrorJSON) => {
-  let plaintext = '';
-
-  if (['paragraph', 'heading'].includes(json.type)) {
-    plaintext += ' ';
-  }
-
-  if (json.content) {
-    plaintext += json.content?.map((innerJson) => {
-      let innerPlaintext = '';
-      if (innerJson.text) {
-        innerPlaintext += innerJson.text;
-      }
-
-      if (innerJson.content) {
-        innerPlaintext += toPlaintext(innerJson);
-      }
-
-      return innerPlaintext;
-    }).join('');
-  }
-
-  return plaintext;
 };

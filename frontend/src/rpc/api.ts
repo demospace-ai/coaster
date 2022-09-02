@@ -19,6 +19,11 @@ export const GetAllQuestions: IEndpoint<{ page: string; }, GetAllQuestionsRespon
     path: '/get_all_questions',
 };
 
+export const GetDataConnections: IEndpoint<undefined, GetDataConnectionsResponse> = {
+    method: 'GET',
+    path: '/get_data_connections',
+};
+
 export const GetAssignedQuestions: IEndpoint<undefined, GetAssignedQuestionsResponse> = {
     method: 'GET',
     path: '/get_assigned_questions',
@@ -138,6 +143,10 @@ export interface GetAllQuestionsResponse {
     questions: Post[];
 }
 
+export interface GetDataConnectionsResponse {
+    data_connections: DataConnection[];
+}
+
 export interface GetAssignedQuestionsResponse {
     questions: Post[];
 }
@@ -198,6 +207,12 @@ export interface Post {
     title: string | undefined;
     body: string;
     user_id: number;
+}
+
+export interface DataConnection {
+    id: number;
+    display_name: string;
+    connection_type: DataConnectionType;
 }
 
 export enum DataConnectionType {

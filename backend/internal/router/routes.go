@@ -84,6 +84,12 @@ var Routes = []Route{
 		HandlerFunc: handlers.GetAllQuestions,
 	},
 	{
+		Name:        "Get all data connections",
+		Method:      "GET",
+		Pattern:     "/api/get_data_connections",
+		HandlerFunc: handlers.GetDataConnections,
+	},
+	{
 		Name:        "Create answer",
 		Method:      "POST",
 		Pattern:     "/api/create_answer",

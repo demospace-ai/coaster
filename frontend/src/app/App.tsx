@@ -11,6 +11,7 @@ import { Inbox } from 'src/pages/inbox/Inbox';
 import { Login } from 'src/pages/login/Login';
 import { MyTasks } from 'src/pages/mytasks/MyTasks';
 import { NewConnection } from 'src/pages/newconnection/NewConnection';
+import { NewQuery } from 'src/pages/newquery/NewQuery';
 import { NewQuestion } from 'src/pages/newquestion/NewQuestion';
 import { NotFound } from 'src/pages/notfound/NotFound';
 import { Question } from 'src/pages/question/Question';
@@ -57,6 +58,7 @@ export const App: React.FC = () => {
           <Route path='/question/:id' element={<RequireAuth element={<Question />} />} />
           <Route path='/search' element={<RequireAuth element={<SearchResults />} />} />
           <Route path='/newconnection' element={<RequireAuth element={<NewConnection />} />} />
+          <Route path='/newquery' element={<RequireAuth element={<NewQuery />} />} />
           <Route path='*' element={<NotFound />} />
         </Route>
       </Routes>

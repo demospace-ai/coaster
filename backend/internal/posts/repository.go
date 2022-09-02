@@ -53,7 +53,6 @@ func LoadAssignedQuestions(db *gorm.DB, userID int64, organizationID int64) ([]m
 		Select("posts.*").
 		Where("posts.assigned_user_id = ?", userID).
 		Where("posts.organization_id = ?", organizationID).
-		Where("posts.organization_id = ?", organizationID).
 		Where("posts.post_type = ?", models.PostTypeQuestion).
 		Where("posts.deactivated_at IS NULL").
 		Find(&questions)
@@ -70,7 +69,6 @@ func LoadAllQuestions(db *gorm.DB, page int, organizationID int64) ([]models.Pos
 	var questions []models.Post
 	result := db.Table("posts").
 		Select("posts.*").
-		Where("posts.organization_id = ?", organizationID).
 		Where("posts.organization_id = ?", organizationID).
 		Where("posts.post_type = ?", models.PostTypeQuestion).
 		Where("posts.deactivated_at IS NULL").

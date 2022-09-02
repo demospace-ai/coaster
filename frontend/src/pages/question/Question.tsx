@@ -48,7 +48,7 @@ export const Question: React.FC = () => {
     };
   }, [id]);
 
-  if (loading) {
+  if (true) {
     return (
       <Loading />
     );

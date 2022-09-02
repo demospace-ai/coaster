@@ -134,7 +134,7 @@ const NewConnectionConfiguration: React.FC<NewConnectionConfigurationProps> = pr
       <form onSubmit={createNewDataConnection}>
         {inputs}
         <TestConnectionButton state={state} connectionType={props.connectionType} />
-        <FormButton className={styles.submit}>{saveLoading ? <Loading style={{ position: "static", margin: "auto" }} /> : "Continue"}</FormButton>
+        <FormButton className={styles.submit}>{saveLoading ? <Loading /> : "Continue"}</FormButton>
         {createConnectionSuccess !== null &&
           /* TODO: return error message here */
           <div className={classNames(styles.result)}>{createConnectionSuccess ? "Success!" : "Failure"}</div>
@@ -183,7 +183,7 @@ const TestConnectionButton: React.FC<{ state: NewConnectionState, connectionType
 
   return (
     <>
-      <Button className={styles.testButton} onClick={testConnection}>{testLoading ? <Loading style={{ position: "static", margin: "auto" }} /> : "Test"}</Button>
+      <Button className={styles.testButton} onClick={testConnection}>{testLoading ? <Loading /> : "Test"}</Button>
       {testConnectionSuccess !== null &&
         /* TODO: return error message here */
         <div className={classNames(styles.result)}>{testConnectionSuccess ? "Success!" : "Failure"}</div>

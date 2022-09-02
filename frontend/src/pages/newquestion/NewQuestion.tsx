@@ -101,7 +101,7 @@ export const NewQuestion: React.FC<NewQuestionProps> = props => {
         <AssigneeInput assignee={state.assignee} setAssignee={(assignee: User) => { setState({ ...state, assignee: assignee }); }} />
       </div>
       <div className={styles.submitContainer}>
-        <Button className={styles.submitQuestionButton} onClick={onCreateQuestion}>{state.loading ? <Loading style={{ position: "static", margin: "auto" }} /> : "Submit"}</Button>
+        <Button className={styles.submitQuestionButton} onClick={onCreateQuestion}>{state.loading ? <Loading /> : "Submit"}</Button>
       </div>
     </>
   );

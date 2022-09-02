@@ -7,12 +7,6 @@
     place-content: stretch;
 }
 
-.loading {
-    position: inherit;
-    margin: auto;
-    margin-top: 120px;
-}
-
 .inboxList {
     display: flex;
     flex-direction: column;

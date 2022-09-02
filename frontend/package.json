@@ -5,6 +5,7 @@
   "dependencies": {
     "@babel/core": "^7.16.0",
     "@headlessui/react": "^1.6.6",
+    "@heroicons/react": "^2.0.10",
     "@highlight-run/react": "^1.1.11",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.3",
     "@reduxjs/toolkit": "^1.8.1",
@@ -59,7 +60,6 @@
     "react-redux": "^7.2.2",
     "react-refresh": "^0.11.0",
     "react-router-dom": "^6.3.0",
-    "remirror": "^1.0.89",
     "resolve": "^1.20.0",
     "resolve-url-loader": "^4.0.0",
     "rudder-sdk-js": "^2.12.1",
