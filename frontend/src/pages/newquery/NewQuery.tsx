@@ -5,10 +5,11 @@ import { ConnectionSelector } from "src/components/connectionSelector/Connection
 import { Loading } from "src/components/loading/Loading";
 import { sendRequest } from "src/rpc/ajax";
 import { DataConnection, QueryResults, RunQuery, RunQueryRequest, Schema } from "src/rpc/api";
+import { useLocalStorage } from "src/utils/localStorage";
 
 
 export const NewQuery: React.FC = () => {
-  const [connection, setConnection] = useState<DataConnection | null>(null);
+  const [connection, setConnection] = useLocalStorage<DataConnection | null>("selectedConnection", null);
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [query, setQuery] = useState<string>("");
