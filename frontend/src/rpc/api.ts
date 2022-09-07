@@ -121,7 +121,10 @@ export interface JSONObject {
     [x: string]: JSONValue;
 }
 
-export interface JSONArray extends Array<JSONValue> { }
+export interface JSONArray extends Array<JSONValue> { };
+
+export interface QueryResult extends Array<string | number> { }
+export interface QueryResults extends Array<QueryResult> { }
 
 export interface ColumnSchema {
     name: string;
@@ -137,7 +140,7 @@ export interface RunQueryRequest {
 
 export interface RunQueryResponse {
     schema: Schema;
-    query_results: JSONArray;
+    query_results: QueryResults;
 }
 
 export interface SetOrganizationRequest {
