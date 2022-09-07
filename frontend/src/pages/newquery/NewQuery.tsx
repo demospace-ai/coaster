@@ -9,10 +9,10 @@ import { useLocalStorage } from "src/utils/localStorage";
 
 
 export const NewQuery: React.FC = () => {
-  const [connection, setConnection] = useLocalStorage<DataConnection | null>("selectedConnection", null);
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [query, setQuery] = useState<string>("");
+  const [connection, setConnection] = useLocalStorage<DataConnection | null>("selectedConnection", null);
+  const [query, setQuery] = useLocalStorage<string>("query", "");
   const [schema, setSchema] = useState<Schema | null>(null);
   const [queryResults, setQueryResults] = useState<QueryResults | null>(null);
 
@@ -48,7 +48,6 @@ export const NewQuery: React.FC = () => {
       'query_string': query,
     };
 
-
     try {
       rudderanalytics.track("run_query.start");
       const response = await sendRequest(RunQuery, payload);
@@ -56,6 +55,7 @@ export const NewQuery: React.FC = () => {
       setSchema(response.schema);
       setQueryResults(response.query_results);
     } catch (e) {
+      console.log(e);
       rudderanalytics.track("run_query.error");
       setErrorMessage((e as Error).message);
       setSchema(null);
