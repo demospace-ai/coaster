@@ -401,7 +401,7 @@ resource "google_kms_crypto_key" "data-connection-key" {
 }
 
 resource "google_kms_key_ring_iam_member" "data-connection-key-ring-cloud-run-role" {
-  crypto_key_id = google_kms_key_ring.data-connection-keyring.id
+  key_ring_id = google_kms_key_ring.data-connection-keyring.id
   role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
   member        = "serviceAccount:932264813910-compute@developer.gserviceaccount.com"
 }
