@@ -76,9 +76,9 @@ export const NewQuery: React.FC = () => {
           <textarea value={query} onKeyDown={onKeyDown} onChange={e => setQuery(e.target.value)} className="tw-w-full tw-h-60 focus:tw-outline-none tw-resize-none tw-p-2 tw-font-mono" placeholder="Select ..." />
         </div>
         <div className="tw-border-solid tw-border-gray-200 tw-border tw-p-2">
-          <Button className="tw-w-32" onClick={runQuery}>Run</Button>
+          <Button className="tw-w-32 tw-h-8" onClick={runQuery}>{loading ? <Loading /> : "Run"}</Button>
         </div>
-        <div className="tw-mt-5 tw-w-full tw-overflow-auto tw-overscroll-contain tw-h-[500px]">
+        <div className="tw-mt-5">
           <QueryResultsTable loading={loading} schema={schema} results={queryResults} />
         </div>
         {errorMessage &&
@@ -96,28 +96,37 @@ type QueryResultsProps = {
 };
 
 const QueryResultsTable: React.FC<QueryResultsProps> = props => {
-  // TODO: display this nicely
-
   if (props.loading) {
     return <Loading />;
   }
 
   if (props.schema && props.results) {
     return (
-      <table className="">
-        <ResultsSchema schema={props.schema} />
-        <tbody className="tw-py-2">
-          {
-            props.results.map(resultRow => {
-              return <tr>
-                {resultRow.map(resultValue => {
-                  return <td className="tw-px-6 tw-py-3 tw-text-left"><div className="tw-h-8 tw-whitespace-nowrap">{resultValue}</div></td>;
-                })}
-              </tr>;
-            })
-          }
-        </tbody>
-      </table>
+      <div className="tw-overflow-auto tw-overscroll-contain tw-max-h-[500px] tw-border-gray-300 tw-border-solid tw-border-2">
+        <table>
+          <ResultsSchema schema={props.schema} />
+          <tbody className="tw-py-2">
+            {
+              props.results.map((resultRow, index) => {
+                return (
+                  <tr key={index} className="even:tw-bg-gray-100">
+                    <td key={-1} className="tw-px-3 tw-py-2 tw-text-right tw-bg-gray-100 tw-border-gray-300 tw-border-solid tw-border-r tw-border-b-0 tw-tabular-nums">
+                      {index + 1}
+                    </td>
+                    {resultRow.map((resultValue, valueIndex) => {
+                      return (
+                        <td key={valueIndex} className="tw-pl-3 tw-pr-5 tw-py-2 tw-text-left tw-border-gray-300 tw-border-solid tw-border-r tw-border-t last:tw-w-full focus:tw-bg-blue-300">
+                          <div className="tw-h-5 tw-whitespace-nowrap">{resultValue}</div>
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })
+            }
+          </tbody>
+        </table>
+      </div>
     );
   }
 
@@ -126,11 +135,16 @@ const QueryResultsTable: React.FC<QueryResultsProps> = props => {
 
 const ResultsSchema: React.FC<{ schema: Schema; }> = ({ schema }) => {
   return (
-    <thead>
-      <tr>
+    <thead className="tw-sticky">
+      <tr >
+        <th key={-1} scope="col" className="tw-pl-3 tw-pr-5 tw-py-2 tw-bg-gray-100 tw-border-gray-300 tw-border-solid tw-border-r tw-border-b"></th>
         {
-          schema.map(columnSchema => {
-            return <th scope="col" className="tw-px-6 tw-py-3 tw-text-left"><div className="tw-h-8">{columnSchema.name}</div></th>;
+          schema.map((columnSchema, index) => {
+            return (
+              <th key={index} scope="col" className="tw-pl-3 tw-pr-5 tw-py-2 tw-text-left tw-bg-gray-100 tw-border-gray-300 tw-border-solid tw-border-r">
+                <div className="tw-h-5 tw-whitespace-nowrap">{columnSchema.name}</div>
+              </th>
+            );
           })
         }
       </tr>
