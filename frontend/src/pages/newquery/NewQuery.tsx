@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { rudderanalytics } from "src/app/rudder";
 import { Button } from "src/components/button/Button";
 import { ConnectionSelector } from "src/components/connectionSelector/ConnectionSelector";
@@ -15,6 +15,21 @@ export const NewQuery: React.FC = () => {
   const [query, setQuery] = useLocalStorage<string>("query", "");
   const [schema, setSchema] = useState<Schema | null>(null);
   const [queryResults, setQueryResults] = useState<QueryResults | null>(null);
+  const lineNumberRef = useRef<HTMLDivElement>(null);
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  useEffect(() => {
+    if (textAreaRef.current) {
+      textAreaRef.current.style.height = "0px";
+      const scrollHeight = textAreaRef.current.scrollHeight;
+      textAreaRef.current.style.height = scrollHeight + "px";
+    }
+
+    if (lineNumberRef.current) {
+      lineNumberRef.current.style.height = "0px";
+      const scrollHeight = lineNumberRef.current.scrollHeight;
+      lineNumberRef.current.style.height = scrollHeight + "px";
+    }
+  }, [query]);
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.metaKey && event.key === 'Enter') {
@@ -65,6 +80,8 @@ export const NewQuery: React.FC = () => {
     setLoading(false);
   };
 
+  const lines = query.split('\n');
+
   return (
     <div className="tw-p-10 tw-flex tw-min-w-0">
       <div className="tw-w-80 tw-min-w-[20rem] tw-inline-block">
@@ -72,8 +89,18 @@ export const NewQuery: React.FC = () => {
         <ConnectionSelector connection={connection} setConnection={onConnectionSelected} />
       </div>
       <div className="tw-ml-10 tw-flex-1 tw-min-w-0 tw-min-h-0">
-        <div className="tw-border-solid tw-border-gray-200 tw-border tw-border-b-0">
-          <textarea value={query} onKeyDown={onKeyDown} onChange={e => setQuery(e.target.value)} className="tw-w-full tw-h-60 focus:tw-outline-none tw-resize-none tw-p-2 tw-font-mono" placeholder="Select ..." />
+        <div className="tw-border-solid tw-border-slate-900 tw-border tw-border-b-0 tw-bg-slate-900 tw-h-60 tw-flex tw-overflow-scroll">
+          <div ref={lineNumberRef} className="tw-pt-2 tw-w-10 tw-min-h-full tw-pl-4 tw-text-white tw-text-mono tw-text-xs tw-border-solid tw-border-gray-800 tw-border-r ">
+            {lines.map((_, index) => (
+              <div>
+                <div className="tw-h-5 tw-leading-5 tw-pr-3 tw-text-right">{index + 1}</div>
+              </div>
+            ))}
+          </div>
+          <textarea
+            ref={textAreaRef}
+            className="tw-pt-2 tw-pl-2 tw-min-h-full tw-leading-[20px] tw-w-full focus:tw-outline-none tw-resize-none tw-overflow-y-hidden tw-font-mono tw-bg-slate-900 tw-text-white tw-whitespace-nowrap"
+            value={query} onKeyDown={onKeyDown} onChange={e => setQuery(e.target.value)} placeholder="Select ..." />
         </div>
         <div className="tw-border-solid tw-border-gray-200 tw-border tw-p-2">
           <Button className="tw-w-32 tw-h-8" onClick={runQuery}>{loading ? <Loading /> : "Run"}</Button>
