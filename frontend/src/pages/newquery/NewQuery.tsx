@@ -6,15 +6,14 @@ import { ConnectionSelector } from "src/components/connectionSelector/Connection
 import { Loading } from "src/components/loading/Loading";
 import { QueryResultsTable } from 'src/components/queryResults/QueryResults';
 import { sendRequest } from "src/rpc/ajax";
-import { DataConnection, QueryResults, RunQuery, RunQueryRequest, Schema } from "src/rpc/api";
+import { QueryResults, RunQuery, RunQueryRequest, Schema } from "src/rpc/api";
 import { createResizeFunction } from 'src/utils/drag';
 import { useLocalStorage } from "src/utils/localStorage";
-
 
 export const NewQuery: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [connection, setConnection] = useLocalStorage<DataConnection | null>("selectedConnection", null);
+  const [connectionID, setConnectionID] = useLocalStorage<number | null>("selectedConnectionID", null);
   const [query, setQuery] = useLocalStorage<string>("query", "");
   const [schema, setSchema] = useState<Schema | null>(null);
   const [queryResults, setQueryResults] = useState<QueryResults | null>(null);
@@ -42,16 +41,16 @@ export const NewQuery: React.FC = () => {
     }
   };
 
-  const onConnectionSelected = (value: DataConnection) => {
+  const onConnectionSelected = (value: number) => {
     setErrorMessage(null);
-    setConnection(value);
+    setConnectionID(value);
   };
 
   const runQuery = async () => {
     setLoading(true);
     setErrorMessage(null);
 
-    if (!connection) {
+    if (!connectionID) {
       setErrorMessage("Data source is not set!");
       setLoading(false);
       return;
@@ -64,7 +63,7 @@ export const NewQuery: React.FC = () => {
     }
 
     const payload: RunQueryRequest = {
-      'connection_id': connection!.id,
+      'connection_id': connectionID,
       'query_string': query,
     };
 
@@ -89,24 +88,11 @@ export const NewQuery: React.FC = () => {
 
   return (
     <>
-      <div className="tw-h-10 tw-bg-gray-200 tw-flex">
-        <div className="tw-cursor-pointer tw-inline-block tw-ml-5 tw-bg-white tw-w-32 tw-rounded-t-md tw-mt-1 tw-mb-0 tw-border-t-2 tw-border-green-400 tw-border-solid">
-          <div className="tw-leading-[35px] tw-ml-3 tw-font-semibold">
-            Query 1
-          </div>
-        </div>
-        <div className="tw-inline-block tw-mx-4 tw-my-2 tw-w-[1px] tw-bg-gray-400"></div>
-        <div className="tw-inline-block tw-bg-white tw-w-32 tw-rounded-t-md tw-mt-1 tw-mb-0 tw-border-b tw-border-gray-200 tw-border-solid">
-          <div className="tw-cursor-pointer tw-leading-[35px] tw-ml-3 tw-font-semibold">
-            New Chart
-            <PlusCircleIcon className='tw-mt-[-2px] tw-ml-1 tw-h-4 tw-inline'></PlusCircleIcon>
-          </div>
-        </div>
-      </div>
+      <QueryNavigation />
       <div className="tw-px-10 tw-pt-5 tw-flex tw-min-w-0">
-        <div className="tw-w-80 tw-min-w-[20rem] tw-inline-block">
+        <div className="tw-w-80 tw-min-w-[20rem] tw-inline-block tw-select-none">
           Data Source
-          <ConnectionSelector connection={connection} setConnection={onConnectionSelected} />
+          <ConnectionSelector className="tw-mt-1" connectionID={connectionID} setConnectionID={onConnectionSelected} />
         </div>
         <div className="tw-ml-10 tw-flex-1 tw-min-w-0 tw-min-h-0">
           <div className="tw-relative ">
@@ -114,7 +100,7 @@ export const NewQuery: React.FC = () => {
               <div ref={lineNumberRef} className="tw-pt-2 tw-w-10 tw-min-h-full tw-pl-4 tw-text-white tw-text-mono tw-text-xs tw-border-solid tw-border-gray-800 tw-border-r ">
                 {lines.map((_, index) => (
                   <div key={index}>
-                    <div className="tw-h-5 tw-leading-5 tw-pr-3 tw-text-right">{index + 1}</div>
+                    <div className="tw-h-5 tw-leading-5 tw-pr-3 tw-text-right tw-select-none">{index + 1}</div>
                   </div>
                 ))}
               </div>
@@ -142,5 +128,24 @@ export const NewQuery: React.FC = () => {
         </div>
       </div>
     </>
+  );
+};
+
+const QueryNavigation: React.FC = () => {
+  return (
+    <div className="tw-h-10 tw-bg-gray-200 tw-flex">
+      <div className="tw-cursor-pointer tw-inline-block tw-ml-5 tw-bg-white tw-w-32 tw-rounded-t-md tw-mt-1 tw-mb-0 tw-border-t-2 tw-border-green-400 tw-border-solid">
+        <div className="tw-leading-[35px] tw-ml-3 tw-font-semibold tw-select-none">
+          Query 1
+        </div>
+      </div>
+      <div className="tw-inline-block tw-mx-4 tw-my-2 tw-w-[1px] tw-bg-gray-400"></div>
+      <div className="tw-inline-block tw-bg-white tw-w-32 tw-rounded-t-md tw-mt-1 tw-mb-0 tw-border-b tw-border-gray-200 tw-border-solid">
+        <div className="tw-cursor-pointer tw-leading-[35px] tw-ml-3 tw-font-semibold tw-select-none">
+          New Chart
+          <PlusCircleIcon className='tw-mt-[-2px] tw-ml-1 tw-h-4 tw-inline'></PlusCircleIcon>
+        </div>
+      </div>
+    </div>
   );
 };
