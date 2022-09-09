@@ -1,11 +1,13 @@
-import { PlusIcon } from '@heroicons/react/20/solid';
+import { PlusCircleIcon } from '@heroicons/react/20/solid';
 import { useEffect, useRef, useState } from "react";
 import { rudderanalytics } from "src/app/rudder";
 import { Button } from "src/components/button/Button";
 import { ConnectionSelector } from "src/components/connectionSelector/ConnectionSelector";
 import { Loading } from "src/components/loading/Loading";
+import { QueryResultsTable } from 'src/components/queryResults/QueryResults';
 import { sendRequest } from "src/rpc/ajax";
 import { DataConnection, QueryResults, RunQuery, RunQueryRequest, Schema } from "src/rpc/api";
+import { createResizeFunction } from 'src/utils/drag';
 import { useLocalStorage } from "src/utils/localStorage";
 
 
@@ -19,6 +21,7 @@ export const NewQuery: React.FC = () => {
   const lineNumberRef = useRef<HTMLDivElement>(null);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
+  const startResize = createResizeFunction(editorRef);
   useEffect(() => {
     if (textAreaRef.current) {
       textAreaRef.current.style.height = "0px";
@@ -84,28 +87,6 @@ export const NewQuery: React.FC = () => {
 
   const lines = query.split('\n');
 
-  let startHeight: number, startY: number;
-
-  const startDrag = (e: React.MouseEvent) => {
-    startHeight = editorRef.current!.clientHeight;
-    startY = e.clientY;
-    document.documentElement.addEventListener('mousemove', onDrag, false);
-    document.documentElement.addEventListener('mouseup', stopDrag, false);
-  };
-
-  const onDrag = (e: MouseEvent) => {
-    if (editorRef.current) {
-      const newHeight = startHeight + (e.clientY - startY);
-      editorRef.current.style.height = newHeight + "px";
-      editorRef.current.scrollTop = 0;
-    }
-  };
-
-  const stopDrag = () => {
-    document.documentElement.removeEventListener('mousemove', onDrag, false);
-    document.documentElement.removeEventListener('mouseup', stopDrag, false);
-  };
-
   return (
     <>
       <div className="tw-h-10 tw-bg-gray-200 tw-flex">
@@ -118,7 +99,7 @@ export const NewQuery: React.FC = () => {
         <div className="tw-inline-block tw-bg-white tw-w-32 tw-rounded-t-md tw-mt-1 tw-mb-0 tw-border-b tw-border-gray-200 tw-border-solid">
           <div className="tw-cursor-pointer tw-leading-[35px] tw-ml-3 tw-font-semibold">
             New Chart
-            <PlusIcon className='tw-mt-[-2px] tw-ml-1 tw-h-4 tw-inline'></PlusIcon>
+            <PlusCircleIcon className='tw-mt-[-2px] tw-ml-1 tw-h-4 tw-inline'></PlusCircleIcon>
           </div>
         </div>
       </div>
@@ -144,7 +125,7 @@ export const NewQuery: React.FC = () => {
               />
             </div>
             <div className="tw-absolute tw-left-1/2 tw-pt-[2px]">
-              <svg className="tw-mx-auto tw-cursor-grab" onMouseDown={startDrag} xmlns="http://www.w3.org/2000/svg" width="36" viewBox="0 0 40 16" fill="none">
+              <svg className="tw-mx-auto tw-cursor-grab" onMouseDown={startResize} xmlns="http://www.w3.org/2000/svg" width="36" viewBox="0 0 40 16" fill="none">
                 <path fill="#b2b2b2" d="M5.5 6.5C5.06667 6.5 4.70833 6.35833 4.425 6.075C4.14167 5.79167 4 5.43333 4 5C4 4.56667 4.14167 4.20833 4.425 3.925C4.70833 3.64167 5.06667 3.5 5.5 3.5H34.5C34.9333 3.5 35.2917 3.64167 35.575 3.925C35.8583 4.20833 36 4.56667 36 5C36 5.43333 35.8583 5.79167 35.575 6.075C35.2917 6.35833 34.9333 6.5 34.5 6.5H5.5ZM5.5 12.5C5.06667 12.5 4.70833 12.3583 4.425 12.075C4.14167 11.7917 4 11.4333 4 11C4 10.5667 4.14167 10.2083 4.425 9.925C4.70833 9.64167 5.06667 9.5 5.5 9.5H34.5C34.9333 9.5 35.2917 9.64167 35.575 9.925C35.8583 10.2083 36 10.5667 36 11C36 11.4333 35.8583 11.7917 35.575 12.075C35.2917 12.3583 34.9333 12.5 34.5 12.5H5.5Z" />
               </svg>
             </div>
@@ -161,68 +142,5 @@ export const NewQuery: React.FC = () => {
         </div>
       </div>
     </>
-  );
-};
-
-type QueryResultsProps = {
-  loading: boolean,
-  schema: Schema | null,
-  results: QueryResults | null,
-};
-
-const QueryResultsTable: React.FC<QueryResultsProps> = props => {
-  if (props.loading) {
-    return <Loading />;
-  }
-
-  if (props.schema && props.results) {
-    return (
-      <div className="tw-overflow-auto tw-overscroll-contain tw-max-h-[500px] tw-border-gray-300 tw-border-solid tw-border-2">
-        <table>
-          <ResultsSchema schema={props.schema} />
-          <tbody className="tw-py-2">
-            {
-              props.results.map((resultRow, index) => {
-                return (
-                  <tr key={index} className="even:tw-bg-gray-100">
-                    <td key={-1} className="tw-px-3 tw-py-2 tw-text-right tw-bg-gray-100 tw-border-gray-300 tw-border-solid tw-border-r tw-border-b-0 tw-tabular-nums">
-                      {index + 1}
-                    </td>
-                    {resultRow.map((resultValue, valueIndex) => {
-                      return (
-                        <td key={valueIndex} className="tw-pl-3 tw-pr-5 tw-py-2 tw-text-left tw-border-gray-300 tw-border-solid tw-border-r tw-border-t last:tw-w-full focus:tw-bg-blue-300">
-                          <div className="tw-h-5 tw-whitespace-nowrap">{resultValue}</div>
-                        </td>
-                      );
-                    })}
-                  </tr>
-                );
-              })
-            }
-          </tbody>
-        </table>
-      </div>
-    );
-  }
-
-  return <>Run a query to see results</>;
-};
-
-const ResultsSchema: React.FC<{ schema: Schema; }> = ({ schema }) => {
-  return (
-    <thead className="tw-sticky">
-      <tr>
-        <th key={-1} scope="col" className="tw-pl-3 tw-pr-5 tw-py-2 tw-bg-gray-100 tw-border-gray-300 tw-border-solid tw-border-r tw-border-b"></th>
-        {
-          schema.map((columnSchema, index) => {
-            return (
-              <th key={index} scope="col" className="tw-pl-3 tw-pr-5 tw-py-2 tw-text-left tw-bg-gray-100 tw-border-gray-300 tw-border-solid tw-border-r">
-                <div className="tw-h-5 tw-whitespace-nowrap">{columnSchema.name}</div>
-              </th>
-            );
-          })
-        }
-      </tr>
-    </thead>
   );
 };
