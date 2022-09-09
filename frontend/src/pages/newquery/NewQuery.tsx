@@ -1,4 +1,5 @@
 import { PlusCircleIcon } from '@heroicons/react/20/solid';
+import { Tooltip } from '@nextui-org/react';
 import { useEffect, useRef, useState } from "react";
 import { rudderanalytics } from "src/app/rudder";
 import { Button } from "src/components/button/Button";
@@ -118,7 +119,9 @@ export const NewQuery: React.FC = () => {
             </div>
           </div>
           <div className="tw-border-solid tw-border-gray-200 tw-border tw-p-2">
-            <Button tooltip={loading ? undefined : "⌘ + Enter"} className="tw-w-40 tw-h-8" onClick={runQuery}>{loading ? "Stop" : "Run"}</Button>
+            <Tooltip color={"invert"} content={"⌘ + Enter"}>
+              <Button className="tw-w-40 tw-h-8" onClick={runQuery}>{loading ? "Stop" : "Run"}</Button>
+            </Tooltip>
           </div>
           <div className="tw-mt-5">
             <QueryResultsTable loading={loading} schema={schema} results={queryResults} />
