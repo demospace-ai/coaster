@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from "react";
 import { rudderanalytics } from "src/app/rudder";
 import { Button } from "src/components/button/Button";
 import { ConnectionSelector } from "src/components/connectionSelector/ConnectionSelector";
-import { Loading } from "src/components/loading/Loading";
 import { QueryResultsTable } from 'src/components/queryResults/QueryResults';
 import { sendRequest } from "src/rpc/ajax";
 import { QueryResults, RunQuery, RunQueryRequest, Schema } from "src/rpc/api";
@@ -110,14 +109,14 @@ export const NewQuery: React.FC = () => {
                 value={query} onKeyDown={onKeyDown} onChange={e => setQuery(e.target.value)} placeholder="Select ..."
               />
             </div>
-            <div className="tw-absolute tw-left-1/2 tw-pt-[2px]">
+            <div className="tw-absolute tw-left-0 tw-right-0 tw-pt-[2px]">
               <svg className="tw-mx-auto tw-cursor-grab" onMouseDown={startResize} xmlns="http://www.w3.org/2000/svg" width="36" viewBox="0 0 40 16" fill="none">
                 <path fill="#b2b2b2" d="M5.5 6.5C5.06667 6.5 4.70833 6.35833 4.425 6.075C4.14167 5.79167 4 5.43333 4 5C4 4.56667 4.14167 4.20833 4.425 3.925C4.70833 3.64167 5.06667 3.5 5.5 3.5H34.5C34.9333 3.5 35.2917 3.64167 35.575 3.925C35.8583 4.20833 36 4.56667 36 5C36 5.43333 35.8583 5.79167 35.575 6.075C35.2917 6.35833 34.9333 6.5 34.5 6.5H5.5ZM5.5 12.5C5.06667 12.5 4.70833 12.3583 4.425 12.075C4.14167 11.7917 4 11.4333 4 11C4 10.5667 4.14167 10.2083 4.425 9.925C4.70833 9.64167 5.06667 9.5 5.5 9.5H34.5C34.9333 9.5 35.2917 9.64167 35.575 9.925C35.8583 10.2083 36 10.5667 36 11C36 11.4333 35.8583 11.7917 35.575 12.075C35.2917 12.3583 34.9333 12.5 34.5 12.5H5.5Z" />
               </svg>
             </div>
           </div>
           <div className="tw-border-solid tw-border-gray-200 tw-border tw-p-2">
-            <Button tooltip={loading ? undefined : "⌘ + Enter"} className="tw-w-40 tw-h-8" onClick={runQuery}>{loading ? <Loading className='tw-h-5' /> : "Run"}</Button>
+            <Button tooltip={loading ? undefined : "⌘ + Enter"} className="tw-w-40 tw-h-8" onClick={runQuery}>{loading ? "Stop" : "Run"}</Button>
           </div>
           <div className="tw-mt-5">
             <QueryResultsTable loading={loading} schema={schema} results={queryResults} />
