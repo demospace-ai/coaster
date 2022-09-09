@@ -3,6 +3,8 @@ import { RefObject } from "react";
 export const createResizeFunction = <T extends HTMLElement>(ref: RefObject<T>) => {
   const createOnDrag = (startHeight: number, startY: number) => {
     return (e: MouseEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
       if (ref.current) {
         const newHeight = startHeight + (e.clientY - startY);
         ref.current.style.height = newHeight + "px";

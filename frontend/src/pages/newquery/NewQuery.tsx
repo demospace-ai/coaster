@@ -6,8 +6,8 @@ import { ConnectionSelector } from "src/components/connectionSelector/Connection
 import { QueryResultsTable } from 'src/components/queryResults/QueryResults';
 import { sendRequest } from "src/rpc/ajax";
 import { QueryResults, RunQuery, RunQueryRequest, Schema } from "src/rpc/api";
-import { createResizeFunction } from 'src/utils/drag';
 import { useLocalStorage } from "src/utils/localStorage";
+import { createResizeFunction } from 'src/utils/resize';
 
 export const NewQuery: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -20,6 +20,8 @@ export const NewQuery: React.FC = () => {
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
   const startResize = createResizeFunction(editorRef);
+
+  // Automatically resize text area based on content
   useEffect(() => {
     if (textAreaRef.current) {
       textAreaRef.current.style.height = "0px";
@@ -133,17 +135,23 @@ export const NewQuery: React.FC = () => {
 const QueryNavigation: React.FC = () => {
   return (
     <div className="tw-h-10 tw-bg-gray-200 tw-flex">
-      <div className="tw-cursor-pointer tw-inline-block tw-ml-5 tw-bg-white tw-w-32 tw-rounded-t-md tw-mt-1 tw-mb-0 tw-border-t-2 tw-border-green-400 tw-border-solid">
-        <div className="tw-leading-[35px] tw-ml-3 tw-font-semibold tw-select-none">
-          Query 1
-        </div>
-      </div>
+      <QueryNavigationTab active={true}>
+        Query 1
+      </QueryNavigationTab>
       <div className="tw-inline-block tw-mx-4 tw-my-2 tw-w-[1px] tw-bg-gray-400"></div>
-      <div className="tw-inline-block tw-bg-white tw-w-32 tw-rounded-t-md tw-mt-1 tw-mb-0 tw-border-b tw-border-gray-200 tw-border-solid">
-        <div className="tw-cursor-pointer tw-leading-[35px] tw-ml-3 tw-font-semibold tw-select-none">
-          New Chart
-          <PlusCircleIcon className='tw-mt-[-2px] tw-ml-1 tw-h-4 tw-inline'></PlusCircleIcon>
-        </div>
+      <QueryNavigationTab>
+        New Chart
+        <PlusCircleIcon className='tw-mt-[-2px] tw-ml-1.5 tw-h-4 tw-inline'></PlusCircleIcon>
+      </QueryNavigationTab>
+    </div >
+  );
+};
+
+const QueryNavigationTab: React.FC<{ active?: boolean, children: React.ReactNode; }> = ({ active, children }) => {
+  return (
+    <div className={"first:tw-ml-5 tw-cursor-pointer tw-inline-block tw-bg-white tw-w-32 tw-rounded-t-md tw-mt-1.5 tw-mb-0" + (active ? " tw-border-t-2 tw-border-green-400 tw-border-solid" : " tw-border-b tw-border-gray-200 tw-border-solid")}>
+      <div className="tw-leading-[32px] tw-ml-3 tw-font-semibold tw-select-none">
+        {children}
       </div>
     </div>
   );
