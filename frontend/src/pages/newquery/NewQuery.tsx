@@ -142,7 +142,7 @@ const QueryNavigation: React.FC = () => {
 
 const QueryNavigationTab: React.FC<{ active?: boolean, children: React.ReactNode; }> = ({ active, children }) => {
   return (
-    <div className={"first:tw-ml-5 tw-cursor-pointer tw-inline-block tw-bg-white tw-w-32 tw-rounded-t-md tw-mt-1.5 tw-mb-0" + (active ? " tw-border-t-2 tw-border-green-400 tw-border-solid" : " tw-border-b tw-border-gray-200 tw-border-solid")}>
+    <div className={"first:tw-ml-5 tw-cursor-pointer tw-inline-block tw-bg-white tw-w-32 tw-rounded-t-md tw-mt-1.5 tw-mb-0" + (active ? " tw-shadow-[0px_-2px_#4ade80]" : " tw-border-b tw-border-gray-200 tw-border-solid")}>
       <div className="tw-leading-[32px] tw-ml-3 tw-font-semibold tw-select-none">
         {children}
       </div>
