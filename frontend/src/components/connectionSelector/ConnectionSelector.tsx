@@ -39,7 +39,7 @@ export const ConnectionSelector: React.FC<ConnectionSelectorProps> = props => {
   return (
     <Listbox value={props.connectionID} onChange={props.setConnectionID}>
       <div className={"tw-relative " + props.className}>
-        <Listbox.Button className="tw-relative tw-w-full tw-rounded-lg tw-bg-white tw-py-2 tw-pl-3 tw-pr-10 tw-text-left tw-border tw-border-solid tw-border-gray-300 focus:tw-outline-none hover:tw-border-green-400">
+        <Listbox.Button className="tw-relative tw-w-full tw-rounded-md tw-bg-white tw-py-2 tw-pl-3 tw-pr-10 tw-text-left tw-border tw-border-solid tw-border-gray-300 focus:tw-outline-none hover:tw-border-green-400">
           <span className="tw-block tw-truncate">{selected ? selected.display_name : "Choose data source"}</span>
           <span className="tw-pointer-events-none tw-absolute tw-inset-y-0 tw-right-0 tw-flex tw-items-center pr-2">
             <ChevronUpDownIcon

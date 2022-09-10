@@ -82,11 +82,25 @@ export const NewQuery: React.FC = () => {
     setLoading(false);
   };
 
+  monaco.editor.defineTheme("fabra", {
+    base: "vs-dark",
+    inherit: true,
+    rules: [
+      { token: "predefined.sql", foreground: "#66d9ef", fontStyle: "bold" },
+      { token: "operator.sql", foreground: "#ffffff" },
+      { token: "keyword.sql", fontStyle: "bold" },
+      { token: "identifier.sql", foreground: "#ffffff" }
+    ],
+    colors: {
+      'editor.lineHighlightBackground': '#2c2c2c',
+    }
+  });
+
   return (
     <>
       <QueryNavigation />
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-min-w-0">
-        <div className="tw-w-80 tw-min-w-[20rem] tw-inline-block tw-select-none">
+        <div className="tw-w-80 tw-min-w-[20rem] tw-inline-block tw-select-none tw-uppercase">
           Data Source
           <ConnectionSelector className="tw-mt-1" connectionID={connectionID} setConnectionID={onConnectionSelected} />
         </div>
@@ -94,9 +108,16 @@ export const NewQuery: React.FC = () => {
           <div className="tw-relative tw-h-80 tw-min-h-[100px] tw-max-h-[700px]" ref={editorRef}>
             <MonacoEditor
               language="sql"
-              theme="vs-dark"
+              theme="fabra"
               value={query}
-              options={{ minimap: { enabled: false }, automaticLayout: true, quickSuggestions: false, contextmenu: false }}
+              options={{
+                minimap: { enabled: false },
+                automaticLayout: true,
+                quickSuggestions: false,
+                contextmenu: false,
+                renderLineHighlight: "all",
+                fontSize: 12,
+              }}
               onChange={setQuery}
               editorDidMount={(editor: EditorLib.IStandaloneCodeEditor) => {
                 editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, runQuery);
