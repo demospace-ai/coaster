@@ -96,7 +96,7 @@ export const NewQuery: React.FC = () => {
               language="sql"
               theme="vs-dark"
               value={query}
-              options={{ minimap: { enabled: false }, automaticLayout: true, quickSuggestions: false }}
+              options={{ minimap: { enabled: false }, automaticLayout: true, quickSuggestions: false, contextmenu: false }}
               onChange={setQuery}
               editorDidMount={(editor: EditorLib.IStandaloneCodeEditor) => {
                 editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, runQuery);
