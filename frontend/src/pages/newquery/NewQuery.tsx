@@ -1,12 +1,12 @@
 import { PlusCircleIcon } from '@heroicons/react/20/solid';
 import { Tooltip } from '@nextui-org/react';
 import { editor as EditorLib } from "monaco-editor/esm/vs/editor/editor.api";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import MonacoEditor, { monaco } from "react-monaco-editor";
 import { rudderanalytics } from "src/app/rudder";
 import { Button } from "src/components/button/Button";
 import { ConnectionSelector } from "src/components/connectionSelector/ConnectionSelector";
-import { QueryResultsTable } from 'src/components/queryResults/QueryResults';
+import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { sendRequest } from "src/rpc/ajax";
 import { QueryResults, RunQuery, RunQueryRequest, Schema } from "src/rpc/api";
 import { useLocalStorage } from "src/utils/localStorage";
@@ -18,26 +18,16 @@ export const NewQuery: React.FC = () => {
   const [connectionID, setConnectionID] = useLocalStorage<number | null>("selectedConnectionID", null);
   const [query, setQuery] = useLocalStorage<string>("query", "");
   const [schema, setSchema] = useState<Schema | null>(null);
+  const [shouldRun, setShouldRun] = useState<boolean>(false);
+  const [bottomPanelHeight, setBottomPanelHeight] = useState<string>("");
   const [queryResults, setQueryResults] = useState<QueryResults | null>(null);
-  const lineNumberRef = useRef<HTMLDivElement>(null);
-  const textAreaRef = useRef<HTMLTextAreaElement>(null);
-  const editorRef = useRef<HTMLDivElement>(null);
-  const startResize = createResizeFunction(editorRef);
+  const topPanelRef = useRef<HTMLDivElement>(null);
+  const paneRef = useRef<HTMLDivElement>(null);
+  const setBottomPanelHeightFn = (topPanelHeight: number) => {
+    setBottomPanelHeight("calc(100% - " + topPanelHeight + "px)");
+  };
 
-  // Automatically resize text area based on content
-  useEffect(() => {
-    if (textAreaRef.current) {
-      textAreaRef.current.style.height = "0px";
-      const scrollHeight = textAreaRef.current.scrollHeight;
-      textAreaRef.current.style.height = scrollHeight + "px";
-    }
-
-    if (lineNumberRef.current) {
-      lineNumberRef.current.style.height = "0px";
-      const scrollHeight = lineNumberRef.current.scrollHeight;
-      lineNumberRef.current.style.height = scrollHeight + "px";
-    }
-  }, [query]);
+  const startResize = createResizeFunction(topPanelRef, setBottomPanelHeightFn);
 
   const onConnectionSelected = (value: number) => {
     setErrorMessage(null);
@@ -82,6 +72,11 @@ export const NewQuery: React.FC = () => {
     setLoading(false);
   };
 
+  if (shouldRun) {
+    runQuery();
+    setShouldRun(false);
+  }
+
   monaco.editor.defineTheme("fabra", {
     base: "vs-dark",
     inherit: true,
@@ -99,47 +94,54 @@ export const NewQuery: React.FC = () => {
   return (
     <>
       <QueryNavigation />
-      <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-min-w-0">
-        <div className="tw-w-80 tw-min-w-[20rem] tw-inline-block tw-select-none tw-uppercase">
-          Data Source
-          <ConnectionSelector className="tw-mt-1" connectionID={connectionID} setConnectionID={onConnectionSelected} />
-        </div>
-        <div className="tw-ml-10 tw-flex-1 tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col">
-          <div className="tw-relative tw-h-80 tw-min-h-[100px] tw-max-h-[700px]" ref={editorRef}>
-            <MonacoEditor
-              language="sql"
-              theme="fabra"
-              value={query}
-              options={{
-                minimap: { enabled: false },
-                automaticLayout: true,
-                quickSuggestions: false,
-                contextmenu: false,
-                renderLineHighlight: "all",
-                fontSize: 12,
-              }}
-              onChange={setQuery}
-              editorDidMount={(editor: EditorLib.IStandaloneCodeEditor) => {
-                editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, runQuery);
-              }}
-            />
-            <div className="tw-absolute tw-left-0 tw-right-0 tw-pt-[2px]">
-              <svg className="tw-mx-auto tw-cursor-grab" onMouseDown={startResize} xmlns="http://www.w3.org/2000/svg" width="36" viewBox="0 0 40 16" fill="none">
-                <path fill="#b2b2b2" d="M5.5 6.5C5.06667 6.5 4.70833 6.35833 4.425 6.075C4.14167 5.79167 4 5.43333 4 5C4 4.56667 4.14167 4.20833 4.425 3.925C4.70833 3.64167 5.06667 3.5 5.5 3.5H34.5C34.9333 3.5 35.2917 3.64167 35.575 3.925C35.8583 4.20833 36 4.56667 36 5C36 5.43333 35.8583 5.79167 35.575 6.075C35.2917 6.35833 34.9333 6.5 34.5 6.5H5.5ZM5.5 12.5C5.06667 12.5 4.70833 12.3583 4.425 12.075C4.14167 11.7917 4 11.4333 4 11C4 10.5667 4.14167 10.2083 4.425 9.925C4.70833 9.64167 5.06667 9.5 5.5 9.5H34.5C34.9333 9.5 35.2917 9.64167 35.575 9.925C35.8583 10.2083 36 10.5667 36 11C36 11.4333 35.8583 11.7917 35.575 12.075C35.2917 12.3583 34.9333 12.5 34.5 12.5H5.5Z" />
-              </svg>
+      <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0" ref={paneRef}>
+        <div className='tw-flex tw-flex-1 tw-min-w-0 tw-min-h-0'>
+          <div id='left-panel' className="tw-w-80 tw-min-w-[20rem] tw-inline-block tw-select-none tw-uppercase">
+            Data Source
+            <ConnectionSelector className="tw-mt-1" connectionID={connectionID} setConnectionID={onConnectionSelected} />
+          </div>
+          <div id='right-panel' className="tw-ml-10 tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1">
+            <div id="top-panel" className="tw-h-[30%] tw-min-h-[100px] tw-max-h-[700px]" ref={topPanelRef}>
+              <MonacoEditor
+                language="sql"
+                theme="fabra"
+                value={query}
+                options={{
+                  minimap: { enabled: false },
+                  automaticLayout: true,
+                  quickSuggestions: false,
+                  contextmenu: false,
+                  renderLineHighlight: "all",
+                  fontSize: 12,
+                  scrollBeyondLastLine: false,
+                }}
+                onChange={setQuery}
+                editorDidMount={(editor: EditorLib.IStandaloneCodeEditor) => {
+                  editor.addAction({ id: "run query", label: "run query", keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter], run: () => setShouldRun(true), });
+                }}
+              />
+              <div id='resize-grabber' className='tw-relative'>
+                <div className="tw-absolute tw-left-0 tw-right-0 tw-pt-[2px]">
+                  <svg className="tw-mx-auto tw-cursor-grab" onMouseDown={startResize} xmlns="http://www.w3.org/2000/svg" width="36" viewBox="0 0 40 16" fill="none">
+                    <path fill="#b2b2b2" d="M5.5 6.5C5.06667 6.5 4.70833 6.35833 4.425 6.075C4.14167 5.79167 4 5.43333 4 5C4 4.56667 4.14167 4.20833 4.425 3.925C4.70833 3.64167 5.06667 3.5 5.5 3.5H34.5C34.9333 3.5 35.2917 3.64167 35.575 3.925C35.8583 4.20833 36 4.56667 36 5C36 5.43333 35.8583 5.79167 35.575 6.075C35.2917 6.35833 34.9333 6.5 34.5 6.5H5.5ZM5.5 12.5C5.06667 12.5 4.70833 12.3583 4.425 12.075C4.14167 11.7917 4 11.4333 4 11C4 10.5667 4.14167 10.2083 4.425 9.925C4.70833 9.64167 5.06667 9.5 5.5 9.5H34.5C34.9333 9.5 35.2917 9.64167 35.575 9.925C35.8583 10.2083 36 10.5667 36 11C36 11.4333 35.8583 11.7917 35.575 12.075C35.2917 12.3583 34.9333 12.5 34.5 12.5H5.5Z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div id="bottom-panel" className='tw-h-[70%] tw-flex tw-flex-col tw-flex-1' style={{ height: bottomPanelHeight }}>
+              <div className="tw-border-solid tw-border-gray-200 tw-border tw-p-2">
+                <Tooltip color={"invert"} content={"⌘ + Enter"}>
+                  <Button className="tw-w-40 tw-h-8" onClick={runQuery}>{loading ? "Stop" : "Run"}</Button>
+                </Tooltip>
+              </div>
+              <div className="tw-my-5 tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden">
+                <MemoizedResultsTable loading={loading} schema={schema} results={queryResults} />
+              </div>
+              {errorMessage &&
+                <div className="tw-mt-5 tw-text-red-600 tw-font-bold">{errorMessage}</div>
+              }
             </div>
           </div>
-          <div className="tw-border-solid tw-border-gray-200 tw-border tw-p-2">
-            <Tooltip color={"invert"} content={"⌘ + Enter"}>
-              <Button className="tw-w-40 tw-h-8" onClick={runQuery}>{loading ? "Stop" : "Run"}</Button>
-            </Tooltip>
-          </div>
-          <div className="tw-mt-5">
-            <QueryResultsTable loading={loading} schema={schema} results={queryResults} />
-          </div>
-          {errorMessage &&
-            <div className="tw-mt-5 tw-text-red-600 tw-font-bold">{errorMessage}</div>
-          }
         </div>
       </div>
     </>

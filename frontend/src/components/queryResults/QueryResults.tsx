@@ -1,3 +1,4 @@
+import React from "react";
 import { Loading } from "src/components/loading/Loading";
 import { QueryResults, Schema } from "src/rpc/api";
 
@@ -8,14 +9,14 @@ type QueryResultsProps = {
   results: QueryResults | null,
 };
 
-export const QueryResultsTable: React.FC<QueryResultsProps> = props => {
+const QueryResultsTable: React.FC<QueryResultsProps> = props => {
   if (props.loading) {
     return <Loading />;
   }
 
   if (props.schema && props.results) {
     return (
-      <div className="tw-overflow-auto tw-overscroll-contain tw-max-h-[400px] tw-border-gray-300 tw-border-solid tw-border-2">
+      <div className="tw-overflow-auto tw-overscroll-contain tw-max-h-full tw-border-gray-300 tw-border-solid tw-border-2">
         <table className="tw-text-xs">
           <ResultsSchema schema={props.schema} />
           <tbody className="tw-py-2">
@@ -64,3 +65,5 @@ const ResultsSchema: React.FC<{ schema: Schema; }> = ({ schema }) => {
     </thead>
   );
 };
+
+export const MemoizedResultsTable = React.memo(QueryResultsTable);
