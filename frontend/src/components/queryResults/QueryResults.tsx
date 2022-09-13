@@ -16,14 +16,14 @@ const QueryResultsTable: React.FC<QueryResultsProps> = props => {
 
   if (props.schema && props.results) {
     return (
-      <div className="tw-overflow-auto tw-overscroll-contain tw-max-h-full tw-border-gray-300 tw-border-solid tw-border-2">
+      <div className="tw-overflow-auto tw-overscroll-contain tw-max-h-full tw-border-gray-300 tw-border-solid tw-border-b">
         <table className="tw-text-xs">
           <ResultsSchema schema={props.schema} />
           <tbody className="tw-py-2">
             {
               props.results.map((resultRow, index) => {
                 return (
-                  <tr key={index} className="even:tw-bg-gray-100">
+                  <tr key={index} className="even:tw-bg-gray-100 odd:tw-bg-white">
                     <td key={-1} className="tw-px-3 tw-py-2 tw-text-right tw-bg-gray-100 tw-border-gray-300 tw-border-solid tw-border-r tw-border-b-0 tw-tabular-nums">
                       {index + 1}
                     </td>
@@ -44,7 +44,7 @@ const QueryResultsTable: React.FC<QueryResultsProps> = props => {
     );
   }
 
-  return <>Run a query to see results</>;
+  return <div className="tw-m-5">Run a query to see results</div>;
 };
 
 const ResultsSchema: React.FC<{ schema: Schema; }> = ({ schema }) => {

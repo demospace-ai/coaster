@@ -23,7 +23,21 @@ export const NewQuery: React.FC = () => {
   const [queryResults, setQueryResults] = useState<QueryResults | null>(null);
   const topPanelRef = useRef<HTMLDivElement>(null);
 
-  const startResize = createResizeFunction(topPanelRef, setTopPanelHeight);
+  // Limit how much the top panel can be resized
+  const setTopPanelHeightBounded = (height: number) => {
+    if (height > 700) {
+      setTopPanelHeight(700);
+      return;
+    }
+
+    if (height < 100) {
+      setTopPanelHeight(100);
+      return;
+    }
+
+    setTopPanelHeight(height);
+  };
+  const startResize = createResizeFunction(topPanelRef, setTopPanelHeightBounded);
 
   const onConnectionSelected = (value: number) => {
     setErrorMessage(null);
@@ -97,7 +111,7 @@ export const NewQuery: React.FC = () => {
             <ConnectionSelector className="tw-mt-1" connectionID={connectionID} setConnectionID={onConnectionSelected} />
           </div>
           <div id='right-panel' className="tw-ml-10 tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1">
-            <div id="top-panel" className="tw-h-[30%] tw-min-h-[100px] tw-max-h-[700px]" style={{ height: topPanelHeight + "px" }} ref={topPanelRef}>
+            <div id="top-panel" className="tw-h-[40%]" style={{ height: topPanelHeight + "px" }} ref={topPanelRef}>
               <MonacoEditor
                 language="sql"
                 theme="fabra"
@@ -124,18 +138,18 @@ export const NewQuery: React.FC = () => {
                 </div>
               </div>
             </div>
-            <div id="bottom-panel" className='tw-h-[70%] tw-flex tw-flex-col tw-flex-1' style={{ height: "calc(100% - " + topPanelHeight + "px)" }}>
-              <div className="tw-border-solid tw-border-gray-200 tw-border tw-p-2">
+            <div id="bottom-panel" className='tw-h-[60%] tw-flex tw-flex-col tw-flex-1' style={{ height: "calc(100% - " + topPanelHeight + "px)" }}>
+              <div className="tw-border-solid tw-border-gray-300 tw-border-x tw-p-2">
                 <Tooltip color={"invert"} content={"⌘ + Enter"}>
                   <Button className="tw-w-40 tw-h-8" onClick={runQuery}>{loading ? "Stop" : "Run"}</Button>
                 </Tooltip>
               </div>
-              <div className="tw-my-5 tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden">
+              <div className="tw-mb-5 tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden tw-border-gray-300 tw-border-solid tw-border tw-bg-gray-100">
                 <MemoizedResultsTable loading={loading} schema={schema} results={queryResults} />
+                {errorMessage &&
+                  <div className="tw-m-5 tw-text-red-600 tw-font-bold">{errorMessage}</div>
+                }
               </div>
-              {errorMessage &&
-                <div className="tw-mt-5 tw-text-red-600 tw-font-bold">{errorMessage}</div>
-              }
             </div>
           </div>
         </div>
