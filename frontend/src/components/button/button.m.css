@@ -24,15 +24,3 @@
 .button:hover {
     background: var(--primary-highlight-color);
 }
-
-.backButton {
-    display: inline;
-    cursor: pointer;
-    user-select: none;
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.backButton:hover {
-    color: var(--primary-highlight-color);
-}

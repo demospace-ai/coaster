@@ -108,7 +108,7 @@ export const NewQuery: React.FC = () => {
         <div className='tw-flex tw-flex-1 tw-min-w-0 tw-min-h-0'>
           <div id='left-panel' className="tw-w-80 tw-min-w-[20rem] tw-inline-block tw-select-none tw-uppercase">
             Data Source
-            <ConnectionSelector className="tw-mt-1" connectionID={connectionID} setConnectionID={onConnectionSelected} />
+            <ConnectionSelector className="tw-mt-1 hover:tw-border-green-500" connectionID={connectionID} setConnectionID={onConnectionSelected} />
           </div>
           <div id='right-panel' className="tw-ml-10 tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1">
             <div id="top-panel" className="tw-h-[40%]" style={{ height: topPanelHeight + "px" }} ref={topPanelRef}>

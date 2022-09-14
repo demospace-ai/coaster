@@ -11,11 +11,13 @@ import { Inbox } from 'src/pages/inbox/Inbox';
 import { Login } from 'src/pages/login/Login';
 import { MyTasks } from 'src/pages/mytasks/MyTasks';
 import { NewConnection } from 'src/pages/newconnection/NewConnection';
+import { NewEventDataset } from 'src/pages/neweventdataset/NewEventDataset';
 import { NewQuery } from 'src/pages/newquery/NewQuery';
 import { NewQuestion } from 'src/pages/newquestion/NewQuestion';
 import { NotFound } from 'src/pages/notfound/NotFound';
 import { Question } from 'src/pages/question/Question';
 import { SearchResults } from 'src/pages/search/Search';
+import { Settings } from 'src/pages/settings/Settings';
 import { useSelector } from 'src/root/model';
 import styles from './app.m.css';
 
@@ -58,7 +60,9 @@ export const App: React.FC = () => {
           <Route path='/question/:id' element={<RequireAuth element={<Question />} />} />
           <Route path='/search' element={<RequireAuth element={<SearchResults />} />} />
           <Route path='/newconnection' element={<RequireAuth element={<NewConnection />} />} />
+          <Route path='/settings' element={<RequireAuth element={<Settings />} />} />
           <Route path='/newquery' element={<RequireAuth element={<NewQuery />} />} />
+          <Route path='/neweventdataset' element={<RequireAuth element={<NewEventDataset />} />} />
           <Route path='*' element={<NotFound />} />
         </Route>
       </Routes>

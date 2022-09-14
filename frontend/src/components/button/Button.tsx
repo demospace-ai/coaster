@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { useNavigate } from 'react-router-dom';
+import { NavLink, NavLinkProps, useNavigate } from 'react-router-dom';
 import styles from './button.m.css';
 
 type ButtonProps = {
@@ -49,6 +49,16 @@ export const BackButton: React.FC<Partial<ButtonProps>> = props => {
   };
 
   return (
-    <div className={classNames(props.className, styles.backButton)} onClick={onClick}>{String.fromCharCode(8592)} Back</div>
+    <div className={classNames('tw-cursor-pointer tw-select-none tw-text-sm tw-font-[500] hover:tw-text-primary-highlight', props.className)} onClick={onClick}>{String.fromCharCode(8592)} Back</div>
+  );
+};
+
+export const NavButton: React.FC<NavLinkProps> = props => {
+  return (
+    <NavLink
+      className={classNames(props.className, 'tw-bg-fabra tw-text-white tw-rounded-md tw-block tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-font-bold tw-text-center tw-transition-colors hover:tw-bg-primary-highlight tw-border tw-border-solid tw-border-[#508368]')}
+      to={props.to}>
+      {props.children}
+    </NavLink>
   );
 };

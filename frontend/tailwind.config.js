@@ -11,7 +11,11 @@ module.exports = {
         'dark-text': '#696969',
         'primary-highlight': '#378159',
         'navigation-highlight': "#d6d6d6",
+        'fabra': '#449e6e',
       },
+      boxShadow: {
+        'centered': 'rgba(99, 99, 99, 0.2) 0 0 10px',
+      }
     }
   },
   plugins: [],

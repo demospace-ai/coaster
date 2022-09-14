@@ -88,7 +88,7 @@ const OrganizationButton: React.FC<OrganizationButtonProps> = props => {
             <Menu.Item>
               {({ active }) => (
                 <NavLink
-                  to={'/newconnection'}
+                  to={'/settings'}
                   className={classNames(
                     active ? 'tw-bg-gray-100 tw-text-gray-900' : 'tw-text-gray-700',
                     'tw-block tw-px-4 tw-py-2 tw-text-sm', "tw-cursor-pointer"

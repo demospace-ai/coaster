@@ -4,6 +4,7 @@ import React, { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { rudderanalytics } from "src/app/rudder";
 import { BackButton, Button, FormButton } from "src/components/button/Button";
+import { ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { sendRequest } from "src/rpc/ajax";
 import { CreateDataConnection, CreateDataConnectionRequest, DataConnectionType, TestDataConnection, TestDataConnectionRequest } from "src/rpc/api";
@@ -15,11 +16,14 @@ export const NewConnection: React.FC = () => {
 
   return (
     <div className={styles.newConnectionPage}>
-      <div className={styles.newConnectionPane}>
+      <div className='tw-m-[160px_auto_auto] tw-shadow-centered tw-bg-white tw-w-[400px] tw-pt-8 tw-pb-10 tw-px-8 tw-rounded-lg'>
         {connectionType ?
           <NewConnectionConfiguration connectionType={connectionType} setConnectionType={setConnectionType} />
           :
-          <ConnectionTypeSelector setConnectionType={setConnectionType} />
+          <>
+            <BackButton className={styles.backButton} />
+            <ConnectionTypeSelector setConnectionType={setConnectionType} />
+          </>
         }
       </div>
     </div >
@@ -224,69 +228,6 @@ const BigQueryInputs: React.FC<ConnectionConfigurationProps> = props => {
         placeholder='Credentials (paste JSON here)'
         textarea={true}
       />
-    </>
-  );
-};
-
-type ValidatedInputProps = {
-  id: string;
-  placeholder?: string;
-  value: string;
-  setValue: (value: string) => void;
-  className?: string;
-  textarea?: boolean;
-};
-
-const ValidatedInput: React.FC<ValidatedInputProps> = props => {
-  const [isValid, setIsValid] = useState(true);
-  let classes = [styles.input, props.className];
-  if (!isValid) {
-    classes.push(styles.invalidBorder);
-  }
-
-  const onKeydown = (event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    event.stopPropagation();
-    if (event.key === 'Escape') {
-      event.currentTarget.blur();
-    }
-  };
-
-  const validateNotEmpty = (value: string): boolean => {
-    const valid = value.length > 0;
-    setIsValid(valid);
-    return valid;
-  };
-
-  return (
-    <>
-      {props.textarea ?
-        <textarea
-          id={props.id}
-          name={props.id}
-          autoComplete={props.id}
-          placeholder={props.placeholder}
-          className={classNames(classes)}
-          onKeyDown={onKeydown}
-          onFocus={() => setIsValid(true)}
-          onChange={e => props.setValue(e.target.value)}
-          onBlur={() => validateNotEmpty(props.value)}
-          value={props.value}
-        />
-        :
-        <input
-          type='text'
-          id={props.id}
-          name={props.id}
-          autoComplete={props.id}
-          placeholder={props.placeholder}
-          className={classNames(classes)}
-          onKeyDown={onKeydown}
-          onFocus={() => setIsValid(true)}
-          onChange={e => props.setValue(e.target.value)}
-          onBlur={() => validateNotEmpty(props.value)}
-          value={props.value}
-        />
-      }
     </>
   );
 };
