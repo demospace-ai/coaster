@@ -1,26 +1,26 @@
 import { FormEvent, useState } from "react";
 import { BackButton, FormButton } from "src/components/button/Button";
 import { ConnectionSelector } from "src/components/connectionSelector/ConnectionSelector";
-import { ValidatedDropdownInput, ValidatedInput } from "src/components/input/Input";
+import { ValidatedComboInput, ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 
 
 type NewEventDatasetState = {
   datasetName: string;
   dataSourceId: number | null;
-  tableName: string;
-  eventTypeColumn: string;
-  timeColumn: string;
-  userIdentifierColumn: string;
+  tableName: string | null;
+  eventTypeColumn: string | null;
+  timeColumn: string | null;
+  userIdentifierColumn: string | null;
 };
 
 const INITIAL_DATASET_STATE: NewEventDatasetState = {
   datasetName: "",
   dataSourceId: null,
-  tableName: "",
-  eventTypeColumn: "",
-  timeColumn: "",
-  userIdentifierColumn: "",
+  tableName: null,
+  eventTypeColumn: null,
+  timeColumn: null,
+  userIdentifierColumn: null,
 };
 
 export const NewEventDataset: React.FC = () => {
@@ -40,11 +40,11 @@ export const NewEventDataset: React.FC = () => {
         <form onSubmit={createNewEventDataset}>
           <ValidatedInput id='datasetName' value={state.datasetName} setValue={(value) => { setState({ ...state, datasetName: value }); }} placeholder='Dataset Display Name' />
           <ConnectionSelector
-            className='tw-my-1'
+            className='tw-mt-1'
             validated={true}
             connectionID={state.dataSourceId} setConnectionID={(value: number) => { setState({ ...state, dataSourceId: value }); }} />
-          <ValidatedDropdownInput
-            className="tw-my-1"
+          <ValidatedComboInput
+            className="tw-my-2"
             options={[]}
             selected={state.tableName}
             setSelected={(value) => { setState({ ...state, tableName: value }); }}
@@ -54,8 +54,8 @@ export const NewEventDataset: React.FC = () => {
             loading={false}
             validated={true}
           />
-          <ValidatedDropdownInput
-            className="tw-my-1"
+          <ValidatedComboInput
+            className="tw-my-2"
             options={[]}
             selected={state.eventTypeColumn}
             setSelected={(value) => { setState({ ...state, eventTypeColumn: value }); }}
@@ -65,8 +65,8 @@ export const NewEventDataset: React.FC = () => {
             loading={false}
             validated={true}
           />
-          <ValidatedDropdownInput
-            className="tw-my-1"
+          <ValidatedComboInput
+            className="tw-my-2"
             options={[]}
             selected={state.timeColumn}
             setSelected={(value) => { setState({ ...state, timeColumn: value }); }}
@@ -76,8 +76,8 @@ export const NewEventDataset: React.FC = () => {
             loading={false}
             validated={true}
           />
-          <ValidatedDropdownInput
-            className="tw-my-1"
+          <ValidatedComboInput
+            className="tw-my-2"
             options={[]}
             selected={state.userIdentifierColumn}
             setSelected={(value) => { setState({ ...state, userIdentifierColumn: value }); }}
