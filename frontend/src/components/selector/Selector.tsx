@@ -7,6 +7,8 @@ type ConnectionSelectorProps = {
   connectionID: number | null;
   setConnectionID: (connection: number) => void;
   className?: string;
+  noOptionsString?: string;
+  placeholder?: string;
   validated?: boolean;
 };
 
@@ -43,8 +45,8 @@ export const ConnectionSelector: React.FC<ConnectionSelectorProps> = props => {
     options={connectionOptions}
     getDisplayName={(connection: DataConnection) => connection.display_name}
     loading={loading}
-    noOptionsString="No connections available!"
-    placeholder="Choose data source"
+    noOptionsString={props.noOptionsString ? props.noOptionsString : "No data sources available!"}
+    placeholder={props.placeholder ? props.placeholder : "Choose data source"}
     validated={props.validated} />;
 };
 
@@ -53,6 +55,8 @@ type DatasetSelectorProps = {
   datasetID: string | null;
   setDatasetID: (datasetID: string) => void;
   className?: string;
+  noOptionsString?: string;
+  placeholder?: string;
   validated?: boolean;
 };
 
@@ -93,8 +97,8 @@ export const DatasetSelector: React.FC<DatasetSelectorProps> = props => {
     options={datasetOptions}
     getDisplayName={(dataset: Dataset) => dataset.id}
     loading={loading}
-    noOptionsString="No datasets available!"
-    placeholder="Choose dataset"
+    noOptionsString={props.noOptionsString ? props.noOptionsString : "No datasets available!"}
+    placeholder={props.placeholder ? props.placeholder : "Choose dataset"}
     validated={props.validated} />;
 };
 
@@ -105,6 +109,7 @@ type TableSelectorProps = {
   setTable: (tableName: string) => void;
   className?: string;
   noOptionsString?: string;
+  placeholder?: string;
   validated?: boolean;
 };
 
@@ -139,6 +144,6 @@ export const TableSelector: React.FC<TableSelectorProps> = props => {
     getDisplayName={(tableName: string) => tableName}
     loading={loading}
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No tables available!"}
-    placeholder="Choose table"
+    placeholder={props.placeholder ? props.placeholder : "Choose table"}
     validated={props.validated} />;
 };

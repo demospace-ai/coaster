@@ -80,7 +80,9 @@ export const NewEventSet: React.FC = () => {
               if (value !== state.datasetId) {
                 setState({ ...state, datasetId: value, tableName: null, eventTypeColumn: null, timeColumn: null });
               }
-            }} />
+            }}
+            noOptionsString="No Datasets Available! (Choose a data source)"
+          />
           <TableSelector
             className="tw-mt-2"
             connectionID={state.dataSourceId}

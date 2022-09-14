@@ -1,7 +1,7 @@
 import { Combobox, Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import classNames from "classnames";
-import { Fragment, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import { Loading } from "src/components/loading/Loading";
 
 type ValidatedInputProps = {
@@ -191,6 +191,7 @@ type ValidatedComboInputProps = {
 export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => {
   const [isValid, setIsValid] = useState(true);
   const [query, setQuery] = useState('');
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const filteredOptions =
     query === ''
@@ -218,9 +219,10 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
               onChange={(event) => setQuery(event.target.value)}
               placeholder={props.placeholder}
               onBlur={() => validateNotNull(props.selected)}
+              onClick={() => { buttonRef.current?.click(); }}
             >
             </Combobox.Input>
-            <Combobox.Button className="tw-inline-block tw-h-full" onBlur={() => validateNotNull(props.selected)}>
+            <Combobox.Button className="tw-inline-block tw-h-full" onBlur={() => validateNotNull(props.selected)} ref={buttonRef}>
               <span className="tw-pointer-events-none pr-2">
                 <ChevronUpDownIcon
                   className="tw-inline tw-float-right tw-h-5 tw-w-5 tw-text-gray-400"
