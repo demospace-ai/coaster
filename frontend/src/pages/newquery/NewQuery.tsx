@@ -5,17 +5,17 @@ import { useRef, useState } from "react";
 import MonacoEditor, { monaco } from "react-monaco-editor";
 import { rudderanalytics } from "src/app/rudder";
 import { Button } from "src/components/button/Button";
-import { ConnectionSelector } from "src/components/selector/Selector";
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
+import { ConnectionSelector } from "src/components/selector/Selector";
 import { sendRequest } from "src/rpc/ajax";
-import { QueryResults, RunQuery, RunQueryRequest, Schema } from "src/rpc/api";
+import { DataConnection, QueryResults, RunQuery, RunQueryRequest, Schema } from "src/rpc/api";
 import { useLocalStorage } from "src/utils/localStorage";
 import { createResizeFunction } from 'src/utils/resize';
 
 export const NewQuery: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [connectionID, setConnectionID] = useLocalStorage<number | null>("selectedConnectionID", null);
+  const [connection, setConnection] = useLocalStorage<DataConnection | null>("selectedConnectionID", null);
   const [query, setQuery] = useLocalStorage<string>("query", "");
   const [schema, setSchema] = useState<Schema | null>(null);
   const [shouldRun, setShouldRun] = useState<boolean>(false);
@@ -39,16 +39,16 @@ export const NewQuery: React.FC = () => {
   };
   const startResize = createResizeFunction(topPanelRef, setTopPanelHeightBounded);
 
-  const onConnectionSelected = (value: number) => {
+  const onConnectionSelected = (value: DataConnection) => {
     setErrorMessage(null);
-    setConnectionID(value);
+    setConnection(value);
   };
 
   const runQuery = async () => {
     setLoading(true);
     setErrorMessage(null);
 
-    if (!connectionID) {
+    if (!connection) {
       setErrorMessage("Data source is not set!");
       setLoading(false);
       return;
@@ -61,7 +61,7 @@ export const NewQuery: React.FC = () => {
     }
 
     const payload: RunQueryRequest = {
-      'connection_id': connectionID,
+      'connection_id': connection.id,
       'query_string': query,
     };
 
@@ -108,7 +108,7 @@ export const NewQuery: React.FC = () => {
         <div className='tw-flex tw-flex-1 tw-min-w-0 tw-min-h-0'>
           <div id='left-panel' className="tw-w-80 tw-min-w-[20rem] tw-inline-block tw-select-none tw-uppercase">
             Data Source
-            <ConnectionSelector className="tw-mt-1 hover:tw-border-green-500" connectionID={connectionID} setConnectionID={onConnectionSelected} />
+            <ConnectionSelector className="tw-mt-1 hover:tw-border-green-500" connection={connection} setConnection={onConnectionSelected} />
           </div>
           <div id='right-panel' className="tw-ml-10 tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1">
             <div id="top-panel" className="tw-h-[40%]" style={{ height: topPanelHeight + "px" }} ref={topPanelRef}>

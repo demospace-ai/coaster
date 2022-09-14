@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { ValidatedDropdownInput } from "src/components/input/Input";
 import { sendRequest } from "src/rpc/ajax";
-import { DataConnection, Dataset, GetDataConnections, GetDatasets, GetTables } from "src/rpc/api";
+import { DataConnection, GetDataConnections, GetDatasets, GetTables } from "src/rpc/api";
 
 type ConnectionSelectorProps = {
-  connectionID: number | null;
-  setConnectionID: (connection: number) => void;
+  connection: DataConnection | null;
+  setConnection: (connection: DataConnection) => void;
   className?: string;
   noOptionsString?: string;
   placeholder?: string;
@@ -31,17 +31,11 @@ export const ConnectionSelector: React.FC<ConnectionSelectorProps> = props => {
     };
   }, []);
 
-  const getConnection = (connectionID: number): DataConnection | undefined => {
-    return connectionOptions?.find(connection => {
-      return connection.id = connectionID;
-    });
-  };
-  const selected = props.connectionID ? getConnection(props.connectionID) : undefined;
-
   return <ValidatedDropdownInput
+    by="id"
     className={props.className}
-    selected={selected}
-    setSelected={(connection: DataConnection) => props.setConnectionID(connection.id)}
+    selected={props.connection}
+    setSelected={(connection: DataConnection) => props.setConnection(connection)}
     options={connectionOptions}
     getDisplayName={(connection: DataConnection) => connection.display_name}
     loading={loading}
@@ -61,7 +55,7 @@ type DatasetSelectorProps = {
 };
 
 export const DatasetSelector: React.FC<DatasetSelectorProps> = props => {
-  const [datasetOptions, setDatasetOptions] = useState<Dataset[]>();
+  const [datasetOptions, setDatasetOptions] = useState<string[]>();
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     if (!props.connectionID) {
@@ -83,19 +77,11 @@ export const DatasetSelector: React.FC<DatasetSelectorProps> = props => {
     };
   }, [props.connectionID]);
 
-  const getDataset = (datasetID: string): Dataset | undefined => {
-    return datasetOptions?.find(dataset => {
-      return dataset.id = datasetID;
-    });
-  };
-  const selected = props.datasetID ? getDataset(props.datasetID) : undefined;
-
   return <ValidatedDropdownInput
     className={props.className}
-    selected={selected}
-    setSelected={(dataset: Dataset) => props.setDatasetID(dataset.id)}
+    selected={props.datasetID}
+    setSelected={(datasetID: string) => props.setDatasetID(datasetID)}
     options={datasetOptions}
-    getDisplayName={(dataset: Dataset) => dataset.id}
     loading={loading}
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No datasets available!"}
     placeholder={props.placeholder ? props.placeholder : "Choose dataset"}
@@ -106,7 +92,7 @@ type TableSelectorProps = {
   connectionID: number | null;
   datasetID: string | null;
   tableName: string | null;
-  setTable: (tableName: string) => void;
+  setTableName: (tableName: string) => void;
   className?: string;
   noOptionsString?: string;
   placeholder?: string;
@@ -139,9 +125,8 @@ export const TableSelector: React.FC<TableSelectorProps> = props => {
   return <ValidatedDropdownInput
     className={props.className}
     selected={props.tableName}
-    setSelected={(tableName: string) => props.setTable(tableName)}
+    setSelected={(tableName: string) => props.setTableName(tableName)}
     options={tableOptions}
-    getDisplayName={(tableName: string) => tableName}
     loading={loading}
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No tables available!"}
     placeholder={props.placeholder ? props.placeholder : "Choose table"}

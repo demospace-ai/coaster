@@ -4,12 +4,12 @@ import { ValidatedComboInput, ValidatedInput } from "src/components/input/Input"
 import { Loading } from "src/components/loading/Loading";
 import { ConnectionSelector, DatasetSelector, TableSelector } from "src/components/selector/Selector";
 import { sendRequest } from "src/rpc/ajax";
-import { ColumnSchema, GetSchema, Schema } from "src/rpc/api";
+import { ColumnSchema, DataConnection, GetSchema, Schema } from "src/rpc/api";
 
 
 type NewEventSetState = {
   eventSetName: string;
-  dataSourceId: number | null;
+  connection: DataConnection | null;
   datasetId: string | null;
   tableName: string | null;
   eventTypeColumn: ColumnSchema | null;
@@ -18,7 +18,7 @@ type NewEventSetState = {
 
 const INITIAL_DATASET_STATE: NewEventSetState = {
   eventSetName: "",
-  dataSourceId: null,
+  connection: null,
   datasetId: null,
   tableName: null,
   eventTypeColumn: null,
@@ -31,13 +31,13 @@ export const NewEventSet: React.FC = () => {
   const [schema, setSchema] = useState<Schema | null>(null);
   const [state, setState] = useState<NewEventSetState>(INITIAL_DATASET_STATE);
   useEffect(() => {
-    if (!state.dataSourceId || !state.datasetId || !state.tableName) {
+    if (!state.connection || !state.datasetId || !state.tableName) {
       return;
     }
 
     setSchemaLoading(true);
     let ignore = false;
-    sendRequest(GetSchema, { connectionID: state.dataSourceId, datasetID: state.datasetId, tableName: state.tableName }).then((results) => {
+    sendRequest(GetSchema, { connectionID: state.connection.id, datasetID: state.datasetId, tableName: state.tableName }).then((results) => {
       if (!ignore) {
         setSchema(results.schema);
       }
@@ -48,7 +48,7 @@ export const NewEventSet: React.FC = () => {
     return () => {
       ignore = true;
     };
-  }, [state.dataSourceId, state.datasetId, state.tableName]);
+  }, [state.connection, state.datasetId, state.tableName]);
 
   const createNewEventDataset = (e: FormEvent) => {
     e.preventDefault();
@@ -65,16 +65,16 @@ export const NewEventSet: React.FC = () => {
           <ConnectionSelector
             className='tw-my-1'
             validated={true}
-            connectionID={state.dataSourceId}
-            setConnectionID={(value: number) => {
-              if (value !== state.dataSourceId) {
-                setState({ ...state, dataSourceId: value, datasetId: null, tableName: null, eventTypeColumn: null, timeColumn: null });
+            connection={state.connection}
+            setConnection={(value: DataConnection) => {
+              if (!state.connection || value.id !== state.connection.id) {
+                setState({ ...state, connection: value, datasetId: null, tableName: null, eventTypeColumn: null, timeColumn: null });
               }
             }} />
           <DatasetSelector
             className='tw-mt-1'
             validated={true}
-            connectionID={state.dataSourceId}
+            connectionID={state.connection ? state.connection.id : null}
             datasetID={state.datasetId}
             setDatasetID={(value: string) => {
               if (value !== state.datasetId) {
@@ -85,10 +85,10 @@ export const NewEventSet: React.FC = () => {
           />
           <TableSelector
             className="tw-mt-2"
-            connectionID={state.dataSourceId}
+            connectionID={state.connection ? state.connection.id : null}
             datasetID={state.datasetId}
             tableName={state.tableName}
-            setTable={(value) => {
+            setTableName={(value: string) => {
               if (value !== state.tableName) {
                 setState({ ...state, tableName: value, eventTypeColumn: null, timeColumn: null });
               }

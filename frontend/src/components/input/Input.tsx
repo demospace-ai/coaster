@@ -68,10 +68,11 @@ export const ValidatedInput: React.FC<ValidatedInputProps> = props => {
 };
 
 type ValidatedDropdownInputProps = {
+  by?: string;
   options: any[] | undefined;
   selected: any | null;
   setSelected: (option: any) => void;
-  getDisplayName: (option: any) => string;
+  getDisplayName?: (option: any) => string;
   loading: boolean;
   placeholder: string;
   noOptionsString: string;
@@ -88,14 +89,18 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = pro
     return valid;
   };
 
+  const getDisplayName = props.getDisplayName ? props.getDisplayName : (value: any) => value;
+
   return (
-    <Listbox value={props.selected} onChange={(value: number) => { props.setSelected(value); setIsValid(true); }}>
+    <Listbox by={props.by} value={props.selected} onChange={value => { props.setSelected(value); setIsValid(true); }}>
       {({ open }) =>
         <>
           <Listbox.Button
             className={classNames("tw-w-full tw-rounded-md tw-bg-white tw-py-2 tw-pl-3 tw-pr-3 tw-text-left tw-border tw-border-solid tw-border-gray-300 focus:tw-outline-none", props.className, !open && props.validated && !isValid && 'tw-border-red-600 tw-outline-none')}
             onBlur={() => validateNotNull(props.selected)}>
-            <span className={classNames("tw-inline tw-truncate", !props.selected && "tw-text-gray-400")}>{props.selected ? props.getDisplayName(props.selected) : props.placeholder}</span>
+            <span className={classNames("tw-inline tw-truncate", !props.selected && "tw-text-gray-400")}>
+              {props.selected ? getDisplayName(props.selected) : props.placeholder}
+            </span>
             <span className="tw-pointer-events-none pr-2">
               <ChevronUpDownIcon
                 className="tw-inline tw-float-right tw-h-5 tw-w-5 tw-text-gray-400"
@@ -114,7 +119,7 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = pro
           >
             <div>
               <Listbox.Options className="tw-absolute tw-z-10 tw-mt-1 tw-max-h-60 tw-w-full tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm">
-                <DropdownOptions loading={props.loading} options={props.options} noOptionsString={props.noOptionsString} getDisplayName={props.getDisplayName} />
+                <DropdownOptions loading={props.loading} options={props.options} noOptionsString={props.noOptionsString} getDisplayName={getDisplayName} />
               </Listbox.Options>
             </div>
           </Transition>
@@ -180,7 +185,7 @@ type ValidatedComboInputProps = {
   options: any[] | undefined;
   selected: any | null;
   setSelected: (option: any) => void;
-  getDisplayName: (option: any) => string;
+  getDisplayName?: (option: any) => string;
   loading: boolean;
   placeholder: string;
   noOptionsString: string;
@@ -193,14 +198,23 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
   const [query, setQuery] = useState('');
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  const filteredOptions =
-    query === ''
-      ? props.options
-      : props.options
-        ? props.options.filter((option) => {
-          return props.getDisplayName(option).toLowerCase().includes(query.toLowerCase());
-        })
-        : [];
+  const getFilteredOptions = () => {
+    if (query === '') {
+      return props.options;
+    }
+
+    if (props.options) {
+      props.options.filter((option) => {
+        const displayName = props.getDisplayName ? props.getDisplayName(option) : option;
+        return displayName.toLowerCase().includes(query.toLowerCase());
+      });
+    }
+
+    return [];
+  };
+  const filteredOptions = getFilteredOptions();
+
+  const getDisplayName = props.getDisplayName ? props.getDisplayName : (value: any) => value;
 
   const validateNotNull = (value: number | null): boolean => {
     const valid = value != null;
@@ -215,8 +229,8 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
           <div className={classNames("tw-flex tw-h-10 tw-w-full tw-rounded-md tw-bg-white tw-pl-3 tw-pr-3 tw-text-left tw-border tw-border-solid tw-border-gray-300", props.className, !open && props.validated && !isValid && 'tw-border-red-600 tw-outline-none')}>
             <Combobox.Input
               className={"tw-inline tw-w-[calc(100%-20px)] tw-border-none tw-pr-10 tw-text-sm tw-leading-5 tw-text-gray-900 tw-outline-none"}
-              displayValue={(selected) => selected ? props.getDisplayName(selected) : ""}
-              onChange={(event) => setQuery(event.target.value)}
+              displayValue={selected => selected ? getDisplayName(selected) : ""}
+              onChange={event => setQuery(event.target.value)}
               placeholder={props.placeholder}
               onBlur={() => validateNotNull(props.selected)}
               onClick={() => { buttonRef.current?.click(); }}
@@ -242,7 +256,7 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
           >
             <div>
               <Combobox.Options className="tw-absolute tw-z-10 tw-mt-1 tw-max-h-60 tw-w-full tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm">
-                <ComboOptions loading={props.loading} options={filteredOptions} noOptionsString={props.noOptionsString} getDisplayName={props.getDisplayName} />
+                <ComboOptions loading={props.loading} options={filteredOptions} noOptionsString={props.noOptionsString} getDisplayName={getDisplayName} />
               </Combobox.Options>
             </div>
           </Transition>

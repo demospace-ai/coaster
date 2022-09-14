@@ -203,7 +203,7 @@ export interface GetDataConnectionsResponse {
 }
 
 export interface GetDatasetsResponse {
-    datasets: Dataset[];
+    datasets: string[];
 }
 
 export interface GetTablesResponse {
@@ -280,15 +280,6 @@ export interface DataConnection {
     id: number;
     display_name: string;
     connection_type: DataConnectionType;
-}
-
-export interface Dataset {
-    id: string;
-}
-
-export interface Table {
-    name: string;
-    schema: Schema;
 }
 
 export enum DataConnectionType {

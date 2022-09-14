@@ -20,7 +20,7 @@ type GetDatasetsRequest struct {
 }
 
 type GetDatasetsResponse struct {
-	Datasets []dataconnections.Dataset `json:"datasets"`
+	Datasets []string `json:"datasets"`
 }
 
 func GetDatasets(env Env, w http.ResponseWriter, r *http.Request) error {
@@ -59,7 +59,7 @@ func GetDatasets(env Env, w http.ResponseWriter, r *http.Request) error {
 	})
 }
 
-func getDatasets(dataConnection models.DataConnection) ([]dataconnections.Dataset, error) {
+func getDatasets(dataConnection models.DataConnection) ([]string, error) {
 	switch dataConnection.ConnectionType {
 	case models.DataConnectionTypeBigQuery:
 		return getBigQueryDatasets(dataConnection)
@@ -70,7 +70,7 @@ func getDatasets(dataConnection models.DataConnection) ([]dataconnections.Datase
 	}
 }
 
-func getBigQueryDatasets(dataConnection models.DataConnection) ([]dataconnections.Dataset, error) {
+func getBigQueryDatasets(dataConnection models.DataConnection) ([]string, error) {
 	bigQueryCredentialsString, err := dataconnections.DecryptBigQueryCredentials(dataConnection)
 	if err != nil {
 		return nil, err
@@ -93,7 +93,7 @@ func getBigQueryDatasets(dataConnection models.DataConnection) ([]dataconnection
 	defer client.Close()
 
 	ts := client.Datasets(ctx)
-	var results []dataconnections.Dataset
+	var results []string
 	for {
 		dataset, err := ts.Next()
 		if err == iterator.Done {
@@ -103,13 +103,13 @@ func getBigQueryDatasets(dataConnection models.DataConnection) ([]dataconnection
 			return nil, err
 		}
 
-		results = append(results, dataconnections.ConvertBigQueryDataset(*dataset))
+		results = append(results, dataset.DatasetID)
 	}
 
 	return results, nil
 }
 
-func getSnowflakeDatasets(dataConnection models.DataConnection) ([]dataconnections.Dataset, error) {
+func getSnowflakeDatasets(dataConnection models.DataConnection) ([]string, error) {
 	// TODO: implement
 	return nil, errors.NewBadRequest("snowflake not supported")
 }
