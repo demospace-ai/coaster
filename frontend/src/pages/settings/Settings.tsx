@@ -8,8 +8,8 @@ export const Settings: React.FC = () => {
         <NavButton className='tw-mb-5' to='/newconnection'>
           New Data Warehouse
         </NavButton>
-        <NavButton to='/neweventdataset'>
-          New Event Dataset
+        <NavButton to='/neweventset'>
+          New Event Set
         </NavButton>
       </div>
     </div >

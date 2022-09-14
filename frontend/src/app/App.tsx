@@ -11,7 +11,7 @@ import { Inbox } from 'src/pages/inbox/Inbox';
 import { Login } from 'src/pages/login/Login';
 import { MyTasks } from 'src/pages/mytasks/MyTasks';
 import { NewConnection } from 'src/pages/newconnection/NewConnection';
-import { NewEventDataset } from 'src/pages/neweventdataset/NewEventDataset';
+import { NewEventSet } from 'src/pages/neweventdataset/NewEventDataset';
 import { NewQuery } from 'src/pages/newquery/NewQuery';
 import { NewQuestion } from 'src/pages/newquestion/NewQuestion';
 import { NotFound } from 'src/pages/notfound/NotFound';
@@ -62,7 +62,7 @@ export const App: React.FC = () => {
           <Route path='/newconnection' element={<RequireAuth element={<NewConnection />} />} />
           <Route path='/settings' element={<RequireAuth element={<Settings />} />} />
           <Route path='/newquery' element={<RequireAuth element={<NewQuery />} />} />
-          <Route path='/neweventdataset' element={<RequireAuth element={<NewEventDataset />} />} />
+          <Route path='/neweventset' element={<RequireAuth element={<NewEventSet />} />} />
           <Route path='*' element={<NotFound />} />
         </Route>
       </Routes>

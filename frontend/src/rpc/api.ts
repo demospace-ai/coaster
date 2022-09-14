@@ -25,6 +25,21 @@ export const GetDataConnections: IEndpoint<undefined, GetDataConnectionsResponse
     path: '/get_data_connections',
 };
 
+export const GetDatasets: IEndpoint<{ connectionID: number; }, GetDatasetsResponse> = {
+    method: 'GET',
+    path: '/get_datasets\\?connectionID=:connectionID',
+};
+
+export const GetTables: IEndpoint<{ connectionID: number, datasetID: string; }, GetTablesResponse> = {
+    method: 'GET',
+    path: '/get_tables\\?connectionID=:connectionID&datasetID=:datasetID',
+};
+
+export const GetSchema: IEndpoint<{ connectionID: number, datasetID: string; tableName: string; }, GetSchemaResponse> = {
+    method: 'GET',
+    path: '/get_schema\\?connectionID=:connectionID&datasetID=:datasetID&tableName=:tableName',
+};
+
 export const GetAssignedQuestions: IEndpoint<undefined, GetAssignedQuestionsResponse> = {
     method: 'GET',
     path: '/get_assigned_questions',
@@ -187,6 +202,18 @@ export interface GetDataConnectionsResponse {
     data_connections: DataConnection[];
 }
 
+export interface GetDatasetsResponse {
+    datasets: Dataset[];
+}
+
+export interface GetTablesResponse {
+    tables: string[];
+}
+
+export interface GetSchemaResponse {
+    schema: Schema;
+}
+
 export interface GetAssignedQuestionsResponse {
     questions: Post[];
 }
@@ -253,6 +280,15 @@ export interface DataConnection {
     id: number;
     display_name: string;
     connection_type: DataConnectionType;
+}
+
+export interface Dataset {
+    id: string;
+}
+
+export interface Table {
+    name: string;
+    schema: Schema;
 }
 
 export enum DataConnectionType {

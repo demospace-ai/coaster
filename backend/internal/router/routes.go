@@ -72,6 +72,24 @@ var Routes = []Route{
 		HandlerFunc: handlers.RunQuery,
 	},
 	{
+		Name:        "Get datasets",
+		Method:      "GET",
+		Pattern:     "/api/get_datasets",
+		HandlerFunc: handlers.GetDatasets,
+	},
+	{
+		Name:        "Get tables for a given data source and dataset",
+		Method:      "GET",
+		Pattern:     "/api/get_tables",
+		HandlerFunc: handlers.GetTables,
+	},
+	{
+		Name:        "Get schema for a given table",
+		Method:      "GET",
+		Pattern:     "/api/get_schema",
+		HandlerFunc: handlers.GetSchema,
+	},
+	{
 		Name:        "Get all users in an organization",
 		Method:      "GET",
 		Pattern:     "/api/get_all_users",

@@ -18,6 +18,16 @@ type ColumnSchema struct {
 	Type string `json:"type"`
 }
 
+type Dataset struct {
+	ID          string `json:"id"`
+	DisplayName string `json:"display_name"`
+}
+
+type Table struct {
+	Name   string `json:"name"`
+	Schema Schema `json:"schema"`
+}
+
 func GetDataConnections(db *gorm.DB, organizationID int64) ([]models.DataConnection, error) {
 	var connections []models.DataConnection
 	result := db.Table("data_connections").
@@ -129,4 +139,10 @@ func ConvertBigQuerySchema(bigQuerySchema bigquery.Schema) Schema {
 	}
 
 	return schema
+}
+
+func ConvertBigQueryDataset(dataset bigquery.Dataset) Dataset {
+	return Dataset{
+		ID: dataset.DatasetID,
+	}
 }

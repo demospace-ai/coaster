@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 import MonacoEditor, { monaco } from "react-monaco-editor";
 import { rudderanalytics } from "src/app/rudder";
 import { Button } from "src/components/button/Button";
-import { ConnectionSelector } from "src/components/connectionSelector/ConnectionSelector";
+import { ConnectionSelector } from "src/components/selector/Selector";
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { sendRequest } from "src/rpc/ajax";
 import { QueryResults, RunQuery, RunQueryRequest, Schema } from "src/rpc/api";
