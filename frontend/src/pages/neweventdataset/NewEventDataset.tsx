@@ -14,6 +14,7 @@ type NewEventSetState = {
   tableName: string | null;
   eventTypeColumn: ColumnSchema | null;
   timeColumn: ColumnSchema | null;
+  userIdentifierColumn: ColumnSchema | null;
 };
 
 const INITIAL_DATASET_STATE: NewEventSetState = {
@@ -23,6 +24,7 @@ const INITIAL_DATASET_STATE: NewEventSetState = {
   tableName: null,
   eventTypeColumn: null,
   timeColumn: null,
+  userIdentifierColumn: null,
 };
 
 export const NewEventSet: React.FC = () => {
@@ -114,6 +116,17 @@ export const NewEventSet: React.FC = () => {
             setSelected={(value: ColumnSchema) => { setState({ ...state, timeColumn: value }); }}
             getDisplayName={(value: ColumnSchema) => value.name}
             placeholder='Timestamp Column'
+            noOptionsString="No Columns Available! (Choose a table)"
+            loading={schemaLoading}
+            validated={true}
+          />
+          <ValidatedComboInput
+            className="tw-my-2"
+            options={schema ? schema : []}
+            selected={state.userIdentifierColumn}
+            setSelected={(value: ColumnSchema) => { setState({ ...state, userIdentifierColumn: value }); }}
+            getDisplayName={(value: ColumnSchema) => value.name}
+            placeholder='User Identifier Column'
             noOptionsString="No Columns Available! (Choose a table)"
             loading={schemaLoading}
             validated={true}

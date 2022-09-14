@@ -93,38 +93,35 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = pro
 
   return (
     <Listbox by={props.by} value={props.selected} onChange={value => { props.setSelected(value); setIsValid(true); }}>
-      {({ open }) =>
-        <>
-          <Listbox.Button
-            className={classNames("tw-w-full tw-rounded-md tw-bg-white tw-py-2 tw-pl-3 tw-pr-3 tw-text-left tw-border tw-border-solid tw-border-gray-300 focus:tw-outline-none", props.className, !open && props.validated && !isValid && 'tw-border-red-600 tw-outline-none')}
-            onBlur={() => validateNotNull(props.selected)}>
-            <span className={classNames("tw-inline tw-truncate", !props.selected && "tw-text-gray-400")}>
-              {props.selected ? getDisplayName(props.selected) : props.placeholder}
-            </span>
-            <span className="tw-pointer-events-none pr-2">
-              <ChevronUpDownIcon
-                className="tw-inline tw-float-right tw-h-5 tw-w-5 tw-text-gray-400"
-                aria-hidden="true"
-              />
-            </span>
-          </Listbox.Button>
-          <Transition
-            as={Fragment}
-            enter="tw-transition tw-ease-out tw-duration-100"
-            enterFrom="tw-transform tw-opacity-0 tw-scale-95"
-            enterTo="tw-transform tw-opacity-100 tw-scale-100"
-            leave="tw-transition tw-ease-in tw-duration-75"
-            leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
-            leaveTo="tw-transform tw-opacity-0 tw-scale-95"
-          >
-            <div>
-              <Listbox.Options className="tw-absolute tw-z-10 tw-mt-1 tw-max-h-60 tw-w-full tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm">
-                <DropdownOptions loading={props.loading} options={props.options} noOptionsString={props.noOptionsString} getDisplayName={getDisplayName} />
-              </Listbox.Options>
-            </div>
-          </Transition>
-        </>
-      }
+      <Listbox.Button
+        className={classNames("tw-w-full tw-rounded-md tw-bg-white tw-py-2 tw-pl-3 tw-pr-3 tw-text-left tw-border tw-border-solid tw-border-gray-300 focus:tw-outline-none", props.className, props.validated && !isValid && 'tw-border-red-600 tw-outline-none')}
+      >
+        <span className={classNames("tw-inline tw-truncate", !props.selected && "tw-text-gray-400")}>
+          {props.selected ? getDisplayName(props.selected) : props.placeholder}
+        </span>
+        <span className="tw-pointer-events-none pr-2">
+          <ChevronUpDownIcon
+            className="tw-inline tw-float-right tw-h-5 tw-w-5 tw-text-gray-400"
+            aria-hidden="true"
+          />
+        </span>
+      </Listbox.Button>
+      <Transition
+        as={Fragment}
+        enter="tw-transition tw-ease-out tw-duration-100"
+        enterFrom="tw-transform tw-opacity-0 tw-scale-95"
+        enterTo="tw-transform tw-opacity-100 tw-scale-100"
+        leave="tw-transition tw-ease-in tw-duration-75"
+        leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
+        leaveTo="tw-transform tw-opacity-0 tw-scale-95"
+        afterLeave={() => validateNotNull(props.selected)}
+      >
+        <div>
+          <Listbox.Options className="tw-absolute tw-z-10 tw-mt-1 tw-max-h-60 tw-w-full tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm">
+            <DropdownOptions loading={props.loading} options={props.options} noOptionsString={props.noOptionsString} getDisplayName={getDisplayName} />
+          </Listbox.Options>
+        </div>
+      </Transition>
     </Listbox>
   );
 };
@@ -204,7 +201,7 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
     }
 
     if (props.options) {
-      props.options.filter((option) => {
+      return props.options.filter((option) => {
         const displayName = props.getDisplayName ? props.getDisplayName(option) : option;
         return displayName.toLowerCase().includes(query.toLowerCase());
       });
@@ -224,45 +221,41 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
 
   return (
     <Combobox value={props.selected} onChange={(value: number) => { props.setSelected(value); setIsValid(true); }}>
-      {({ open }) =>
-        <>
-          <div className={classNames("tw-flex tw-h-10 tw-w-full tw-rounded-md tw-bg-white tw-pl-3 tw-pr-3 tw-text-left tw-border tw-border-solid tw-border-gray-300", props.className, !open && props.validated && !isValid && 'tw-border-red-600 tw-outline-none')}>
-            <Combobox.Input
-              className={"tw-inline tw-w-[calc(100%-20px)] tw-border-none tw-pr-10 tw-text-sm tw-leading-5 tw-text-gray-900 tw-outline-none"}
-              displayValue={selected => selected ? getDisplayName(selected) : ""}
-              onChange={event => setQuery(event.target.value)}
-              placeholder={props.placeholder}
-              onBlur={() => validateNotNull(props.selected)}
-              onClick={() => { buttonRef.current?.click(); }}
-            >
-            </Combobox.Input>
-            <Combobox.Button className="tw-inline-block tw-h-full" onBlur={() => validateNotNull(props.selected)} ref={buttonRef}>
-              <span className="tw-pointer-events-none pr-2">
-                <ChevronUpDownIcon
-                  className="tw-inline tw-float-right tw-h-5 tw-w-5 tw-text-gray-400"
-                  aria-hidden="true"
-                />
-              </span>
-            </Combobox.Button>
-          </div>
-          <Transition
-            as={Fragment}
-            enter="tw-transition tw-ease-out tw-duration-100"
-            enterFrom="tw-transform tw-opacity-0 tw-scale-95"
-            enterTo="tw-transform tw-opacity-100 tw-scale-100"
-            leave="tw-transition tw-ease-in tw-duration-75"
-            leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
-            leaveTo="tw-transform tw-opacity-0 tw-scale-95"
-          >
-            <div>
-              <Combobox.Options className="tw-absolute tw-z-10 tw-mt-1 tw-max-h-60 tw-w-full tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm">
-                <ComboOptions loading={props.loading} options={filteredOptions} noOptionsString={props.noOptionsString} getDisplayName={getDisplayName} />
-              </Combobox.Options>
-            </div>
-          </Transition>
-        </>
-      }
-    </Combobox>
+      <div className={classNames("tw-flex tw-h-10 tw-w-full tw-rounded-md tw-bg-white tw-pl-3 tw-pr-3 tw-text-left tw-border tw-border-solid tw-border-gray-300", props.className, props.validated && !isValid && 'tw-border-red-600 tw-outline-none')}>
+        <Combobox.Input
+          className={"tw-inline tw-w-[calc(100%-20px)] tw-border-none tw-pr-10 tw-text-sm tw-leading-5 tw-text-gray-900 tw-outline-none"}
+          displayValue={selected => selected ? getDisplayName(selected) : ""}
+          onChange={event => setQuery(event.target.value)}
+          placeholder={props.placeholder}
+          onClick={() => buttonRef.current?.click()}
+        >
+        </Combobox.Input>
+        <Combobox.Button className="tw-inline-block tw-h-full" ref={buttonRef}>
+          <span className="tw-pointer-events-none pr-2">
+            <ChevronUpDownIcon
+              className="tw-inline tw-float-right tw-h-5 tw-w-5 tw-text-gray-400"
+              aria-hidden="true"
+            />
+          </span>
+        </Combobox.Button>
+      </div>
+      <Transition
+        as={Fragment}
+        enter="tw-transition tw-ease-out tw-duration-100"
+        enterFrom="tw-transform tw-opacity-0 tw-scale-95"
+        enterTo="tw-transform tw-opacity-100 tw-scale-100"
+        leave="tw-transition tw-ease-in tw-duration-75"
+        leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
+        leaveTo="tw-transform tw-opacity-0 tw-scale-95"
+        afterLeave={() => { validateNotNull(props.selected); setQuery(''); }}
+      >
+        <div>
+          <Combobox.Options className="tw-absolute tw-z-10 tw-mt-1 tw-max-h-60 tw-w-full tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm">
+            <ComboOptions loading={props.loading} options={filteredOptions} noOptionsString={props.noOptionsString} getDisplayName={getDisplayName} />
+          </Combobox.Options>
+        </div>
+      </Transition>
+    </Combobox >
   );
 };
 
@@ -315,4 +308,4 @@ const ComboOptions: React.FC<ComboOptionsProps> = props => {
       <div className="tw-p-2 tw-pl-4 tw-select-none">{props.noOptionsString}</div>
     );
   }
-};;;
+};

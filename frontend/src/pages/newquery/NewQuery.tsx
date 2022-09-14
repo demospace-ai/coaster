@@ -15,7 +15,7 @@ import { createResizeFunction } from 'src/utils/resize';
 export const NewQuery: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [connection, setConnection] = useLocalStorage<DataConnection | null>("selectedConnectionID", null);
+  const [connection, setConnection] = useLocalStorage<DataConnection | null>("selectedConnection", null);
   const [query, setQuery] = useLocalStorage<string>("query", "");
   const [schema, setSchema] = useState<Schema | null>(null);
   const [shouldRun, setShouldRun] = useState<boolean>(false);

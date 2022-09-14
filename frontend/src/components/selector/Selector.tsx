@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ValidatedDropdownInput } from "src/components/input/Input";
+import { ValidatedComboInput, ValidatedDropdownInput } from "src/components/input/Input";
 import { sendRequest } from "src/rpc/ajax";
 import { DataConnection, GetDataConnections, GetDatasets, GetTables } from "src/rpc/api";
 
@@ -122,7 +122,7 @@ export const TableSelector: React.FC<TableSelectorProps> = props => {
     };
   }, [props.connectionID, props.datasetID]);
 
-  return <ValidatedDropdownInput
+  return <ValidatedComboInput
     className={props.className}
     selected={props.tableName}
     setSelected={(tableName: string) => props.setTableName(tableName)}
