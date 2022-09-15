@@ -60,6 +60,12 @@ var Routes = []Route{
 		HandlerFunc: handlers.CreateDataConnection,
 	},
 	{
+		Name:        "Create event set",
+		Method:      "POST",
+		Pattern:     "/api/create_event_set",
+		HandlerFunc: handlers.CreateEventSet,
+	},
+	{
 		Name:        "Test data connection",
 		Method:      "POST",
 		Pattern:     "/api/test_data_connection",

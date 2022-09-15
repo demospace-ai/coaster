@@ -101,6 +101,11 @@ export const CreateDataConnection: IEndpoint<CreateDataConnectionRequest, undefi
     path: '/create_data_connection',
 };
 
+export const CreateEventSet: IEndpoint<CreateEventSetRequest, undefined> = {
+    method: 'POST',
+    path: '/create_event_set',
+};
+
 export interface TestDataConnectionRequest {
     display_name: string;
     connection_type: DataConnectionType;
@@ -123,6 +128,16 @@ export interface CreateDataConnectionRequest {
     warehouse_name?: string;
     role?: string;
     account?: string;
+}
+
+export interface CreateEventSetRequest {
+    display_name: string;
+    connection_id: number;
+    dataset_name: string;
+    table_name: string;
+    event_type_column: string;
+    timestamp_column: string;
+    user_identifier_column: string;
 }
 
 export type JSONValue =

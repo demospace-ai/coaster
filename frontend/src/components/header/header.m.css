@@ -2,7 +2,8 @@
 
 .headerContainer {
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    /*grid-template-columns: 1fr auto 1fr;*/
+    grid-template-columns: 1fr 1fr;
     box-sizing: border-box;
     min-height: 60px;
     height: 60px;
@@ -21,11 +22,6 @@
 .pageTitle {
     font-size: 14px;
     user-select: none;
-}
-
-.searchBarContainer {
-    margin: auto;
-    width: 500px;
 }
 
 .profileIcon {

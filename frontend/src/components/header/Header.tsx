@@ -2,7 +2,6 @@ import { Menu, Transition } from '@headlessui/react';
 import classNames from 'classnames';
 import React, { Fragment } from 'react';
 import { useLocation } from 'react-router-dom';
-import { SearchBar } from 'src/components/searchbar/SearchBar';
 import { useLogout } from 'src/pages/login/actions';
 import { useSelector } from 'src/root/model';
 import styles from './header.m.css';
@@ -36,9 +35,6 @@ export const Header: React.FC = () => {
     <>
       <div className={styles.headerContainer}>
         <div className={styles.pageTitle}>{page}</div>
-        <div className={styles.searchBarContainer}>
-          <SearchBar />
-        </div>
         <ProfileDropdown />
       </div>
     </>
@@ -71,7 +67,7 @@ const ProfileDropdown: React.FC = () => {
                 <div
                   className={classNames(
                     active ? 'tw-bg-gray-100 tw-text-gray-900' : 'tw-text-gray-700',
-                    'tw-block tw-px-4 tw-py-2 tw-text-sm', "tw-cursor-pointer"
+                    'tw-block tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none'
                   )}
                 >
                   My Profile
@@ -83,7 +79,7 @@ const ProfileDropdown: React.FC = () => {
                 <div
                   className={classNames(
                     active ? 'tw-bg-gray-100 tw-text-gray-900' : 'tw-text-gray-700',
-                    'tw-block tw-px-4 tw-py-2 tw-text-sm', "tw-cursor-pointer"
+                    'tw-block tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none'
                   )}
                   onClick={logout}
                 >
