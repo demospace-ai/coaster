@@ -12,7 +12,7 @@ import { DataConnection, QueryResults, RunQuery, RunQueryRequest, Schema } from 
 import { useLocalStorage } from "src/utils/localStorage";
 import { createResizeFunction } from 'src/utils/resize';
 
-export const NewQuery: React.FC = () => {
+export const CustomQuery: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [connection, setConnection] = useLocalStorage<DataConnection | null>("selectedConnection", null);
@@ -106,8 +106,8 @@ export const NewQuery: React.FC = () => {
       <QueryNavigation />
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0" >
         <div className='tw-flex tw-flex-1 tw-min-w-0 tw-min-h-0'>
-          <div id='left-panel' className="tw-w-80 tw-min-w-[20rem] tw-inline-block tw-select-none tw-uppercase">
-            Data Source
+          <div id='left-panel' className="tw-w-80 tw-min-w-[20rem] tw-inline-block tw-select-none">
+            <span className='tw-uppercase'>Data Source</span>
             <ConnectionSelector className="tw-mt-1 hover:tw-border-green-500" connection={connection} setConnection={onConnectionSelected} />
           </div>
           <div id='right-panel' className="tw-ml-10 tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1">

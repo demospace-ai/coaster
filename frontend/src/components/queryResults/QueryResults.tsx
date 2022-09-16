@@ -7,6 +7,7 @@ type QueryResultsProps = {
   loading: boolean,
   schema: Schema | null,
   results: QueryResults | null,
+  placeholder?: string,
 };
 
 const QueryResultsTable: React.FC<QueryResultsProps> = props => {
@@ -44,7 +45,7 @@ const QueryResultsTable: React.FC<QueryResultsProps> = props => {
     );
   }
 
-  return <div className="tw-m-5">Run a query to see results</div>;
+  return <div className="tw-m-5">{props.placeholder ? props.placeholder : "Run a query to see results"}</div>;
 };
 
 const ResultsSchema: React.FC<{ schema: Schema; }> = ({ schema }) => {

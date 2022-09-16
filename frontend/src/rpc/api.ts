@@ -312,6 +312,9 @@ export interface EventSet {
     connection_id: number;
     dataset_name: string;
     table_name: string;
+    event_type_column: string;
+    timestamp_column: string;
+    user_identifier_column: string;
 }
 
 export enum DataConnectionType {

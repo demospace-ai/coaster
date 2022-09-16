@@ -179,6 +179,7 @@ const DropdownOptions: React.FC<DropdownOptionsProps> = props => {
 
 
 type ValidatedComboInputProps = {
+  by?: string;
   options: any[] | undefined;
   selected: any | null;
   setSelected: (option: any) => void;
@@ -220,7 +221,7 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
   };
 
   return (
-    <Combobox value={props.selected} onChange={(value: number) => { props.setSelected(value); setIsValid(true); }}>
+    <Combobox by={props.by} value={props.selected} onChange={(value: number) => { props.setSelected(value); setIsValid(true); }}>
       <div className={classNames("tw-flex tw-h-10 tw-w-full tw-rounded-md tw-bg-white tw-pl-3 tw-pr-3 tw-text-left tw-border tw-border-solid tw-border-gray-300", props.className, props.validated && !isValid && 'tw-border-red-600 tw-outline-none')}>
         <Combobox.Input
           className={"tw-inline tw-w-[calc(100%-20px)] tw-border-none tw-pr-10 tw-text-sm tw-leading-5 tw-text-gray-900 tw-outline-none"}

@@ -1,5 +1,6 @@
 import { Menu, Transition } from "@headlessui/react";
 import { ChartBarIcon, ChevronDownIcon, CommandLineIcon, PlusCircleIcon, PresentationChartLineIcon } from '@heroicons/react/20/solid';
+import { HomeIcon } from '@heroicons/react/24/outline';
 import classNames from "classnames";
 import { Fragment } from "react";
 import { NavLink } from "react-router-dom";
@@ -22,9 +23,7 @@ export const NavigationBar: React.FC = () => {
         <OrganizationButton organization={organization} />
         <NewAnalysisButton />
         <NavLink className={({ isActive }) => isActive ? styles.activeRouteContainer : styles.routeContainer} to={'/'}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13" fill="none" style={{ marginTop: '1px' }}>
-            <path d="M1.20765 13C0.887978 13 0.606785 12.8786 0.364071 12.6359C0.121357 12.3932 0 12.112 0 11.7924V1.20765C0 0.876139 0.121357 0.591985 0.364071 0.355191C0.606785 0.118397 0.887978 0 1.20765 0H11.7924C12.1239 0 12.408 0.118397 12.6448 0.355191C12.8816 0.591985 13 0.876139 13 1.20765V11.7924C13 12.112 12.8816 12.3932 12.6448 12.6359C12.408 12.8786 12.1239 13 11.7924 13H1.20765ZM1.20765 11.7924H11.7924V9.39481H9.23497C8.92714 9.8684 8.52755 10.2325 8.0362 10.487C7.54485 10.7416 7.03279 10.8689 6.5 10.8689C5.96721 10.8689 5.45515 10.7416 4.9638 10.487C4.47245 10.2325 4.07286 9.8684 3.76503 9.39481H1.20765V11.7924ZM6.5 9.80328C6.87887 9.80328 7.21334 9.7204 7.50342 9.55464C7.79349 9.38889 8.1102 9.08698 8.45355 8.64891C8.54827 8.54235 8.65483 8.46243 8.77322 8.40915C8.89162 8.35587 9.04554 8.32924 9.23497 8.32924H11.7924V1.20765H1.20765V8.32924H3.76503C3.95446 8.32924 4.11134 8.35292 4.23566 8.40027C4.35997 8.44763 4.46357 8.53051 4.54645 8.64891C4.8306 9.07514 5.13251 9.37409 5.45219 9.54577C5.77186 9.71744 6.12113 9.80328 6.5 9.80328Z" fill="#323232" />
-          </svg>
+          <HomeIcon className="tw-h-4" strokeWidth="2" />
           <div className={styles.route}>Home</div>
         </NavLink>
         <div className={styles.helpContainer}>
@@ -112,7 +111,7 @@ const NewAnalysisButton: React.FC = () => (
                   active ? 'tw-bg-gray-100 tw-text-gray-900' : 'tw-text-gray-700',
                   'tw-flex tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none tw-w-full tw-whitespace-nowrap'
                 )}
-                to="/"
+                to="/funnel"
               >
                 <div className="tw-flex tw-flex-col tw-justify-center">
                   <ChartBarIcon className="tw-inline-block tw-h-4 tw-mr-2 tw-scale-x-[-1]" />
@@ -171,7 +170,7 @@ const NewAnalysisButton: React.FC = () => (
                   active ? 'tw-bg-gray-100 tw-text-gray-900' : 'tw-text-gray-700',
                   'tw-flex tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none tw-w-full tw-whitespace-nowrap'
                 )}
-                to="/newquery"
+                to="/customquery"
               >
                 <div className="tw-flex tw-flex-col tw-justify-center">
                   <CommandLineIcon className="tw-inline-block tw-h-4 tw-mr-2" />

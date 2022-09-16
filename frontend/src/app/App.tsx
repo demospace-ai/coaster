@@ -4,14 +4,11 @@ import { useStart } from 'src/app/actions';
 import { Header } from 'src/components/header/Header';
 import { Loading } from 'src/components/loading/Loading';
 import { NavigationBar } from 'src/components/navigationBar/NavigationBar';
-import { AllQuestions } from 'src/pages/allquestions/AllQuestions';
+import { CustomQuery } from 'src/pages/customquery/CustomQuery';
+import { Funnel } from 'src/pages/funnel/Funnel';
 import { Inbox } from 'src/pages/inbox/Inbox';
 import { Login } from 'src/pages/login/Login';
-import { MyTasks } from 'src/pages/mytasks/MyTasks';
-import { NewQuery } from 'src/pages/newquery/NewQuery';
 import { NotFound } from 'src/pages/notfound/NotFound';
-import { Question } from 'src/pages/question/Question';
-import { SearchResults } from 'src/pages/search/Search';
 import { WorkspaceSettings } from 'src/pages/workspacesettings/WorkspaceSettings';
 import { useSelector } from 'src/root/model';
 import styles from './app.m.css';
@@ -42,12 +39,9 @@ export const App: React.FC = () => {
         <Route element={<AppLayout />}>
           <Route path='/login' element={<Login />} />
           <Route path='/' element={<RequireAuth element={<Inbox />} />} />
-          <Route path='/tasks' element={<RequireAuth element={<MyTasks />} />} />
-          <Route path='/allquestions' element={<RequireAuth element={<AllQuestions />} />} />
-          <Route path='/question/:id' element={<RequireAuth element={<Question />} />} />
-          <Route path='/search' element={<RequireAuth element={<SearchResults />} />} />
           <Route path='/workspacesettings' element={<RequireAuth element={<WorkspaceSettings />} />} />
-          <Route path='/newquery' element={<RequireAuth element={<NewQuery />} />} />
+          <Route path='/customquery' element={<RequireAuth element={<CustomQuery />} />} />
+          <Route path='/funnel' element={<RequireAuth element={<Funnel />} />} />
           <Route path='*' element={<NotFound />} />
         </Route>
       </Routes>

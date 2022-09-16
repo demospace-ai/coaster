@@ -14,10 +14,13 @@ export const Header: React.FC = () => {
   let page: string;
   switch (location.pathname) {
     case '/':
-      page = 'Inbox';
+      page = 'Home';
       break;
-    case '/newquery':
+    case '/customquery':
       page = 'Custom Query';
+      break;
+    case '/funnel':
+      page = 'Funnel Report';
       break;
     case '/workspacesettings':
       page = 'Workspace Settings';
