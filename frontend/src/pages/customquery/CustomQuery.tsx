@@ -94,7 +94,8 @@ export const CustomQuery: React.FC = () => {
       { token: "predefined.sql", foreground: "#66d9ef", fontStyle: "bold" },
       { token: "operator.sql", foreground: "#ffffff" },
       { token: "keyword.sql", fontStyle: "bold" },
-      { token: "identifier.sql", foreground: "#ffffff" }
+      { token: "identifier.sql", foreground: "#ffffff" },
+      { token: "string.sql", foreground: "#8888ea" }
     ],
     colors: {
       'editor.lineHighlightBackground': '#2c2c2c',
