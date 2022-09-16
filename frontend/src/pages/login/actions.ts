@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { rudderanalytics } from 'src/app/rudder';
 import { useDispatch } from 'src/root/model';
 import { sendRequest } from 'src/rpc/ajax';
-import { GetAllUsers, GetAssignedQuestions, Login, Logout, Organization, SetOrganization, User } from 'src/rpc/api';
+import { GetAllUsers, Login, Logout, Organization, SetOrganization, User } from 'src/rpc/api';
 
 export type GoogleLoginResponse = {
   credential: string;
@@ -76,12 +76,6 @@ export function useOnLoginSuccess() {
       dispatch({
         type: 'login.allUsers',
         users: allUsers.users,
-      });
-
-      const assignedQuestions = await sendRequest(GetAssignedQuestions);
-      dispatch({
-        type: 'login.assignedQuestions',
-        assignedQuestions: assignedQuestions.questions,
       });
     } catch (e) {
     }

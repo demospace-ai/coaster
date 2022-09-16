@@ -1,5 +1,5 @@
 import { PlusCircleIcon } from "@heroicons/react/20/solid";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "src/components/button/Button";
 import { Loading } from "src/components/loading/Loading";
 import { Modal } from "src/components/modal/Modal";
@@ -19,7 +19,7 @@ export const WorkspaceSettings: React.FC = () => {
   const [modalType, setModalType] = useState<ModalType | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [connectionMap, setConnectionMap] = useState<Map<number, DataConnection> | null>(null);
-
+  const setConnectionMapCallback = useCallback(setConnectionMap, [setConnectionMap]);
 
   const triggerModal = (modalType: ModalType) => {
     setModalType(modalType);
@@ -42,14 +42,14 @@ export const WorkspaceSettings: React.FC = () => {
         {modalContent}
       </Modal>
       <div className='tw-py-14 tw-px-20'>
-        <DataSourceSettings triggerModal={triggerModal} setConnectionMap={setConnectionMap} />
+        <DataSourceSettings triggerModal={triggerModal} setConnectionMap={setConnectionMapCallback} />
         <EventSetSettings triggerModal={triggerModal} connectionMap={connectionMap} />
       </div>
     </>
   );
 };
 
-const DataSourceSettings: React.FC<{ triggerModal: (modalType: ModalType) => void; setConnectionMap: (map: Map<number, DataConnection>) => void; }> = props => {
+const DataSourceSettings: React.FC<{ triggerModal: (modalType: ModalType) => void; setConnectionMap: (map: Map<number, DataConnection>) => void; }> = ({ triggerModal, setConnectionMap }) => {
   const [dataConnections, setDataConnections] = useState<DataConnection[] | null>(null);
   const [dataConnectionsLoading, setDataConnectionsLoading] = useState<boolean>(true);
   useEffect(() => {
@@ -57,7 +57,7 @@ const DataSourceSettings: React.FC<{ triggerModal: (modalType: ModalType) => voi
     sendRequest(GetDataConnections).then((results) => {
       if (!ignore) {
         setDataConnections(results.data_connections);
-        props.setConnectionMap(new Map(results.data_connections.map(i => [i.id, i])));
+        setConnectionMap(new Map(results.data_connections.map(i => [i.id, i])));
       }
 
       setDataConnectionsLoading(false);
@@ -66,13 +66,13 @@ const DataSourceSettings: React.FC<{ triggerModal: (modalType: ModalType) => voi
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [setConnectionMap]);
 
   return (
     <>
       <div className="tw-flex tw-w-full tw-mb-3">
         <div className="tw-flex tw-flex-col tw-justify-end tw-font-bold tw-text-lg">Data Sources</div>
-        <Button className='tw-ml-auto tw-flex' onClick={() => props.triggerModal(ModalType.NewDataSource)}>
+        <Button className='tw-ml-auto tw-flex' onClick={() => triggerModal(ModalType.NewDataSource)}>
           <div className="tw-flex tw-flex-col tw-justify-center tw-h-full">
             <PlusCircleIcon className='tw-h-4 tw-inline-block tw-mr-2' />
           </div>
@@ -94,7 +94,7 @@ const DataSourceSettings: React.FC<{ triggerModal: (modalType: ModalType) => voi
               </tr>
             </thead>
             <tbody className="tw-border-t tw-border-solid tw-border-gray-300">
-              {dataConnections?.map((dataConnection, index) => (
+              {dataConnections!.length > 0 ? dataConnections!.map((dataConnection, index) => (
                 <tr key={index}>
                   <td className={tableCellStyle}>
                     {dataConnection.display_name}
@@ -103,7 +103,7 @@ const DataSourceSettings: React.FC<{ triggerModal: (modalType: ModalType) => voi
                     {dataConnection.connection_type}
                   </td>
                 </tr>
-              ))}
+              )) : <tr><td className={tableCellStyle}>No event sets configured yet!</td></tr>}
             </tbody>
           </table>
         }
@@ -159,7 +159,7 @@ const EventSetSettings: React.FC<{ triggerModal: (modalType: ModalType) => void,
               </tr>
             </thead>
             <tbody className="tw-border-t tw-border-solid tw-border-gray-300">
-              {eventSets?.map((eventSet, index) => (
+              {eventSets!.length > 0 ? eventSets!.map((eventSet, index) => (
                 <tr key={index}>
                   <td className={tableCellStyle}>
                     {eventSet.display_name}
@@ -174,7 +174,7 @@ const EventSetSettings: React.FC<{ triggerModal: (modalType: ModalType) => void,
                     {eventSet.table_name}
                   </td>
                 </tr>
-              ))}
+              )) : <tr><td className={tableCellStyle}>No event sets configured yet!</td></tr>}
             </tbody>
           </table>
         }
