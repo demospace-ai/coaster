@@ -144,6 +144,33 @@ const NewAnalysisButton: React.FC = () => (
                   active ? 'tw-bg-gray-100 tw-text-gray-900' : 'tw-text-gray-700',
                   'tw-flex tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none tw-w-full tw-whitespace-nowrap'
                 )}
+                to="/"
+              >
+                <div className="tw-flex tw-flex-col tw-justify-center">
+                  <svg className={classNames('tw-h-[14px] tw-mt-[1px] tw-ml-[2px] tw-mr-2', active ? 'tw-text-gray-900' : 'tw-fill-gray-700')} viewBox="0 0 4900 4900" >
+                    <rect width="1000" height="1000" rx="300" />
+                    <rect x="3900" width="1000" height="1000" rx="300" />
+                    <rect x="2600" width="1000" height="1000" rx="300" />
+                    <rect x="1300" width="1000" height="1000" rx="300" />
+                    <rect y="3900" width="1000" height="1000" rx="300" />
+                    <rect y="2600" width="1000" height="1000" rx="300" />
+                    <rect x="1300" y="2600" width="1000" height="1000" rx="300" />
+                    <rect y="1300" width="1000" height="1000" rx="300" />
+                    <rect x="2600" y="1300" width="1000" height="1000" rx="300" />
+                    <rect x="1300" y="1300" width="1000" height="1000" rx="300" />
+                  </svg>
+                </div>
+                Retention Report (Coming Soon!)
+              </NavLink>
+            )}
+          </Menu.Item>
+          <Menu.Item>
+            {({ active }) => (
+              <NavLink
+                className={classNames(
+                  active ? 'tw-bg-gray-100 tw-text-gray-900' : 'tw-text-gray-700',
+                  'tw-flex tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none tw-w-full tw-whitespace-nowrap'
+                )}
                 to="/newquery"
               >
                 <div className="tw-flex tw-flex-col tw-justify-center">
