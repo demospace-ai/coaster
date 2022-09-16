@@ -22,7 +22,7 @@ export const NavigationBar: React.FC = () => {
         <OrganizationButton organization={organization} />
         <NavLink className={styles.newQuestion} to={'/newquery'}>
           <PlusCircleIcon className='tw-h-5' />
-          <div className={styles.newQuestionText}>New</div>
+          <div className={styles.newQuestionText}>New Analysis</div>
         </NavLink>
         <NavLink className={({ isActive }) => isActive ? styles.activeRouteContainer : styles.routeContainer} to={'/'}>
           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13" fill="none" style={{ marginTop: '1px' }}>
@@ -73,13 +73,13 @@ const OrganizationButton: React.FC<OrganizationButtonProps> = props => {
             <Menu.Item>
               {({ active }) => (
                 <NavLink
-                  to={'/settings'}
+                  to={'/workspacesettings'}
                   className={classNames(
                     active ? 'tw-bg-gray-100 tw-text-gray-900' : 'tw-text-gray-700',
                     'tw-block tw-px-4 tw-py-2 tw-text-sm', "tw-cursor-pointer"
                   )}
                 >
-                  Settings
+                  Workspace Settings
                 </NavLink>
               )}
             </Menu.Item>

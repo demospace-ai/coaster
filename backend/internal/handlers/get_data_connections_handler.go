@@ -17,7 +17,7 @@ func GetDataConnections(env Env, w http.ResponseWriter, r *http.Request) error {
 		return nil
 	}
 
-	connections, err := dataconnections.GetDataConnections(env.Db, env.Auth.Organization.ID)
+	connections, err := dataconnections.LoadAllDataConnections(env.Db, env.Auth.Organization.ID)
 	if err != nil {
 		return err
 	}

@@ -25,6 +25,11 @@ export const GetDataConnections: IEndpoint<undefined, GetDataConnectionsResponse
     path: '/get_data_connections',
 };
 
+export const GetEventSets: IEndpoint<undefined, GetEventSetsResponse> = {
+    method: 'GET',
+    path: '/get_event_sets',
+};
+
 export const GetDatasets: IEndpoint<{ connectionID: number; }, GetDatasetsResponse> = {
     method: 'GET',
     path: '/get_datasets\\?connectionID=:connectionID',
@@ -217,6 +222,10 @@ export interface GetDataConnectionsResponse {
     data_connections: DataConnection[];
 }
 
+export interface GetEventSetsResponse {
+    event_sets: EventSet[];
+}
+
 export interface GetDatasetsResponse {
     datasets: string[];
 }
@@ -295,6 +304,14 @@ export interface DataConnection {
     id: number;
     display_name: string;
     connection_type: DataConnectionType;
+}
+
+export interface EventSet {
+    id: number;
+    display_name: string;
+    connection_id: number;
+    dataset_name: string;
+    table_name: string;
 }
 
 export enum DataConnectionType {

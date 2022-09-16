@@ -120,6 +120,12 @@ var Routes = []Route{
 		HandlerFunc: handlers.GetDataConnections,
 	},
 	{
+		Name:        "Get all event sets",
+		Method:      "GET",
+		Pattern:     "/api/get_event_sets",
+		HandlerFunc: handlers.GetEventSets,
+	},
+	{
 		Name:        "Create answer",
 		Method:      "POST",
 		Pattern:     "/api/create_answer",

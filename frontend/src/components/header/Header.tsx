@@ -16,11 +16,11 @@ export const Header: React.FC = () => {
     case '/':
       page = 'Inbox';
       break;
-    case '/tasks':
-      page = 'My Tasks';
+    case '/newquery':
+      page = 'Custom Query';
       break;
-    case '/allquestions':
-      page = 'All Questions';
+    case '/workspacesettings':
+      page = 'Workspace Settings';
       break;
     default:
       page = '';

@@ -49,6 +49,7 @@
 .backButton {
     display: block;
     margin-bottom: 20px;
+    margin-top: -28px;
 }
 
 .credentialsInput {

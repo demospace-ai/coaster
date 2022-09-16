@@ -1,7 +1,6 @@
 
 import classNames from "classnames";
 import React, { FormEvent, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { rudderanalytics } from "src/app/rudder";
 import { BackButton, Button, FormButton } from "src/components/button/Button";
 import { ValidatedInput } from "src/components/input/Input";
@@ -11,28 +10,24 @@ import { CreateDataConnection, CreateDataConnectionRequest, DataConnectionType, 
 
 import styles from './newconnection.m.css';
 
-export const NewConnection: React.FC = () => {
+export const NewConnection: React.FC<{ onComplete: () => void; }> = props => {
   const [connectionType, setConnectionType] = useState<DataConnectionType | null>(null);
 
   return (
-    <div className={styles.newConnectionPage}>
-      <div className='tw-m-[160px_auto_auto] tw-shadow-centered tw-bg-white tw-w-[400px] tw-pt-8 tw-pb-10 tw-px-8 tw-rounded-lg'>
-        {connectionType ?
-          <NewConnectionConfiguration connectionType={connectionType} setConnectionType={setConnectionType} />
-          :
-          <>
-            <BackButton className={styles.backButton} />
-            <ConnectionTypeSelector setConnectionType={setConnectionType} />
-          </>
-        }
-      </div>
-    </div >
+    <div className='tw-w-[400px] tw-pb-10 tw-px-8'>
+      {connectionType ?
+        <NewConnectionConfiguration connectionType={connectionType} setConnectionType={setConnectionType} onComplete={props.onComplete} />
+        :
+        <ConnectionTypeSelector setConnectionType={setConnectionType} />
+      }
+    </div>
   );
 };
 
 type NewConnectionConfigurationProps = {
   connectionType: DataConnectionType;
   setConnectionType: (connectionType: DataConnectionType | null) => void;
+  onComplete: () => void;
 };
 
 type NewConnectionState = {
@@ -76,7 +71,6 @@ const NewConnectionConfiguration: React.FC<NewConnectionConfigurationProps> = pr
   const [state, setState] = useState<NewConnectionState>(INITIAL_CONNECTION_STATE);
   const [saveLoading, setSaveLoading] = useState(false);
   const [createConnectionSuccess, setCreateConnectionSuccess] = useState<boolean | null>(null);
-  const navigate = useNavigate();
 
   const createNewDataConnection = async (e: FormEvent) => {
     e.preventDefault();
@@ -125,7 +119,7 @@ const NewConnectionConfiguration: React.FC<NewConnectionConfigurationProps> = pr
     return (
       <div>
         <div className={styles.successMessage}>🎉 Congratulations! Your connection is set up. 🎉</div>
-        <Button className={styles.successButton} onClick={() => { navigate("/"); }}>Return Home</Button>
+        <Button className={styles.successButton} onClick={props.onComplete}>Return Home</Button>
       </div>
     );
   }
@@ -133,7 +127,7 @@ const NewConnectionConfiguration: React.FC<NewConnectionConfigurationProps> = pr
   return (
     <>
       <BackButton className={styles.backButton} onClick={() => props.setConnectionType(null)} />
-      <div className={styles.connectionSelectorTitle}>Enter your data warehouse configuration:</div>
+      <div className={styles.connectionSelectorTitle}>Enter your data source configuration:</div>
       <form onSubmit={createNewDataConnection}>
         {inputs}
         <TestConnectionButton state={state} connectionType={props.connectionType} />

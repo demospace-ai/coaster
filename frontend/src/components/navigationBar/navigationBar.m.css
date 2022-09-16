@@ -68,7 +68,6 @@
     align-items: center;
     padding-left: 10px;
     font-size: 14px;
-    font-weight: 500;
     box-shadow: rgb(0 0 0 / 7%) 0px 1px 1px;
     border: 1px solid #508368;
     cursor: pointer;
@@ -82,6 +81,7 @@
 .newQuestionText {
     margin-left: 5px;
     display: inline-block;
+    font-weight: 600;
 }
 
 .activeRouteContainer {

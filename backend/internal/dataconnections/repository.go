@@ -18,7 +18,7 @@ type ColumnSchema struct {
 	Type string `json:"type"`
 }
 
-func GetDataConnections(db *gorm.DB, organizationID int64) ([]models.DataConnection, error) {
+func LoadAllDataConnections(db *gorm.DB, organizationID int64) ([]models.DataConnection, error) {
 	var connections []models.DataConnection
 	result := db.Table("data_connections").
 		Select("data_connections.*").

@@ -1,7 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { rudderanalytics } from "src/app/rudder";
-import { BackButton, Button, FormButton } from "src/components/button/Button";
+import { Button, FormButton } from "src/components/button/Button";
 import { ValidatedComboInput, ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { ConnectionSelector, DatasetSelector, TableSelector } from "src/components/selector/Selector";
@@ -39,23 +38,20 @@ const validateAll = (state: NewEventSetState): boolean => {
     && state.userIdentifierColumn != null;
 };
 
-export const NewEventSet: React.FC = () => {
+export const NewEventSet: React.FC<{ onComplete: () => void; }> = props => {
   return (
-    <div className='tw-flex tw-flex-row tw-h-full'>
-      <div className='tw-m-[160px_auto_auto] tw-shadow-centered tw-bg-white tw-w-[400px] tw-pt-8 tw-pb-10 tw-px-8 tw-rounded-lg'>
-        <NewEventSetForm />
-      </div>
+    <div className='tw-w-[400px] tw-pb-10 tw-px-8'>
+      <NewEventSetForm onComplete={props.onComplete} />
     </div>
   );
 };
 
-export const NewEventSetForm: React.FC = () => {
+export const NewEventSetForm: React.FC<{ onComplete: () => void; }> = props => {
   const [loading, setLoading] = useState<boolean>(false);
   const [schemaLoading, setSchemaLoading] = useState<boolean>(false);
   const [schema, setSchema] = useState<Schema | null>(null);
   const [createEventSetSuccess, setCreateEventSetSuccess] = useState<boolean | null>(null);
   const [state, setState] = useState<NewEventSetState>(INITIAL_DATASET_STATE);
-  const navigate = useNavigate();
   useEffect(() => {
     if (!state.connection || !state.datasetId || !state.tableName) {
       return;
@@ -112,14 +108,13 @@ export const NewEventSetForm: React.FC = () => {
     return (
       <div>
         <div className='tw-mt-10 tw-text-center tw-font-bold'>🎉 Congratulations! Your event set is set up. 🎉</div>
-        <Button className='tw-block tw-mt-8 tw-mx-auto tw-mb-10' onClick={() => { navigate("/"); }}>Return Home</Button>
+        <Button className='tw-block tw-mt-8 tw-mx-auto tw-mb-10' onClick={props.onComplete}>Done</Button>
       </div>
     );
   }
 
   return (
     <>
-      <BackButton className='tw-mb-4 tw-block' />
       <div className="tw-w-full tw-text-center tw-mb-5 tw-font-bold tw-text-lg">New Event Dataset</div>
       <form onSubmit={createNewEventDataset}>
         <ValidatedInput id='eventSetName' value={state.eventSetName} setValue={(value) => { setState({ ...state, eventSetName: value }); }} placeholder='Event Set Display Name' />
