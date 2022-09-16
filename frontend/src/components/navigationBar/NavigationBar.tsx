@@ -103,14 +103,14 @@ const NewAnalysisButton: React.FC = () => (
       leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
       leaveTo="tw-transform tw-opacity-0 tw-scale-95"
     >
-      <Menu.Items className="tw-origin-top-left tw-absolute tw-top-10 tw-w-56 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none">
+      <Menu.Items className="tw-origin-top-left tw-absolute tw-top-10 tw-w-fit tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none">
         <div className="tw-py-1">
           <Menu.Item>
             {({ active }) => (
               <NavLink
                 className={classNames(
                   active ? 'tw-bg-gray-100 tw-text-gray-900' : 'tw-text-gray-700',
-                  'tw-flex tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none tw-w-full'
+                  'tw-flex tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none tw-w-full tw-whitespace-nowrap'
                 )}
                 to="/"
               >
@@ -126,14 +126,14 @@ const NewAnalysisButton: React.FC = () => (
               <NavLink
                 className={classNames(
                   active ? 'tw-bg-gray-100 tw-text-gray-900' : 'tw-text-gray-700',
-                  'tw-flex tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none tw-w-full'
+                  'tw-flex tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none tw-w-full tw-whitespace-nowrap'
                 )}
                 to="/"
               >
                 <div className="tw-flex tw-flex-col tw-justify-center">
                   <PresentationChartLineIcon className="tw-inline-block tw-h-4 tw-mr-2" />
                 </div>
-                Trend Report
+                Trend Report (Coming Soon!)
               </NavLink>
             )}
           </Menu.Item>
@@ -142,7 +142,7 @@ const NewAnalysisButton: React.FC = () => (
               <NavLink
                 className={classNames(
                   active ? 'tw-bg-gray-100 tw-text-gray-900' : 'tw-text-gray-700',
-                  'tw-flex tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none tw-w-full'
+                  'tw-flex tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none tw-w-full tw-whitespace-nowrap'
                 )}
                 to="/newquery"
               >
