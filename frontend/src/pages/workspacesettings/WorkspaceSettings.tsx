@@ -103,7 +103,7 @@ const DataSourceSettings: React.FC<{ triggerModal: (modalType: ModalType) => voi
                     {dataConnection.connection_type}
                   </td>
                 </tr>
-              )) : <tr><td className={tableCellStyle}>No event sets configured yet!</td></tr>}
+              )) : <tr><td className={tableCellStyle}>No data sources configured yet!</td></tr>}
             </tbody>
           </table>
         }
