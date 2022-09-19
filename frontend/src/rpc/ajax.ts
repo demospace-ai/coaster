@@ -26,6 +26,7 @@ export async function sendRequest<RequestType extends object, ResponseType>(
 
     if (!response.ok) {
         console.log(response);
+        response.text().then(text => console.log(text));
         throw new Error(response.statusText);
     }
 
