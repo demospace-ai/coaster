@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import React from "react";
 import { Loading } from "src/components/loading/Loading";
 import { QueryResults, Schema } from "src/rpc/api";
@@ -23,14 +24,15 @@ const QueryResultsTable: React.FC<QueryResultsProps> = props => {
           <tbody className="tw-py-2">
             {
               props.results.map((resultRow, index) => {
+                const lastRow = index === props.results!.length - 1;
                 return (
-                  <tr key={index} className="even:tw-bg-gray-100 odd:tw-bg-white">
+                  <tr key={index} className={classNames("even:tw-bg-gray-100 odd:tw-bg-white", lastRow && "tw-border-gray-300 tw-border-solid tw-border-b")}>
                     <td key={-1} className="tw-px-3 tw-py-2 tw-text-right tw-bg-gray-100 tw-border-gray-300 tw-border-solid tw-border-r tw-border-b-0 tw-tabular-nums">
                       <div className="tw-h-5 tw-whitespace-nowrap">{index + 1}</div>
                     </td>
                     {resultRow.map((resultValue, valueIndex) => {
                       return (
-                        <td key={valueIndex} className="tw-pl-3 tw-pr-5 tw-py-2 tw-text-left tw-border-gray-300 tw-border-solid tw-border-r tw-border-t last:tw-w-full focus:tw-bg-blue-300">
+                        <td key={valueIndex} className={classNames("tw-pl-3 tw-pr-5 tw-py-2 tw-text-left tw-border-gray-300 tw-border-solid tw-border-r last:tw-border-r-0 last:tw-w-full focus:tw-bg-blue-300", !lastRow && "tw-border-b")}>
                           <div className="tw-h-5 tw-whitespace-nowrap">{resultValue}</div>
                         </td>
                       );
@@ -50,13 +52,13 @@ const QueryResultsTable: React.FC<QueryResultsProps> = props => {
 
 const ResultsSchema: React.FC<{ schema: Schema; }> = ({ schema }) => {
   return (
-    <thead className="tw-sticky">
+    <thead className="tw-sticky tw-top-0 tw-shadow-[0_0px_0.5px_1px] tw-shadow-gray-300">
       <tr>
-        <th key={-1} scope="col" className="tw-pl-3 tw-pr-5 tw-py-2 tw-bg-gray-100 tw-border-gray-300 tw-border-solid tw-border-r tw-border-b"></th>
+        <th key={-1} scope="col" className="tw-pl-3 tw-pr-5 tw-py-2 tw-bg-gray-100 tw-border-gray-300 tw-border-solid tw-border-r"></th>
         {
           schema.map((columnSchema, index) => {
             return (
-              <th key={index} scope="col" className="tw-pl-3 tw-pr-5 tw-py-2 tw-text-left tw-bg-gray-100 tw-border-gray-300 tw-border-solid tw-border-r">
+              <th key={index} scope="col" className="tw-pl-3 tw-pr-5 tw-py-2 tw-text-left tw-bg-gray-100 tw-border-gray-300 tw-border-solid tw-border-r last:tw-border-r-0">
                 <div className="tw-h-5 tw-whitespace-nowrap">{columnSchema.name}</div>
               </th>
             );
