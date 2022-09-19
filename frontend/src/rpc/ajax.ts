@@ -25,6 +25,7 @@ export async function sendRequest<RequestType extends object, ResponseType>(
     const response = await fetch(url, options);
 
     if (!response.ok) {
+        console.log(response);
         throw new Error(response.statusText);
     }
 
