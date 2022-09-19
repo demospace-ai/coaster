@@ -25,11 +25,10 @@ export async function sendRequest<RequestType extends object, ResponseType>(
     const response = await fetch(url, options);
 
     if (!response.ok) {
-        console.log(response);
-        response.text().then(text => console.log(text));
-        throw new Error(response.statusText);
+        const errorMessage = response.statusText ? response.statusText : await response.text();
+        throw new Error(errorMessage);
     }
 
     // not all AJAX requests have a response. the ones that do will be formatted as JSON
-    return response.json().catch(() => { });
+    return response.json().catch(e => { throw e; });
 }

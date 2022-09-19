@@ -174,6 +174,8 @@ export interface RunQueryRequest {
 }
 
 export interface RunQueryResponse {
+    success: boolean;
+    error_message: string;
     schema: Schema;
     query_results: QueryResults;
 }

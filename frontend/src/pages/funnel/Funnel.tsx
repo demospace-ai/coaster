@@ -62,9 +62,13 @@ export const Funnel: React.FC = () => {
     }
 
     try {
-      const results = await runFunnelQuery(connection.id, eventSet, events);
-      setSchema(results.schema);
-      setQueryResults(results.query_results);
+      const response = await runFunnelQuery(connection.id, eventSet, events);
+      if (response.success) {
+        setSchema(response.schema);
+        setQueryResults(response.query_results);
+      } else {
+        setErrorMessage(response.error_message);
+      }
     } catch (e) {
       setErrorMessage((e as Error).message);
     }

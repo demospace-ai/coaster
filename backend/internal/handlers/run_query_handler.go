@@ -19,7 +19,17 @@ type RunQueryRequest struct {
 	QueryString  string `json:"query_string"`
 }
 
+type QueryError struct {
+	err error
+}
+
+func (e QueryError) Error() string {
+	return e.err.Error()
+}
+
 type RunQueryResponse struct {
+	Success      bool                   `json:"success"`
+	ErrorMessage string                 `json:"error_message"`
 	Schema       dataconnections.Schema `json:"schema"`
 	QueryResults []interface{}          `json:"query_results"`
 }
@@ -49,10 +59,19 @@ func RunQuery(env Env, w http.ResponseWriter, r *http.Request) error {
 
 	schema, queryResults, err := runQuery(*dataConnection, runQueryRequest.QueryString)
 	if err != nil {
-		return err
+		if _, ok := err.(QueryError); ok {
+			// Not actually a failure, the user's query was just wrong. Send the details back to them.
+			return json.NewEncoder(w).Encode(RunQueryResponse{
+				Success:      false,
+				ErrorMessage: err.Error(),
+			})
+		} else {
+			return err
+		}
 	}
 
 	return json.NewEncoder(w).Encode(RunQueryResponse{
+		Success:      true,
 		Schema:       schema,
 		QueryResults: queryResults,
 	})
@@ -100,10 +119,10 @@ func runBigQueryQuery(dataConnection models.DataConnection, queryString string) 
 	}
 	status, err := job.Wait(ctx)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, QueryError{err}
 	}
 	if err := status.Err(); err != nil {
-		return nil, nil, err
+		return nil, nil, QueryError{err}
 	}
 
 	var results []interface{}

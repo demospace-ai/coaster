@@ -69,12 +69,16 @@ export const CustomQuery: React.FC = () => {
       rudderanalytics.track("run_query.start");
       const response = await sendRequest(RunQuery, payload);
       rudderanalytics.track("run_query.success");
-      setSchema(response.schema);
-      setQueryResults(response.query_results);
+
+      if (response.success) {
+        setSchema(response.schema);
+        setQueryResults(response.query_results);
+      } else {
+        setErrorMessage(response.error_message);
+      }
     } catch (e) {
-      console.log(JSON.stringify(e, Object.getOwnPropertyNames(e)));
       rudderanalytics.track("run_query.error");
-      setErrorMessage(JSON.stringify(e, Object.getOwnPropertyNames(e)));
+      setErrorMessage((e as Error).message);
       setSchema(null);
       setQueryResults(null);
     }
@@ -83,8 +87,8 @@ export const CustomQuery: React.FC = () => {
   };
 
   if (shouldRun) {
-    runQuery();
     setShouldRun(false);
+    runQuery();
   }
 
   monaco.editor.defineTheme("fabra", {
