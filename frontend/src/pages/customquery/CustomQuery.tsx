@@ -150,10 +150,12 @@ export const CustomQuery: React.FC = () => {
                 </Tooltip>
               </div>
               <div className="tw-mb-5 tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden tw-border-gray-300 tw-border-solid tw-border tw-bg-gray-100">
-                <MemoizedResultsTable loading={loading} schema={schema} results={queryResults} />
                 {errorMessage &&
-                  <div className="tw-m-5 tw-text-red-600 tw-font-bold">{errorMessage}</div>
+                  <div className="tw-p-5 tw-text-red-600 tw-font-bold tw-border-gray-300 tw-border-solid tw-border-b">
+                    Error: {errorMessage}
+                  </div>
                 }
+                <MemoizedResultsTable loading={loading} schema={schema} results={queryResults} />
               </div>
             </div>
           </div>

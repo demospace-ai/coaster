@@ -17,7 +17,7 @@ const QueryResultsTable: React.FC<QueryResultsProps> = props => {
 
   if (props.schema && props.results) {
     return (
-      <div className="tw-overflow-auto tw-overscroll-contain tw-max-h-full tw-border-gray-300 tw-border-solid tw-border-b">
+      <div className="tw-overflow-auto tw-overscroll-contain tw-max-h-full">
         <table className="tw-text-xs">
           <ResultsSchema schema={props.schema} />
           <tbody className="tw-py-2">

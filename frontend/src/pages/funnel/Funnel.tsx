@@ -110,10 +110,12 @@ export const Funnel: React.FC = () => {
           </div>
           <div id="bottom-panel" className='tw-flex tw-flex-col tw-flex-1'>
             <div className="tw-mb-5 tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden">
-              <MemoizedResultsTable loading={loading} schema={schema} results={queryResults} placeholder="Choose two or more steps to see results!" />
               {errorMessage &&
-                <div className="tw-m-5 tw-text-red-600 tw-font-bold">{errorMessage}</div>
+                <div className="tw-p-5 tw-text-red-600 tw-font-bold tw-border-gray-300 tw-border-solid tw-border-b">
+                  Error: {errorMessage}
+                </div>
               }
+              <MemoizedResultsTable loading={loading} schema={schema} results={queryResults} placeholder="Choose two or more steps to see results!" />
             </div>
           </div>
         </div>
