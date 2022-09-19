@@ -24,11 +24,11 @@ type BigQueryCredentials struct {
 
 type DataConnection struct {
 	OrganizationID int64
-	DisplayName    string             `json:"display_name"`
-	ConnectionType DataConnectionType `json:"connection_type"`
-	Username       database.NullString
-	Password       database.NullString
-	Credentials    database.NullString
+	DisplayName    string              `json:"display_name"`
+	ConnectionType DataConnectionType  `json:"connection_type"`
+	Username       database.NullString `json:"-"`
+	Password       database.NullString `json:"-"`
+	Credentials    database.NullString `json:"-"`
 	WarehouseName  database.NullString
 	DatabaseName   database.NullString
 	Role           database.NullString
