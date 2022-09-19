@@ -52,6 +52,7 @@ export const WorkspaceSettings: React.FC = () => {
 const DataSourceSettings: React.FC<{ triggerModal: (modalType: ModalType) => void; setConnectionMap: (map: Map<number, DataConnection>) => void; }> = ({ triggerModal, setConnectionMap }) => {
   const [dataConnections, setDataConnections] = useState<DataConnection[] | null>(null);
   const [dataConnectionsLoading, setDataConnectionsLoading] = useState<boolean>(true);
+  // TODO: reload on new data source added
   useEffect(() => {
     let ignore = false;
     sendRequest(GetDataConnections).then((results) => {
@@ -115,6 +116,7 @@ const DataSourceSettings: React.FC<{ triggerModal: (modalType: ModalType) => voi
 const EventSetSettings: React.FC<{ triggerModal: (modalType: ModalType) => void, connectionMap: Map<number, DataConnection> | null; }> = props => {
   const [eventSets, setEventSets] = useState<EventSet[] | null>(null);
   const [eventSetsLoading, setEventSetsLoading] = useState<boolean>(true);
+  // TODO: reload on new event set added
   useEffect(() => {
     let ignore = false;
 

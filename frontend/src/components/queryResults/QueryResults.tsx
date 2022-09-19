@@ -26,7 +26,7 @@ const QueryResultsTable: React.FC<QueryResultsProps> = props => {
                 return (
                   <tr key={index} className="even:tw-bg-gray-100 odd:tw-bg-white">
                     <td key={-1} className="tw-px-3 tw-py-2 tw-text-right tw-bg-gray-100 tw-border-gray-300 tw-border-solid tw-border-r tw-border-b-0 tw-tabular-nums">
-                      {index + 1}
+                      <div className="tw-h-5 tw-whitespace-nowrap">{index + 1}</div>
                     </td>
                     {resultRow.map((resultValue, valueIndex) => {
                       return (

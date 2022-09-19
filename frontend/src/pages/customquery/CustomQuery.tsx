@@ -72,9 +72,9 @@ export const CustomQuery: React.FC = () => {
       setSchema(response.schema);
       setQueryResults(response.query_results);
     } catch (e) {
-      console.log(e);
+      console.log(JSON.stringify(e, Object.getOwnPropertyNames(e)));
       rudderanalytics.track("run_query.error");
-      setErrorMessage((e as Error).message);
+      setErrorMessage(JSON.stringify(e, Object.getOwnPropertyNames(e)));
       setSchema(null);
       setQueryResults(null);
     }
