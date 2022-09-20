@@ -7,7 +7,7 @@ import { Loading } from "src/components/loading/Loading";
 type ValidatedInputProps = {
   id: string;
   placeholder?: string;
-  value: string;
+  value: string | null;
   setValue: (value: string) => void;
   className?: string;
   textarea?: boolean;
@@ -27,8 +27,8 @@ export const ValidatedInput: React.FC<ValidatedInputProps> = props => {
     }
   };
 
-  const validateNotEmpty = (value: string): boolean => {
-    const valid = value.length > 0;
+  const validateNotEmpty = (value: string | null): boolean => {
+    const valid = value != null && value.length > 0;
     setIsValid(valid);
     return valid;
   };
@@ -46,7 +46,7 @@ export const ValidatedInput: React.FC<ValidatedInputProps> = props => {
           onFocus={() => setIsValid(true)}
           onChange={e => props.setValue(e.target.value)}
           onBlur={() => validateNotEmpty(props.value)}
-          value={props.value}
+          value={props.value ? props.value : ""}
         />
         :
         <input
@@ -60,7 +60,7 @@ export const ValidatedInput: React.FC<ValidatedInputProps> = props => {
           onFocus={() => setIsValid(true)}
           onChange={e => props.setValue(e.target.value)}
           onBlur={() => validateNotEmpty(props.value)}
-          value={props.value}
+          value={props.value ? props.value : ""}
         />
       }
     </>
@@ -189,6 +189,7 @@ type ValidatedComboInputProps = {
   noOptionsString: string;
   className?: string;
   validated?: boolean;
+  allowCustom?: boolean;
 };
 
 export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => {
@@ -252,7 +253,7 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
       >
         <div>
           <Combobox.Options className="tw-absolute tw-z-10 tw-mt-1 tw-max-h-60 tw-w-full tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm">
-            <ComboOptions loading={props.loading} options={filteredOptions} noOptionsString={props.noOptionsString} getDisplayName={getDisplayName} />
+            <ComboOptions loading={props.loading} options={filteredOptions} noOptionsString={props.noOptionsString} getDisplayName={getDisplayName} query={query} allowCustom={props.allowCustom} />
           </Combobox.Options>
         </div>
       </Transition>
@@ -265,6 +266,8 @@ type ComboOptionsProps = {
   options: any[] | undefined,
   noOptionsString: string,
   getDisplayName: (value: any) => string,
+  query: string,
+  allowCustom?: boolean,
 };
 
 const ComboOptions: React.FC<ComboOptionsProps> = props => {
@@ -279,6 +282,14 @@ const ComboOptions: React.FC<ComboOptionsProps> = props => {
   if (props.options && props.options.length > 0) {
     return (
       <>
+        {props.allowCustom && props.query.length > 0 && (
+          <Combobox.Option value={{ id: null, name: props.query }} className={({ active, selected }) =>
+            `tw-relative tw-cursor-pointer tw-select-none tw-py-2 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-green-100 tw-text-green-900' : 'tw-text-gray-900'
+            }`
+          }>
+            Custom: "{props.query}"
+          </Combobox.Option>
+        )}
         {props.options!.map((option: any, index: number) => (
           <Combobox.Option key={index} value={option} className={({ active, selected }) =>
             `tw-relative tw-cursor-pointer tw-select-none tw-py-2 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-green-100 tw-text-green-900' : 'tw-text-gray-900'
@@ -306,7 +317,20 @@ const ComboOptions: React.FC<ComboOptionsProps> = props => {
     );
   } else {
     return (
-      <div className="tw-p-2 tw-pl-4 tw-select-none">{props.noOptionsString}</div>
+      <>
+        {props.allowCustom ?
+          props.allowCustom && props.query.length > 0 && (
+            <Combobox.Option value={{ id: null, name: props.query }} className={({ active, selected }) =>
+              `tw-relative tw-cursor-pointer tw-select-none tw-py-2 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-green-100 tw-text-green-900' : 'tw-text-gray-900'
+              }`
+            }>
+              Custom: "{props.query}"
+            </Combobox.Option>
+          )
+          :
+          <div className="tw-p-2 tw-pl-4 tw-select-none">{props.noOptionsString}</div>
+        }
+      </>
     );
   }
 };

@@ -28,12 +28,13 @@ export const getEvents = async (connectionID: number, eventSet: EventSet): Promi
   }
 };
 
-const createStepSubquery = (eventSet: EventSet, event: string, order: number, previous?: string): string => {
+const createStepSubquery = (eventSet: EventSet, event: string, order: number, previous?: string, joinedTable?: boolean): string => {
   const tableName = `${event}_${order}`;
+  const sourceTable = joinedTable ? "joined_events" : `${eventSet.dataset_name}.${eventSet.table_name}`;
   const queryArray = `
-    ${!previous ? "WITH " : ""}${tableName} AS (
+    ${tableName} AS (
       SELECT DISTINCT ${tableName}.${eventSet.user_identifier_column}, ${tableName}.${eventSet.timestamp_column}
-      FROM ${eventSet.dataset_name}.${eventSet.table_name} AS ${tableName}
+      FROM ${sourceTable} AS ${tableName}
       ${previous ? `JOIN ${previous} ON ${previous}.${eventSet.user_identifier_column} = ${tableName}.${eventSet.user_identifier_column}` : ``}
       WHERE ${tableName}.${eventSet.event_type_column} = '${event}'
       ${previous ? `AND ${previous}.${eventSet.timestamp_column} < ${tableName}.${eventSet.timestamp_column}` : ``}
@@ -57,12 +58,22 @@ const createResultsSubquery = (eventSet: EventSet, events: string[]): string => 
 };
 
 export const runFunnelQuery = async (connectionID: number, eventSet: EventSet, events: string[]): Promise<RunQueryResponse> => {
+  let joinedTable: string | undefined = undefined;
+  if (eventSet.custom_join) {
+    joinedTable = `
+    joined_events AS (
+      ${eventSet.custom_join}
+    ),
+    `;
+  }
+
   const stepSubqueryArray = events.map((event, index) => {
-    return createStepSubquery(eventSet, event, index, index === 0 ? undefined : `${events[index - 1]}_${index - 1}`);
+    return createStepSubquery(eventSet, event, index, index === 0 ? undefined : `${events[index - 1]}_${index - 1}`, joinedTable !== undefined);
   });
   const stepSubqueryString = stepSubqueryArray.join(", ");
 
   const query = `
+    WITH ${joinedTable ? joinedTable : ``}
     ${stepSubqueryString},
     ${createResultsSubquery(eventSet, events)}
     SELECT count, event, (count / (SELECT MAX(count) FROM results)) as percent from results ORDER BY results.event_order

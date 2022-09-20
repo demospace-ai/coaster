@@ -143,6 +143,7 @@ export interface CreateEventSetRequest {
     event_type_column: string;
     timestamp_column: string;
     user_identifier_column: string;
+    custom_join?: string;
 }
 
 export type JSONValue =
@@ -317,6 +318,7 @@ export interface EventSet {
     event_type_column: string;
     timestamp_column: string;
     user_identifier_column: string;
+    custom_join: string | undefined;
 }
 
 export enum DataConnectionType {

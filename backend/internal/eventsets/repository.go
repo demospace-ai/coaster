@@ -1,6 +1,7 @@
 package eventsets
 
 import (
+	"fabra/internal/database"
 	"fabra/internal/models"
 
 	"gorm.io/gorm"
@@ -16,6 +17,7 @@ func CreateEventSet(
 	eventTypeColumn string,
 	timestampColumn string,
 	userIdentifierColumn string,
+	customJoin *string,
 ) (*models.EventSet, error) {
 
 	eventSet := models.EventSet{
@@ -27,6 +29,10 @@ func CreateEventSet(
 		EventTypeColumn:      eventTypeColumn,
 		TimestampColumn:      timestampColumn,
 		UserIdentifierColumn: userIdentifierColumn,
+	}
+
+	if customJoin != nil {
+		eventSet.CustomJoin = database.NewNullString(*customJoin)
 	}
 
 	result := db.Create(&eventSet)

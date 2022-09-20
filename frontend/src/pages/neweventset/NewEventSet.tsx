@@ -9,27 +9,29 @@ import { ColumnSchema, CreateEventSet, CreateEventSetRequest, DataConnection, Ge
 
 
 type NewEventSetState = {
-  eventSetName: string;
+  eventSetName: string | null;
   connection: DataConnection | null;
   datasetId: string | null;
   tableName: string | null;
   eventTypeColumn: ColumnSchema | null;
   timeColumn: ColumnSchema | null;
   userIdentifierColumn: ColumnSchema | null;
+  customJoin: string | null;
 };
 
 const INITIAL_DATASET_STATE: NewEventSetState = {
-  eventSetName: "",
+  eventSetName: null,
   connection: null,
   datasetId: null,
   tableName: null,
   eventTypeColumn: null,
   timeColumn: null,
   userIdentifierColumn: null,
+  customJoin: null,
 };
 
 const validateAll = (state: NewEventSetState): boolean => {
-  return state.eventSetName.length > 0
+  return state.eventSetName != null && state.eventSetName.length > 0
     && state.connection != null
     && state.datasetId != null && state.datasetId.length > 0
     && state.tableName != null && state.tableName.length > 0
@@ -82,7 +84,7 @@ export const NewEventSetForm: React.FC<{ onComplete: () => void; }> = props => {
     }
 
     const payload: CreateEventSetRequest = {
-      'display_name': state.eventSetName,
+      'display_name': state.eventSetName!,
       'connection_id': state.connection!.id,
       'dataset_name': state.datasetId!,
       'table_name': state.tableName!,
@@ -90,6 +92,10 @@ export const NewEventSetForm: React.FC<{ onComplete: () => void; }> = props => {
       'timestamp_column': state.timeColumn!.name,
       'user_identifier_column': state.userIdentifierColumn!.name,
     };
+
+    if (state.customJoin != null) {
+      payload.custom_join = state.customJoin;
+    }
 
     try {
       rudderanalytics.track("create_event_set.start");
@@ -184,6 +190,15 @@ export const NewEventSetForm: React.FC<{ onComplete: () => void; }> = props => {
           noOptionsString="No Columns Available! (Choose a table)"
           loading={schemaLoading}
           validated={true}
+          allowCustom={true}
+        />
+        <ValidatedInput
+          className="tw-my-2"
+          id='custom-join'
+          value={state.customJoin}
+          setValue={(value) => { setState({ ...state, customJoin: value }); }}
+          placeholder='Custom Join (Optional)'
+          textarea={true}
         />
         <FormButton className='tw-mt-5 tw-w-full tw-h-10'>{loading ? <Loading /> : "Save"}</FormButton>
       </form>
