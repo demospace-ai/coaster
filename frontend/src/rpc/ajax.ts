@@ -4,14 +4,23 @@ import { IEndpoint } from 'src/rpc/api';
 const IS_PROD = process.env.NODE_ENV === 'production';
 const ROOT_DOMAIN = IS_PROD ? 'https://app.fabra.io/api' : 'http://localhost:8080/api';
 
-export async function sendRequest<RequestType extends object, ResponseType>(
+export async function sendRequest<RequestType extends Record<string, any>, ResponseType>(
     endpoint: IEndpoint<RequestType, ResponseType>,
     payload?: RequestType,
 ): Promise<ResponseType> {
     const toPath = compile(endpoint.path);
     const path = toPath(payload);
 
-    const url = ROOT_DOMAIN + path;
+    const url = new URL(ROOT_DOMAIN + path);
+    if (endpoint.queryParams && payload) {
+        endpoint.queryParams.forEach(queryParam => {
+            const queryParamValue = payload[queryParam];
+            if (queryParamValue) {
+                url.searchParams.append(queryParam, queryParamValue);
+            }
+        });
+    }
+
     let options: RequestInit = {
         method: endpoint.method,
         headers: new Headers({ 'Content-Type': 'application/json' }),

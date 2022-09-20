@@ -12,15 +12,27 @@ import styles from './newconnection.m.css';
 
 export const NewConnection: React.FC<{ onComplete: () => void; }> = props => {
   const [connectionType, setConnectionType] = useState<DataConnectionType | null>(null);
+  const onBack = () => {
+    if (connectionType) {
+      setConnectionType(null);
+    } else {
+      props.onComplete();
+    }
+  };
 
   return (
-    <div className='tw-w-[400px] tw-pb-10 tw-px-8'>
-      {connectionType ?
-        <NewConnectionConfiguration connectionType={connectionType} setConnectionType={setConnectionType} onComplete={props.onComplete} />
-        :
-        <ConnectionTypeSelector setConnectionType={setConnectionType} />
-      }
-    </div>
+    <>
+      <BackButton className="tw-m-10" onClick={onBack} />
+      <div className="tw-flex tw-justify-center tw-h-full">
+        <div className='tw-w-[400px] tw-pb-10 tw-px-8 tw-mx-auto tw-mt-24'>
+          {connectionType ?
+            <NewConnectionConfiguration connectionType={connectionType} setConnectionType={setConnectionType} onComplete={props.onComplete} />
+            :
+            <ConnectionTypeSelector setConnectionType={setConnectionType} />
+          }
+        </div>
+      </div>
+    </>
   );
 };
 
@@ -117,16 +129,15 @@ const NewConnectionConfiguration: React.FC<NewConnectionConfigurationProps> = pr
 
   if (createConnectionSuccess) {
     return (
-      <div>
-        <div className={styles.successMessage}>🎉 Congratulations! Your connection is set up. 🎉</div>
-        <Button className={styles.successButton} onClick={props.onComplete}>Return Home</Button>
+      <div className="tw-w-[200%] tw-translate-x-[-25%]">
+        <div className='tw-mt-10 tw-text-center tw-font-bold tw-text-lg'>🎉 Congratulations! Your event set is set up. 🎉</div>
+        <Button className='tw-block tw-mt-8 tw-mx-auto tw-mb-10 tw-w-32' onClick={props.onComplete}>Done</Button>
       </div>
     );
   }
 
   return (
     <>
-      <BackButton className={styles.backButton} onClick={() => props.setConnectionType(null)} />
       <div className={styles.connectionSelectorTitle}>Enter your data source configuration:</div>
       <form onSubmit={createNewDataConnection}>
         {inputs}

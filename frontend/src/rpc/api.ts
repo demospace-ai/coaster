@@ -3,6 +3,7 @@
 export interface IEndpoint<RequestType, ResponseType> {
     method: 'GET' | 'POST' | 'DELETE' | 'PUT';
     path: string;
+    queryParams?: string[]; // These will be used as query params instead of being used as path params
 }
 
 export const Login: IEndpoint<LoginRequest, LoginResponse> = {
@@ -32,17 +33,20 @@ export const GetEventSets: IEndpoint<undefined, GetEventSetsResponse> = {
 
 export const GetDatasets: IEndpoint<{ connectionID: number; }, GetDatasetsResponse> = {
     method: 'GET',
-    path: '/get_datasets\\?connectionID=:connectionID',
+    path: '/get_datasets',
+    queryParams: ['connectionID']
 };
 
 export const GetTables: IEndpoint<{ connectionID: number, datasetID: string; }, GetTablesResponse> = {
     method: 'GET',
-    path: '/get_tables\\?connectionID=:connectionID&datasetID=:datasetID',
+    path: '/get_tables',
+    queryParams: ['connectionID', 'datasetID'],
 };
 
-export const GetSchema: IEndpoint<{ connectionID: number, datasetID: string; tableName: string; }, GetSchemaResponse> = {
+export const GetSchema: IEndpoint<GetSchemaRequest, GetSchemaResponse> = {
     method: 'GET',
-    path: '/get_schema\\?connectionID=:connectionID&datasetID=:datasetID&tableName=:tableName',
+    path: '/get_schema',
+    queryParams: ['connectionID', 'datasetID', 'tableName', 'customJoin'],
 };
 
 export const GetAssignedQuestions: IEndpoint<undefined, GetAssignedQuestionsResponse> = {
@@ -235,6 +239,13 @@ export interface GetDatasetsResponse {
 
 export interface GetTablesResponse {
     tables: string[];
+}
+
+export interface GetSchemaRequest {
+    connectionID: number,
+    datasetID?: string,
+    tableName?: string,
+    customJoin?: string,
 }
 
 export interface GetSchemaResponse {
