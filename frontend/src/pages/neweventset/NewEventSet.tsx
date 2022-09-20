@@ -193,7 +193,7 @@ export const NewEventSetForm: React.FC<{ onComplete: () => void; }> = props => {
           allowCustom={true}
         />
         <ValidatedInput
-          className="tw-my-2"
+          className="tw-mt-0 tw-mb-2"
           id='custom-join'
           value={state.customJoin}
           setValue={(value) => { setState({ ...state, customJoin: value }); }}
