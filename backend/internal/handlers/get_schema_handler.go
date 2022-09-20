@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"cloud.google.com/go/bigquery"
 	"google.golang.org/api/option"
@@ -39,13 +40,10 @@ func GetSchema(env Env, w http.ResponseWriter, r *http.Request) error {
 	}
 
 	datasetID := r.URL.Query().Get("datasetID")
-	if len(datasetID) == 0 {
-		return fmt.Errorf("missing dataset ID from GetSchema request URL: %s", r.URL.RequestURI())
-	}
-
 	tableName := r.URL.Query().Get("tableName")
-	if len(tableName) == 0 {
-		return fmt.Errorf("missing table name from GetSchema request URL: %s", r.URL.RequestURI())
+	customJoin := r.URL.Query().Get("customJoin")
+	if (len(datasetID) == 0 || len(tableName) == 0) && len(customJoin) == 0 {
+		return fmt.Errorf("must provide both dataset name and table name or custom join in GetSchema request: %s", r.URL.RequestURI())
 	}
 
 	// TODO: write test to make sure only authorized users can use the data connection
@@ -54,9 +52,17 @@ func GetSchema(env Env, w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	schema, err := getSchema(*dataConnection, datasetID, tableName)
-	if err != nil {
-		return err
+	var schema *dataconnections.Schema
+	if len(customJoin) > 0 {
+		schema, err = getSchemaForCustomJoin(*dataConnection, customJoin)
+		if err != nil {
+			return err
+		}
+	} else {
+		schema, err = getSchemaForTable(*dataConnection, datasetID, tableName)
+		if err != nil {
+			return err
+		}
 	}
 
 	return json.NewEncoder(w).Encode(GetSchemaResponse{
@@ -64,18 +70,82 @@ func GetSchema(env Env, w http.ResponseWriter, r *http.Request) error {
 	})
 }
 
-func getSchema(dataConnection models.DataConnection, datasetID string, tableName string) (*dataconnections.Schema, error) {
+func getSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (*dataconnections.Schema, error) {
 	switch dataConnection.ConnectionType {
 	case models.DataConnectionTypeBigQuery:
-		return getBigQuerySchema(dataConnection, datasetID, tableName)
+		return getBigQuerySchemaForTable(dataConnection, datasetID, tableName)
 	case models.DataConnectionTypeSnowflake:
-		return getSnowflakeSchema(dataConnection, datasetID, tableName)
+		return getSnowflakeSchemaForTable(dataConnection, datasetID, tableName)
 	default:
 		return nil, errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", dataConnection.ConnectionType))
 	}
 }
 
-func getBigQuerySchema(dataConnection models.DataConnection, datasetID string, tableName string) (*dataconnections.Schema, error) {
+func getSchemaForCustomJoin(dataConnection models.DataConnection, customJoin string) (*dataconnections.Schema, error) {
+	switch dataConnection.ConnectionType {
+	case models.DataConnectionTypeBigQuery:
+		return getBigQuerySchemaForCustom(dataConnection, customJoin)
+	case models.DataConnectionTypeSnowflake:
+		return getSnowflakeSchemaForCustom(dataConnection, customJoin)
+	default:
+		return nil, errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", dataConnection.ConnectionType))
+	}
+}
+
+func getBigQuerySchemaForCustom(dataConnection models.DataConnection, customJoin string) (*dataconnections.Schema, error) {
+	bigQueryCredentialsString, err := dataconnections.DecryptBigQueryCredentials(dataConnection)
+	if err != nil {
+		return nil, err
+	}
+
+	var bigQueryCredentials models.BigQueryCredentials
+	err = json.Unmarshal([]byte(*bigQueryCredentialsString), &bigQueryCredentials)
+	if err != nil {
+		return nil, err
+	}
+
+	credentialOption := option.WithCredentialsJSON([]byte(*bigQueryCredentialsString))
+
+	ctx := context.Background()
+	client, err := bigquery.NewClient(ctx, bigQueryCredentials.ProjectID, credentialOption)
+	if err != nil {
+		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
+	}
+
+	defer client.Close()
+
+	// Make sure there is no trailing semicolon, and limit to 1 since we only care about the schema
+	queryString := customJoin
+	queryString = strings.TrimRight(queryString, ";")
+	queryString = queryString + " LIMIT 1"
+
+	q := client.Query(queryString)
+	// Location must match that of the dataset(s) referenced in the query.
+	q.Location = "US"
+	// Run the query and print results when the query job is completed.
+	job, err := q.Run(ctx)
+	if err != nil {
+		return nil, err
+	}
+	status, err := job.Wait(ctx)
+	if err != nil {
+		return nil, QueryError{err}
+	}
+	if err := status.Err(); err != nil {
+		return nil, QueryError{err}
+	}
+
+	it, err := job.Read(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	schema := dataconnections.ConvertBigQuerySchema(it.Schema)
+
+	return &schema, nil
+}
+
+func getBigQuerySchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (*dataconnections.Schema, error) {
 	bigQueryCredentialsString, err := dataconnections.DecryptBigQueryCredentials(dataConnection)
 	if err != nil {
 		return nil, err
@@ -107,7 +177,12 @@ func getBigQuerySchema(dataConnection models.DataConnection, datasetID string, t
 	return &schema, nil
 }
 
-func getSnowflakeSchema(dataConnection models.DataConnection, datasetID string, tableName string) (*dataconnections.Schema, error) {
+func getSnowflakeSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (*dataconnections.Schema, error) {
+	// TODO: implement
+	return nil, errors.NewBadRequest("snowflake not supported")
+}
+
+func getSnowflakeSchemaForCustom(dataConnection models.DataConnection, customJoin string) (*dataconnections.Schema, error) {
 	// TODO: implement
 	return nil, errors.NewBadRequest("snowflake not supported")
 }

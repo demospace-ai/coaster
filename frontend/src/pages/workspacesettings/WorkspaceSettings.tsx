@@ -1,14 +1,15 @@
 import { PlusCircleIcon } from "@heroicons/react/20/solid";
+import { Tooltip } from "@nextui-org/react";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "src/components/button/Button";
 import { Loading } from "src/components/loading/Loading";
-import { Modal } from "src/components/modal/Modal";
 import { NewConnection } from "src/pages/newconnection/NewConnection";
 import { NewEventSet } from "src/pages/neweventset/NewEventSet";
 import { sendRequest } from "src/rpc/ajax";
 import { DataConnection, EventSet, GetDataConnections, GetEventSets } from "src/rpc/api";
 
-enum ModalType {
+enum Step {
+  Initial,
   NewDataSource,
   NewEventSet,
 }
@@ -16,40 +17,33 @@ enum ModalType {
 const tableCellStyle = "tw-p-4 tw-w-56";
 
 export const WorkspaceSettings: React.FC = () => {
-  const [modalType, setModalType] = useState<ModalType | null>(null);
-  const [showModal, setShowModal] = useState<boolean>(false);
+  const [step, setStep] = useState<Step>(Step.Initial);
   const [connectionMap, setConnectionMap] = useState<Map<number, DataConnection> | null>(null);
   const setConnectionMapCallback = useCallback(setConnectionMap, [setConnectionMap]);
 
-  const triggerModal = (modalType: ModalType) => {
-    setModalType(modalType);
-    setShowModal(true);
-  };
 
-  let modalContent;
-  switch (modalType) {
-    case ModalType.NewDataSource:
-      modalContent = <NewConnection onComplete={() => setShowModal(false)} />;
+  let content;
+  switch (step) {
+    case Step.Initial:
+      content = (
+        <div className='tw-py-14 tw-px-20'>
+          <DataSourceSettings setStep={setStep} setConnectionMap={setConnectionMapCallback} />
+          <EventSetSettings setStep={setStep} connectionMap={connectionMap} />
+        </div>
+      );
       break;
-    case ModalType.NewEventSet:
-      modalContent = <NewEventSet onComplete={() => setShowModal(false)} />;
+    case Step.NewDataSource:
+      content = <NewConnection onComplete={() => setStep(Step.Initial)} />;
+      break;
+    case Step.NewEventSet:
+      content = <NewEventSet onComplete={() => setStep(Step.Initial)} />;
       break;
   }
 
-  return (
-    <>
-      <Modal show={showModal} close={() => setShowModal(false)}>
-        {modalContent}
-      </Modal>
-      <div className='tw-py-14 tw-px-20'>
-        <DataSourceSettings triggerModal={triggerModal} setConnectionMap={setConnectionMapCallback} />
-        <EventSetSettings triggerModal={triggerModal} connectionMap={connectionMap} />
-      </div>
-    </>
-  );
+  return content;
 };
 
-const DataSourceSettings: React.FC<{ triggerModal: (modalType: ModalType) => void; setConnectionMap: (map: Map<number, DataConnection>) => void; }> = ({ triggerModal, setConnectionMap }) => {
+const DataSourceSettings: React.FC<{ setStep: (step: Step) => void; setConnectionMap: (map: Map<number, DataConnection>) => void; }> = ({ setStep, setConnectionMap }) => {
   const [dataConnections, setDataConnections] = useState<DataConnection[] | null>(null);
   const [dataConnectionsLoading, setDataConnectionsLoading] = useState<boolean>(true);
   // TODO: reload on new data source added
@@ -73,7 +67,7 @@ const DataSourceSettings: React.FC<{ triggerModal: (modalType: ModalType) => voi
     <>
       <div className="tw-flex tw-w-full tw-mb-3">
         <div className="tw-flex tw-flex-col tw-justify-end tw-font-bold tw-text-lg">Data Sources</div>
-        <Button className='tw-ml-auto tw-flex' onClick={() => triggerModal(ModalType.NewDataSource)}>
+        <Button className='tw-ml-auto tw-flex' onClick={() => setStep(Step.NewDataSource)}>
           <div className="tw-flex tw-flex-col tw-justify-center tw-h-full">
             <PlusCircleIcon className='tw-h-4 tw-inline-block tw-mr-2' />
           </div>
@@ -82,21 +76,21 @@ const DataSourceSettings: React.FC<{ triggerModal: (modalType: ModalType) => voi
           </div>
         </Button>
       </div>
-      <div className='tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-max-h-64 tw-overflow-scroll' >
+      <div className='tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-max-h-64 tw-overflow-auto tw-overscroll-contain' >
         {dataConnectionsLoading
           ?
           <Loading className="tw-my-5" />
           :
-          <table className="tw-w-full tw-table-fixed tw-truncate">
-            <thead className="tw-text-left">
+          <table className="tw-w-full">
+            <thead className="tw-text-left tw-sticky tw-top-0 tw-shadow-[0_0px_0.5px_1px] tw-shadow-gray-300 tw-bg-gray-100">
               <tr>
                 <th scope="col" className="tw-p-4">Display Name</th>
                 <th scope="col" className="tw-p-4">Source Type</th>
               </tr>
             </thead>
-            <tbody className="tw-border-t tw-border-solid tw-border-gray-300">
+            <tbody>
               {dataConnections!.length > 0 ? dataConnections!.map((dataConnection, index) => (
-                <tr key={index}>
+                <tr key={index} className="tw-border-b tw-border-solid tw-border-gray-200 last:tw-border-0">
                   <td className={tableCellStyle}>
                     {dataConnection.display_name}
                   </td>
@@ -113,7 +107,7 @@ const DataSourceSettings: React.FC<{ triggerModal: (modalType: ModalType) => voi
   );
 };
 
-const EventSetSettings: React.FC<{ triggerModal: (modalType: ModalType) => void, connectionMap: Map<number, DataConnection> | null; }> = props => {
+const EventSetSettings: React.FC<{ setStep: (step: Step) => void, connectionMap: Map<number, DataConnection> | null; }> = props => {
   const [eventSets, setEventSets] = useState<EventSet[] | null>(null);
   const [eventSetsLoading, setEventSetsLoading] = useState<boolean>(true);
   // TODO: reload on new event set added
@@ -137,7 +131,7 @@ const EventSetSettings: React.FC<{ triggerModal: (modalType: ModalType) => void,
     <>
       <div className="tw-flex tw-w-full tw-mb-3 tw-mt-8">
         <div className="tw-flex tw-flex-col tw-justify-end tw-font-bold tw-text-lg">Event Sets</div>
-        <Button className='tw-ml-auto tw-flex' onClick={() => props.triggerModal(ModalType.NewEventSet)}>
+        <Button className='tw-ml-auto tw-flex' onClick={() => props.setStep(Step.NewEventSet)}>
           <div className="tw-flex tw-flex-col tw-justify-center tw-h-full">
             <PlusCircleIcon className='tw-h-4 tw-inline-block tw-mr-2' />
           </div>
@@ -146,23 +140,24 @@ const EventSetSettings: React.FC<{ triggerModal: (modalType: ModalType) => void,
           </div>
         </Button>
       </div>
-      <div className='tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-max-h-64 tw-overflow-scroll' >
+      <div className='tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-max-h-64 tw-overflow-auto tw-overscroll-contain' >
         {eventSetsLoading
           ?
           <Loading className="tw-my-5" />
           :
-          <table className="tw-w-full tw-table-fixed tw-truncate">
-            <thead className="tw-p-4 tw-text-left tw-w-50">
+          <table className="tw-w-full">
+            <thead className="tw-text-left tw-sticky tw-top-0 tw-shadow-[0_0px_0.5px_1px] tw-shadow-gray-300 tw-bg-gray-100">
               <tr>
-                <th scope="col" className="tw-p-4">Display Name</th>
-                <th scope="col" className="tw-p-4">Data Source Name</th>
-                <th scope="col" className="tw-p-4">Dataset Name</th>
-                <th scope="col" className="tw-p-4">Table Name</th>
+                <th scope="col" className="tw-p-4 tw-whitespace-nowrap">Display Name</th>
+                <th scope="col" className="tw-p-4 tw-whitespace-nowrap">Data Source Name</th>
+                <th scope="col" className="tw-p-4 tw-whitespace-nowrap">Dataset Name</th>
+                <th scope="col" className="tw-p-4 tw-whitespace-nowrap">Table Name</th>
+                <th scope="col" className="tw-p-4 tw-whitespace-nowrap">Custom Join</th>
               </tr>
             </thead>
-            <tbody className="tw-border-t tw-border-solid tw-border-gray-300">
+            <tbody>
               {eventSets!.length > 0 ? eventSets!.map((eventSet, index) => (
-                <tr key={index}>
+                <tr key={index} className="tw-border-b tw-border-solid tw-border-gray-200 last:tw-border-0">
                   <td className={tableCellStyle}>
                     {eventSet.display_name}
                   </td>
@@ -174,6 +169,13 @@ const EventSetSettings: React.FC<{ triggerModal: (modalType: ModalType) => void,
                   </td>
                   <td className={tableCellStyle}>
                     {eventSet.table_name}
+                  </td>
+                  <td className={tableCellStyle}>
+                    <Tooltip content={eventSet.custom_join} rounded color="invert" leaveDelay={100}>
+                      <div className="tw-max-w-[240px] tw-max-h-24 tw-overflow-hidden tw-text-ellipsis tw-whitespace-nowrap">
+                        {eventSet.custom_join}
+                      </div>
+                    </Tooltip>
                   </td>
                 </tr>
               )) : <tr><td className={tableCellStyle}>No event sets configured yet!</td></tr>}

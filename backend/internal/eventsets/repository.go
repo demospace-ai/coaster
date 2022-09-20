@@ -12,26 +12,27 @@ func CreateEventSet(
 	organizationID int64,
 	displayName string,
 	connectionID int64,
-	datasetName string,
-	tableName string,
+	datasetName *string,
+	tableName *string,
+	customJoin *string,
 	eventTypeColumn string,
 	timestampColumn string,
 	userIdentifierColumn string,
-	customJoin *string,
 ) (*models.EventSet, error) {
 
 	eventSet := models.EventSet{
 		OrganizationID:       organizationID,
 		DisplayName:          displayName,
 		ConnectionID:         connectionID,
-		DatasetName:          datasetName,
-		TableName:            tableName,
 		EventTypeColumn:      eventTypeColumn,
 		TimestampColumn:      timestampColumn,
 		UserIdentifierColumn: userIdentifierColumn,
 	}
 
-	if customJoin != nil {
+	if tableName != nil && datasetName != nil {
+		eventSet.DatasetName = database.NewNullString(*datasetName)
+		eventSet.TableName = database.NewNullString(*tableName)
+	} else if customJoin != nil {
 		eventSet.CustomJoin = database.NewNullString(*customJoin)
 	}
 

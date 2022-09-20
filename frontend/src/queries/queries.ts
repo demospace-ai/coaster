@@ -3,11 +3,12 @@ import { sendRequest } from "src/rpc/ajax";
 import { EventSet, RunQuery, RunQueryRequest, RunQueryResponse } from "src/rpc/api";
 
 export const getEvents = async (connectionID: number, eventSet: EventSet): Promise<string[]> => {
-  const queryArray = [
-    "SELECT DISTINCT", eventSet.event_type_column, "FROM",
-    eventSet.dataset_name + "." + eventSet.table_name + ";"
-  ];
-  const query = queryArray.join(' ');
+  const table = eventSet.custom_join ? "custom_events" : `${eventSet.dataset_name}.${eventSet.table_name}`;
+  const customTableQuery = getCustomTableQuery(eventSet);
+  const query = `
+    ${eventSet.custom_join ? customTableQuery : ''}
+    SELECT DISTINCT ${eventSet.event_type_column} FROM ${table}
+  `;
 
   const payload: RunQueryRequest = {
     'connection_id': connectionID,
@@ -28,9 +29,9 @@ export const getEvents = async (connectionID: number, eventSet: EventSet): Promi
   }
 };
 
-const createStepSubquery = (eventSet: EventSet, event: string, order: number, previous?: string, joinedTable?: boolean): string => {
+const createStepSubquery = (eventSet: EventSet, event: string, order: number, previous?: string, usingCustomTableQuery?: boolean): string => {
   const tableName = `${event}_${order}`;
-  const sourceTable = joinedTable ? "joined_events" : `${eventSet.dataset_name}.${eventSet.table_name}`;
+  const sourceTable = usingCustomTableQuery ? "custom_events" : `${eventSet.dataset_name}.${eventSet.table_name}`;
   const queryArray = `
     ${tableName} AS (
       SELECT DISTINCT ${tableName}.${eventSet.user_identifier_column}, ${tableName}.${eventSet.timestamp_column}
@@ -57,23 +58,28 @@ const createResultsSubquery = (eventSet: EventSet, events: string[]): string => 
   return queryArray.join(" ");
 };
 
-export const runFunnelQuery = async (connectionID: number, eventSet: EventSet, events: string[]): Promise<RunQueryResponse> => {
-  let joinedTable: string | undefined = undefined;
+const getCustomTableQuery = (eventSet: EventSet) => {
   if (eventSet.custom_join) {
-    joinedTable = `
-    joined_events AS (
-      ${eventSet.custom_join}
-    ),
+    return `
+      WITH custom_events AS (
+        ${eventSet.custom_join}
+      )
     `;
+  } else {
+    return undefined;
   }
+};
+
+export const runFunnelQuery = async (connectionID: number, eventSet: EventSet, events: string[]): Promise<RunQueryResponse> => {
+  const customTableQuery = getCustomTableQuery(eventSet);
 
   const stepSubqueryArray = events.map((event, index) => {
-    return createStepSubquery(eventSet, event, index, index === 0 ? undefined : `${events[index - 1]}_${index - 1}`, joinedTable !== undefined);
+    return createStepSubquery(eventSet, event, index, index === 0 ? undefined : `${events[index - 1]}_${index - 1}`, customTableQuery !== undefined);
   });
   const stepSubqueryString = stepSubqueryArray.join(", ");
 
   const query = `
-    WITH ${joinedTable ? joinedTable : ``}
+    ${customTableQuery ? `${customTableQuery},` : 'WITH'}
     ${stepSubqueryString},
     ${createResultsSubquery(eventSet, events)}
     SELECT count, event, (count / (SELECT MAX(count) FROM results)) as percent from results ORDER BY results.event_order
