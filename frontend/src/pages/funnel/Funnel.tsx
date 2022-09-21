@@ -105,7 +105,7 @@ export const Funnel: React.FC = () => {
           </Tooltip>
         </div>
         <div id='right-panel' className="tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1 tw-ml-10 tw-my-8 tw-border-gray-300 tw-border-solid tw-border tw-rounded-md">
-          <div id="top-panel" className="tw-p-4 tw-border-gray-300 tw-border-solid tw-border-b tw-text-lg tw-font-bold">
+          <div id="top-panel" className="tw-p-4 tw-pl-5 tw-border-gray-300 tw-border-solid tw-border-b tw-text-lg tw-font-bold">
             Results
           </div>
           <div id="bottom-panel" className='tw-flex tw-flex-col tw-flex-1'>
