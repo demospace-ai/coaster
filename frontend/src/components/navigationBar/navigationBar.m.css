@@ -56,7 +56,7 @@
     padding-top: 3px;
 }
 
-.newQuestion {
+.newAnalysis {
     height: 32px;
     display: flex;
     flex-direction: row;
@@ -74,7 +74,7 @@
     user-select: none;
 }
 
-.newQuestion:hover {
+.newAnalysis:hover {
     background: var(--primary-highlight-color);
 }
 

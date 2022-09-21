@@ -88,7 +88,7 @@ const OrganizationButton: React.FC<OrganizationButtonProps> = props => {
 
 const NewAnalysisButton: React.FC = () => (
   <Menu as="div" className="tw-relative tw-z-0 tw-m-5">
-    <Menu.Button className={styles.newQuestion}>
+    <Menu.Button className={styles.newAnalysis}>
       <PlusCircleIcon className='tw-h-5 tw-inline-block' />
       <div className="tw-inline-block tw-font-[500] tw-ml-[5px]">New Analysis</div>
     </Menu.Button>

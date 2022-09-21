@@ -4,8 +4,7 @@ declare const styles: {
   readonly "organizationIcon": string;
   readonly "organizationName": string;
   readonly "caret": string;
-  readonly "newQuestion": string;
-  readonly "newQuestionText": string;
+  readonly "newAnalysis": string;
   readonly "activeRouteContainer": string;
   readonly "routeContainer": string;
   readonly "route": string;

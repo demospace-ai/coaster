@@ -4,6 +4,7 @@ import { Loading } from "src/components/loading/Loading";
 import { useSearch, useSetResults } from "src/pages/search/actions";
 import styles from "src/pages/search/search.m.css";
 import { useSelector } from "src/root/model";
+import { Analysis, AnalysisType } from "src/rpc/api";
 
 export const SearchResults: React.FC = () => {
   const [params] = useSearchParams();
@@ -30,6 +31,15 @@ export const SearchResults: React.FC = () => {
     return <Loading />;
   }
 
+  const getAnalysisLink = (analysis: Analysis) => {
+    switch (analysis.analysis_type) {
+      case AnalysisType.CustomQuery:
+        return `/customquery/${analysis.id}`;
+      case AnalysisType.Funnel:
+        return `/funnel/${analysis.id}`;
+    }
+  };
+
   return (
     <div className="tw-overflow-scroll">
       <div className={styles.resultsContainer}>
@@ -39,7 +49,7 @@ export const SearchResults: React.FC = () => {
           {results.map((result, index) => (
             <li key={index} className={styles.result} >
               <div className={styles.postTitleContainer}>
-                <Link className={styles.postTitle} to={`/question/${result.id}`}>Q: {result.title}</Link>
+                <Link className={styles.postTitle} to={getAnalysisLink(result)}>Q: {result.title}</Link>
               </div>
             </li>
           ))}

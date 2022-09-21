@@ -4,20 +4,14 @@ export type AppAction =
   }
   | {
     type: 'done';
-  }
-  | {
-    type: 'showNewQuestionModal',
-    showNewQuestionModal: boolean;
   };
 
 const INITIAL_APP_STATE: AppState = {
   loading: true,
-  showNewQuestionModal: false,
 };
 
 export interface AppState {
   loading: boolean;
-  showNewQuestionModal: boolean;
 }
 
 export function appReducer(state: AppState = INITIAL_APP_STATE, action: AppAction): AppState {
@@ -31,11 +25,6 @@ export function appReducer(state: AppState = INITIAL_APP_STATE, action: AppActio
       return {
         ...state,
         loading: false,
-      };
-    case 'showNewQuestionModal':
-      return {
-        ...state,
-        showNewQuestionModal: action.showNewQuestionModal,
       };
     default:
       return state;

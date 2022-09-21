@@ -1,6 +1,5 @@
 declare const styles: {
   readonly "home": string;
-  readonly "loading": string;
   readonly "inboxList": string;
   readonly "inboxBody": string;
   readonly "inboxBodyPlaceholder": string;

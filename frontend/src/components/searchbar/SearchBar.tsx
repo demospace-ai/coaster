@@ -27,7 +27,7 @@ export const SearchBar: React.FC<SearchBarProps> = props => {
       <input
         className={styles.searchInput}
         type='text'
-        id='question-search'
+        id='analysis-search'
         placeholder='Find an answer...'
         onChange={e => setQuery(e.target.value)}
         value={query}

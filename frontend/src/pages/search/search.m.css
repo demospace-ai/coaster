@@ -47,15 +47,3 @@
     width: fit-content;
     margin: 0;
 }
-
-.newQuestionPrompt {
-    margin-top: 40px;
-    display: flex;
-    width: 100%;
-    margin-bottom: 100px;
-}
-
-.newQuestionButton {
-    height: 36px;
-    margin-left: 24px;
-}
