@@ -48,10 +48,10 @@ var Routes = []Route{
 		HandlerFunc: handlers.Search,
 	},
 	{
-		Name:        "Create question",
+		Name:        "Create analysis",
 		Method:      "POST",
-		Pattern:     "/api/create_question",
-		HandlerFunc: handlers.CreateQuestion,
+		Pattern:     "/api/create_analysis",
+		HandlerFunc: handlers.CreateAnalysis,
 	},
 	{
 		Name:        "Create data connection",
@@ -102,16 +102,10 @@ var Routes = []Route{
 		HandlerFunc: handlers.GetAllUsers,
 	},
 	{
-		Name:        "Get all assigned questions for a user",
+		Name:        "Get all analyses for an organization. Paginated",
 		Method:      "GET",
-		Pattern:     "/api/get_assigned_questions",
-		HandlerFunc: handlers.GetAssignedQuestions,
-	},
-	{
-		Name:        "Get all questions for an organization. Paginated",
-		Method:      "GET",
-		Pattern:     "/api/get_all_questions",
-		HandlerFunc: handlers.GetAllQuestions,
+		Pattern:     "/api/get_all_analyses",
+		HandlerFunc: handlers.GetAllAnalyses,
 	},
 	{
 		Name:        "Get all data connections",
@@ -126,16 +120,10 @@ var Routes = []Route{
 		HandlerFunc: handlers.GetEventSets,
 	},
 	{
-		Name:        "Create answer",
-		Method:      "POST",
-		Pattern:     "/api/create_answer",
-		HandlerFunc: handlers.CreateAnswer,
-	},
-	{
-		Name:        "Get question",
+		Name:        "Get analysis",
 		Method:      "GET",
-		Pattern:     "/api/get_question/{questionID}",
-		HandlerFunc: handlers.GetQuestion,
+		Pattern:     "/api/get_analysis/{analysisID}",
+		HandlerFunc: handlers.GetAnalysis,
 	},
 	{
 		Name:        "Send validation code",

@@ -2,24 +2,24 @@ package handlers
 
 import (
 	"encoding/json"
+	analysis_repository "fabra/internal/analyses"
 	"fabra/internal/errors"
 	"fabra/internal/models"
-	post_repository "fabra/internal/posts"
 	"net/http"
 	"strconv"
 
 	"github.com/gorilla/mux"
 )
 
-type GetAllQuestionsRequest struct {
+type GetAllAnalysesRequest struct {
 	Page *int `json:"page,omitempty"`
 }
 
-type GetAllQuestionsResponse struct {
-	Questions []models.Post `json:"questions"`
+type GetAllAnalysesResponse struct {
+	Analyses []models.Analysis `json:"analyses"`
 }
 
-func GetAllQuestions(env Env, w http.ResponseWriter, r *http.Request) error {
+func GetAllAnalyses(env Env, w http.ResponseWriter, r *http.Request) error {
 	if !env.Auth.IsAuthenticated {
 		w.WriteHeader(http.StatusUnauthorized)
 		return nil
@@ -37,12 +37,12 @@ func GetAllQuestions(env Env, w http.ResponseWriter, r *http.Request) error {
 		page = pageInt
 	}
 
-	questions, err := post_repository.LoadAllQuestions(env.Db, page, env.Auth.Organization.ID)
+	analyses, err := analysis_repository.LoadAllAnalyses(env.Db, page, env.Auth.Organization.ID)
 	if err != nil {
 		return err
 	}
 
-	return json.NewEncoder(w).Encode(GetAssignedQuestionsResponse{
-		Questions: questions,
+	return json.NewEncoder(w).Encode(GetAllAnalysesResponse{
+		Analyses: analyses,
 	})
 }

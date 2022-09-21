@@ -1,4 +1,4 @@
-import { Post } from "src/rpc/api";
+import { Analysis } from "src/rpc/api";
 
 const INITIAL_SEARCH_STATE: SearchState = {
   query: '',
@@ -7,13 +7,13 @@ const INITIAL_SEARCH_STATE: SearchState = {
 
 export interface SearchState {
   query: string,
-  results: Post[],
+  results: Analysis[],
 }
 
 export type SearchAction =
   | {
     type: 'search.results',
-    results: Post[],
+    results: Analysis[],
   }
   | {
     type: 'search.query',

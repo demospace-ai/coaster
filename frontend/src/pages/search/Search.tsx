@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { Button } from "src/components/button/Button";
-import { Display } from "src/components/editor/Editor";
 import { Loading } from "src/components/loading/Loading";
 import { useSearch, useSetResults } from "src/pages/search/actions";
 import styles from "src/pages/search/search.m.css";
-import { useDispatch, useSelector } from "src/root/model";
+import { useSelector } from "src/root/model";
 
 export const SearchResults: React.FC = () => {
   const [params] = useSearchParams();
@@ -14,10 +12,6 @@ export const SearchResults: React.FC = () => {
   const search = useSearch();
   const setResults = useSetResults();
   const [loading, setLoading] = useState(true);
-  const dispatch = useDispatch();
-  const showNewQuestionModal = () => {
-    dispatch({ type: "showNewQuestionModal", showNewQuestionModal: true });
-  };
 
   useEffect(() => {
     // No query, no need to search
@@ -47,20 +41,9 @@ export const SearchResults: React.FC = () => {
               <div className={styles.postTitleContainer}>
                 <Link className={styles.postTitle} to={`/question/${result.id}`}>Q: {result.title}</Link>
               </div>
-              {result.body &&
-                <div className={styles.postBody}>
-                  <Display
-                    value={result.body}
-                  />
-                </div>
-              }
             </li>
           ))}
         </ul>
-        <div className={styles.newQuestionPrompt}>
-          <div className="tw-text-lg tw-my-auto tw-font-semibold">Not finding what you're looking for?</div>
-          <Button className={styles.newQuestionButton} onClick={showNewQuestionModal}>Ask a question</Button>
-        </div>
       </div>
     </div>
   );

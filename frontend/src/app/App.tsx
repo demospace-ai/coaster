@@ -4,6 +4,7 @@ import { useStart } from 'src/app/actions';
 import { Header } from 'src/components/header/Header';
 import { Loading } from 'src/components/loading/Loading';
 import { NavigationBar } from 'src/components/navigationBar/NavigationBar';
+import { AllAnalyses } from 'src/pages/allanalyses/AllAnalyses';
 import { CustomQuery } from 'src/pages/customquery/CustomQuery';
 import { Funnel } from 'src/pages/funnel/Funnel';
 import { Inbox } from 'src/pages/inbox/Inbox';
@@ -39,6 +40,7 @@ export const App: React.FC = () => {
         <Route element={<AppLayout />}>
           <Route path='/login' element={<Login />} />
           <Route path='/' element={<RequireAuth element={<Inbox />} />} />
+          <Route path='/saved' element={<RequireAuth element={<AllAnalyses />} />} />
           <Route path='/workspacesettings' element={<RequireAuth element={<WorkspaceSettings />} />} />
           <Route path='/customquery' element={<RequireAuth element={<CustomQuery />} />} />
           <Route path='/funnel' element={<RequireAuth element={<Funnel />} />} />

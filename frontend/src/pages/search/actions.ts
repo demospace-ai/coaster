@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useDispatch } from "src/root/model";
 import { sendRequest } from "src/rpc/ajax";
-import { Post, Search } from "src/rpc/api";
+import { Analysis, Search } from "src/rpc/api";
 
 export function useSearch() {
   const dispatch = useDispatch();
@@ -11,7 +11,7 @@ export function useSearch() {
       const response = await sendRequest(Search, payload);
       dispatch({
         type: 'search.results',
-        results: response.posts,
+        results: response.analyses,
       });
     } catch (e) {
     }
@@ -20,7 +20,7 @@ export function useSearch() {
 
 export function useSetResults() {
   const dispatch = useDispatch();
-  return useCallback((results: Post[]) => {
+  return useCallback((results: Analysis[]) => {
     dispatch({
       type: 'search.results',
       results: results,

@@ -16,9 +16,9 @@ export const GetAllUsers: IEndpoint<undefined, GetAllUsersResponse> = {
     path: '/get_all_users',
 };
 
-export const GetAllQuestions: IEndpoint<{ page: string; }, GetAllQuestionsResponse> = {
+export const GetAllAnalyses: IEndpoint<{ page: string; }, GetAllAnalysesResponse> = {
     method: 'GET',
-    path: '/get_all_questions',
+    path: '/get_all_analyses',
 };
 
 export const GetDataConnections: IEndpoint<undefined, GetDataConnectionsResponse> = {
@@ -49,11 +49,6 @@ export const GetSchema: IEndpoint<GetSchemaRequest, GetSchemaResponse> = {
     queryParams: ['connectionID', 'datasetID', 'tableName', 'customJoin'],
 };
 
-export const GetAssignedQuestions: IEndpoint<undefined, GetAssignedQuestionsResponse> = {
-    method: 'GET',
-    path: '/get_assigned_questions',
-};
-
 export const CheckSession: IEndpoint<undefined, CheckSessionResponse> = {
     method: 'GET',
     path: '/check_session',
@@ -79,19 +74,14 @@ export const SetOrganization: IEndpoint<SetOrganizationRequest, SetOrganizationR
     path: '/set_organization',
 };
 
-export const GetQuestion: IEndpoint<{ questionID: string; }, GetQuestionResponse> = {
+export const GetAnalysis: IEndpoint<{ analysisID: string; }, GetAnalysisResponse> = {
     method: 'GET',
-    path: '/get_question/:questionID',
+    path: '/get_analysis/:analysisID',
 };
 
-export const CreateAnswer: IEndpoint<CreateAnswerRequest, CreateAnswerResponse> = {
+export const CreateAnalysis: IEndpoint<CreateAnalysisRequest, CreateAnalysisResponse> = {
     method: 'POST',
-    path: '/create_answer',
-};
-
-export const CreateQuestion: IEndpoint<CreateQuestionRequest, CreateQuestionResponse> = {
-    method: 'POST',
-    path: '/create_question',
+    path: '/create_analysis',
 };
 
 export const TestDataConnection: IEndpoint<TestDataConnectionRequest, undefined> = {
@@ -221,8 +211,8 @@ export interface GetAllUsersResponse {
     users: User[];
 }
 
-export interface GetAllQuestionsResponse {
-    questions: Post[];
+export interface GetAllAnalysesResponse {
+    analyses: Analysis[];
 }
 
 export interface GetDataConnectionsResponse {
@@ -252,10 +242,6 @@ export interface GetSchemaResponse {
     schema: Schema;
 }
 
-export interface GetAssignedQuestionsResponse {
-    questions: Post[];
-}
-
 export interface LoginResponse {
     user: User;
     organization?: Organization;
@@ -273,24 +259,12 @@ export interface CheckSessionResponse {
     suggested_organizations?: Organization[];
 }
 
-export interface CreateQuestionRequest {
-    question_title: string;
-    question_body: string;
-    assigned_user_id?: number;
+export interface CreateAnalysisRequest {
+    analysis_type: AnalysisType;
 }
 
-export interface CreateQuestionResponse {
-    question: Post;
-}
-
-export interface CreateAnswerRequest {
-    question_id: number;
-    answer_body: string;
-}
-
-export interface CreateAnswerResponse {
-    question: Post;
-    answers: Post[];
+export interface CreateAnalysisResponse {
+    analysis: Analysis;
 }
 
 export interface SearchRequest {
@@ -298,20 +272,27 @@ export interface SearchRequest {
 }
 
 export interface SearchResponse {
-    posts: Post[];
+    analyses: Analysis[];
 }
 
-export interface GetQuestionResponse {
-    question: Post;
-    answers: Post[];
+export interface GetAnalysisResponse {
+    analysis: Analysis;
 }
 
-export interface Post {
+export interface Analysis {
     id: number;
-    post_type: string;
-    title: string | undefined;
-    body: string;
     user_id: number;
+    organization_id: number;
+    analysis_type: AnalysisType;
+    connection_id: number | undefined;
+    event_set_id: number | undefined;
+    title: string | undefined;
+    query: string | undefined;
+}
+
+export enum AnalysisType {
+    CustomQuery = "custom_query",
+    Funnel = "funnel",
 }
 
 export interface DataConnection {

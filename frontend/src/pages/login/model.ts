@@ -1,4 +1,4 @@
-import { Organization, Post, User } from "src/rpc/api";
+import { Analysis, Organization, User } from "src/rpc/api";
 
 const INITIAL_LOGIN_STATE: LoginState = {
   authenticated: false,
@@ -13,7 +13,7 @@ export interface LoginState {
   suggestedOrganizations?: Organization[];
   email?: string;
   users?: User[];
-  assignedQuestions?: Post[];
+  assignedQuestions?: Analysis[];
 }
 
 export type LoginAction =
@@ -40,7 +40,7 @@ export type LoginAction =
   }
   | {
     type: 'login.assignedQuestions',
-    assignedQuestions: Post[],
+    assignedQuestions: Analysis[],
   };
 
 export function loginReducer(state: LoginState = INITIAL_LOGIN_STATE, action: LoginAction): LoginState {
