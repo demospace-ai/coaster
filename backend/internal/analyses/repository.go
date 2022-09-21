@@ -10,18 +10,18 @@ import (
 const PAGE_SIZE = 20
 
 func CreateAnalysis(db *gorm.DB, userID int64, organizationID int64, analysisType models.AnalysisType) (*models.Analysis, error) {
-	post := models.Analysis{
+	analysis := models.Analysis{
 		UserID:         userID,
 		OrganizationID: organizationID,
 		AnalysisType:   analysisType,
 	}
 
-	result := db.Create(&post)
+	result := db.Create(&analysis)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
-	return &post, nil
+	return &analysis, nil
 }
 
 func LoadAnalysisByID(db *gorm.DB, analysisID int64, organizationID int64) (*models.Analysis, error) {

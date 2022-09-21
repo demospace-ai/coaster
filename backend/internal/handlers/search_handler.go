@@ -28,7 +28,6 @@ func Search(env Env, w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	// TODO: should only return questions, even if a result was found via the answer
 	analyses, err := analyses.Search(env.Db, searchRequest.SearchQuery, env.Auth.Organization.ID)
 	if err != nil {
 		return err
