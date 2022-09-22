@@ -108,7 +108,7 @@ func UpdateAnalysis(env Env, w http.ResponseWriter, r *http.Request) error {
 	}
 
 	analysisView := views.Analysis{
-		Analysis:    *analysis,
+		Analysis:    *updatedAnalysis,
 		FunnelSteps: funnelSteps,
 	}
 
