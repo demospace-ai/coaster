@@ -124,6 +124,9 @@ export const CustomQuery: React.FC = () => {
     setLoading(true);
     setErrorMessage(null);
 
+    // Save the query even if it can't be run
+    updateCustomQuery(Number(id), { query: query });
+
     if (!connectionID) {
       setErrorMessage("Data source is not set!");
       setLoading(false);
@@ -135,8 +138,6 @@ export const CustomQuery: React.FC = () => {
       setLoading(false);
       return;
     }
-
-    updateCustomQuery(Number(id), { query: query });
 
     const payload: RunQueryRequest = {
       'connection_id': connectionID,
