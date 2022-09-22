@@ -4,10 +4,10 @@ import { useStart } from 'src/app/actions';
 import { Header } from 'src/components/header/Header';
 import { Loading } from 'src/components/loading/Loading';
 import { NavigationBar } from 'src/components/navigationBar/NavigationBar';
-import { AllAnalyses } from 'src/pages/allanalyses/AllAnalyses';
 import { CustomQuery } from 'src/pages/customquery/CustomQuery';
 import { Funnel } from 'src/pages/funnel/Funnel';
 import { Inbox } from 'src/pages/inbox/Inbox';
+import { Insights } from 'src/pages/insights/Insights';
 import { Login } from 'src/pages/login/Login';
 import { NotFound } from 'src/pages/notfound/NotFound';
 import { WorkspaceSettings } from 'src/pages/workspacesettings/WorkspaceSettings';
@@ -40,10 +40,10 @@ export const App: React.FC = () => {
         <Route element={<AppLayout />}>
           <Route path='/login' element={<Login />} />
           <Route path='/' element={<RequireAuth element={<Inbox />} />} />
-          <Route path='/saved' element={<RequireAuth element={<AllAnalyses />} />} />
           <Route path='/workspacesettings' element={<RequireAuth element={<WorkspaceSettings />} />} />
           <Route path='/customquery/:id' element={<RequireAuth element={<CustomQuery />} />} />
           <Route path='/funnel/:id' element={<RequireAuth element={<Funnel />} />} />
+          <Route path='/insights' element={<RequireAuth element={<Insights />} />} />
           <Route path='*' element={<NotFound />} />
         </Route>
       </Routes>

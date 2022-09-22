@@ -1,6 +1,6 @@
 import { Menu, Transition } from "@headlessui/react";
 import { ChartBarIcon, ChevronDownIcon, CommandLineIcon, PlusCircleIcon, PresentationChartLineIcon } from '@heroicons/react/20/solid';
-import { HomeIcon } from '@heroicons/react/24/outline';
+import { ChartBarSquareIcon, HomeIcon } from '@heroicons/react/24/outline';
 import classNames from "classnames";
 import { Fragment } from "react";
 import { NavLink } from "react-router-dom";
@@ -25,6 +25,10 @@ export const NavigationBar: React.FC = () => {
         <NavLink className={({ isActive }) => isActive ? styles.activeRouteContainer : styles.routeContainer} to={'/'}>
           <HomeIcon className="tw-h-4" strokeWidth="2" />
           <div className={styles.route}>Home</div>
+        </NavLink>
+        <NavLink className={({ isActive }) => isActive ? styles.activeRouteContainer : styles.routeContainer} to={'/insights'}>
+          <ChartBarSquareIcon className="tw-h-4" strokeWidth="2" />
+          <div className={styles.route}>Insights</div>
         </NavLink>
         <div className={styles.helpContainer}>
           <div className={styles.route} >Help</div>

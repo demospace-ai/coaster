@@ -22,6 +22,9 @@ export const Header: React.FC = () => {
     case '/funnel':
       page = 'Funnel Report';
       break;
+    case '/insights':
+      page = 'Insights';
+      break;
     case '/workspacesettings':
       page = 'Workspace Settings';
       break;
