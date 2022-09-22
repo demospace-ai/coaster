@@ -50,6 +50,8 @@ export async function sendRequest<RequestType extends Record<string, any>, Respo
         rudderanalytics.track(`${endpoint.name}_success`);
     }
 
+    // TODO: clean this up
     // not all AJAX requests have a response. the ones that do will be formatted as JSON
-    return response.json().catch(e => { throw e; });
+    // so just catch any error from trying to fetch the json and do nothing with it
+    return response.json().catch(() => null);
 }

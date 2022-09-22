@@ -67,7 +67,7 @@ const ProfileDropdown: React.FC = () => {
           leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
           leaveTo="tw-transform tw-opacity-0 tw-scale-95"
         >
-          <Menu.Items className="tw-origin-top-right tw-absolute tw-right-5 tw-mt-2 tw-w-40 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none">
+          <Menu.Items className="tw-origin-top-right tw-z-10 tw-absolute tw-right-5 tw-mt-2 tw-w-40 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none">
             <div className="tw-py-1">
               <Menu.Item>
                 {({ active }) => (

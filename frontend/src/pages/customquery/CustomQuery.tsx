@@ -282,13 +282,15 @@ const QueryNavigation: React.FC = () => {
   return (
     <div className="tw-h-10 tw-bg-gray-200 tw-flex">
       <QueryNavigationTab active={true}>
-        Query 1
+        Query
       </QueryNavigationTab>
       <div className="tw-inline-block tw-mx-4 tw-my-2 tw-w-[1px] tw-bg-gray-400"></div>
-      <QueryNavigationTab>
-        New Chart
-        <PlusCircleIcon className='tw-mt-[-2px] tw-ml-1.5 tw-h-4 tw-inline'></PlusCircleIcon>
-      </QueryNavigationTab>
+      <Tooltip color={"invert"} content="Coming soon!">
+        <QueryNavigationTab>
+          New Chart
+          <PlusCircleIcon className='tw-mt-[-2px] tw-ml-1.5 tw-h-4 tw-inline'></PlusCircleIcon>
+        </QueryNavigationTab>
+      </Tooltip>
     </div >
   );
 };
