@@ -26,6 +26,8 @@ export const CustomQuery: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [saving, setSaving] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [editor, setEditor] = useState<EditorLib.IStandaloneCodeEditor | null>(null);
+  const [initialQuery, setInitialQuery] = useState<string>("");
 
   const [topPanelHeight, setTopPanelHeight] = useState<number>();
   const topPanelRef = useRef<HTMLDivElement>(null);
@@ -58,14 +60,14 @@ export const CustomQuery: React.FC = () => {
       }
 
       if (response.analysis.query) {
-        setQuery(response.analysis.query);
+        setInitialQuery(response.analysis.query);
       }
 
     } catch (e) {
       // TODO: handle error here
     }
     setLoading(false);
-  }, [setConnection, setQuery]);
+  }, [setConnection, setInitialQuery]);
 
   const updateCustomQuery = useCallback(async (id: number, updates: { connection?: DataConnection, query?: string; }) => {
     setSaving(true);
@@ -185,6 +187,13 @@ export const CustomQuery: React.FC = () => {
     }
   }, [id, connectionID, query, shouldRun, runQuery]);
 
+  // Hack to set initial editor value from saved query without causing any selection to be made
+  useEffect(() => {
+    if (editor) {
+      editor.setValue(initialQuery);
+    }
+  }, [initialQuery, editor]);
+
   monaco.editor.defineTheme("fabra", {
     base: "vs-dark",
     inherit: true,
@@ -227,6 +236,7 @@ export const CustomQuery: React.FC = () => {
                 onChange={setQuery}
                 editorDidMount={(editor: EditorLib.IStandaloneCodeEditor) => {
                   editor.addAction({ id: "run query", label: "run query", keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter], run: () => setShouldRun(true), });
+                  setEditor(editor);
                 }}
               />
               <div id='resize-grabber' className='tw-relative'>
@@ -285,22 +295,22 @@ const QueryNavigation: React.FC = () => {
         Query
       </QueryNavigationTab>
       <div className="tw-inline-block tw-mx-4 tw-my-2 tw-w-[1px] tw-bg-gray-400"></div>
-      <Tooltip color={"invert"} content="Coming soon!">
-        <QueryNavigationTab>
-          New Chart
-          <PlusCircleIcon className='tw-mt-[-2px] tw-ml-1.5 tw-h-4 tw-inline'></PlusCircleIcon>
-        </QueryNavigationTab>
-      </Tooltip>
+      <QueryNavigationTab tooltip="Coming Soon!">
+        New Chart
+        <PlusCircleIcon className='tw-mt-[-2px] tw-ml-1.5 tw-h-4 tw-inline'></PlusCircleIcon>
+      </QueryNavigationTab>
     </div >
   );
 };
 
-const QueryNavigationTab: React.FC<{ active?: boolean, children: React.ReactNode; }> = ({ active, children }) => {
+const QueryNavigationTab: React.FC<{ active?: boolean, children: React.ReactNode; tooltip?: string; }> = ({ active, children, tooltip }) => {
   return (
     <div className={"first:tw-ml-5 tw-cursor-pointer tw-inline-block tw-bg-white tw-w-32 tw-rounded-t-md tw-mt-1.5 tw-mb-0" + (active ? " tw-shadow-[0px_-2px_#4ade80]" : " tw-border-b tw-border-gray-200 tw-border-solid")}>
-      <div className="tw-leading-[32px] tw-ml-3 tw-font-semibold tw-select-none">
-        {children}
-      </div>
+      <Tooltip color={"invert"} content={tooltip ? tooltip : ''}>
+        <div className="tw-leading-[32px] tw-ml-3 tw-font-semibold tw-select-none">
+          {children}
+        </div>
+      </Tooltip>
     </div>
   );
 };

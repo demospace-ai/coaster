@@ -328,7 +328,6 @@ export const NewEventSetStepThree: React.FC<NewEventSetFormProps & { onComplete:
         noOptionsString="No Columns Available! (Choose a table)"
         loading={schemaLoading}
         validated={true}
-        allowCustom={true}
       />
       <Button onClick={() => createNewEventDataset()} className='tw-mt-5 tw-w-full tw-h-10'>{loading ? <Loading /> : "Save"}</Button>
     </>

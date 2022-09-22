@@ -113,16 +113,16 @@ func UpdateAnalysis(env Env, w http.ResponseWriter, r *http.Request) error {
 	}
 
 	var updatedConnection *models.DataConnection
-	if analysis.ConnectionID.Valid {
-		updatedConnection, err = dataconnections.LoadDataConnectionByID(env.Db, env.Auth.Organization.ID, analysis.ConnectionID.Int64)
+	if updatedAnalysis.ConnectionID.Valid {
+		updatedConnection, err = dataconnections.LoadDataConnectionByID(env.Db, env.Auth.Organization.ID, updatedAnalysis.ConnectionID.Int64)
 		if err != nil {
 			return nil
 		}
 	}
 
 	var updatedEventSet *models.EventSet
-	if analysis.EventSetID.Valid {
-		updatedEventSet, err = eventsets.LoadEventSetByID(env.Db, env.Auth.Organization.ID, analysis.EventSetID.Int64)
+	if updatedAnalysis.EventSetID.Valid {
+		updatedEventSet, err = eventsets.LoadEventSetByID(env.Db, env.Auth.Organization.ID, updatedAnalysis.EventSetID.Int64)
 		if err != nil {
 			return nil
 		}
