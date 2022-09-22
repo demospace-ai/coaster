@@ -1,16 +1,15 @@
 import { PlusCircleIcon } from '@heroicons/react/20/solid';
 import { Tooltip } from '@nextui-org/react';
 import { editor as EditorLib } from "monaco-editor/esm/vs/editor/editor.api";
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import MonacoEditor, { monaco } from "react-monaco-editor";
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { rudderanalytics } from 'src/app/rudder';
 import { Button } from "src/components/button/Button";
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { ConnectionSelector } from "src/components/selector/Selector";
 import { sendRequest } from "src/rpc/ajax";
-import { DataConnection, QueryResults, RunQuery, RunQueryRequest, Schema } from "src/rpc/api";
-import { useLocalStorage } from "src/utils/localStorage";
+import { AnalysisType, CreateAnalysis, CreateAnalysisRequest, DataConnection, GetAnalysis, QueryResults, RunQuery, RunQueryRequest, Schema, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
 import { createResizeFunction } from 'src/utils/resize';
 
 type QueryParams = {
@@ -19,15 +18,83 @@ type QueryParams = {
 
 export const CustomQuery: React.FC = () => {
   const { id } = useParams<QueryParams>();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [connection, setConnection] = useLocalStorage<DataConnection | null>("selectedConnection", null);
-  const [query, setQuery] = useLocalStorage<string>("query", "");
+  const [connection, setConnection] = useState<DataConnection | null>(null);
+  const [query, setQuery] = useState<string>("");
   const [schema, setSchema] = useState<Schema | null>(null);
   const [shouldRun, setShouldRun] = useState<boolean>(false);
   const [topPanelHeight, setTopPanelHeight] = useState<number>();
   const [queryResults, setQueryResults] = useState<QueryResults | null>(null);
   const topPanelRef = useRef<HTMLDivElement>(null);
+  const connectionID = connection ? connection.id : null;
+
+  const createNewCustomQuery = useCallback(async () => {
+    setLoading(true);
+    const payload: CreateAnalysisRequest = { analysis_type: AnalysisType.CustomQuery };
+    try {
+      const response = await sendRequest(CreateAnalysis, payload);
+      navigate(`/customquery/${response.analysis.id}`);
+    } catch (e) {
+      // TODO: handle error here
+    }
+    setLoading(false);
+  }, [navigate]);
+
+  const loadSavedCustomQuery = useCallback(async (id: string) => {
+    setLoading(true);
+    try {
+      const response = await sendRequest(GetAnalysis, { analysisID: id });
+      if (response.connection) {
+        setConnection(response.connection);
+      }
+
+      if (response.analysis.query) {
+        setQuery(response.analysis.query);
+      }
+
+    } catch (e) {
+      // TODO: handle error here
+    }
+    setLoading(false);
+  }, [setConnection, setQuery]);
+
+  const updateCustomQuery = useCallback(async (id: number, updates: { connection?: DataConnection, query?: string; }) => {
+    const payload: UpdateAnalysisRequest = { analysis_id: Number(id) };
+    if (updates.connection) {
+      payload.connection_id = updates.connection.id;
+    }
+
+    if (updates.connection) {
+      payload.connection_id = updates.connection.id;
+    }
+
+    if (updates.query) {
+      payload.query = updates.query;
+    }
+
+    try {
+      const response = await sendRequest(UpdateAnalysis, payload);
+      setConnection(response.connection ? response.connection : null);
+    } catch (e) {
+      // TODO: handle error here
+    }
+  }, []);
+
+  useEffect(() => {
+    // Reset state on new ID since data will be newly loaded
+    setConnection(null);
+    setQuery("");
+
+    if (id === "new") {
+      createNewCustomQuery();
+    } else if (id != null) {
+      loadSavedCustomQuery(id);
+    } else {
+      // TODO: use bugsnag here to record bad state
+    }
+  }, [id, createNewCustomQuery, loadSavedCustomQuery]);
 
   // Limit how much the top panel can be resized
   const setTopPanelHeightBounded = (height: number) => {
@@ -46,15 +113,18 @@ export const CustomQuery: React.FC = () => {
   const startResize = createResizeFunction(topPanelRef, setTopPanelHeightBounded);
 
   const onConnectionSelected = (value: DataConnection) => {
-    setErrorMessage(null);
-    setConnection(value);
+    if (!connection || connection.id !== value.id) {
+      setErrorMessage(null);
+      setConnection(value);
+      updateCustomQuery(Number(id), { connection: value });
+    }
   };
 
-  const runQuery = async () => {
+  const runQuery = useCallback(async (id: number, connectionID: number | null, query: string) => {
     setLoading(true);
     setErrorMessage(null);
 
-    if (!connection) {
+    if (!connectionID) {
       setErrorMessage("Data source is not set!");
       setLoading(false);
       return;
@@ -66,8 +136,10 @@ export const CustomQuery: React.FC = () => {
       return;
     }
 
+    updateCustomQuery(Number(id), { query: query });
+
     const payload: RunQueryRequest = {
-      'connection_id': connection.id,
+      'connection_id': connectionID,
       'query_string': query,
     };
 
@@ -87,12 +159,16 @@ export const CustomQuery: React.FC = () => {
     }
 
     setLoading(false);
-  };
+  }, [updateCustomQuery]);
 
-  if (shouldRun) {
-    setShouldRun(false);
-    runQuery();
-  }
+  // Hack to run the query since the Monaco editor will keep a memoized version of the runQuery function
+  // that uses the first query passed to it.
+  useEffect(() => {
+    if (shouldRun) {
+      setShouldRun(false);
+      runQuery(Number(id), connectionID, query);
+    }
+  }, [id, connectionID, query, shouldRun, runQuery]);
 
   monaco.editor.defineTheme("fabra", {
     base: "vs-dark",
@@ -149,7 +225,7 @@ export const CustomQuery: React.FC = () => {
             <div id="bottom-panel" className='tw-h-[60%] tw-flex tw-flex-col tw-flex-1' style={{ height: "calc(100% - " + topPanelHeight + "px)" }}>
               <div className="tw-border-solid tw-border-gray-300 tw-border-x tw-p-2">
                 <Tooltip color={"invert"} content={"⌘ + Enter"}>
-                  <Button className="tw-w-40 tw-h-8" onClick={runQuery}>{loading ? "Stop" : "Run"}</Button>
+                  <Button className="tw-w-40 tw-h-8" onClick={() => setShouldRun(true)}>{loading ? "Stop" : "Run"}</Button>
                 </Tooltip>
               </div>
               <div className="tw-mb-5 tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden tw-border-gray-300 tw-border-solid tw-border tw-bg-gray-100">

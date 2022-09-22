@@ -12,6 +12,18 @@ type FunnelParams = {
   id: string,
 };
 
+/*
+
+TODO: tests
+
+- updating connection should clear event set and steps
+- updating event set should clear steps
+- should request event set once when connection changes
+- should request events once when event set or connection changes
+- should not trigger update if the object changes but the ID does not
+- should not trigger update on load
+
+*/
 export const Funnel: React.FC = () => {
   const { id } = useParams<FunnelParams>();
   const navigate = useNavigate();

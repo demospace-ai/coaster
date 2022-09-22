@@ -26,6 +26,14 @@ type UpdateAnalysisResponse struct {
 	EventSet   *models.EventSet       `json:"event_set"`
 }
 
+/*
+
+TODO: tests
+- updating connection should clear event set and steps
+- updating event set should clear steps
+- updating connection should NOT clear query
+
+*/
 func UpdateAnalysis(env Env, w http.ResponseWriter, r *http.Request) error {
 	if !env.Auth.IsAuthenticated {
 		w.WriteHeader(http.StatusUnauthorized)
