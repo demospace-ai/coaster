@@ -69,9 +69,9 @@ const DataSourceSettings: React.FC<{ setStep: (step: Step) => void; setConnectio
         <div className="tw-flex tw-flex-col tw-justify-end tw-font-bold tw-text-lg">Data Sources</div>
         <Button className='tw-ml-auto tw-flex' onClick={() => setStep(Step.NewDataSource)}>
           <div className="tw-flex tw-flex-col tw-justify-center tw-h-full">
-            <PlusCircleIcon className='tw-h-4 tw-inline-block tw-mr-2' />
+            <PlusCircleIcon className='tw-h-4 tw-inline-block tw-mr-[6px]' />
           </div>
-          <div className="tw-flex tw-flex-col tw-justify-center">
+          <div className="tw-flex tw-flex-col tw-justify-center tw-pr-2">
             New data source
           </div>
         </Button>
@@ -133,9 +133,9 @@ const EventSetSettings: React.FC<{ setStep: (step: Step) => void, connectionMap:
         <div className="tw-flex tw-flex-col tw-justify-end tw-font-bold tw-text-lg">Event Sets</div>
         <Button className='tw-ml-auto tw-flex' onClick={() => props.setStep(Step.NewEventSet)}>
           <div className="tw-flex tw-flex-col tw-justify-center tw-h-full">
-            <PlusCircleIcon className='tw-h-4 tw-inline-block tw-mr-2' />
+            <PlusCircleIcon className='tw-h-4 tw-inline-block tw-mr-[6px]' />
           </div>
-          <div className="tw-flex tw-flex-col tw-justify-center">
+          <div className="tw-flex tw-flex-col tw-justify-center tw-pr-2">
             New event set
           </div>
         </Button>

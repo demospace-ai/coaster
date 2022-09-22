@@ -6,6 +6,7 @@ import MonacoEditor, { monaco } from "react-monaco-editor";
 import { useNavigate, useParams } from 'react-router-dom';
 import { rudderanalytics } from 'src/app/rudder';
 import { Button } from "src/components/button/Button";
+import { Loading } from 'src/components/loading/Loading';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { ConnectionSelector } from "src/components/selector/Selector";
 import { sendRequest } from "src/rpc/ajax";
@@ -27,6 +28,7 @@ export const CustomQuery: React.FC = () => {
   const [shouldRun, setShouldRun] = useState<boolean>(false);
   const [topPanelHeight, setTopPanelHeight] = useState<number>();
   const [queryResults, setQueryResults] = useState<QueryResults | null>(null);
+  const [saving, setSaving] = useState<boolean>(false);
   const topPanelRef = useRef<HTMLDivElement>(null);
   const connectionID = connection ? connection.id : null;
 
@@ -61,6 +63,7 @@ export const CustomQuery: React.FC = () => {
   }, [setConnection, setQuery]);
 
   const updateCustomQuery = useCallback(async (id: number, updates: { connection?: DataConnection, query?: string; }) => {
+    setSaving(true);
     const payload: UpdateAnalysisRequest = { analysis_id: Number(id) };
     if (updates.connection) {
       payload.connection_id = updates.connection.id;
@@ -80,6 +83,7 @@ export const CustomQuery: React.FC = () => {
     } catch (e) {
       // TODO: handle error here
     }
+    setSaving(false);
   }, []);
 
   useEffect(() => {
@@ -118,6 +122,10 @@ export const CustomQuery: React.FC = () => {
       setConnection(value);
       updateCustomQuery(Number(id), { connection: value });
     }
+  };
+
+  const updateQuery = () => {
+    updateCustomQuery(Number(id), { query: query });
   };
 
   const runQuery = useCallback(async (id: number, connectionID: number | null, query: string) => {
@@ -224,10 +232,13 @@ export const CustomQuery: React.FC = () => {
               </div>
             </div>
             <div id="bottom-panel" className='tw-h-[60%] tw-flex tw-flex-col tw-flex-1' style={{ height: "calc(100% - " + topPanelHeight + "px)" }}>
-              <div className="tw-border-solid tw-border-gray-300 tw-border-x tw-p-2">
+              <div className="tw-border-solid tw-border-gray-300 tw-border-x tw-p-[10px] tw-flex">
                 <Tooltip color={"invert"} content={"⌘ + Enter"}>
                   <Button className="tw-w-40 tw-h-8" onClick={() => setShouldRun(true)}>{loading ? "Stop" : "Run"}</Button>
                 </Tooltip>
+                <Button className="tw-flex tw-justify-center tw-align-middle tw-ml-auto tw-w-24 tw-h-8 tw-bg-white tw-border-primary-text tw-text-primary-text hover:tw-bg-gray-200" onClick={updateQuery}>
+                  {saving ? <Loading /> : <><SaveIcon className='tw-h-5 tw-inline tw-mr-1' />Save</>}
+                </Button>
               </div>
               <div className="tw-mb-5 tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden tw-border-gray-300 tw-border-solid tw-border tw-bg-gray-100">
                 {errorMessage &&
@@ -267,5 +278,13 @@ const QueryNavigationTab: React.FC<{ active?: boolean, children: React.ReactNode
         {children}
       </div>
     </div>
+  );
+};
+
+const SaveIcon: React.FC<{ className?: string; }> = ({ className }) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox='0 0 48 48' className={className}>
+      <path d="M42 13.85V39q0 1.2-.9 2.1-.9.9-2.1.9H9q-1.2 0-2.1-.9Q6 40.2 6 39V9q0-1.2.9-2.1Q7.8 6 9 6h25.15Zm-3 1.35L32.8 9H9v30h30ZM24 35.75q2.15 0 3.675-1.525T29.2 30.55q0-2.15-1.525-3.675T24 25.35q-2.15 0-3.675 1.525T18.8 30.55q0 2.15 1.525 3.675T24 35.75ZM11.65 18.8h17.9v-7.15h-17.9ZM9 15.2V39 9Z" />
+    </svg>
   );
 };

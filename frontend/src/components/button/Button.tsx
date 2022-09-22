@@ -1,6 +1,5 @@
 import classNames from 'classnames';
 import { NavLink, NavLinkProps, useNavigate } from 'react-router-dom';
-import styles from './button.m.css';
 
 type ButtonProps = {
   onClick: () => void;
@@ -10,9 +9,16 @@ type ButtonProps = {
 };
 
 export const Button: React.FC<ButtonProps> = props => {
+  const buttonStyle = classNames(
+    'tw-text-white tw-bg-fabra hover:tw-bg-primary-highlight',
+    'tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition',
+    'tw-border tw-border-green-border tw-border-solid',
+    props.secondary && 'tw-bg-white tw-text-primary-text tw-font-normal',
+    props.className
+  );
   return (
     <button
-      className={classNames(styles.button, props.secondary ? styles.secondary : null, props.className)}
+      className={buttonStyle}
       type='button'
       onClick={props.onClick}
     >
@@ -27,9 +33,15 @@ type FormButtonProps = {
 };
 
 export const FormButton: React.FC<FormButtonProps> = props => {
+  const buttonStyle = classNames(
+    'tw-text-white tw-bg-fabra hover:tw-bg-primary-highlight',
+    'tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition',
+    'tw-border tw-border-green-border tw-border-solid',
+    props.className
+  );
   return (
     <button
-      className={classNames(styles.button, props.className)}
+      className={buttonStyle}
       type='submit'
     >
       {props.children}
