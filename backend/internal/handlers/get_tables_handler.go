@@ -45,7 +45,7 @@ func GetTables(env Env, w http.ResponseWriter, r *http.Request) error {
 	}
 
 	// TODO: write test to make sure only authorized users can use the data connection
-	dataConnection, err := dataconnections.LoadDataConnectionByID(env.Db, connectionID, env.Auth.Organization.ID)
+	dataConnection, err := dataconnections.LoadDataConnectionByID(env.Db, env.Auth.Organization.ID, connectionID)
 	if err != nil {
 		return err
 	}

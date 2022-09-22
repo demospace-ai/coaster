@@ -1,108 +1,156 @@
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export interface IEndpoint<RequestType, ResponseType> {
-    method: 'GET' | 'POST' | 'DELETE' | 'PUT';
+    name: string;
+    method: 'GET' | 'POST' | 'DELETE' | 'PUT' | 'PATCH';
     path: string;
+    track?: boolean;
     queryParams?: string[]; // These will be used as query params instead of being used as path params
 }
 
 export const Login: IEndpoint<LoginRequest, LoginResponse> = {
+    name: 'login',
     method: 'POST',
     path: '/login',
+    track: true,
 };
 
 export const GetAllUsers: IEndpoint<undefined, GetAllUsersResponse> = {
+    name: 'get_all_users',
     method: 'GET',
     path: '/get_all_users',
 };
 
 export const GetAllAnalyses: IEndpoint<{ page: string; }, GetAllAnalysesResponse> = {
+    name: 'get_all_analyses',
     method: 'GET',
     path: '/get_all_analyses',
 };
 
 export const GetDataConnections: IEndpoint<undefined, GetDataConnectionsResponse> = {
+    name: 'get_data_connections',
     method: 'GET',
     path: '/get_data_connections',
 };
 
 export const GetEventSets: IEndpoint<undefined, GetEventSetsResponse> = {
+    name: 'get_event_sets',
     method: 'GET',
     path: '/get_event_sets',
 };
 
 export const GetDatasets: IEndpoint<{ connectionID: number; }, GetDatasetsResponse> = {
+    name: 'get_datasets',
     method: 'GET',
     path: '/get_datasets',
     queryParams: ['connectionID']
 };
 
 export const GetTables: IEndpoint<{ connectionID: number, datasetID: string; }, GetTablesResponse> = {
+    name: 'get_tables',
     method: 'GET',
     path: '/get_tables',
     queryParams: ['connectionID', 'datasetID'],
 };
 
 export const GetSchema: IEndpoint<GetSchemaRequest, GetSchemaResponse> = {
+    name: 'get_schema',
     method: 'GET',
     path: '/get_schema',
     queryParams: ['connectionID', 'datasetID', 'tableName', 'customJoin'],
 };
 
 export const CheckSession: IEndpoint<undefined, CheckSessionResponse> = {
+    name: 'check_session',
     method: 'GET',
     path: '/check_session',
 };
 
 export const Logout: IEndpoint<undefined, undefined> = {
+    name: 'logout',
     method: 'DELETE',
     path: '/logout',
+    track: true,
 };
 
 export const Search: IEndpoint<SearchRequest, SearchResponse> = {
+    name: 'search',
     method: 'POST',
     path: '/search',
-};
-
-export const ValidationCode: IEndpoint<ValidationCodeRequest, undefined> = {
-    method: 'POST',
-    path: '/validation_code',
+    track: true,
 };
 
 export const SetOrganization: IEndpoint<SetOrganizationRequest, SetOrganizationResponse> = {
+    name: 'set_organization',
     method: 'POST',
     path: '/set_organization',
+    track: true,
 };
 
 export const GetAnalysis: IEndpoint<{ analysisID: string; }, GetAnalysisResponse> = {
+    name: 'get_analysis',
     method: 'GET',
     path: '/get_analysis/:analysisID',
+    track: true,
 };
 
 export const CreateAnalysis: IEndpoint<CreateAnalysisRequest, CreateAnalysisResponse> = {
+    name: 'create_analysis',
     method: 'POST',
     path: '/create_analysis',
+    track: true,
+};
+
+export const UpdateAnalysis: IEndpoint<UpdateAnalysisRequest, UpdateAnalysisResponse> = {
+    name: 'update_analysis',
+    method: 'PATCH',
+    path: '/update_analysis',
+    track: true,
 };
 
 export const TestDataConnection: IEndpoint<TestDataConnectionRequest, undefined> = {
+    name: 'test_data_connection',
     method: 'POST',
     path: '/test_data_connection',
+    track: true,
 };
 
-
 export const RunQuery: IEndpoint<RunQueryRequest, RunQueryResponse> = {
+    name: 'run_query',
     method: 'POST',
     path: '/run_query',
+    track: true,
+};
+
+// Same as RunQuery, but separate definition so Rudderstack can track separately
+export const GetEvents: IEndpoint<GetEventsRequest, GetEventsResponse> = {
+    name: 'get_events',
+    method: 'GET',
+    path: '/get_events',
+    queryParams: ['connectionID', 'eventSetID'],
+    track: true,
+};
+
+// Same as RunQuery, but separate definition so Rudderstack can track separately
+export const RunFunnelQuery: IEndpoint<RunQueryRequest, RunQueryResponse> = {
+    name: 'run_funnel_query',
+    method: 'POST',
+    path: '/run_query',
+    track: true,
 };
 
 export const CreateDataConnection: IEndpoint<CreateDataConnectionRequest, undefined> = {
+    name: 'create_data_connection',
     method: 'POST',
     path: '/create_data_connection',
+    track: true,
 };
 
 export const CreateEventSet: IEndpoint<CreateEventSetRequest, undefined> = {
+    name: 'create_event_set',
     method: 'POST',
     path: '/create_event_set',
+    track: true,
 };
 
 export interface TestDataConnectionRequest {
@@ -166,6 +214,15 @@ export interface Schema extends Array<ColumnSchema> { }
 export interface RunQueryRequest {
     connection_id: number;
     query_string: string;
+}
+
+export interface GetEventsRequest {
+    connectionID: number;
+    eventSetID: number;
+}
+
+export interface GetEventsResponse {
+    events: string[];
 }
 
 export interface RunQueryResponse {
@@ -265,6 +322,23 @@ export interface CreateAnalysisRequest {
 
 export interface CreateAnalysisResponse {
     analysis: Analysis;
+    connection?: DataConnection;
+    event_set?: EventSet;
+}
+
+export interface UpdateAnalysisRequest {
+    analysis_id: number;
+    connection_id?: number;
+    event_set_id?: number;
+    title?: string;
+    query?: string;
+    step_names?: string[];
+}
+
+export interface UpdateAnalysisResponse {
+    analysis: Analysis;
+    connection?: DataConnection;
+    event_set?: EventSet;
 }
 
 export interface SearchRequest {
@@ -277,6 +351,8 @@ export interface SearchResponse {
 
 export interface GetAnalysisResponse {
     analysis: Analysis;
+    connection?: DataConnection;
+    event_set?: EventSet;
 }
 
 export interface Analysis {
@@ -284,10 +360,17 @@ export interface Analysis {
     user_id: number;
     organization_id: number;
     analysis_type: AnalysisType;
-    connection_id: number | undefined;
-    event_set_id: number | undefined;
-    title: string | undefined;
-    query: string | undefined;
+    connection_id?: number;
+    event_set_id?: number;
+    title?: string;
+    query?: string;
+    funnel_steps?: FunnelSteps;
+}
+
+export type FunnelSteps = FunnelStep[];
+
+export interface FunnelStep {
+    step_name: string;
 }
 
 export enum AnalysisType {

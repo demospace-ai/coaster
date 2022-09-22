@@ -5,18 +5,10 @@ import (
 	"fabra/internal/database"
 	"fabra/internal/models"
 
-	"cloud.google.com/go/bigquery"
 	"gorm.io/gorm"
 )
 
 const CRYPTO_KEY_NAME = "projects/fabra-344902/locations/global/keyRings/data-connection-keyring/cryptoKeys/data-connection-key"
-
-type Schema []ColumnSchema
-
-type ColumnSchema struct {
-	Name string `json:"name"`
-	Type string `json:"type"`
-}
 
 func LoadAllDataConnections(db *gorm.DB, organizationID int64) ([]models.DataConnection, error) {
 	var connections []models.DataConnection
@@ -34,7 +26,7 @@ func LoadAllDataConnections(db *gorm.DB, organizationID int64) ([]models.DataCon
 	return connections, nil
 }
 
-func LoadDataConnectionByID(db *gorm.DB, connectionID int64, organizationID int64) (*models.DataConnection, error) {
+func LoadDataConnectionByID(db *gorm.DB, organizationID int64, connectionID int64) (*models.DataConnection, error) {
 	var dataConnection models.DataConnection
 	result := db.Table("data_connections").
 		Select("data_connections.*").
@@ -114,19 +106,4 @@ func DecryptBigQueryCredentials(dataConnection models.DataConnection) (*string, 
 	}
 
 	return credentialsString, nil
-}
-
-func ConvertBigQuerySchema(bigQuerySchema bigquery.Schema) Schema {
-	schema := Schema{}
-
-	for _, bigQuerySchemaField := range bigQuerySchema {
-		columnSchema := ColumnSchema{
-			Name: bigQuerySchemaField.Name,
-			Type: string(bigQuerySchemaField.Type),
-		}
-
-		schema = append(schema, columnSchema)
-	}
-
-	return schema
 }

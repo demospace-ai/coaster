@@ -111,7 +111,7 @@ const NewAnalysisButton: React.FC = () => (
                   active ? 'tw-bg-gray-100 tw-text-gray-900' : 'tw-text-gray-700',
                   'tw-flex tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none tw-w-full tw-whitespace-nowrap'
                 )}
-                to="/funnel"
+                to="/funnel/new"
               >
                 <div className="tw-flex tw-flex-col tw-justify-center">
                   <ChartBarIcon className="tw-inline-block tw-h-4 tw-mr-2 tw-scale-x-[-1]" />
@@ -170,7 +170,7 @@ const NewAnalysisButton: React.FC = () => (
                   active ? 'tw-bg-gray-100 tw-text-gray-900' : 'tw-text-gray-700',
                   'tw-flex tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none tw-w-full tw-whitespace-nowrap'
                 )}
-                to="/customquery"
+                to="/customquery/new"
               >
                 <div className="tw-flex tw-flex-col tw-justify-center">
                   <CommandLineIcon className="tw-inline-block tw-h-4 tw-mr-2" />

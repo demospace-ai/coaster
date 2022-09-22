@@ -3,7 +3,8 @@ import { Tooltip } from '@nextui-org/react';
 import { editor as EditorLib } from "monaco-editor/esm/vs/editor/editor.api";
 import { useRef, useState } from "react";
 import MonacoEditor, { monaco } from "react-monaco-editor";
-import { rudderanalytics } from "src/app/rudder";
+import { useParams } from 'react-router-dom';
+import { rudderanalytics } from 'src/app/rudder';
 import { Button } from "src/components/button/Button";
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { ConnectionSelector } from "src/components/selector/Selector";
@@ -12,7 +13,12 @@ import { DataConnection, QueryResults, RunQuery, RunQueryRequest, Schema } from 
 import { useLocalStorage } from "src/utils/localStorage";
 import { createResizeFunction } from 'src/utils/resize';
 
+type QueryParams = {
+  id: string,
+};
+
 export const CustomQuery: React.FC = () => {
+  const { id } = useParams<QueryParams>();
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [connection, setConnection] = useLocalStorage<DataConnection | null>("selectedConnection", null);
@@ -66,18 +72,15 @@ export const CustomQuery: React.FC = () => {
     };
 
     try {
-      rudderanalytics.track("run_query.start");
       const response = await sendRequest(RunQuery, payload);
-      rudderanalytics.track("run_query.success");
-
       if (response.success) {
         setSchema(response.schema);
         setQueryResults(response.query_results);
       } else {
         setErrorMessage(response.error_message);
+        rudderanalytics.track(`run_query_processing_error`);
       }
     } catch (e) {
-      rudderanalytics.track("run_query.error");
       setErrorMessage((e as Error).message);
       setSchema(null);
       setQueryResults(null);

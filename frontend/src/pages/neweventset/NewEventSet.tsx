@@ -1,7 +1,6 @@
 import { Tab } from "@headlessui/react";
 import classNames from "classnames";
 import { useEffect, useState } from "react";
-import { rudderanalytics } from "src/app/rudder";
 import { BackButton, Button } from "src/components/button/Button";
 import { ValidatedComboInput, ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
@@ -276,12 +275,9 @@ export const NewEventSetStepThree: React.FC<NewEventSetFormProps & { onComplete:
     }
 
     try {
-      rudderanalytics.track("create_event_set.start");
       await sendRequest(CreateEventSet, payload);
-      rudderanalytics.track("create_event_set.success");
       setCreateEventSetSuccess(true);
     } catch (e) {
-      rudderanalytics.track("create_event_set.error");
       setCreateEventSetSuccess(false);
     }
 

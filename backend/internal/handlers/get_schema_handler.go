@@ -6,6 +6,7 @@ import (
 	"fabra/internal/dataconnections"
 	"fabra/internal/errors"
 	"fabra/internal/models"
+	"fabra/internal/query"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -16,7 +17,7 @@ import (
 )
 
 type GetSchemaResponse struct {
-	Schema dataconnections.Schema `json:"schema"`
+	Schema query.Schema `json:"schema"`
 }
 
 func GetSchema(env Env, w http.ResponseWriter, r *http.Request) error {
@@ -47,12 +48,12 @@ func GetSchema(env Env, w http.ResponseWriter, r *http.Request) error {
 	}
 
 	// TODO: write test to make sure only authorized users can use the data connection
-	dataConnection, err := dataconnections.LoadDataConnectionByID(env.Db, connectionID, env.Auth.Organization.ID)
+	dataConnection, err := dataconnections.LoadDataConnectionByID(env.Db, env.Auth.Organization.ID, connectionID)
 	if err != nil {
 		return err
 	}
 
-	var schema *dataconnections.Schema
+	var schema *query.Schema
 	if len(customJoin) > 0 {
 		schema, err = getSchemaForCustomJoin(*dataConnection, customJoin)
 		if err != nil {
@@ -70,7 +71,7 @@ func GetSchema(env Env, w http.ResponseWriter, r *http.Request) error {
 	})
 }
 
-func getSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (*dataconnections.Schema, error) {
+func getSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (*query.Schema, error) {
 	switch dataConnection.ConnectionType {
 	case models.DataConnectionTypeBigQuery:
 		return getBigQuerySchemaForTable(dataConnection, datasetID, tableName)
@@ -81,7 +82,7 @@ func getSchemaForTable(dataConnection models.DataConnection, datasetID string, t
 	}
 }
 
-func getSchemaForCustomJoin(dataConnection models.DataConnection, customJoin string) (*dataconnections.Schema, error) {
+func getSchemaForCustomJoin(dataConnection models.DataConnection, customJoin string) (*query.Schema, error) {
 	switch dataConnection.ConnectionType {
 	case models.DataConnectionTypeBigQuery:
 		return getBigQuerySchemaForCustom(dataConnection, customJoin)
@@ -92,7 +93,7 @@ func getSchemaForCustomJoin(dataConnection models.DataConnection, customJoin str
 	}
 }
 
-func getBigQuerySchemaForCustom(dataConnection models.DataConnection, customJoin string) (*dataconnections.Schema, error) {
+func getBigQuerySchemaForCustom(dataConnection models.DataConnection, customJoin string) (*query.Schema, error) {
 	bigQueryCredentialsString, err := dataconnections.DecryptBigQueryCredentials(dataConnection)
 	if err != nil {
 		return nil, err
@@ -129,10 +130,10 @@ func getBigQuerySchemaForCustom(dataConnection models.DataConnection, customJoin
 	}
 	status, err := job.Wait(ctx)
 	if err != nil {
-		return nil, QueryError{err}
+		return nil, query.NewError(err)
 	}
 	if err := status.Err(); err != nil {
-		return nil, QueryError{err}
+		return nil, query.NewError(err)
 	}
 
 	it, err := job.Read(ctx)
@@ -140,12 +141,12 @@ func getBigQuerySchemaForCustom(dataConnection models.DataConnection, customJoin
 		return nil, err
 	}
 
-	schema := dataconnections.ConvertBigQuerySchema(it.Schema)
+	schema := query.ConvertBigQuerySchema(it.Schema)
 
 	return &schema, nil
 }
 
-func getBigQuerySchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (*dataconnections.Schema, error) {
+func getBigQuerySchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (*query.Schema, error) {
 	bigQueryCredentialsString, err := dataconnections.DecryptBigQueryCredentials(dataConnection)
 	if err != nil {
 		return nil, err
@@ -172,17 +173,17 @@ func getBigQuerySchemaForTable(dataConnection models.DataConnection, datasetID s
 		return nil, err
 	}
 
-	schema := dataconnections.ConvertBigQuerySchema(metadata.Schema)
+	schema := query.ConvertBigQuerySchema(metadata.Schema)
 
 	return &schema, nil
 }
 
-func getSnowflakeSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (*dataconnections.Schema, error) {
+func getSnowflakeSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (*query.Schema, error) {
 	// TODO: implement
 	return nil, errors.NewBadRequest("snowflake not supported")
 }
 
-func getSnowflakeSchemaForCustom(dataConnection models.DataConnection, customJoin string) (*dataconnections.Schema, error) {
+func getSnowflakeSchemaForCustom(dataConnection models.DataConnection, customJoin string) (*query.Schema, error) {
 	// TODO: implement
 	return nil, errors.NewBadRequest("snowflake not supported")
 }

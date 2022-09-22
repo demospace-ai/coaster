@@ -27,23 +27,25 @@ const QueryResultsTable: React.FC<QueryResultsProps> = props => {
                 const lastRow = index === props.results!.length - 1;
                 return (
                   <tr key={index} className={classNames("even:tw-bg-gray-100 odd:tw-bg-white", lastRow && "tw-border-gray-300 tw-border-solid tw-border-b")}>
-                    <td key={-1} className="tw-px-3 tw-py-2 tw-text-right tw-bg-gray-100 tw-border-gray-300 tw-border-solid tw-border-r tw-border-b-0 tw-tabular-nums">
+                    <td key={-1} className={classNames("tw-px-3 tw-py-2 tw-text-right tw-bg-gray-100 tw-border-gray-300 tw-border-solid tw-border-r tw-tabular-nums", !lastRow && "tw-border-b tw-border-b-transparent")} >
                       <div className="tw-h-5 tw-whitespace-nowrap">{index + 1}</div>
                     </td>
-                    {resultRow.map((resultValue, valueIndex) => {
-                      return (
-                        <td key={valueIndex} className={classNames("tw-pl-3 tw-pr-5 tw-py-2 tw-text-left tw-border-gray-300 tw-border-solid tw-border-r last:tw-border-r-0 last:tw-w-full focus:tw-bg-blue-300", !lastRow && "tw-border-b")}>
-                          <div className="tw-h-5 tw-whitespace-nowrap">{resultValue}</div>
-                        </td>
-                      );
-                    })}
+                    {
+                      resultRow.map((resultValue, valueIndex) => {
+                        return (
+                          <td key={valueIndex} className={classNames("tw-pl-3 tw-pr-5 tw-py-2 tw-text-left tw-border-gray-300 tw-border-solid tw-border-r last:tw-border-r-0 last:tw-w-full focus:tw-bg-blue-300", !lastRow && "tw-border-b")}>
+                            <div className="tw-h-5 tw-whitespace-nowrap">{resultValue}</div>
+                          </td>
+                        );
+                      })
+                    }
                   </tr>
                 );
               })
             }
           </tbody>
         </table>
-      </div>
+      </div >
     );
   }
 

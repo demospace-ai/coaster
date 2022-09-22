@@ -47,6 +47,11 @@ func New(message string) error {
 	return errors.New(message)
 }
 
+func Newf(format string, a ...any) error {
+	message := fmt.Sprintf(format, a...)
+	return errors.New(message)
+}
+
 func IsRecordNotFound(err error) bool {
 	return errors.Is(err, gorm.ErrRecordNotFound)
 }

@@ -44,6 +44,22 @@ func CreateEventSet(
 	return &eventSet, nil
 }
 
+func LoadEventSetByID(db *gorm.DB, organizationID int64, eventSetID int64) (*models.EventSet, error) {
+	var eventSet models.EventSet
+	result := db.Table("event_sets").
+		Select("event_sets.*").
+		Where("event_sets.id = ?", eventSetID).
+		Where("event_sets.organization_id = ?", organizationID).
+		Where("event_sets.deactivated_at IS NULL").
+		Take(&eventSet)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &eventSet, nil
+}
+
 func LoadAllEventSets(
 	db *gorm.DB,
 	organizationID int64,

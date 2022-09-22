@@ -1,4 +1,5 @@
 import { compile } from 'path-to-regexp';
+import { rudderanalytics } from 'src/app/rudder';
 import { IEndpoint } from 'src/rpc/api';
 
 const IS_PROD = process.env.NODE_ENV === 'production';
@@ -8,6 +9,10 @@ export async function sendRequest<RequestType extends Record<string, any>, Respo
     endpoint: IEndpoint<RequestType, ResponseType>,
     payload?: RequestType,
 ): Promise<ResponseType> {
+    if (endpoint.track) {
+        rudderanalytics.track(`${endpoint.name}_start`);
+    }
+
     const toPath = compile(endpoint.path);
     const path = toPath(payload);
 
@@ -27,7 +32,7 @@ export async function sendRequest<RequestType extends Record<string, any>, Respo
         credentials: 'include',
     };
 
-    if (endpoint.method === 'POST') {
+    if (endpoint.method === 'POST' || endpoint.method === 'PATCH') {
         options.body = JSON.stringify(payload);
     }
 
@@ -35,7 +40,14 @@ export async function sendRequest<RequestType extends Record<string, any>, Respo
 
     if (!response.ok) {
         const errorMessage = response.statusText ? response.statusText : await response.text();
+        if (endpoint.track) {
+            rudderanalytics.track(`${endpoint.name}_error`);
+        }
         throw new Error(errorMessage);
+    }
+
+    if (endpoint.track) {
+        rudderanalytics.track(`${endpoint.name}_success`);
     }
 
     // not all AJAX requests have a response. the ones that do will be formatted as JSON

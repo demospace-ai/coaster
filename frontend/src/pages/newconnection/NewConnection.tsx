@@ -1,7 +1,6 @@
 
 import classNames from "classnames";
 import React, { FormEvent, useState } from "react";
-import { rudderanalytics } from "src/app/rudder";
 import { BackButton, Button, FormButton } from "src/components/button/Button";
 import { ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
@@ -106,12 +105,9 @@ const NewConnectionConfiguration: React.FC<NewConnectionConfigurationProps> = pr
     };
 
     try {
-      rudderanalytics.track("create_data_connection.start");
       await sendRequest(CreateDataConnection, payload);
-      rudderanalytics.track("create_data_connection.success");
       setCreateConnectionSuccess(true);
     } catch (e) {
-      rudderanalytics.track("create_data_connection.error");
       setCreateConnectionSuccess(false);
     }
 
@@ -178,12 +174,9 @@ const TestConnectionButton: React.FC<{ state: NewConnectionState, connectionType
     };
 
     try {
-      rudderanalytics.track("test_connection.start");
       await sendRequest(TestDataConnection, payload);
-      rudderanalytics.track("test_connection.success");
       setTestConnectionSuccess(true);
     } catch (e) {
-      rudderanalytics.track("test_connection.error");
       setTestConnectionSuccess(false);
     }
 

@@ -135,7 +135,7 @@ export const TableSelector: React.FC<TableSelectorProps> = props => {
 };
 
 type EventSetSelectorProps = {
-  connectionID: number | null;
+  connection: DataConnection | null;
   eventSet: EventSet | null;
   setEventSet: (eventSet: EventSet) => void;
   className?: string;
@@ -147,14 +147,15 @@ type EventSetSelectorProps = {
 export const EventSetSelector: React.FC<EventSetSelectorProps> = props => {
   const [eventSetOptions, setEventSetOptions] = useState<EventSet[]>();
   const [loading, setLoading] = useState(false);
+  const connectionID = props.connection ? props.connection.id : undefined;
   useEffect(() => {
-    if (!props.connectionID) {
+    if (!connectionID) {
       return;
     }
 
     setLoading(true);
     let ignore = false;
-    sendRequest(GetEventSets, { connectionID: props.connectionID }).then((results) => {
+    sendRequest(GetEventSets, { connectionID: connectionID }).then((results) => {
       if (!ignore) {
         setEventSetOptions(results.event_sets);
       }
@@ -165,7 +166,7 @@ export const EventSetSelector: React.FC<EventSetSelectorProps> = props => {
     return () => {
       ignore = true;
     };
-  }, [props.connectionID]);
+  }, [connectionID]);
 
   return <ValidatedDropdownInput
     by="id"
@@ -182,26 +183,29 @@ export const EventSetSelector: React.FC<EventSetSelectorProps> = props => {
 
 type EventSelectorProps = {
   connectionID: number | null;
-  eventSet: EventSet | null;
+  eventSetID: number | null;
   event: string | null,
   setEvent: (event: string) => void;
   className?: string;
   noOptionsString?: string;
   placeholder?: string;
   validated?: boolean;
+  eventOptions?: string[];
+  loading?: boolean;
+  controlled?: boolean;
 };
 
 export const EventSelector: React.FC<EventSelectorProps> = props => {
   const [eventOptions, setEventOptions] = useState<string[]>();
   const [loading, setLoading] = useState(false);
   useEffect(() => {
-    if (!props.connectionID || !props.eventSet) {
+    if (!props.connectionID || !props.eventSetID || props.controlled) {
       return;
     }
 
     setLoading(true);
     let ignore = false;
-    getEvents(props.connectionID, props.eventSet).then((results) => {
+    getEvents(props.connectionID, props.eventSetID).then((results) => {
       if (!ignore) {
         setEventOptions(results);
       }
@@ -212,14 +216,17 @@ export const EventSelector: React.FC<EventSelectorProps> = props => {
     return () => {
       ignore = true;
     };
-  }, [props.connectionID, props.eventSet]);
+  }, [props.connectionID, props.eventSetID, props.controlled]);
+
+  // Let parent pass options since there will be multiple event selectors on a page
+  const options = props.eventOptions ? props.eventOptions : eventOptions;
 
   return <ValidatedComboInput
     className={props.className}
     selected={props.event}
     setSelected={(event: string) => props.setEvent(event)}
-    options={eventOptions}
-    loading={loading}
+    options={options}
+    loading={loading || Boolean(props.loading)}
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No events available!"}
     placeholder={props.placeholder ? props.placeholder : "Choose event"}
     validated={props.validated} />;

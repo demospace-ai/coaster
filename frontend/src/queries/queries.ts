@@ -1,30 +1,18 @@
-import { rudderanalytics } from "src/app/rudder";
 import { sendRequest } from "src/rpc/ajax";
-import { EventSet, RunQuery, RunQueryRequest, RunQueryResponse } from "src/rpc/api";
+import { EventSet, GetEvents, GetEventsRequest, RunFunnelQuery, RunQueryRequest, RunQueryResponse } from "src/rpc/api";
 
-export const getEvents = async (connectionID: number, eventSet: EventSet): Promise<string[]> => {
-  const table = eventSet.custom_join ? "custom_events" : `${eventSet.dataset_name}.${eventSet.table_name}`;
-  const customTableQuery = getCustomTableQuery(eventSet);
-  const query = `
-    ${eventSet.custom_join ? customTableQuery : ''}
-    SELECT DISTINCT ${eventSet.event_type_column} FROM ${table}
-  `;
-
-  const payload: RunQueryRequest = {
-    'connection_id': connectionID,
-    'query_string': query,
+export const getEvents = async (connectionID: number, eventSetID: number): Promise<string[]> => {
+  const payload: GetEventsRequest = {
+    connectionID: connectionID,
+    eventSetID: eventSetID,
   };
 
   try {
-    rudderanalytics.track("get_events.start");
-    const response = await sendRequest(RunQuery, payload);
-    rudderanalytics.track("get_events.success");
-
+    const response = await sendRequest(GetEvents, payload);
     // The result should only have a single query result column, which is the event types
-    return response.query_results.map(result => result[0]) as string[];
+    return response.events;
   } catch (e) {
     console.log(e);
-    rudderanalytics.track("get_events.error");
     return [];
   }
 };
@@ -91,12 +79,9 @@ export const runFunnelQuery = async (connectionID: number, eventSet: EventSet, e
   };
 
   try {
-    rudderanalytics.track("run_funnel_query.start");
-    const response = await sendRequest(RunQuery, payload);
-    rudderanalytics.track("run_funnel_query.success");
+    const response = await sendRequest(RunFunnelQuery, payload);
     return response;
   } catch (e) {
-    rudderanalytics.track("run_funnel_query.error");
     throw e;
   }
 };

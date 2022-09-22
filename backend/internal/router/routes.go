@@ -54,6 +54,12 @@ var Routes = []Route{
 		HandlerFunc: handlers.CreateAnalysis,
 	},
 	{
+		Name:        "Update analysis",
+		Method:      "PATCH",
+		Pattern:     "/api/update_analysis",
+		HandlerFunc: handlers.UpdateAnalysis,
+	},
+	{
 		Name:        "Create data connection",
 		Method:      "POST",
 		Pattern:     "/api/create_data_connection",
@@ -118,6 +124,12 @@ var Routes = []Route{
 		Method:      "GET",
 		Pattern:     "/api/get_event_sets",
 		HandlerFunc: handlers.GetEventSets,
+	},
+	{
+		Name:        "Get all events",
+		Method:      "GET",
+		Pattern:     "/api/get_events",
+		HandlerFunc: handlers.GetEvents,
 	},
 	{
 		Name:        "Get analysis",

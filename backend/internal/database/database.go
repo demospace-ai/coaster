@@ -41,6 +41,8 @@ func NewNullInt64(i int64) NullInt64 {
 	return NullInt64{sql.NullInt64{Int64: i, Valid: true}}
 }
 
+var EmptyNullInt64 = NullInt64{sql.NullInt64{Valid: false}}
+
 func InitDatabase() (*gorm.DB, error) {
 	if application.IsProd() {
 		return initDatabaseProd()
