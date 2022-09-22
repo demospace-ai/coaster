@@ -11,21 +11,22 @@ export const Header: React.FC = () => {
   const isAuthenticated = useSelector(state => state.login.authenticated);
   const organization = useSelector(state => state.login.organization);
 
+  const pathTokens = location.pathname.split('/');
   let page: string;
-  switch (location.pathname) {
-    case '/':
+  switch (pathTokens[1]) {
+    case '':
       page = 'Home';
       break;
-    case '/customquery':
+    case 'customquery':
       page = 'Custom Query';
       break;
-    case '/funnel':
-      page = 'Funnel Report';
+    case 'funnel':
+      page = `Funnel Report`;
       break;
-    case '/insights':
+    case 'insights':
       page = 'Insights';
       break;
-    case '/workspacesettings':
+    case 'workspacesettings':
       page = 'Workspace Settings';
       break;
     default:
