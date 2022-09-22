@@ -216,6 +216,15 @@ export interface RunQueryRequest {
     query_string: string;
 }
 
+export function toCsvData(schema: Schema | null, queryResults: QueryResults | null): (string | number)[][] {
+    if (schema && queryResults) {
+        const header = schema.map(columnSchema => columnSchema.name);
+        return [header, ...queryResults];
+    }
+
+    return [];
+}
+
 export interface GetEventsRequest {
     connectionID: number;
     eventSetID: number;

@@ -1,15 +1,26 @@
+import { ArrowDownTrayIcon } from '@heroicons/react/20/solid';
 import { Tooltip } from '@nextui-org/react';
+import classNames from 'classnames';
 import { useCallback, useEffect, useState } from "react";
+import { CSVLink } from "react-csv";
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from 'src/components/button/Button';
+import { SaveIcon } from 'src/components/icons/Icons';
+import { Loading } from 'src/components/loading/Loading';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { ConnectionSelector, EventSelector, EventSetSelector } from "src/components/selector/Selector";
 import { getEvents, runFunnelQuery } from 'src/queries/queries';
 import { sendRequest } from 'src/rpc/ajax';
-import { AnalysisType, CreateAnalysis, CreateAnalysisRequest, DataConnection, EventSet, GetAnalysis, QueryResults, Schema, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
+import { AnalysisType, CreateAnalysis, CreateAnalysisRequest, DataConnection, EventSet, GetAnalysis, QueryResults, Schema, toCsvData, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
 
 type FunnelParams = {
   id: string,
+};
+
+type FunnelUpdates = {
+  connection?: DataConnection,
+  eventSet?: EventSet,
+  steps?: string[],
 };
 
 /*
@@ -32,10 +43,12 @@ export const Funnel: React.FC = () => {
   const [connection, setConnection] = useState<DataConnection | null>(null);
   const [eventSet, setEventSet] = useState<EventSet | null>(null);
   const [steps, setSteps] = useState<string[]>([]);
+  const [saving, setSaving] = useState<boolean>(false);
 
   const [shouldRun, setShouldRun] = useState<boolean>(false);
   const [schema, setSchema] = useState<Schema | null>(null);
   const [queryResults, setQueryResults] = useState<QueryResults | null>(null);
+  const hasResults = schema !== null && queryResults !== null;
 
   const createNewFunnel = useCallback(async () => {
     setLoading(true);
@@ -71,7 +84,7 @@ export const Funnel: React.FC = () => {
     setLoading(false);
   }, []);
 
-  const updateFunnel = useCallback(async (id: number, updates: { connection?: DataConnection, eventSet?: EventSet, steps?: string[]; }) => {
+  const updateFunnel = useCallback(async (id: number, updates: FunnelUpdates) => {
     const payload: UpdateAnalysisRequest = { analysis_id: Number(id) };
     if (updates.connection) {
       payload.connection_id = updates.connection.id;
@@ -94,6 +107,25 @@ export const Funnel: React.FC = () => {
       // TODO: handle error here
     }
   }, []);
+
+  const updateAllProperties = async () => {
+    setSaving(true);
+    const updates: FunnelUpdates = {};
+    if (connection) {
+      updates.connection = connection;
+    }
+
+    if (eventSet) {
+      updates.eventSet = eventSet;
+    }
+
+    if (steps) {
+      updates.steps = steps;
+    }
+
+    await updateFunnel(Number(id), updates);
+    setSaving(false);
+  };
 
   useEffect(() => {
     // Reset state on new ID since data will be newly loaded
@@ -205,8 +237,29 @@ export const Funnel: React.FC = () => {
           </Tooltip>
         </div>
         <div id='right-panel' className="tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1 tw-ml-10 tw-my-8 tw-border-gray-300 tw-border-solid tw-border tw-rounded-md">
-          <div id="top-panel" className="tw-p-4 tw-pl-5 tw-border-gray-300 tw-border-solid tw-border-b tw-text-lg tw-font-bold">
-            Results
+          <div id="top-panel" className="tw-p-4 tw-pl-5 tw-border-gray-300 tw-border-solid tw-border-b tw-flex">
+            <span className='tw-text-lg tw-font-bold'>
+              Results
+            </span>
+            <div className='tw-flex tw-ml-auto'>
+              <Tooltip color={"invert"} content={hasResults ? '' : "You must run the query to fetch results before exporting."}>
+                <CSVLink
+                  className={classNames(
+                    'tw-flex tw-rounded-md tw-font-bold tw-py-1 tw-tracking-wide tw-justify-center tw-align-middle tw-ml-2 tw-w-36 tw-h-8 tw-bg-white tw-border tw-border-solid tw-border-primary-text tw-text-primary-text hover:tw-bg-gray-200',
+                    hasResults ? null : 'tw-bg-gray-300 tw-text-gray-500 tw-border-0 tw-cursor-not-allowed hover:tw-bg-gray-300'
+                  )}
+                  data={toCsvData(schema, queryResults)}
+                  filename={`funnel_${id}_results.csv`} // TODO: use saved name
+                  onClick={() => hasResults} // prevent download if there are no results
+                >
+                  <ArrowDownTrayIcon className='tw-h-5 tw-inline tw-mr-1' />
+                  Export CSV
+                </CSVLink>
+              </Tooltip>
+              <Button className="tw-flex tw-justify-center tw-align-middle tw-ml-3 tw-w-24 tw-h-8 tw-bg-white tw-border-primary-text tw-text-primary-text hover:tw-bg-gray-200" onClick={updateAllProperties}>
+                {saving ? <Loading /> : <><SaveIcon className='tw-h-5 tw-inline tw-mr-1' />Save</>}
+              </Button>
+            </div>
           </div>
           <div id="bottom-panel" className='tw-flex tw-flex-col tw-flex-1'>
             <div className="tw-mb-5 tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden">

@@ -50,7 +50,7 @@ func UpdateAnalysis(
 	db *gorm.DB,
 	userID int64,
 	organizationID int64,
-	analysis *models.Analysis,
+	analysis models.Analysis,
 	connectionID *int64,
 	eventSetID *int64,
 	query *string,
@@ -74,7 +74,7 @@ func UpdateAnalysis(
 		return nil, result.Error
 	}
 
-	return analysis, nil
+	return &analysis, nil
 }
 
 func CreateFunnelSteps(

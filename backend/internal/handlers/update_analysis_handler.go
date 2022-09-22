@@ -68,11 +68,11 @@ func UpdateAnalysis(env Env, w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	_, err = analyses.UpdateAnalysis(
+	updatedAnalysis, err := analyses.UpdateAnalysis(
 		env.Db,
 		env.Auth.User.ID,
 		env.Auth.Organization.ID,
-		analysis,
+		*analysis,
 		updateAnalysisRequest.ConnectionID,
 		updateAnalysisRequest.EventSetID,
 		updateAnalysisRequest.Query,
@@ -90,7 +90,9 @@ func UpdateAnalysis(env Env, w http.ResponseWriter, r *http.Request) error {
 				return err
 			}
 
-			if updateAnalysisRequest.StepNames != nil {
+			// Ignore adding funnel steps from request if the connection or event set changed
+			sourceChanged := (analysis.ConnectionID != updatedAnalysis.ConnectionID) || (analysis.EventSetID != updatedAnalysis.EventSetID)
+			if updateAnalysisRequest.StepNames != nil && !sourceChanged {
 				funnelSteps, err = analyses.CreateFunnelSteps(env.Db, analysis.ID, updateAnalysisRequest.StepNames)
 				if err != nil {
 					return err

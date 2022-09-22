@@ -1,16 +1,19 @@
-import { PlusCircleIcon } from '@heroicons/react/20/solid';
+import { ArrowDownTrayIcon, PlusCircleIcon } from '@heroicons/react/20/solid';
 import { Tooltip } from '@nextui-org/react';
+import classNames from 'classnames';
 import { editor as EditorLib } from "monaco-editor/esm/vs/editor/editor.api";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { CSVLink } from "react-csv";
 import MonacoEditor, { monaco } from "react-monaco-editor";
 import { useNavigate, useParams } from 'react-router-dom';
 import { rudderanalytics } from 'src/app/rudder';
 import { Button } from "src/components/button/Button";
+import { SaveIcon } from 'src/components/icons/Icons';
 import { Loading } from 'src/components/loading/Loading';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { ConnectionSelector } from "src/components/selector/Selector";
 import { sendRequest } from "src/rpc/ajax";
-import { AnalysisType, CreateAnalysis, CreateAnalysisRequest, DataConnection, GetAnalysis, QueryResults, RunQuery, RunQueryRequest, Schema, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
+import { AnalysisType, CreateAnalysis, CreateAnalysisRequest, DataConnection, GetAnalysis, QueryResults, RunQuery, RunQueryRequest, Schema, toCsvData, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
 import { createResizeFunction } from 'src/utils/resize';
 
 type QueryParams = {
@@ -21,16 +24,18 @@ export const CustomQuery: React.FC = () => {
   const { id } = useParams<QueryParams>();
   const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
+  const [saving, setSaving] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const [topPanelHeight, setTopPanelHeight] = useState<number>();
+  const topPanelRef = useRef<HTMLDivElement>(null);
+
   const [connection, setConnection] = useState<DataConnection | null>(null);
   const [query, setQuery] = useState<string>("");
   const [schema, setSchema] = useState<Schema | null>(null);
-  const [shouldRun, setShouldRun] = useState<boolean>(false);
-  const [topPanelHeight, setTopPanelHeight] = useState<number>();
   const [queryResults, setQueryResults] = useState<QueryResults | null>(null);
-  const [saving, setSaving] = useState<boolean>(false);
-  const topPanelRef = useRef<HTMLDivElement>(null);
-  const connectionID = connection ? connection.id : null;
+  const hasResults = schema !== null && queryResults !== null;
+  const [shouldRun, setShouldRun] = useState<boolean>(false);
 
   const createNewCustomQuery = useCallback(async () => {
     setLoading(true);
@@ -172,6 +177,7 @@ export const CustomQuery: React.FC = () => {
 
   // Hack to run the query since the Monaco editor will keep a memoized version of the runQuery function
   // that uses the first query passed to it.
+  const connectionID = connection ? connection.id : null;
   useEffect(() => {
     if (shouldRun) {
       setShouldRun(false);
@@ -236,9 +242,25 @@ export const CustomQuery: React.FC = () => {
                 <Tooltip color={"invert"} content={"⌘ + Enter"}>
                   <Button className="tw-w-40 tw-h-8" onClick={() => setShouldRun(true)}>{loading ? "Stop" : "Run"}</Button>
                 </Tooltip>
-                <Button className="tw-flex tw-justify-center tw-align-middle tw-ml-auto tw-w-24 tw-h-8 tw-bg-white tw-border-primary-text tw-text-primary-text hover:tw-bg-gray-200" onClick={updateQuery}>
-                  {saving ? <Loading /> : <><SaveIcon className='tw-h-5 tw-inline tw-mr-1' />Save</>}
-                </Button>
+                <div className='tw-flex tw-ml-auto'>
+                  <Tooltip color={"invert"} content={hasResults ? '' : "You must run the query to fetch results before exporting."}>
+                    <CSVLink
+                      className={classNames(
+                        'tw-flex tw-rounded-md tw-font-bold tw-py-1 tw-tracking-wide tw-justify-center tw-align-middle tw-ml-2 tw-w-36 tw-h-8 tw-bg-white tw-border tw-border-solid tw-border-primary-text tw-text-primary-text hover:tw-bg-gray-200',
+                        hasResults ? null : 'tw-bg-gray-300 tw-text-gray-500 tw-border-0 tw-cursor-not-allowed hover:tw-bg-gray-300'
+                      )}
+                      data={toCsvData(schema, queryResults)}
+                      filename={`custom_query_${id}_results.csv`} // TODO: use saved name
+                      onClick={() => hasResults} // prevent download if there are no results
+                    >
+                      <ArrowDownTrayIcon className='tw-h-5 tw-inline tw-mr-1' />
+                      Export CSV
+                    </CSVLink>
+                  </Tooltip>
+                  <Button className="tw-flex tw-justify-center tw-align-middle tw-ml-3 tw-w-24 tw-h-8 tw-bg-white tw-border-primary-text tw-text-primary-text hover:tw-bg-gray-200" onClick={updateQuery}>
+                    {saving ? <Loading /> : <><SaveIcon className='tw-h-5 tw-inline tw-mr-1' />Save</>}
+                  </Button>
+                </div>
               </div>
               <div className="tw-mb-5 tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden tw-border-gray-300 tw-border-solid tw-border tw-bg-gray-100">
                 {errorMessage &&
@@ -278,13 +300,5 @@ const QueryNavigationTab: React.FC<{ active?: boolean, children: React.ReactNode
         {children}
       </div>
     </div>
-  );
-};
-
-const SaveIcon: React.FC<{ className?: string; }> = ({ className }) => {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox='0 0 48 48' className={className}>
-      <path d="M42 13.85V39q0 1.2-.9 2.1-.9.9-2.1.9H9q-1.2 0-2.1-.9Q6 40.2 6 39V9q0-1.2.9-2.1Q7.8 6 9 6h25.15Zm-3 1.35L32.8 9H9v30h30ZM24 35.75q2.15 0 3.675-1.525T29.2 30.55q0-2.15-1.525-3.675T24 25.35q-2.15 0-3.675 1.525T18.8 30.55q0 2.15 1.525 3.675T24 35.75ZM11.65 18.8h17.9v-7.15h-17.9ZM9 15.2V39 9Z" />
-    </svg>
   );
 };
