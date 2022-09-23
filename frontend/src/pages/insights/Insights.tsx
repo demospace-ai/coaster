@@ -49,7 +49,7 @@ export const Insights: React.FC = () => {
   }, [analyses]);
 
   return (
-    <div className='tw-h-full tw-overflow-scroll tw-z-0'>
+    <div className='tw-h-full tw-overflow-scroll'>
       <div className='tw-w-full'>
         <DeleteModal analysisToDelete={analysisToDelete} deleteAnalysis={deleteAnalysis} close={() => setAnalysisToDelete(null)} />
         {loading ? <Loading className='tw-mx-auto tw-mt-32' /> : (

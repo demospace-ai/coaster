@@ -35,28 +35,6 @@
     padding-top: 3px;
 }
 
-.newAnalysis {
-    height: 32px;
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    border-radius: 5px;
-    background: var(--primary-color);
-    color: white;
-    text-decoration: none;
-    align-items: center;
-    padding-left: 10px;
-    font-size: 14px;
-    box-shadow: rgb(0 0 0 / 7%) 0px 1px 1px;
-    border: 1px solid #508368;
-    cursor: pointer;
-    user-select: none;
-}
-
-.newAnalysis:hover {
-    background: var(--primary-highlight-color);
-}
-
 .activeRouteContainer {
     background: #d6d6d6;
     padding-left: 15px;

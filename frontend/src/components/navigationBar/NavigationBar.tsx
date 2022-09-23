@@ -53,7 +53,7 @@ type OrganizationButtonProps = {
 const OrganizationButton: React.FC<OrganizationButtonProps> = props => {
   return (
     <Menu as="div" >
-      <Menu.Button className="tw-w-full">
+      <Menu.Button className="tw-w-full tw-z-10">
         {({ open }) => (
           <div className={classNames("tw-py-[15px] tw-px-5 tw-flex tw-flex-row tw-h-[60px] tw-box-border tw-border-b tw-border-solid tw-border-gray-200 tw-cursor-pointer tw-w-full", "hover:tw-bg-navigation-highlight", open && "tw-bg-navigation-highlight")}>
             <div className={styles.organizationIcon}>
@@ -76,7 +76,7 @@ const OrganizationButton: React.FC<OrganizationButtonProps> = props => {
         leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
         leaveTo="tw-transform tw-opacity-0 tw-scale-95"
       >
-        <Menu.Items className="tw-z-10 tw-origin-top-left tw-absolute tw-left-3 tw-mt-2 tw-w-56 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none">
+        <Menu.Items className="tw-z-20 tw-origin-top-left tw-absolute tw-left-3 tw-mt-2 tw-w-56 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none">
           <div className="tw-py-1">
             <Menu.Item>
               {({ active }) => (
@@ -99,10 +99,11 @@ const OrganizationButton: React.FC<OrganizationButtonProps> = props => {
 };
 
 const NewAnalysisButton: React.FC = () => (
-  <Menu as="div" className="tw-relative tw-z-0 tw-m-5">
-    <Menu.Button className={styles.newAnalysis}>
+  /* Z-index of this menu must be more than other items, but less than the Workspace Settings menu */
+  <Menu as="div" className="tw-relative tw-m-5 tw-z-10">
+    <Menu.Button className="tw-flex tw-h-8 tw-w-full tw-rounded-md tw-bg-fabra tw-text-white tw-pl-3 tw-shadow-centered tw-border tw-border-solid tw-border-green-border hover:tw-bg-primary-highlight tw-select-none tw-items-center">
       <PlusCircleIcon className='tw-h-5 tw-inline-block' />
-      <div className="tw-inline-block tw-font-[500] tw-ml-[5px]">New Analysis</div>
+      <div className="tw-inline-block tw-font-[500] tw-ml-[6px]">New Analysis</div>
     </Menu.Button>
 
     <Transition
