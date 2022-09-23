@@ -15,6 +15,8 @@ export const SearchResults: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let ignore = false;
+
     // No query, no need to search
     if (!query) {
       setLoading(false);
@@ -23,8 +25,14 @@ export const SearchResults: React.FC = () => {
     }
 
     search(query).then(() => {
-      setLoading(false);
+      if (!ignore) {
+        setLoading(false);
+      }
     });
+
+    return () => {
+      ignore = true;
+    };
   }, [search, setResults, query]);
 
   if (loading) {

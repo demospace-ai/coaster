@@ -242,9 +242,8 @@ export const NewEventSetStepThree: React.FC<NewEventSetFormProps & { onComplete:
     sendRequest(GetSchema, payload).then((results) => {
       if (!ignore) {
         setSchema(results.schema);
+        setSchemaLoading(false);
       }
-
-      setSchemaLoading(false);
     });
 
     return () => {

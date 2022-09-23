@@ -1,9 +1,17 @@
-export const debounce = <T = void, K = void>(callback: (arg: T) => K, delayMillis: number) => {
-  let timeout: number | undefined;
-  return (arg: T) => {
-    if (timeout) {
-      clearTimeout(timeout)
-    }
-    timeout = window.setTimeout(() => callback(arg), delayMillis);
-  }
+import { useState } from "react";
+
+type Timer = ReturnType<typeof setTimeout>;
+
+export function useDebounce<F extends (...args: any[]) => void>(func: F, delayMs: number) {
+  const [timer, setTimer] = useState<Timer>(); //Create timer state
+
+  const debouncedFunction = ((...args) => {
+    const newTimer = setTimeout(() => {
+      func(...args);
+    }, delayMs);
+    clearTimeout(timer);
+    setTimer(newTimer);
+  }) as F;
+
+  return debouncedFunction;
 }

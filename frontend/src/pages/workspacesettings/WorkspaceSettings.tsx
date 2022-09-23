@@ -53,9 +53,8 @@ const DataSourceSettings: React.FC<{ setStep: (step: Step) => void; setConnectio
       if (!ignore) {
         setDataConnections(results.data_connections);
         setConnectionMap(new Map(results.data_connections.map(i => [i.id, i])));
+        setDataConnectionsLoading(false);
       }
-
-      setDataConnectionsLoading(false);
     });
 
     return () => {
@@ -117,9 +116,8 @@ const EventSetSettings: React.FC<{ setStep: (step: Step) => void, connectionMap:
     sendRequest(GetEventSets).then((results) => {
       if (!ignore) {
         setEventSets(results.event_sets);
+        setEventSetsLoading(false);
       }
-
-      setEventSetsLoading(false);
     });
 
     return () => {

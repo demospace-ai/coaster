@@ -38,7 +38,8 @@ TODO: tests
 export const Funnel: React.FC = () => {
   const { id } = useParams<FunnelParams>();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState<boolean>(false);
+  const [initialLoading, setInitialLoading] = useState<boolean>(true);
+  const [queryLoading, setQueryLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [connection, setConnection] = useState<DataConnection | null>(null);
   const [eventSet, setEventSet] = useState<EventSet | null>(null);
@@ -51,7 +52,7 @@ export const Funnel: React.FC = () => {
   const hasResults = schema !== null && queryResults !== null;
 
   const createNewFunnel = useCallback(async () => {
-    setLoading(true);
+    setInitialLoading(true);
     const payload: CreateAnalysisRequest = { analysis_type: AnalysisType.Funnel };
     try {
       const response = await sendRequest(CreateAnalysis, payload);
@@ -59,11 +60,11 @@ export const Funnel: React.FC = () => {
     } catch (e) {
       // TODO: handle error here
     }
-    setLoading(false);
+    setInitialLoading(false);
   }, [navigate]);
 
   const loadSavedFunnel = useCallback(async (id: string) => {
-    setLoading(true);
+    setInitialLoading(true);
     try {
       const response = await sendRequest(GetAnalysis, { analysisID: id });
       if (response.connection) {
@@ -81,7 +82,7 @@ export const Funnel: React.FC = () => {
     } catch (e) {
       // TODO: handle error here
     }
-    setLoading(false);
+    setInitialLoading(false);
   }, []);
 
   const updateFunnel = useCallback(async (id: number, updates: FunnelUpdates) => {
@@ -176,24 +177,24 @@ export const Funnel: React.FC = () => {
   }, [id, steps, updateFunnel]);
 
   const runQuery = async () => {
-    setLoading(true);
+    setQueryLoading(true);
     setErrorMessage(null);
 
     if (!connection) {
       setErrorMessage("Data source is not set!");
-      setLoading(false);
+      setQueryLoading(false);
       return;
     }
 
     if (!eventSet) {
       setErrorMessage("Event set is not set!");
-      setLoading(false);
+      setQueryLoading(false);
       return;
     }
 
     if (steps.length < 2) {
       setErrorMessage("Must have 2 or more steps!");
-      setLoading(false);
+      setQueryLoading(false);
       return;
     }
 
@@ -209,12 +210,16 @@ export const Funnel: React.FC = () => {
       setErrorMessage((e as Error).message);
     }
 
-    setLoading(false);
+    setQueryLoading(false);
   };
 
   if (shouldRun) {
     runQuery();
     setShouldRun(false);
+  }
+
+  if (initialLoading) {
+    return <Loading />;
   }
 
   return (
@@ -233,7 +238,7 @@ export const Funnel: React.FC = () => {
             <Steps connectionID={connection ? connection.id : null} eventSetID={eventSet ? eventSet.id : null} steps={steps} onEventSelected={onEventSelected} onEventAdded={onEventAdded} />
           </div>
           <Tooltip className='tw-mt-10' color={"invert"} content={"⌘ + Enter"}>
-            <Button className="tw-w-40 tw-h-8" onClick={runQuery}>{loading ? "Stop" : "Run"}</Button>
+            <Button className="tw-w-40 tw-h-8" onClick={runQuery}>{queryLoading ? "Stop" : "Run"}</Button>
           </Tooltip>
         </div>
         <div id='right-panel' className="tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1 tw-ml-10 tw-my-8 tw-border-gray-300 tw-border-solid tw-border tw-rounded-md">
@@ -268,7 +273,7 @@ export const Funnel: React.FC = () => {
                   Error: {errorMessage}
                 </div>
               }
-              <MemoizedResultsTable loading={loading} schema={schema} results={queryResults} placeholder="Choose two or more steps to see results!" />
+              <MemoizedResultsTable loading={queryLoading} schema={schema} results={queryResults} placeholder="Choose two or more steps to see results!" />
             </div>
           </div>
         </div>
@@ -299,9 +304,8 @@ const Steps: React.FC<StepsProps> = props => {
     getEvents(connectionID, eventSetID).then((results) => {
       if (!ignore) {
         setEventOptions(results);
+        setLoading(false);
       }
-
-      setLoading(false);
     });
 
     return () => {

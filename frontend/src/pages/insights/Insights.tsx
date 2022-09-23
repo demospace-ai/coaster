@@ -14,9 +14,8 @@ export const Insights: React.FC = () => {
     sendRequest(GetAllAnalyses).then((results) => {
       if (!ignore) {
         setAnalyses(results.analyses);
+        setLoading(false);
       }
-
-      setLoading(false);
     });
 
     return () => {

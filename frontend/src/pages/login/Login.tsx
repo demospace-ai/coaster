@@ -27,9 +27,14 @@ export const Login: React.FC = () => {
 
   // Use effect to navigate after render if authenticated
   useEffect(() => {
-    if (isAuthenticated && organization) {
+    let ignore = false;
+    if (isAuthenticated && organization && !ignore) {
       navigate('/');
     }
+
+    return () => {
+      ignore = true;
+    };
   }, [navigate, isAuthenticated, organization]);
 
   if (loading) {

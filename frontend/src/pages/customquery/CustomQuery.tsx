@@ -14,20 +14,31 @@ import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { ConnectionSelector } from "src/components/selector/Selector";
 import { sendRequest } from "src/rpc/ajax";
 import { AnalysisType, CreateAnalysis, CreateAnalysisRequest, DataConnection, GetAnalysis, QueryResults, RunQuery, RunQueryRequest, Schema, toCsvData, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
+import { useDebounce } from 'src/utils/debounce';
 import { createResizeFunction } from 'src/utils/resize';
 
 type QueryParams = {
   id: string,
 };
 
+/*
+
+TODO: tests
+
+- updating connection should not clear query
+- should only trigger one update for a string of changes within 1.5 seconds
+- should not trigger update if the connection object changes but the ID does not
+- should not trigger update on load
+- should not trigger update when setting the query after the first load
+
+*/
 export const CustomQuery: React.FC = () => {
   const { id } = useParams<QueryParams>();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState<boolean>(false);
+  const [initialLoading, setInitialLoading] = useState<boolean>(true);
+  const [queryLoading, setQueryLoading] = useState<boolean>(false);
   const [saving, setSaving] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [editor, setEditor] = useState<EditorLib.IStandaloneCodeEditor | null>(null);
-  const [initialQuery, setInitialQuery] = useState<string>("");
 
   const [topPanelHeight, setTopPanelHeight] = useState<number>();
   const topPanelRef = useRef<HTMLDivElement>(null);
@@ -37,10 +48,12 @@ export const CustomQuery: React.FC = () => {
   const [schema, setSchema] = useState<Schema | null>(null);
   const [queryResults, setQueryResults] = useState<QueryResults | null>(null);
   const hasResults = schema !== null && queryResults !== null;
+
   const [shouldRun, setShouldRun] = useState<boolean>(false);
+  const [shouldSave, setShouldSave] = useState<boolean>(false);
 
   const createNewCustomQuery = useCallback(async () => {
-    setLoading(true);
+    setInitialLoading(true);
     const payload: CreateAnalysisRequest = { analysis_type: AnalysisType.CustomQuery };
     try {
       const response = await sendRequest(CreateAnalysis, payload);
@@ -48,11 +61,11 @@ export const CustomQuery: React.FC = () => {
     } catch (e) {
       // TODO: handle error here
     }
-    setLoading(false);
+    setInitialLoading(false);
   }, [navigate]);
 
   const loadSavedCustomQuery = useCallback(async (id: string) => {
-    setLoading(true);
+    setInitialLoading(true);
     try {
       const response = await sendRequest(GetAnalysis, { analysisID: id });
       if (response.connection) {
@@ -60,14 +73,14 @@ export const CustomQuery: React.FC = () => {
       }
 
       if (response.analysis.query) {
-        setInitialQuery(response.analysis.query);
+        setQuery(response.analysis.query);
       }
 
     } catch (e) {
       // TODO: handle error here
     }
-    setLoading(false);
-  }, [setConnection, setInitialQuery]);
+    setInitialLoading(false);
+  }, [setConnection, setQuery]);
 
   const updateCustomQuery = useCallback(async (id: number, updates: { connection?: DataConnection, query?: string; }) => {
     setSaving(true);
@@ -131,12 +144,14 @@ export const CustomQuery: React.FC = () => {
     }
   };
 
-  const updateQuery = () => {
-    updateCustomQuery(Number(id), { query: query });
-  };
+  const debouncedUpdate = useDebounce((id: number, query: string) => updateCustomQuery(id, { query: query }), 1500);
+  const onQueryChange = useCallback((query: string) => {
+    setQuery(query);
+    debouncedUpdate(Number(id), query);
+  }, [id, debouncedUpdate]);
 
   const runQuery = useCallback(async (id: number, connectionID: number | null, query: string) => {
-    setLoading(true);
+    setQueryLoading(true);
     setErrorMessage(null);
 
     // Save the query even if it can't be run
@@ -144,13 +159,13 @@ export const CustomQuery: React.FC = () => {
 
     if (!connectionID) {
       setErrorMessage("Data source is not set!");
-      setLoading(false);
+      setQueryLoading(false);
       return;
     }
 
     if (!query.trim()) {
       setErrorMessage("Query cannot be empty!");
-      setLoading(false);
+      setQueryLoading(false);
       return;
     }
 
@@ -174,10 +189,10 @@ export const CustomQuery: React.FC = () => {
       setQueryResults(null);
     }
 
-    setLoading(false);
+    setQueryLoading(false);
   }, [updateCustomQuery]);
 
-  // Hack to run the query since the Monaco editor will keep a memoized version of the runQuery function
+  // Hack to run/save the query since the Monaco editor will keep a memoized version of the runQuery function
   // that uses the first query passed to it.
   const connectionID = connection ? connection.id : null;
   useEffect(() => {
@@ -185,14 +200,12 @@ export const CustomQuery: React.FC = () => {
       setShouldRun(false);
       runQuery(Number(id), connectionID, query);
     }
-  }, [id, connectionID, query, shouldRun, runQuery]);
 
-  // Hack to set initial editor value from saved query without causing any selection to be made
-  useEffect(() => {
-    if (editor) {
-      editor.setValue(initialQuery);
+    if (shouldSave) {
+      setShouldSave(false);
+      updateCustomQuery(Number(id), { query: query });
     }
-  }, [initialQuery, editor]);
+  }, [id, connectionID, query, shouldRun, shouldSave, runQuery, updateCustomQuery]);
 
   monaco.editor.defineTheme("fabra", {
     base: "vs-dark",
@@ -208,6 +221,10 @@ export const CustomQuery: React.FC = () => {
       'editor.lineHighlightBackground': '#2c2c2c',
     }
   });
+
+  if (initialLoading) {
+    return <Loading />;
+  }
 
   return (
     <>
@@ -233,10 +250,10 @@ export const CustomQuery: React.FC = () => {
                   fontSize: 12,
                   scrollBeyondLastLine: false,
                 }}
-                onChange={setQuery}
+                onChange={onQueryChange}
                 editorDidMount={(editor: EditorLib.IStandaloneCodeEditor) => {
                   editor.addAction({ id: "run query", label: "run query", keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter], run: () => setShouldRun(true), });
-                  setEditor(editor);
+                  editor.addAction({ id: "save query", label: "save query", keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS], run: () => setShouldSave(true), });
                 }}
               />
               <div id='resize-grabber' className='tw-relative'>
@@ -250,7 +267,7 @@ export const CustomQuery: React.FC = () => {
             <div id="bottom-panel" className='tw-h-[60%] tw-flex tw-flex-col tw-flex-1' style={{ height: "calc(100% - " + topPanelHeight + "px)" }}>
               <div className="tw-border-solid tw-border-gray-300 tw-border-x tw-p-[10px] tw-flex">
                 <Tooltip color={"invert"} content={"⌘ + Enter"}>
-                  <Button className="tw-w-40 tw-h-8" onClick={() => setShouldRun(true)}>{loading ? "Stop" : "Run"}</Button>
+                  <Button className="tw-w-40 tw-h-8" onClick={() => setShouldRun(true)}>{queryLoading ? "Stop" : "Run"}</Button>
                 </Tooltip>
                 <div className='tw-flex tw-ml-auto'>
                   <Tooltip color={"invert"} content={hasResults ? '' : "You must run the query to fetch results before exporting."}>
@@ -267,7 +284,7 @@ export const CustomQuery: React.FC = () => {
                       Export CSV
                     </CSVLink>
                   </Tooltip>
-                  <Button className="tw-flex tw-justify-center tw-align-middle tw-ml-3 tw-w-24 tw-h-8 tw-bg-white tw-border-primary-text tw-text-primary-text hover:tw-bg-gray-200" onClick={updateQuery}>
+                  <Button className="tw-flex tw-justify-center tw-align-middle tw-ml-3 tw-w-24 tw-h-8 tw-bg-white tw-border-primary-text tw-text-primary-text hover:tw-bg-gray-200" onClick={() => setShouldSave(true)}>
                     {saving ? <Loading /> : <><SaveIcon className='tw-h-5 tw-inline tw-mr-1' />Save</>}
                   </Button>
                 </div>
@@ -278,7 +295,7 @@ export const CustomQuery: React.FC = () => {
                     Error: {errorMessage}
                   </div>
                 }
-                <MemoizedResultsTable loading={loading} schema={schema} results={queryResults} />
+                <MemoizedResultsTable loading={queryLoading} schema={schema} results={queryResults} />
               </div>
             </div>
           </div>

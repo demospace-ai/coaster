@@ -22,9 +22,8 @@ export const ConnectionSelector: React.FC<ConnectionSelectorProps> = props => {
     sendRequest(GetDataConnections).then((results) => {
       if (!ignore) {
         setConnectionOptions(results.data_connections);
+        setLoading(false);
       }
-
-      setLoading(false);
     });
 
     return () => {
@@ -113,9 +112,8 @@ export const TableSelector: React.FC<TableSelectorProps> = props => {
     sendRequest(GetTables, { connectionID: props.connectionID, datasetID: props.datasetID }).then((results) => {
       if (!ignore) {
         setTableOptions(results.tables);
+        setLoading(false);
       }
-
-      setLoading(false);
     });
 
     return () => {
@@ -158,9 +156,8 @@ export const EventSetSelector: React.FC<EventSetSelectorProps> = props => {
     sendRequest(GetEventSets, { connectionID: connectionID }).then((results) => {
       if (!ignore) {
         setEventSetOptions(results.event_sets);
+        setLoading(false);
       }
-
-      setLoading(false);
     });
 
     return () => {
@@ -208,9 +205,8 @@ export const EventSelector: React.FC<EventSelectorProps> = props => {
     getEvents(props.connectionID, props.eventSetID).then((results) => {
       if (!ignore) {
         setEventOptions(results);
+        setLoading(false);
       }
-
-      setLoading(false);
     });
 
     return () => {
