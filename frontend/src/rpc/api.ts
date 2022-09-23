@@ -101,6 +101,13 @@ export const CreateAnalysis: IEndpoint<CreateAnalysisRequest, CreateAnalysisResp
     track: true,
 };
 
+export const DeleteAnalysis: IEndpoint<{ analysisID: number; }, undefined> = {
+    name: 'delete_analysis',
+    method: 'DELETE',
+    path: '/delete_analysis/:analysisID',
+    track: true,
+};
+
 export const UpdateAnalysis: IEndpoint<UpdateAnalysisRequest, UpdateAnalysisResponse> = {
     name: 'update_analysis',
     method: 'PATCH',

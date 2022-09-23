@@ -29,16 +29,15 @@
 }
 
 .title {
-    font-size: 14px;
     display: inline;
-    margin: 20px;
+    margin: 24px;
     margin-bottom: 10px;
     user-select: none;
 }
 
 .closeButton {
     display: inline;
-    margin: 20px;
+    margin: 24px;
     margin-left: auto;
     margin-bottom: 10px;
     background-color: transparent;

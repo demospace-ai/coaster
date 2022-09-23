@@ -7,6 +7,7 @@ interface ModalProps {
   close?: () => void;
   children?: React.ReactNode;
   title?: string;
+  titleStyle?: string;
   clickToEscape?: boolean;
 }
 
@@ -30,7 +31,7 @@ export const Modal: React.FC<ModalProps> = props => {
     <div className={classNames(styles.modal, showHideClassName)} onClick={props.clickToEscape ? props.close : undefined}>
       <section className={styles.modalMain} onClick={e => e.stopPropagation()}>
         <div style={{ display: "flex" }}>
-          <div className={styles.title}>
+          <div className={classNames(styles.title, props.titleStyle)}>
             {props.title}
           </div>
           <button className={styles.closeButton} onClick={props.close}>

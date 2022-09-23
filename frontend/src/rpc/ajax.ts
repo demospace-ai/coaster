@@ -32,7 +32,7 @@ export async function sendRequest<RequestType extends Record<string, any>, Respo
         credentials: 'include',
     };
 
-    if (endpoint.method === 'POST' || endpoint.method === 'PATCH') {
+    if (["POST", "PATCH", "PUT"].includes(endpoint.method)) {
         options.body = JSON.stringify(payload);
     }
 

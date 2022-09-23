@@ -11,7 +11,7 @@ type ButtonProps = {
 export const Button: React.FC<ButtonProps> = props => {
   const buttonStyle = classNames(
     'tw-text-white tw-bg-fabra hover:tw-bg-primary-highlight',
-    'tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition',
+    'tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition tw-select-none',
     'tw-border tw-border-green-border tw-border-solid',
     props.secondary && 'tw-bg-white tw-text-primary-text tw-font-normal',
     props.className
@@ -35,7 +35,7 @@ type FormButtonProps = {
 export const FormButton: React.FC<FormButtonProps> = props => {
   const buttonStyle = classNames(
     'tw-text-white tw-bg-fabra hover:tw-bg-primary-highlight',
-    'tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition',
+    'tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition tw-select-none',
     'tw-border tw-border-green-border tw-border-solid',
     props.className
   );

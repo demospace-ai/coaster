@@ -14,10 +14,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type GetAnalysisRequest struct {
-	AnalysisID int64 `json:"analysis_id"`
-}
-
 type GetAnalysisResponse struct {
 	Analysis   views.Analysis         `json:"analysis"`
 	Connection *models.DataConnection `json:"connection"`

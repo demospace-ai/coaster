@@ -242,12 +242,12 @@ export const Funnel: React.FC = () => {
           </Tooltip>
         </div>
         <div id='right-panel' className="tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1 tw-ml-10 tw-my-8 tw-border-gray-300 tw-border-solid tw-border tw-rounded-md">
-          <div id="top-panel" className="tw-p-4 tw-pl-5 tw-border-gray-300 tw-border-solid tw-border-b tw-flex">
+          <div id="top-panel" className="tw-p-4 tw-pl-5 tw-border-gray-300 tw-border-solid tw-border-b tw-flex tw-select-none">
             <span className='tw-text-lg tw-font-bold'>
               Results
             </span>
             <div className='tw-flex tw-ml-auto'>
-              <Tooltip color={"invert"} content={hasResults ? '' : "You must run the query to fetch results before exporting."}>
+              <Tooltip className="tw-select-none" color={"invert"} content={hasResults ? '' : "You must run the query to fetch results before exporting."}>
                 <CSVLink
                   className={classNames(
                     'tw-flex tw-rounded-md tw-font-bold tw-py-1 tw-tracking-wide tw-justify-center tw-align-middle tw-ml-2 tw-w-36 tw-h-8 tw-bg-white tw-border tw-border-solid tw-border-primary-text tw-text-primary-text hover:tw-bg-gray-200',

@@ -138,6 +138,12 @@ var Routes = []Route{
 		HandlerFunc: handlers.GetAnalysis,
 	},
 	{
+		Name:        "Delete analysis",
+		Method:      "DELETE",
+		Pattern:     "/api/delete_analysis/{analysisID}",
+		HandlerFunc: handlers.DeleteAnalysis,
+	},
+	{
 		Name:        "Send validation code",
 		Method:      "POST",
 		Pattern:     "/api/validation_code",

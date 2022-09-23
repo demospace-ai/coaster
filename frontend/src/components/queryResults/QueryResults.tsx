@@ -49,7 +49,7 @@ const QueryResultsTable: React.FC<QueryResultsProps> = props => {
     );
   }
 
-  return <div className="tw-m-5">{props.placeholder ? props.placeholder : "Run a query to see results"}</div>;
+  return <div className="tw-m-5 tw-select-none">{props.placeholder ? props.placeholder : "Run a query to see results"}</div>;
 };
 
 const ResultsSchema: React.FC<{ schema: Schema; }> = ({ schema }) => {

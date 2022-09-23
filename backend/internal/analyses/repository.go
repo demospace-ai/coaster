@@ -105,7 +105,9 @@ func DeactivateFunnelSteps(
 	analysisID int64,
 ) error {
 	currentTime := time.Now()
-	result := db.Table("funnel_steps").Where("analysis_id = ?", analysisID).Update("deactivated_at", currentTime)
+	result := db.Table("funnel_steps").
+		Where("analysis_id = ?", analysisID).
+		Update("deactivated_at", currentTime)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -164,6 +166,21 @@ func LoadAllAnalyses(db *gorm.DB, page int, organizationID int64) ([]models.Anal
 	}
 
 	return analyses, nil
+}
+
+func DeactivateAnalyisByID(db *gorm.DB, organizationID int64, analysisID int64) error {
+	currentTime := time.Now()
+	result := db.Table("analyses").
+		Where("analyses.id = ?", analysisID).
+		Where("analyses.organization_id = ?", organizationID).
+		Where("analyses.deactivated_at IS NULL").
+		Update("deactivated_at", currentTime)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
 }
 
 func Search(db *gorm.DB, searchQuery string, organizationID int64) ([]models.Analysis, error) {
