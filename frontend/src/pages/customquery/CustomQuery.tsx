@@ -267,7 +267,7 @@ export const CustomQuery: React.FC = () => {
             </div>
             <div id="bottom-panel" className='tw-h-[60%] tw-flex tw-flex-col tw-flex-1' style={{ height: "calc(100% - " + topPanelHeight + "px)" }}>
               <div className="tw-border-solid tw-border-gray-300 tw-border-x tw-p-[10px] tw-flex">
-                <Tooltip color={"invert"} content={"⌘ + Enter"}>
+                <Tooltip color={"invert"} content="⌘ + Enter">
                   <Button className="tw-w-40 tw-h-8" onClick={() => setShouldRun(true)}>{queryLoading ? "Stop" : "Run"}</Button>
                 </Tooltip>
                 <div className='tw-flex tw-ml-auto'>
@@ -285,9 +285,11 @@ export const CustomQuery: React.FC = () => {
                       Export CSV
                     </CSVLink>
                   </Tooltip>
-                  <Button className="tw-flex tw-justify-center tw-align-middle tw-ml-3 tw-w-24 tw-h-8 tw-bg-white tw-border-primary-text tw-text-primary-text hover:tw-bg-gray-200" onClick={() => setShouldSave(true)}>
-                    {saving ? <Loading /> : <><SaveIcon className='tw-h-5 tw-inline tw-mr-1' />Save</>}
-                  </Button>
+                  <Tooltip color={"invert"} content="⌘ + S">
+                    <Button className="tw-flex tw-justify-center tw-align-middle tw-ml-3 tw-w-24 tw-h-8 tw-bg-white tw-border-primary-text tw-text-primary-text hover:tw-bg-gray-200" onClick={() => setShouldSave(true)}>
+                      {saving ? <Loading /> : <><SaveIcon className='tw-h-5 tw-inline tw-mr-1' />Save</>}
+                    </Button>
+                  </Tooltip>
                 </div>
               </div>
               <div className="tw-mb-5 tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden tw-border-gray-300 tw-border-solid tw-border tw-bg-gray-100">
