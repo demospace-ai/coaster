@@ -83,7 +83,6 @@ export const CustomQuery: React.FC = () => {
   }, [setConnection, setQuery]);
 
   const updateCustomQuery = useCallback(async (id: number, updates: { connection?: DataConnection, query?: string; }) => {
-    setSaving(true);
     const payload: UpdateAnalysisRequest = { analysis_id: Number(id) };
     if (updates.connection) {
       payload.connection_id = updates.connection.id;
@@ -103,7 +102,6 @@ export const CustomQuery: React.FC = () => {
     } catch (e) {
       // TODO: handle error here
     }
-    setSaving(false);
   }, []);
 
   useEffect(() => {
@@ -203,7 +201,10 @@ export const CustomQuery: React.FC = () => {
 
     if (shouldSave) {
       setShouldSave(false);
+      // Only set saving state (and therefore UI feedback) if user interfaction triggered the save
+      setSaving(true);
       updateCustomQuery(Number(id), { query: query });
+      setSaving(false);
     }
   }, [id, connectionID, query, shouldRun, shouldSave, runQuery, updateCustomQuery]);
 
