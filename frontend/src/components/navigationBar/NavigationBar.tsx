@@ -17,9 +17,17 @@ export const NavigationBar: React.FC = () => {
     return <></>;
   };
 
+  // min-width: 220px;
+  // width: 220px;
+  // height: 100%;
+  // display: flex;
+  // flex-direction: column;
+  // box-sizing: border-box;
+  // border-right: 1px solid var(--border-color);
+  // background: #efefef;
   return (
     <>
-      <div className={styles.navigationBar}>
+      <div className="tw-min-w-[220px] tw-w-[220px] tw-h-full tw-flex tw-flex-col tw-box-border tw-border-r tw-border-solid tw-border-gray-200 tw-bg-gray-100">
         <OrganizationButton organization={organization} />
         <NewAnalysisButton />
         <NavLink className={({ isActive }) => isActive ? styles.activeRouteContainer : styles.routeContainer} to={'/'}>
@@ -47,14 +55,14 @@ const OrganizationButton: React.FC<OrganizationButtonProps> = props => {
     <Menu as="div" >
       <Menu.Button className="tw-w-full">
         {({ open }) => (
-          <div className={classNames(styles.organizationContainer, "hover:tw-bg-navigation-highlight", open && "tw-bg-navigation-highlight")}>
+          <div className={classNames("tw-py-[15px] tw-px-5 tw-flex tw-flex-row tw-h-[60px] tw-box-border tw-border-b tw-border-solid tw-border-gray-200 tw-cursor-pointer tw-w-full", "hover:tw-bg-navigation-highlight", open && "tw-bg-navigation-highlight")}>
             <div className={styles.organizationIcon}>
               {props.organization!.name.charAt(0)}
             </div>
             <div className={styles.organizationName}>
               {props.organization!.name}
             </div>
-            <ChevronDownIcon className="tw-w-4 tw-pt-0" />
+            <ChevronDownIcon className="tw-h-5 tw-mt-[5px]" />
           </div>
         )}
       </Menu.Button>
