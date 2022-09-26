@@ -57,7 +57,7 @@ export const Insights: React.FC = () => {
             {analyses.map((analysis, index) =>
               <li
                 key={index}
-                className='tw-w-full tw-border-b tw-border-solid tw-border-gray-200 tw-box-border tw-py-4 tw-px-8 tw-cursor-pointer tw-flex tw-select-none tw-text-sm hover:tw-bg-gray-100'
+                className='tw-w-full tw-border-b tw-border-solid tw-border-gray-200 tw-box-border tw-py-3 tw-px-8 tw-cursor-pointer tw-flex tw-select-none tw-text-sm hover:tw-bg-gray-100'
                 onClick={() => onClick(analysis)}
               >
                 {getAnalysisIcon(analysis.analysis_type)}
@@ -78,7 +78,7 @@ const MoreOptionsButton: React.FC<{ className?: string; triggerDelete: () => voi
   return (
     <Menu as="div" className={classNames("tw-relative tw-inline", props.className)}>
       <Menu.Button onClick={(e: MouseEvent) => e.stopPropagation()} className='tw-z-0'>
-        <div className='tw-border tw-border-solid tw-bg-white tw-border-gray-200 tw-rounded-md tw-p-[1px] hover:tw-bg-gray-200' >
+        <div className='tw-border tw-border-solid tw-bg-white tw-border-gray-200 tw-rounded-md tw-p-[2px] hover:tw-bg-gray-200' >
           <EllipsisHorizontalIcon className='tw-inline tw-h-5' />
         </div>
       </Menu.Button>

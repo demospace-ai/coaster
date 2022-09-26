@@ -1,4 +1,5 @@
 import { ArrowDownTrayIcon } from '@heroicons/react/20/solid';
+import { FunnelIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { Tooltip } from '@nextui-org/react';
 import classNames from 'classnames';
 import { useCallback, useEffect, useState } from "react";
@@ -169,6 +170,13 @@ export const Funnel: React.FC = () => {
     }
   }, [id, steps, updateFunnel]);
 
+  const onEventRemoved = useCallback((index: number) => {
+    setErrorMessage(null);
+    const updatedSteps = steps.filter((_, i) => i !== index);
+    setSteps(updatedSteps);
+    updateFunnel(Number(id), { steps: updatedSteps });
+  }, [id, steps, updateFunnel]);
+
   const onEventAdded = useCallback((value: string) => {
     setErrorMessage(null);
     const updatedSteps = [...steps, value];
@@ -225,7 +233,7 @@ export const Funnel: React.FC = () => {
   return (
     <div className="tw-px-10 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0" >
       <div className='tw-flex tw-flex-1 tw-min-w-0 tw-min-h-0'>
-        <div id='left-panel' className="tw-w-80 tw-min-w-[20rem] tw-inline-block tw-select-none tw-pt-8">
+        <div id='left-panel' className="tw-w-96 tw-min-w-[20rem] tw-inline-block tw-select-none tw-pt-8">
           <div className='tw-mt-[2px]'>
             <span className='tw-uppercase'>Data Source</span>
             <ConnectionSelector className="tw-mt-1 hover:tw-border-green-500" connection={connection} setConnection={onConnectionSelected} />
@@ -235,7 +243,7 @@ export const Funnel: React.FC = () => {
             <EventSetSelector className="tw-mt-1 hover:tw-border-green-500" connection={connection} eventSet={eventSet} setEventSet={onEventSetSelected} />
           </div>
           <div className='tw-mt-5'>
-            <Steps connectionID={connection ? connection.id : null} eventSetID={eventSet ? eventSet.id : null} steps={steps} onEventSelected={onEventSelected} onEventAdded={onEventAdded} />
+            <Steps connectionID={connection ? connection.id : null} eventSetID={eventSet ? eventSet.id : null} steps={steps} onEventSelected={onEventSelected} onEventAdded={onEventAdded} onEventRemoved={onEventRemoved} />
           </div>
           <Tooltip className='tw-mt-10' color={"invert"} content={"⌘ + Enter"}>
             <Button className="tw-w-40 tw-h-8" onClick={runQuery}>{queryLoading ? "Stop" : "Run"}</Button>
@@ -288,10 +296,11 @@ type StepsProps = {
   steps: string[];
   onEventSelected: (event: string, index: number) => void;
   onEventAdded: (event: string) => void;
+  onEventRemoved: (index: number) => void;
 };
 
 const Steps: React.FC<StepsProps> = props => {
-  const { connectionID, eventSetID, steps, onEventSelected, onEventAdded } = props;
+  const { connectionID, eventSetID, steps, onEventSelected, onEventAdded, onEventRemoved } = props;
   const [eventOptions, setEventOptions] = useState<string[]>();
   const [loading, setLoading] = useState(false);
   useEffect(() => {
@@ -316,10 +325,37 @@ const Steps: React.FC<StepsProps> = props => {
   return (
     <>
       <span className='tw-uppercase'>Steps</span>
-      {steps.map((event, index) =>
-        <EventSelector key={index} className="first:tw-mt-1 tw-mt-2 hover:tw-border-green-500" connectionID={connectionID} eventSetID={eventSetID} event={event} setEvent={(event) => onEventSelected(event, index)} eventOptions={eventOptions} loading={loading} controlled={true} />
-      )}
-      <EventSelector className="tw-mt-2 hover:tw-border-green-500" connectionID={connectionID} eventSetID={eventSetID} event={null} setEvent={onEventAdded} eventOptions={eventOptions} loading={loading} controlled={true} />
+      <div className='tw-mt-2'>
+        {steps.map((event, index) =>
+          <Step key={index} connectionID={connectionID} eventSetID={eventSetID} event={event} setEvent={(event) => onEventSelected(event, index)} eventOptions={eventOptions} loading={loading} removeEvent={() => onEventRemoved(index)} />
+        )}
+        <Step connectionID={connectionID} eventSetID={eventSetID} event={null} setEvent={onEventAdded} eventOptions={eventOptions} loading={loading} removeEvent={() => null} />
+      </div>
     </>
+  );
+};
+
+type StepProp = {
+  connectionID: number | null;
+  eventSetID: number | null;
+  event: string | null;
+  eventOptions: string[] | undefined;
+  setEvent: (event: string) => void;
+  removeEvent: () => void;
+  loading: boolean;
+};
+
+const Step: React.FC<StepProp> = props => {
+  const { connectionID, eventSetID, event, eventOptions, setEvent, removeEvent, loading } = props;
+  return (
+    <div className='tw-flex tw-items-center tw-mt-[-1px] tw-p-4 tw-border tw-border-solid tw-border-gray-300 first:tw-rounded-t-md last:tw-rounded-b-md'>
+      <EventSelector className="hover:tw-border-green-500" connectionID={connectionID} eventSetID={eventSetID} event={event} setEvent={setEvent} eventOptions={eventOptions} loading={loading} controlled={true} />
+      <div className='tw-p-1 tw-ml-2 hover:tw-bg-gray-200 tw-cursor-pointer tw-rounded-md'>
+        <FunnelIcon className='tw-h-6 tw-stroke-[1.7]' />
+      </div>
+      <div className='tw-p-1 tw-ml-[1px] hover:tw-bg-gray-200 tw-cursor-pointer tw-rounded-md'>
+        <TrashIcon className='tw-h-6 tw-stroke-[1.7]' onClick={removeEvent} />
+      </div>
+    </div>
   );
 };
