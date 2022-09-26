@@ -4,7 +4,8 @@ steps:
   entrypoint: bash
   args:
     - '-c'
-    - 'go test -v backend/...'
+    - 'cd backend'
+    - 'go test -v ./...'
   waitFor: ['-']
 
 - id: build-backend
