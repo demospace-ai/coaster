@@ -7,3 +7,7 @@ import (
 func TestRunQueryWithWrongOrganization(t *testing.T) {
 	t.Fail()
 }
+
+func TestRunQueryWithBadQuery(t *testing.T) {
+	t.Fail()
+}
