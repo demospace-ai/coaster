@@ -4,6 +4,6 @@ import (
 	"testing"
 )
 
-func TestRunQuery(t *testing.T) {
-	t.Fail()
+func TestGetEvents(t *testing.T) {
+
 }
