@@ -2,10 +2,9 @@ steps:
 - id: test-backend
   name: 'golang:1.18'
   entrypoint: bash
-  args:
-    - '-c'
-    - 'cd backend'
-    - 'go test -v ./...'
+  script: |
+    cd backend;
+    go test -v ./...;
   waitFor: ['-']
 
 - id: build-backend
