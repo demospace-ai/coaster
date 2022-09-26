@@ -1,7 +1,6 @@
 steps:
 - id: test-backend
   name: 'golang:1.18'
-  entrypoint: bash
   script: |
     cd backend;
     go test -v ./...;

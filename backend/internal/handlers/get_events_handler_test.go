@@ -4,6 +4,6 @@ import (
 	"testing"
 )
 
-func TestGetEventsWithWrongOrganization(t *testing.T) {
+func TestGetEventsWithWrdongOrganization(t *testing.T) {
 	t.Fail()
 }
