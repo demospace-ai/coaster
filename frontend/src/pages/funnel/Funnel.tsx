@@ -325,7 +325,7 @@ const Steps: React.FC<StepsProps> = props => {
   return (
     <>
       <span className='tw-uppercase'>Steps</span>
-      <div className='tw-mt-2'>
+      <div className='tw-mt-1'>
         {steps.map((event, index) =>
           <Step key={index} connectionID={connectionID} eventSetID={eventSetID} event={event} setEvent={(event) => onEventSelected(event, index)} eventOptions={eventOptions} loading={loading} removeEvent={() => onEventRemoved(index)} />
         )}
