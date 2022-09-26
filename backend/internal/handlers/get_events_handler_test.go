@@ -5,5 +5,5 @@ import (
 )
 
 func TestGetEvents(t *testing.T) {
-
+	t.Fail()
 }
