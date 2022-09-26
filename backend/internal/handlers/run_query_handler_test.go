@@ -8,6 +8,6 @@ func TestRunQueryWithWrongOrganization(t *testing.T) {
 	t.Fail()
 }
 
-func TestRunQueryWithBdsdfadQuery(t *testing.T) {
+func TestRunQueryWithBdsdfsdfadQuery(t *testing.T) {
 	t.Fail()
 }
