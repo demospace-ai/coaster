@@ -1,8 +1,13 @@
 steps:
+- id: test-backend
+  name: 'golang:1.18'
+  entrypoint: /bin/bash
+  args: 'go test -v ./...'
+
 - id: build-backend
   name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'gcr.io/fabra-344902/fabra:$COMMIT_SHA', '-t', 'gcr.io/fabra-344902/fabra:latest', 'backend/']
-  waitFor: ['-']
+  waitFor: ['test-backend']
 
 - id: push-backend
   name: 'gcr.io/cloud-builders/docker'
