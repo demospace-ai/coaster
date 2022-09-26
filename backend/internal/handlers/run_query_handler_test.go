@@ -4,6 +4,6 @@ import (
 	"testing"
 )
 
-func TestRunQuery(t *testing.T) {
+func TestRunQueryWithWrongOrganization(t *testing.T) {
 	t.Fail()
 }
