@@ -24,8 +24,10 @@ func SetupDatabase() (*gorm.DB, func()) {
 		log.Fatalf("Could not connect to docker: %s", err)
 	}
 
+	cloudbuildNetwork := GetCloudbuildNetwork(pool)
 	// pulls an image, creates a container based on it and runs it
 	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
+		NetworkID:  cloudbuildNetwork.ID,
 		Repository: "postgres",
 		Tag:        "14",
 		Env: []string{
@@ -83,6 +85,22 @@ func SetupDatabase() (*gorm.DB, func()) {
 	}
 
 	return db, cleanup
+}
+
+func GetCloudbuildNetwork(pool *dockertest.Pool) *docker.Network {
+	networks, err := pool.Client.ListNetworks()
+	if err != nil {
+		log.Fatalf("Could not fetch networks")
+	}
+
+	for _, network := range networks {
+		if network.Name == "cloudbuild" {
+			return &network
+		}
+	}
+
+	log.Fatalf("No cloudbuild network found")
+	return nil
 }
 
 func SeedDatabase(db *gorm.DB) error {
