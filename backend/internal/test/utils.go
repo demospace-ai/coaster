@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/golang-migrate/migrate"
-	"github.com/ory/dockertest"
-	"github.com/ory/dockertest/docker"
+	"github.com/ory/dockertest/v3"
+	"github.com/ory/dockertest/v3/docker"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -25,7 +25,9 @@ func SetupDatabase() (*gorm.DB, func()) {
 	}
 
 	// pulls an image, creates a container based on it and runs it
+	list, _ := pool.NetworksByName("cloudbuild")
 	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
+		Networks:   []*dockertest.Network{&list[0]},
 		Repository: "postgres",
 		Tag:        "14",
 		Env: []string{
@@ -38,7 +40,6 @@ func SetupDatabase() (*gorm.DB, func()) {
 		// set AutoRemove to true so that stopped container goes away by itself
 		config.AutoRemove = true
 		config.RestartPolicy = docker.RestartPolicy{Name: "no"}
-		config.NetworkMode = "cloudbuild"
 	})
 	if err != nil {
 		log.Fatalf("Could not start resource: %s", err)
