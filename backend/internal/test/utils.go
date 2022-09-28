@@ -44,7 +44,7 @@ func SetupDatabase() (*gorm.DB, func()) {
 		log.Fatalf("Could not start resource: %s", err)
 	}
 
-	host := "127.0.0.1"
+	host := resource.Container.NetworkSettings.Networks["cloudbuild"].IPAddress
 	port := resource.GetPort("5432/tcp")
 	dbURI := fmt.Sprintf("user=fabratest password=fabratest database=fabratest host=%s port=%s", host, port)
 
