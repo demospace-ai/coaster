@@ -44,7 +44,7 @@ func SetupDatabase() (*gorm.DB, func()) {
 		log.Fatalf("Could not start resource: %s", err)
 	}
 
-	host := resource.GetBoundIP("5432/tcp")
+	host := "127.0.0.1"
 	port := "5432"
 	dbURI := fmt.Sprintf("user=fabratest password=fabratest database=fabratest host=%s port=%s", host, port)
 
@@ -54,7 +54,7 @@ func SetupDatabase() (*gorm.DB, func()) {
 
 	// exponential backoff-retry, because the application in the container might not be ready to accept connections yet
 	var db *gorm.DB
-	pool.MaxWait = 120 * time.Second
+	pool.MaxWait = 20 * time.Second
 	if err = pool.Retry(func() error {
 		db, err = gorm.Open(postgres.Open(dbURI), &gorm.Config{
 			Logger: logger.Default.LogMode(logger.Silent),
