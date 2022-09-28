@@ -1,5 +1,5 @@
 import { ArrowDownTrayIcon } from '@heroicons/react/20/solid';
-import { FunnelIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { CheckIcon, FunnelIcon, LinkIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { Tooltip } from '@nextui-org/react';
 import classNames from 'classnames';
 import { useCallback, useEffect, useState } from "react";
@@ -46,6 +46,7 @@ export const Funnel: React.FC = () => {
   const [eventSet, setEventSet] = useState<EventSet | null>(null);
   const [steps, setSteps] = useState<string[]>([]);
   const [saving, setSaving] = useState<boolean>(false);
+  const [copied, setCopied] = useState<boolean>(false);
 
   const [shouldRun, setShouldRun] = useState<boolean>(false);
   const [schema, setSchema] = useState<Schema | null>(null);
@@ -221,6 +222,12 @@ export const Funnel: React.FC = () => {
     setQueryLoading(false);
   };
 
+  const copyLink = () => {
+    setCopied(true);
+    navigator.clipboard.writeText(window.location.href);
+    setTimeout(() => setCopied(false), 1200);
+  };
+
   if (shouldRun) {
     runQuery();
     setShouldRun(false);
@@ -249,16 +256,16 @@ export const Funnel: React.FC = () => {
             <Button className="tw-w-40 tw-h-8" onClick={runQuery}>{queryLoading ? "Stop" : "Run"}</Button>
           </Tooltip>
         </div>
-        <div id='right-panel' className="tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1 tw-ml-10 tw-my-8 tw-border-gray-300 tw-border-solid tw-border tw-rounded-md">
+        <div id='right-panel' className="tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1 tw-ml-10 tw-my-8 tw-border-gray-300 tw-border-solid tw-border tw-rounded-md tw-shadow-centered-sm">
           <div id="top-panel" className="tw-p-4 tw-pl-5 tw-border-gray-300 tw-border-solid tw-border-b tw-flex tw-select-none">
             <span className='tw-text-lg tw-font-bold'>
               Results
             </span>
             <div className='tw-flex tw-ml-auto'>
-              <Tooltip className="tw-select-none" color={"invert"} content={hasResults ? '' : "You must run the query to fetch results before exporting."}>
+              <Tooltip color={"invert"} content={hasResults ? '' : "You must run the query to fetch results before exporting."}>
                 <CSVLink
                   className={classNames(
-                    'tw-flex tw-rounded-md tw-font-bold tw-py-1 tw-tracking-wide tw-justify-center tw-align-middle tw-ml-2 tw-w-36 tw-h-8 tw-bg-white tw-border tw-border-solid tw-border-primary-text tw-text-primary-text hover:tw-bg-gray-200',
+                    'tw-flex tw-rounded-md tw-font-bold tw-py-1 tw-tracking-wide tw-justify-center tw-align-middle tw-ml-2 tw-px-4 tw-h-8 tw-bg-white tw-border tw-border-solid tw-border-gray-400 tw-text-primary-text hover:tw-bg-gray-200',
                     hasResults ? null : 'tw-bg-gray-300 tw-text-gray-500 tw-border-0 tw-cursor-not-allowed hover:tw-bg-gray-300'
                   )}
                   data={toCsvData(schema, queryResults)}
@@ -269,8 +276,11 @@ export const Funnel: React.FC = () => {
                   Export CSV
                 </CSVLink>
               </Tooltip>
-              <Button className="tw-flex tw-justify-center tw-align-middle tw-ml-3 tw-w-24 tw-h-8 tw-bg-white tw-border-primary-text tw-text-primary-text hover:tw-bg-gray-200" onClick={updateAllProperties}>
+              <Button className="tw-flex tw-justify-center tw-align-middle tw-ml-3 tw-w-24 tw-h-8 tw-bg-white tw-border-gray-400 tw-text-primary-text hover:tw-bg-gray-200" onClick={updateAllProperties}>
                 {saving ? <Loading /> : <><SaveIcon className='tw-h-5 tw-inline tw-mr-1' />Save</>}
+              </Button>
+              <Button className="tw-flex tw-justify-center tw-align-middle tw-ml-3 tw-w-9 tw-px-0 tw-h-8 tw-bg-white tw-border-gray-400 tw-text-primary-text hover:tw-bg-gray-200" onClick={copyLink}>
+                {copied ? <CheckIcon className='tw-h-5 tw-inline tw-mx-auto tw-stroke-2' /> : <LinkIcon className='tw-h-5 tw-inline tw-mx-auto tw-stroke-2' />}
               </Button>
             </div>
           </div>
