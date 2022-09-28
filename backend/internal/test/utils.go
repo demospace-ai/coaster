@@ -26,7 +26,6 @@ func SetupDatabase() (*gorm.DB, func()) {
 
 	// pulls an image, creates a container based on it and runs it
 	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
-		NetworkID:  "cloudbuild",
 		Repository: "postgres",
 		Tag:        "14",
 		Env: []string{
@@ -39,13 +38,14 @@ func SetupDatabase() (*gorm.DB, func()) {
 		// set AutoRemove to true so that stopped container goes away by itself
 		config.AutoRemove = true
 		config.RestartPolicy = docker.RestartPolicy{Name: "no"}
+		config.NetworkMode = "cloudbuild"
 	})
 	if err != nil {
 		log.Fatalf("Could not start resource: %s", err)
 	}
 
 	host := "127.0.0.1"
-	port := "5432"
+	port := resource.GetPort("5432/tcp")
 	dbURI := fmt.Sprintf("user=fabratest password=fabratest database=fabratest host=%s port=%s", host, port)
 
 	log.Println("Connecting to database with uri:", dbURI)
