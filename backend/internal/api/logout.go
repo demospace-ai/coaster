@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func (s Service) Logout(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) Logout(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if !auth.IsAuthenticated {
 		return nil
 	}

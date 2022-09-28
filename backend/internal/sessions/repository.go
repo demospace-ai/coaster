@@ -26,7 +26,8 @@ func generateToken() (*string, error) {
 	return &token, nil
 }
 
-func hashToken(token string) string {
+// Exported for testing
+func HashToken(token string) string {
 	h := sha256.Sum256([]byte(token))
 	return base64.StdEncoding.EncodeToString(h[:])
 }
@@ -38,7 +39,7 @@ func Create(db *gorm.DB, userID int64) (*string, error) {
 	}
 
 	// we store hashed tokens in case the DB is leaked
-	token := hashToken(*rawToken)
+	token := HashToken(*rawToken)
 	expiration := time.Now().Add(SESSION_EXPIRATION)
 
 	session := models.Session{
@@ -77,7 +78,7 @@ func Clear(db *gorm.DB, session *models.Session) error {
 
 func LoadValidByToken(db *gorm.DB, rawToken string) (*models.Session, error) {
 	// we store hashed tokens in case the DB is leaked
-	token := hashToken(rawToken)
+	token := HashToken(rawToken)
 
 	var session models.Session
 	result := db.Take(&session, "token = ? AND expiration >= ? AND deactivated_at IS NULL", token, time.Now())

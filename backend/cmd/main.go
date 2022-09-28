@@ -6,7 +6,7 @@ import (
 	"fabra/internal/crypto"
 	"fabra/internal/database"
 	"fabra/internal/query"
-	"fabra/internal/server"
+	"fabra/internal/router"
 	"log"
 	"math/rand"
 	"time"
@@ -29,8 +29,8 @@ func main() {
 
 	cryptoService := crypto.NewCryptoService()
 	queryService := query.NewQueryService(cryptoService)
-	apiService := api.NewService(db, cryptoService, queryService)
+	apiService := api.NewApiService(db, cryptoService, queryService)
 
-	server := server.NewServer(db)
-	server.RunService(apiService)
+	router := router.NewRouter(db)
+	router.RunService(apiService)
 }

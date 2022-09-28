@@ -21,7 +21,7 @@ type GetSchemaResponse struct {
 	Schema query.Schema `json:"schema"`
 }
 
-func (s Service) GetSchema(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) GetSchema(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if !auth.IsAuthenticated {
 		w.WriteHeader(http.StatusUnauthorized)
 		return nil
@@ -72,7 +72,7 @@ func (s Service) GetSchema(auth auth.Authentication, w http.ResponseWriter, r *h
 	})
 }
 
-func (s Service) getSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (*query.Schema, error) {
+func (s ApiService) getSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (*query.Schema, error) {
 	switch dataConnection.ConnectionType {
 	case models.DataConnectionTypeBigQuery:
 		return s.getBigQuerySchemaForTable(dataConnection, datasetID, tableName)
@@ -83,7 +83,7 @@ func (s Service) getSchemaForTable(dataConnection models.DataConnection, dataset
 	}
 }
 
-func (s Service) getSchemaForCustomJoin(dataConnection models.DataConnection, customJoin string) (*query.Schema, error) {
+func (s ApiService) getSchemaForCustomJoin(dataConnection models.DataConnection, customJoin string) (*query.Schema, error) {
 	switch dataConnection.ConnectionType {
 	case models.DataConnectionTypeBigQuery:
 		return s.getBigQuerySchemaForCustom(dataConnection, customJoin)
@@ -94,7 +94,7 @@ func (s Service) getSchemaForCustomJoin(dataConnection models.DataConnection, cu
 	}
 }
 
-func (s Service) getBigQuerySchemaForCustom(dataConnection models.DataConnection, customJoin string) (*query.Schema, error) {
+func (s ApiService) getBigQuerySchemaForCustom(dataConnection models.DataConnection, customJoin string) (*query.Schema, error) {
 	bigQueryCredentialsString, err := s.cryptoService.DecryptDataConnectionCredentials(dataConnection.Credentials.String)
 	if err != nil {
 		return nil, err
@@ -147,7 +147,7 @@ func (s Service) getBigQuerySchemaForCustom(dataConnection models.DataConnection
 	return &schema, nil
 }
 
-func (s Service) getBigQuerySchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (*query.Schema, error) {
+func (s ApiService) getBigQuerySchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (*query.Schema, error) {
 	bigQueryCredentialsString, err := s.cryptoService.DecryptDataConnectionCredentials(dataConnection.Credentials.String)
 	if err != nil {
 		return nil, err
@@ -179,12 +179,12 @@ func (s Service) getBigQuerySchemaForTable(dataConnection models.DataConnection,
 	return &schema, nil
 }
 
-func (s Service) getSnowflakeSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (*query.Schema, error) {
+func (s ApiService) getSnowflakeSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (*query.Schema, error) {
 	// TODO: implement
 	return nil, errors.NewBadRequest("snowflake not supported")
 }
 
-func (s Service) getSnowflakeSchemaForCustom(dataConnection models.DataConnection, customJoin string) (*query.Schema, error) {
+func (s ApiService) getSnowflakeSchemaForCustom(dataConnection models.DataConnection, customJoin string) (*query.Schema, error) {
 	// TODO: implement
 	return nil, errors.NewBadRequest("snowflake not supported")
 }

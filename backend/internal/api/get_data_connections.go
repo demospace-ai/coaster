@@ -12,7 +12,7 @@ type GetDataConnectionResponse struct {
 	DataConnections []models.DataConnection `json:"data_connections"`
 }
 
-func (s Service) GetDataConnections(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) GetDataConnections(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if !auth.IsAuthenticated {
 		w.WriteHeader(http.StatusUnauthorized)
 		return nil

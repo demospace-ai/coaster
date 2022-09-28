@@ -20,7 +20,7 @@ type GetTablesResponse struct {
 	Tables []string `json:"tables"`
 }
 
-func (s Service) GetTables(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) GetTables(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if !auth.IsAuthenticated {
 		w.WriteHeader(http.StatusUnauthorized)
 		return nil
@@ -61,7 +61,7 @@ func (s Service) GetTables(auth auth.Authentication, w http.ResponseWriter, r *h
 	})
 }
 
-func (s Service) getTables(dataConnection models.DataConnection, datasetID string) ([]string, error) {
+func (s ApiService) getTables(dataConnection models.DataConnection, datasetID string) ([]string, error) {
 	switch dataConnection.ConnectionType {
 	case models.DataConnectionTypeBigQuery:
 		return s.getBigQueryTables(dataConnection, datasetID)
@@ -72,7 +72,7 @@ func (s Service) getTables(dataConnection models.DataConnection, datasetID strin
 	}
 }
 
-func (s Service) getBigQueryTables(dataConnection models.DataConnection, datasetID string) ([]string, error) {
+func (s ApiService) getBigQueryTables(dataConnection models.DataConnection, datasetID string) ([]string, error) {
 	bigQueryCredentialsString, err := s.cryptoService.DecryptDataConnectionCredentials(dataConnection.Credentials.String)
 	if err != nil {
 		return nil, err
@@ -111,7 +111,7 @@ func (s Service) getBigQueryTables(dataConnection models.DataConnection, dataset
 	return results, nil
 }
 
-func (s Service) getSnowflakeTables(dataConnection models.DataConnection, datasetID string) ([]string, error) {
+func (s ApiService) getSnowflakeTables(dataConnection models.DataConnection, datasetID string) ([]string, error) {
 	// TODO: implement
 	return nil, errors.NewBadRequest("snowflake not supported")
 }

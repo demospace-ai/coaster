@@ -20,7 +20,7 @@ type GetAllAnalysesResponse struct {
 	Analyses []models.Analysis `json:"analyses"`
 }
 
-func (s Service) GetAllAnalyses(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) GetAllAnalyses(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if !auth.IsAuthenticated {
 		w.WriteHeader(http.StatusUnauthorized)
 		return nil

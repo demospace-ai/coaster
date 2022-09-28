@@ -3,11 +3,13 @@ package test
 import (
 	"fabra/internal/database"
 	"fabra/internal/models"
+	"fabra/internal/sessions"
+	"time"
 
 	"gorm.io/gorm"
 )
 
-func CreateTestOrganization(db *gorm.DB) *models.Organization {
+func CreateOrganization(db *gorm.DB) *models.Organization {
 	organization := models.Organization{
 		Name:        "Fabra",
 		EmailDomain: "fabra.io",
@@ -18,7 +20,7 @@ func CreateTestOrganization(db *gorm.DB) *models.Organization {
 	return &organization
 }
 
-func CreateTestUser(db *gorm.DB, organizationID int64) *models.User {
+func CreateUser(db *gorm.DB, organizationID int64) *models.User {
 	user := models.User{
 		FirstName:         "Test",
 		LastName:          "User",
@@ -32,15 +34,60 @@ func CreateTestUser(db *gorm.DB, organizationID int64) *models.User {
 	return &user
 }
 
-func CreateTestDataConnection(db *gorm.DB, organizationID int64) *models.DataConnection {
+func CreateDataConnection(db *gorm.DB, organizationID int64) *models.DataConnection {
 	dataConnection := models.DataConnection{
-		DisplayName:    "Test",
+		DisplayName:    "Test Data Connection",
 		OrganizationID: organizationID,
 		ConnectionType: models.DataConnectionTypeBigQuery,
-		Credentials:    database.NewNullString("test"),
+		Credentials:    database.NewNullString("testCredentials"),
 	}
 
 	db.Create(&dataConnection)
 
 	return &dataConnection
+}
+
+func CreateEventSet(db *gorm.DB, organizationID int64, connectionID int64) *models.EventSet {
+	eventSet := models.EventSet{
+		DisplayName:          "Test Event Set",
+		OrganizationID:       organizationID,
+		ConnectionID:         connectionID,
+		DatasetName:          database.NewNullString("testDataset"),
+		TableName:            database.NewNullString("testTable"),
+		EventTypeColumn:      "event_type",
+		TimestampColumn:      "timestamp",
+		UserIdentifierColumn: "user_id",
+	}
+
+	db.Create(&eventSet)
+
+	return &eventSet
+}
+
+func CreateActiveSession(db *gorm.DB, userID int64) string {
+	rawToken := "active"
+	token := sessions.HashToken(rawToken)
+	session := models.Session{
+		Token:      token,
+		UserID:     userID,
+		Expiration: time.Now().Add(time.Duration(1) * time.Hour),
+	}
+
+	db.Create(&session)
+
+	return rawToken
+}
+
+func CreateExpiredSession(db *gorm.DB, userID int64) string {
+	rawToken := "expired"
+	token := sessions.HashToken(rawToken)
+	session := models.Session{
+		Token:      token,
+		UserID:     userID,
+		Expiration: time.Now().Add(-(time.Duration(1) * time.Hour)),
+	}
+
+	db.Create(&session)
+
+	return rawToken
 }

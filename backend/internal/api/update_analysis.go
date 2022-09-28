@@ -35,7 +35,7 @@ TODO: tests
 - updating connection should NOT clear query
 
 */
-func (s Service) UpdateAnalysis(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) UpdateAnalysis(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if !auth.IsAuthenticated {
 		w.WriteHeader(http.StatusUnauthorized)
 		return nil

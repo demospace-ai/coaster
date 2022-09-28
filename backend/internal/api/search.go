@@ -16,7 +16,7 @@ type SearchResponse struct {
 	Analyses []models.Analysis `json:"analyses"`
 }
 
-func (s Service) Search(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) Search(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if !auth.IsAuthenticated {
 		w.WriteHeader(http.StatusUnauthorized)
 		return nil

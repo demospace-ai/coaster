@@ -26,7 +26,7 @@ type TestDataConnectionRequest struct {
 	Account        *string                   `json:"account,omitempty"`
 }
 
-func (s Service) TestDataConnection(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) TestDataConnection(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if !auth.IsAuthenticated {
 		w.WriteHeader(http.StatusUnauthorized)
 		return nil

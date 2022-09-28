@@ -13,7 +13,7 @@ type GetAllUsersResponse struct {
 	Users []models.User `json:"users"`
 }
 
-func (s Service) GetAllUsers(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) GetAllUsers(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
 		return errors.NewBadRequest("cannot request users without organization")
 	}

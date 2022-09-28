@@ -21,7 +21,7 @@ type ValidationCodeRequest struct {
 	LastName  string `json:"last_name"`
 }
 
-func (s Service) ValidationCode(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) ValidationCode(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	// apiKey := config.GetMailgunApiKey()
 	// TODO: fill this out
 	apiKey := "todo"

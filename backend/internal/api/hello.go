@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func (s Service) Hello(w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) Hello(w http.ResponseWriter, r *http.Request) error {
 	fmt.Fprintf(w, "hello world")
 	return nil
 }

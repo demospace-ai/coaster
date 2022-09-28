@@ -24,7 +24,7 @@ type GetDatasetsResponse struct {
 	Datasets []string `json:"datasets"`
 }
 
-func (s Service) GetDatasets(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) GetDatasets(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if !auth.IsAuthenticated {
 		w.WriteHeader(http.StatusUnauthorized)
 		return nil
@@ -60,7 +60,7 @@ func (s Service) GetDatasets(auth auth.Authentication, w http.ResponseWriter, r 
 	})
 }
 
-func (s Service) getDatasets(dataConnection models.DataConnection) ([]string, error) {
+func (s ApiService) getDatasets(dataConnection models.DataConnection) ([]string, error) {
 	switch dataConnection.ConnectionType {
 	case models.DataConnectionTypeBigQuery:
 		return s.getBigQueryDatasets(dataConnection)
@@ -71,7 +71,7 @@ func (s Service) getDatasets(dataConnection models.DataConnection) ([]string, er
 	}
 }
 
-func (s Service) getBigQueryDatasets(dataConnection models.DataConnection) ([]string, error) {
+func (s ApiService) getBigQueryDatasets(dataConnection models.DataConnection) ([]string, error) {
 	bigQueryCredentialsString, err := s.cryptoService.DecryptDataConnectionCredentials(dataConnection.Credentials.String)
 	if err != nil {
 		return nil, err
@@ -110,7 +110,7 @@ func (s Service) getBigQueryDatasets(dataConnection models.DataConnection) ([]st
 	return results, nil
 }
 
-func (s Service) getSnowflakeDatasets(dataConnection models.DataConnection) ([]string, error) {
+func (s ApiService) getSnowflakeDatasets(dataConnection models.DataConnection) ([]string, error) {
 	// TODO: implement
 	return nil, errors.NewBadRequest("snowflake not supported")
 }

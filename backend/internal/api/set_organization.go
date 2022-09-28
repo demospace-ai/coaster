@@ -20,7 +20,7 @@ type SetOrganizationResponse struct {
 	Organization models.Organization `json:"organization"`
 }
 
-func (s Service) SetOrganization(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) SetOrganization(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if !auth.IsAuthenticated {
 		w.WriteHeader(http.StatusUnauthorized)
 		return nil

@@ -21,7 +21,7 @@ type GetAnalysisResponse struct {
 	EventSet   *models.EventSet       `json:"event_set"`
 }
 
-func (s Service) GetAnalysis(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) GetAnalysis(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if !auth.IsAuthenticated {
 		w.WriteHeader(http.StatusUnauthorized)
 		return nil

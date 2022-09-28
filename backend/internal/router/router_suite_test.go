@@ -1,7 +1,7 @@
-package api_test
+package router_test
 
 import (
-	"fabra/internal/api"
+	"fabra/internal/router"
 	"fabra/internal/test"
 	"testing"
 
@@ -12,17 +12,17 @@ import (
 )
 
 var db *gorm.DB
-var service api.ApiService
+var r router.Router
 var cleanup func()
 
-func TestHandlers(t *testing.T) {
+func TestRouter(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Handlers Suite")
+	RunSpecs(t, "Router Suite")
 }
 
 var _ = BeforeSuite(func() {
 	db, cleanup = test.SetupDatabase()
-	service = api.NewApiService(db, test.MockCryptoService{}, test.MockQueryService{})
+	r = router.NewRouter(db)
 })
 
 var _ = AfterSuite((func() {

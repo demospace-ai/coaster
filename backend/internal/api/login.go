@@ -35,7 +35,7 @@ type LoginResponse struct {
 	SuggestedOrganizations []models.Organization `json:"suggested_organizations"`
 }
 
-func (s Service) Login(w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) Login(w http.ResponseWriter, r *http.Request) error {
 	// Login is not an authenticated endpoint, but we can still short-circuit if the user is already logged-in
 	authResult, err := auth.GetAuthentication(s.db, r)
 	if err != nil {

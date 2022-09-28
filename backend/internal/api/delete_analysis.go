@@ -14,7 +14,7 @@ type DeleteAnalysisRequest struct {
 	AnalysisID int64 `json:"analysis_id"`
 }
 
-func (s Service) DeleteAnalysis(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) DeleteAnalysis(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if !auth.IsAuthenticated {
 		w.WriteHeader(http.StatusUnauthorized)
 		return nil

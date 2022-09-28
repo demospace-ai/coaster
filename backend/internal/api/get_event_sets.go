@@ -12,7 +12,7 @@ type GetEventSetsResponse struct {
 	EventSets []models.EventSet `json:"event_sets"`
 }
 
-func (s Service) GetEventSets(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) GetEventSets(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if !auth.IsAuthenticated {
 		w.WriteHeader(http.StatusUnauthorized)
 		return nil
