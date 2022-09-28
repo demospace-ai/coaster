@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"fabra/internal/application"
 	"fabra/internal/config"
@@ -54,7 +55,17 @@ func InitDatabase() (*gorm.DB, error) {
 func initDatabaseDev() (*gorm.DB, error) {
 	dbURI := "user=fabra password=fabra database=fabra host=localhost"
 
-	db, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{
+		Logger: logger.New(
+			log.New(os.Stdout, "\r\n", log.LstdFlags),
+			logger.Config{
+				SlowThreshold:             200 * time.Millisecond,
+				LogLevel:                  logger.Warn,
+				IgnoreRecordNotFoundError: true,
+				Colorful:                  true,
+			},
+		),
+	})
 	if err != nil {
 		return nil, fmt.Errorf("sql.Open: %v", err)
 	}

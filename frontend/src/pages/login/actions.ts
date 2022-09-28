@@ -69,6 +69,7 @@ export function useOnLoginSuccess() {
     // If there's no organization, go to the login page so the user can set it
     if (!organization) {
       navigate("/login");
+      return;
     }
 
     try {

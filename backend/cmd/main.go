@@ -1,9 +1,10 @@
 package main
 
 import (
+	"fabra/internal/api"
 	"fabra/internal/config"
 	"fabra/internal/database"
-	"fabra/internal/router"
+	"fabra/internal/server"
 	"log"
 	"math/rand"
 	"time"
@@ -24,5 +25,6 @@ func main() {
 
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	router.RunServer(db)
+	apiService := api.NewService(db)
+	server.RunService(db, apiService)
 }

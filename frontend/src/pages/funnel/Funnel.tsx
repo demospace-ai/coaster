@@ -235,11 +235,11 @@ export const Funnel: React.FC = () => {
       <div className='tw-flex tw-flex-1 tw-min-w-0 tw-min-h-0'>
         <div id='left-panel' className="tw-w-96 tw-min-w-[20rem] tw-inline-block tw-select-none tw-pt-8">
           <div className='tw-mt-[2px]'>
-            <span className='tw-uppercase'>Data Source</span>
+            <span className='tw-uppercase tw-font-bold'>Data Source</span>
             <ConnectionSelector className="tw-mt-1 hover:tw-border-green-500" connection={connection} setConnection={onConnectionSelected} />
           </div>
           <div className='tw-mt-5'>
-            <span className='tw-uppercase'>Event Set</span>
+            <span className='tw-uppercase  tw-font-bold'>Event Set</span>
             <EventSetSelector className="tw-mt-1 hover:tw-border-green-500" connection={connection} eventSet={eventSet} setEventSet={onEventSetSelected} />
           </div>
           <div className='tw-mt-5'>
@@ -324,7 +324,7 @@ const Steps: React.FC<StepsProps> = props => {
 
   return (
     <>
-      <span className='tw-uppercase'>Steps</span>
+      <span className='tw-uppercase tw-font-bold'>Steps</span>
       <div className='tw-mt-1'>
         {steps.map((event, index) =>
           <Step key={index} connectionID={connectionID} eventSetID={eventSetID} event={event} setEvent={(event) => onEventSelected(event, index)} eventOptions={eventOptions} loading={loading} removeEvent={() => onEventRemoved(index)} />
