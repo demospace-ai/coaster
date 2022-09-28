@@ -64,7 +64,7 @@ func SetupDatabase() (*gorm.DB, func()) {
 
 	// exponential backoff-retry, because the application in the container might not be ready to accept connections yet
 	var db *gorm.DB
-	pool.MaxWait = 20 * time.Second
+	pool.MaxWait = 120 * time.Second
 	if err = pool.Retry(func() error {
 		db, err = gorm.Open(postgres.Open(dbURI), &gorm.Config{
 			Logger: logger.Default.LogMode(logger.Silent),
