@@ -45,7 +45,7 @@ func SetupDatabase() (*gorm.DB, func()) {
 	}
 
 	host := resource.GetBoundIP("5432/tcp")
-	port := resource.GetPort("5432/tcp")
+	port := "5432"
 	dbURI := fmt.Sprintf("user=fabratest password=fabratest database=fabratest host=%s port=%s", host, port)
 
 	log.Println("Connecting to database with uri:", dbURI)
