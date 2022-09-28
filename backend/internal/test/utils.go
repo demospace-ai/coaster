@@ -24,10 +24,9 @@ func SetupDatabase() (*gorm.DB, func()) {
 		log.Fatalf("Could not connect to docker: %s", err)
 	}
 
-	cloudbuildNetwork := GetCloudbuildNetwork(pool)
 	// pulls an image, creates a container based on it and runs it
 	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
-		NetworkID:  cloudbuildNetwork.ID,
+		NetworkID:  "cloudbuild",
 		Repository: "postgres",
 		Tag:        "14",
 		Env: []string{
