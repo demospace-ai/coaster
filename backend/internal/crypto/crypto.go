@@ -13,11 +13,16 @@ import (
 
 const DATA_CONNECTION_KEY = "projects/fabra-344902/locations/global/keyRings/data-connection-keyring/cryptoKeys/data-connection-key"
 
-type CryptoService struct {
+type CryptoService interface {
+	DecryptDataConnectionCredentials(credentials string) (*string, error)
+	EncryptDataConnectionCredentials(credentials string) (*string, error)
+}
+
+type CryptoServiceImpl struct {
 }
 
 func NewCryptoService() CryptoService {
-	return CryptoService{}
+	return CryptoServiceImpl{}
 }
 
 func encrypt(keyName string, plaintextString string) (*string, error) {
@@ -96,7 +101,7 @@ func decrypt(keyName string, ciphertextString string) (*string, error) {
 	return &plaintext, nil
 }
 
-func (cs CryptoService) DecryptDataConnectionCredentials(credentials string) (*string, error) {
+func (cs CryptoServiceImpl) DecryptDataConnectionCredentials(credentials string) (*string, error) {
 	credentialsString, err := decrypt(DATA_CONNECTION_KEY, credentials)
 	if err != nil {
 		return nil, err
@@ -105,7 +110,7 @@ func (cs CryptoService) DecryptDataConnectionCredentials(credentials string) (*s
 	return credentialsString, nil
 }
 
-func (cs CryptoService) EncryptDataConnectionCredentials(credentials string) (*string, error) {
+func (cs CryptoServiceImpl) EncryptDataConnectionCredentials(credentials string) (*string, error) {
 	encryptedCredentials, err := encrypt(DATA_CONNECTION_KEY, credentials)
 	if err != nil {
 		return nil, err

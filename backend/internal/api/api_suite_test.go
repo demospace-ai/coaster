@@ -1,6 +1,7 @@
 package api_test
 
 import (
+	"fabra/internal/api"
 	"fabra/internal/test"
 	"testing"
 
@@ -10,6 +11,7 @@ import (
 )
 
 var db *gorm.DB
+var service api.Service
 var cleanup func()
 
 func TestHandlers(t *testing.T) {
@@ -19,6 +21,7 @@ func TestHandlers(t *testing.T) {
 
 var _ = BeforeSuite(func() {
 	db, cleanup = test.SetupDatabase()
+	service = api.NewService(db, test.MockCryptoService{}, test.MockQueryService{})
 })
 
 var _ = AfterSuite((func() {

@@ -24,10 +24,23 @@ func CreateTestUser(db *gorm.DB, organizationID int64) *models.User {
 		LastName:          "User",
 		Email:             "test@fabra.io",
 		ProfilePictureURL: "",
-		OrganizationID:    database.NullInt64{},
+		OrganizationID:    database.NewNullInt64(organizationID),
 	}
 
 	db.Create(&user)
 
 	return &user
+}
+
+func CreateTestDataConnection(db *gorm.DB, organizationID int64) *models.DataConnection {
+	dataConnection := models.DataConnection{
+		DisplayName:    "Test",
+		OrganizationID: organizationID,
+		ConnectionType: models.DataConnectionTypeBigQuery,
+		Credentials:    database.NewNullString("test"),
+	}
+
+	db.Create(&dataConnection)
+
+	return &dataConnection
 }

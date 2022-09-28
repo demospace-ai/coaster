@@ -13,25 +13,22 @@ import (
 	"google.golang.org/api/option"
 )
 
-type QueryService struct {
+type QueryService interface {
+	GetEvents(dataConnection models.DataConnection, eventSet models.EventSet) ([]string, error)
+	RunQuery(dataConnection models.DataConnection, queryString string) (Schema, []Row, error)
+}
+
+type QueryServiceImpl struct {
 	cryptoService crypto.CryptoService
 }
 
 func NewQueryService(cryptoService crypto.CryptoService) QueryService {
-	return QueryService{
+	return QueryServiceImpl{
 		cryptoService: cryptoService,
 	}
 }
 
-func NewError(err error) error {
-	return Error{err: err}
-}
-
-func (e Error) Error() string {
-	return e.err.Error()
-}
-
-func (qs QueryService) GetEvents(dataConnection models.DataConnection, eventSet models.EventSet) ([]string, error) {
+func (qs QueryServiceImpl) GetEvents(dataConnection models.DataConnection, eventSet models.EventSet) ([]string, error) {
 	queryString, err := createGetEventsQuery(eventSet)
 	if err != nil {
 		return nil, err
@@ -50,7 +47,7 @@ func (qs QueryService) GetEvents(dataConnection models.DataConnection, eventSet 
 	return events, nil
 }
 
-func (qs QueryService) RunQuery(dataConnection models.DataConnection, queryString string) (Schema, []Row, error) {
+func (qs QueryServiceImpl) RunQuery(dataConnection models.DataConnection, queryString string) (Schema, []Row, error) {
 	switch dataConnection.ConnectionType {
 	case models.DataConnectionTypeBigQuery:
 		return qs.runBigQueryQuery(dataConnection, queryString)
@@ -76,7 +73,7 @@ func createGetEventsQuery(eventSet models.EventSet) (string, error) {
 	return "", errors.Newf("bad event set: %v", eventSet)
 }
 
-func (qs QueryService) runBigQueryQuery(dataConnection models.DataConnection, queryString string) (Schema, []Row, error) {
+func (qs QueryServiceImpl) runBigQueryQuery(dataConnection models.DataConnection, queryString string) (Schema, []Row, error) {
 	bigQueryCredentialsString, err := qs.cryptoService.DecryptDataConnectionCredentials(dataConnection.Credentials.String)
 	if err != nil {
 		return nil, nil, err
@@ -143,7 +140,7 @@ func bigQueryRowtoRow(bigQueryRow []bigquery.Value) Row {
 	return row
 }
 
-func (qs QueryService) runSnowflakeQuery(dataConnection models.DataConnection, queryString string) (Schema, []Row, error) {
+func (qs QueryServiceImpl) runSnowflakeQuery(dataConnection models.DataConnection, queryString string) (Schema, []Row, error) {
 	// TODO: implement
 	return nil, nil, errors.NewBadRequest("snowflake not supported")
 }
