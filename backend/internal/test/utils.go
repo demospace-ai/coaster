@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fabra/internal/application"
 	"fabra/internal/models"
 	"fmt"
 	"log"
@@ -38,14 +39,23 @@ func SetupDatabase() (*gorm.DB, func()) {
 		// set AutoRemove to true so that stopped container goes away by itself
 		config.AutoRemove = true
 		config.RestartPolicy = docker.RestartPolicy{Name: "no"}
-		config.NetworkMode = "cloudbuild"
+		if application.IsCloudBuild() {
+			config.NetworkMode = "cloudbuild"
+		}
 	})
 	if err != nil {
 		log.Fatalf("Could not start resource: %s", err)
 	}
 
-	host := resource.Container.NetworkSettings.Networks["cloudbuild"].IPAddress
-	port := "5432"
+	var host, port string
+	if application.IsCloudBuild() {
+		host = resource.Container.NetworkSettings.Networks["cloudbuild"].IPAddress
+		port = "5432"
+	} else {
+		host = "localhost"
+		port = resource.GetPort("5432/tcp")
+	}
+
 	dbURI := fmt.Sprintf("user=fabratest password=fabratest database=fabratest host=%s port=%s", host, port)
 
 	log.Println("Connecting to database with uri:", dbURI)

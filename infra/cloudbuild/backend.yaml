@@ -4,6 +4,8 @@ steps:
   script: |
     cd backend;
     go test -v ./...;
+  env:
+    - 'IS_CLOUD_BUILD=true'
   waitFor: ['-']
 
 - id: build-backend
