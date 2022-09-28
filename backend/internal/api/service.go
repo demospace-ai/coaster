@@ -1,18 +1,24 @@
 package api
 
 import (
+	"fabra/internal/crypto"
+	"fabra/internal/query"
 	"fabra/internal/route"
 
 	"gorm.io/gorm"
 )
 
 type Service struct {
-	db *gorm.DB
+	db            *gorm.DB
+	cryptoService crypto.CryptoService
+	queryService  query.QueryService
 }
 
-func NewService(db *gorm.DB) Service {
+func NewService(db *gorm.DB, cryptoService crypto.CryptoService, queryService query.QueryService) Service {
 	return Service{
-		db: db,
+		db:            db,
+		cryptoService: cryptoService,
+		queryService:  queryService,
 	}
 }
 

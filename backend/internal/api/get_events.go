@@ -5,7 +5,6 @@ import (
 	"fabra/internal/auth"
 	"fabra/internal/dataconnections"
 	"fabra/internal/eventsets"
-	"fabra/internal/query"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -52,7 +51,7 @@ func (s Service) GetEvents(auth auth.Authentication, w http.ResponseWriter, r *h
 		return err
 	}
 
-	events, err := query.GetEvents(*dataConnection, *eventSet)
+	events, err := s.queryService.GetEvents(*dataConnection, *eventSet)
 	if err != nil {
 		return err
 	}

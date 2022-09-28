@@ -44,7 +44,7 @@ func (s Service) RunQuery(auth auth.Authentication, w http.ResponseWriter, r *ht
 		return err
 	}
 
-	schema, queryResults, err := query.RunQuery(*dataConnection, runQueryRequest.QueryString)
+	schema, queryResults, err := s.queryService.RunQuery(*dataConnection, runQueryRequest.QueryString)
 	if err != nil {
 		if _, ok := err.(query.Error); ok {
 			// Not actually a failure, the user's query was just wrong. Send the details back to them.

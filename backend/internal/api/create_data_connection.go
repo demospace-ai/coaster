@@ -49,17 +49,26 @@ func (s Service) CreateDataConnection(auth auth.Authentication, w http.ResponseW
 	}
 
 	var dataConnection *models.DataConnection
+	var encryptedCredentials *string
 	switch createDataConnectionRequest.ConnectionType {
 	case models.DataConnectionTypeBigQuery:
+		encryptedCredentials, err = s.cryptoService.EncryptDataConnectionCredentials(*createDataConnectionRequest.Credentials)
+		if err != nil {
+			return err
+		}
 		dataConnection, err = dataconnections.CreateBigQueryDataConnection(
-			s.db, auth.Organization.ID, createDataConnectionRequest.DisplayName, *createDataConnectionRequest.Credentials,
+			s.db, auth.Organization.ID, createDataConnectionRequest.DisplayName, *encryptedCredentials,
 		)
 	case models.DataConnectionTypeSnowflake:
+		encryptedCredentials, err = s.cryptoService.EncryptDataConnectionCredentials(*createDataConnectionRequest.Password)
+		if err != nil {
+			return err
+		}
 		dataConnection, err = dataconnections.CreateSnowflakeDataConnection(
 			s.db, auth.Organization.ID,
 			createDataConnectionRequest.DisplayName,
 			*createDataConnectionRequest.Username,
-			*createDataConnectionRequest.Password,
+			*encryptedCredentials,
 			*createDataConnectionRequest.DatabaseName,
 			*createDataConnectionRequest.WarehouseName,
 			*createDataConnectionRequest.Role,

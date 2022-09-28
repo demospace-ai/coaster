@@ -56,12 +56,12 @@ func (s Service) GetSchema(auth auth.Authentication, w http.ResponseWriter, r *h
 
 	var schema *query.Schema
 	if len(customJoin) > 0 {
-		schema, err = getSchemaForCustomJoin(*dataConnection, customJoin)
+		schema, err = s.getSchemaForCustomJoin(*dataConnection, customJoin)
 		if err != nil {
 			return err
 		}
 	} else {
-		schema, err = getSchemaForTable(*dataConnection, datasetID, tableName)
+		schema, err = s.getSchemaForTable(*dataConnection, datasetID, tableName)
 		if err != nil {
 			return err
 		}
@@ -72,30 +72,30 @@ func (s Service) GetSchema(auth auth.Authentication, w http.ResponseWriter, r *h
 	})
 }
 
-func getSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (*query.Schema, error) {
+func (s Service) getSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (*query.Schema, error) {
 	switch dataConnection.ConnectionType {
 	case models.DataConnectionTypeBigQuery:
-		return getBigQuerySchemaForTable(dataConnection, datasetID, tableName)
+		return s.getBigQuerySchemaForTable(dataConnection, datasetID, tableName)
 	case models.DataConnectionTypeSnowflake:
-		return getSnowflakeSchemaForTable(dataConnection, datasetID, tableName)
+		return s.getSnowflakeSchemaForTable(dataConnection, datasetID, tableName)
 	default:
 		return nil, errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", dataConnection.ConnectionType))
 	}
 }
 
-func getSchemaForCustomJoin(dataConnection models.DataConnection, customJoin string) (*query.Schema, error) {
+func (s Service) getSchemaForCustomJoin(dataConnection models.DataConnection, customJoin string) (*query.Schema, error) {
 	switch dataConnection.ConnectionType {
 	case models.DataConnectionTypeBigQuery:
-		return getBigQuerySchemaForCustom(dataConnection, customJoin)
+		return s.getBigQuerySchemaForCustom(dataConnection, customJoin)
 	case models.DataConnectionTypeSnowflake:
-		return getSnowflakeSchemaForCustom(dataConnection, customJoin)
+		return s.getSnowflakeSchemaForCustom(dataConnection, customJoin)
 	default:
 		return nil, errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", dataConnection.ConnectionType))
 	}
 }
 
-func getBigQuerySchemaForCustom(dataConnection models.DataConnection, customJoin string) (*query.Schema, error) {
-	bigQueryCredentialsString, err := dataconnections.DecryptBigQueryCredentials(dataConnection)
+func (s Service) getBigQuerySchemaForCustom(dataConnection models.DataConnection, customJoin string) (*query.Schema, error) {
+	bigQueryCredentialsString, err := s.cryptoService.DecryptDataConnectionCredentials(dataConnection.Credentials.String)
 	if err != nil {
 		return nil, err
 	}
@@ -147,8 +147,8 @@ func getBigQuerySchemaForCustom(dataConnection models.DataConnection, customJoin
 	return &schema, nil
 }
 
-func getBigQuerySchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (*query.Schema, error) {
-	bigQueryCredentialsString, err := dataconnections.DecryptBigQueryCredentials(dataConnection)
+func (s Service) getBigQuerySchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (*query.Schema, error) {
+	bigQueryCredentialsString, err := s.cryptoService.DecryptDataConnectionCredentials(dataConnection.Credentials.String)
 	if err != nil {
 		return nil, err
 	}
@@ -179,12 +179,12 @@ func getBigQuerySchemaForTable(dataConnection models.DataConnection, datasetID s
 	return &schema, nil
 }
 
-func getSnowflakeSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (*query.Schema, error) {
+func (s Service) getSnowflakeSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (*query.Schema, error) {
 	// TODO: implement
 	return nil, errors.NewBadRequest("snowflake not supported")
 }
 
-func getSnowflakeSchemaForCustom(dataConnection models.DataConnection, customJoin string) (*query.Schema, error) {
+func (s Service) getSnowflakeSchemaForCustom(dataConnection models.DataConnection, customJoin string) (*query.Schema, error) {
 	// TODO: implement
 	return nil, errors.NewBadRequest("snowflake not supported")
 }

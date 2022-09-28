@@ -17,17 +17,27 @@ import (
 var ALLOWED_ORIGINS = []string{"https://app.fabra.io"}
 var ALLOWED_HEADERS = []string{"Content-Type"}
 
-func RunService(db *gorm.DB, s api.Service) {
+type Server struct {
+	db *gorm.DB
+}
+
+func NewServer(db *gorm.DB) Server {
+	return Server{
+		db: db,
+	}
+}
+
+func (server Server) RunService(service api.Service) {
 	// No HTTPS needed since TLS is terminated by Google Cloud Run
 	router := mux.NewRouter()
 
-	for _, route := range s.AuthenticatedRoutes() {
-		wrapped := wrapAuthenticatedRoute(db, route.HandlerFunc)
+	for _, route := range service.AuthenticatedRoutes() {
+		wrapped := server.wrapAuthenticatedRoute(route.HandlerFunc)
 		router.Handle(route.Pattern, wrapped).Methods(route.Method.String(), "OPTIONS")
 	}
 
-	for _, route := range s.UnauthenticatedRoutes() {
-		wrapped := wrapUnauthenticatedRoute(db, route.HandlerFunc)
+	for _, route := range service.UnauthenticatedRoutes() {
+		wrapped := server.wrapUnauthenticatedRoute(route.HandlerFunc)
 		router.Handle(route.Pattern, wrapped).Methods(route.Method.String(), "OPTIONS")
 	}
 
@@ -36,20 +46,20 @@ func RunService(db *gorm.DB, s api.Service) {
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
-func wrapAuthenticatedRoute(db *gorm.DB, handler route.AuthenticatedHandlerFunc) http.Handler {
-	withAuth := wrapWithAuth(db, handler)
-	withError := wrapWithErrorHandling(withAuth)
+func (s Server) wrapAuthenticatedRoute(handler route.AuthenticatedHandlerFunc) http.Handler {
+	withAuth := s.wrapWithAuth(handler)
+	withError := s.wrapWithErrorHandling(withAuth)
 	return withError
 }
 
-func wrapUnauthenticatedRoute(db *gorm.DB, handler route.ErrorHandlerFunc) http.Handler {
-	withError := wrapWithErrorHandling(handler)
+func (s Server) wrapUnauthenticatedRoute(handler route.ErrorHandlerFunc) http.Handler {
+	withError := s.wrapWithErrorHandling(handler)
 	return withError
 }
 
-func wrapWithAuth(db *gorm.DB, handler route.AuthenticatedHandlerFunc) route.ErrorHandlerFunc {
+func (s Server) wrapWithAuth(handler route.AuthenticatedHandlerFunc) route.ErrorHandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		auth, err := auth.GetAuthentication(db, r)
+		auth, err := auth.GetAuthentication(s.db, r)
 		if err != nil {
 			return err
 		}
@@ -63,7 +73,7 @@ func wrapWithAuth(db *gorm.DB, handler route.AuthenticatedHandlerFunc) route.Err
 	}
 }
 
-func wrapWithErrorHandling(handler route.ErrorHandlerFunc) http.Handler {
+func (s Server) wrapWithErrorHandling(handler route.ErrorHandlerFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		err := handler(w, r)
 		if err == nil {

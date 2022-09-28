@@ -43,8 +43,9 @@ func SetupDatabase() (*gorm.DB, func()) {
 		log.Fatalf("Could not start resource: %s", err)
 	}
 
+	host := resource.GetBoundIP("5432/tcp")
 	port := resource.GetPort("5432/tcp")
-	dbURI := fmt.Sprintf("user=fabratest password=fabratest database=fabratest host=localhost port=%s", port)
+	dbURI := fmt.Sprintf("user=fabratest password=fabratest database=fabratest host=%s port=%s", host, port)
 
 	log.Println("Connecting to database with uri:", dbURI)
 
@@ -59,11 +60,11 @@ func SetupDatabase() (*gorm.DB, func()) {
 		})
 		return err
 	}); err != nil {
-		log.Fatalf("Could not connect to docker: %s", err)
+		log.Fatalf("Could not connect to database: %s", err)
 	}
 
 	log.Println("Running migrations.")
-	migrateURI := fmt.Sprintf("postgres://fabratest:fabratest@localhost:%s/fabratest?sslmode=disable", port)
+	migrateURI := fmt.Sprintf("postgres://fabratest:fabratest@%s:%s/fabratest?sslmode=disable", host, port)
 	m, err := migrate.New("file://../..//migrations", migrateURI)
 	if err != nil {
 		log.Fatalf("unable to open migrations connection: %s, %s", migrateURI, err)

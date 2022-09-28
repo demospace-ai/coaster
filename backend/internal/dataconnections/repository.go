@@ -1,14 +1,11 @@
 package dataconnections
 
 import (
-	"fabra/internal/crypto"
 	"fabra/internal/database"
 	"fabra/internal/models"
 
 	"gorm.io/gorm"
 )
-
-const CRYPTO_KEY_NAME = "projects/fabra-344902/locations/global/keyRings/data-connection-keyring/cryptoKeys/data-connection-key"
 
 func LoadAllDataConnections(db *gorm.DB, organizationID int64) ([]models.DataConnection, error) {
 	var connections []models.DataConnection
@@ -42,17 +39,12 @@ func LoadDataConnectionByID(db *gorm.DB, organizationID int64, connectionID int6
 	return &dataConnection, nil
 }
 
-func CreateBigQueryDataConnection(db *gorm.DB, organizationID int64, displayName string, credentials string) (*models.DataConnection, error) {
-	encryptedCredentials, err := crypto.Encrypt(CRYPTO_KEY_NAME, credentials)
-	if err != nil {
-		return nil, err
-	}
-
+func CreateBigQueryDataConnection(db *gorm.DB, organizationID int64, displayName string, encryptedCredentials string) (*models.DataConnection, error) {
 	dataConnection := models.DataConnection{
 		OrganizationID: organizationID,
 		DisplayName:    displayName,
 		ConnectionType: models.DataConnectionTypeBigQuery,
-		Credentials:    database.NewNullString(*encryptedCredentials),
+		Credentials:    database.NewNullString(encryptedCredentials),
 	}
 
 	result := db.Create(&dataConnection)
@@ -68,23 +60,18 @@ func CreateSnowflakeDataConnection(
 	organizationID int64,
 	displayName string,
 	username string,
-	password string,
+	encryptedPassword string,
 	databaseName string,
 	warehouseName string,
 	role string,
 	account string,
 ) (*models.DataConnection, error) {
-	encryptedPassword, err := crypto.Encrypt(CRYPTO_KEY_NAME, password)
-	if err != nil {
-		return nil, err
-	}
-
 	dataConnection := models.DataConnection{
 		OrganizationID: organizationID,
 		DisplayName:    displayName,
 		ConnectionType: models.DataConnectionTypeSnowflake,
 		Username:       database.NewNullString(username),
-		Password:       database.NewNullString(*encryptedPassword),
+		Password:       database.NewNullString(encryptedPassword),
 		DatabaseName:   database.NewNullString(databaseName),
 		WarehouseName:  database.NewNullString(warehouseName),
 		Role:           database.NewNullString(role),
@@ -96,14 +83,5 @@ func CreateSnowflakeDataConnection(
 		return nil, result.Error
 	}
 
-	return &dataConnection, err
-}
-
-func DecryptBigQueryCredentials(dataConnection models.DataConnection) (*string, error) {
-	credentialsString, err := crypto.Decrypt(CRYPTO_KEY_NAME, dataConnection.Credentials.String)
-	if err != nil {
-		return nil, err
-	}
-
-	return credentialsString, nil
+	return &dataConnection, nil
 }

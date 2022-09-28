@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 	"encoding/json"
-	"fabra/internal/dataconnections"
+	"fabra/internal/crypto"
 	"fabra/internal/errors"
 	"fabra/internal/models"
 	"fmt"
@@ -13,18 +13,14 @@ import (
 	"google.golang.org/api/option"
 )
 
-type Schema []ColumnSchema
-
-type ColumnSchema struct {
-	Name string `json:"name"`
-	Type string `json:"type"`
+type QueryService struct {
+	cryptoService crypto.CryptoService
 }
 
-type Row []Value
-type Value interface{}
-
-type Error struct {
-	err error
+func NewQueryService(cryptoService crypto.CryptoService) QueryService {
+	return QueryService{
+		cryptoService: cryptoService,
+	}
 }
 
 func NewError(err error) error {
@@ -33,6 +29,36 @@ func NewError(err error) error {
 
 func (e Error) Error() string {
 	return e.err.Error()
+}
+
+func (qs QueryService) GetEvents(dataConnection models.DataConnection, eventSet models.EventSet) ([]string, error) {
+	queryString, err := createGetEventsQuery(eventSet)
+	if err != nil {
+		return nil, err
+	}
+
+	_, results, err := qs.RunQuery(dataConnection, queryString)
+	if err != nil {
+		return nil, err
+	}
+
+	events := []string{}
+	for _, row := range results {
+		events = append(events, row[0].(string))
+	}
+
+	return events, nil
+}
+
+func (qs QueryService) RunQuery(dataConnection models.DataConnection, queryString string) (Schema, []Row, error) {
+	switch dataConnection.ConnectionType {
+	case models.DataConnectionTypeBigQuery:
+		return qs.runBigQueryQuery(dataConnection, queryString)
+	case models.DataConnectionTypeSnowflake:
+		return qs.runSnowflakeQuery(dataConnection, queryString)
+	default:
+		return nil, nil, errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", dataConnection.ConnectionType))
+	}
 }
 
 func createGetEventsQuery(eventSet models.EventSet) (string, error) {
@@ -50,38 +76,8 @@ func createGetEventsQuery(eventSet models.EventSet) (string, error) {
 	return "", errors.Newf("bad event set: %v", eventSet)
 }
 
-func GetEvents(dataConnection models.DataConnection, eventSet models.EventSet) ([]string, error) {
-	queryString, err := createGetEventsQuery(eventSet)
-	if err != nil {
-		return nil, err
-	}
-
-	_, results, err := RunQuery(dataConnection, queryString)
-	if err != nil {
-		return nil, err
-	}
-
-	events := []string{}
-	for _, row := range results {
-		events = append(events, row[0].(string))
-	}
-
-	return events, nil
-}
-
-func RunQuery(dataConnection models.DataConnection, queryString string) (Schema, []Row, error) {
-	switch dataConnection.ConnectionType {
-	case models.DataConnectionTypeBigQuery:
-		return runBigQueryQuery(dataConnection, queryString)
-	case models.DataConnectionTypeSnowflake:
-		return runSnowflakeQuery(dataConnection, queryString)
-	default:
-		return nil, nil, errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", dataConnection.ConnectionType))
-	}
-}
-
-func runBigQueryQuery(dataConnection models.DataConnection, queryString string) (Schema, []Row, error) {
-	bigQueryCredentialsString, err := dataconnections.DecryptBigQueryCredentials(dataConnection)
+func (qs QueryService) runBigQueryQuery(dataConnection models.DataConnection, queryString string) (Schema, []Row, error) {
+	bigQueryCredentialsString, err := qs.cryptoService.DecryptDataConnectionCredentials(dataConnection.Credentials.String)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -138,21 +134,6 @@ func runBigQueryQuery(dataConnection models.DataConnection, queryString string) 
 	return ConvertBigQuerySchema(it.Schema), results, nil
 }
 
-func ConvertBigQuerySchema(bigQuerySchema bigquery.Schema) Schema {
-	schema := Schema{}
-
-	for _, bigQuerySchemaField := range bigQuerySchema {
-		columnSchema := ColumnSchema{
-			Name: bigQuerySchemaField.Name,
-			Type: string(bigQuerySchemaField.Type),
-		}
-
-		schema = append(schema, columnSchema)
-	}
-
-	return schema
-}
-
 func bigQueryRowtoRow(bigQueryRow []bigquery.Value) Row {
 	var row Row
 	for _, value := range bigQueryRow {
@@ -162,7 +143,7 @@ func bigQueryRowtoRow(bigQueryRow []bigquery.Value) Row {
 	return row
 }
 
-func runSnowflakeQuery(dataConnection models.DataConnection, queryString string) (Schema, []Row, error) {
+func (qs QueryService) runSnowflakeQuery(dataConnection models.DataConnection, queryString string) (Schema, []Row, error) {
 	// TODO: implement
 	return nil, nil, errors.NewBadRequest("snowflake not supported")
 }

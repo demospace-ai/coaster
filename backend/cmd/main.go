@@ -3,7 +3,9 @@ package main
 import (
 	"fabra/internal/api"
 	"fabra/internal/config"
+	"fabra/internal/crypto"
 	"fabra/internal/database"
+	"fabra/internal/query"
 	"fabra/internal/server"
 	"log"
 	"math/rand"
@@ -25,6 +27,10 @@ func main() {
 
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	apiService := api.NewService(db)
-	server.RunService(db, apiService)
+	cryptoService := crypto.NewCryptoService()
+	queryService := query.NewQueryService(cryptoService)
+	apiService := api.NewService(db, cryptoService, queryService)
+
+	server := server.NewServer(db)
+	server.RunService(apiService)
 }

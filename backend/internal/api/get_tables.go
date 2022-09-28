@@ -51,7 +51,7 @@ func (s Service) GetTables(auth auth.Authentication, w http.ResponseWriter, r *h
 		return err
 	}
 
-	tables, err := getTables(*dataConnection, datasetID)
+	tables, err := s.getTables(*dataConnection, datasetID)
 	if err != nil {
 		return err
 	}
@@ -61,19 +61,19 @@ func (s Service) GetTables(auth auth.Authentication, w http.ResponseWriter, r *h
 	})
 }
 
-func getTables(dataConnection models.DataConnection, datasetID string) ([]string, error) {
+func (s Service) getTables(dataConnection models.DataConnection, datasetID string) ([]string, error) {
 	switch dataConnection.ConnectionType {
 	case models.DataConnectionTypeBigQuery:
-		return getBigQueryTables(dataConnection, datasetID)
+		return s.getBigQueryTables(dataConnection, datasetID)
 	case models.DataConnectionTypeSnowflake:
-		return getSnowflakeTables(dataConnection, datasetID)
+		return s.getSnowflakeTables(dataConnection, datasetID)
 	default:
 		return nil, errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", dataConnection.ConnectionType))
 	}
 }
 
-func getBigQueryTables(dataConnection models.DataConnection, datasetID string) ([]string, error) {
-	bigQueryCredentialsString, err := dataconnections.DecryptBigQueryCredentials(dataConnection)
+func (s Service) getBigQueryTables(dataConnection models.DataConnection, datasetID string) ([]string, error) {
+	bigQueryCredentialsString, err := s.cryptoService.DecryptDataConnectionCredentials(dataConnection.Credentials.String)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func getBigQueryTables(dataConnection models.DataConnection, datasetID string) (
 	return results, nil
 }
 
-func getSnowflakeTables(dataConnection models.DataConnection, datasetID string) ([]string, error) {
+func (s Service) getSnowflakeTables(dataConnection models.DataConnection, datasetID string) ([]string, error) {
 	// TODO: implement
 	return nil, errors.NewBadRequest("snowflake not supported")
 }

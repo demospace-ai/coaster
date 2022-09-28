@@ -11,7 +11,16 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
-func Encrypt(keyName string, plaintextString string) (*string, error) {
+const DATA_CONNECTION_KEY = "projects/fabra-344902/locations/global/keyRings/data-connection-keyring/cryptoKeys/data-connection-key"
+
+type CryptoService struct {
+}
+
+func NewCryptoService() CryptoService {
+	return CryptoService{}
+}
+
+func encrypt(keyName string, plaintextString string) (*string, error) {
 	ctx := context.Background()
 	client, err := kms.NewKeyManagementClient(ctx)
 	if err != nil {
@@ -39,17 +48,17 @@ func Encrypt(keyName string, plaintextString string) (*string, error) {
 	}
 
 	if !result.VerifiedPlaintextCrc32C {
-		return nil, fmt.Errorf("Encrypt: request corrupted in-transit")
+		return nil, fmt.Errorf("encrypt: request corrupted in-transit")
 	}
 	if int64(crc32c(result.Ciphertext)) != result.CiphertextCrc32C.Value {
-		return nil, fmt.Errorf("Encrypt: response corrupted in-transit")
+		return nil, fmt.Errorf("encrypt: response corrupted in-transit")
 	}
 
 	ciphertext := hex.EncodeToString(result.Ciphertext)
 	return &ciphertext, nil
 }
 
-func Decrypt(keyName string, ciphertextString string) (*string, error) {
+func decrypt(keyName string, ciphertextString string) (*string, error) {
 	ciphertext, err := hex.DecodeString(ciphertextString)
 	if err != nil {
 		return nil, err
@@ -80,9 +89,27 @@ func Decrypt(keyName string, ciphertextString string) (*string, error) {
 	}
 
 	if int64(crc32c(result.Plaintext)) != result.PlaintextCrc32C.Value {
-		return nil, fmt.Errorf("Decrypt: response corrupted in-transit")
+		return nil, fmt.Errorf("decrypt: response corrupted in-transit")
 	}
 
 	plaintext := string(result.Plaintext)
 	return &plaintext, nil
+}
+
+func (cs CryptoService) DecryptDataConnectionCredentials(credentials string) (*string, error) {
+	credentialsString, err := decrypt(DATA_CONNECTION_KEY, credentials)
+	if err != nil {
+		return nil, err
+	}
+
+	return credentialsString, nil
+}
+
+func (cs CryptoService) EncryptDataConnectionCredentials(credentials string) (*string, error) {
+	encryptedCredentials, err := encrypt(DATA_CONNECTION_KEY, credentials)
+	if err != nil {
+		return nil, err
+	}
+
+	return encryptedCredentials, nil
 }

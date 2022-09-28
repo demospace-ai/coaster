@@ -50,7 +50,7 @@ func (s Service) GetDatasets(auth auth.Authentication, w http.ResponseWriter, r 
 		return err
 	}
 
-	datasets, err := getDatasets(*dataConnection)
+	datasets, err := s.getDatasets(*dataConnection)
 	if err != nil {
 		return err
 	}
@@ -60,19 +60,19 @@ func (s Service) GetDatasets(auth auth.Authentication, w http.ResponseWriter, r 
 	})
 }
 
-func getDatasets(dataConnection models.DataConnection) ([]string, error) {
+func (s Service) getDatasets(dataConnection models.DataConnection) ([]string, error) {
 	switch dataConnection.ConnectionType {
 	case models.DataConnectionTypeBigQuery:
-		return getBigQueryDatasets(dataConnection)
+		return s.getBigQueryDatasets(dataConnection)
 	case models.DataConnectionTypeSnowflake:
-		return getSnowflakeDatasets(dataConnection)
+		return s.getSnowflakeDatasets(dataConnection)
 	default:
 		return nil, errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", dataConnection.ConnectionType))
 	}
 }
 
-func getBigQueryDatasets(dataConnection models.DataConnection) ([]string, error) {
-	bigQueryCredentialsString, err := dataconnections.DecryptBigQueryCredentials(dataConnection)
+func (s Service) getBigQueryDatasets(dataConnection models.DataConnection) ([]string, error) {
+	bigQueryCredentialsString, err := s.cryptoService.DecryptDataConnectionCredentials(dataConnection.Credentials.String)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +110,7 @@ func getBigQueryDatasets(dataConnection models.DataConnection) ([]string, error)
 	return results, nil
 }
 
-func getSnowflakeDatasets(dataConnection models.DataConnection) ([]string, error) {
+func (s Service) getSnowflakeDatasets(dataConnection models.DataConnection) ([]string, error) {
 	// TODO: implement
 	return nil, errors.NewBadRequest("snowflake not supported")
 }
