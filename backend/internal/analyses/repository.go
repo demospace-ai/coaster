@@ -68,7 +68,7 @@ func UpdateAnalysis(
 		analysis.Query = database.NewNullString(*query)
 	}
 
-	// TODO: decide if this should be limited to the original user
+	// TODO: decide if this should be limited to the original user or not
 	result := db.Save(&analysis)
 	if result.Error != nil {
 		return nil, result.Error
