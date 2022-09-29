@@ -83,10 +83,11 @@ func CreateFunnelSteps(
 	stepNames []string,
 ) ([]models.FunnelStep, error) {
 	var funnelSteps []models.FunnelStep
-	for _, stepName := range stepNames {
+	for i, stepName := range stepNames {
 		funnelStep := models.FunnelStep{
 			AnalysisID: analysisID,
 			StepName:   stepName,
+			StepOrder:  int64(i),
 		}
 
 		result := db.Create(&funnelStep)
@@ -124,6 +125,7 @@ func LoadFunnelStepsByAnalysisID(
 		Select("funnel_steps.*").
 		Where("funnel_steps.analysis_id = ?", analysisID).
 		Where("funnel_steps.deactivated_at IS NULL").
+		Order("funnel_steps.step_order ASC").
 		Find(&funnelSteps)
 
 	if result.Error != nil {
