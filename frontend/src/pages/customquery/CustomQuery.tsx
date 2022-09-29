@@ -109,6 +109,8 @@ export const CustomQuery: React.FC = () => {
     // Reset state on new ID since data will be newly loaded
     setConnection(null);
     setQuery("");
+    setQueryResults(null);
+    setSchema(null);
 
     if (id === "new") {
       createNewCustomQuery();

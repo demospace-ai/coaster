@@ -135,6 +135,8 @@ export const Funnel: React.FC = () => {
     setConnection(null);
     setEventSet(null);
     setSteps([]);
+    setQueryResults(null);
+    setSchema(null);
 
     if (id === "new") {
       createNewFunnel();
