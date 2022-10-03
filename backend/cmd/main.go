@@ -28,7 +28,7 @@ func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	cryptoService := crypto.NewCryptoService()
-	queryService := query.NewQueryService(cryptoService)
+	queryService := query.NewQueryService(db, cryptoService)
 	apiService := api.NewApiService(db, cryptoService, queryService)
 
 	router := router.NewRouter(db)

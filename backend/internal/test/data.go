@@ -47,6 +47,20 @@ func CreateDataConnection(db *gorm.DB, organizationID int64) *models.DataConnect
 	return &dataConnection
 }
 
+func CreateFunnelAnalysis(db *gorm.DB, userID int64, organizationID int64, connectionID int64, eventSetID int64) *models.Analysis {
+	analysis := models.Analysis{
+		UserID:         userID,
+		OrganizationID: organizationID,
+		ConnectionID:   database.NewNullInt64(connectionID),
+		EventSetID:     database.NewNullInt64(eventSetID),
+		AnalysisType:   models.AnalysisTypeFunnel,
+	}
+
+	db.Create(&analysis)
+
+	return &analysis
+}
+
 func CreateEventSet(db *gorm.DB, organizationID int64, connectionID int64) *models.EventSet {
 	eventSet := models.EventSet{
 		DisplayName:          "Test Event Set",

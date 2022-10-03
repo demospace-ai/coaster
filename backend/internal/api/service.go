@@ -127,6 +127,12 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.GetEvents,
 		},
 		{
+			Name:        "Run funnel query",
+			Method:      router.POST,
+			Pattern:     "/api/run_funnel_query",
+			HandlerFunc: s.RunFunnelQuery,
+		},
+		{
 			Name:        "Get analysis",
 			Method:      router.GET,
 			Pattern:     "/api/get_analysis/{analysisID}",

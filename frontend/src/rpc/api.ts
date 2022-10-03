@@ -129,7 +129,6 @@ export const RunQuery: IEndpoint<RunQueryRequest, RunQueryResponse> = {
     track: true,
 };
 
-// Same as RunQuery, but separate definition so Rudderstack can track separately
 export const GetEvents: IEndpoint<GetEventsRequest, GetEventsResponse> = {
     name: 'get_events',
     method: 'GET',
@@ -138,11 +137,10 @@ export const GetEvents: IEndpoint<GetEventsRequest, GetEventsResponse> = {
     track: true,
 };
 
-// Same as RunQuery, but separate definition so Rudderstack can track separately
-export const RunFunnelQuery: IEndpoint<RunQueryRequest, RunQueryResponse> = {
+export const RunFunnelQuery: IEndpoint<RunFunnelQueryRequest, RunQueryResponse> = {
     name: 'run_funnel_query',
     method: 'POST',
-    path: '/run_query',
+    path: '/run_funnel_query',
     track: true,
 };
 
@@ -230,6 +228,11 @@ export function toCsvData(schema: Schema | null, queryResults: QueryResults | nu
     }
 
     return [];
+}
+
+export interface RunFunnelQueryRequest {
+    connection_id: number;
+    analysis_id: number;
 }
 
 export interface GetEventsRequest {

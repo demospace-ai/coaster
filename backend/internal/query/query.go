@@ -11,43 +11,28 @@ import (
 	"cloud.google.com/go/bigquery"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
+	"gorm.io/gorm"
 )
 
 type QueryService interface {
-	GetEvents(dataConnection models.DataConnection, eventSet models.EventSet) ([]string, error)
-	RunQuery(dataConnection models.DataConnection, queryString string) (Schema, []Row, error)
+	GetEvents(dataConnection *models.DataConnection, eventSet *models.EventSet) ([]string, error)
+	RunFunnelQuery(dataConnection *models.DataConnection, analysis *models.Analysis) (Schema, []Row, error)
+	RunQuery(dataConnection *models.DataConnection, queryString string) (Schema, []Row, error)
 }
 
 type QueryServiceImpl struct {
+	db            *gorm.DB
 	cryptoService crypto.CryptoService
 }
 
-func NewQueryService(cryptoService crypto.CryptoService) QueryService {
+func NewQueryService(db *gorm.DB, cryptoService crypto.CryptoService) QueryService {
 	return QueryServiceImpl{
+		db:            db,
 		cryptoService: cryptoService,
 	}
 }
 
-func (qs QueryServiceImpl) GetEvents(dataConnection models.DataConnection, eventSet models.EventSet) ([]string, error) {
-	queryString, err := createGetEventsQuery(eventSet)
-	if err != nil {
-		return nil, err
-	}
-
-	_, results, err := qs.RunQuery(dataConnection, queryString)
-	if err != nil {
-		return nil, err
-	}
-
-	events := []string{}
-	for _, row := range results {
-		events = append(events, row[0].(string))
-	}
-
-	return events, nil
-}
-
-func (qs QueryServiceImpl) RunQuery(dataConnection models.DataConnection, queryString string) (Schema, []Row, error) {
+func (qs QueryServiceImpl) RunQuery(dataConnection *models.DataConnection, queryString string) (Schema, []Row, error) {
 	switch dataConnection.ConnectionType {
 	case models.DataConnectionTypeBigQuery:
 		return qs.runBigQueryQuery(dataConnection, queryString)
@@ -58,22 +43,7 @@ func (qs QueryServiceImpl) RunQuery(dataConnection models.DataConnection, queryS
 	}
 }
 
-func createGetEventsQuery(eventSet models.EventSet) (string, error) {
-	if eventSet.CustomJoin.Valid {
-		return "WITH custom_events AS (" +
-			eventSet.CustomJoin.String +
-			")" +
-			"SELECT DISTINCT " + eventSet.EventTypeColumn + " FROM custom_events", nil
-	}
-
-	if eventSet.DatasetName.Valid && eventSet.TableName.Valid {
-		return "SELECT DISTINCT " + eventSet.EventTypeColumn + " FROM " + eventSet.DatasetName.String + "." + eventSet.TableName.String, nil
-	}
-
-	return "", errors.Newf("bad event set: %v", eventSet)
-}
-
-func (qs QueryServiceImpl) runBigQueryQuery(dataConnection models.DataConnection, queryString string) (Schema, []Row, error) {
+func (qs QueryServiceImpl) runBigQueryQuery(dataConnection *models.DataConnection, queryString string) (Schema, []Row, error) {
 	bigQueryCredentialsString, err := qs.cryptoService.DecryptDataConnectionCredentials(dataConnection.Credentials.String)
 	if err != nil {
 		return nil, nil, err
@@ -140,7 +110,7 @@ func bigQueryRowtoRow(bigQueryRow []bigquery.Value) Row {
 	return row
 }
 
-func (qs QueryServiceImpl) runSnowflakeQuery(dataConnection models.DataConnection, queryString string) (Schema, []Row, error) {
+func (qs QueryServiceImpl) runSnowflakeQuery(dataConnection *models.DataConnection, queryString string) (Schema, []Row, error) {
 	// TODO: implement
 	return nil, nil, errors.NewBadRequest("snowflake not supported")
 }

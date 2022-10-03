@@ -51,7 +51,7 @@ func (s ApiService) GetEvents(auth auth.Authentication, w http.ResponseWriter, r
 		return err
 	}
 
-	events, err := s.queryService.GetEvents(*dataConnection, *eventSet)
+	events, err := s.queryService.GetEvents(dataConnection, eventSet)
 	if err != nil {
 		return err
 	}
