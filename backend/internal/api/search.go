@@ -17,10 +17,6 @@ type SearchResponse struct {
 }
 
 func (s ApiService) Search(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
-	if !auth.IsAuthenticated {
-		w.WriteHeader(http.StatusUnauthorized)
-		return nil
-	}
 
 	decoder := json.NewDecoder(r.Body)
 	var searchRequest SearchRequest

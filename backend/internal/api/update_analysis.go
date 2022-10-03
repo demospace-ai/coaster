@@ -36,10 +36,6 @@ TODO: tests
 
 */
 func (s ApiService) UpdateAnalysis(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
-	if !auth.IsAuthenticated {
-		w.WriteHeader(http.StatusUnauthorized)
-		return nil
-	}
 
 	decoder := json.NewDecoder(r.Body)
 	var updateAnalysisRequest UpdateAnalysisRequest

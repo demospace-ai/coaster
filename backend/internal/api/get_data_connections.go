@@ -13,10 +13,6 @@ type GetDataConnectionResponse struct {
 }
 
 func (s ApiService) GetDataConnections(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
-	if !auth.IsAuthenticated {
-		w.WriteHeader(http.StatusUnauthorized)
-		return nil
-	}
 
 	connections, err := dataconnections.LoadAllDataConnections(s.db, auth.Organization.ID)
 	if err != nil {

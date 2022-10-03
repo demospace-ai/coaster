@@ -13,10 +13,6 @@ type GetEventSetsResponse struct {
 }
 
 func (s ApiService) GetEventSets(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
-	if !auth.IsAuthenticated {
-		w.WriteHeader(http.StatusUnauthorized)
-		return nil
-	}
 
 	eventSets, err := eventsets.LoadAllEventSets(s.db, auth.Organization.ID)
 	if err != nil {

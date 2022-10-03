@@ -23,11 +23,6 @@ type RunFunnelQueryResponse struct {
 }
 
 func (s ApiService) RunFunnelQuery(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
-	if !auth.IsAuthenticated {
-		w.WriteHeader(http.StatusUnauthorized)
-		return nil
-	}
-
 	if auth.Organization == nil {
 		return errors.NewBadRequest("must setup organization first")
 	}
