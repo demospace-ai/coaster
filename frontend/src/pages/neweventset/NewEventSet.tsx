@@ -300,7 +300,7 @@ export const NewEventSetStepThree: React.FC<NewEventSetFormProps & { onComplete:
         options={schema ? schema : []}
         selected={state.eventTypeColumn}
         setSelected={(value: ColumnSchema) => { setState({ ...state, eventTypeColumn: value }); }}
-        getDisplayName={(value: ColumnSchema) => value.name}
+        getElementForDisplay={(value: ColumnSchema) => value.name}
         placeholder='Event Type Column'
         noOptionsString="No Columns Available! (Choose a table)"
         loading={schemaLoading}
@@ -311,7 +311,7 @@ export const NewEventSetStepThree: React.FC<NewEventSetFormProps & { onComplete:
         options={schema ? schema : []}
         selected={state.timeColumn}
         setSelected={(value: ColumnSchema) => { setState({ ...state, timeColumn: value }); }}
-        getDisplayName={(value: ColumnSchema) => value.name}
+        getElementForDisplay={(value: ColumnSchema) => value.name}
         placeholder='Timestamp Column'
         noOptionsString="No Columns Available! (Choose a table)"
         loading={schemaLoading}
@@ -322,7 +322,7 @@ export const NewEventSetStepThree: React.FC<NewEventSetFormProps & { onComplete:
         options={schema ? schema : []}
         selected={state.userIdentifierColumn}
         setSelected={(value: ColumnSchema) => { setState({ ...state, userIdentifierColumn: value }); }}
-        getDisplayName={(value: ColumnSchema) => value.name}
+        getElementForDisplay={(value: ColumnSchema) => value.name}
         placeholder='User Identifier Column'
         noOptionsString="No Columns Available! (Choose a table)"
         loading={schemaLoading}

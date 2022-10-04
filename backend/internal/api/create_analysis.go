@@ -17,7 +17,7 @@ type CreateAnalysisRequest struct {
 	ConnectionID *int64              `json:"connection_id,omitempty"`
 	EventSetID   *int64              `json:"event_set_id,omitempty"`
 	Query        *string             `json:"query,omitempty"`
-	StepNames    []string            `json:"step_names,omitempty"`
+	FunnelSteps  []views.FunnelStep  `json:"funnel_steps,omitempty"`
 }
 
 type CreateAnalysisResponse struct {
@@ -75,8 +75,8 @@ func (s ApiService) CreateAnalysis(auth auth.Authentication, w http.ResponseWrit
 	}
 
 	var funnelSteps []models.FunnelStep
-	if createAnalysisRequest.StepNames != nil {
-		funnelSteps, err = analyses.CreateFunnelSteps(s.db, analysis.ID, createAnalysisRequest.StepNames)
+	if createAnalysisRequest.FunnelSteps != nil {
+		funnelSteps, err = analyses.CreateFunnelSteps(s.db, analysis.ID, createAnalysisRequest.FunnelSteps)
 		if err != nil {
 			return err
 		}
@@ -84,7 +84,7 @@ func (s ApiService) CreateAnalysis(auth auth.Authentication, w http.ResponseWrit
 
 	analysisView := views.Analysis{
 		Analysis:    *analysis,
-		FunnelSteps: funnelSteps,
+		FunnelSteps: views.ConvertFunnelSteps(funnelSteps),
 	}
 
 	// TODO: mask database ID

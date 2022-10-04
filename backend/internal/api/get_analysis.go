@@ -49,7 +49,7 @@ func (s ApiService) GetAnalysis(auth auth.Authentication, w http.ResponseWriter,
 
 	analysisView := views.Analysis{
 		Analysis:    *analysis,
-		FunnelSteps: funnelSteps,
+		FunnelSteps: views.ConvertFunnelSteps(funnelSteps),
 	}
 
 	var connection *models.DataConnection

@@ -1,5 +1,5 @@
 import { sendRequest } from "src/rpc/ajax";
-import { GetEvents, GetEventsRequest, RunFunnelQuery, RunFunnelQueryRequest, RunQueryResponse } from "src/rpc/api";
+import { GetEvents, GetEventsRequest, GetProperties, GetPropertiesRequest, PropertyGroup, RunFunnelQuery, RunFunnelQueryRequest, RunQueryResponse } from "src/rpc/api";
 
 export const getEvents = async (connectionID: number, eventSetID: number): Promise<string[]> => {
   const payload: GetEventsRequest = {
@@ -11,6 +11,20 @@ export const getEvents = async (connectionID: number, eventSetID: number): Promi
     const response = await sendRequest(GetEvents, payload);
     // The result should only have a single query result column, which is the event types
     return response.events;
+  } catch (e) {
+    throw e;
+  }
+};
+
+export const getEventProperties = async (connectionID: number, eventSetID: number): Promise<PropertyGroup[]> => {
+  const payload: GetPropertiesRequest = {
+    connectionID: connectionID,
+    eventSetID: eventSetID,
+  };
+
+  try {
+    const response = await sendRequest(GetProperties, payload);
+    return response.property_groups;
   } catch (e) {
     throw e;
   }

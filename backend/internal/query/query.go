@@ -6,6 +6,7 @@ import (
 	"fabra/internal/crypto"
 	"fabra/internal/errors"
 	"fabra/internal/models"
+	"fabra/internal/views"
 	"fmt"
 
 	"cloud.google.com/go/bigquery"
@@ -16,6 +17,7 @@ import (
 
 type QueryService interface {
 	GetEvents(dataConnection *models.DataConnection, eventSet *models.EventSet) ([]string, error)
+	GetProperties(dataConnection *models.DataConnection, eventSet *models.EventSet) ([]views.PropertyGroup, error)
 	RunFunnelQuery(dataConnection *models.DataConnection, analysis *models.Analysis) (Schema, []Row, error)
 	RunQuery(dataConnection *models.DataConnection, queryString string) (Schema, []Row, error)
 }

@@ -137,6 +137,14 @@ export const GetEvents: IEndpoint<GetEventsRequest, GetEventsResponse> = {
     track: true,
 };
 
+export const GetProperties: IEndpoint<GetPropertiesRequest, GetPropertiesResponse> = {
+    name: 'get_properties',
+    method: 'GET',
+    path: '/get_properties',
+    queryParams: ['connectionID', 'eventSetID'],
+    track: true,
+};
+
 export const RunFunnelQuery: IEndpoint<RunFunnelQueryRequest, RunQueryResponse> = {
     name: 'run_funnel_query',
     method: 'POST',
@@ -216,6 +224,11 @@ export interface ColumnSchema {
 
 export interface Schema extends Array<ColumnSchema> { }
 
+export interface PropertyGroup {
+    name: string;
+    properties: string[];
+}
+
 export interface RunQueryRequest {
     connection_id: number;
     query_string: string;
@@ -242,6 +255,15 @@ export interface GetEventsRequest {
 
 export interface GetEventsResponse {
     events: string[];
+}
+
+export interface GetPropertiesRequest {
+    connectionID: number;
+    eventSetID: number;
+}
+
+export interface GetPropertiesResponse {
+    property_groups: PropertyGroup[];
 }
 
 export interface RunQueryResponse {
@@ -351,7 +373,7 @@ export interface UpdateAnalysisRequest {
     event_set_id?: number;
     title?: string;
     query?: string;
-    step_names?: string[];
+    funnel_steps?: FunnelStep[];
 }
 
 export interface UpdateAnalysisResponse {
@@ -383,14 +405,52 @@ export interface Analysis {
     event_set_id?: number;
     title?: string;
     query?: string;
-    funnel_steps?: FunnelSteps;
+    funnel_steps?: FunnelStep[];
 }
-
-export type FunnelSteps = FunnelStep[];
 
 export interface FunnelStep {
     step_name: string;
+    filters: StepFilter[];
 }
+
+export interface StepFilter {
+    property_name: string;
+    property_type: ColumnType;
+    filter_type: FilterType;
+    value: string;
+    custom_property_group_id?: number;
+}
+
+export enum ColumnType {
+    String = "string",
+    Number = "number",
+}
+
+export enum FilterType {
+    Equal = "equal",
+    NotEqual = "not_equal",
+    GreaterThan = "greater_than",
+    LessThan = "less_than",
+    Contains = "contains",
+    NotContains = "not_contains",
+}
+
+export const EMPTY_FILTER: StepFilter = {
+    property_name: "",
+    property_type: ColumnType.String,
+    filter_type: FilterType.Equal,
+    value: "",
+};
+
+export const stepFiltersMatch = (filters1: StepFilter[], filters2: StepFilter[]) => {
+    return filters1.length === filters2.length && filters1.every((filter1, index) => {
+        const filter2 = filters2[index];
+        return filter1.property_name === filter2.property_name
+            && filter1.filter_type === filter2.filter_type
+            && filter1.value === filter2.value
+            && filter1.custom_property_group_id === filter2.custom_property_group_id;
+    });
+};
 
 export enum AnalysisType {
     CustomQuery = "custom_query",

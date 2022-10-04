@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fabra/internal/database"
 	"fabra/internal/models"
+	"fabra/internal/views"
 	"time"
 
 	"gorm.io/gorm"
@@ -80,13 +81,14 @@ func UpdateAnalysis(
 func CreateFunnelSteps(
 	db *gorm.DB,
 	analysisID int64,
-	stepNames []string,
+	funnelSteps []views.FunnelStep,
 ) ([]models.FunnelStep, error) {
-	var funnelSteps []models.FunnelStep
-	for _, stepName := range stepNames {
+	var funnelStepModels []models.FunnelStep
+	for _, funnelStep := range funnelSteps {
 		funnelStep := models.FunnelStep{
 			AnalysisID: analysisID,
-			StepName:   stepName,
+			StepName:   funnelStep.Name,
+			// TODO: add the filter values here
 		}
 
 		result := db.Create(&funnelStep)
@@ -94,10 +96,10 @@ func CreateFunnelSteps(
 			return nil, result.Error
 		}
 
-		funnelSteps = append(funnelSteps, funnelStep)
+		funnelStepModels = append(funnelStepModels, funnelStep)
 	}
 
-	return funnelSteps, nil
+	return funnelStepModels, nil
 }
 
 func DeactivateFunnelSteps(

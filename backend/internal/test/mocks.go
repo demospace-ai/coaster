@@ -5,6 +5,7 @@ import (
 	"fabra/internal/eventsets"
 	"fabra/internal/models"
 	"fabra/internal/query"
+	"fabra/internal/views"
 
 	"gorm.io/gorm"
 )
@@ -71,4 +72,8 @@ func (qs MockQueryService) RunFunnelQuery(dataConnection *models.DataConnection,
 	}
 
 	return schema, rows, nil
+}
+
+func (qs MockQueryService) GetProperties(dataConnection *models.DataConnection, eventSet *models.EventSet) ([]views.PropertyGroup, error) {
+	return nil, nil
 }

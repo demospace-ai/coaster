@@ -15,6 +15,7 @@ import { ConnectionSelector } from "src/components/selector/Selector";
 import { sendRequest } from "src/rpc/ajax";
 import { AnalysisType, CreateAnalysis, CreateAnalysisRequest, DataConnection, GetAnalysis, QueryResults, RunQuery, RunQueryRequest, Schema, toCsvData, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
 import { useDebounce } from 'src/utils/debounce';
+import { toNull } from 'src/utils/undefined';
 import { createResizeFunction } from 'src/utils/resize';
 
 type QueryParams = {
@@ -99,7 +100,7 @@ export const CustomQuery: React.FC = () => {
 
     try {
       const response = await sendRequest(UpdateAnalysis, payload);
-      setConnection(response.connection ? response.connection : null);
+      setConnection(toNull(response.connection));
     } catch (e) {
       // TODO: handle error here
     }
@@ -195,7 +196,7 @@ export const CustomQuery: React.FC = () => {
 
   // Hack to run/save the query since the Monaco editor will keep a memoized version of the runQuery function
   // that uses the first query passed to it.
-  const connectionID = connection ? connection.id : null;
+  const connectionID = toNull(connection?.id);
   useEffect(() => {
     if (shouldRun) {
       setShouldRun(false);

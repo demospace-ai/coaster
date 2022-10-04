@@ -14,11 +14,11 @@ import (
 )
 
 type UpdateAnalysisRequest struct {
-	AnalysisID   int64    `json:"analysis_id"`
-	ConnectionID *int64   `json:"connection_id,omitempty"`
-	EventSetID   *int64   `json:"event_set_id,omitempty"`
-	Query        *string  `json:"query,omitempty"`
-	StepNames    []string `json:"step_names,omitempty"`
+	AnalysisID   int64              `json:"analysis_id"`
+	ConnectionID *int64             `json:"connection_id,omitempty"`
+	EventSetID   *int64             `json:"event_set_id,omitempty"`
+	Query        *string            `json:"query,omitempty"`
+	FunnelSteps  []views.FunnelStep `json:"funnel_steps,omitempty"`
 }
 
 type UpdateAnalysisResponse struct {
@@ -89,8 +89,8 @@ func (s ApiService) UpdateAnalysis(auth auth.Authentication, w http.ResponseWrit
 
 			// Ignore adding funnel steps from request if the connection or event set changed
 			sourceChanged := (analysis.ConnectionID != updatedAnalysis.ConnectionID) || (analysis.EventSetID != updatedAnalysis.EventSetID)
-			if updateAnalysisRequest.StepNames != nil && !sourceChanged {
-				funnelSteps, err = analyses.CreateFunnelSteps(s.db, analysis.ID, updateAnalysisRequest.StepNames)
+			if updateAnalysisRequest.FunnelSteps != nil && !sourceChanged {
+				funnelSteps, err = analyses.CreateFunnelSteps(s.db, analysis.ID, updateAnalysisRequest.FunnelSteps)
 				if err != nil {
 					return err
 				}
@@ -106,7 +106,7 @@ func (s ApiService) UpdateAnalysis(auth auth.Authentication, w http.ResponseWrit
 
 	analysisView := views.Analysis{
 		Analysis:    *updatedAnalysis,
-		FunnelSteps: funnelSteps,
+		FunnelSteps: views.ConvertFunnelSteps(funnelSteps),
 	}
 
 	var updatedConnection *models.DataConnection
