@@ -23,7 +23,7 @@ func init() {
 		{{ end }}
 		{{.stepSubqueryString}},
 		{{.resultSubquery}}
-		SELECT count, event, (count / (SELECT MAX(count) FROM results)) as percent from results ORDER BY results.event_order
+		SELECT count, event, IFNULL(count / NULLIF((SELECT MAX(count) FROM results), 0), 0) as percent from results ORDER BY results.event_order
 	`))
 
 	stepSubqueryTemplate = template.Must(template.New("stepSubQuery").Parse(`
