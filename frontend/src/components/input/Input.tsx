@@ -210,8 +210,12 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
 
     if (props.options) {
       return props.options.filter((option) => {
-        const displayName = props.getElementForDisplay ? props.getElementForDisplay(option) : option;
-        return displayName.toLowerCase().includes(query.toLowerCase());
+        const displayValue = props.getElementForDisplay ? props.getElementForDisplay(option) : option;
+        if (typeof displayValue === "string") {
+          return displayValue.toLowerCase().includes(query.toLowerCase());
+        } else {
+          return true; // TODO: figure out how to do this for elements
+        }
       });
     }
 

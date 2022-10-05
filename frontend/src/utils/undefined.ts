@@ -13,3 +13,11 @@ export function toEmptyList<T>(arg: T | undefined): T | [] {
 
   return arg;
 }
+
+export function toUndefined<T>(arg: T | null): T | undefined {
+  if (arg === null) {
+    return undefined;
+  }
+
+  return arg;
+}

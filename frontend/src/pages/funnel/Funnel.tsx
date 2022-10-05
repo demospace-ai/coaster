@@ -13,7 +13,7 @@ import { ConnectionSelector, ControlledEventSelector, ControlledPropertySelector
 import { getEvents, getProperties, runFunnelQuery } from 'src/queries/queries';
 import { sendRequest } from 'src/rpc/ajax';
 import { AnalysisType, CreateAnalysis, CreateAnalysisRequest, DataConnection, EventSet, FilterType, FunnelStep, GetAnalysis, Property, PropertyGroup, QueryResults, Schema, StepFilter, stepFiltersMatch, toCsvData, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
-import { toEmptyList } from 'src/utils/undefined';
+import { toEmptyList, toUndefined } from 'src/utils/undefined';
 
 type FunnelParams = {
   id: string,
@@ -105,7 +105,7 @@ export const Funnel: React.FC = () => {
     try {
       const response = await sendRequest(UpdateAnalysis, payload);
       setConnection(response.connection);
-      setEventSet(response.event_set);
+      setEventSet(toUndefined(response.event_set));
       setSteps(toEmptyList(response.analysis.funnel_steps));
     } catch (e) {
       // TODO: handle error here
