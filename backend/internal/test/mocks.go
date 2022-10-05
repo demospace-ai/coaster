@@ -4,7 +4,6 @@ import (
 	"fabra/internal/analyses"
 	"fabra/internal/eventsets"
 	"fabra/internal/models"
-	"fabra/internal/query"
 	"fabra/internal/views"
 
 	"gorm.io/gorm"
@@ -38,20 +37,20 @@ func (qs MockQueryService) GetEvents(dataConnection *models.DataConnection, even
 	return result, nil
 }
 
-func (qs MockQueryService) RunQuery(dataConnection *models.DataConnection, queryString string) (query.Schema, []query.Row, error) {
-	schema := query.Schema{
-		query.ColumnSchema{Name: "Column 1", Type: "string"},
-		query.ColumnSchema{Name: "Column 2", Type: "number"},
+func (qs MockQueryService) RunQuery(dataConnection *models.DataConnection, queryString string) (views.Schema, []views.Row, error) {
+	schema := views.Schema{
+		views.ColumnSchema{Name: "Column 1", Type: "string"},
+		views.ColumnSchema{Name: "Column 2", Type: "number"},
 	}
 
-	rows := []query.Row{
+	rows := []views.Row{
 		{"value1", "value2"},
 	}
 
 	return schema, rows, nil
 }
 
-func (qs MockQueryService) RunFunnelQuery(dataConnection *models.DataConnection, analysis *models.Analysis) (query.Schema, []query.Row, error) {
+func (qs MockQueryService) RunFunnelQuery(dataConnection *models.DataConnection, analysis *models.Analysis) (views.Schema, []views.Row, error) {
 	_, err := eventsets.LoadEventSetByID(qs.db, analysis.OrganizationID, analysis.EventSetID.Int64)
 	if err != nil {
 		return nil, nil, err
@@ -62,12 +61,12 @@ func (qs MockQueryService) RunFunnelQuery(dataConnection *models.DataConnection,
 		return nil, nil, err
 	}
 
-	schema := query.Schema{
-		query.ColumnSchema{Name: "Column 1", Type: "string"},
-		query.ColumnSchema{Name: "Column 2", Type: "number"},
+	schema := views.Schema{
+		views.ColumnSchema{Name: "Column 1", Type: "string"},
+		views.ColumnSchema{Name: "Column 2", Type: "number"},
 	}
 
-	rows := []query.Row{
+	rows := []views.Row{
 		{"value1", "value2"},
 	}
 
@@ -75,5 +74,9 @@ func (qs MockQueryService) RunFunnelQuery(dataConnection *models.DataConnection,
 }
 
 func (qs MockQueryService) GetProperties(dataConnection *models.DataConnection, eventSet *models.EventSet) ([]views.PropertyGroup, error) {
+	return nil, nil
+}
+
+func (qs MockQueryService) GetPropertyValues(dataConnection *models.DataConnection, eventSet *models.EventSet, propertyName string) ([]views.Value, error) {
 	return nil, nil
 }

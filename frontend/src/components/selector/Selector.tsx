@@ -1,12 +1,13 @@
 import classNames from "classnames";
 import { useEffect, useState } from "react";
 import { ValidatedComboInput, ValidatedDropdownInput } from "src/components/input/Input";
-import { getEvents } from "src/queries/queries";
+import { getEvents, getPropertyValues } from "src/queries/queries";
 import { sendRequest } from "src/rpc/ajax";
-import { DataConnection, EventSet, FilterType, GetDataConnections, GetDatasets, GetEventSets, GetTables, PropertyGroup } from "src/rpc/api";
+import { DataConnection, EventSet, FilterType, GetDataConnections, GetDatasets, GetEventSets, GetTables, Property, PropertyGroup } from "src/rpc/api";
+import { toNull } from "src/utils/undefined";
 
 type ConnectionSelectorProps = {
-  connection: DataConnection | null;
+  connection: DataConnection | undefined;
   setConnection: (connection: DataConnection) => void;
   className?: string;
   noOptionsString?: string;
@@ -46,8 +47,8 @@ export const ConnectionSelector: React.FC<ConnectionSelectorProps> = props => {
 };
 
 type DatasetSelectorProps = {
-  connectionID: number | null;
-  datasetID: string | null;
+  connectionID: number | undefined;
+  datasetID: string | undefined;
   setDatasetID: (datasetID: string) => void;
   className?: string;
   noOptionsString?: string;
@@ -90,9 +91,9 @@ export const DatasetSelector: React.FC<DatasetSelectorProps> = props => {
 };
 
 type TableSelectorProps = {
-  connectionID: number | null;
-  datasetID: string | null;
-  tableName: string | null;
+  connectionID: number | undefined;
+  datasetID: string | undefined;
+  tableName: string | undefined;
   setTableName: (tableName: string) => void;
   className?: string;
   noOptionsString?: string;
@@ -134,8 +135,8 @@ export const TableSelector: React.FC<TableSelectorProps> = props => {
 };
 
 type EventSetSelectorProps = {
-  connection: DataConnection | null;
-  eventSet: EventSet | null;
+  connection: DataConnection | undefined;
+  eventSet: EventSet | undefined;
   setEventSet: (eventSet: EventSet) => void;
   className?: string;
   noOptionsString?: string;
@@ -180,9 +181,9 @@ export const EventSetSelector: React.FC<EventSetSelectorProps> = props => {
 };
 
 type EventSelectorProps = {
-  connectionID: number | null;
-  eventSetID: number | null;
-  event: string | null,
+  connectionID: number | undefined;
+  eventSetID: number | undefined;
+  event: string | undefined,
   setEvent: (event: string) => void;
   className?: string;
   noOptionsString?: string;
@@ -283,7 +284,7 @@ export const FilterSelector: React.FC<FilterSelectorProps> = props => {
 };
 
 type ControlledEventSelectorProps = {
-  event: string | null,
+  event: string | undefined,
   setEvent: (event: string) => void;
   className?: string;
   noOptionsString?: string;
@@ -306,8 +307,8 @@ export const ControlledEventSelector: React.FC<ControlledEventSelectorProps> = p
 };
 
 type PropertySelectorProps = {
-  property: string | null,
-  setProperty: (event: string) => void;
+  property: Property | undefined,
+  setProperty: (property: Property) => void;
   className?: string;
   noOptionsString?: string;
   placeholder?: string;
@@ -323,7 +324,8 @@ export const ControlledPropertySelector: React.FC<PropertySelectorProps> = props
   return <ValidatedComboInput
     className={props.className}
     selected={props.property}
-    setSelected={(eventProperty: string) => props.setProperty(eventProperty)}
+    setSelected={(property: Property) => props.setProperty(property)}
+    getElementForDisplay={(property: Property) => property.name}
     options={propertyNames}
     loading={Boolean(props.loading)}
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No event properties available!"}
@@ -331,13 +333,12 @@ export const ControlledPropertySelector: React.FC<PropertySelectorProps> = props
     validated={props.validated} />;
 };
 
-
 type PropertyValueSelectorProps = {
-  connectionID: number | null;
-  eventSetID: number | null;
-  propertyName: string | null;
+  connectionID: number | undefined;
+  eventSetID: number | undefined;
+  property: Property | undefined;
   customPropertyGroupID?: number;
-  propertyValue: string | null,
+  propertyValue: string | number | null | undefined,
   setPropertyValue: (event: string) => void;
   className?: string;
   noOptionsString?: string;
@@ -348,16 +349,17 @@ type PropertyValueSelectorProps = {
 };
 
 export const PropertyValueSelector: React.FC<PropertyValueSelectorProps> = props => {
-  const [propertyValues, setPropertyValues] = useState<string[]>();
+  const [propertyValues, setPropertyValues] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const propertyName = toNull(props.property?.name);
   useEffect(() => {
-    if (!props.connectionID || !props.eventSetID || !props.propertyName) {
+    if (!props.connectionID || !props.eventSetID || !propertyName) {
       return;
     }
 
     setLoading(true);
     let ignore = false;
-    getEvents(props.connectionID, props.eventSetID).then((results) => {
+    getPropertyValues(props.connectionID, props.eventSetID, propertyName).then((results) => {
       if (!ignore) {
         setPropertyValues(results);
         setLoading(false);
@@ -367,13 +369,14 @@ export const PropertyValueSelector: React.FC<PropertyValueSelectorProps> = props
     return () => {
       ignore = true;
     };
-  }, [props.connectionID, props.eventSetID, props.propertyName]);
+  }, [props.connectionID, props.eventSetID, propertyName]);
 
   return <ValidatedComboInput
     className={props.className}
     selected={props.propertyValue}
     setSelected={(eventProperty: string) => props.setPropertyValue(eventProperty)}
     options={propertyValues}
+    getElementForDisplay={(propertyValue: string) => propertyValue ? propertyValue : "<empty>"}
     loading={loading}
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No properties values available!"}
     placeholder={props.placeholder ? props.placeholder : "Choose property value"}

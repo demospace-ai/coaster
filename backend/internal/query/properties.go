@@ -17,13 +17,9 @@ func (qs QueryServiceImpl) GetProperties(dataConnection *models.DataConnection, 
 		return nil, err
 	}
 
-	propertyNames := []string{}
-	for _, column := range schema {
-		propertyNames = append(propertyNames, column.Name)
-	}
 	eventProperties := views.PropertyGroup{
 		Name:       "Event",
-		Properties: propertyNames,
+		Properties: schema,
 	}
 
 	// TODO: fetch custom properties as well
@@ -32,11 +28,43 @@ func (qs QueryServiceImpl) GetProperties(dataConnection *models.DataConnection, 
 
 func createPropertiesQuery(eventSet *models.EventSet) (string, error) {
 	if eventSet.CustomJoin.Valid {
-		return createCustomTableQuery(eventSet) + "SELECT * FROM custom_events LIMIT 0", nil
+		return createCustomTableQuery(eventSet) + "SELECT * FROM custom_events LIMIT 1", nil
 	}
 
 	if eventSet.DatasetName.Valid && eventSet.TableName.Valid {
-		return "SELECT * FROM " + eventSet.DatasetName.String + "." + eventSet.TableName.String + " LIMIT 0", nil
+		return "SELECT * FROM " + eventSet.DatasetName.String + "." + eventSet.TableName.String + " LIMIT 1", nil
+	}
+
+	return "", errors.Newf("bad event set: %v", eventSet)
+}
+
+func (qs QueryServiceImpl) GetPropertyValues(dataConnection *models.DataConnection, eventSet *models.EventSet, propertyName string) ([]views.Value, error) {
+	queryString, err := createGetPropertyValuesQuery(eventSet, propertyName)
+	if err != nil {
+		return nil, err
+	}
+
+	_, results, err := qs.RunQuery(dataConnection, queryString)
+	if err != nil {
+		return nil, err
+	}
+
+	events := []views.Value{}
+	for _, row := range results {
+		events = append(events, row[0])
+	}
+
+	return events, nil
+}
+
+// This gets 50 values, in the future we might make this configurable
+func createGetPropertyValuesQuery(eventSet *models.EventSet, propertyValue string) (string, error) {
+	if eventSet.CustomJoin.Valid {
+		return createCustomTableQuery(eventSet) + "SELECT DISTINCT " + propertyValue + " FROM custom_events LIMIT 50", nil
+	}
+
+	if eventSet.DatasetName.Valid && eventSet.TableName.Valid {
+		return "SELECT DISTINCT " + propertyValue + " FROM " + eventSet.DatasetName.String + "." + eventSet.TableName.String + " LIMIT 50", nil
 	}
 
 	return "", errors.Newf("bad event set: %v", eventSet)

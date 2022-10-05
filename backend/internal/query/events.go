@@ -18,6 +18,10 @@ func (qs QueryServiceImpl) GetEvents(dataConnection *models.DataConnection, even
 
 	events := []string{}
 	for _, row := range results {
+		if row[0] == nil {
+			continue
+		}
+
 		events = append(events, row[0].(string))
 	}
 

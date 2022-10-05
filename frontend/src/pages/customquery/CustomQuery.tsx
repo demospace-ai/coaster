@@ -15,8 +15,8 @@ import { ConnectionSelector } from "src/components/selector/Selector";
 import { sendRequest } from "src/rpc/ajax";
 import { AnalysisType, CreateAnalysis, CreateAnalysisRequest, DataConnection, GetAnalysis, QueryResults, RunQuery, RunQueryRequest, Schema, toCsvData, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
 import { useDebounce } from 'src/utils/debounce';
-import { toNull } from 'src/utils/undefined';
 import { createResizeFunction } from 'src/utils/resize';
+import { toNull } from 'src/utils/undefined';
 
 type QueryParams = {
   id: string,
@@ -45,10 +45,10 @@ export const CustomQuery: React.FC = () => {
   const [topPanelHeight, setTopPanelHeight] = useState<number>();
   const topPanelRef = useRef<HTMLDivElement>(null);
 
-  const [connection, setConnection] = useState<DataConnection | null>(null);
+  const [connection, setConnection] = useState<DataConnection | undefined>(undefined);
   const [query, setQuery] = useState<string>("");
-  const [schema, setSchema] = useState<Schema | null>(null);
-  const [queryResults, setQueryResults] = useState<QueryResults | null>(null);
+  const [schema, setSchema] = useState<Schema | undefined>(undefined);
+  const [queryResults, setQueryResults] = useState<QueryResults | undefined>(undefined);
   const hasResults = schema !== null && queryResults !== null;
 
   const [shouldRun, setShouldRun] = useState<boolean>(false);
@@ -100,7 +100,7 @@ export const CustomQuery: React.FC = () => {
 
     try {
       const response = await sendRequest(UpdateAnalysis, payload);
-      setConnection(toNull(response.connection));
+      setConnection(response.connection);
     } catch (e) {
       // TODO: handle error here
     }
@@ -108,10 +108,10 @@ export const CustomQuery: React.FC = () => {
 
   useEffect(() => {
     // Reset state on new ID since data will be newly loaded
-    setConnection(null);
+    setConnection(undefined);
     setQuery("");
-    setQueryResults(null);
-    setSchema(null);
+    setQueryResults(undefined);
+    setSchema(undefined);
 
     if (id === "new") {
       createNewCustomQuery();
@@ -187,8 +187,8 @@ export const CustomQuery: React.FC = () => {
       }
     } catch (e) {
       setErrorMessage((e as Error).message);
-      setSchema(null);
-      setQueryResults(null);
+      setSchema(undefined);
+      setQueryResults(undefined);
     }
 
     setQueryLoading(false);

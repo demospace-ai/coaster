@@ -4,10 +4,12 @@ import classNames from "classnames";
 import { Fragment, useRef, useState } from "react";
 import { Loading } from "src/components/loading/Loading";
 
+const UNSET: any = { "undefined": true };
+
 type ValidatedInputProps = {
   id: string;
   placeholder?: string;
-  value: string | null;
+  value: string | undefined;
   setValue: (value: string) => void;
   className?: string;
   textarea?: boolean;
@@ -27,8 +29,8 @@ export const ValidatedInput: React.FC<ValidatedInputProps> = props => {
     }
   };
 
-  const validateNotEmpty = (value: string | null): boolean => {
-    const valid = value != null && value.length > 0;
+  const validateNotEmpty = (value: string | undefined): boolean => {
+    const valid = value !== undefined && value.length > 0;
     setIsValid(valid);
     return valid;
   };
@@ -70,7 +72,7 @@ export const ValidatedInput: React.FC<ValidatedInputProps> = props => {
 type ValidatedDropdownInputProps = {
   by?: string;
   options: any[] | undefined;
-  selected: any | null;
+  selected: any | undefined;
   setSelected: (option: any) => void;
   getElementForDisplay?: (option: any) => string | React.ReactElement;
   getElementForDropdown?: (option: any) => string | React.ReactElement;
@@ -85,8 +87,8 @@ type ValidatedDropdownInputProps = {
 export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = props => {
   const [isValid, setIsValid] = useState(true);
 
-  const validateNotNull = (value: number | null): boolean => {
-    const valid = value != null;
+  const validateNotUndefined = (value: number | undefined): boolean => {
+    const valid = value !== undefined;
     setIsValid(valid);
     return valid;
   };
@@ -94,13 +96,16 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = pro
   const getElementForDisplay = props.getElementForDisplay ? props.getElementForDisplay : (value: any) => value;
   const getElementForDropdown = props.getElementForDropdown ? props.getElementForDropdown : getElementForDisplay;
 
+  // TODO: Hack because Headless UI does not handle undefined correctly
+  const value = props.selected === undefined ? UNSET : props.selected;
+
   return (
-    <Listbox by={props.by} value={props.selected} onChange={value => { props.setSelected(value); setIsValid(true); }}>
+    <Listbox by={props.by} value={value} onChange={value => { props.setSelected(value); setIsValid(true); }}>
       <Listbox.Button
         className={classNames("tw-flex tw-justify-center tw-w-full tw-rounded-md tw-py-2 tw-pl-3 tw-pr-3 tw-text-left tw-border tw-border-solid tw-border-gray-300 focus:tw-outline-none", props.className, props.validated && !isValid && 'tw-border-red-600 tw-outline-none')}
       >
         <div className={classNames("tw-inline-block tw-w-[calc(100%-20px)] tw-truncate tw-overflow-none", !props.selected && "tw-text-gray-400")}>
-          {props.selected ? getElementForDisplay(props.selected) : props.placeholder}
+          {props.selected !== UNSET ? getElementForDisplay(props.selected) : props.placeholder}
         </div>
         {!props.noCaret &&
           <span className="tw-pointer-events-none pr-2">
@@ -118,7 +123,7 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = pro
         leave="tw-transition tw-ease-in tw-duration-75"
         leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
         leaveTo="tw-transform tw-opacity-0 tw-scale-95"
-        afterLeave={() => validateNotNull(props.selected)}
+        afterLeave={() => validateNotUndefined(props.selected)}
       >
         <div className="tw-relative tw-z-10">
           <Listbox.Options className="tw-absolute tw-z-20 tw-mt-1 tw-max-h-60 tw-min-w-full tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm">
@@ -182,7 +187,7 @@ const DropdownOptions: React.FC<DropdownOptionsProps> = props => {
 type ValidatedComboInputProps = {
   by?: string;
   options: any[] | undefined;
-  selected: any | null;
+  selected: any | undefined;
   setSelected: (option: any) => void;
   getElementForDisplay?: (option: any) => string | React.ReactElement;
   loading: boolean;
@@ -216,19 +221,22 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
 
   const getElementForDisplay = props.getElementForDisplay ? props.getElementForDisplay : (value: any) => value;
 
-  const validateNotNull = (value: number | null): boolean => {
-    const valid = value != null;
+  const validateNotUndefined = (value: number | undefined): boolean => {
+    const valid = value !== undefined;
     setIsValid(valid);
     return valid;
   };
 
+  // TODO: Hack because Headless UI does not handle undefined correctly
+  const value = props.selected === undefined ? UNSET : props.selected;
+
   return (
-    <Combobox as="div" className="tw-flex tw-w-full" by={props.by} value={props.selected} onChange={(value: number) => { props.setSelected(value); setIsValid(true); }}>
+    <Combobox as="div" className="tw-flex tw-w-full" by={props.by} value={value} onChange={(value: number) => { props.setSelected(value); setIsValid(true); }}>
       <div className="tw-relative tw-w-full">
         <div className={classNames("tw-flex tw-h-10 tw-w-full tw-rounded-md tw-bg-white tw-pl-2 tw-pr-2 tw-text-left tw-border tw-border-solid tw-border-gray-300", props.className, props.validated && !isValid && 'tw-border-red-600 tw-outline-none')}>
           <Combobox.Input
-            className={"tw-inline tw-bg-transparent tw-w-[calc(100%-20px)] tw-border-none tw-pr-10 tw-text-sm tw-leading-5 tw-text-gray-900 tw-outline-none tw-text-ellipsis"}
-            displayValue={selected => selected ? getElementForDisplay(selected) : ""}
+            className={"tw-inline tw-bg-transparent tw-w-[calc(100%-20px)] tw-border-none tw-pr-2 tw-text-sm tw-leading-5 tw-text-gray-900 tw-outline-none tw-text-ellipsis"}
+            displayValue={selected => selected !== UNSET ? getElementForDisplay(selected) : ""}
             onChange={event => setQuery(event.target.value)}
             placeholder={props.placeholder}
             onClick={() => buttonRef.current?.click()}
@@ -251,7 +259,7 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
           leave="tw-transition tw-ease-in tw-duration-75"
           leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
           leaveTo="tw-transform tw-opacity-0 tw-scale-95"
-          afterLeave={() => { validateNotNull(props.selected); setQuery(''); }}
+          afterLeave={() => { validateNotUndefined(props.selected); setQuery(''); }}
         >
           <div className="tw-relative tw-z-10">
             <Combobox.Options className="tw-absolute tw-z-20 tw-mt-1 tw-min-w-full tw-max-h-60 tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm">

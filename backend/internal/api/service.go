@@ -133,6 +133,12 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.GetProperties,
 		},
 		{
+			Name:        "Get values for a specified property",
+			Method:      router.GET,
+			Pattern:     "/api/get_property_values",
+			HandlerFunc: s.GetPropertyValues,
+		},
+		{
 			Name:        "Run funnel query",
 			Method:      router.POST,
 			Pattern:     "/api/run_funnel_query",

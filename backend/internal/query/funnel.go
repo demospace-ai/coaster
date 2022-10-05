@@ -5,6 +5,7 @@ import (
 	"fabra/internal/errors"
 	"fabra/internal/eventsets"
 	"fabra/internal/models"
+	"fabra/internal/views"
 	"fmt"
 	"strings"
 	"text/template"
@@ -40,7 +41,7 @@ func init() {
 	`))
 }
 
-func (qs QueryServiceImpl) RunFunnelQuery(dataConnection *models.DataConnection, analysis *models.Analysis) (Schema, []Row, error) {
+func (qs QueryServiceImpl) RunFunnelQuery(dataConnection *models.DataConnection, analysis *models.Analysis) (views.Schema, []views.Row, error) {
 	if !analysis.EventSetID.Valid {
 		return nil, nil, errors.NewBadRequest("no event set configured")
 	}

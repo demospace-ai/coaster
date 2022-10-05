@@ -6,8 +6,8 @@ import { QueryResults, Schema } from "src/rpc/api";
 
 type QueryResultsProps = {
   loading: boolean,
-  schema: Schema | null,
-  results: QueryResults | null,
+  schema: Schema | undefined,
+  results: QueryResults | undefined,
   placeholder?: string,
 };
 

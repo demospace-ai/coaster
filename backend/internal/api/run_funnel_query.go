@@ -7,6 +7,7 @@ import (
 	"fabra/internal/dataconnections"
 	"fabra/internal/errors"
 	"fabra/internal/query"
+	"fabra/internal/views"
 	"net/http"
 )
 
@@ -18,8 +19,8 @@ type RunFunnelQueryRequest struct {
 type RunFunnelQueryResponse struct {
 	Success      bool         `json:"success"`
 	ErrorMessage string       `json:"error_message"`
-	Schema       query.Schema `json:"schema"`
-	QueryResults []query.Row  `json:"query_results"`
+	Schema       views.Schema `json:"schema"`
+	QueryResults []views.Row  `json:"query_results"`
 }
 
 func (s ApiService) RunFunnelQuery(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {

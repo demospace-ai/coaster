@@ -20,38 +20,38 @@ enum TableType {
 }
 
 type NewEventSetState = {
-  eventSetName: string | null;
-  connection: DataConnection | null;
-  datasetId: string | null;
-  tableName: string | null;
-  eventTypeColumn: ColumnSchema | null;
-  timeColumn: ColumnSchema | null;
-  userIdentifierColumn: ColumnSchema | null;
-  customJoin: string | null;
+  eventSetName: string | undefined;
+  connection: DataConnection | undefined;
+  datasetId: string | undefined;
+  tableName: string | undefined;
+  eventTypeColumn: ColumnSchema | undefined;
+  timeColumn: ColumnSchema | undefined;
+  userIdentifierColumn: ColumnSchema | undefined;
+  customJoin: string | undefined;
   step: Step;
   tableType: TableType;
 };
 
 const INITIAL_DATASET_STATE: NewEventSetState = {
-  eventSetName: null,
-  connection: null,
-  datasetId: null,
-  tableName: null,
-  eventTypeColumn: null,
-  timeColumn: null,
-  userIdentifierColumn: null,
-  customJoin: null,
+  eventSetName: undefined,
+  connection: undefined,
+  datasetId: undefined,
+  tableName: undefined,
+  eventTypeColumn: undefined,
+  timeColumn: undefined,
+  userIdentifierColumn: undefined,
+  customJoin: undefined,
   step: Step.One,
   tableType: TableType.SingleTable,
 };
 
 const validateAll = (state: NewEventSetState): boolean => {
-  return state.eventSetName != null && state.eventSetName.length > 0
-    && state.connection != null
-    && ((state.datasetId != null && state.datasetId.length > 0 && state.tableName != null && state.tableName.length > 0) || (state.customJoin != null && state.customJoin.length > 0))
-    && state.eventTypeColumn != null
-    && state.timeColumn != null
-    && state.userIdentifierColumn != null;
+  return state.eventSetName !== undefined && state.eventSetName.length > 0
+    && state.connection !== undefined
+    && ((state.datasetId !== undefined && state.datasetId.length > 0 && state.tableName !== undefined && state.tableName.length > 0) || (state.customJoin !== undefined && state.customJoin.length > 0))
+    && state.eventTypeColumn !== undefined
+    && state.timeColumn !== undefined
+    && state.userIdentifierColumn !== undefined;
 };
 
 export const NewEventSet: React.FC<{ onComplete: () => void; }> = props => {
@@ -164,7 +164,7 @@ export const NewEventSetStepTwo: React.FC<NewEventSetFormProps> = props => {
         connection={state.connection}
         setConnection={(value: DataConnection) => {
           if (!state.connection || value.id !== state.connection.id) {
-            setState({ ...state, connection: value, datasetId: null, tableName: null, eventTypeColumn: null, timeColumn: null });
+            setState({ ...state, connection: value, datasetId: undefined, tableName: undefined, eventTypeColumn: undefined, timeColumn: undefined });
           }
         }} />
       {
@@ -173,23 +173,23 @@ export const NewEventSetStepTwo: React.FC<NewEventSetFormProps> = props => {
             <DatasetSelector
               className='tw-my-1'
               validated={true}
-              connectionID={state.connection ? state.connection.id : null}
+              connectionID={state.connection?.id}
               datasetID={state.datasetId}
               setDatasetID={(value: string) => {
                 if (value !== state.datasetId) {
-                  setState({ ...state, datasetId: value, tableName: null, eventTypeColumn: null, timeColumn: null });
+                  setState({ ...state, datasetId: value, tableName: undefined, eventTypeColumn: undefined, timeColumn: undefined });
                 }
               }}
               noOptionsString="No Datasets Available! (Choose a data source)"
             />
             <TableSelector
               className="tw-mt-1"
-              connectionID={state.connection ? state.connection.id : null}
+              connectionID={state.connection?.id}
               datasetID={state.datasetId}
               tableName={state.tableName}
               setTableName={(value: string) => {
                 if (value !== state.tableName) {
-                  setState({ ...state, tableName: value, eventTypeColumn: null, timeColumn: null });
+                  setState({ ...state, tableName: value, eventTypeColumn: undefined, timeColumn: undefined });
                 }
               }}
               noOptionsString="No Tables Available!"

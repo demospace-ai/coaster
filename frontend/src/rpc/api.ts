@@ -145,6 +145,14 @@ export const GetProperties: IEndpoint<GetPropertiesRequest, GetPropertiesRespons
     track: true,
 };
 
+export const GetPropertyValues: IEndpoint<GetPropertyValuesRequest, GetPropertyValuesResponse> = {
+    name: 'get_property_values',
+    method: 'GET',
+    path: '/get_property_values',
+    queryParams: ['connectionID', 'eventSetID', 'propertyName'],
+    track: true,
+};
+
 export const RunFunnelQuery: IEndpoint<RunFunnelQueryRequest, RunQueryResponse> = {
     name: 'run_funnel_query',
     method: 'POST',
@@ -224,9 +232,11 @@ export interface ColumnSchema {
 
 export interface Schema extends Array<ColumnSchema> { }
 
+export type Property = ColumnSchema;
+
 export interface PropertyGroup {
     name: string;
-    properties: string[];
+    properties: Property[];
 }
 
 export interface RunQueryRequest {
@@ -234,7 +244,7 @@ export interface RunQueryRequest {
     query_string: string;
 }
 
-export function toCsvData(schema: Schema | null, queryResults: QueryResults | null): (string | number)[][] {
+export function toCsvData(schema: Schema | undefined, queryResults: QueryResults | undefined): (string | number)[][] {
     if (schema && queryResults) {
         const header = schema.map(columnSchema => columnSchema.name);
         return [header, ...queryResults];
@@ -264,6 +274,16 @@ export interface GetPropertiesRequest {
 
 export interface GetPropertiesResponse {
     property_groups: PropertyGroup[];
+}
+
+export interface GetPropertyValuesRequest {
+    connectionID: number;
+    eventSetID: number;
+    propertyName: string;
+}
+
+export interface GetPropertyValuesResponse {
+    property_values: string[];
 }
 
 export interface RunQueryResponse {
@@ -414,10 +434,9 @@ export interface FunnelStep {
 }
 
 export interface StepFilter {
-    property_name: string;
-    property_type: ColumnType;
+    property: Property;
     filter_type: FilterType;
-    value: string;
+    value: string | null;
     custom_property_group_id?: number;
 }
 
@@ -436,16 +455,19 @@ export enum FilterType {
 }
 
 export const EMPTY_FILTER: StepFilter = {
-    property_name: "",
-    property_type: ColumnType.String,
+    property: {
+        name: "",
+        type: ColumnType.String,
+    },
     filter_type: FilterType.Equal,
     value: "",
 };
 
 export const stepFiltersMatch = (filters1: StepFilter[], filters2: StepFilter[]) => {
     return filters1.length === filters2.length && filters1.every((filter1, index) => {
-        const filter2 = filters2[index];
-        return filter1.property_name === filter2.property_name
+        const filter2: StepFilter = filters2[index];
+        return filter1.property.name === filter2.property.name
+            && filter1.property.type === filter2.property.type
             && filter1.filter_type === filter2.filter_type
             && filter1.value === filter2.value
             && filter1.custom_property_group_id === filter2.custom_property_group_id;

@@ -18,8 +18,9 @@ import (
 type QueryService interface {
 	GetEvents(dataConnection *models.DataConnection, eventSet *models.EventSet) ([]string, error)
 	GetProperties(dataConnection *models.DataConnection, eventSet *models.EventSet) ([]views.PropertyGroup, error)
-	RunFunnelQuery(dataConnection *models.DataConnection, analysis *models.Analysis) (Schema, []Row, error)
-	RunQuery(dataConnection *models.DataConnection, queryString string) (Schema, []Row, error)
+	GetPropertyValues(dataConnection *models.DataConnection, eventSet *models.EventSet, propertyName string) ([]views.Value, error)
+	RunFunnelQuery(dataConnection *models.DataConnection, analysis *models.Analysis) (views.Schema, []views.Row, error)
+	RunQuery(dataConnection *models.DataConnection, queryString string) (views.Schema, []views.Row, error)
 }
 
 type QueryServiceImpl struct {
@@ -34,7 +35,7 @@ func NewQueryService(db *gorm.DB, cryptoService crypto.CryptoService) QueryServi
 	}
 }
 
-func (qs QueryServiceImpl) RunQuery(dataConnection *models.DataConnection, queryString string) (Schema, []Row, error) {
+func (qs QueryServiceImpl) RunQuery(dataConnection *models.DataConnection, queryString string) (views.Schema, []views.Row, error) {
 	switch dataConnection.ConnectionType {
 	case models.DataConnectionTypeBigQuery:
 		return qs.runBigQueryQuery(dataConnection, queryString)
@@ -45,7 +46,7 @@ func (qs QueryServiceImpl) RunQuery(dataConnection *models.DataConnection, query
 	}
 }
 
-func (qs QueryServiceImpl) runBigQueryQuery(dataConnection *models.DataConnection, queryString string) (Schema, []Row, error) {
+func (qs QueryServiceImpl) runBigQueryQuery(dataConnection *models.DataConnection, queryString string) (views.Schema, []views.Row, error) {
 	bigQueryCredentialsString, err := qs.cryptoService.DecryptDataConnectionCredentials(dataConnection.Credentials.String)
 	if err != nil {
 		return nil, nil, err
@@ -82,7 +83,7 @@ func (qs QueryServiceImpl) runBigQueryQuery(dataConnection *models.DataConnectio
 		return nil, nil, NewError(err)
 	}
 
-	var results []Row
+	var results []views.Row
 	it, err := job.Read(ctx)
 	if err != nil {
 		return nil, nil, err
@@ -103,16 +104,16 @@ func (qs QueryServiceImpl) runBigQueryQuery(dataConnection *models.DataConnectio
 	return ConvertBigQuerySchema(it.Schema), results, nil
 }
 
-func bigQueryRowtoRow(bigQueryRow []bigquery.Value) Row {
-	var row Row
+func bigQueryRowtoRow(bigQueryRow []bigquery.Value) views.Row {
+	var row views.Row
 	for _, value := range bigQueryRow {
-		row = append(row, Value(value))
+		row = append(row, views.Value(value))
 	}
 
 	return row
 }
 
-func (qs QueryServiceImpl) runSnowflakeQuery(dataConnection *models.DataConnection, queryString string) (Schema, []Row, error) {
+func (qs QueryServiceImpl) runSnowflakeQuery(dataConnection *models.DataConnection, queryString string) (views.Schema, []views.Row, error) {
 	// TODO: implement
 	return nil, nil, errors.NewBadRequest("snowflake not supported")
 }

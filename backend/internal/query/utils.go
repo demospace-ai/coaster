@@ -1,16 +1,13 @@
 package query
 
-import "cloud.google.com/go/bigquery"
+import (
+	"bytes"
+	"fabra/internal/models"
+	"fabra/internal/views"
+	"text/template"
 
-type Schema []ColumnSchema
-
-type ColumnSchema struct {
-	Name string `json:"name"`
-	Type string `json:"type"`
-}
-
-type Row []Value
-type Value interface{}
+	"cloud.google.com/go/bigquery"
+)
 
 type Error struct {
 	err error
@@ -24,11 +21,26 @@ func (e Error) Error() string {
 	return e.err.Error()
 }
 
-func ConvertBigQuerySchema(bigQuerySchema bigquery.Schema) Schema {
-	schema := Schema{}
+func createCustomTableQuery(eventSet *models.EventSet) string {
+	return "WITH custom_events AS (" + eventSet.CustomJoin.String + ")"
+}
+
+func executeTemplate(tmpl *template.Template, args map[string]interface{}) (*string, error) {
+	var resultBytes bytes.Buffer
+	err := tmpl.Execute(&resultBytes, args)
+	if err != nil {
+		return nil, err
+	}
+
+	result := resultBytes.String()
+	return &result, nil
+}
+
+func ConvertBigQuerySchema(bigQuerySchema bigquery.Schema) views.Schema {
+	schema := views.Schema{}
 
 	for _, bigQuerySchemaField := range bigQuerySchema {
-		columnSchema := ColumnSchema{
+		columnSchema := views.ColumnSchema{
 			Name: bigQuerySchemaField.Name,
 			Type: string(bigQuerySchemaField.Type),
 		}
