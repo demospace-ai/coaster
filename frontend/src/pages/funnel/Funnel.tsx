@@ -220,7 +220,7 @@ export const Funnel: React.FC = () => {
   return (
     <div className="tw-px-10 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0" >
       <div className='tw-flex tw-flex-1 tw-min-w-0 tw-min-h-0'>
-        <div id='left-panel' className="tw-w-96 tw-min-w-[20rem] tw-inline-block tw-select-none tw-pt-8">
+        <div id='left-panel' className="tw-w-96 tw-min-w-[20rem] tw-inline-block tw-select-none tw-pt-8 tw-pb-20 tw-pr-10 tw-overflow-scroll tw-h-full">
           <div className='tw-mt-[2px]'>
             <span className='tw-uppercase tw-font-bold'>Data Source</span>
             <ConnectionSelector className="tw-mt-1 hover:tw-border-green-500" connection={connection} setConnection={onConnectionSelected} />
@@ -236,7 +236,7 @@ export const Funnel: React.FC = () => {
             <Button className="tw-w-40 tw-h-8" onClick={runQuery}>{queryLoading ? "Stop" : "Run"}</Button>
           </Tooltip>
         </div>
-        <div id='right-panel' className="tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1 tw-ml-10 tw-my-8 tw-border-gray-300 tw-border-solid tw-border tw-rounded-md tw-shadow-centered-sm">
+        <div id='right-panel' className="tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1 tw-ml-2 tw-my-8 tw-border-gray-300 tw-border-solid tw-border tw-rounded-md tw-shadow-centered-sm">
           <div id="top-panel" className="tw-p-4 tw-pl-5 tw-border-gray-300 tw-border-solid tw-border-b tw-flex tw-select-none">
             <span className='tw-text-lg tw-font-bold'>
               Results
