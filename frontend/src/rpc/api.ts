@@ -393,8 +393,14 @@ export interface UpdateAnalysisRequest {
     event_set_id?: number;
     title?: string;
     query?: string;
-    funnel_steps?: FunnelStep[];
+    funnel_steps?: FunnelStepInput[];
 }
+
+
+export interface FunnelStepInput {
+    step_name: string;
+    filters: StepFilter[];
+};
 
 export interface UpdateAnalysisResponse {
     analysis: Analysis;
@@ -429,6 +435,7 @@ export interface Analysis {
 }
 
 export interface FunnelStep {
+    id: number;
     step_name: string;
     filters: StepFilter[];
 }

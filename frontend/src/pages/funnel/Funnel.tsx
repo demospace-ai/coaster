@@ -1,3 +1,4 @@
+import { Transition } from '@headlessui/react';
 import { ArrowDownTrayIcon } from '@heroicons/react/20/solid';
 import { CheckIcon, FunnelIcon, LinkIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { Tooltip } from '@nextui-org/react';
@@ -12,7 +13,7 @@ import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { ConnectionSelector, ControlledEventSelector, ControlledPropertySelector, EventSetSelector, FilterSelector, PropertyValueSelector } from "src/components/selector/Selector";
 import { getEvents, getProperties, runFunnelQuery } from 'src/queries/queries';
 import { sendRequest } from 'src/rpc/ajax';
-import { AnalysisType, CreateAnalysis, CreateAnalysisRequest, DataConnection, EventSet, FilterType, FunnelStep, GetAnalysis, Property, PropertyGroup, QueryResults, Schema, StepFilter, stepFiltersMatch, toCsvData, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
+import { AnalysisType, CreateAnalysis, CreateAnalysisRequest, DataConnection, EventSet, FilterType, FunnelStep, FunnelStepInput, GetAnalysis, Property, PropertyGroup, QueryResults, Schema, StepFilter, stepFiltersMatch, toCsvData, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
 import { toEmptyList, toUndefined } from 'src/utils/undefined';
 
 type FunnelParams = {
@@ -22,7 +23,7 @@ type FunnelParams = {
 type FunnelUpdates = {
   connection?: DataConnection,
   eventSet?: EventSet,
-  steps?: FunnelStep[],
+  steps?: FunnelStepInput[],
 };
 
 /*
@@ -229,7 +230,7 @@ export const Funnel: React.FC = () => {
             <EventSetSelector className="tw-mt-1 hover:tw-border-green-500" connection={connection} eventSet={eventSet} setEventSet={onEventSetSelected} />
           </div>
           <div className='tw-mt-5'>
-            <Steps id={Number(id)} connectionID={connection?.id} eventSetID={eventSet?.id} steps={steps} setSteps={setSteps} setErrorMessage={setErrorMessage} updateFunnel={updateFunnel} />
+            <Steps id={Number(id)} connectionID={connection?.id} eventSetID={eventSet?.id} steps={steps} setErrorMessage={setErrorMessage} updateFunnel={updateFunnel} />
           </div>
           <Tooltip className='tw-mt-10' color={"invert"} content={"⌘ + Enter"}>
             <Button className="tw-w-40 tw-h-8" onClick={runQuery}>{queryLoading ? "Stop" : "Run"}</Button>
@@ -284,13 +285,13 @@ type StepsProps = {
   connectionID: number | undefined;
   eventSetID: number | undefined;
   steps: FunnelStep[];
-  setSteps: (steps: FunnelStep[]) => void;
   setErrorMessage: (message: string | null) => void;
   updateFunnel: (id: number, updates: FunnelUpdates) => void;
 };
 
 const Steps: React.FC<StepsProps> = props => {
-  const { id, connectionID, eventSetID, steps, setSteps, setErrorMessage, updateFunnel } = props;
+  console.log("steps render");
+  const { id, connectionID, eventSetID, steps, setErrorMessage, updateFunnel } = props;
   const [eventOptions, setEventOptions] = useState<string[]>();
   const [loading, setLoading] = useState(false);
   const [eventPropertyOptions, setEventPropertyOptions] = useState<PropertyGroup[]>();
@@ -327,7 +328,7 @@ const Steps: React.FC<StepsProps> = props => {
   const onEventSelected = useCallback((value: string, index: number) => {
     if (steps[index].step_name !== value) {
       setErrorMessage(null);
-      const updatedSteps: FunnelStep[] = [...steps];
+      const updatedSteps: FunnelStepInput[] = [...steps];
       // Clear filters on event selected since they may no longer apply
       updatedSteps[index] = { step_name: value, filters: [] };
       updateFunnel(Number(id), { steps: updatedSteps });
@@ -343,7 +344,7 @@ const Steps: React.FC<StepsProps> = props => {
   const onEventAdded = useCallback((value: string) => {
     setErrorMessage(null);
     // New events, filters should be empty
-    const updatedSteps: FunnelStep[] = [...steps, { step_name: value, filters: [] }];
+    const updatedSteps: FunnelStepInput[] = [...steps, { step_name: value, filters: [] }];
     updateFunnel(Number(id), { steps: updatedSteps });
   }, [id, steps, setErrorMessage, updateFunnel]);
 
@@ -365,7 +366,6 @@ const Steps: React.FC<StepsProps> = props => {
             key={index}
             index={index}
             step={step}
-
             setEvent={(event) => onEventSelected(event, index)}
             eventOptions={eventOptions}
             eventPropertyOptions={eventPropertyOptions}
@@ -386,7 +386,6 @@ const Steps: React.FC<StepsProps> = props => {
 type StepProp = {
   index: number;
   step: FunnelStep;
-  stepID?: number;
   connectionID: number | undefined;
   eventSetID: number | undefined;
   eventOptions: string[] | undefined;
@@ -399,13 +398,8 @@ type StepProp = {
 };
 
 const Step: React.FC<StepProp> = props => {
-  const [filterOpen, setFilterOpen] = useState<boolean>(false);
-  const { index, step, stepID, connectionID, eventSetID, eventOptions, eventPropertyOptions, setEvent, removeEvent, loading, propertiesLoading, setStepFilters } = props;
-
-  // Reset whether the filter is open if the step passed to this component changes
-  useEffect(() => {
-    setFilterOpen(false);
-  }, [stepID]);
+  const [showFilters, setShowFilters] = useState<boolean>(false);
+  const { index, step, connectionID, eventSetID, eventOptions, eventPropertyOptions, setEvent, removeEvent, loading, propertiesLoading, setStepFilters } = props;
 
   return (
     <div className='tw-flex tw-mb-4'>
@@ -415,11 +409,11 @@ const Step: React.FC<StepProp> = props => {
             {index + 1}
           </div>
           <ControlledEventSelector className="tw-border-none tw-bg-gray-100 hover:tw-bg-green-100" event={step?.step_name} setEvent={setEvent} eventOptions={eventOptions} loading={loading} />
-          <div className='tw-p-1 tw-ml-2 hover:tw-bg-gray-200 tw-cursor-pointer tw-rounded-md' onClick={() => setFilterOpen(!filterOpen)}>
+          <div className='tw-p-1 tw-ml-2 hover:tw-bg-gray-200 tw-cursor-pointer tw-rounded-md' onClick={() => setShowFilters(!showFilters)}>
             <FunnelIcon className='tw-h-6 tw-stroke-[1.7]' />
             {step.filters.length > 0 &&
               <div className='tw-relative'>
-                <span className="tw-absolute tw-bottom-[15px] tw-left-[15px] tw-flex tw-shrink-0 tw-items-center tw-rounded-full tw-bg-fabra tw-h-4 tw-w-4 tw-justify-center tw-text-xs tw-text-white">
+                <span className="tw-absolute tw-bottom-[14px] tw-left-[14px] tw-flex tw-shrink-0 tw-items-center tw-rounded-full tw-border-2 tw-border-solid tw-border-white tw-bg-fabra tw-h-[18px] tw-w-[18px] tw-justify-center tw-text-[10px] tw-text-white tw-font-bold">
                   {step.filters.length}
                 </span>
               </div>
@@ -429,7 +423,7 @@ const Step: React.FC<StepProp> = props => {
             <TrashIcon className='tw-h-6 tw-stroke-[1.7]' />
           </div>
         </div>
-        <StepFilters display={filterOpen} connectionID={connectionID} eventSetID={eventSetID} filters={step.filters} eventPropertyOptions={eventPropertyOptions} setStepFilters={setStepFilters} propertiesLoading={propertiesLoading} />
+        <StepFilters show={showFilters} connectionID={connectionID} eventSetID={eventSetID} filters={step.filters} eventPropertyOptions={eventPropertyOptions} setStepFilters={setStepFilters} propertiesLoading={propertiesLoading} />
       </div>
     </div>
   );
@@ -444,12 +438,27 @@ type NewStepProps = {
 
 const NewStep: React.FC<NewStepProps> = props => {
   return (
-    <Step index={props.index} step={{ step_name: "", filters: [] }} setEvent={props.addEvent} eventOptions={props.eventOptions} eventPropertyOptions={[]} loading={props.loading} removeEvent={() => null} setStepFilters={() => null} propertiesLoading={false} connectionID={undefined} eventSetID={undefined} />
+    <div className='tw-flex tw-mb-4'>
+      <div className='tw-w-full tw-mt-[-1px] tw-border tw-border-solid tw-border-gray-300 tw-rounded-t-md tw-rounded-b-md'>
+        <div className='tw-flex tw-items-center tw-p-2'>
+          <div className='tw-flex tw-mr-2 tw-items-center tw-justify-center tw-shrink-0 tw-rounded-full tw-bg-fabra tw-text-white  tw-h-6 tw-w-6 tw-my-auto'>
+            {props.index + 1}
+          </div>
+          <ControlledEventSelector className="tw-border-none tw-bg-gray-100 hover:tw-bg-green-100" event={undefined} setEvent={props.addEvent} eventOptions={props.eventOptions} loading={props.loading} />
+          <div className='tw-p-1 tw-ml-2 hover:tw-bg-gray-200 tw-cursor-pointer tw-rounded-md'>
+            <FunnelIcon className='tw-h-6 tw-stroke-[1.7]' />
+          </div>
+          <div className='tw-p-1 tw-ml-[1px] hover:tw-bg-gray-200 tw-cursor-pointer tw-rounded-md'>
+            <TrashIcon className='tw-h-6 tw-stroke-[1.7]' />
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
 type StepFiltersProp = {
-  display: boolean;
+  show: boolean;
   connectionID: number | undefined;
   eventSetID: number | undefined;
   filters: StepFilter[];
@@ -477,15 +486,13 @@ const StepFilters: React.FC<StepFiltersProp> = props => {
     setStepFilters(updatedFilters);
   };
 
-  const display = props.display ? '' : 'tw-hidden';
-
   return (
-    <div className={display}>
+    <Transition show={props.show}>
       {filters.map((filter, i) =>
         <StepFilterComponent key={i} index={i} filter={filter} connectionID={connectionID} eventSetID={eventSetID} eventPropertyOptions={eventPropertyOptions} setStepFilter={(filter: StepFilter) => updateFilter(filter, i)} removeFilter={() => removeFilter(i)} propertiesLoading={propertiesLoading} />
       )}
       <StepFilterComponent index={filters.length} filter={undefined} connectionID={connectionID} eventSetID={eventSetID} eventPropertyOptions={eventPropertyOptions} setStepFilter={(filter: StepFilter) => addFilter(filter)} removeFilter={() => null} propertiesLoading={propertiesLoading} newFilter={true} />
-    </div>
+    </Transition>
   );
 };
 
@@ -560,7 +567,7 @@ const StepFilterComponent: React.FC<StepFilterProp> = props => {
           </div>
         </div>
       </div>
-      <div className='tw-px-2 tw-pb-2 tw-rounded-b-md tw-flex tw-items-center '>
+      <div className='tw-px-2 tw-pb-2 tw-rounded-b-md tw-flex tw-items-center'>
         <div className='tw-flex tw-w-24 tw-shrink-0 tw-mr-2'>
           <div className='tw-relative tw-w-full'>
             <FilterSelector className="tw-inline tw-border-none tw-bg-gray-100 hover:tw-bg-green-100" filterType={filterType} setFilterType={onFilterTypeChanged} />
