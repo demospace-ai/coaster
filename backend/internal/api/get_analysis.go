@@ -40,8 +40,14 @@ func (s ApiService) GetAnalysis(auth auth.Authentication, w http.ResponseWriter,
 	}
 
 	var funnelSteps []models.FunnelStep
+	var stepFilters []models.StepFilter
 	if analysis.AnalysisType == models.AnalysisTypeFunnel {
 		funnelSteps, err = analyses.LoadFunnelStepsByAnalysisID(s.db, analysis.ID)
+		if err != nil {
+			return err
+		}
+
+		stepFilters, err = analyses.LoadStepFiltersByAnalysisID(s.db, analysis.ID)
 		if err != nil {
 			return err
 		}
@@ -49,7 +55,7 @@ func (s ApiService) GetAnalysis(auth auth.Authentication, w http.ResponseWriter,
 
 	analysisView := views.Analysis{
 		Analysis:    *analysis,
-		FunnelSteps: views.ConvertFunnelSteps(funnelSteps),
+		FunnelSteps: views.ConvertFunnelSteps(funnelSteps, stepFilters),
 	}
 
 	var connection *models.DataConnection

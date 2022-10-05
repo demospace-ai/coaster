@@ -75,8 +75,9 @@ func (s ApiService) CreateAnalysis(auth auth.Authentication, w http.ResponseWrit
 	}
 
 	var funnelSteps []models.FunnelStep
+	var stepFilters []models.StepFilter
 	if createAnalysisRequest.FunnelSteps != nil {
-		funnelSteps, err = analyses.CreateFunnelSteps(s.db, analysis.ID, createAnalysisRequest.FunnelSteps)
+		funnelSteps, stepFilters, err = analyses.CreateFunnelStepsAndFilters(s.db, analysis.ID, createAnalysisRequest.FunnelSteps)
 		if err != nil {
 			return err
 		}
@@ -84,7 +85,7 @@ func (s ApiService) CreateAnalysis(auth auth.Authentication, w http.ResponseWrit
 
 	analysisView := views.Analysis{
 		Analysis:    *analysis,
-		FunnelSteps: views.ConvertFunnelSteps(funnelSteps),
+		FunnelSteps: views.ConvertFunnelSteps(funnelSteps, stepFilters),
 	}
 
 	// TODO: mask database ID

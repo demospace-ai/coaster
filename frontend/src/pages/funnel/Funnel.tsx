@@ -330,36 +330,31 @@ const Steps: React.FC<StepsProps> = props => {
       const updatedSteps: FunnelStep[] = [...steps];
       // Clear filters on event selected since they may no longer apply
       updatedSteps[index] = { step_name: value, filters: [] };
-      setSteps(updatedSteps);
       updateFunnel(Number(id), { steps: updatedSteps });
     }
-  }, [id, steps, setSteps, setErrorMessage, updateFunnel]);
+  }, [id, steps, setErrorMessage, updateFunnel]);
 
   const onEventRemoved = useCallback((index: number) => {
     setErrorMessage(null);
     const updatedSteps = steps.filter((_, i) => i !== index);
-    setSteps(updatedSteps);
     updateFunnel(Number(id), { steps: updatedSteps });
-  }, [id, steps, setSteps, setErrorMessage, updateFunnel]);
+  }, [id, steps, setErrorMessage, updateFunnel]);
 
   const onEventAdded = useCallback((value: string) => {
     setErrorMessage(null);
     // New events, filters should be empty
     const updatedSteps: FunnelStep[] = [...steps, { step_name: value, filters: [] }];
-    setSteps(updatedSteps);
     updateFunnel(Number(id), { steps: updatedSteps });
-  }, [id, steps, setSteps, setErrorMessage, updateFunnel]);
+  }, [id, steps, setErrorMessage, updateFunnel]);
 
   const setStepFilters = useCallback((filters: StepFilter[], stepIndex: number) => {
     if (!stepFiltersMatch(steps[stepIndex].filters, filters)) {
       setErrorMessage(null);
       const updatedSteps: FunnelStep[] = [...steps];
       updatedSteps[stepIndex] = { ...steps[stepIndex], filters: filters };
-      setSteps(updatedSteps);
-      // TODO: only save on full filter
-      // updateFunnel(Number(id), { steps: updatedSteps });
+      updateFunnel(Number(id), { steps: updatedSteps });
     }
-  }, [id, steps, setSteps, setErrorMessage, updateFunnel]);
+  }, [id, steps, setErrorMessage, updateFunnel]);
 
   return (
     <>
@@ -370,6 +365,7 @@ const Steps: React.FC<StepsProps> = props => {
             key={index}
             index={index}
             step={step}
+
             setEvent={(event) => onEventSelected(event, index)}
             eventOptions={eventOptions}
             eventPropertyOptions={eventPropertyOptions}
@@ -390,6 +386,7 @@ const Steps: React.FC<StepsProps> = props => {
 type StepProp = {
   index: number;
   step: FunnelStep;
+  stepID?: number;
   connectionID: number | undefined;
   eventSetID: number | undefined;
   eventOptions: string[] | undefined;
@@ -403,7 +400,13 @@ type StepProp = {
 
 const Step: React.FC<StepProp> = props => {
   const [filterOpen, setFilterOpen] = useState<boolean>(false);
-  const { index, step, connectionID, eventSetID, eventOptions, eventPropertyOptions, setEvent, removeEvent, loading, propertiesLoading, setStepFilters } = props;
+  const { index, step, stepID, connectionID, eventSetID, eventOptions, eventPropertyOptions, setEvent, removeEvent, loading, propertiesLoading, setStepFilters } = props;
+
+  // Reset whether the filter is open if the step passed to this component changes
+  useEffect(() => {
+    setFilterOpen(false);
+  }, [stepID]);
+
   return (
     <div className='tw-flex tw-mb-4'>
       <div className='tw-w-full tw-mt-[-1px] tw-border tw-border-solid tw-border-gray-300 tw-rounded-t-md tw-rounded-b-md'>
@@ -459,7 +462,7 @@ const StepFilters: React.FC<StepFiltersProp> = props => {
   const { connectionID, eventSetID, filters, eventPropertyOptions, propertiesLoading, setStepFilters } = props;
 
   const updateFilter = (filter: StepFilter, index: number) => {
-    const updatedFilters = filters;
+    const updatedFilters = [...filters];
     updatedFilters[index] = filter;
     setStepFilters(updatedFilters);
   };
@@ -469,14 +472,19 @@ const StepFilters: React.FC<StepFiltersProp> = props => {
     setStepFilters(updatedFilters);
   };
 
+  const removeFilter = (index: number) => {
+    const updatedFilters = filters.filter((_, i) => i !== index);
+    setStepFilters(updatedFilters);
+  };
+
   const display = props.display ? '' : 'tw-hidden';
 
   return (
     <div className={display}>
       {filters.map((filter, i) =>
-        <StepFilterComponent key={i} index={i} filter={filter} connectionID={connectionID} eventSetID={eventSetID} eventPropertyOptions={eventPropertyOptions} setStepFilter={(filter: StepFilter) => updateFilter(filter, i)} propertiesLoading={propertiesLoading} />
+        <StepFilterComponent key={i} index={i} filter={filter} connectionID={connectionID} eventSetID={eventSetID} eventPropertyOptions={eventPropertyOptions} setStepFilter={(filter: StepFilter) => updateFilter(filter, i)} removeFilter={() => removeFilter(i)} propertiesLoading={propertiesLoading} />
       )}
-      <StepFilterComponent index={filters.length} filter={undefined} connectionID={connectionID} eventSetID={eventSetID} eventPropertyOptions={eventPropertyOptions} setStepFilter={(filter: StepFilter) => addFilter(filter)} propertiesLoading={propertiesLoading} newFilter={true} />
+      <StepFilterComponent index={filters.length} filter={undefined} connectionID={connectionID} eventSetID={eventSetID} eventPropertyOptions={eventPropertyOptions} setStepFilter={(filter: StepFilter) => addFilter(filter)} removeFilter={() => null} propertiesLoading={propertiesLoading} newFilter={true} />
     </div>
   );
 };
@@ -488,17 +496,27 @@ type StepFilterProp = {
   eventSetID: number | undefined;
   eventPropertyOptions: PropertyGroup[] | undefined;
   setStepFilter: (filter: StepFilter) => void;
+  removeFilter: () => void;
   propertiesLoading: boolean;
   newFilter?: boolean;
 };
 
 const StepFilterComponent: React.FC<StepFilterProp> = props => {
-  const { index, filter, connectionID, eventSetID, eventPropertyOptions, propertiesLoading, setStepFilter, newFilter } = props;
+  const { index, filter, connectionID, eventSetID, eventPropertyOptions, propertiesLoading, setStepFilter, removeFilter, newFilter } = props;
   const [property, setProperty] = useState<Property | undefined>(filter ? filter.property : undefined);
   const [filterType, setFilterType] = useState<FilterType>(filter ? filter.filter_type : FilterType.Equal); // Equal is a good starting value for filter type
-  const [propertyValue, setPropertyValue] = useState<string | null | undefined>(filter ? filter.value : undefined); // Null is a valid value
+  const [propertyValue, setPropertyValue] = useState<string | null | undefined>(filter ? filter.property_value : undefined); // Null is a valid value
+
+  useEffect(() => {
+    if (filter) {
+      setProperty(filter.property);
+      setFilterType(filter.filter_type);
+      setPropertyValue(filter.property_value);
+    }
+  }, [filter]);
 
   const onFilterPropertyChanged = (property: Property) => {
+    // No need to save because updating the property clears the value which must be set again
     setProperty(property);
     setFilterType(FilterType.Equal);
     setPropertyValue(undefined);
@@ -513,20 +531,21 @@ const StepFilterComponent: React.FC<StepFilterProp> = props => {
         setFilterType(FilterType.Equal);
         setPropertyValue(undefined);
       }
-      setStepFilter({ property: property, value: propertyValue, filter_type: filterType });
+      setStepFilter({ property: property, property_value: propertyValue, filter_type: filterType });
     }
   };
 
   const onFilterPropertyValueChanged = (propertyValue: string | null) => {
-    setPropertyValue(propertyValue);
-    // TODO:
+    // Coerce to string since it can be any arbitrary value
+    const valueString: string | null = propertyValue ? String(propertyValue) : null;
+    setPropertyValue(valueString);
     if (property && propertyValue !== undefined) {
       if (newFilter) {
         setProperty(undefined);
         setFilterType(FilterType.Equal);
         setPropertyValue(undefined);
       }
-      setStepFilter({ property: property, value: propertyValue, filter_type: filterType });
+      setStepFilter({ property: property, property_value: valueString, filter_type: filterType });
     }
   };
 
@@ -535,6 +554,11 @@ const StepFilterComponent: React.FC<StepFilterProp> = props => {
       <div className='tw-border-t tw-border-solid tw-border-gray-300 tw-p-2 tw-rounded-b-md tw-flex tw-items-center '>
         {getFilterPrefix(index)}
         <ControlledPropertySelector className="tw-inline tw-border-none tw-bg-gray-100 hover:tw-bg-green-100" property={property} setProperty={onFilterPropertyChanged} propertyOptions={eventPropertyOptions} loading={propertiesLoading} />
+        <div className='tw-flex tw-shrink-0 tw-relative tw-ml-2 tw-w-8'>
+          <div className='tw-absolute tw-top-2 tw-p-1 hover:tw-bg-gray-200 tw-cursor-pointer tw-rounded-md' onClick={removeFilter}>
+            <TrashIcon className='tw-h-6 tw-stroke-[1.7]' />
+          </div>
+        </div>
       </div>
       <div className='tw-px-2 tw-pb-2 tw-rounded-b-md tw-flex tw-items-center '>
         <div className='tw-flex tw-w-24 tw-shrink-0 tw-mr-2'>
@@ -543,6 +567,7 @@ const StepFilterComponent: React.FC<StepFilterProp> = props => {
           </div>
         </div>
         <PropertyValueSelector connectionID={connectionID} eventSetID={eventSetID} property={property} className="tw-inline tw-border-none tw-bg-gray-100 hover:tw-bg-green-100" propertyValue={propertyValue} setPropertyValue={onFilterPropertyValueChanged} />
+        <div className='tw-flex tw-shrink-0 tw-p-1 tw-ml-2 tw-w-8' />
       </div>
     </>
   );

@@ -78,28 +78,46 @@ func UpdateAnalysis(
 	return &analysis, nil
 }
 
-func CreateFunnelSteps(
+func CreateFunnelStepsAndFilters(
 	db *gorm.DB,
 	analysisID int64,
 	funnelSteps []views.FunnelStep,
-) ([]models.FunnelStep, error) {
-	var funnelStepModels []models.FunnelStep
+) ([]models.FunnelStep, []models.StepFilter, error) {
+	var createdFunnelSteps []models.FunnelStep
+	var createdStepFilters []models.StepFilter
 	for _, funnelStep := range funnelSteps {
-		funnelStep := models.FunnelStep{
+		funnelStepModel := models.FunnelStep{
 			AnalysisID: analysisID,
 			StepName:   funnelStep.Name,
-			// TODO: add the filter values here
 		}
 
-		result := db.Create(&funnelStep)
+		result := db.Create(&funnelStepModel)
 		if result.Error != nil {
-			return nil, result.Error
+			return nil, nil, result.Error
 		}
 
-		funnelStepModels = append(funnelStepModels, funnelStep)
+		for _, filter := range funnelStep.Filters {
+			filterModel := models.StepFilter{
+				AnalysisID:    analysisID,
+				StepID:        funnelStepModel.ID,
+				PropertyName:  filter.Property.Name,
+				PropertyType:  filter.Property.Type,
+				FilterType:    filter.FilterType,
+				PropertyValue: filter.PropertyValue,
+			}
+
+			result := db.Create(&filterModel)
+			if result.Error != nil {
+				return nil, nil, result.Error
+			}
+
+			createdStepFilters = append(createdStepFilters, filterModel)
+		}
+
+		createdFunnelSteps = append(createdFunnelSteps, funnelStepModel)
 	}
 
-	return funnelStepModels, nil
+	return createdFunnelSteps, createdStepFilters, nil
 }
 
 func DeactivateFunnelSteps(
@@ -134,6 +152,25 @@ func LoadFunnelStepsByAnalysisID(
 	}
 
 	return funnelSteps, nil
+}
+
+func LoadStepFiltersByAnalysisID(
+	db *gorm.DB,
+	analysisID int64,
+) ([]models.StepFilter, error) {
+	var stepFilters []models.StepFilter
+	result := db.Table("step_filters").
+		Select("step_filters.*").
+		Where("step_filters.analysis_id = ?", analysisID).
+		Where("step_filters.deactivated_at IS NULL").
+		Order("step_filters.id ASC").
+		Find(&stepFilters)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return stepFilters, nil
 }
 
 func LoadAnalysisByID(db *gorm.DB, organizationID int64, analysisID int64) (*models.Analysis, error) {

@@ -33,12 +33,20 @@ func init() {
 			{{ if .previous }}
 				JOIN {{.previous}} ON {{.previous}}.{{.userIdentifierColumn}} = {{.tableName}}.{{.userIdentifierColumn}}
 			{{ end }}
-			WHERE {{.tableName}}.{{.eventTypeColumn}} = '{{.stepName}}'
+			WHERE {{.tableName}}.{{.eventTypeColumn}} = "{{.stepName}}"
+			{{range $filterClause := .filterClauses}}
+				AND {{$filterClause}}
+			{{end}}
 			{{ if .previous }}
 				AND {{.previous}}.{{.timestampColumn}} < {{.tableName}}.{{.timestampColumn}}
 			{{ end }}
 		)
 	`))
+}
+
+type FunnelStep struct {
+	Name    string
+	Filters []models.StepFilter
 }
 
 func (qs QueryServiceImpl) RunFunnelQuery(dataConnection *models.DataConnection, analysis *models.Analysis) (views.Schema, []views.Row, error) {
@@ -51,12 +59,17 @@ func (qs QueryServiceImpl) RunFunnelQuery(dataConnection *models.DataConnection,
 		return nil, nil, err
 	}
 
-	events, err := analyses.LoadFunnelStepsByAnalysisID(qs.db, analysis.ID)
+	steps, err := analyses.LoadFunnelStepsByAnalysisID(qs.db, analysis.ID)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	queryString, err := createFunnelQuery(eventSet, events)
+	filters, err := analyses.LoadStepFiltersByAnalysisID(qs.db, analysis.ID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	queryString, err := createFunnelQuery(eventSet, convertFunnelSteps(steps, filters))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -64,20 +77,20 @@ func (qs QueryServiceImpl) RunFunnelQuery(dataConnection *models.DataConnection,
 	return qs.RunQuery(dataConnection, *queryString)
 }
 
-func createFunnelQuery(eventSet *models.EventSet, events []models.FunnelStep) (*string, error) {
+func createFunnelQuery(eventSet *models.EventSet, steps []FunnelStep) (*string, error) {
 	var customTableQuery string
 	if eventSet.CustomJoin.Valid {
 		customTableQuery = createCustomTableQuery(eventSet)
 	}
 
 	var stepSubqueryArray []string
-	for i, event := range events {
+	for i, step := range steps {
 		var previous string
 		if i > 0 {
-			previous = events[i-1].StepName + "_" + fmt.Sprint(i-1)
+			previous = steps[i-1].Name + "_" + fmt.Sprint(i-1)
 		}
 
-		stepSubquery, err := createStepSubquery(eventSet, event.StepName, i, previous, eventSet.CustomJoin.Valid)
+		stepSubquery, err := createStepSubquery(eventSet, step, i, previous, eventSet.CustomJoin.Valid)
 		if err != nil {
 			return nil, err
 		}
@@ -87,7 +100,7 @@ func createFunnelQuery(eventSet *models.EventSet, events []models.FunnelStep) (*
 
 	stepSubqueryString := strings.Join(stepSubqueryArray, ", ")
 
-	resultSubquery := createResultsSubquery(eventSet, events)
+	resultSubquery := createResultsSubquery(eventSet, steps)
 
 	query, err := executeTemplate(funnelQueryTemplate, map[string]interface{}{
 		"customTableQuery":   customTableQuery,
@@ -98,14 +111,19 @@ func createFunnelQuery(eventSet *models.EventSet, events []models.FunnelStep) (*
 	return query, err
 }
 
-func createStepSubquery(eventSet *models.EventSet, stepName string, order int, previous string, usingCustomTableQuery bool) (*string, error) {
-	tableName := stepName + "_" + fmt.Sprint(order)
+func createStepSubquery(eventSet *models.EventSet, funnelStep FunnelStep, order int, previous string, usingCustomTableQuery bool) (*string, error) {
+	tableName := funnelStep.Name + "_" + fmt.Sprint(order)
 
 	var sourceTable string
 	if usingCustomTableQuery {
 		sourceTable = "custom_events"
 	} else {
 		sourceTable = eventSet.DatasetName.String + "." + eventSet.TableName.String
+	}
+
+	var filterClauses []string
+	for _, filter := range funnelStep.Filters {
+		filterClauses = append(filterClauses, toSQL(tableName, filter))
 	}
 
 	queryArray, err := executeTemplate(stepSubqueryTemplate, map[string]interface{}{
@@ -115,19 +133,71 @@ func createStepSubquery(eventSet *models.EventSet, stepName string, order int, p
 		"userIdentifierColumn": eventSet.UserIdentifierColumn,
 		"timestampColumn":      eventSet.TimestampColumn,
 		"previous":             previous,
-		"stepName":             stepName,
+		"stepName":             funnelStep.Name,
+		"filterClauses":        filterClauses,
 	})
 
 	return queryArray, err
 }
 
-func createResultsSubquery(eventSet *models.EventSet, events []models.FunnelStep) string {
+func createResultsSubquery(eventSet *models.EventSet, steps []FunnelStep) string {
 	var rollupArray []string
-	for i, event := range events {
+	for i, step := range steps {
 		rollupArray = append(rollupArray,
-			"SELECT COUNT(DISTINCT "+eventSet.UserIdentifierColumn+") AS count, '"+event.StepName+"' AS event, "+fmt.Sprint(i)+" AS event_order FROM "+event.StepName+"_"+fmt.Sprint(i),
+			"SELECT COUNT(DISTINCT "+eventSet.UserIdentifierColumn+") AS count, '"+step.Name+"' AS event, "+fmt.Sprint(i)+" AS event_order FROM "+step.Name+"_"+fmt.Sprint(i),
 		)
 	}
 
 	return "results AS ( " + strings.Join(rollupArray, " UNION ALL ") + " )"
+}
+
+func convertFunnelSteps(funnelSteps []models.FunnelStep, stepFilters []models.StepFilter) []FunnelStep {
+	filterMap := map[int64][]models.StepFilter{} // Step ID to slice of filter SQL clauses
+	for _, stepFilter := range stepFilters {
+		filterMap[stepFilter.StepID] = append(filterMap[stepFilter.StepID], stepFilter)
+	}
+
+	funnelStepsView := []FunnelStep{}
+	for _, funnelStep := range funnelSteps {
+		view := FunnelStep{
+			Name:    funnelStep.StepName,
+			Filters: filterMap[funnelStep.ID],
+		}
+		funnelStepsView = append(funnelStepsView, view)
+	}
+
+	return funnelStepsView
+}
+
+func toSQL(tableName string, stepFilter models.StepFilter) string {
+	var propertyValue string
+	switch stepFilter.PropertyType {
+	case models.PropertyTypeInteger:
+		propertyValue = stepFilter.PropertyValue
+	case models.PropertyTypeString:
+		// Strings must be enclosed with quotes for SQL
+		propertyValue = `"` + stepFilter.PropertyValue + `"`
+	case models.PropertyTypeTimestamp:
+		// TODO: this only works for BigQuery timestamps
+		propertyValue = `"` + stepFilter.PropertyValue + `"`
+	}
+
+	switch stepFilter.FilterType {
+	case models.FilterTypeEqual:
+		return tableName + "." + stepFilter.PropertyName + " = " + propertyValue
+	case models.FilterTypeNotEqual:
+		return tableName + "." + stepFilter.PropertyName + " <> " + propertyValue
+	case models.FilterTypeGreaterThan:
+		return tableName + "." + stepFilter.PropertyName + " > " + propertyValue
+	case models.FilterTypeLessThan:
+		return tableName + "." + stepFilter.PropertyName + " < " + propertyValue
+	case models.FilterTypeContains:
+		// TODO
+		return ""
+	case models.FilterTypeNotContains:
+		// TODO
+		return ""
+	default:
+		return "true" // This will be added as an AND clause, so just let it pass
+	}
 }

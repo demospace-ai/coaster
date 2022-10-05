@@ -79,6 +79,7 @@ func (s ApiService) UpdateAnalysis(auth auth.Authentication, w http.ResponseWrit
 	}
 
 	var funnelSteps []models.FunnelStep
+	var stepFilters []models.StepFilter
 	if analysis.AnalysisType == models.AnalysisTypeFunnel {
 		err = s.db.Transaction(func(tx *gorm.DB) error {
 			// Always deactivate the steps on a funnel update, since changing any value invalidates the old steps
@@ -90,7 +91,7 @@ func (s ApiService) UpdateAnalysis(auth auth.Authentication, w http.ResponseWrit
 			// Ignore adding funnel steps from request if the connection or event set changed
 			sourceChanged := (analysis.ConnectionID != updatedAnalysis.ConnectionID) || (analysis.EventSetID != updatedAnalysis.EventSetID)
 			if updateAnalysisRequest.FunnelSteps != nil && !sourceChanged {
-				funnelSteps, err = analyses.CreateFunnelSteps(s.db, analysis.ID, updateAnalysisRequest.FunnelSteps)
+				funnelSteps, stepFilters, err = analyses.CreateFunnelStepsAndFilters(s.db, analysis.ID, updateAnalysisRequest.FunnelSteps)
 				if err != nil {
 					return err
 				}
@@ -106,7 +107,7 @@ func (s ApiService) UpdateAnalysis(auth auth.Authentication, w http.ResponseWrit
 
 	analysisView := views.Analysis{
 		Analysis:    *updatedAnalysis,
-		FunnelSteps: views.ConvertFunnelSteps(funnelSteps),
+		FunnelSteps: views.ConvertFunnelSteps(funnelSteps, stepFilters),
 	}
 
 	var updatedConnection *models.DataConnection

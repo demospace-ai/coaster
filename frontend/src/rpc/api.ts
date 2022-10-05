@@ -436,13 +436,14 @@ export interface FunnelStep {
 export interface StepFilter {
     property: Property;
     filter_type: FilterType;
-    value: string | null;
+    property_value: string | null;
     custom_property_group_id?: number;
 }
 
 export enum ColumnType {
-    String = "string",
-    Number = "number",
+    String = "STRING",
+    Integer = "INTEGER",
+    Timestamp = "TIMESTAMP"
 }
 
 export enum FilterType {
@@ -454,22 +455,13 @@ export enum FilterType {
     NotContains = "not_contains",
 }
 
-export const EMPTY_FILTER: StepFilter = {
-    property: {
-        name: "",
-        type: ColumnType.String,
-    },
-    filter_type: FilterType.Equal,
-    value: "",
-};
-
 export const stepFiltersMatch = (filters1: StepFilter[], filters2: StepFilter[]) => {
     return filters1.length === filters2.length && filters1.every((filter1, index) => {
         const filter2: StepFilter = filters2[index];
         return filter1.property.name === filter2.property.name
             && filter1.property.type === filter2.property.type
             && filter1.filter_type === filter2.filter_type
-            && filter1.value === filter2.value
+            && filter1.property_value === filter2.property_value
             && filter1.custom_property_group_id === filter2.custom_property_group_id;
     });
 };

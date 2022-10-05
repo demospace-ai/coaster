@@ -105,7 +105,7 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = pro
         className={classNames("tw-flex tw-justify-center tw-w-full tw-rounded-md tw-py-2 tw-pl-3 tw-pr-3 tw-text-left tw-border tw-border-solid tw-border-gray-300 focus:tw-outline-none", props.className, props.validated && !isValid && 'tw-border-red-600 tw-outline-none')}
       >
         <div className={classNames("tw-inline-block tw-w-[calc(100%-20px)] tw-truncate tw-overflow-none", !props.selected && "tw-text-gray-400")}>
-          {props.selected !== UNSET ? getElementForDisplay(props.selected) : props.placeholder}
+          {value !== UNSET ? getElementForDisplay(props.selected) : props.placeholder}
         </div>
         {!props.noCaret &&
           <span className="tw-pointer-events-none pr-2">
@@ -294,7 +294,7 @@ const ComboOptions: React.FC<ComboOptionsProps> = props => {
     return (
       <>
         {props.allowCustom && props.query.length > 0 && (
-          <Combobox.Option value={{ id: null, name: props.query }} className={({ active, selected }) =>
+          <Combobox.Option value={props.query} className={({ active, selected }) =>
             `tw-relative tw-cursor-pointer tw-select-none tw-py-2 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-green-100 tw-text-green-900' : 'tw-text-gray-900'
             }`
           }>
@@ -328,7 +328,7 @@ const ComboOptions: React.FC<ComboOptionsProps> = props => {
       <>
         {props.allowCustom ?
           props.allowCustom && props.query.length > 0 && (
-            <Combobox.Option value={{ id: null, name: props.query }} className={({ active, selected }) =>
+            <Combobox.Option value={props.query} className={({ active, selected }) =>
               `tw-relative tw-cursor-pointer tw-select-none tw-py-2 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-green-100 tw-text-green-900' : 'tw-text-gray-900'
               }`
             }>
