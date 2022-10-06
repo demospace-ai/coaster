@@ -1,15 +1,17 @@
-import { ArrowDownTrayIcon, CheckIcon, LinkIcon, PlusCircleIcon } from '@heroicons/react/20/solid';
+import { Menu, Transition } from '@headlessui/react';
+import { ArrowDownTrayIcon, CheckIcon, EllipsisHorizontalIcon, LinkIcon, PlusCircleIcon } from '@heroicons/react/20/solid';
 import { Tooltip } from '@nextui-org/react';
 import classNames from 'classnames';
 import { editor as EditorLib } from "monaco-editor/esm/vs/editor/editor.api";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, MouseEvent, useCallback, useEffect, useRef, useState } from "react";
 import { CSVLink } from "react-csv";
 import MonacoEditor, { monaco } from "react-monaco-editor";
 import { useNavigate, useParams } from 'react-router-dom';
 import { rudderanalytics } from 'src/app/rudder';
-import { Button } from "src/components/button/Button";
+import { Button, MoreOptionsButton } from "src/components/button/Button";
 import { SaveIcon } from 'src/components/icons/Icons';
 import { Loading } from 'src/components/loading/Loading';
+import { ConfigureAnalysisModal } from 'src/components/modal/Modal';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { useSelector } from 'src/root/model';
 import { sendRequest } from "src/rpc/ajax";
@@ -44,7 +46,10 @@ export const CustomQuery: React.FC = () => {
   const [topPanelHeight, setTopPanelHeight] = useState<number>();
   const topPanelRef = useRef<HTMLDivElement>(null);
 
-  const connectionID = useSelector(state => state.login.organization?.default_data_connection_id);
+  const defaultConnectionID = useSelector(state => state.login.organization?.default_data_connection_id);
+  const [connection, setConnection] = useState<DataConnection | undefined>(undefined);
+  const connectionID = connection?.id;
+
   const [query, setQuery] = useState<string>("");
   const [schema, setSchema] = useState<Schema | undefined>(undefined);
   const [queryResults, setQueryResults] = useState<QueryResults | undefined>(undefined);
@@ -52,10 +57,16 @@ export const CustomQuery: React.FC = () => {
 
   const [shouldRun, setShouldRun] = useState<boolean>(false);
   const [shouldSave, setShouldSave] = useState<boolean>(false);
+  const [showModal, setShowModal] = useState<boolean>(false);
 
+  // TODO: what should we do if no default connection ID is configured?
   const createNewCustomQuery = useCallback(async () => {
     setInitialLoading(true);
-    const payload: CreateAnalysisRequest = { analysis_type: AnalysisType.CustomQuery };
+    const payload: CreateAnalysisRequest = {
+      connection_id: defaultConnectionID,
+      analysis_type: AnalysisType.Funnel
+    };
+
     try {
       const response = await sendRequest(CreateAnalysis, payload);
       navigate(`/customquery/${response.analysis.id}`);
@@ -63,38 +74,32 @@ export const CustomQuery: React.FC = () => {
       // TODO: handle error here
     }
     setInitialLoading(false);
-  }, [navigate]);
+  }, [navigate, defaultConnectionID]);
 
   const loadSavedCustomQuery = useCallback(async (id: string) => {
     setInitialLoading(true);
     try {
       const response = await sendRequest(GetAnalysis, { analysisID: id });
+      if (response.connection) {
+        setConnection(response.connection);
+      }
       if (response.analysis.query) {
         setQuery(response.analysis.query);
       }
-
     } catch (e) {
       // TODO: handle error here
     }
     setInitialLoading(false);
   }, [setQuery]);
 
-  const updateCustomQuery = useCallback(async (id: number, updates: { connection?: DataConnection, query?: string; }) => {
+  const updateCustomQuery = useCallback(async (id: number, updates: { query?: string; }) => {
     const payload: UpdateAnalysisRequest = { analysis_id: Number(id) };
-    if (updates.connection) {
-      payload.connection_id = updates.connection.id;
-    }
-
-    if (updates.connection) {
-      payload.connection_id = updates.connection.id;
-    }
-
     if (updates.query) {
       payload.query = updates.query;
     }
 
     try {
-      const response = await sendRequest(UpdateAnalysis, payload);
+      await sendRequest(UpdateAnalysis, payload);
     } catch (e) {
       // TODO: handle error here
     }
@@ -137,19 +142,12 @@ export const CustomQuery: React.FC = () => {
     debouncedUpdate(Number(id), query);
   }, [id, debouncedUpdate]);
 
-  const runQuery = useCallback(async (id: number, connectionID: number | undefined, query: string) => {
+  const runQuery = useCallback(async (id: number, query: string) => {
     setQueryLoading(true);
     setErrorMessage(null);
 
     // Save the query even if it can't be run
     await updateCustomQuery(Number(id), { query: query });
-
-    if (!connectionID) {
-      setErrorMessage("Data source is not set!");
-      setQueryLoading(false);
-      return;
-    }
-
     if (!query.trim()) {
       setErrorMessage("Query cannot be empty!");
       setQueryLoading(false);
@@ -183,7 +181,7 @@ export const CustomQuery: React.FC = () => {
   useEffect(() => {
     if (shouldRun) {
       setShouldRun(false);
-      runQuery(Number(id), connectionID, query);
+      runQuery(Number(id), query);
     }
 
     if (shouldSave) {
@@ -222,6 +220,7 @@ export const CustomQuery: React.FC = () => {
 
   return (
     <>
+      <ConfigureAnalysisModal analysisID={Number(id)} analysisType={AnalysisType.CustomQuery} connection={connection} eventSet={undefined} show={showModal} close={() => setShowModal(false)} />
       <QueryNavigation />
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0" >
         <div className='tw-flex tw-flex-1 tw-min-w-0 tw-min-h-0'>
@@ -281,9 +280,10 @@ export const CustomQuery: React.FC = () => {
                       {saving ? <Loading /> : <><SaveIcon className='tw-h-5 tw-inline tw-mr-1' />Save</>}
                     </Button>
                   </Tooltip>
-                  <Button className="tw-flex tw-justify-center tw-align-middle tw-ml-3 tw-w-9 tw-px-0 tw-h-8 tw-bg-white tw-border-gray-400 tw-text-primary-text hover:tw-bg-gray-200" onClick={copyLink}>
+                  <Button className="tw-flex tw-justify-center tw-items-center tw-ml-3 tw-w-[34px] tw-h-8 tw-px-0 tw-py-0 tw-bg-white tw-border-gray-400 tw-text-primary-text hover:tw-bg-gray-200" onClick={copyLink}>
                     {copied ? <CheckIcon className='tw-h-5 tw-inline tw-mx-auto tw-stroke-2' /> : <LinkIcon className='tw-h-5 tw-inline tw-mx-auto tw-stroke-2' />}
                   </Button>
+                  <MoreOptionsButton className='tw-flex tw-justify-center tw-align-middle tw-ml-3' showModal={() => setShowModal(true)} />
                 </div>
               </div>
               <div className="tw-mb-5 tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden tw-border-gray-300 tw-border-solid tw-border tw-bg-gray-100">

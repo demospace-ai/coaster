@@ -1,5 +1,10 @@
 import classNames from 'classnames';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { Button } from 'src/components/button/Button';
+import { Loading } from 'src/components/loading/Loading';
+import { ConnectionSelector, EventSetSelector } from 'src/components/selector/Selector';
+import { sendRequest } from 'src/rpc/ajax';
+import { AnalysisType, DataConnection, EventSet, UpdateAnalysis, UpdateAnalysisRequest } from 'src/rpc/api';
 import styles from './modal.m.css';
 
 interface ModalProps {
@@ -43,5 +48,61 @@ export const Modal: React.FC<ModalProps> = props => {
         {props.children}
       </section>
     </div>
+  );
+};
+
+
+type ConfigureAnalysisModalProps = {
+  analysisID: number;
+  analysisType: AnalysisType;
+  connection: DataConnection | undefined;
+  eventSet: EventSet | undefined;
+  show: boolean;
+  close: () => void;
+};
+
+export const ConfigureAnalysisModal: React.FC<ConfigureAnalysisModalProps> = props => {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [connection, setConnection] = useState<DataConnection | undefined>(props.connection);
+  const [eventSet, setEventSet] = useState<EventSet | undefined>(props.eventSet);
+
+  const updateAnalysis = async (analysisID: number | null) => {
+    if (analysisID === null) {
+      return;
+    }
+
+    const payload: UpdateAnalysisRequest = { analysis_id: analysisID };
+
+    setLoading(true);
+    if (connection) {
+      payload.connection_id = connection.id;
+    }
+
+    if (eventSet) {
+      payload.event_set_id = eventSet.id;
+    }
+
+    try {
+      await sendRequest(UpdateAnalysis, payload);
+    } catch (e) {
+      // TODO: handle error here
+    }
+
+    setLoading(false);
+  };
+
+  return (
+    <Modal show={props.show} close={props.close} title="Configure Analysis" titleStyle='tw-font-bold tw-text-xl'>
+      <div className='tw-w-80 tw-m-6'>
+        <ConnectionSelector connection={connection} setConnection={setConnection} />
+        {props.analysisType === AnalysisType.Funnel && <EventSetSelector className="tw-mt-4" connection={connection} eventSet={eventSet} setEventSet={setEventSet} />}
+        <div className='tw-mt-8 tw-flex'>
+          <div className='tw-ml-auto'>
+            <Button className='tw-bg-white tw-text-primary-text hover:tw-bg-gray-200 tw-border-0 tw-mr-3' onClick={props.close}>Cancel</Button>
+            <Button className='tw-w-24 tw-bg-fabra hover:tw-bg-primary-highlight tw-border-0' onClick={() => updateAnalysis(props.analysisID)}>{loading ? <Loading className='tw-inline' /> : "Save"}</Button>
+          </div>
+        </div>
+      </div>
+    </Modal>
   );
 };

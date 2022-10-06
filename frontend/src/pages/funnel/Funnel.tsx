@@ -6,15 +6,16 @@ import classNames from 'classnames';
 import { useCallback, useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button } from 'src/components/button/Button';
+import { Button, MoreOptionsButton } from 'src/components/button/Button';
 import { SaveIcon } from 'src/components/icons/Icons';
 import { Loading } from 'src/components/loading/Loading';
+import { ConfigureAnalysisModal } from 'src/components/modal/Modal';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { ControlledEventSelector, ControlledPropertySelector, FilterSelector, PropertyValueSelector } from "src/components/selector/Selector";
 import { getEvents, getProperties, runFunnelQuery } from 'src/queries/queries';
 import { useSelector } from 'src/root/model';
 import { sendRequest } from 'src/rpc/ajax';
-import { AnalysisType, CreateAnalysis, CreateAnalysisRequest, FilterType, FunnelStep, FunnelStepInput, GetAnalysis, Property, PropertyGroup, QueryResults, Schema, StepFilter, stepFiltersMatch, toCsvData, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
+import { AnalysisType, CreateAnalysis, CreateAnalysisRequest, DataConnection, EventSet, FilterType, FunnelStep, FunnelStepInput, GetAnalysis, Property, PropertyGroup, QueryResults, Schema, StepFilter, stepFiltersMatch, toCsvData, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
 import { toEmptyList } from 'src/utils/undefined';
 
 type FunnelParams = {
@@ -22,8 +23,6 @@ type FunnelParams = {
 };
 
 type FunnelUpdates = {
-  connectionID?: number,
-  eventSetID?: number,
   steps?: FunnelStepInput[],
 };
 
@@ -45,8 +44,10 @@ export const Funnel: React.FC = () => {
   const [initialLoading, setInitialLoading] = useState<boolean>(true);
   const [queryLoading, setQueryLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const connectionID = useSelector(state => state.login.organization?.default_data_connection_id);
-  const eventSetID = useSelector(state => state.login.organization?.default_event_set_id);
+  const defaultConnectionID = useSelector(state => state.login.organization?.default_data_connection_id);
+  const defaultEventSetID = useSelector(state => state.login.organization?.default_event_set_id);
+  const [connection, setConnection] = useState<DataConnection | undefined>(undefined);
+  const [eventSet, setEventSet] = useState<EventSet | undefined>(undefined);
   const [steps, setSteps] = useState<FunnelStep[]>([]);
   const [saving, setSaving] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
@@ -54,14 +55,18 @@ export const Funnel: React.FC = () => {
   const [shouldRun, setShouldRun] = useState<boolean>(false);
   const [schema, setSchema] = useState<Schema | undefined>(undefined);
   const [queryResults, setQueryResults] = useState<QueryResults | undefined>(undefined);
+  const [showModal, setShowModal] = useState<boolean>(false);
+
   const hasResults = schema !== undefined && queryResults !== undefined;
+  const connectionID = connection?.id;
+  const eventSetID = eventSet?.id;
 
   // TODO: error out if organization does not have connection and event set configured
   const createNewFunnel = useCallback(async () => {
     setInitialLoading(true);
     const payload: CreateAnalysisRequest = {
-      connection_id: connectionID,
-      event_set_id: eventSetID,
+      connection_id: defaultConnectionID,
+      event_set_id: defaultEventSetID,
       analysis_type: AnalysisType.Funnel
     };
 
@@ -72,16 +77,21 @@ export const Funnel: React.FC = () => {
       // TODO: handle error here
     }
     setInitialLoading(false);
-  }, [navigate, connectionID, eventSetID]);
+  }, [navigate, defaultConnectionID, defaultEventSetID]);
 
   const loadSavedFunnel = useCallback(async (id: string) => {
     setInitialLoading(true);
     try {
       const response = await sendRequest(GetAnalysis, { analysisID: id });
+      if (response.connection) {
+        setConnection(response.connection);
+      }
+      if (response.event_set) {
+        setEventSet(response.event_set);
+      }
       if (response.analysis.funnel_steps) {
         setSteps(response.analysis.funnel_steps);
       }
-
     } catch (e) {
       // TODO: handle error here
     }
@@ -181,57 +191,61 @@ export const Funnel: React.FC = () => {
   }
 
   return (
-    <div className="tw-px-10 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0" >
-      <div className='tw-flex tw-flex-1 tw-min-w-0 tw-min-h-0'>
-        <div id='left-panel' className="tw-w-[420px] tw-min-w-[20rem] tw-inline-block tw-select-none tw-pt-8 tw-pb-20 tw-pr-10 tw-overflow-scroll tw-h-full">
-          <div>
-            <Steps id={Number(id)} connectionID={connectionID} eventSetID={eventSetID} steps={steps} setErrorMessage={setErrorMessage} updateFunnel={updateFunnel} />
-          </div>
-          <Tooltip className='tw-mt-10' color={"invert"} content={"⌘ + Enter"}>
-            <Button className="tw-w-40 tw-h-8" onClick={runQuery}>{queryLoading ? "Stop" : "Run"}</Button>
-          </Tooltip>
-        </div>
-        <div id='right-panel' className="tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1 tw-ml-2 tw-my-8 tw-border-gray-300 tw-border-solid tw-border tw-rounded-md tw-shadow-centered-sm">
-          <div id="top-panel" className="tw-p-4 tw-pl-5 tw-border-gray-300 tw-border-solid tw-border-b tw-flex tw-select-none">
-            <span className='tw-text-lg tw-font-bold'>
-              Results
-            </span>
-            <div className='tw-flex tw-ml-auto'>
-              <Tooltip color={"invert"} content={hasResults ? '' : "You must run the query to fetch results before exporting."}>
-                <CSVLink
-                  className={classNames(
-                    'tw-flex tw-rounded-md tw-font-bold tw-py-1 tw-tracking-wide tw-justify-center tw-align-middle tw-ml-2 tw-px-4 tw-h-8 tw-bg-white tw-border tw-border-solid tw-border-gray-400 tw-text-primary-text hover:tw-bg-gray-200',
-                    hasResults ? null : 'tw-bg-gray-300 tw-text-gray-500 tw-border-0 tw-cursor-not-allowed hover:tw-bg-gray-300'
-                  )}
-                  data={toCsvData(schema, queryResults)}
-                  filename={`funnel_${id}_results.csv`} // TODO: use saved name
-                  onClick={() => hasResults} // prevent download if there are no results
-                >
-                  <ArrowDownTrayIcon className='tw-h-5 tw-inline tw-mr-1' />
-                  Export CSV
-                </CSVLink>
-              </Tooltip>
-              <Button className="tw-flex tw-justify-center tw-align-middle tw-ml-3 tw-w-24 tw-h-8 tw-bg-white tw-border-gray-400 tw-text-primary-text hover:tw-bg-gray-200" onClick={updateAllProperties}>
-                {saving ? <Loading /> : <><SaveIcon className='tw-h-5 tw-inline tw-mr-1' />Save</>}
-              </Button>
-              <Button className="tw-flex tw-justify-center tw-align-middle tw-ml-3 tw-w-9 tw-px-0 tw-h-8 tw-bg-white tw-border-gray-400 tw-text-primary-text hover:tw-bg-gray-200" onClick={copyLink}>
-                {copied ? <CheckIcon className='tw-h-5 tw-inline tw-mx-auto tw-stroke-2' /> : <LinkIcon className='tw-h-5 tw-inline tw-mx-auto tw-stroke-2' />}
-              </Button>
+    <>
+      <ConfigureAnalysisModal analysisID={Number(id)} analysisType={AnalysisType.Funnel} connection={connection} eventSet={eventSet} show={showModal} close={() => setShowModal(false)} />
+      <div className="tw-px-10 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0" >
+        <div className='tw-flex tw-flex-1 tw-min-w-0 tw-min-h-0'>
+          <div id='left-panel' className="tw-w-[420px] tw-min-w-[20rem] tw-inline-block tw-select-none tw-pt-8 tw-pb-20 tw-pr-10 tw-overflow-scroll tw-h-full">
+            <div>
+              <Steps id={Number(id)} connectionID={connectionID} eventSetID={eventSetID} steps={steps} setErrorMessage={setErrorMessage} updateFunnel={updateFunnel} />
             </div>
+            <Tooltip className='tw-mt-10' color={"invert"} content={"⌘ + Enter"}>
+              <Button className="tw-w-40 tw-h-8" onClick={runQuery}>{queryLoading ? "Stop" : "Run"}</Button>
+            </Tooltip>
           </div>
-          <div id="bottom-panel" className='tw-flex tw-flex-col tw-flex-1'>
-            <div className="tw-mb-5 tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden">
-              {errorMessage &&
-                <div className="tw-p-5 tw-text-red-600 tw-font-bold tw-border-gray-300 tw-border-solid tw-border-b">
-                  Error: {errorMessage}
-                </div>
-              }
-              <MemoizedResultsTable loading={queryLoading} schema={schema} results={queryResults} placeholder="Choose two or more steps to see results!" />
+          <div id='right-panel' className="tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1 tw-ml-2 tw-my-8 tw-border-gray-300 tw-border-solid tw-border tw-rounded-md tw-shadow-centered-sm">
+            <div id="top-panel" className="tw-p-4 tw-pl-5 tw-border-gray-300 tw-border-solid tw-border-b tw-flex tw-select-none">
+              <span className='tw-text-lg tw-font-bold'>
+                Results
+              </span>
+              <div className='tw-flex tw-ml-auto'>
+                <Tooltip color={"invert"} content={hasResults ? '' : "You must run the query to fetch results before exporting."}>
+                  <CSVLink
+                    className={classNames(
+                      'tw-flex tw-rounded-md tw-font-bold tw-py-1 tw-tracking-wide tw-justify-center tw-align-middle tw-ml-2 tw-px-4 tw-h-8 tw-bg-white tw-border tw-border-solid tw-border-gray-400 tw-text-primary-text hover:tw-bg-gray-200',
+                      hasResults ? null : 'tw-bg-gray-300 tw-text-gray-500 tw-border-0 tw-cursor-not-allowed hover:tw-bg-gray-300'
+                    )}
+                    data={toCsvData(schema, queryResults)}
+                    filename={`funnel_${id}_results.csv`} // TODO: use saved name
+                    onClick={() => hasResults} // prevent download if there are no results
+                  >
+                    <ArrowDownTrayIcon className='tw-h-5 tw-inline tw-mr-1' />
+                    Export CSV
+                  </CSVLink>
+                </Tooltip>
+                <Button className="tw-flex tw-justify-center tw-align-middle tw-ml-3 tw-w-24 tw-h-8 tw-bg-white tw-border-gray-400 tw-text-primary-text hover:tw-bg-gray-200" onClick={updateAllProperties}>
+                  {saving ? <Loading /> : <><SaveIcon className='tw-h-5 tw-inline tw-mr-1' />Save</>}
+                </Button>
+                <Button className="tw-flex tw-justify-center tw-align-middle tw-ml-3 tw-w-9 tw-px-0 tw-h-8 tw-bg-white tw-border-gray-400 tw-text-primary-text hover:tw-bg-gray-200" onClick={copyLink}>
+                  {copied ? <CheckIcon className='tw-h-5 tw-inline tw-mx-auto tw-stroke-2' /> : <LinkIcon className='tw-h-5 tw-inline tw-mx-auto tw-stroke-2' />}
+                </Button>
+                <MoreOptionsButton className='tw-flex tw-justify-center tw-align-middle tw-ml-3' showModal={() => setShowModal(true)} />
+              </div>
+            </div>
+            <div id="bottom-panel" className='tw-flex tw-flex-col tw-flex-1'>
+              <div className="tw-mb-5 tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden">
+                {errorMessage &&
+                  <div className="tw-p-5 tw-text-red-600 tw-font-bold tw-border-gray-300 tw-border-solid tw-border-b">
+                    Error: {errorMessage}
+                  </div>
+                }
+                <MemoizedResultsTable loading={queryLoading} schema={schema} results={queryResults} placeholder="Choose two or more steps to see results!" />
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
