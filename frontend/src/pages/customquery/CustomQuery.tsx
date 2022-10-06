@@ -13,7 +13,7 @@ import { Loading } from 'src/components/loading/Loading';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { useSelector } from 'src/root/model';
 import { sendRequest } from "src/rpc/ajax";
-import { AnalysisType, CreateAnalysis, CreateAnalysisRequest, DataConnection, GetAnalysis, QueryResults, RunQuery, RunQueryRequest, Schema, toCsvData, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
+import { AnalysisType, CreateAnalysis, CreateAnalysisRequest, DataConnection, GetAnalysis, QueryResults, RunCustomQuery, RunCustomQueryRequest, Schema, toCsvData, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
 import { useDebounce } from 'src/utils/debounce';
 import { createResizeFunction } from 'src/utils/resize';
 
@@ -142,7 +142,7 @@ export const CustomQuery: React.FC = () => {
     setErrorMessage(null);
 
     // Save the query even if it can't be run
-    updateCustomQuery(Number(id), { query: query });
+    await updateCustomQuery(Number(id), { query: query });
 
     if (!connectionID) {
       setErrorMessage("Data source is not set!");
@@ -156,13 +156,12 @@ export const CustomQuery: React.FC = () => {
       return;
     }
 
-    const payload: RunQueryRequest = {
-      'connection_id': connectionID,
-      'query_string': query,
+    const payload: RunCustomQueryRequest = {
+      'analysis_id': Number(id),
     };
 
     try {
-      const response = await sendRequest(RunQuery, payload);
+      const response = await sendRequest(RunCustomQuery, payload);
       if (response.success) {
         setSchema(response.schema);
         setQueryResults(response.query_results);

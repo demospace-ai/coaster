@@ -19,8 +19,8 @@ type QueryService interface {
 	GetEvents(dataConnection *models.DataConnection, eventSet *models.EventSet) ([]string, error)
 	GetProperties(dataConnection *models.DataConnection, eventSet *models.EventSet) ([]views.PropertyGroup, error)
 	GetPropertyValues(dataConnection *models.DataConnection, eventSet *models.EventSet, propertyName string) ([]views.Value, error)
-	RunFunnelQuery(dataConnection *models.DataConnection, analysis *models.Analysis) (views.Schema, []views.Row, error)
-	RunQuery(dataConnection *models.DataConnection, queryString string) (views.Schema, []views.Row, error)
+	RunFunnelQuery(analysis *models.Analysis) (views.Schema, []views.Row, error)
+	RunCustomQuery(analysis *models.Analysis) (views.Schema, []views.Row, error)
 }
 
 type QueryServiceImpl struct {
@@ -35,7 +35,7 @@ func NewQueryService(db *gorm.DB, cryptoService crypto.CryptoService) QueryServi
 	}
 }
 
-func (qs QueryServiceImpl) RunQuery(dataConnection *models.DataConnection, queryString string) (views.Schema, []views.Row, error) {
+func (qs QueryServiceImpl) runQuery(dataConnection *models.DataConnection, queryString string) (views.Schema, []views.Row, error) {
 	switch dataConnection.ConnectionType {
 	case models.DataConnectionTypeBigQuery:
 		return qs.runBigQueryQuery(dataConnection, queryString)

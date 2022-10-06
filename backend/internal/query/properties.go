@@ -12,7 +12,7 @@ func (qs QueryServiceImpl) GetProperties(dataConnection *models.DataConnection, 
 		return nil, err
 	}
 
-	schema, _, err := qs.RunQuery(dataConnection, queryString)
+	schema, _, err := qs.runQuery(dataConnection, queryString)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +44,7 @@ func (qs QueryServiceImpl) GetPropertyValues(dataConnection *models.DataConnecti
 		return nil, err
 	}
 
-	_, results, err := qs.RunQuery(dataConnection, queryString)
+	_, results, err := qs.runQuery(dataConnection, queryString)
 	if err != nil {
 		return nil, err
 	}

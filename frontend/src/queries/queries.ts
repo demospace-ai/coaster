@@ -47,7 +47,6 @@ export const getPropertyValues = async (connectionID: number, eventSetID: number
 
 export const runFunnelQuery = async (connectionID: number, analysisID: number): Promise<RunQueryResponse> => {
   const payload: RunFunnelQueryRequest = {
-    connection_id: connectionID,
     analysis_id: analysisID,
   };
 

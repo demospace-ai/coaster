@@ -2,6 +2,7 @@ package test
 
 import (
 	"fabra/internal/analyses"
+	"fabra/internal/dataconnections"
 	"fabra/internal/eventsets"
 	"fabra/internal/models"
 	"fabra/internal/views"
@@ -37,7 +38,12 @@ func (qs MockQueryService) GetEvents(dataConnection *models.DataConnection, even
 	return result, nil
 }
 
-func (qs MockQueryService) RunQuery(dataConnection *models.DataConnection, queryString string) (views.Schema, []views.Row, error) {
+func (qs MockQueryService) RunCustomQuery(analysis *models.Analysis) (views.Schema, []views.Row, error) {
+	_, err := dataconnections.LoadDataConnectionByID(qs.db, analysis.OrganizationID, analysis.ConnectionID.Int64)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	schema := views.Schema{
 		views.ColumnSchema{Name: "Column 1", Type: "string"},
 		views.ColumnSchema{Name: "Column 2", Type: "number"},
@@ -50,8 +56,13 @@ func (qs MockQueryService) RunQuery(dataConnection *models.DataConnection, query
 	return schema, rows, nil
 }
 
-func (qs MockQueryService) RunFunnelQuery(dataConnection *models.DataConnection, analysis *models.Analysis) (views.Schema, []views.Row, error) {
-	_, err := eventsets.LoadEventSetByID(qs.db, analysis.OrganizationID, analysis.EventSetID.Int64)
+func (qs MockQueryService) RunFunnelQuery(analysis *models.Analysis) (views.Schema, []views.Row, error) {
+	_, err := dataconnections.LoadDataConnectionByID(qs.db, analysis.OrganizationID, analysis.ConnectionID.Int64)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	_, err = eventsets.LoadEventSetByID(qs.db, analysis.OrganizationID, analysis.EventSetID.Int64)
 	if err != nil {
 		return nil, nil, err
 	}

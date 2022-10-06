@@ -61,6 +61,20 @@ func CreateFunnelAnalysis(db *gorm.DB, userID int64, organizationID int64, conne
 	return &analysis
 }
 
+func CreateCustomQueryAnalysis(db *gorm.DB, userID int64, organizationID int64, connectionID int64) *models.Analysis {
+	analysis := models.Analysis{
+		UserID:         userID,
+		OrganizationID: organizationID,
+		ConnectionID:   database.NewNullInt64(connectionID),
+		AnalysisType:   models.AnalysisTypeCustomQuery,
+		Query:          database.NewNullString("select * from table"),
+	}
+
+	db.Create(&analysis)
+
+	return &analysis
+}
+
 func CreateEventSet(db *gorm.DB, organizationID int64, connectionID int64) *models.EventSet {
 	eventSet := models.EventSet{
 		DisplayName:          "Test Event Set",

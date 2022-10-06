@@ -16,8 +16,7 @@ import (
 
 func createRunFunnelQueryRequest(connectionID int64, analysisID int64) *http.Request {
 	reqBody := api.RunFunnelQueryRequest{
-		ConnectionID: connectionID,
-		AnalysisID:   analysisID,
+		AnalysisID: analysisID,
 	}
 	b, err := json.Marshal(&reqBody)
 	Expect(err).To(BeNil())
@@ -95,7 +94,7 @@ var _ = Describe("RunFunnelQueryHandler", func() {
 		rr := httptest.NewRecorder()
 		req := createRunFunnelQueryRequest(connection.ID, analysis.ID)
 
-		err := service.RunQuery(reqAuth, rr, req)
+		err := service.RunCustomQuery(reqAuth, rr, req)
 		Expect(err).To(BeNil())
 
 		response := rr.Result()

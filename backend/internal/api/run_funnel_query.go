@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fabra/internal/analyses"
 	"fabra/internal/auth"
-	"fabra/internal/dataconnections"
 	"fabra/internal/errors"
 	"fabra/internal/query"
 	"fabra/internal/views"
@@ -12,8 +11,7 @@ import (
 )
 
 type RunFunnelQueryRequest struct {
-	ConnectionID int64 `json:"connection_id"`
-	AnalysisID   int64 `json:"analysis_id"`
+	AnalysisID int64 `json:"analysis_id"`
 }
 
 type RunFunnelQueryResponse struct {
@@ -35,17 +33,13 @@ func (s ApiService) RunFunnelQuery(auth auth.Authentication, w http.ResponseWrit
 		return err
 	}
 
-	dataConnection, err := dataconnections.LoadDataConnectionByID(s.db, auth.Organization.ID, runFunnelQueryRequest.ConnectionID)
-	if err != nil {
-		return err
-	}
-
+	// This should prevent unauthorized access to the wrong data connection
 	analysis, err := analyses.LoadAnalysisByID(s.db, auth.Organization.ID, runFunnelQueryRequest.AnalysisID)
 	if err != nil {
 		return err
 	}
 
-	schema, queryResults, err := s.queryService.RunFunnelQuery(dataConnection, analysis)
+	schema, queryResults, err := s.queryService.RunFunnelQuery(analysis)
 	if err != nil {
 		if _, ok := err.(query.Error); ok {
 			// Not actually a failure, the user's query was just wrong. Send the details back to them.

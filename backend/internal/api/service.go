@@ -73,10 +73,10 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.TestDataConnection,
 		},
 		{
-			Name:        "Run query",
+			Name:        "Run custom query",
 			Method:      router.POST,
-			Pattern:     "/api/run_query",
-			HandlerFunc: s.RunQuery,
+			Pattern:     "/api/run_custom_query",
+			HandlerFunc: s.RunCustomQuery,
 		},
 		{
 			Name:        "Get datasets",

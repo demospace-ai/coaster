@@ -11,7 +11,7 @@ func (qs QueryServiceImpl) GetEvents(dataConnection *models.DataConnection, even
 		return nil, err
 	}
 
-	_, results, err := qs.RunQuery(dataConnection, queryString)
+	_, results, err := qs.runQuery(dataConnection, queryString)
 	if err != nil {
 		return nil, err
 	}

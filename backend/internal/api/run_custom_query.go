@@ -2,8 +2,8 @@ package api
 
 import (
 	"encoding/json"
+	"fabra/internal/analyses"
 	"fabra/internal/auth"
-	"fabra/internal/dataconnections"
 	"fabra/internal/errors"
 	"fabra/internal/query"
 	"fabra/internal/views"
@@ -11,8 +11,7 @@ import (
 )
 
 type RunQueryRequest struct {
-	ConnectionID int64  `json:"connection_id"`
-	QueryString  string `json:"query_string"`
+	AnalysisID int64 `json:"analysis_id"`
 }
 
 type RunQueryResponse struct {
@@ -22,8 +21,7 @@ type RunQueryResponse struct {
 	QueryResults []views.Row  `json:"query_results"`
 }
 
-func (s ApiService) RunQuery(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
-
+func (s ApiService) RunCustomQuery(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
 		return errors.NewBadRequest("must setup organization first")
 	}
@@ -35,13 +33,13 @@ func (s ApiService) RunQuery(auth auth.Authentication, w http.ResponseWriter, r 
 		return err
 	}
 
-	// TODO: write test to make sure only authorized users can use the data connection
-	dataConnection, err := dataconnections.LoadDataConnectionByID(s.db, auth.Organization.ID, runQueryRequest.ConnectionID)
+	// This should prevent unauthorized access to the wrong data connection
+	analysis, err := analyses.LoadAnalysisByID(s.db, auth.Organization.ID, runQueryRequest.AnalysisID)
 	if err != nil {
 		return err
 	}
 
-	schema, queryResults, err := s.queryService.RunQuery(dataConnection, runQueryRequest.QueryString)
+	schema, queryResults, err := s.queryService.RunCustomQuery(analysis)
 	if err != nil {
 		if _, ok := err.(query.Error); ok {
 			// Not actually a failure, the user's query was just wrong. Send the details back to them.

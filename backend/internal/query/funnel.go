@@ -2,6 +2,7 @@ package query
 
 import (
 	"fabra/internal/analyses"
+	"fabra/internal/dataconnections"
 	"fabra/internal/errors"
 	"fabra/internal/eventsets"
 	"fabra/internal/models"
@@ -49,9 +50,22 @@ type FunnelStep struct {
 	Filters []models.StepFilter
 }
 
-func (qs QueryServiceImpl) RunFunnelQuery(dataConnection *models.DataConnection, analysis *models.Analysis) (views.Schema, []views.Row, error) {
+func (qs QueryServiceImpl) RunFunnelQuery(analysis *models.Analysis) (views.Schema, []views.Row, error) {
+	if !analysis.ConnectionID.Valid {
+		return nil, nil, errors.NewBadRequest("no data connection configured")
+	}
+
 	if !analysis.EventSetID.Valid {
 		return nil, nil, errors.NewBadRequest("no event set configured")
+	}
+
+	if analysis.AnalysisType != models.AnalysisTypeFunnel {
+		return nil, nil, errors.NewBadRequest("wrong analysis type")
+	}
+
+	dataConnection, err := dataconnections.LoadDataConnectionByID(qs.db, analysis.OrganizationID, analysis.ConnectionID.Int64)
+	if err != nil {
+		return nil, nil, err
 	}
 
 	eventSet, err := eventsets.LoadEventSetByID(qs.db, analysis.OrganizationID, analysis.EventSetID.Int64)
@@ -74,7 +88,7 @@ func (qs QueryServiceImpl) RunFunnelQuery(dataConnection *models.DataConnection,
 		return nil, nil, err
 	}
 
-	return qs.RunQuery(dataConnection, *queryString)
+	return qs.runQuery(dataConnection, *queryString)
 }
 
 func createFunnelQuery(eventSet *models.EventSet, steps []FunnelStep) (*string, error) {

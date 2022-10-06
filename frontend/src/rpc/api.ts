@@ -129,10 +129,10 @@ export const TestDataConnection: IEndpoint<TestDataConnectionRequest, undefined>
     track: true,
 };
 
-export const RunQuery: IEndpoint<RunQueryRequest, RunQueryResponse> = {
-    name: 'run_query',
+export const RunCustomQuery: IEndpoint<RunCustomQueryRequest, RunQueryResponse> = {
+    name: 'run_custom_query',
     method: 'POST',
-    path: '/run_query',
+    path: '/run_custom_query',
     track: true,
 };
 
@@ -239,18 +239,6 @@ export interface ColumnSchema {
 
 export interface Schema extends Array<ColumnSchema> { }
 
-export type Property = ColumnSchema;
-
-export interface PropertyGroup {
-    name: string;
-    properties: Property[];
-}
-
-export interface RunQueryRequest {
-    connection_id: number;
-    query_string: string;
-}
-
 export function toCsvData(schema: Schema | undefined, queryResults: QueryResults | undefined): (string | number)[][] {
     if (schema && queryResults) {
         const header = schema.map(columnSchema => columnSchema.name);
@@ -260,8 +248,18 @@ export function toCsvData(schema: Schema | undefined, queryResults: QueryResults
     return [];
 }
 
+export type Property = ColumnSchema;
+
+export interface PropertyGroup {
+    name: string;
+    properties: Property[];
+}
+
+export interface RunCustomQueryRequest {
+    analysis_id: number;
+}
+
 export interface RunFunnelQueryRequest {
-    connection_id: number;
     analysis_id: number;
 }
 
