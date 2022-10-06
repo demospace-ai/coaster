@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-const PAGE_SIZE = 20
+const PAGE_SIZE = 50
 
 func CreateAnalysis(
 	db *gorm.DB,
