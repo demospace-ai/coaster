@@ -193,9 +193,9 @@ export const Funnel: React.FC = () => {
   return (
     <>
       <ConfigureAnalysisModal analysisID={Number(id)} analysisType={AnalysisType.Funnel} connection={connection} eventSet={eventSet} show={showModal} close={() => setShowModal(false)} />
-      <div className="tw-px-10 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0" >
-        <div className='tw-flex tw-flex-1 tw-min-w-0 tw-min-h-0'>
-          <div id='left-panel' className="tw-w-[420px] tw-min-w-[20rem] tw-inline-block tw-select-none tw-pt-8 tw-pb-20 tw-pr-10 tw-overflow-scroll tw-h-full">
+      <div className="tw-px-10 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-scroll" >
+        <div className='tw-flex tw-flex-1 tw-pb-24'>
+          <div id='left-panel' className="tw-w-[420px] tw-min-w-[20rem] tw-inline-block tw-select-none tw-pt-8 tw-pr-10 tw-h-full">
             <div>
               <Steps id={Number(id)} connectionID={connectionID} eventSetID={eventSetID} steps={steps} setErrorMessage={setErrorMessage} updateFunnel={updateFunnel} />
             </div>
