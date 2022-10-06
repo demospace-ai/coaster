@@ -12,6 +12,7 @@
     font-size: 14px;
     display: inline-block;
     margin-top: 5px;
+    user-select: none;
 }
 
 .organizationName {

@@ -1,6 +1,7 @@
 package organizations
 
 import (
+	"fabra/internal/database"
 	"fabra/internal/models"
 
 	"gorm.io/gorm"
@@ -46,4 +47,24 @@ func LoadOrganizationsByEmailDomain(db *gorm.DB, emailDomain string) ([]models.O
 	}
 
 	return organizations, nil
+}
+
+func SetOrganizationDefaultDataConnection(db *gorm.DB, organization *models.Organization, dataConnectionID int64) (*models.Organization, error) {
+	organization.DefaultDataConnectionID = database.NewNullInt64(dataConnectionID)
+	result := db.Save(organization)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return organization, nil
+}
+
+func SetOrganizationDefaultEventSet(db *gorm.DB, organization *models.Organization, eventSetID int64) (*models.Organization, error) {
+	organization.DefaultEventSetID = database.NewNullInt64(eventSetID)
+	result := db.Save(organization)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return organization, nil
 }

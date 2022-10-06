@@ -6,6 +6,7 @@ import (
 	"fabra/internal/errors"
 	"fabra/internal/eventsets"
 	"fabra/internal/models"
+	"fabra/internal/organizations"
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
@@ -20,6 +21,7 @@ type CreateEventSetRequest struct {
 	EventTypeColumn      string  `json:"event_type_column" validate:"required"`
 	TimestampColumn      string  `json:"timestamp_column" validate:"required"`
 	UserIdentifierColumn string  `json:"user_identifier_column" validate:"required"`
+	SetDefault           bool    `json:"set_default,omitempty"`
 }
 
 type CreateEventSetResponse struct {
@@ -63,6 +65,10 @@ func (s ApiService) CreateEventSet(auth auth.Authentication, w http.ResponseWrit
 	)
 	if err != nil {
 		return err
+	}
+
+	if createEventSetRequest.SetDefault {
+		organizations.SetOrganizationDefaultEventSet(s.db, auth.Organization, eventSet.ID)
 	}
 
 	return json.NewEncoder(w).Encode(CreateEventSetResponse{

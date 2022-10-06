@@ -1,12 +1,15 @@
 import { PlusCircleIcon } from "@heroicons/react/20/solid";
 import { Tooltip } from "@nextui-org/react";
+import classNames from "classnames";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "src/components/button/Button";
 import { Loading } from "src/components/loading/Loading";
+import { Modal } from "src/components/modal/Modal";
 import { NewConnection } from "src/pages/newconnection/NewConnection";
 import { NewEventSet } from "src/pages/neweventset/NewEventSet";
+import { useDispatch } from "src/root/model";
 import { sendRequest } from "src/rpc/ajax";
-import { DataConnection, EventSet, GetDataConnections, GetEventSets } from "src/rpc/api";
+import { DataConnection, EventSet, GetDataConnections, GetEventSets, UpdateOrganization } from "src/rpc/api";
 
 enum Step {
   Initial,
@@ -14,21 +17,70 @@ enum Step {
   NewEventSet,
 }
 
-const tableCellStyle = "tw-p-4 tw-w-56";
+const tableHeaderStyle = "tw-sticky tw-top-0 tw-z-10 tw-border-b tw-border-gray-300 tw-bg-gray-50 tw-bg-opacity-75 tw-py-3.5 tw-pr-4 tw-pl-3 backdrop-blur backdrop-filter sm:tw-pr-6 lg:tw-pr-8 tw-text-left";
+const tableCellStyle = "tw-whitespace-nowrap tw-px-3 tw-py-4 tw-text-sm tw-text-gray-500 tw-hidden sm:tw-table-cell";
 
 export const WorkspaceSettings: React.FC = () => {
+  const dispatch = useDispatch();
   const [step, setStep] = useState<Step>(Step.Initial);
-  const [connectionMap, setConnectionMap] = useState<Map<number, DataConnection> | null>(null);
-  const setConnectionMapCallback = useCallback(setConnectionMap, [setConnectionMap]);
+  const [connectionMap, setConnectionMap] = useState<Map<number, DataConnection> | undefined>(undefined);
+  const [dataConnections, setDataConnections] = useState<DataConnection[] | undefined>(undefined);
+  const [eventSets, setEventSets] = useState<EventSet[] | undefined>(undefined);
+  const [selectedConnection, setSelectedConnection] = useState<DataConnection | undefined>(undefined);
+  const [selectedEventSet, setSelectedEventSet] = useState<EventSet | undefined>(undefined);
+  const close = () => {
+    setSelectedConnection(undefined);
+    setSelectedEventSet(undefined);
+  };
+  const setDefault = useCallback(async (connectionID: number | undefined, eventSetID: number | undefined) => {
+    try {
+      const response = await sendRequest(UpdateOrganization, { connection_id: connectionID, event_set_id: eventSetID });
+      dispatch({
+        type: 'login.organizationSet',
+        organization: response.organization,
+      });
+    } catch (e) {
+    }
+  }, [dispatch]);
 
+  // TODO: reload on new data source added
+  useEffect(() => {
+    let ignore = false;
+    sendRequest(GetDataConnections).then((results) => {
+      if (!ignore) {
+        setDataConnections(results.data_connections);
+        setConnectionMap(new Map(results.data_connections.map(i => [i.id, i])));
+      }
+    });
+
+    return () => {
+      ignore = true;
+    };
+  }, [setConnectionMap]);
+
+  // TODO: reload on new event set added
+  useEffect(() => {
+    let ignore = false;
+
+    sendRequest(GetEventSets).then((results) => {
+      if (!ignore) {
+        setEventSets(results.event_sets);
+      }
+    });
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   let content;
   switch (step) {
     case Step.Initial:
       content = (
         <div className='tw-py-14 tw-px-20'>
-          <DataSourceSettings setStep={setStep} setConnectionMap={setConnectionMapCallback} />
-          <EventSetSettings setStep={setStep} connectionMap={connectionMap} />
+          <SetDefaultModal connection={selectedConnection} eventSet={selectedEventSet} setDefault={setDefault} close={close} />
+          <DataSourceSettings setStep={setStep} dataConnections={dataConnections} setSelectedConnection={setSelectedConnection} />
+          <EventSetSettings setStep={setStep} connectionMap={connectionMap} eventSets={eventSets} setSelectedEventSet={setSelectedEventSet} />
         </div>
       );
       break;
@@ -43,25 +95,13 @@ export const WorkspaceSettings: React.FC = () => {
   return content;
 };
 
-const DataSourceSettings: React.FC<{ setStep: (step: Step) => void; setConnectionMap: (map: Map<number, DataConnection>) => void; }> = ({ setStep, setConnectionMap }) => {
-  const [dataConnections, setDataConnections] = useState<DataConnection[] | null>(null);
-  const [dataConnectionsLoading, setDataConnectionsLoading] = useState<boolean>(true);
-  // TODO: reload on new data source added
-  useEffect(() => {
-    let ignore = false;
-    sendRequest(GetDataConnections).then((results) => {
-      if (!ignore) {
-        setDataConnections(results.data_connections);
-        setConnectionMap(new Map(results.data_connections.map(i => [i.id, i])));
-        setDataConnectionsLoading(false);
-      }
-    });
+type DataSourceSettingsProps = {
+  setStep: (step: Step) => void;
+  dataConnections: DataConnection[] | undefined;
+  setSelectedConnection: (connection: DataConnection) => void;
+};
 
-    return () => {
-      ignore = true;
-    };
-  }, [setConnectionMap]);
-
+const DataSourceSettings: React.FC<DataSourceSettingsProps> = ({ setStep, dataConnections, setSelectedConnection }) => {
   return (
     <>
       <div className="tw-flex tw-w-full tw-mb-3">
@@ -75,16 +115,16 @@ const DataSourceSettings: React.FC<{ setStep: (step: Step) => void; setConnectio
           </div>
         </Button>
       </div>
-      <div className='tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-max-h-64 tw-overflow-auto tw-overscroll-contain' >
-        {dataConnectionsLoading
+      <div className='tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-max-h-64 tw-overflow-x-auto tw-overscroll-contain' >
+        {dataConnections
           ?
-          <Loading className="tw-my-5" />
-          :
-          <table className="tw-w-full">
-            <thead className="tw-text-left tw-sticky tw-top-0 tw-shadow-[0_0px_0.5px_1px] tw-shadow-gray-300 tw-bg-gray-100">
+          <table className="tw-min-w-full tw-border-separate tw-border-spacing-0">
+            <thead className="tw-bg-gray-100">
               <tr>
-                <th scope="col" className="tw-p-4">Display Name</th>
-                <th scope="col" className="tw-p-4">Source Type</th>
+                <th scope="col" className={tableHeaderStyle}>Display Name</th>
+                <th scope="col" className={tableHeaderStyle}>Source Type</th>
+                <th scope="col" className={classNames(tableHeaderStyle, 'tw-w-5')}></th>
+                <th scope="col" className={classNames(tableHeaderStyle, 'tw-w-5')}></th>
               </tr>
             </thead>
             <tbody>
@@ -96,40 +136,37 @@ const DataSourceSettings: React.FC<{ setStep: (step: Step) => void; setConnectio
                   <td className={tableCellStyle}>
                     {dataConnection.connection_type}
                   </td>
+                  <td className={tableCellStyle}>
+                    <div className="tw-cursor-pointer tw-font-medium tw-select-none tw-text-blue-700 hover:tw-text-blue-900" onClick={() => setSelectedConnection(dataConnection)}>Set Default</div>
+                  </td>
+                  <td className={tableCellStyle}>
+                    <div className="tw-cursor-pointer tw-font-medium tw-select-none tw-text-blue-700 hover:tw-text-blue-900" onClick={() => null}>Delete</div>
+                  </td>
                 </tr>
               )) : <tr><td className={tableCellStyle}>No data sources configured yet!</td></tr>}
             </tbody>
           </table>
+          :
+          <Loading className="tw-my-5" />
         }
       </div>
     </>
   );
 };
 
-const EventSetSettings: React.FC<{ setStep: (step: Step) => void, connectionMap: Map<number, DataConnection> | null; }> = props => {
-  const [eventSets, setEventSets] = useState<EventSet[] | null>(null);
-  const [eventSetsLoading, setEventSetsLoading] = useState<boolean>(true);
-  // TODO: reload on new event set added
-  useEffect(() => {
-    let ignore = false;
+type EventSetSettingsProps = {
+  setStep: (step: Step) => void,
+  connectionMap: Map<number, DataConnection> | undefined;
+  eventSets: EventSet[] | undefined;
+  setSelectedEventSet: (eventSet: EventSet) => void;
+};
 
-    sendRequest(GetEventSets).then((results) => {
-      if (!ignore) {
-        setEventSets(results.event_sets);
-        setEventSetsLoading(false);
-      }
-    });
-
-    return () => {
-      ignore = true;
-    };
-  }, []);
-
+const EventSetSettings: React.FC<EventSetSettingsProps> = ({ setStep, connectionMap, eventSets, setSelectedEventSet }) => {
   return (
     <>
       <div className="tw-flex tw-w-full tw-mb-3 tw-mt-8">
         <div className="tw-flex tw-flex-col tw-justify-end tw-font-bold tw-text-lg">Event Sets</div>
-        <Button className='tw-ml-auto tw-flex' onClick={() => props.setStep(Step.NewEventSet)}>
+        <Button className='tw-ml-auto tw-flex' onClick={() => setStep(Step.NewEventSet)}>
           <div className="tw-flex tw-flex-col tw-justify-center tw-h-full">
             <PlusCircleIcon className='tw-h-4 tw-inline-block tw-mr-[6px]' />
           </div>
@@ -138,29 +175,29 @@ const EventSetSettings: React.FC<{ setStep: (step: Step) => void, connectionMap:
           </div>
         </Button>
       </div>
-      <div className='tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-max-h-64 tw-overflow-auto tw-overscroll-contain' >
-        {eventSetsLoading
+      <div className='tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-overflow-scroll tw-overscroll-contain'>
+        {eventSets
           ?
-          <Loading className="tw-my-5" />
-          :
-          <table className="tw-w-full">
-            <thead className="tw-text-left tw-sticky tw-top-0 tw-shadow-[0_0px_0.5px_1px] tw-shadow-gray-300 tw-bg-gray-100">
+          <table className="tw-min-w-full tw-border-separate tw-border-spacing-0">
+            <thead className="tw-bg-gray-100">
               <tr>
-                <th scope="col" className="tw-p-4 tw-whitespace-nowrap">Display Name</th>
-                <th scope="col" className="tw-p-4 tw-whitespace-nowrap">Data Source Name</th>
-                <th scope="col" className="tw-p-4 tw-whitespace-nowrap">Dataset Name</th>
-                <th scope="col" className="tw-p-4 tw-whitespace-nowrap">Table Name</th>
-                <th scope="col" className="tw-p-4 tw-whitespace-nowrap">Custom Join</th>
+                <th scope="col" className={tableHeaderStyle}>Display Name</th>
+                <th scope="col" className={tableHeaderStyle}>Data Source Name</th>
+                <th scope="col" className={tableHeaderStyle}>Dataset Name</th>
+                <th scope="col" className={tableHeaderStyle}>Table Name</th>
+                <th scope="col" className={tableHeaderStyle}>Custom Join</th>
+                <th scope="col" className={classNames(tableHeaderStyle, 'tw-w-5')}></th>
+                <th scope="col" className={classNames(tableHeaderStyle, 'tw-w-5')}></th>
               </tr>
             </thead>
-            <tbody>
-              {eventSets!.length > 0 ? eventSets!.map((eventSet, index) => (
+            <tbody className="tw-bg-white">
+              {eventSets.length > 0 ? eventSets!.map((eventSet, index) => (
                 <tr key={index} className="tw-border-b tw-border-solid tw-border-gray-200 last:tw-border-0">
                   <td className={tableCellStyle}>
                     {eventSet.display_name}
                   </td>
                   <td className={tableCellStyle}>
-                    {props.connectionMap ? props.connectionMap.get(eventSet.connection_id)?.display_name : <Loading />}
+                    {connectionMap ? connectionMap.get(eventSet.connection_id)?.display_name : <Loading />}
                   </td>
                   <td className={tableCellStyle}>
                     {eventSet.dataset_name}
@@ -175,12 +212,66 @@ const EventSetSettings: React.FC<{ setStep: (step: Step) => void, connectionMap:
                       </div>
                     </Tooltip>
                   </td>
+                  <td className={tableCellStyle}>
+                    <div className="tw-cursor-pointer tw-font-medium tw-select-none tw-text-blue-700 hover:tw-text-blue-900" onClick={() => setSelectedEventSet(eventSet)}>Set Default</div>
+                  </td>
+                  <td className={tableCellStyle}>
+                    <div className="tw-cursor-pointer tw-font-medium tw-select-none tw-text-blue-700 hover:tw-text-blue-900" onClick={() => null}>Delete</div>
+                  </td>
                 </tr>
               )) : <tr><td className={tableCellStyle}>No event sets configured yet!</td></tr>}
             </tbody>
           </table>
+          :
+          <Loading className="tw-my-5" />
         }
       </div>
     </>
+  );
+};
+
+type SetDefaultModalProps = {
+  connection: DataConnection | undefined;
+  eventSet: EventSet | undefined;
+  setDefault: (connectionID: number | undefined, eventSetID: number | undefined) => Promise<void>;
+  close: () => void;
+};
+
+const SetDefaultModal: React.FC<SetDefaultModalProps> = props => {
+  const [loading, setLoading] = useState<boolean>(false);
+  const connectionID = props.connection?.id;
+  const eventSetID = props.eventSet?.id;
+  const show = props.connection !== undefined || props.eventSet !== undefined;
+  const setDefault = async (connectionID: number | undefined, eventSetID: number | undefined) => {
+    setLoading(true);
+    await props.setDefault(connectionID, eventSetID);
+    props.close();
+    setLoading(false);
+  };
+
+  var type: string = "";
+  var title: string = "";
+  if (props.connection) {
+    title = props.connection.display_name;
+    type = "data connection";
+  } else if (props.eventSet) {
+    title = props.eventSet.display_name;
+    type = "event set";
+  }
+
+  return (
+    <Modal show={show} close={props.close} title="Set Default" titleStyle='tw-font-bold tw-text-xl'>
+      <div className='tw-w-80 tw-m-6'>
+        <div>
+          Set {`${type}`} "<span className="tw-font-bold">{`${title}`}</span>" as the organization's default?
+        </div>
+        <div className='tw-mt-8 tw-flex'>
+          <div className='tw-ml-auto'>
+            <Button className='tw-bg-white tw-text-primary-text hover:tw-bg-gray-200 tw-border-0 tw-mr-3' onClick={props.close}>Cancel</Button>
+            <Button className='tw-w-28 tw-bg-fabra hover:tw-bg-primary-highlight tw-border-0' onClick={() => setDefault(connectionID, eventSetID)}>{loading ? <Loading className='tw-inline' /> : "Continue"}</Button>
+          </div>
+        </div>
+      </div>
+    </Modal>
   );
 };

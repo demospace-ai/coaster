@@ -10,19 +10,20 @@ import { Button } from 'src/components/button/Button';
 import { SaveIcon } from 'src/components/icons/Icons';
 import { Loading } from 'src/components/loading/Loading';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
-import { ConnectionSelector, ControlledEventSelector, ControlledPropertySelector, EventSetSelector, FilterSelector, PropertyValueSelector } from "src/components/selector/Selector";
+import { ControlledEventSelector, ControlledPropertySelector, FilterSelector, PropertyValueSelector } from "src/components/selector/Selector";
 import { getEvents, getProperties, runFunnelQuery } from 'src/queries/queries';
+import { useSelector } from 'src/root/model';
 import { sendRequest } from 'src/rpc/ajax';
-import { AnalysisType, CreateAnalysis, CreateAnalysisRequest, DataConnection, EventSet, FilterType, FunnelStep, FunnelStepInput, GetAnalysis, Property, PropertyGroup, QueryResults, Schema, StepFilter, stepFiltersMatch, toCsvData, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
-import { toEmptyList, toUndefined } from 'src/utils/undefined';
+import { AnalysisType, CreateAnalysis, CreateAnalysisRequest, FilterType, FunnelStep, FunnelStepInput, GetAnalysis, Property, PropertyGroup, QueryResults, Schema, StepFilter, stepFiltersMatch, toCsvData, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
+import { toEmptyList } from 'src/utils/undefined';
 
 type FunnelParams = {
   id: string,
 };
 
 type FunnelUpdates = {
-  connection?: DataConnection,
-  eventSet?: EventSet,
+  connectionID?: number,
+  eventSetID?: number,
   steps?: FunnelStepInput[],
 };
 
@@ -44,8 +45,8 @@ export const Funnel: React.FC = () => {
   const [initialLoading, setInitialLoading] = useState<boolean>(true);
   const [queryLoading, setQueryLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [connection, setConnection] = useState<DataConnection | undefined>(undefined);
-  const [eventSet, setEventSet] = useState<EventSet | undefined>(undefined);
+  const connectionID = useSelector(state => state.login.organization?.default_data_connection_id);
+  const eventSetID = useSelector(state => state.login.organization?.default_event_set_id);
   const [steps, setSteps] = useState<FunnelStep[]>([]);
   const [saving, setSaving] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
@@ -55,9 +56,15 @@ export const Funnel: React.FC = () => {
   const [queryResults, setQueryResults] = useState<QueryResults | undefined>(undefined);
   const hasResults = schema !== undefined && queryResults !== undefined;
 
+  // TODO: error out if organization does not have connection and event set configured
   const createNewFunnel = useCallback(async () => {
     setInitialLoading(true);
-    const payload: CreateAnalysisRequest = { analysis_type: AnalysisType.Funnel };
+    const payload: CreateAnalysisRequest = {
+      connection_id: connectionID,
+      event_set_id: eventSetID,
+      analysis_type: AnalysisType.Funnel
+    };
+
     try {
       const response = await sendRequest(CreateAnalysis, payload);
       navigate(`/funnel/${response.analysis.id}`);
@@ -65,20 +72,12 @@ export const Funnel: React.FC = () => {
       // TODO: handle error here
     }
     setInitialLoading(false);
-  }, [navigate]);
+  }, [navigate, connectionID, eventSetID]);
 
   const loadSavedFunnel = useCallback(async (id: string) => {
     setInitialLoading(true);
     try {
       const response = await sendRequest(GetAnalysis, { analysisID: id });
-      if (response.connection) {
-        setConnection(response.connection);
-      }
-
-      if (response.event_set) {
-        setEventSet(response.event_set);
-      }
-
       if (response.analysis.funnel_steps) {
         setSteps(response.analysis.funnel_steps);
       }
@@ -91,22 +90,12 @@ export const Funnel: React.FC = () => {
 
   const updateFunnel = useCallback(async (id: number, updates: FunnelUpdates) => {
     const payload: UpdateAnalysisRequest = { analysis_id: Number(id) };
-    if (updates.connection) {
-      payload.connection_id = updates.connection.id;
-    }
-
-    if (updates.eventSet) {
-      payload.event_set_id = updates.eventSet.id;
-    }
-
     if (updates.steps) {
       payload.funnel_steps = updates.steps;
     }
 
     try {
       const response = await sendRequest(UpdateAnalysis, payload);
-      setConnection(response.connection);
-      setEventSet(toUndefined(response.event_set));
       setSteps(toEmptyList(response.analysis.funnel_steps));
     } catch (e) {
       // TODO: handle error here
@@ -116,14 +105,6 @@ export const Funnel: React.FC = () => {
   const updateAllProperties = async () => {
     setSaving(true);
     const updates: FunnelUpdates = {};
-    if (connection) {
-      updates.connection = connection;
-    }
-
-    if (eventSet) {
-      updates.eventSet = eventSet;
-    }
-
     if (steps) {
       updates.steps = steps;
     }
@@ -134,8 +115,6 @@ export const Funnel: React.FC = () => {
 
   useEffect(() => {
     // Reset state on new ID since data will be newly loaded
-    setConnection(undefined);
-    setEventSet(undefined);
     setSteps([]);
     setQueryResults(undefined);
     setSchema(undefined);
@@ -149,33 +128,17 @@ export const Funnel: React.FC = () => {
     }
   }, [id, createNewFunnel, loadSavedFunnel]);
 
-  const onConnectionSelected = useCallback((value: DataConnection) => {
-    if (!connection || connection.id !== value.id) {
-      setErrorMessage(null);
-      setConnection(value);
-      updateFunnel(Number(id), { connection: value });
-    }
-  }, [id, connection, updateFunnel]);
-
-  const onEventSetSelected = useCallback((value: EventSet) => {
-    if (!eventSet || eventSet.id !== value.id) {
-      setErrorMessage(null);
-      setEventSet(value);
-      updateFunnel(Number(id), { eventSet: value });
-    }
-  }, [id, eventSet, updateFunnel]);
-
-  const runQuery = async () => {
+  const runQuery = useCallback(async () => {
     setQueryLoading(true);
     setErrorMessage(null);
 
-    if (!connection) {
+    if (!connectionID) {
       setErrorMessage("Data source is not set!");
       setQueryLoading(false);
       return;
     }
 
-    if (!eventSet) {
+    if (!eventSetID) {
       setErrorMessage("Event set is not set!");
       setQueryLoading(false);
       return;
@@ -188,7 +151,7 @@ export const Funnel: React.FC = () => {
     }
 
     try {
-      const response = await runFunnelQuery(connection.id, Number(id));
+      const response = await runFunnelQuery(connectionID, Number(id));
       if (response.success) {
         setSchema(response.schema);
         setQueryResults(response.query_results);
@@ -200,7 +163,7 @@ export const Funnel: React.FC = () => {
     }
 
     setQueryLoading(false);
-  };
+  }, [connectionID, eventSetID, id, steps.length]);
 
   const copyLink = () => {
     setCopied(true);
@@ -220,17 +183,9 @@ export const Funnel: React.FC = () => {
   return (
     <div className="tw-px-10 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0" >
       <div className='tw-flex tw-flex-1 tw-min-w-0 tw-min-h-0'>
-        <div id='left-panel' className="tw-w-96 tw-min-w-[20rem] tw-inline-block tw-select-none tw-pt-8 tw-pb-20 tw-pr-10 tw-overflow-scroll tw-h-full">
-          <div className='tw-mt-[2px]'>
-            <span className='tw-uppercase tw-font-bold'>Data Source</span>
-            <ConnectionSelector className="tw-mt-1 hover:tw-border-green-500" connection={connection} setConnection={onConnectionSelected} />
-          </div>
-          <div className='tw-mt-5'>
-            <span className='tw-uppercase  tw-font-bold'>Event Set</span>
-            <EventSetSelector className="tw-mt-1 hover:tw-border-green-500" connection={connection} eventSet={eventSet} setEventSet={onEventSetSelected} />
-          </div>
-          <div className='tw-mt-5'>
-            <Steps id={Number(id)} connectionID={connection?.id} eventSetID={eventSet?.id} steps={steps} setErrorMessage={setErrorMessage} updateFunnel={updateFunnel} />
+        <div id='left-panel' className="tw-w-[420px] tw-min-w-[20rem] tw-inline-block tw-select-none tw-pt-8 tw-pb-20 tw-pr-10 tw-overflow-scroll tw-h-full">
+          <div>
+            <Steps id={Number(id)} connectionID={connectionID} eventSetID={eventSetID} steps={steps} setErrorMessage={setErrorMessage} updateFunnel={updateFunnel} />
           </div>
           <Tooltip className='tw-mt-10' color={"invert"} content={"⌘ + Enter"}>
             <Button className="tw-w-40 tw-h-8" onClick={runQuery}>{queryLoading ? "Stop" : "Run"}</Button>
@@ -290,7 +245,6 @@ type StepsProps = {
 };
 
 const Steps: React.FC<StepsProps> = props => {
-  console.log("steps render");
   const { id, connectionID, eventSetID, steps, setErrorMessage, updateFunnel } = props;
   const [eventOptions, setEventOptions] = useState<string[]>();
   const [loading, setLoading] = useState(false);

@@ -168,6 +168,12 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			Pattern:     "/api/set_organization",
 			HandlerFunc: s.SetOrganization,
 		},
+		{
+			Name:        "Update organization",
+			Method:      router.PATCH,
+			Pattern:     "/api/update_organization",
+			HandlerFunc: s.UpdateOrganization,
+		},
 	}
 }
 

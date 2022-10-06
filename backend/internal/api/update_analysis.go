@@ -48,7 +48,7 @@ func (s ApiService) UpdateAnalysis(auth auth.Authentication, w http.ResponseWrit
 	if updateAnalysisRequest.ConnectionID != nil {
 		_, err = dataconnections.LoadDataConnectionByID(s.db, auth.Organization.ID, *updateAnalysisRequest.ConnectionID)
 		if err != nil {
-			return nil
+			return err
 		}
 	}
 
@@ -56,7 +56,7 @@ func (s ApiService) UpdateAnalysis(auth auth.Authentication, w http.ResponseWrit
 	if updateAnalysisRequest.EventSetID != nil {
 		_, err = eventsets.LoadEventSetByID(s.db, auth.Organization.ID, *updateAnalysisRequest.EventSetID)
 		if err != nil {
-			return nil
+			return err
 		}
 	}
 

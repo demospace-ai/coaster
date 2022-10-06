@@ -87,6 +87,13 @@ export const SetOrganization: IEndpoint<SetOrganizationRequest, SetOrganizationR
     track: true,
 };
 
+export const UpdateOrganization: IEndpoint<UpdateOrganizationRequest, UpdateOrganizationResponse> = {
+    name: 'update_organization',
+    method: 'PATCH',
+    path: '/update_organization',
+    track: true,
+};
+
 export const GetAnalysis: IEndpoint<{ analysisID: string; }, GetAnalysisResponse> = {
     name: 'get_analysis',
     method: 'GET',
@@ -302,6 +309,15 @@ export interface SetOrganizationResponse {
     organization: Organization;
 }
 
+export interface UpdateOrganizationRequest {
+    connection_id?: number;
+    event_set_id?: number;
+}
+
+export interface UpdateOrganizationResponse {
+    organization: Organization;
+}
+
 export interface ValidationCodeRequest {
     email: string;
 }
@@ -369,6 +385,8 @@ export interface LoginResponse {
 export interface Organization {
     id: number;
     name: string;
+    default_data_connection_id?: number;
+    default_event_set_id?: number;
 }
 
 export interface CheckSessionResponse {
@@ -378,6 +396,8 @@ export interface CheckSessionResponse {
 }
 
 export interface CreateAnalysisRequest {
+    connection_id?: number;
+    event_set_id?: number;
     analysis_type: AnalysisType;
 }
 
@@ -395,7 +415,6 @@ export interface UpdateAnalysisRequest {
     query?: string;
     funnel_steps?: FunnelStepInput[];
 }
-
 
 export interface FunnelStepInput {
     step_name: string;

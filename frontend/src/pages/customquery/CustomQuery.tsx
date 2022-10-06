@@ -11,12 +11,11 @@ import { Button } from "src/components/button/Button";
 import { SaveIcon } from 'src/components/icons/Icons';
 import { Loading } from 'src/components/loading/Loading';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
-import { ConnectionSelector } from "src/components/selector/Selector";
+import { useSelector } from 'src/root/model';
 import { sendRequest } from "src/rpc/ajax";
 import { AnalysisType, CreateAnalysis, CreateAnalysisRequest, DataConnection, GetAnalysis, QueryResults, RunQuery, RunQueryRequest, Schema, toCsvData, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
 import { useDebounce } from 'src/utils/debounce';
 import { createResizeFunction } from 'src/utils/resize';
-import { toNull } from 'src/utils/undefined';
 
 type QueryParams = {
   id: string,
@@ -45,7 +44,7 @@ export const CustomQuery: React.FC = () => {
   const [topPanelHeight, setTopPanelHeight] = useState<number>();
   const topPanelRef = useRef<HTMLDivElement>(null);
 
-  const [connection, setConnection] = useState<DataConnection | undefined>(undefined);
+  const connectionID = useSelector(state => state.login.organization?.default_data_connection_id);
   const [query, setQuery] = useState<string>("");
   const [schema, setSchema] = useState<Schema | undefined>(undefined);
   const [queryResults, setQueryResults] = useState<QueryResults | undefined>(undefined);
@@ -70,10 +69,6 @@ export const CustomQuery: React.FC = () => {
     setInitialLoading(true);
     try {
       const response = await sendRequest(GetAnalysis, { analysisID: id });
-      if (response.connection) {
-        setConnection(response.connection);
-      }
-
       if (response.analysis.query) {
         setQuery(response.analysis.query);
       }
@@ -82,7 +77,7 @@ export const CustomQuery: React.FC = () => {
       // TODO: handle error here
     }
     setInitialLoading(false);
-  }, [setConnection, setQuery]);
+  }, [setQuery]);
 
   const updateCustomQuery = useCallback(async (id: number, updates: { connection?: DataConnection, query?: string; }) => {
     const payload: UpdateAnalysisRequest = { analysis_id: Number(id) };
@@ -100,7 +95,6 @@ export const CustomQuery: React.FC = () => {
 
     try {
       const response = await sendRequest(UpdateAnalysis, payload);
-      setConnection(response.connection);
     } catch (e) {
       // TODO: handle error here
     }
@@ -108,7 +102,6 @@ export const CustomQuery: React.FC = () => {
 
   useEffect(() => {
     // Reset state on new ID since data will be newly loaded
-    setConnection(undefined);
     setQuery("");
     setQueryResults(undefined);
     setSchema(undefined);
@@ -138,21 +131,13 @@ export const CustomQuery: React.FC = () => {
   };
   const startResize = createResizeFunction(topPanelRef, setTopPanelHeightBounded);
 
-  const onConnectionSelected = (value: DataConnection) => {
-    if (!connection || connection.id !== value.id) {
-      setErrorMessage(null);
-      setConnection(value);
-      updateCustomQuery(Number(id), { connection: value });
-    }
-  };
-
   const debouncedUpdate = useDebounce((id: number, query: string) => updateCustomQuery(id, { query: query }), 1500);
   const onQueryChange = useCallback((query: string) => {
     setQuery(query);
     debouncedUpdate(Number(id), query);
   }, [id, debouncedUpdate]);
 
-  const runQuery = useCallback(async (id: number, connectionID: number | null, query: string) => {
+  const runQuery = useCallback(async (id: number, connectionID: number | undefined, query: string) => {
     setQueryLoading(true);
     setErrorMessage(null);
 
@@ -196,7 +181,6 @@ export const CustomQuery: React.FC = () => {
 
   // Hack to run/save the query since the Monaco editor will keep a memoized version of the runQuery function
   // that uses the first query passed to it.
-  const connectionID = toNull(connection?.id);
   useEffect(() => {
     if (shouldRun) {
       setShouldRun(false);
@@ -243,8 +227,6 @@ export const CustomQuery: React.FC = () => {
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0" >
         <div className='tw-flex tw-flex-1 tw-min-w-0 tw-min-h-0'>
           <div id='left-panel' className="tw-w-80 tw-min-w-[20rem] tw-inline-block tw-select-none">
-            <span className='tw-uppercase'>Data Source</span>
-            <ConnectionSelector className="tw-mt-1 hover:tw-border-green-500" connection={connection} setConnection={onConnectionSelected} />
           </div>
           <div id='right-panel' className="tw-ml-10 tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1">
             <div id="top-panel" className="tw-h-[40%]" style={{ height: topPanelHeight + "px" }} ref={topPanelRef}>
