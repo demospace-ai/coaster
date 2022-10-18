@@ -214,7 +214,7 @@ export const Funnel: React.FC = () => {
               <Button className="tw-w-40 tw-h-8" onClick={runQuery}>{queryLoading ? "Stop" : "Run"}</Button>
             </Tooltip>
           </div>
-          <div id='right-panel' className="tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1 tw-ml-2 tw-my-8 tw-border-gray-300 tw-border-solid tw-border tw-rounded-md tw-shadow-centered-sm">
+          <div id='right-panel' className="tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1 tw-ml-2 tw-my-8 tw-border-gray-300 tw-border-solid tw-border tw-rounded-md">
             <div id="top-panel" className="tw-p-4 tw-pl-5 tw-border-gray-300 tw-border-solid tw-border-b tw-flex tw-select-none">
               <span className='tw-text-lg tw-font-bold'>
                 Results
@@ -255,7 +255,7 @@ export const Funnel: React.FC = () => {
                     <ResponsiveContainer width={300 * funnelData.length} height={320}>
                       <BarChart data={funnelData} margin={{ top: 5, right: 30, left: 0, bottom: 25 }}>
                         <XAxis dataKey="name" height={30} />
-                        <YAxis ticks={[0, 20, 40, 60, 80, 100]} tickFormatter={tick => tick + "%"} />
+                        <YAxis ticks={[0, 20, 40, 60, 80, 100]} tickFormatter={tick => tick + "%"} domain={[0, 100]} allowDataOverflow={true} />
                         <RechartTooltip />
                         <Bar dataKey="percentage" barSize={200} fill="#639f63" background={{ fill: '#eee' }} radius={[5, 5, 0, 0]} />
                         <Bar dataKey="count" barSize={0} />
@@ -594,7 +594,7 @@ const convertData = (results: QueryResults): FunnelResult[] => {
     return {
       name: result[1] as string,
       count: result[0] as number,
-      percentage: (result[2] as number) * 100,
+      percentage: +((result[2] as number) * 100).toFixed(2),
     };
   });
 };
