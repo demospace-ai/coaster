@@ -1,9 +1,8 @@
-import { Menu, Transition } from '@headlessui/react';
-import { ArrowDownTrayIcon, CheckIcon, EllipsisHorizontalIcon, LinkIcon, PlusCircleIcon } from '@heroicons/react/20/solid';
+import { ArrowDownTrayIcon, CheckIcon, LinkIcon, PlusCircleIcon } from '@heroicons/react/20/solid';
 import { Tooltip } from '@nextui-org/react';
 import classNames from 'classnames';
 import { editor as EditorLib } from "monaco-editor/esm/vs/editor/editor.api";
-import { Fragment, MouseEvent, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CSVLink } from "react-csv";
 import MonacoEditor, { monaco } from "react-monaco-editor";
 import { useNavigate, useParams } from 'react-router-dom';

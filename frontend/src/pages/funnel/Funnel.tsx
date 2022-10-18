@@ -6,6 +6,7 @@ import classNames from 'classnames';
 import { useCallback, useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
 import { useNavigate, useParams } from 'react-router-dom';
+import { Bar, BarChart, ResponsiveContainer, Tooltip as RechartTooltip, XAxis, YAxis } from 'recharts';
 import { Button, MoreOptionsButton } from 'src/components/button/Button';
 import { SaveIcon } from 'src/components/icons/Icons';
 import { Loading } from 'src/components/loading/Loading';
@@ -24,6 +25,13 @@ type FunnelParams = {
 
 type FunnelUpdates = {
   steps?: FunnelStepInput[],
+};
+
+type FunnelResult = {
+  name: string,
+  count: number,
+  percentage: number,
+  conversionFromPrevious?: number,
 };
 
 /*
@@ -55,6 +63,7 @@ export const Funnel: React.FC = () => {
   const [shouldRun, setShouldRun] = useState<boolean>(false);
   const [schema, setSchema] = useState<Schema | undefined>(undefined);
   const [queryResults, setQueryResults] = useState<QueryResults | undefined>(undefined);
+  const [funnelData, setFunnelData] = useState<FunnelResult[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
 
   const hasResults = schema !== undefined && queryResults !== undefined;
@@ -126,8 +135,9 @@ export const Funnel: React.FC = () => {
   useEffect(() => {
     // Reset state on new ID since data will be newly loaded
     setSteps([]);
-    setQueryResults(undefined);
     setSchema(undefined);
+    setQueryResults(undefined);
+    setFunnelData([]);
 
     if (id === "new") {
       createNewFunnel();
@@ -165,6 +175,7 @@ export const Funnel: React.FC = () => {
       if (response.success) {
         setSchema(response.schema);
         setQueryResults(response.query_results);
+        setFunnelData(convertData(response.query_results));
       } else {
         setErrorMessage(response.error_message);
       }
@@ -239,6 +250,19 @@ export const Funnel: React.FC = () => {
                     Error: {errorMessage}
                   </div>
                 }
+                <Transition show={!queryLoading && funnelData.length > 0}>
+                  <div className='tw-overflow-scroll tw-mt-5 tw-border-b tw-border-gray-300 tw-border-solid '>
+                    <ResponsiveContainer width={300 * funnelData.length} height={320}>
+                      <BarChart data={funnelData} margin={{ top: 5, right: 30, left: 0, bottom: 25 }}>
+                        <XAxis dataKey="name" height={30} />
+                        <YAxis ticks={[0, 20, 40, 60, 80, 100]} tickFormatter={tick => tick + "%"} />
+                        <RechartTooltip />
+                        <Bar dataKey="percentage" barSize={200} fill="#639f63" background={{ fill: '#eee' }} radius={[5, 5, 0, 0]} />
+                        <Bar dataKey="count" barSize={0} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </Transition>
                 <MemoizedResultsTable loading={queryLoading} schema={schema} results={queryResults} placeholder="Choose two or more steps to see results!" />
               </div>
             </div>
@@ -563,6 +587,16 @@ function getFilterPrefix(index: number): React.ReactNode {
       </div>
     );
   }
+};
+
+const convertData = (results: QueryResults): FunnelResult[] => {
+  return results.map(result => {
+    return {
+      name: result[1] as string,
+      count: result[0] as number,
+      percentage: (result[2] as number) * 100,
+    };
+  });
 };
 
 const RightArrow: React.FC<{ className?: string; }> = ({ className }) => {
