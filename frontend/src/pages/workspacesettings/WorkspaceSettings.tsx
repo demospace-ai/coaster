@@ -1,10 +1,10 @@
 import { PlusCircleIcon } from "@heroicons/react/20/solid";
-import { Tooltip } from "@nextui-org/react";
 import classNames from "classnames";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "src/components/button/Button";
 import { Loading } from "src/components/loading/Loading";
 import { Modal } from "src/components/modal/Modal";
+import { Tooltip } from "src/components/tooltip/Tooltip";
 import { NewConnection } from "src/pages/newconnection/NewConnection";
 import { NewEventSet } from "src/pages/neweventset/NewEventSet";
 import { useDispatch } from "src/root/model";
@@ -206,7 +206,7 @@ const EventSetSettings: React.FC<EventSetSettingsProps> = ({ setStep, connection
                     {eventSet.table_name}
                   </td>
                   <td className={tableCellStyle}>
-                    <Tooltip content={eventSet.custom_join} rounded color="invert" leaveDelay={100}>
+                    <Tooltip label={eventSet.custom_join} delayHide={100}>
                       <div className="tw-max-w-[240px] tw-max-h-24 tw-overflow-hidden tw-text-ellipsis tw-whitespace-nowrap">
                         {eventSet.custom_join}
                       </div>

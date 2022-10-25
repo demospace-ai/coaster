@@ -6,12 +6,14 @@ import { NavLink, NavLinkProps, useNavigate } from 'react-router-dom';
 
 type ButtonProps = {
   onClick: () => void;
-  children: React.ReactNode;
   className?: string;
   secondary?: boolean;
+  children: React.ReactNode;
 };
 
 export const Button: React.FC<ButtonProps> = props => {
+  const { onClick, className, children, secondary, ...remaining } = props;
+
   const buttonStyle = classNames(
     props.className,
     'tw-text-white tw-bg-fabra hover:tw-bg-primary-highlight',
@@ -24,9 +26,10 @@ export const Button: React.FC<ButtonProps> = props => {
       className={buttonStyle}
       type='button'
       onClick={props.onClick}
+      {...remaining}
     >
       {props.children}
-    </button >
+    </button>
   );
 };
 

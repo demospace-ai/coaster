@@ -1,7 +1,6 @@
 import { Transition } from '@headlessui/react';
 import { ArrowDownTrayIcon } from '@heroicons/react/20/solid';
 import { CheckIcon, FunnelIcon, LinkIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { Tooltip } from '@nextui-org/react';
 import classNames from 'classnames';
 import { useCallback, useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
@@ -13,6 +12,7 @@ import { Loading } from 'src/components/loading/Loading';
 import { ConfigureAnalysisModal } from 'src/components/modal/Modal';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { ControlledEventSelector, ControlledPropertySelector, FilterSelector, PropertyValueSelector } from "src/components/selector/Selector";
+import { Tooltip } from 'src/components/tooltip/Tooltip';
 import { getEvents, getProperties, runFunnelQuery } from 'src/queries/queries';
 import { useSelector } from 'src/root/model';
 import { sendRequest } from 'src/rpc/ajax';
@@ -66,7 +66,7 @@ export const Funnel: React.FC = () => {
   const [funnelData, setFunnelData] = useState<FunnelResult[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
 
-  const hasResults = schema !== undefined && queryResults !== undefined;
+  const hasResults = Boolean(schema && queryResults);
   const connectionID = connection?.id;
   const eventSetID = eventSet?.id;
 
@@ -210,7 +210,7 @@ export const Funnel: React.FC = () => {
             <div>
               <Steps id={Number(id)} connectionID={connectionID} eventSetID={eventSetID} steps={steps} setErrorMessage={setErrorMessage} updateFunnel={updateFunnel} />
             </div>
-            <Tooltip className='tw-mt-10' color={"invert"} content={"⌘ + Enter"}>
+            <Tooltip label={"⌘ + Enter"}>
               <Button className="tw-w-40 tw-h-8" onClick={runQuery}>{queryLoading ? "Stop" : "Run"}</Button>
             </Tooltip>
           </div>
@@ -220,7 +220,7 @@ export const Funnel: React.FC = () => {
                 Results
               </span>
               <div className='tw-flex tw-ml-auto'>
-                <Tooltip color={"invert"} content={hasResults ? '' : "You must run the query to fetch results before exporting."}>
+                <Tooltip label={hasResults ? '' : "You must run the query to fetch results before exporting."}>
                   <CSVLink
                     className={classNames(
                       'tw-flex tw-rounded-md tw-font-bold tw-py-1 tw-tracking-wide tw-justify-center tw-align-middle tw-ml-2 tw-px-4 tw-h-8 tw-bg-white tw-border tw-border-solid tw-border-gray-400 tw-text-primary-text hover:tw-bg-gray-200',

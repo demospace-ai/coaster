@@ -1,5 +1,4 @@
 import { ArrowDownTrayIcon, CheckIcon, LinkIcon, PlusCircleIcon } from '@heroicons/react/20/solid';
-import { Tooltip } from '@nextui-org/react';
 import classNames from 'classnames';
 import { editor as EditorLib } from "monaco-editor/esm/vs/editor/editor.api";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -12,6 +11,7 @@ import { SaveIcon } from 'src/components/icons/Icons';
 import { Loading } from 'src/components/loading/Loading';
 import { ConfigureAnalysisModal } from 'src/components/modal/Modal';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
+import { Tooltip } from 'src/components/tooltip/Tooltip';
 import { useSelector } from 'src/root/model';
 import { sendRequest } from "src/rpc/ajax";
 import { AnalysisType, CreateAnalysis, CreateAnalysisRequest, DataConnection, GetAnalysis, QueryResults, RunCustomQuery, RunCustomQueryRequest, Schema, toCsvData, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
@@ -52,7 +52,7 @@ export const CustomQuery: React.FC = () => {
   const [query, setQuery] = useState<string>("");
   const [schema, setSchema] = useState<Schema | undefined>(undefined);
   const [queryResults, setQueryResults] = useState<QueryResults | undefined>(undefined);
-  const hasResults = schema !== null && queryResults !== null;
+  const hasResults = Boolean(schema && queryResults);
 
   const [shouldRun, setShouldRun] = useState<boolean>(false);
   const [shouldSave, setShouldSave] = useState<boolean>(false);
@@ -256,11 +256,11 @@ export const CustomQuery: React.FC = () => {
             </div>
             <div id="bottom-panel" className='tw-h-[60%] tw-flex tw-flex-col tw-flex-1' style={{ height: "calc(100% - " + topPanelHeight + "px)" }}>
               <div className="tw-border-solid tw-border-gray-300 tw-border-x tw-p-[10px] tw-flex">
-                <Tooltip color={"invert"} content="⌘ + Enter">
+                <Tooltip label="⌘ + Enter">
                   <Button className="tw-w-40 tw-h-8" onClick={() => setShouldRun(true)}>{queryLoading ? "Stop" : "Run"}</Button>
                 </Tooltip>
                 <div className='tw-flex tw-ml-auto'>
-                  <Tooltip color={"invert"} content={hasResults ? '' : "You must run the query to fetch results before exporting."}>
+                  <Tooltip label={hasResults ? '' : "You must run the query to fetch results before exporting."}>
                     <CSVLink
                       className={classNames(
                         'tw-flex tw-rounded-md tw-font-bold tw-py-1 tw-tracking-wide tw-justify-center tw-align-middle tw-ml-2 tw-px-4 tw-h-8 tw-bg-white tw-border tw-border-solid tw-border-gray-400 tw-text-primary-text hover:tw-bg-gray-200',
@@ -274,7 +274,7 @@ export const CustomQuery: React.FC = () => {
                       Export CSV
                     </CSVLink>
                   </Tooltip>
-                  <Tooltip color={"invert"} content="⌘ + S">
+                  <Tooltip label="⌘ + S">
                     <Button className="tw-flex tw-justify-center tw-align-middle tw-ml-3 tw-px-4 tw-h-8 tw-bg-white tw-border-gray-400 tw-text-primary-text hover:tw-bg-gray-200" onClick={() => setShouldSave(true)}>
                       {saving ? <Loading /> : <><SaveIcon className='tw-h-5 tw-inline tw-mr-1' />Save</>}
                     </Button>
@@ -319,7 +319,7 @@ const QueryNavigation: React.FC = () => {
 const QueryNavigationTab: React.FC<{ active?: boolean, children: React.ReactNode; tooltip?: string; }> = ({ active, children, tooltip }) => {
   return (
     <div className={"first:tw-ml-5 tw-cursor-pointer tw-inline-block tw-bg-white tw-w-32 tw-rounded-t-md tw-mt-1.5 tw-mb-0" + (active ? " tw-shadow-[0px_-2px_#4ade80]" : " tw-border-b tw-border-gray-200 tw-border-solid")}>
-      <Tooltip color={"invert"} content={tooltip ? tooltip : ''}>
+      <Tooltip label={tooltip ? tooltip : ''}>
         <div className="tw-leading-[32px] tw-ml-3 tw-font-semibold tw-select-none">
           {children}
         </div>

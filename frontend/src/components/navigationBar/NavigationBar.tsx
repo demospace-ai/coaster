@@ -1,9 +1,10 @@
 import { Menu, Transition } from "@headlessui/react";
 import { ChartBarIcon, ChevronDownIcon, CommandLineIcon, PlusCircleIcon, PresentationChartLineIcon } from '@heroicons/react/20/solid';
-import { ChartBarSquareIcon, HomeIcon } from '@heroicons/react/24/outline';
+import { ChartBarSquareIcon, HomeIcon, RectangleGroupIcon } from '@heroicons/react/24/outline';
 import classNames from "classnames";
 import { Fragment } from "react";
 import { NavLink } from "react-router-dom";
+import { Tooltip } from "src/components/tooltip/Tooltip";
 import { useSelector } from "src/root/model";
 import { Organization } from "src/rpc/api";
 import styles from './navigationBar.m.css';
@@ -17,27 +18,27 @@ export const NavigationBar: React.FC = () => {
     return <></>;
   };
 
-  // min-width: 220px;
-  // width: 220px;
-  // height: 100%;
-  // display: flex;
-  // flex-direction: column;
-  // box-sizing: border-box;
-  // border-right: 1px solid var(--border-color);
-  // background: #efefef;
+  const routeContainer = "tw-pl-4 tw-flex tw-flex-row tw-h-8 tw-box-border tw-cursor-pointer tw-items-center tw-text-primary-text tw-my-0 tw-mx-5 tw-rounded-md tw-mb-2 tw-select-none hover:tw-bg-gray-300";
+
   return (
     <>
       <div className="tw-min-w-[220px] tw-w-[220px] tw-h-full tw-flex tw-flex-col tw-box-border tw-border-r tw-border-solid tw-border-gray-200 tw-bg-gray-100">
         <OrganizationButton organization={organization} />
         <NewAnalysisButton />
-        <NavLink className={({ isActive }) => isActive ? styles.activeRouteContainer : styles.routeContainer} to={'/'}>
+        <NavLink className={({ isActive }) => classNames(routeContainer, isActive && "tw-bg-gray-300")} to={'/'}>
           <HomeIcon className="tw-h-4" strokeWidth="2" />
           <div className={styles.route}>Home</div>
         </NavLink>
-        <NavLink className={({ isActive }) => isActive ? styles.activeRouteContainer : styles.routeContainer} to={'/insights'}>
+        <NavLink className={({ isActive }) => classNames(routeContainer, isActive && "tw-bg-gray-300")} to={'/insights'}>
           <ChartBarSquareIcon className="tw-h-4" strokeWidth="2" />
           <div className={styles.route}>Insights</div>
         </NavLink>
+        <Tooltip label="Coming soon!">
+          <div className={routeContainer}>
+            <RectangleGroupIcon className="tw-h-4" strokeWidth="2" />
+            <div className={styles.route}>Dashboards</div>
+          </div>
+        </Tooltip>
         <div className={styles.helpContainer}>
           <div className={styles.route} >Help</div>
         </div>

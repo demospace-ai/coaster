@@ -36,43 +36,6 @@
     padding-top: 3px;
 }
 
-.activeRouteContainer {
-    background: #d6d6d6;
-    padding-left: 15px;
-    display: flex;
-    flex-direction: row;
-    height: 30px;
-    box-sizing: border-box;
-    cursor: pointer;
-    align-items: center;
-    color: var(--primary-text-color);
-    text-decoration: none;
-    margin: 0 20px;
-    border-radius: 5px;
-    margin-bottom: 5px;
-    user-select: none;
-}
-
-.routeContainer {
-    padding-left: 15px;
-    display: flex;
-    flex-direction: row;
-    height: 30px;
-    box-sizing: border-box;
-    cursor: pointer;
-    align-items: center;
-    color: var(--primary-text-color);
-    text-decoration: none;
-    margin: 0 20px;
-    border-radius: 5px;
-    margin-bottom: 5px;
-    user-select: none;
-}
-
-.routeContainer:hover {
-    background: #d6d6d6;
-}
-
 .route {
     padding-top: 1px;
     display: inline-block;
