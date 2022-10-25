@@ -18,7 +18,7 @@ export const NavigationBar: React.FC = () => {
     return <></>;
   };
 
-  const routeContainer = "tw-pl-4 tw-flex tw-flex-row tw-h-8 tw-box-border tw-cursor-pointer tw-items-center tw-text-primary-text tw-my-0 tw-mx-5 tw-rounded-md tw-mb-2 tw-select-none hover:tw-bg-gray-300";
+  const routeContainer = "tw-pl-4 tw-flex tw-flex-row tw-h-8 tw-box-border tw-cursor-pointer tw-items-center tw-text-primary-text tw-my-0 tw-mx-5 tw-rounded-md tw-mb-1 tw-select-none hover:tw-bg-gray-300";
 
   return (
     <>
