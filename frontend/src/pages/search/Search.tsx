@@ -57,7 +57,7 @@ export const SearchResults: React.FC = () => {
           {results.map((result, index) => (
             <li key={index} className={styles.result} >
               <div className={styles.postTitleContainer}>
-                <Link className={styles.postTitle} to={getAnalysisLink(result)}>Q: {result.title}</Link>
+                <Link className="tw-text-left tw-block hover:tw-text-gray-800" to={getAnalysisLink(result)}>Q: {result.title}</Link>
               </div>
             </li>
           ))}

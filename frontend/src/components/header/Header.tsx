@@ -5,7 +5,6 @@ import React, { Fragment } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useLogout } from 'src/pages/login/actions';
 import { useSelector } from 'src/root/model';
-import styles from './header.m.css';
 
 export const Header: React.FC = () => {
   const location = useLocation();
@@ -24,8 +23,8 @@ export const Header: React.FC = () => {
     case 'funnel':
       page = `Funnel Report`;
       break;
-    case 'insights':
-      page = 'Insights';
+    case 'reports':
+      page = 'Reports';
       break;
     case 'workspacesettings':
       page = 'Workspace Settings';
@@ -41,8 +40,8 @@ export const Header: React.FC = () => {
 
   return (
     <>
-      <div className={styles.headerContainer}>
-        <div className={styles.pageTitle}>{page}</div>
+      <div className="tw-grid tw-grid-cols-2 tw-box-border tw-min-h-[64px] tw-h-16 tw-px-8 tw-py-3 tw-items-center tw-border-b tw-border-solid tw-border-gray-200">
+        <div className="tw-text-sm tw-font-semibold tw-select-none">{page}</div>
         <ProfileDropdown />
       </div>
     </>
@@ -56,7 +55,7 @@ const ProfileDropdown: React.FC = () => {
   return (
     <div className='tw-flex tw-flex-col tw-justify-center tw-ml-auto'>
       <Menu as="div">
-        <Menu.Button className={styles.profileIcon}>
+        <Menu.Button className="tw-bg-orange-400 tw-text-white tw-rounded-full tw-w-7 tw-h-7 tw-cursor-pointer tw-select-none">
           {user!.first_name.charAt(0)}
         </Menu.Button>
 
@@ -75,7 +74,7 @@ const ProfileDropdown: React.FC = () => {
                 {({ active }) => (
                   <div
                     className={classNames(
-                      active ? 'tw-bg-gray-100 tw-text-gray-900' : 'tw-text-gray-700',
+                      active ? 'tw-bg-gray-200 tw-text-gray-900' : 'tw-text-gray-700',
                       'tw-flex tw-items-center tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none'
                     )}
                   >
@@ -88,7 +87,7 @@ const ProfileDropdown: React.FC = () => {
                 {({ active }) => (
                   <div
                     className={classNames(
-                      active ? 'tw-bg-gray-100 tw-text-gray-900' : 'tw-text-gray-700',
+                      active ? 'tw-bg-gray-200 tw-text-gray-900' : 'tw-text-gray-700',
                       'tw-flex tw-items-center tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none'
                     )}
                     onClick={logout}

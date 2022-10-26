@@ -6,14 +6,13 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'hover': "#E4E4E4",
-        'dark-hover': "#b6b6b6",
-        'dark-text': '#696969',
-        'primary-text': '#323232',
-        'primary-highlight': '#378159',
-        'navigation-highlight': "#d6d6d6",
-        'fabra': '#449e6e',
-        'green-border': '#508368',
+        'fabra-green-400': '#508368',
+        'fabra-green-500': '#449e6e',
+        'fabra-green-600': '#378159',
+        'dark-100': '#536680',
+        'dark-300': '#3a475a',
+        'dark-500': '#2f3a49',
+        'dark-900': '#0d1117',
       },
       boxShadow: {
         'centered': 'rgba(99, 99, 99, 0.2) 0 0 10px',

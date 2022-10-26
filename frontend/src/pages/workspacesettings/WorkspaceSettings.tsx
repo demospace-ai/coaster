@@ -267,8 +267,8 @@ const SetDefaultModal: React.FC<SetDefaultModalProps> = props => {
         </div>
         <div className='tw-mt-8 tw-flex'>
           <div className='tw-ml-auto'>
-            <Button className='tw-bg-white tw-text-primary-text hover:tw-bg-gray-200 tw-border-0 tw-mr-3' onClick={props.close}>Cancel</Button>
-            <Button className='tw-w-28 tw-bg-fabra hover:tw-bg-primary-highlight tw-border-0' onClick={() => setDefault(connectionID, eventSetID)}>{loading ? <Loading className='tw-inline' /> : "Continue"}</Button>
+            <Button className='tw-bg-white tw-text-gray-800 hover:tw-bg-gray-200 tw-border-0 tw-mr-3' onClick={props.close}>Cancel</Button>
+            <Button className='tw-w-28 tw-bg-fabra-green-500 hover:tw-bg-fabra-green-600 tw-border-0' onClick={() => setDefault(connectionID, eventSetID)}>{loading ? <Loading className='tw-inline' /> : "Continue"}</Button>
           </div>
         </div>
       </div>

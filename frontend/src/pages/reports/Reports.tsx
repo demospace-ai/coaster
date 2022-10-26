@@ -10,7 +10,7 @@ import { Modal } from 'src/components/modal/Modal';
 import { sendRequest } from 'src/rpc/ajax';
 import { Analysis, AnalysisType, DeleteAnalysis, GetAllAnalyses } from 'src/rpc/api';
 
-export const Insights: React.FC = () => {
+export const Reports: React.FC = () => {
   const navigate = useNavigate();
   const [analyses, setAnalyses] = useState<Analysis[]>([]);
   const [loading, setLoading] = useState(false);
@@ -57,7 +57,7 @@ export const Insights: React.FC = () => {
             {analyses.map((analysis, index) =>
               <li
                 key={index}
-                className='tw-w-full tw-border-b tw-border-solid tw-border-gray-200 tw-box-border tw-py-3 tw-px-8 tw-cursor-pointer tw-flex tw-select-none tw-text-sm hover:tw-bg-gray-100'
+                className='tw-w-full tw-border-b tw-border-solid tw-border-gray-200 tw-box-border tw-py-3 tw-px-8 tw-cursor-pointer tw-flex tw-select-none tw-text-sm hover:tw-bg-gray-200'
                 onClick={() => onClick(analysis)}
               >
                 {getAnalysisIcon(analysis.analysis_type)}
@@ -96,7 +96,7 @@ const MoreOptionsButton: React.FC<{ className?: string; triggerDelete: () => voi
             <Menu.Item>
               {({ active }) => (
                 <div onClick={(e: MouseEvent) => { e.stopPropagation(); props.triggerDelete(); }} className={classNames(
-                  active ? 'tw-bg-gray-100 tw-text-gray-900' : 'tw-text-gray-700',
+                  active ? 'tw-bg-gray-200 tw-text-gray-900' : 'tw-text-gray-700',
                   'tw-flex tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none tw-w-full tw-whitespace-nowrap'
                 )}>
                   Delete
@@ -136,11 +136,11 @@ const DeleteModal: React.FC<DeleteModalProps> = props => {
       <div className='tw-w-80 tw-m-6'>
         <div>
           Are you sure you want to delete "<span className="tw-font-bold">{`${getAnalysisDraftTitle(analysisType)} ${analysisID}`}</span>"?
-          <br /><br />Deleting insights is permanent.
+          <br /><br />Deleting reports is permanent.
         </div>
         <div className='tw-mt-8 tw-flex'>
           <div className='tw-ml-auto'>
-            <Button className='tw-bg-white tw-text-primary-text hover:tw-bg-gray-200 tw-border-0 tw-mr-3' onClick={props.close}>Cancel</Button>
+            <Button className='tw-bg-white tw-text-gray-800 hover:tw-bg-gray-200 tw-border-0 tw-mr-3' onClick={props.close}>Cancel</Button>
             <Button className='tw-w-24 tw-bg-red-600 hover:tw-bg-red-800 tw-border-0' onClick={() => deleteAnalysis(analysisID)}>{loading ? <Loading className='tw-inline' /> : "Delete"}</Button>
           </div>
         </div>

@@ -223,7 +223,7 @@ export const Funnel: React.FC = () => {
                 <Tooltip label={hasResults ? '' : "You must run the query to fetch results before exporting."}>
                   <CSVLink
                     className={classNames(
-                      'tw-flex tw-rounded-md tw-font-bold tw-py-1 tw-tracking-wide tw-justify-center tw-align-middle tw-ml-2 tw-px-4 tw-h-8 tw-bg-white tw-border tw-border-solid tw-border-gray-400 tw-text-primary-text hover:tw-bg-gray-200',
+                      'tw-flex tw-rounded-md tw-font-bold tw-py-1 tw-tracking-wide tw-justify-center tw-align-middle tw-ml-2 tw-px-4 tw-h-8 tw-bg-white tw-border tw-border-solid tw-border-gray-400 tw-text-gray-800 hover:tw-bg-gray-200',
                       hasResults ? null : 'tw-bg-gray-300 tw-text-gray-500 tw-border-0 tw-cursor-not-allowed hover:tw-bg-gray-300'
                     )}
                     data={toCsvData(schema, queryResults)}
@@ -234,10 +234,10 @@ export const Funnel: React.FC = () => {
                     Export CSV
                   </CSVLink>
                 </Tooltip>
-                <Button className="tw-flex tw-justify-center tw-align-middle tw-ml-3 tw-w-24 tw-h-8 tw-bg-white tw-border-gray-400 tw-text-primary-text hover:tw-bg-gray-200" onClick={updateAllProperties}>
+                <Button className="tw-flex tw-justify-center tw-align-middle tw-ml-3 tw-w-24 tw-h-8 tw-bg-white tw-border-gray-400 tw-text-gray-800 hover:tw-bg-gray-200" onClick={updateAllProperties}>
                   {saving ? <Loading /> : <><SaveIcon className='tw-h-5 tw-inline tw-mr-1' />Save</>}
                 </Button>
-                <Button className="tw-flex tw-justify-center tw-align-middle tw-ml-3 tw-w-9 tw-px-0 tw-h-8 tw-bg-white tw-border-gray-400 tw-text-primary-text hover:tw-bg-gray-200" onClick={copyLink}>
+                <Button className="tw-flex tw-justify-center tw-align-middle tw-ml-3 tw-w-9 tw-px-0 tw-h-8 tw-bg-white tw-border-gray-400 tw-text-gray-800 hover:tw-bg-gray-200" onClick={copyLink}>
                   {copied ? <CheckIcon className='tw-h-5 tw-inline tw-mx-auto tw-stroke-2' /> : <LinkIcon className='tw-h-5 tw-inline tw-mx-auto tw-stroke-2' />}
                 </Button>
                 <MoreOptionsButton className='tw-flex tw-justify-center tw-align-middle tw-ml-3' showModal={() => setShowModal(true)} />
@@ -397,7 +397,7 @@ const Step: React.FC<StepProp> = props => {
     <div className='tw-flex tw-mb-4'>
       <div className='tw-w-full tw-mt-[-1px] tw-border tw-border-solid tw-border-gray-300 tw-rounded-t-md tw-rounded-b-md'>
         <div className='tw-flex tw-items-center tw-p-2'>
-          <div className='tw-flex tw-mr-2 tw-items-center tw-justify-center tw-shrink-0 tw-rounded-full tw-bg-fabra tw-text-white  tw-h-6 tw-w-6 tw-my-auto'>
+          <div className='tw-flex tw-mr-2 tw-items-center tw-justify-center tw-shrink-0 tw-rounded-full tw-bg-fabra-green-500 tw-text-white tw-h-6 tw-w-6 tw-my-auto'>
             {index + 1}
           </div>
           <ControlledEventSelector className="tw-border-none tw-bg-gray-100 hover:tw-bg-green-100" event={step?.step_name} setEvent={setEvent} eventOptions={eventOptions} loading={loading} />
@@ -405,7 +405,7 @@ const Step: React.FC<StepProp> = props => {
             <FunnelIcon className='tw-h-6 tw-stroke-[1.7]' />
             {step.filters.length > 0 &&
               <div className='tw-relative'>
-                <span className="tw-absolute tw-bottom-[14px] tw-left-[14px] tw-flex tw-shrink-0 tw-items-center tw-rounded-full tw-border-2 tw-border-solid tw-border-white tw-bg-fabra tw-h-[18px] tw-w-[18px] tw-justify-center tw-text-[10px] tw-text-white tw-font-bold">
+                <span className="tw-absolute tw-bottom-[14px] tw-left-[14px] tw-flex tw-shrink-0 tw-items-center tw-rounded-full tw-border-2 tw-border-solid tw-border-white tw-bg-fabra-green-500 tw-h-[18px] tw-w-[18px] tw-justify-center tw-text-[10px] tw-text-white tw-font-bold">
                   {step.filters.length}
                 </span>
               </div>
@@ -433,7 +433,7 @@ const NewStep: React.FC<NewStepProps> = props => {
     <div className='tw-flex tw-mb-4'>
       <div className='tw-w-full tw-mt-[-1px] tw-border tw-border-solid tw-border-gray-300 tw-rounded-t-md tw-rounded-b-md'>
         <div className='tw-flex tw-items-center tw-p-2'>
-          <div className='tw-flex tw-mr-2 tw-items-center tw-justify-center tw-shrink-0 tw-rounded-full tw-bg-fabra tw-text-white  tw-h-6 tw-w-6 tw-my-auto'>
+          <div className='tw-flex tw-mr-2 tw-items-center tw-justify-center tw-shrink-0 tw-rounded-full tw-bg-fabra-green-500 tw-text-white tw-h-6 tw-w-6 tw-my-auto'>
             {props.index + 1}
           </div>
           <ControlledEventSelector className="tw-border-none tw-bg-gray-100 hover:tw-bg-green-100" event={undefined} setEvent={props.addEvent} eventOptions={props.eventOptions} loading={props.loading} />

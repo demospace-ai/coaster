@@ -16,10 +16,10 @@ export const Button: React.FC<ButtonProps> = props => {
 
   const buttonStyle = classNames(
     props.className,
-    'tw-text-white tw-bg-fabra hover:tw-bg-primary-highlight',
+    'tw-text-white tw-bg-fabra-green-500 hover:tw-bg-fabra-green-600',
     'tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition tw-select-none',
-    'tw-border tw-border-green-border tw-border-solid',
-    props.secondary && 'tw-bg-white tw-text-primary-text tw-font-normal',
+    'tw-border tw-border-fabra-green-400 tw-border-solid',
+    props.secondary && 'tw-bg-white tw-text-gray-800 tw-font-normal',
   );
   return (
     <button
@@ -40,9 +40,9 @@ type FormButtonProps = {
 
 export const FormButton: React.FC<FormButtonProps> = props => {
   const buttonStyle = classNames(
-    'tw-text-white tw-bg-fabra hover:tw-bg-primary-highlight',
+    'tw-text-white tw-bg-fabra-green-500 hover:tw-bg-fabra-green-600',
     'tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition tw-select-none',
-    'tw-border tw-border-green-border tw-border-solid',
+    'tw-border tw-border-fabra-green-400 tw-border-solid',
     props.className
   );
   return (
@@ -67,14 +67,14 @@ export const BackButton: React.FC<Partial<ButtonProps>> = props => {
   };
 
   return (
-    <div className={classNames('tw-cursor-pointer tw-select-none tw-text-sm tw-font-[500] hover:tw-text-primary-highlight', props.className)} onClick={onClick}>{String.fromCharCode(8592)} Back</div>
+    <div className={classNames('tw-cursor-pointer tw-select-none tw-text-sm tw-font-[500] hover:tw-text-fabra-green-600 tw-w-fit', props.className)} onClick={onClick}>{String.fromCharCode(8592)} Back</div>
   );
 };
 
 export const NavButton: React.FC<NavLinkProps> = props => {
   return (
     <NavLink
-      className={classNames(props.className, 'tw-bg-fabra tw-text-white tw-rounded-md tw-block tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-font-bold tw-text-center tw-transition-colors hover:tw-bg-primary-highlight tw-border tw-border-solid tw-border-[#508368]')}
+      className={classNames(props.className, 'tw-bg-fabra-green-500 tw-text-white tw-rounded-md tw-block tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-font-bold tw-text-center tw-transition-colors hover:tw-bg-fabra-green-600 tw-border tw-border-solid tw-border-[#508368]')}
       to={props.to}>
       {props.children}
     </NavLink>
@@ -84,7 +84,7 @@ export const NavButton: React.FC<NavLinkProps> = props => {
 export const MoreOptionsButton: React.FC<{ className?: string; showModal: () => void; }> = props => {
   return (
     <Menu as="div" className={classNames("tw-relative tw-inline", props.className)}>
-      <Menu.Button onClick={(e: MouseEvent) => e.stopPropagation()} className='tw-z-0 tw-w-8 tw-h-8 tw-rounded-md tw-bg-white tw-border tw-border-gray-400 tw-text-primary-text hover:tw-bg-gray-200'>
+      <Menu.Button onClick={(e: MouseEvent) => e.stopPropagation()} className='tw-z-0 tw-w-8 tw-h-8 tw-rounded-md tw-bg-white tw-border tw-border-gray-400 tw-text-gray-800 hover:tw-bg-gray-200'>
         <EllipsisHorizontalIcon className='tw-inline tw-h-5 tw-stroke-2' />
       </Menu.Button>
       <Transition
@@ -101,7 +101,7 @@ export const MoreOptionsButton: React.FC<{ className?: string; showModal: () => 
             <Menu.Item>
               {({ active }) => (
                 <div onClick={(e: MouseEvent) => { e.stopPropagation(); props.showModal(); }} className={classNames(
-                  active ? 'tw-bg-gray-100 tw-text-gray-900' : 'tw-text-gray-700',
+                  active ? 'tw-bg-gray-200 tw-text-gray-900' : 'tw-text-gray-700',
                   'tw-flex tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none tw-w-full tw-whitespace-nowrap'
                 )}>
                   Configure

@@ -203,6 +203,7 @@ export const CustomQuery: React.FC = () => {
       { token: "string.sql", foreground: "#8888ea" }
     ],
     colors: {
+      'editor.background': '#161b22',
       'editor.lineHighlightBackground': '#2c2c2c',
     }
   });
@@ -226,7 +227,7 @@ export const CustomQuery: React.FC = () => {
           <div id='left-panel' className="tw-w-80 tw-min-w-[20rem] tw-inline-block tw-select-none">
           </div>
           <div id='right-panel' className="tw-ml-10 tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1">
-            <div id="top-panel" className="tw-h-[40%]" style={{ height: topPanelHeight + "px" }} ref={topPanelRef}>
+            <div id="top-panel" className="tw-h-[40%] tw-border tw-border-solid tw-border-gray-200" style={{ height: topPanelHeight + "px" }} ref={topPanelRef}>
               <MonacoEditor
                 language="sql"
                 theme="fabra"
@@ -255,7 +256,7 @@ export const CustomQuery: React.FC = () => {
               </div>
             </div>
             <div id="bottom-panel" className='tw-h-[60%] tw-flex tw-flex-col tw-flex-1' style={{ height: "calc(100% - " + topPanelHeight + "px)" }}>
-              <div className="tw-border-solid tw-border-gray-300 tw-border-x tw-p-[10px] tw-flex">
+              <div className="tw-border-solid tw-border-gray-200 tw-border-x tw-p-[10px] tw-flex">
                 <Tooltip label="⌘ + Enter">
                   <Button className="tw-w-40 tw-h-8" onClick={() => setShouldRun(true)}>{queryLoading ? "Stop" : "Run"}</Button>
                 </Tooltip>
@@ -263,7 +264,7 @@ export const CustomQuery: React.FC = () => {
                   <Tooltip label={hasResults ? '' : "You must run the query to fetch results before exporting."}>
                     <CSVLink
                       className={classNames(
-                        'tw-flex tw-rounded-md tw-font-bold tw-py-1 tw-tracking-wide tw-justify-center tw-align-middle tw-ml-2 tw-px-4 tw-h-8 tw-bg-white tw-border tw-border-solid tw-border-gray-400 tw-text-primary-text hover:tw-bg-gray-200',
+                        'tw-flex tw-rounded-md tw-font-bold tw-py-1 tw-tracking-wide tw-justify-center tw-align-middle tw-ml-2 tw-px-4 tw-h-8 tw-bg-white tw-border tw-border-solid tw-border-gray-400 tw-text-gray-800 hover:tw-bg-gray-200',
                         hasResults ? null : 'tw-bg-gray-300 tw-text-gray-500 tw-border-0 tw-cursor-not-allowed hover:tw-bg-gray-300'
                       )}
                       data={toCsvData(schema, queryResults)}
@@ -275,19 +276,19 @@ export const CustomQuery: React.FC = () => {
                     </CSVLink>
                   </Tooltip>
                   <Tooltip label="⌘ + S">
-                    <Button className="tw-flex tw-justify-center tw-align-middle tw-ml-3 tw-px-4 tw-h-8 tw-bg-white tw-border-gray-400 tw-text-primary-text hover:tw-bg-gray-200" onClick={() => setShouldSave(true)}>
+                    <Button className="tw-flex tw-justify-center tw-align-middle tw-ml-3 tw-px-4 tw-h-8 tw-bg-white tw-border-gray-200 tw-text-gray-800 hover:tw-bg-gray-200" onClick={() => setShouldSave(true)}>
                       {saving ? <Loading /> : <><SaveIcon className='tw-h-5 tw-inline tw-mr-1' />Save</>}
                     </Button>
                   </Tooltip>
-                  <Button className="tw-flex tw-justify-center tw-items-center tw-ml-3 tw-w-[34px] tw-h-8 tw-px-0 tw-py-0 tw-bg-white tw-border-gray-400 tw-text-primary-text hover:tw-bg-gray-200" onClick={copyLink}>
+                  <Button className="tw-flex tw-justify-center tw-items-center tw-ml-3 tw-w-[34px] tw-h-8 tw-px-0 tw-py-0 tw-bg-white tw-border-gray-400 tw-text-gray-800 hover:tw-bg-gray-200" onClick={copyLink}>
                     {copied ? <CheckIcon className='tw-h-5 tw-inline tw-mx-auto tw-stroke-2' /> : <LinkIcon className='tw-h-5 tw-inline tw-mx-auto tw-stroke-2' />}
                   </Button>
                   <MoreOptionsButton className='tw-flex tw-justify-center tw-align-middle tw-ml-3' showModal={() => setShowModal(true)} />
                 </div>
               </div>
-              <div className="tw-mb-5 tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden tw-border-gray-300 tw-border-solid tw-border tw-bg-gray-100">
+              <div className="tw-mb-5 tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden tw-border-gray-200 tw-border-solid tw-border tw-bg-gray-100">
                 {errorMessage &&
-                  <div className="tw-p-5 tw-text-red-600 tw-font-bold tw-border-gray-300 tw-border-solid tw-border-b">
+                  <div className="tw-p-5 tw-text-red-600 tw-font-bold tw-border-gray-200 tw-border-solid tw-border-b">
                     Error: {errorMessage}
                   </div>
                 }

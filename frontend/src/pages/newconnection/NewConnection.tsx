@@ -21,7 +21,7 @@ export const NewConnection: React.FC<{ onComplete: () => void; }> = props => {
 
   return (
     <>
-      <BackButton className="tw-m-10" onClick={onBack} />
+      <BackButton className="tw-mt-10 tw-mx-10" onClick={onBack} />
       <div className="tw-flex tw-justify-center tw-h-full">
         <div className='tw-w-[400px] tw-pb-10 tw-px-8 tw-mx-auto tw-mt-24'>
           <div className="tw-w-full tw-text-center tw-mb-5 tw-font-bold tw-text-lg">New Data Source</div>
