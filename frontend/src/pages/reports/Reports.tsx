@@ -53,18 +53,20 @@ export const Reports: React.FC = () => {
       <div className='tw-w-full'>
         <DeleteModal analysisToDelete={analysisToDelete} deleteAnalysis={deleteAnalysis} close={() => setAnalysisToDelete(null)} />
         {loading ? <Loading className='tw-mx-auto tw-mt-32' /> : (
-          <ul className='tw-list-none tw-p-0 tw-m-0 tw-pb-24'>
+          <ul className='tw-relative tw-z-0 tw-list-none tw-p-0 tw-m-0 tw-pb-24'>
             {analyses.map((analysis, index) =>
               <li
                 key={index}
-                className='tw-w-full tw-border-b tw-border-solid tw-border-gray-200 tw-box-border tw-py-3 tw-px-8 tw-cursor-pointer tw-flex tw-select-none tw-text-sm hover:tw-bg-gray-200'
+                className='tw-relative tw-w-full tw-h-12 tw-border-b tw-border-solid tw-border-gray-200 tw-box-border tw-cursor-pointer tw-select-none tw-text-sm'
                 onClick={() => onClick(analysis)}
               >
-                {getAnalysisIcon(analysis.analysis_type)}
-                <div className='tw-inline tw-mt-[2px] tw-leading-6'>
-                  {analysis.title ? analysis.title : `${getAnalysisDraftTitle(analysis.analysis_type)} ${analysis.id}`}
+                <div className='tw-flex tw-w-full tw-h-full tw-py-3 tw-px-8 tw-items-center hover:tw-bg-gray-200'>
+                  {getAnalysisIcon(analysis.analysis_type)}
+                  <div className='tw-mt-[1px]'>
+                    {analysis.title ? analysis.title : `${getAnalysisDraftTitle(analysis.analysis_type)} ${analysis.id}`}
+                  </div>
                 </div>
-                <MoreOptionsButton className='tw-ml-auto tw-mr-3' triggerDelete={() => setAnalysisToDelete(analysis)} />
+                <MoreOptionsButton triggerDelete={() => setAnalysisToDelete(analysis)} />
               </li>
             )}
           </ul>
@@ -74,24 +76,18 @@ export const Reports: React.FC = () => {
   );
 };
 
-const MoreOptionsButton: React.FC<{ className?: string; triggerDelete: () => void; }> = props => {
+const MoreOptionsButton: React.FC<{ triggerDelete: () => void; }> = props => {
   return (
-    <Menu as="div" className={classNames("tw-relative tw-inline", props.className)}>
-      <Menu.Button onClick={(e: MouseEvent) => e.stopPropagation()} className='tw-z-0'>
-        <div className='tw-border tw-border-solid tw-bg-white tw-border-gray-200 tw-rounded-md tw-p-[2px] hover:tw-bg-gray-200' >
+    <Menu as="div" className='tw-absolute tw-right-8 tw-top-0 tw-bottom-0 tw-flex'>
+      <Menu.Button onClick={(e: MouseEvent) => e.stopPropagation()} className='tw-m-0'>
+        <div className='tw-border tw-border-solid tw-bg-white tw-border-gray-200 tw-rounded-md tw-p-[2px] hover:tw-bg-gray-300' >
           <EllipsisHorizontalIcon className='tw-inline tw-h-5' />
         </div>
       </Menu.Button>
       <Transition
         as={Fragment}
-        enter="tw-transition tw-ease-out tw-duration-100"
-        enterFrom="tw-transform tw-opacity-0 tw-scale-95"
-        enterTo="tw-transform tw-opacity-100 tw-scale-100"
-        leave="tw-transition tw-ease-in tw-duration-75"
-        leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
-        leaveTo="tw-transform tw-opacity-0 tw-scale-95"
       >
-        <Menu.Items className="tw-z-10 tw-absolute tw-origin-top-right tw-right-0 tw-top-8 tw-w-fit tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none" onClick={(e: MouseEvent) => e.stopPropagation()}>
+        <Menu.Items className="tw-absolute tw-z-10 tw-right-0 tw-top-11 tw-w-fit tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none" onClick={(e: MouseEvent) => e.stopPropagation()}>
           <div className="tw-py-1">
             <Menu.Item>
               {({ active }) => (
@@ -152,10 +148,10 @@ const DeleteModal: React.FC<DeleteModalProps> = props => {
 function getAnalysisIcon(analysisType: AnalysisType): ReactNode {
   switch (analysisType) {
     case AnalysisType.CustomQuery:
-      return <CommandLineIcon className="tw-inline-block tw-h-4 tw-mr-2 tw-mt-[6px]" />
+      return <CommandLineIcon className="tw-h-4 tw-mr-2" />
         ;
     case AnalysisType.Funnel:
-      return <ChartBarIcon className="tw-inline-block tw-h-4 tw-mr-2 tw-mt-1 tw-scale-x-[-1]" />;
+      return <ChartBarIcon className="tw-h-4 tw-mr-2" />;
     default:
       return <></>;
   }
