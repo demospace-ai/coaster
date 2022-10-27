@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
 import { useNavigate, useParams } from 'react-router-dom';
 import { Bar, BarChart, ResponsiveContainer, Tooltip as RechartTooltip, XAxis, YAxis } from 'recharts';
-import { Button, MoreOptionsButton } from 'src/components/button/Button';
+import { Button, DivButton, MoreOptionsButton } from 'src/components/button/Button';
 import { SaveIcon } from 'src/components/icons/Icons';
 import { Loading } from 'src/components/loading/Loading';
 import { ConfigureAnalysisModal } from 'src/components/modal/Modal';
@@ -401,7 +401,7 @@ const Step: React.FC<StepProp> = props => {
             {index + 1}
           </div>
           <ControlledEventSelector className="tw-border-none tw-bg-gray-100 hover:tw-bg-green-100" event={step?.step_name} setEvent={setEvent} eventOptions={eventOptions} loading={loading} />
-          <div className='tw-p-1 tw-ml-2 hover:tw-bg-gray-200 tw-cursor-pointer tw-rounded-md' onClick={() => setShowFilters(!showFilters)}>
+          <DivButton className='tw-p-1 tw-ml-2 hover:tw-bg-gray-200 tw-cursor-pointer tw-rounded-md' onClick={() => setShowFilters(!showFilters)}>
             <FunnelIcon className='tw-h-6 tw-stroke-[1.7]' />
             {step.filters.length > 0 &&
               <div className='tw-relative'>
@@ -410,10 +410,10 @@ const Step: React.FC<StepProp> = props => {
                 </span>
               </div>
             }
-          </div>
-          <div className='tw-p-1 tw-ml-[1px] hover:tw-bg-gray-200 tw-cursor-pointer tw-rounded-md' onClick={removeEvent} >
+          </DivButton>
+          <DivButton className='tw-p-1 tw-ml-[1px] hover:tw-bg-gray-200 tw-cursor-pointer tw-rounded-md' onClick={removeEvent} >
             <TrashIcon className='tw-h-6 tw-stroke-[1.7]' />
-          </div>
+          </DivButton>
         </div>
         <StepFilters show={showFilters} connectionID={connectionID} eventSetID={eventSetID} filters={step.filters} eventPropertyOptions={eventPropertyOptions} setStepFilters={setStepFilters} propertiesLoading={propertiesLoading} />
       </div>

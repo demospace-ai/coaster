@@ -4,7 +4,7 @@ import { ChartBarIcon, CommandLineIcon } from '@heroicons/react/24/outline';
 import classNames from 'classnames';
 import React, { Fragment, MouseEvent, ReactNode, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from 'src/components/button/Button';
+import { Button, DivButton } from 'src/components/button/Button';
 import { Loading } from 'src/components/loading/Loading';
 import { Modal } from 'src/components/modal/Modal';
 import { sendRequest } from 'src/rpc/ajax';
@@ -55,17 +55,13 @@ export const Reports: React.FC = () => {
         {loading ? <Loading className='tw-mx-auto tw-mt-32' /> : (
           <ul className='tw-relative tw-z-0 tw-list-none tw-p-0 tw-m-0 tw-pb-24'>
             {analyses.map((analysis, index) =>
-              <li
-                key={index}
-                className='tw-relative tw-w-full tw-h-12 tw-border-b tw-border-solid tw-border-gray-200 tw-box-border tw-cursor-pointer tw-select-none tw-text-sm'
-                onClick={() => onClick(analysis)}
-              >
-                <div className='tw-flex tw-w-full tw-h-full tw-py-3 tw-px-8 tw-items-center hover:tw-bg-gray-200'>
+              <li key={index} className='tw-relative tw-w-full tw-h-12 tw-border-b tw-border-solid tw-border-gray-200 tw-box-border tw-cursor-pointer tw-select-none tw-text-sm'>
+                <DivButton className='tw-flex tw-w-full tw-h-full tw-py-3 tw-px-8 tw-items-center hover:tw-bg-gray-200' onClick={() => onClick(analysis)}>
                   {getAnalysisIcon(analysis.analysis_type)}
                   <div className='tw-mt-[1px]'>
                     {analysis.title ? analysis.title : `${getAnalysisDraftTitle(analysis.analysis_type)} ${analysis.id}`}
                   </div>
-                </div>
+                </DivButton>
                 <MoreOptionsButton triggerDelete={() => setAnalysisToDelete(analysis)} />
               </li>
             )}

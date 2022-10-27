@@ -4,7 +4,7 @@ import ReactTooltip from 'react-tooltip';
 type Place = 'top' | 'right' | 'bottom' | 'left';
 
 type TooltipProps = {
-  children: any;
+  children: React.ReactElement;
   label?: string;
   place?: Place;
   delayHide?: number;

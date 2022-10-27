@@ -1,7 +1,7 @@
 import { Menu, Transition } from '@headlessui/react';
 import { EllipsisHorizontalIcon } from '@heroicons/react/24/outline';
 import classNames from 'classnames';
-import { Fragment, MouseEvent } from 'react';
+import React, { Fragment, MouseEvent } from 'react';
 import { NavLink, NavLinkProps, useNavigate } from 'react-router-dom';
 
 type ButtonProps = {
@@ -78,6 +78,12 @@ export const NavButton: React.FC<NavLinkProps> = props => {
       to={props.to}>
       {props.children}
     </NavLink>
+  );
+};
+
+export const DivButton: React.FC<ButtonProps> = props => {
+  return (
+    <div className={props.className} tabIndex={0} onClick={props.onClick} onKeyDown={(event: React.KeyboardEvent<HTMLDivElement>) => { if (event.key === "Enter") props.onClick(); }}>{props.children}</div>
   );
 };
 
