@@ -51,7 +51,7 @@ export const Header: React.FC = () => {
 const ProfileDropdown: React.FC = () => {
   const user = useSelector(state => state.login.user);
   const logout = useLogout();
-  const menuItem = 'tw-flex tw-items-center tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded';
+  const menuItem = 'tw-flex tw-items-center tw-py-2 tw-pl-3 tw-pr-5 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded';
 
   return (
     <div className='tw-flex tw-flex-col tw-justify-center tw-ml-auto'>
@@ -68,7 +68,7 @@ const ProfileDropdown: React.FC = () => {
           leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
           leaveTo="tw-transform tw-opacity-0 tw-scale-95"
         >
-          <Menu.Items className="tw-absolute tw-origin-top-right tw-z-10 tw-right-5 tw-mt-2 tw-w-40 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none">
+          <Menu.Items className="tw-absolute tw-origin-top-right tw-z-10 tw-right-5 tw-mt-2 tw-mr-2 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none">
             <div className="tw-m-1">
               <Menu.Item>
                 {({ active }) => (

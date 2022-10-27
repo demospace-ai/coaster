@@ -77,7 +77,7 @@ const ReportOptionsButton: React.FC<{ triggerDelete: () => void; }> = props => {
   return (
     <Menu as="div" className='tw-absolute tw-right-8 tw-top-0 tw-bottom-0 tw-flex'>
       <Menu.Button onClick={(e: MouseEvent) => e.stopPropagation()} className='tw-m-0'>
-        <div className='tw-border tw-border-solid tw-bg-white tw-border-gray-200 tw-rounded-md tw-p-[2px] hover:tw-bg-gray-300' >
+        <div className='tw-rounded-md tw-p-[2px] hover:tw-bg-gray-300' >
           <EllipsisHorizontalIcon className='tw-inline tw-h-5' />
         </div>
       </Menu.Button>

@@ -1,10 +1,10 @@
 import { Menu, Transition } from "@headlessui/react";
 import { ChartBarIcon, ChevronDownIcon, CommandLineIcon, PresentationChartLineIcon } from '@heroicons/react/20/solid';
-import { ChartBarSquareIcon, HomeIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { ChartBarSquareIcon, Cog6ToothIcon, HomeIcon, PlusIcon } from '@heroicons/react/24/outline';
 import classNames from "classnames";
 import { Fragment } from "react";
 import { NavLink } from "react-router-dom";
-import { DashboardIcon } from "src/components/icons/Icons";
+import { DashboardIcon, QuestionCircleIcon } from "src/components/icons/Icons";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { useSelector } from "src/root/model";
 import { Organization } from "src/rpc/api";
@@ -45,13 +45,18 @@ export const NavigationBar: React.FC = () => {
               <DashboardIcon className="tw-h-4" strokeWidth="2" />
               <div className={styles.route}>Dashboards</div>
             </div>
-            <div className="tw-absolute tw-right-1 hover:tw-bg-gray-400 tw-rounded-md tw-p-1">
+            <div className="tw-absolute tw-right-1 hover:tw-bg-gray-350 tw-rounded-md tw-p-1">
               <PlusIcon className="tw-h-4" strokeWidth="2" />
             </div>
           </div>
         </Tooltip>
-        <div className={styles.helpContainer}>
-          <div className={styles.route} >Help</div>
+        <div id="bottomSection" className="tw-mt-auto tw-mb-5">
+          <div className={routeContainer}>
+            <a className={navLink} href='mailto:nick@fabra.io?subject=Help with Fabra'>
+              <QuestionCircleIcon className="tw-h-[18px] tw-mt-[1px]" strokeWidth="2" />
+              <div className={styles.route}>Help</div>
+            </a>
+          </div>
         </div>
       </div>
     </>
@@ -63,7 +68,7 @@ type OrganizationButtonProps = {
 };
 
 const OrganizationButton: React.FC<OrganizationButtonProps> = props => {
-  const menuItem = 'tw-flex tw-items-center tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded';
+  const menuItem = 'tw-flex tw-items-center tw-px-2 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded';
   return (
     <Menu as="div" className="tw-mb-3">
       <Menu.Button className="tw-w-full tw-z-10">
@@ -99,6 +104,7 @@ const OrganizationButton: React.FC<OrganizationButtonProps> = props => {
                     menuItem
                   )}
                 >
+                  <Cog6ToothIcon className="tw-h-4 tw-mr-2" strokeWidth="2" />
                   Workspace Settings
                 </NavLink>
               )}
@@ -115,7 +121,7 @@ const NewAnalysisButton: React.FC = () => {
   return (
     /* Z-index of this menu must be more than other items, but less than the Workspace Settings menu */
     <Menu as="div" className="tw-absolute tw-right-1 tw-z-10">
-      <Menu.Button className="hover:tw-bg-gray-400 tw-rounded-md tw-p-1">
+      <Menu.Button className="hover:tw-bg-gray-350 tw-rounded-md tw-p-1">
         <PlusIcon className='tw-h-4' strokeWidth="2" />
       </Menu.Button>
       <Transition

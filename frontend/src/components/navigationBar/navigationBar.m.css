@@ -18,9 +18,3 @@
     height: 30px;
     width: 30px;
 }
-
-.helpContainer {
-    margin: auto 20px 20px;
-    cursor: pointer;
-    user-select: none;
-}
