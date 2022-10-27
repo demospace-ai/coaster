@@ -19,7 +19,7 @@ export const NavigationBar: React.FC = () => {
     return <></>;
   };
 
-  const routeContainer = "tw-relative tw-flex tw-flex-row tw-h-8 tw-box-border tw-cursor-pointer tw-items-center tw-text-gray-800 tw-my-0 tw-mx-2 tw-rounded-md tw-mb-1 tw-select-none";
+  const routeContainer = "tw-relative tw-flex tw-flex-row tw-h-8 tw-box-border tw-cursor-pointer tw-items-center tw-text-gray-800 tw-mt-0 tw-mb-[3px] tw-mx-2 tw-rounded-md tw-select-none";
   const navLink = "tw-w-full tw-h-full tw-pl-3 tw-rounded-md tw-flex tw-flex-row tw-items-center hover:tw-bg-gray-300";
 
   return (
@@ -45,7 +45,7 @@ export const NavigationBar: React.FC = () => {
               <DashboardIcon className="tw-h-4" strokeWidth="2" />
               <div className={styles.route}>Dashboards</div>
             </div>
-            <div className="tw-absolute tw-right-1 hover:tw-bg-gray-400 tw-rounded-lg tw-p-1">
+            <div className="tw-absolute tw-right-1 hover:tw-bg-gray-400 tw-rounded-md tw-p-1">
               <PlusIcon className="tw-h-4" strokeWidth="2" />
             </div>
           </div>
@@ -115,7 +115,7 @@ const NewAnalysisButton: React.FC = () => {
   return (
     /* Z-index of this menu must be more than other items, but less than the Workspace Settings menu */
     <Menu as="div" className="tw-absolute tw-right-1 tw-z-10">
-      <Menu.Button className="hover:tw-bg-gray-400 tw-rounded-lg tw-p-1">
+      <Menu.Button className="hover:tw-bg-gray-400 tw-rounded-md tw-p-1">
         <PlusIcon className='tw-h-4' strokeWidth="2" />
       </Menu.Button>
       <Transition
