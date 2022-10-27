@@ -7,9 +7,9 @@ import { NavigationBar } from 'src/components/navigationBar/NavigationBar';
 import { CustomQuery } from 'src/pages/customquery/CustomQuery';
 import { Funnel } from 'src/pages/funnel/Funnel';
 import { Inbox } from 'src/pages/inbox/Inbox';
+import { Insights } from 'src/pages/insights/Insights';
 import { Login } from 'src/pages/login/Login';
 import { NotFound } from 'src/pages/notfound/NotFound';
-import { Reports } from 'src/pages/reports/Reports';
 import { WorkspaceSettings } from 'src/pages/workspacesettings/WorkspaceSettings';
 import { useSelector } from 'src/root/model';
 import styles from './app.m.css';
@@ -43,7 +43,7 @@ export const App: React.FC = () => {
           <Route path='/workspacesettings' element={<RequireAuth element={<WorkspaceSettings />} />} />
           <Route path='/customquery/:id' element={<RequireAuth element={<CustomQuery />} />} />
           <Route path='/funnel/:id' element={<RequireAuth element={<Funnel />} />} />
-          <Route path='/reports' element={<RequireAuth element={<Reports />} />} />
+          <Route path='/insights' element={<RequireAuth element={<Insights />} />} />
           <Route path='*' element={<NotFound />} />
         </Route>
       </Routes>

@@ -33,9 +33,9 @@ export const NavigationBar: React.FC = () => {
           </NavLink>
         </div>
         <div className={routeContainer}>
-          <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-gray-300")} to={'/reports'}>
+          <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-gray-300")} to={'/insights'}>
             <ChartBarSquareIcon className="tw-h-4" strokeWidth="2" />
-            <div className={styles.route}>Reports</div>
+            <div className={styles.route}>Insights</div>
           </NavLink>
           <NewAnalysisButton />
         </div>

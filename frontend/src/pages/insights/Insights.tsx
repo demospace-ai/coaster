@@ -10,7 +10,7 @@ import { Modal } from 'src/components/modal/Modal';
 import { sendRequest } from 'src/rpc/ajax';
 import { Analysis, AnalysisType, DeleteAnalysis, GetAllAnalyses } from 'src/rpc/api';
 
-export const Reports: React.FC = () => {
+export const Insights: React.FC = () => {
   const navigate = useNavigate();
   const [analyses, setAnalyses] = useState<Analysis[]>([]);
   const [loading, setLoading] = useState(false);
@@ -40,7 +40,6 @@ export const Reports: React.FC = () => {
         break;
     }
   };
-
 
   const deleteAnalysis = useCallback(async (analysisID: number) => {
     await sendRequest(DeleteAnalysis, { analysisID: analysisID });
@@ -132,10 +131,10 @@ const DeleteModal: React.FC<DeleteModalProps> = props => {
 
   return (
     <Modal show={props.analysisToDelete !== null} close={props.close} title="Delete Insight" titleStyle='tw-font-bold tw-text-xl'>
-      <div className='tw-w-80 tw-m-6'>
+      <div className='tw-w-96 tw-m-6'>
         <div>
           Are you sure you want to delete "<span className="tw-font-bold">{`${getAnalysisDraftTitle(analysisType)} ${analysisID}`}</span>"?
-          <br /><br />Deleting reports is permanent.
+          <br /><br />Deleting an insight is permanent.
         </div>
         <div className='tw-mt-8 tw-flex'>
           <div className='tw-ml-auto'>
