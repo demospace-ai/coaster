@@ -51,7 +51,7 @@ func (s ApiService) GetSchema(auth auth.Authentication, w http.ResponseWriter, r
 		return err
 	}
 
-	var schema *views.Schema
+	var schema views.Schema
 	if len(customJoin) > 0 {
 		schema, err = s.getSchemaForCustomJoin(*dataConnection, customJoin)
 		if err != nil {
@@ -65,11 +65,11 @@ func (s ApiService) GetSchema(auth auth.Authentication, w http.ResponseWriter, r
 	}
 
 	return json.NewEncoder(w).Encode(GetSchemaResponse{
-		Schema: *schema,
+		Schema: schema,
 	})
 }
 
-func (s ApiService) getSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (*views.Schema, error) {
+func (s ApiService) getSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (views.Schema, error) {
 	switch dataConnection.ConnectionType {
 	case models.DataConnectionTypeBigQuery:
 		return s.getBigQuerySchemaForTable(dataConnection, datasetID, tableName)
@@ -80,7 +80,7 @@ func (s ApiService) getSchemaForTable(dataConnection models.DataConnection, data
 	}
 }
 
-func (s ApiService) getSchemaForCustomJoin(dataConnection models.DataConnection, customJoin string) (*views.Schema, error) {
+func (s ApiService) getSchemaForCustomJoin(dataConnection models.DataConnection, customJoin string) (views.Schema, error) {
 	switch dataConnection.ConnectionType {
 	case models.DataConnectionTypeBigQuery:
 		return s.getBigQuerySchemaForCustom(dataConnection, customJoin)
@@ -91,7 +91,7 @@ func (s ApiService) getSchemaForCustomJoin(dataConnection models.DataConnection,
 	}
 }
 
-func (s ApiService) getBigQuerySchemaForCustom(dataConnection models.DataConnection, customJoin string) (*views.Schema, error) {
+func (s ApiService) getBigQuerySchemaForCustom(dataConnection models.DataConnection, customJoin string) (views.Schema, error) {
 	bigQueryCredentialsString, err := s.cryptoService.DecryptDataConnectionCredentials(dataConnection.Credentials.String)
 	if err != nil {
 		return nil, err
@@ -141,47 +141,19 @@ func (s ApiService) getBigQuerySchemaForCustom(dataConnection models.DataConnect
 
 	schema := query.ConvertBigQuerySchema(it.Schema)
 
-	return &schema, nil
+	return schema, nil
 }
 
-func (s ApiService) getBigQuerySchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (*views.Schema, error) {
-	bigQueryCredentialsString, err := s.cryptoService.DecryptDataConnectionCredentials(dataConnection.Credentials.String)
-	if err != nil {
-		return nil, err
-	}
-
-	var bigQueryCredentials models.BigQueryCredentials
-	err = json.Unmarshal([]byte(*bigQueryCredentialsString), &bigQueryCredentials)
-	if err != nil {
-		return nil, err
-	}
-
-	credentialOption := option.WithCredentialsJSON([]byte(*bigQueryCredentialsString))
-
-	ctx := context.Background()
-	client, err := bigquery.NewClient(ctx, bigQueryCredentials.ProjectID, credentialOption)
-	if err != nil {
-		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
-	}
-
-	defer client.Close()
-
-	metadata, err := client.Dataset(datasetID).Table(tableName).Metadata(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	schema := query.ConvertBigQuerySchema(metadata.Schema)
-
-	return &schema, nil
+func (s ApiService) getBigQuerySchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (views.Schema, error) {
+	return s.queryService.GetTableSchema(&dataConnection, datasetID, tableName)
 }
 
-func (s ApiService) getSnowflakeSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (*views.Schema, error) {
+func (s ApiService) getSnowflakeSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (views.Schema, error) {
 	// TODO: implement
 	return nil, errors.NewBadRequest("snowflake not supported")
 }
 
-func (s ApiService) getSnowflakeSchemaForCustom(dataConnection models.DataConnection, customJoin string) (*views.Schema, error) {
+func (s ApiService) getSnowflakeSchemaForCustom(dataConnection models.DataConnection, customJoin string) (views.Schema, error) {
 	// TODO: implement
 	return nil, errors.NewBadRequest("snowflake not supported")
 }

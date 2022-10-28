@@ -1,17 +1,21 @@
+import { Transition } from "@headlessui/react";
+import classNames from "classnames";
 import { editor as EditorLib } from "monaco-editor/esm/vs/editor/editor.api";
 import { useCallback, useEffect, useRef, useState } from "react";
 import MonacoEditor, { monaco } from "react-monaco-editor";
 import { useNavigate, useParams } from 'react-router-dom';
 import { rudderanalytics } from 'src/app/rudder';
 import { Button } from "src/components/button/Button";
+import { CollapseIcon, ExpandIcon } from "src/components/icons/Icons";
 import { ReportHeader } from "src/components/insight/InsightComponents";
 import { Loading } from 'src/components/loading/Loading';
 import { ConfigureAnalysisModal } from 'src/components/modal/Modal';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
+import { ConnectionSelector, DatasetSelector, TableSelector } from "src/components/selector/Selector";
 import { Tooltip } from 'src/components/tooltip/Tooltip';
 import { useSelector } from 'src/root/model';
 import { sendRequest } from "src/rpc/ajax";
-import { AnalysisType, CreateAnalysis, CreateAnalysisRequest, DataConnection, GetAnalysis, QueryResults, RunCustomQuery, RunCustomQueryRequest, Schema, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
+import { AnalysisType, CreateAnalysis, CreateAnalysisRequest, DataConnection, GetAnalysis, GetSchema, GetSchemaRequest, QueryResults, RunCustomQuery, RunCustomQueryRequest, Schema, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
 import { useDebounce } from 'src/utils/debounce';
 import { createResizeFunction } from 'src/utils/resize';
 
@@ -45,6 +49,9 @@ export const CustomQuery: React.FC = () => {
   const defaultConnectionID = useSelector(state => state.login.organization?.default_data_connection_id);
   const [connection, setConnection] = useState<DataConnection | undefined>(undefined);
   const connectionID = connection?.id;
+  const [datasetName, setDatasetName] = useState<string | undefined>(undefined);
+  const [tableName, setTableName] = useState<string | undefined>(undefined);
+  const [showSchemaExplorer, setShowSchemaExplorer] = useState<boolean>(true);
 
   const [query, setQuery] = useState<string>("");
   const [schema, setSchema] = useState<Schema | undefined>(undefined);
@@ -53,6 +60,17 @@ export const CustomQuery: React.FC = () => {
   const [shouldRun, setShouldRun] = useState<boolean>(false);
   const [shouldSave, setShouldSave] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
+
+  const setConnectionAndClear = (dataConnection: DataConnection) => {
+    setConnection(dataConnection);
+    setDatasetName(undefined);
+    setTableName(undefined);
+  };
+
+  const setDatasetAndClear = (datasetName: string) => {
+    setDatasetName(datasetName);
+    setTableName(undefined);
+  };
 
   // TODO: what should we do if no default connection ID is configured?
   const createNewCustomQuery = useCallback(async () => {
@@ -216,14 +234,46 @@ export const CustomQuery: React.FC = () => {
 
   return (
     <>
-      <ConfigureAnalysisModal analysisID={Number(id)} analysisType={AnalysisType.CustomQuery} connection={connection} eventSet={undefined} show={showModal} close={() => setShowModal(false)} />
+      <ConfigureAnalysisModal analysisID={Number(id)} analysisType={AnalysisType.CustomQuery} connection={connection} setConnection={setConnectionAndClear} eventSet={undefined} setEventSet={() => undefined} show={showModal} close={() => setShowModal(false)} />
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0" >
         <ReportHeader copied={copied} saving={saving} copyLink={copyLink} save={() => setShouldSave(true)} showModal={() => setShowModal(true)} />
         <div className='tw-flex tw-flex-1 tw-min-w-0 tw-min-h-0 tw-mt-8'>
-          <div id='left-panel' className="tw-w-80 tw-min-w-[20rem] tw-inline-block tw-select-none">
-          </div>
-          <div id='right-panel' className="tw-ml-10 tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1">
-            <div id="top-panel" className="tw-h-[40%] tw-border tw-border-solid tw-border-gray-200 tw-p-2 tw-bg-dark tw-rounded-t-md" style={{ height: topPanelHeight + "px" }} ref={topPanelRef}>
+          <Transition
+            show={showSchemaExplorer}
+            enter="tw-transition tw-ease-out tw-duration-150"
+            enterFrom="tw-transform tw-opacity-0 tw-scale-95"
+            enterTo="tw-transform tw-opacity-100 tw-scale-100"
+            leave="tw-transition tw-ease-in tw-duration-150"
+            leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
+            leaveTo="tw-transform tw-opacity-0 tw-scale-95"
+          >
+            <div id='left-panel' className="tw-w-96 tw-min-w-[20rem] tw-flex tw-flex-col tw-select-none">
+              <div className="tw-font-semibold tw-text-lg -tw-mt-1 tw-mb-2 tw-flex tw-flex-row tw-justify-center tw-items-center">
+                Schema Explorer
+                <CollapseIcon className="tw-h-5 tw-ml-auto tw-cursor-pointer" onClick={() => setShowSchemaExplorer(false)} />
+              </div>
+              <div className='tw-text-xs tw-uppercase tw-select-none tw-mb-2'>Data Source</div>
+              <ConnectionSelector connection={connection} setConnection={setConnectionAndClear} />
+              <div className='tw-text-xs tw-uppercase tw-select-none tw-mt-4 tw-mb-2'>Dataset</div>
+              <DatasetSelector connection={connection} datasetName={datasetName} setDatasetName={setDatasetAndClear} />
+              <div className='tw-text-xs tw-uppercase tw-select-none tw-mt-4 tw-mb-2'>Table</div>
+              <TableSelector connection={connection} datasetName={datasetName} tableName={tableName} setTableName={setTableName} />
+              {connection && datasetName && tableName &&
+                <>
+                  <div className="tw-mt-5 tw-pt-3 tw-border-t tw-border-solid tw-border-gray-200" />
+                  <div className='tw-text-sm tw-font-semibold tw-select-none tw-mb-2'>{tableName}</div>
+                  <SchemaPreview connectionID={connection.id} datasetName={datasetName} tableName={tableName} />
+                </>
+              }
+            </div>
+          </Transition>
+          {!showSchemaExplorer &&
+            <div className="tw-flex tw-flex-col tw-justify-center tw-items-center hover:tw-bg-gray-200 tw-mr-2 tw-px-2 tw-mb-5 tw-cursor-pointer tw-rounded" onClick={() => setShowSchemaExplorer(true)}>
+              <ExpandIcon className="tw-h-5" />
+            </div>
+          }
+          <div id='right-panel' className={classNames("tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1", showSchemaExplorer && 'tw-ml-10')}>
+            <div id="top-panel" className="tw-h-[40%] tw-border tw-border-solid tw-border-gray-200 tw-p-2 tw-bg-dark tw-rounded-t-[4px]" style={{ height: topPanelHeight + "px" }} ref={topPanelRef}>
               <MonacoEditor
                 language="sql"
                 theme="fabra"
@@ -257,7 +307,7 @@ export const CustomQuery: React.FC = () => {
                   <Button className="tw-w-40 tw-h-8 tw-ml-auto" onClick={() => setShouldRun(true)}>{queryLoading ? "Stop" : "Run"}</Button>
                 </Tooltip>
               </div>
-              <div className="tw-mb-5 tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden tw-border-gray-200 tw-border-solid tw-border tw-bg-gray-100 tw-rounded-b-md">
+              <div className="tw-mb-5 tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden tw-border-gray-200 tw-border-solid tw-border tw-bg-gray-100 tw-rounded-b-[4px]">
                 {errorMessage &&
                   <div className="tw-p-5 tw-text-red-600 tw-font-bold tw-border-gray-200 tw-border-solid tw-border-b">
                     Error: {errorMessage}
@@ -270,5 +320,58 @@ export const CustomQuery: React.FC = () => {
         </div>
       </div>
     </>
+  );
+};
+
+type SchemaPreviewProps = {
+  connectionID: number;
+  datasetName: string;
+  tableName: string;
+};
+
+const SchemaPreview: React.FC<SchemaPreviewProps> = props => {
+  const { connectionID, datasetName, tableName } = props;
+  const [schema, setSchema] = useState<Schema | undefined>(undefined);
+  const [schemaLoading, setSchemaLoading] = useState<boolean>(false);
+  useEffect(() => {
+    setSchemaLoading(true);
+    let payload: GetSchemaRequest = {
+      connectionID: connectionID,
+      datasetID: datasetName,
+      tableName: tableName,
+    };
+
+    let ignore = false;
+    sendRequest(GetSchema, payload).then((results) => {
+      if (!ignore) {
+        setSchema(results.schema);
+        setSchemaLoading(false);
+      }
+    });
+
+    return () => {
+      ignore = true;
+    };
+  }, [connectionID, datasetName, tableName]);
+
+  return (
+    <div className="tw-overflow-scroll tw-flex-shrink tw-mb-10 tw-ml-1">
+      {schemaLoading ?
+        <Loading className="tw-mt-5" />
+        :
+        <ul>
+          {schema?.map(columnSchema => (
+            <li className="tw-whitespace-nowrap tw-flex tw-flex-row tw-my-0.5">
+              <div className="tw-uppercase tw-pr-16">
+                {columnSchema.name}
+              </div>
+              <div className="tw-uppercase tw-ml-auto tw-text-gray-500">
+                {columnSchema.type}
+              </div>
+            </li>
+          ))}
+        </ul>
+      }
+    </div>
   );
 };

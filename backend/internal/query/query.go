@@ -21,6 +21,7 @@ type QueryService interface {
 	GetPropertyValues(dataConnection *models.DataConnection, eventSet *models.EventSet, propertyName string) ([]views.Value, error)
 	RunFunnelQuery(analysis *models.Analysis) (views.Schema, []views.Row, error)
 	RunCustomQuery(analysis *models.Analysis) (views.Schema, []views.Row, error)
+	GetTableSchema(dataConnection *models.DataConnection, datasetName string, tableName string) (views.Schema, error)
 }
 
 type QueryServiceImpl struct {

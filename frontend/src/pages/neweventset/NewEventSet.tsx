@@ -22,7 +22,7 @@ enum TableType {
 type NewEventSetState = {
   eventSetName: string | undefined;
   connection: DataConnection | undefined;
-  datasetId: string | undefined;
+  datasetName: string | undefined;
   tableName: string | undefined;
   eventTypeColumn: ColumnSchema | undefined;
   timeColumn: ColumnSchema | undefined;
@@ -35,7 +35,7 @@ type NewEventSetState = {
 const INITIAL_DATASET_STATE: NewEventSetState = {
   eventSetName: undefined,
   connection: undefined,
-  datasetId: undefined,
+  datasetName: undefined,
   tableName: undefined,
   eventTypeColumn: undefined,
   timeColumn: undefined,
@@ -48,7 +48,7 @@ const INITIAL_DATASET_STATE: NewEventSetState = {
 const validateAll = (state: NewEventSetState): boolean => {
   return state.eventSetName !== undefined && state.eventSetName.length > 0
     && state.connection !== undefined
-    && ((state.datasetId !== undefined && state.datasetId.length > 0 && state.tableName !== undefined && state.tableName.length > 0) || (state.customJoin !== undefined && state.customJoin.length > 0))
+    && ((state.datasetName !== undefined && state.datasetName.length > 0 && state.tableName !== undefined && state.tableName.length > 0) || (state.customJoin !== undefined && state.customJoin.length > 0))
     && state.eventTypeColumn !== undefined
     && state.timeColumn !== undefined
     && state.userIdentifierColumn !== undefined;
@@ -130,7 +130,7 @@ export const NewEventSetStepTwo: React.FC<NewEventSetFormProps> = props => {
   const setState = props.setState;
   const onClick = () => {
     if (state.connection != null) {
-      if (state.tableType === TableType.SingleTable && state.datasetId != null && state.datasetId.length > 0 && state.tableName != null && state.tableName.length > 0) {
+      if (state.tableType === TableType.SingleTable && state.datasetName != null && state.datasetName.length > 0 && state.tableName != null && state.tableName.length > 0) {
         setState({ ...state, step: Step.Three });
       }
 
@@ -164,7 +164,7 @@ export const NewEventSetStepTwo: React.FC<NewEventSetFormProps> = props => {
         connection={state.connection}
         setConnection={(value: DataConnection) => {
           if (!state.connection || value.id !== state.connection.id) {
-            setState({ ...state, connection: value, datasetId: undefined, tableName: undefined, eventTypeColumn: undefined, timeColumn: undefined });
+            setState({ ...state, connection: value, datasetName: undefined, tableName: undefined, eventTypeColumn: undefined, timeColumn: undefined });
           }
         }} />
       {
@@ -173,19 +173,19 @@ export const NewEventSetStepTwo: React.FC<NewEventSetFormProps> = props => {
             <DatasetSelector
               className='tw-my-1'
               validated={true}
-              connectionID={state.connection?.id}
-              datasetID={state.datasetId}
-              setDatasetID={(value: string) => {
-                if (value !== state.datasetId) {
-                  setState({ ...state, datasetId: value, tableName: undefined, eventTypeColumn: undefined, timeColumn: undefined });
+              connection={state.connection}
+              datasetName={state.datasetName}
+              setDatasetName={(value: string) => {
+                if (value !== state.datasetName) {
+                  setState({ ...state, datasetName: value, tableName: undefined, eventTypeColumn: undefined, timeColumn: undefined });
                 }
               }}
               noOptionsString="No Datasets Available! (Choose a data source)"
             />
             <TableSelector
               className="tw-mt-1"
-              connectionID={state.connection?.id}
-              datasetID={state.datasetId}
+              connection={state.connection}
+              datasetName={state.datasetName}
               tableName={state.tableName}
               setTableName={(value: string) => {
                 if (value !== state.tableName) {
@@ -229,8 +229,8 @@ export const NewEventSetStepThree: React.FC<NewEventSetFormProps & { onComplete:
       connectionID: state.connection.id,
     };
 
-    if (state.tableType === TableType.SingleTable && state.datasetId && state.tableName) {
-      payload.datasetID = state.datasetId;
+    if (state.tableType === TableType.SingleTable && state.datasetName && state.tableName) {
+      payload.datasetID = state.datasetName;
       payload.tableName = state.tableName;
     } else if (state.tableType === TableType.CustomJoin && state.customJoin) {
       payload.customJoin = state.customJoin;
@@ -249,7 +249,7 @@ export const NewEventSetStepThree: React.FC<NewEventSetFormProps & { onComplete:
     return () => {
       ignore = true;
     };
-  }, [state.connection, state.datasetId, state.tableName, state.customJoin, state.tableType]);
+  }, [state.connection, state.datasetName, state.tableName, state.customJoin, state.tableType]);
 
   const createNewEventDataset = async () => {
     setLoading(true);
@@ -262,7 +262,7 @@ export const NewEventSetStepThree: React.FC<NewEventSetFormProps & { onComplete:
     const payload: CreateEventSetRequest = {
       'display_name': state.eventSetName!,
       'connection_id': state.connection!.id,
-      'dataset_name': state.datasetId!,
+      'dataset_name': state.datasetName!,
       'table_name': state.tableName!,
       'event_type_column': state.eventTypeColumn!.name,
       'timestamp_column': state.timeColumn!.name,

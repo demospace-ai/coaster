@@ -56,15 +56,16 @@ type ConfigureAnalysisModalProps = {
   analysisID: number;
   analysisType: AnalysisType;
   connection: DataConnection | undefined;
+  setConnection: (dataConnection: DataConnection) => void;
   eventSet: EventSet | undefined;
+  setEventSet: (eventSet: EventSet) => void;
   show: boolean;
   close: () => void;
 };
 
 export const ConfigureAnalysisModal: React.FC<ConfigureAnalysisModalProps> = props => {
+  const { connection, setConnection, eventSet, setEventSet } = props;
   const [loading, setLoading] = useState<boolean>(false);
-  const [connection, setConnection] = useState<DataConnection | undefined>(props.connection);
-  const [eventSet, setEventSet] = useState<EventSet | undefined>(props.eventSet);
 
   const updateAnalysis = async (analysisID: number | null) => {
     if (analysisID === null) {

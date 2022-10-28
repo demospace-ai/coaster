@@ -91,3 +91,7 @@ func (qs MockQueryService) GetProperties(dataConnection *models.DataConnection, 
 func (qs MockQueryService) GetPropertyValues(dataConnection *models.DataConnection, eventSet *models.EventSet, propertyName string) ([]views.Value, error) {
 	return nil, nil
 }
+
+func (qs MockQueryService) GetTableSchema(dataConnection *models.DataConnection, datasetName string, tableName string) (views.Schema, error) {
+	return nil, nil
+}

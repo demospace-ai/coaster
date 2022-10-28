@@ -199,7 +199,7 @@ export const Funnel: React.FC = () => {
 
   return (
     <>
-      <ConfigureAnalysisModal analysisID={Number(id)} analysisType={AnalysisType.Funnel} connection={connection} eventSet={eventSet} show={showModal} close={() => setShowModal(false)} />
+      <ConfigureAnalysisModal analysisID={Number(id)} analysisType={AnalysisType.Funnel} connection={connection} setConnection={setConnection} eventSet={eventSet} setEventSet={setEventSet} show={showModal} close={() => setShowModal(false)} />
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-scroll">
         <ReportHeader copied={copied} saving={saving} copyLink={copyLink} save={updateAllProperties} showModal={() => setShowModal(true)} />
         <div className='tw-flex tw-flex-1 tw-pb-24 tw-mt-8'>
