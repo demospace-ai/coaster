@@ -1,13 +1,12 @@
 import { Menu, Transition } from "@headlessui/react";
 import { ChartBarIcon, ChevronDownIcon, CommandLineIcon, PresentationChartLineIcon } from '@heroicons/react/20/solid';
-import { ChartBarSquareIcon, Cog6ToothIcon, HomeIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { ChartBarSquareIcon, CheckIcon, Cog6ToothIcon, HomeIcon, PlusIcon } from '@heroicons/react/24/outline';
 import classNames from "classnames";
 import { Fragment } from "react";
 import { NavLink } from "react-router-dom";
 import { DashboardIcon, QuestionCircleIcon } from "src/components/icons/Icons";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { useSelector } from "src/root/model";
-import { Organization } from "src/rpc/api";
 import styles from './navigationBar.m.css';
 
 export const NavigationBar: React.FC = () => {
@@ -25,7 +24,7 @@ export const NavigationBar: React.FC = () => {
   return (
     <>
       <div className="tw-min-w-[240px] tw-w-60 tw-h-full tw-flex tw-flex-col tw-box-border tw-border-r tw-border-solid tw-border-gray-200 tw-bg-gray-100">
-        <OrganizationButton organization={organization} />
+        <OrganizationButton />
         <div className={routeContainer}>
           <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-gray-300")} to={'/'}>
             <HomeIcon className="tw-h-4" strokeWidth="2" />
@@ -63,24 +62,21 @@ export const NavigationBar: React.FC = () => {
   );
 };
 
-type OrganizationButtonProps = {
-  organization: Organization;
-};
-
-const OrganizationButton: React.FC<OrganizationButtonProps> = props => {
+const OrganizationButton: React.FC = () => {
+  const organization = useSelector(state => state.login.organization);
   const menuItem = 'tw-flex tw-items-center tw-px-2 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded';
   return (
     <Menu as="div" className="tw-mb-3">
       <Menu.Button className="tw-w-full tw-z-10">
         {({ open }) => (
-          <div className={classNames("tw-py-4 tw-px-5 tw-flex tw-flex-row tw-h-16 tw-box-border tw-border-b tw-border-solid tw-border-gray-200 tw-cursor-pointer tw-w-full", "hover:tw-bg-gray-300", open && "tw-bg-gray-300")}>
-            <div className='tw-h-5 tw-w-5 tw-text-center tw-rounded tw-bg-purple-500 tw-text-white tw-inline-block tw-my-auto tw-select-none'>
-              {props.organization!.name.charAt(0)}
+          <div className={classNames("tw-py-4 tw-px-4 tw-flex tw-flex-row tw-h-16 tw-box-border tw-border-b tw-border-solid tw-border-gray-200 tw-cursor-pointer tw-w-full", "hover:tw-bg-gray-300", open && "tw-bg-gray-300")}>
+            <div className='tw-h-6 tw-w-6 tw-justify-center tw-items-center tw-rounded tw-bg-purple-500 tw-text-white tw-flex tw-my-auto tw-select-none'>
+              {organization!.name.charAt(0)}
             </div>
-            <div className='tw-my-auto tw-ml-2 tw-mr-1 tw-text-base tw-text-ellipsis tw-max-w-[150px] tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-bold'>
-              {props.organization!.name}
+            <div className='tw-my-auto tw-ml-2.5 tw-text-base tw-text-ellipsis tw-max-w-[150px] tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-bold'>
+              {organization!.name}
             </div>
-            <ChevronDownIcon className="tw-h-5 tw-mt-[5px]" />
+            <ChevronDownIcon className="tw-h-4 tw-mt-2 tw-ml-auto" />
           </div>
         )}
       </Menu.Button>
@@ -93,22 +89,43 @@ const OrganizationButton: React.FC<OrganizationButtonProps> = props => {
         leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
         leaveTo="tw-transform tw-opacity-0 tw-scale-95"
       >
-        <Menu.Items className="tw-z-20 tw-origin-top-left tw-absolute tw-left-3 tw-mt-1 tw-w-56 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none">
-          <div className="tw-m-1">
-            <Menu.Item>
-              {({ active }) => (
-                <NavLink
-                  to={'/workspacesettings'}
-                  className={classNames(
+        <Menu.Items className="tw-z-20 tw-origin-top-left tw-absolute tw-left-3 -tw-mt-2 tw-w-64 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none">
+          <div className="tw-m-2 tw-divide-y">
+            <div className="tw-pb-2">
+              <p className="tw-px-1 tw-pt-2 tw-pb-1 tw-text-xs tw-uppercase">Workspaces</p>
+              <Menu.Item>
+                {({ active }) => (
+                  <div className={classNames(
                     active ? 'tw-bg-gray-200 tw-text-gray-900' : 'tw-text-gray-700',
                     menuItem
-                  )}
-                >
-                  <Cog6ToothIcon className="tw-h-4 tw-mr-2" strokeWidth="2" />
-                  Workspace Settings
-                </NavLink>
-              )}
-            </Menu.Item>
+                  )}>
+                    <div className='tw-h-5 tw-w-5 tw-justify-center tw-items-center tw-rounded tw-bg-gray-500 tw-text-white tw-flex tw-my-auto tw-select-none tw-text-xs'>
+                      {organization!.name.charAt(0)}
+                    </div>
+                    <div className='tw-my-auto tw-ml-2.5 tw-text-base tw-text-ellipsis tw-max-w-[150px] tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium'>
+                      {organization!.name}
+                    </div>
+                    <CheckIcon className="tw-ml-auto tw-h-4" />
+                  </div>
+                )}
+              </Menu.Item>
+            </div>
+            <div className="tw-pt-2">
+              <Menu.Item>
+                {({ active }) => (
+                  <NavLink
+                    to={'/workspacesettings'}
+                    className={classNames(
+                      active ? 'tw-bg-gray-200 tw-text-gray-900' : 'tw-text-gray-700',
+                      menuItem
+                    )}
+                  >
+                    <Cog6ToothIcon className="tw-h-4 tw-mr-2" strokeWidth="2" />
+                    Workspace Settings
+                  </NavLink>
+                )}
+              </Menu.Item>
+            </div>
           </div>
         </Menu.Items>
       </Transition>

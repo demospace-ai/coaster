@@ -1,20 +1,17 @@
-import { ArrowDownTrayIcon, CheckIcon, LinkIcon, PlusCircleIcon } from '@heroicons/react/20/solid';
-import classNames from 'classnames';
 import { editor as EditorLib } from "monaco-editor/esm/vs/editor/editor.api";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { CSVLink } from "react-csv";
 import MonacoEditor, { monaco } from "react-monaco-editor";
 import { useNavigate, useParams } from 'react-router-dom';
 import { rudderanalytics } from 'src/app/rudder';
-import { Button, MoreOptionsButton } from "src/components/button/Button";
-import { SaveIcon } from 'src/components/icons/Icons';
+import { Button } from "src/components/button/Button";
+import { ReportHeader } from "src/components/insight/InsightComponents";
 import { Loading } from 'src/components/loading/Loading';
 import { ConfigureAnalysisModal } from 'src/components/modal/Modal';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { Tooltip } from 'src/components/tooltip/Tooltip';
 import { useSelector } from 'src/root/model';
 import { sendRequest } from "src/rpc/ajax";
-import { AnalysisType, CreateAnalysis, CreateAnalysisRequest, DataConnection, GetAnalysis, QueryResults, RunCustomQuery, RunCustomQueryRequest, Schema, toCsvData, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
+import { AnalysisType, CreateAnalysis, CreateAnalysisRequest, DataConnection, GetAnalysis, QueryResults, RunCustomQuery, RunCustomQueryRequest, Schema, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
 import { useDebounce } from 'src/utils/debounce';
 import { createResizeFunction } from 'src/utils/resize';
 
@@ -221,13 +218,13 @@ export const CustomQuery: React.FC = () => {
   return (
     <>
       <ConfigureAnalysisModal analysisID={Number(id)} analysisType={AnalysisType.CustomQuery} connection={connection} eventSet={undefined} show={showModal} close={() => setShowModal(false)} />
-      <QueryNavigation />
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0" >
-        <div className='tw-flex tw-flex-1 tw-min-w-0 tw-min-h-0'>
+        <ReportHeader copied={copied} saving={saving} copyLink={copyLink} save={() => setShouldSave(true)} showModal={() => setShowModal(true)} />
+        <div className='tw-flex tw-flex-1 tw-min-w-0 tw-min-h-0 tw-mt-8'>
           <div id='left-panel' className="tw-w-80 tw-min-w-[20rem] tw-inline-block tw-select-none">
           </div>
           <div id='right-panel' className="tw-ml-10 tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1">
-            <div id="top-panel" className="tw-h-[40%] tw-border tw-border-solid tw-border-gray-200" style={{ height: topPanelHeight + "px" }} ref={topPanelRef}>
+            <div id="top-panel" className="tw-h-[40%] tw-border tw-border-solid tw-border-gray-200 tw-p-2 tw-bg-dark tw-rounded-t-md" style={{ height: topPanelHeight + "px" }} ref={topPanelRef}>
               <MonacoEditor
                 language="sql"
                 theme="fabra"
@@ -248,7 +245,7 @@ export const CustomQuery: React.FC = () => {
                 }}
               />
               <div id='resize-grabber' className='tw-relative'>
-                <div className="tw-absolute tw-left-0 tw-right-0 tw-pt-[2px] tw-h-3 tw-cursor-row-resize" onMouseDown={startResize}>
+                <div className="tw-absolute tw-left-0 tw-right-0 tw-pt-3 tw-h-3 tw-cursor-row-resize" onMouseDown={startResize}>
                   <svg className="tw-mx-auto" xmlns="http://www.w3.org/2000/svg" width="36" viewBox="0 0 40 16" fill="none">
                     <path fill="#b2b2b2" d="M5.5 6.5C5.06667 6.5 4.70833 6.35833 4.425 6.075C4.14167 5.79167 4 5.43333 4 5C4 4.56667 4.14167 4.20833 4.425 3.925C4.70833 3.64167 5.06667 3.5 5.5 3.5H34.5C34.9333 3.5 35.2917 3.64167 35.575 3.925C35.8583 4.20833 36 4.56667 36 5C36 5.43333 35.8583 5.79167 35.575 6.075C35.2917 6.35833 34.9333 6.5 34.5 6.5H5.5ZM5.5 12.5C5.06667 12.5 4.70833 12.3583 4.425 12.075C4.14167 11.7917 4 11.4333 4 11C4 10.5667 4.14167 10.2083 4.425 9.925C4.70833 9.64167 5.06667 9.5 5.5 9.5H34.5C34.9333 9.5 35.2917 9.64167 35.575 9.925C35.8583 10.2083 36 10.5667 36 11C36 11.4333 35.8583 11.7917 35.575 12.075C35.2917 12.3583 34.9333 12.5 34.5 12.5H5.5Z" />
                   </svg>
@@ -258,35 +255,10 @@ export const CustomQuery: React.FC = () => {
             <div id="bottom-panel" className='tw-h-[60%] tw-flex tw-flex-col tw-flex-1' style={{ height: "calc(100% - " + topPanelHeight + "px)" }}>
               <div className="tw-border-solid tw-border-gray-200 tw-border-x tw-p-[10px] tw-flex">
                 <Tooltip label="⌘ + Enter">
-                  <Button className="tw-w-40 tw-h-8" onClick={() => setShouldRun(true)}>{queryLoading ? "Stop" : "Run"}</Button>
+                  <Button className="tw-w-40 tw-h-8 tw-ml-auto" onClick={() => setShouldRun(true)}>{queryLoading ? "Stop" : "Run"}</Button>
                 </Tooltip>
-                <div className='tw-flex tw-ml-auto'>
-                  <Tooltip label={hasResults ? '' : "You must run the query to fetch results before exporting."}>
-                    <CSVLink
-                      className={classNames(
-                        'tw-flex tw-rounded-md tw-font-bold tw-py-1 tw-tracking-wide tw-justify-center tw-align-middle tw-ml-2 tw-px-4 tw-h-8 tw-bg-white tw-border tw-border-solid tw-border-gray-400 tw-text-gray-800 hover:tw-bg-gray-200',
-                        hasResults ? null : 'tw-bg-gray-300 tw-text-gray-500 tw-border-0 tw-cursor-not-allowed hover:tw-bg-gray-300'
-                      )}
-                      data={toCsvData(schema, queryResults)}
-                      filename={`custom_query_${id}_results.csv`} // TODO: use saved name
-                      onClick={() => hasResults} // prevent download if there are no results
-                    >
-                      <ArrowDownTrayIcon className='tw-h-5 tw-inline tw-mr-1' />
-                      Export CSV
-                    </CSVLink>
-                  </Tooltip>
-                  <Tooltip label="⌘ + S">
-                    <Button className="tw-flex tw-justify-center tw-align-middle tw-ml-3 tw-px-4 tw-h-8 tw-bg-white tw-border-gray-200 tw-text-gray-800 hover:tw-bg-gray-200" onClick={() => setShouldSave(true)}>
-                      {saving ? <Loading /> : <><SaveIcon className='tw-h-5 tw-inline tw-mr-1' />Save</>}
-                    </Button>
-                  </Tooltip>
-                  <Button className="tw-flex tw-justify-center tw-items-center tw-ml-3 tw-w-[34px] tw-h-8 tw-px-0 tw-py-0 tw-bg-white tw-border-gray-400 tw-text-gray-800 hover:tw-bg-gray-200" onClick={copyLink}>
-                    {copied ? <CheckIcon className='tw-h-5 tw-inline tw-mx-auto tw-stroke-2' /> : <LinkIcon className='tw-h-5 tw-inline tw-mx-auto tw-stroke-2' />}
-                  </Button>
-                  <MoreOptionsButton className='tw-flex tw-justify-center tw-align-middle tw-ml-3' showModal={() => setShowModal(true)} />
-                </div>
               </div>
-              <div className="tw-mb-5 tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden tw-border-gray-200 tw-border-solid tw-border tw-bg-gray-100">
+              <div className="tw-mb-5 tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden tw-border-gray-200 tw-border-solid tw-border tw-bg-gray-100 tw-rounded-b-md">
                 {errorMessage &&
                   <div className="tw-p-5 tw-text-red-600 tw-font-bold tw-border-gray-200 tw-border-solid tw-border-b">
                     Error: {errorMessage}
@@ -299,32 +271,5 @@ export const CustomQuery: React.FC = () => {
         </div>
       </div>
     </>
-  );
-};
-
-const QueryNavigation: React.FC = () => {
-  return (
-    <div className="tw-h-10 tw-bg-gray-200 tw-flex">
-      <QueryNavigationTab active={true}>
-        Query
-      </QueryNavigationTab>
-      <div className="tw-inline-block tw-mx-4 tw-my-2 tw-w-[1px] tw-bg-gray-400"></div>
-      <QueryNavigationTab tooltip="Coming Soon!">
-        New Chart
-        <PlusCircleIcon className='tw-mt-[-2px] tw-ml-1.5 tw-h-4 tw-inline'></PlusCircleIcon>
-      </QueryNavigationTab>
-    </div >
-  );
-};
-
-const QueryNavigationTab: React.FC<{ active?: boolean, children: React.ReactNode; tooltip?: string; }> = ({ active, children, tooltip }) => {
-  return (
-    <div className={"first:tw-ml-5 tw-cursor-pointer tw-inline-block tw-bg-white tw-w-32 tw-rounded-t-md tw-mt-1.5 tw-mb-0" + (active ? " tw-shadow-[0px_-2px_#4ade80]" : " tw-border-b tw-border-gray-200 tw-border-solid")}>
-      <Tooltip label={tooltip ? tooltip : ''}>
-        <div className="tw-leading-[32px] tw-ml-3 tw-font-semibold tw-select-none">
-          {children}
-        </div>
-      </Tooltip>
-    </div>
   );
 };

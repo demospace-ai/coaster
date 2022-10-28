@@ -1,8 +1,8 @@
 import { Menu, Transition } from '@headlessui/react';
-import { ArrowRightOnRectangleIcon, UserCircleIcon } from '@heroicons/react/24/outline';
+import { ArrowRightOnRectangleIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import classNames from 'classnames';
 import React, { Fragment } from 'react';
-import { useLocation } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useLogout } from 'src/pages/login/actions';
 import { useSelector } from 'src/root/model';
 
@@ -11,28 +11,6 @@ export const Header: React.FC = () => {
   const isAuthenticated = useSelector(state => state.login.authenticated);
   const organization = useSelector(state => state.login.organization);
 
-  const pathTokens = location.pathname.split('/');
-  let page: string;
-  switch (pathTokens[1]) {
-    case '':
-      page = 'Home';
-      break;
-    case 'customquery':
-      page = 'Custom Query';
-      break;
-    case 'funnel':
-      page = `Funnel Report`;
-      break;
-    case 'insights':
-      page = 'Insights';
-      break;
-    case 'workspacesettings':
-      page = 'Workspace Settings';
-      break;
-    default:
-      page = '';
-  }
-
   // No header whatsoever for login and home page
   if (!isAuthenticated || !organization) {
     return <></>;
@@ -40,18 +18,63 @@ export const Header: React.FC = () => {
 
   return (
     <>
-      <div className="tw-grid tw-grid-cols-2 tw-box-border tw-min-h-[64px] tw-h-16 tw-px-8 tw-py-3 tw-items-center tw-border-b tw-border-solid tw-border-gray-200">
-        <div className="tw-text-sm tw-font-semibold tw-select-none">{page}</div>
+      <div className="tw-grid tw-grid-cols-2 tw-box-border tw-min-h-[64px] tw-h-16 tw-px-10 tw-py-3 tw-items-center tw-border-b tw-border-solid tw-border-gray-200">
+        <Breadcrumbs pathname={location.pathname} />
         <ProfileDropdown />
       </div>
     </>
   );
 };
 
+type Breadcrumb = {
+  path: string;
+  title: string;
+};
+
+// Gluten free
+const Breadcrumbs: React.FC<{ pathname: string; }> = props => {
+  const pathTokens = props.pathname.split('/');
+  let crumbs: Breadcrumb[] = [];
+  // TODO: figure out how to get customized insight title here
+  switch (pathTokens[1]) {
+    case '':
+      // no crumbs for Home
+      break;
+    case 'customquery':
+      crumbs.push({ title: 'Insights', path: '/insights' });
+      crumbs.push({ title: 'Custom Query ' + pathTokens[2], path: props.pathname });
+      break;
+    case 'funnel':
+      crumbs.push({ title: 'Insights', path: '/insights' });
+      crumbs.push({ title: 'Funnel Report ' + pathTokens[2], path: props.pathname });
+      break;
+    case 'insights':
+      crumbs.push({ title: 'Insights', path: props.pathname });
+      break;
+    case 'workspacesettings':
+      crumbs.push({ title: 'WorkspaceSettings', path: props.pathname });
+      break;
+    default:
+      break;
+  }
+
+  return (
+    <div className='tw-flex tw-flex-row tw-items-center'>
+      <NavLink className="tw-text-sm tw-font-medium tw-select-none tw-text-gray-900 hover:tw-text-green-800" to='/'>Home</NavLink>
+      {crumbs.map(crumb => (
+        <>
+          <ChevronRightIcon className="tw-h-3 tw-mx-3" />
+          <NavLink className="tw-text-sm tw-font-medium tw-select-none tw-text-gray-900 hover:tw-text-green-800" to={crumb.path}>{crumb.title}</NavLink>
+        </>
+      ))}
+    </div>
+  );
+};
+
 const ProfileDropdown: React.FC = () => {
   const user = useSelector(state => state.login.user);
   const logout = useLogout();
-  const menuItem = 'tw-flex tw-items-center tw-py-2 tw-pl-3 tw-pr-5 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded';
+  const menuItem = 'tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded';
 
   return (
     <div className='tw-flex tw-flex-col tw-justify-center tw-ml-auto'>
@@ -68,21 +91,30 @@ const ProfileDropdown: React.FC = () => {
           leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
           leaveTo="tw-transform tw-opacity-0 tw-scale-95"
         >
-          <Menu.Items className="tw-absolute tw-origin-top-right tw-z-10 tw-right-5 tw-mt-2 tw-mr-2 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none">
-            <div className="tw-m-1">
+          <Menu.Items className="tw-absolute tw-origin-top-right tw-z-10 tw-divide-y tw-right-5 tw-mt-2 tw-mr-2 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none tw-w-56">
+            <div className="tw-m-2">
+              <p className="tw-px-1 tw-pt-2 tw-pb-1 tw-text-xs tw-uppercase">Signed in as</p>
               <Menu.Item>
                 {({ active }) => (
                   <div
                     className={classNames(
                       active ? 'tw-bg-gray-200 tw-text-gray-900' : 'tw-text-gray-700',
-                      menuItem
+                      menuItem,
+                      'tw-pl-2'
                     )}
                   >
-                    <UserCircleIcon className='tw-h-4 tw-inline tw-mr-2 tw-stroke-2' />
-                    My Profile
+                    <div className="tw-bg-gray-400 tw-text-white tw-rounded-full tw-w-7 tw-h-7 tw-select-none tw-flex tw-items-center tw-justify-center tw-mr-3">
+                      {user!.first_name.charAt(0)}
+                    </div>
+                    <div className='tw-flex tw-flex-col'>
+                      <p className="tw-truncate tw-text-sm tw-font-semibold tw-text-gray-900">{user?.first_name} {user?.last_name}</p>
+                      <p className="tw-truncate tw-text-sm tw-font-medium tw-text-gray-900">{user?.email}</p>
+                    </div>
                   </div>
                 )}
               </Menu.Item>
+            </div>
+            <div className="tw-m-2 tw-pt-2">
               <Menu.Item>
                 {({ active }) => (
                   <div

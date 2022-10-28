@@ -1,5 +1,5 @@
 import { Menu, Transition } from '@headlessui/react';
-import { EllipsisHorizontalIcon } from '@heroicons/react/24/outline';
+import { EllipsisHorizontalIcon } from '@heroicons/react/24/solid';
 import classNames from 'classnames';
 import React, { Fragment, MouseEvent } from 'react';
 import { NavLink, NavLinkProps, useNavigate } from 'react-router-dom';
@@ -91,8 +91,8 @@ export const MoreOptionsButton: React.FC<{ className?: string; showModal: () => 
   const menuItem = 'tw-flex tw-items-center tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded';
   return (
     <Menu as="div" className={classNames("tw-relative tw-inline", props.className)}>
-      <Menu.Button onClick={(e: MouseEvent) => e.stopPropagation()} className='tw-z-0 tw-w-8 tw-h-8 tw-rounded-md tw-bg-white tw-border tw-border-gray-400 tw-text-gray-800 hover:tw-bg-gray-200'>
-        <EllipsisHorizontalIcon className='tw-inline tw-h-5 tw-stroke-2' />
+      <Menu.Button onClick={(e: MouseEvent) => e.stopPropagation()} className='tw-z-0 tw-w-8 tw-h-8 tw-rounded-md tw-bg-white tw-text-gray-800 hover:tw-bg-gray-200'>
+        <EllipsisHorizontalIcon className='tw-inline tw-h-6' strokeWidth="2" />
       </Menu.Button>
       <Transition
         as={Fragment}

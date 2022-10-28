@@ -55,7 +55,7 @@ export const Insights: React.FC = () => {
           <ul className='tw-relative tw-z-0 tw-list-none tw-p-0 tw-m-0 tw-pb-24'>
             {analyses.map((analysis, index) =>
               <li key={index} className='tw-relative tw-w-full tw-h-12 tw-border-b tw-border-solid tw-border-gray-200 tw-box-border tw-cursor-pointer tw-select-none tw-text-sm'>
-                <DivButton className='tw-flex tw-w-full tw-h-full tw-py-3 tw-px-8 tw-items-center hover:tw-bg-gray-200' onClick={() => onClick(analysis)}>
+                <DivButton className='tw-flex tw-w-full tw-h-full tw-py-3 tw-px-10 tw-items-center hover:tw-bg-gray-200' onClick={() => onClick(analysis)}>
                   {getAnalysisIcon(analysis.analysis_type)}
                   <div className='tw-mt-[1px]'>
                     {analysis.title ? analysis.title : `${getAnalysisDraftTitle(analysis.analysis_type)} ${analysis.id}`}
@@ -74,7 +74,7 @@ export const Insights: React.FC = () => {
 const ReportOptionsButton: React.FC<{ triggerDelete: () => void; }> = props => {
   const menuItem = 'tw-flex tw-items-center tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded';
   return (
-    <Menu as="div" className='tw-absolute tw-right-8 tw-top-0 tw-bottom-0 tw-flex'>
+    <Menu as="div" className='tw-absolute tw-right-11 tw-top-0 tw-bottom-0 tw-flex'>
       <Menu.Button onClick={(e: MouseEvent) => e.stopPropagation()} className='tw-m-0'>
         <div className='tw-rounded-md tw-p-[2px] hover:tw-bg-gray-300' >
           <EllipsisHorizontalIcon className='tw-inline tw-h-5' />
