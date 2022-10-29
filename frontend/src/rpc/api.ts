@@ -397,6 +397,7 @@ export interface CreateAnalysisRequest {
     connection_id?: number;
     event_set_id?: number;
     analysis_type: AnalysisType;
+    timezone: string;
 }
 
 export interface CreateAnalysisResponse {

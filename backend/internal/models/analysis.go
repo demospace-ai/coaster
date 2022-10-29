@@ -9,6 +9,17 @@ const (
 	AnalysisTypeFunnel      AnalysisType = "funnel"
 )
 
+func (e AnalysisType) ToString() string {
+	switch e {
+	case AnalysisTypeCustomQuery:
+		return "Custom Query"
+	case AnalysisTypeFunnel:
+		return "Funnel"
+	default:
+		return ""
+	}
+}
+
 // TODO: marshal to externally-friendly json
 type Analysis struct {
 	UserID         int64               `json:"user_id"`
@@ -16,8 +27,9 @@ type Analysis struct {
 	AnalysisType   AnalysisType        `json:"analysis_type"`
 	ConnectionID   database.NullInt64  `json:"connection_id"`
 	EventSetID     database.NullInt64  `json:"event_set_id"`
-	Title          database.NullString `json:"title,omitempty"`
 	Query          database.NullString `json:"query"`
+	Title          string              `json:"title"`
+	Description    database.NullString `json:"description"`
 
 	BaseModel
 }

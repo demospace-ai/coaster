@@ -33,7 +33,7 @@ TODO: tests
 - should not trigger update when setting the query after the first load
 
 */
-export const CustomQuery: React.FC = () => {
+export const CustomQuery: React.FC<{ setTitle: (title: string | undefined) => void; }> = ({ setTitle }) => {
   const { id } = useParams<QueryParams>();
   const navigate = useNavigate();
   const [initialLoading, setInitialLoading] = useState<boolean>(true);
@@ -75,7 +75,8 @@ export const CustomQuery: React.FC = () => {
     setInitialLoading(true);
     const payload: CreateAnalysisRequest = {
       connection_id: defaultConnectionID,
-      analysis_type: AnalysisType.Funnel
+      analysis_type: AnalysisType.CustomQuery,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     };
 
     try {
@@ -91,6 +92,7 @@ export const CustomQuery: React.FC = () => {
     setInitialLoading(true);
     try {
       const response = await sendRequest(GetAnalysis, { analysisID: id });
+      setTitle(response.analysis.title);
       if (response.connection) {
         setConnection(response.connection);
       }
@@ -101,7 +103,7 @@ export const CustomQuery: React.FC = () => {
       // TODO: handle error here
     }
     setInitialLoading(false);
-  }, [setQuery]);
+  }, [setQuery, setTitle]);
 
   const updateCustomQuery = useCallback(async (id: number, updates: { query?: string; }) => {
     const payload: UpdateAnalysisRequest = { analysis_id: Number(id) };
@@ -121,6 +123,7 @@ export const CustomQuery: React.FC = () => {
     setQuery("");
     setQueryResults(undefined);
     setSchema(undefined);
+    setTitle(undefined);
 
     if (id === "new") {
       createNewCustomQuery();
@@ -129,7 +132,7 @@ export const CustomQuery: React.FC = () => {
     } else {
       // TODO: use bugsnag here to record bad state
     }
-  }, [id, createNewCustomQuery, loadSavedCustomQuery]);
+  }, [id, createNewCustomQuery, loadSavedCustomQuery, setTitle]);
 
   // Limit how much the top panel can be resized
   const setTopPanelHeightBounded = (height: number) => {

@@ -10,6 +10,7 @@ import (
 	"fabra/internal/models"
 	"fabra/internal/views"
 	"net/http"
+	"time"
 )
 
 type CreateAnalysisRequest struct {
@@ -18,6 +19,7 @@ type CreateAnalysisRequest struct {
 	EventSetID   *int64              `json:"event_set_id,omitempty"`
 	Query        *string             `json:"query,omitempty"`
 	FunnelSteps  []views.FunnelStep  `json:"funnel_steps,omitempty"`
+	Timezone     string              `json:"timezone"`
 }
 
 type CreateAnalysisResponse struct {
@@ -61,6 +63,13 @@ func (s ApiService) CreateAnalysis(auth auth.Authentication, w http.ResponseWrit
 		}
 	}
 
+	currentTime := time.Now().UTC()
+	loc, err := time.LoadLocation(createAnalysisRequest.Timezone)
+	if err == nil {
+		currentTime = currentTime.In(loc)
+	}
+
+	title := createAnalysisRequest.AnalysisType.ToString() + " - " + currentTime.Format("Jan 2 15:04")
 	analysis, err := analyses.CreateAnalysis(
 		s.db,
 		auth.User.ID,
@@ -69,6 +78,7 @@ func (s ApiService) CreateAnalysis(auth auth.Authentication, w http.ResponseWrit
 		createAnalysisRequest.ConnectionID,
 		createAnalysisRequest.EventSetID,
 		createAnalysisRequest.Query,
+		title,
 	)
 	if err != nil {
 		return err

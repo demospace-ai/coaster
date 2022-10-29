@@ -20,11 +20,13 @@ func CreateAnalysis(
 	connectionID *int64,
 	eventSetID *int64,
 	query *string,
+	title string,
 ) (*models.Analysis, error) {
 	analysis := models.Analysis{
 		UserID:         userID,
 		OrganizationID: organizationID,
 		AnalysisType:   analysisType,
+		Title:          title,
 	}
 
 	if connectionID != nil {

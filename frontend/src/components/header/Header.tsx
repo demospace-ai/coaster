@@ -3,10 +3,11 @@ import { ArrowRightOnRectangleIcon, ChevronRightIcon } from '@heroicons/react/24
 import classNames from 'classnames';
 import React, { Fragment } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { Loading } from 'src/components/loading/Loading';
 import { useLogout } from 'src/pages/login/actions';
 import { useSelector } from 'src/root/model';
 
-export const Header: React.FC = () => {
+export const Header: React.FC<{ title?: string; }> = props => {
   const location = useLocation();
   const isAuthenticated = useSelector(state => state.login.authenticated);
   const organization = useSelector(state => state.login.organization);
@@ -19,7 +20,7 @@ export const Header: React.FC = () => {
   return (
     <>
       <div className="tw-grid tw-grid-cols-2 tw-box-border tw-min-h-[64px] tw-h-16 tw-px-10 tw-py-3 tw-items-center tw-border-b tw-border-solid tw-border-gray-200">
-        <Breadcrumbs pathname={location.pathname} />
+        <Breadcrumbs pathname={location.pathname} title={props.title} />
         <ProfileDropdown />
       </div>
     </>
@@ -28,11 +29,11 @@ export const Header: React.FC = () => {
 
 type Breadcrumb = {
   path: string;
-  title: string;
+  title: string | undefined;
 };
 
 // Gluten free
-const Breadcrumbs: React.FC<{ pathname: string; }> = props => {
+const Breadcrumbs: React.FC<{ pathname: string; title?: string; }> = props => {
   const pathTokens = props.pathname.split('/');
   let crumbs: Breadcrumb[] = [];
   // TODO: figure out how to get customized insight title here
@@ -42,11 +43,11 @@ const Breadcrumbs: React.FC<{ pathname: string; }> = props => {
       break;
     case 'customquery':
       crumbs.push({ title: 'Insights', path: '/insights' });
-      crumbs.push({ title: 'Custom Query ' + pathTokens[2], path: props.pathname });
+      crumbs.push({ title: props.title, path: props.pathname });
       break;
     case 'funnel':
       crumbs.push({ title: 'Insights', path: '/insights' });
-      crumbs.push({ title: 'Funnel Report ' + pathTokens[2], path: props.pathname });
+      crumbs.push({ title: props.title, path: props.pathname });
       break;
     case 'insights':
       crumbs.push({ title: 'Insights', path: props.pathname });
@@ -64,7 +65,7 @@ const Breadcrumbs: React.FC<{ pathname: string; }> = props => {
       {crumbs.map(crumb => (
         <>
           <ChevronRightIcon className="tw-h-3 tw-mx-3" />
-          <NavLink className="tw-text-sm tw-font-medium tw-select-none tw-text-gray-900 hover:tw-text-green-800" to={crumb.path}>{crumb.title}</NavLink>
+          <NavLink className="tw-text-sm tw-font-medium tw-select-none tw-text-gray-900 hover:tw-text-green-800" to={crumb.path}>{crumb.title ? crumb.title : <Loading className='tw-h-4 tw-w-4' />}</NavLink>
         </>
       ))}
     </div>

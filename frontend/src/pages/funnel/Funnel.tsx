@@ -43,7 +43,7 @@ TODO: tests
 - should not trigger update on load
 
 */
-export const Funnel: React.FC = () => {
+export const Funnel: React.FC<{ setTitle: (title: string | undefined) => void; }> = ({ setTitle }) => {
   const { id } = useParams<FunnelParams>();
   const navigate = useNavigate();
   const [initialLoading, setInitialLoading] = useState<boolean>(true);
@@ -72,7 +72,8 @@ export const Funnel: React.FC = () => {
     const payload: CreateAnalysisRequest = {
       connection_id: defaultConnectionID,
       event_set_id: defaultEventSetID,
-      analysis_type: AnalysisType.Funnel
+      analysis_type: AnalysisType.Funnel,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     };
 
     try {
@@ -88,6 +89,7 @@ export const Funnel: React.FC = () => {
     setInitialLoading(true);
     try {
       const response = await sendRequest(GetAnalysis, { analysisID: id });
+      setTitle(response.analysis.title);
       if (response.connection) {
         setConnection(response.connection);
       }
@@ -101,7 +103,7 @@ export const Funnel: React.FC = () => {
       // TODO: handle error here
     }
     setInitialLoading(false);
-  }, []);
+  }, [setTitle]);
 
   const updateFunnel = useCallback(async (id: number, updates: FunnelUpdates) => {
     const payload: UpdateAnalysisRequest = { analysis_id: Number(id) };
@@ -134,6 +136,7 @@ export const Funnel: React.FC = () => {
     setSchema(undefined);
     setQueryResults(undefined);
     setFunnelData([]);
+    setTitle(undefined);
 
     if (id === "new") {
       createNewFunnel();
@@ -142,7 +145,7 @@ export const Funnel: React.FC = () => {
     } else {
       // TODO: use bugsnag here to record bad state
     }
-  }, [id, createNewFunnel, loadSavedFunnel]);
+  }, [id, createNewFunnel, loadSavedFunnel, setTitle]);
 
   const runQuery = useCallback(async () => {
     setQueryLoading(true);
