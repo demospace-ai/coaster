@@ -342,7 +342,7 @@ const SchemaExplorer: React.FC<SchemaExplorerProps> = props => {
         show={showExpand}
         afterLeave={() => setShowSchemaExplorer(true)}
       >
-        <div className="tw-flex tw-flex-col tw-justify-center tw-items-center hover:tw-bg-gray-200 tw-ml-2 tw-px-2 tw-mb-5 tw-cursor-pointer tw-rounded" onClick={() => setShowExpand(false)}>
+        <div className="tw-flex tw-flex-col tw-justify-center tw-items-center hover:tw-bg-gray-200 tw-ml-2 tw-px-2 tw-cursor-pointer tw-rounded" onClick={() => setShowExpand(false)}>
           <BoxLeftIcon className="tw-h-5" />
         </div>
       </Transition>
