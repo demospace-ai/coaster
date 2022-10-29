@@ -5,6 +5,10 @@ import { Loading } from "src/components/loading/Loading";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 
 type HeaderProps = {
+  title: string | undefined;
+  setTitle: (title: string | undefined) => void;
+  description: string | undefined;
+  setDescription: (description: string | undefined) => void;
   copied: boolean;
   saving: boolean;
   showModal: () => void;
@@ -18,7 +22,7 @@ export const ReportHeader: React.FC<HeaderProps> = props => {
     <div className="">
       <div className="tw-mb-3 tw-flex tw-flex-row">
         <div className='tw-font-semibold tw-text-2xl'>
-          Report
+          {props.title}
         </div>
         <div className='tw-flex tw-ml-auto'>
           <MoreOptionsButton className='tw-flex tw-justify-center tw-align-middle tw-ml-3' showModal={showModal} />

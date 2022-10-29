@@ -43,7 +43,7 @@ TODO: tests
 - should not trigger update on load
 
 */
-export const Funnel: React.FC<{ setTitle: (title: string | undefined) => void; }> = ({ setTitle }) => {
+export const Funnel: React.FC<{ setHeaderTitle: (title: string | undefined) => void; }> = ({ setHeaderTitle }) => {
   const { id } = useParams<FunnelParams>();
   const navigate = useNavigate();
   const [initialLoading, setInitialLoading] = useState<boolean>(true);
@@ -56,6 +56,8 @@ export const Funnel: React.FC<{ setTitle: (title: string | undefined) => void; }
   const [steps, setSteps] = useState<FunnelStep[]>([]);
   const [saving, setSaving] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
+  const [title, setTitle] = useState<string | undefined>(undefined);
+  const [description, setDescription] = useState<string | undefined>(undefined);
 
   const [shouldRun, setShouldRun] = useState<boolean>(false);
   const [schema, setSchema] = useState<Schema | undefined>(undefined);
@@ -65,6 +67,11 @@ export const Funnel: React.FC<{ setTitle: (title: string | undefined) => void; }
 
   const connectionID = connection?.id;
   const eventSetID = eventSet?.id;
+
+  const setTitleAndHeader = useCallback((title: string | undefined) => {
+    setTitle(title);
+    setHeaderTitle(title);
+  }, [setHeaderTitle]);
 
   // TODO: error out if organization does not have connection and event set configured
   const createNewFunnel = useCallback(async () => {
@@ -89,7 +96,7 @@ export const Funnel: React.FC<{ setTitle: (title: string | undefined) => void; }
     setInitialLoading(true);
     try {
       const response = await sendRequest(GetAnalysis, { analysisID: id });
-      setTitle(response.analysis.title);
+      setTitleAndHeader(response.analysis.title);
       if (response.connection) {
         setConnection(response.connection);
       }
@@ -103,7 +110,7 @@ export const Funnel: React.FC<{ setTitle: (title: string | undefined) => void; }
       // TODO: handle error here
     }
     setInitialLoading(false);
-  }, [setTitle]);
+  }, [setTitleAndHeader]);
 
   const updateFunnel = useCallback(async (id: number, updates: FunnelUpdates) => {
     const payload: UpdateAnalysisRequest = { analysis_id: Number(id) };
@@ -136,7 +143,7 @@ export const Funnel: React.FC<{ setTitle: (title: string | undefined) => void; }
     setSchema(undefined);
     setQueryResults(undefined);
     setFunnelData([]);
-    setTitle(undefined);
+    setTitleAndHeader(undefined);
 
     if (id === "new") {
       createNewFunnel();
@@ -145,7 +152,7 @@ export const Funnel: React.FC<{ setTitle: (title: string | undefined) => void; }
     } else {
       // TODO: use bugsnag here to record bad state
     }
-  }, [id, createNewFunnel, loadSavedFunnel, setTitle]);
+  }, [id, createNewFunnel, loadSavedFunnel, setTitleAndHeader]);
 
   const runQuery = useCallback(async () => {
     setQueryLoading(true);
@@ -204,7 +211,7 @@ export const Funnel: React.FC<{ setTitle: (title: string | undefined) => void; }
     <>
       <ConfigureAnalysisModal analysisID={Number(id)} analysisType={AnalysisType.Funnel} connection={connection} setConnection={setConnection} eventSet={eventSet} setEventSet={setEventSet} show={showModal} close={() => setShowModal(false)} />
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-scroll">
-        <ReportHeader copied={copied} saving={saving} copyLink={copyLink} save={updateAllProperties} showModal={() => setShowModal(true)} />
+        <ReportHeader title={title} setTitle={setTitleAndHeader} description={description} setDescription={setDescription} copied={copied} saving={saving} copyLink={copyLink} save={updateAllProperties} showModal={() => setShowModal(true)} />
         <div className='tw-flex tw-flex-1 tw-pb-24 tw-mt-8'>
           <div id='left-panel' className="tw-w-[420px] tw-min-w-[20rem] tw-flex tw-flex-col tw-select-none tw-pr-10">
             <Steps id={Number(id)} connectionID={connectionID} eventSetID={eventSetID} steps={steps} setErrorMessage={setErrorMessage} updateFunnel={updateFunnel} />

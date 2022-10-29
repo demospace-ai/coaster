@@ -33,7 +33,7 @@ TODO: tests
 - should not trigger update when setting the query after the first load
 
 */
-export const CustomQuery: React.FC<{ setTitle: (title: string | undefined) => void; }> = ({ setTitle }) => {
+export const CustomQuery: React.FC<{ setHeaderTitle: (title: string | undefined) => void; }> = ({ setHeaderTitle }) => {
   const { id } = useParams<QueryParams>();
   const navigate = useNavigate();
   const [initialLoading, setInitialLoading] = useState<boolean>(true);
@@ -50,6 +50,8 @@ export const CustomQuery: React.FC<{ setTitle: (title: string | undefined) => vo
   const connectionID = connection?.id;
   const [datasetName, setDatasetName] = useState<string | undefined>(undefined);
   const [tableName, setTableName] = useState<string | undefined>(undefined);
+  const [title, setTitle] = useState<string | undefined>(undefined);
+  const [description, setDescription] = useState<string | undefined>(undefined);
 
   const [query, setQuery] = useState<string>("");
   const [schema, setSchema] = useState<Schema | undefined>(undefined);
@@ -58,6 +60,11 @@ export const CustomQuery: React.FC<{ setTitle: (title: string | undefined) => vo
   const [shouldRun, setShouldRun] = useState<boolean>(false);
   const [shouldSave, setShouldSave] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
+
+  const setTitleAndHeader = useCallback((title: string | undefined) => {
+    setTitle(title);
+    setHeaderTitle(title);
+  }, [setHeaderTitle]);
 
   const setConnectionAndClear = (dataConnection: DataConnection) => {
     setConnection(dataConnection);
@@ -92,7 +99,7 @@ export const CustomQuery: React.FC<{ setTitle: (title: string | undefined) => vo
     setInitialLoading(true);
     try {
       const response = await sendRequest(GetAnalysis, { analysisID: id });
-      setTitle(response.analysis.title);
+      setTitleAndHeader(response.analysis.title);
       if (response.connection) {
         setConnection(response.connection);
       }
@@ -103,7 +110,7 @@ export const CustomQuery: React.FC<{ setTitle: (title: string | undefined) => vo
       // TODO: handle error here
     }
     setInitialLoading(false);
-  }, [setQuery, setTitle]);
+  }, [setQuery, setTitleAndHeader]);
 
   const updateCustomQuery = useCallback(async (id: number, updates: { query?: string; }) => {
     const payload: UpdateAnalysisRequest = { analysis_id: Number(id) };
@@ -123,7 +130,7 @@ export const CustomQuery: React.FC<{ setTitle: (title: string | undefined) => vo
     setQuery("");
     setQueryResults(undefined);
     setSchema(undefined);
-    setTitle(undefined);
+    setTitleAndHeader(undefined);
 
     if (id === "new") {
       createNewCustomQuery();
@@ -132,7 +139,7 @@ export const CustomQuery: React.FC<{ setTitle: (title: string | undefined) => vo
     } else {
       // TODO: use bugsnag here to record bad state
     }
-  }, [id, createNewCustomQuery, loadSavedCustomQuery, setTitle]);
+  }, [id, createNewCustomQuery, loadSavedCustomQuery, setTitleAndHeader]);
 
   // Limit how much the top panel can be resized
   const setTopPanelHeightBounded = (height: number) => {
@@ -237,7 +244,7 @@ export const CustomQuery: React.FC<{ setTitle: (title: string | undefined) => vo
     <>
       <ConfigureAnalysisModal analysisID={Number(id)} analysisType={AnalysisType.CustomQuery} connection={connection} setConnection={setConnectionAndClear} eventSet={undefined} setEventSet={() => undefined} show={showModal} close={() => setShowModal(false)} />
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-scroll" >
-        <ReportHeader copied={copied} saving={saving} copyLink={copyLink} save={() => setShouldSave(true)} showModal={() => setShowModal(true)} />
+        <ReportHeader title={title} setTitle={setTitleAndHeader} description={description} setDescription={setDescription} copied={copied} saving={saving} copyLink={copyLink} save={() => setShouldSave(true)} showModal={() => setShowModal(true)} />
         <div className='tw-flex tw-flex-1 tw-min-w-0 tw-min-h-0 tw-my-8'>
           <div id='left-panel' className="tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-grow">
             <div id="top-panel" className="tw-h-[30vh] tw-border tw-border-solid tw-border-gray-300 tw-p-2 tw-bg-dark tw-rounded-t-[4px] tw-shrink-0" style={{ height: topPanelHeight + "px" }} ref={topPanelRef}>

@@ -42,8 +42,8 @@ export const App: React.FC = () => {
           <Route path='/login' element={<Login />} />
           <Route path='/' element={<RequireAuth element={<Inbox />} />} />
           <Route path='/workspacesettings' element={<RequireAuth element={<WorkspaceSettings />} />} />
-          <Route path='/customquery/:id' element={<RequireAuth element={<CustomQuery setTitle={setTitle} />} />} />
-          <Route path='/funnel/:id' element={<RequireAuth element={<Funnel setTitle={setTitle} />} />} />
+          <Route path='/customquery/:id' element={<RequireAuth element={<CustomQuery setHeaderTitle={setTitle} />} />} />
+          <Route path='/funnel/:id' element={<RequireAuth element={<Funnel setHeaderTitle={setTitle} />} />} />
           <Route path='/insights' element={<RequireAuth element={<Insights />} />} />
           <Route path='*' element={<NotFound />} />
         </Route>
