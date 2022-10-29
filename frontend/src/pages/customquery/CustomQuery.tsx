@@ -210,7 +210,7 @@ export const CustomQuery: React.FC<{ setHeaderTitle: (title: string | undefined)
       // Only set saving state (and therefore UI feedback) if user interfaction triggered the save
       setSaving(true);
       updateCustomQuery(Number(id), { query: query });
-      setSaving(false);
+      setTimeout(() => setSaving(false), 500);
     }
   }, [id, connectionID, query, shouldRun, shouldSave, runQuery, updateCustomQuery]);
 

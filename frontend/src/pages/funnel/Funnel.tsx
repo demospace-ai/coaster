@@ -134,7 +134,7 @@ export const Funnel: React.FC<{ setHeaderTitle: (title: string | undefined) => v
     }
 
     await updateFunnel(Number(id), updates);
-    setSaving(false);
+    setTimeout(() => setSaving(false), 500);
   };
 
   useEffect(() => {
