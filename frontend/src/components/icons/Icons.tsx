@@ -50,3 +50,11 @@ export const BoxRightIcon: React.FC<IconProps> = props => {
     </svg>
   );
 };
+
+export const CursorRayIcon: React.FC<IconProps> = props => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" className={props.className} {...props}>
+      <path d="M16.493 20.5L14.5 16M14.5 16L11.424 18.825L11.993 9.355L18.75 16H14.5ZM12.25 2.25V4.5M18.084 4.666L16.493 6.257M20.5 10.5H18.25M8.007 14.743L6.417 16.333M6.25 10.5H4M8.007 6.257L6.417 4.667" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+};

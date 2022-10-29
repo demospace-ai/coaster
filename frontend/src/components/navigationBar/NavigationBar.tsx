@@ -1,10 +1,10 @@
 import { Menu, Transition } from "@headlessui/react";
 import { ChartBarIcon, ChevronDownIcon, CommandLineIcon, PresentationChartLineIcon } from '@heroicons/react/20/solid';
-import { ChartBarSquareIcon, CheckIcon, Cog6ToothIcon, HomeIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { ChartBarSquareIcon, CheckIcon, Cog6ToothIcon, HomeIcon, PlusIcon, UsersIcon } from '@heroicons/react/24/outline';
 import classNames from "classnames";
 import { Fragment } from "react";
 import { NavLink } from "react-router-dom";
-import { DashboardIcon, QuestionCircleIcon } from "src/components/icons/Icons";
+import { CursorRayIcon, DashboardIcon, QuestionCircleIcon } from "src/components/icons/Icons";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { useSelector } from "src/root/model";
 import styles from './navigationBar.m.css';
@@ -46,6 +46,22 @@ export const NavigationBar: React.FC = () => {
             </div>
             <div className="tw-absolute tw-right-1 hover:tw-bg-gray-350 tw-rounded-md tw-p-1">
               <PlusIcon className="tw-h-4" strokeWidth="2" />
+            </div>
+          </div>
+        </Tooltip>
+        <Tooltip label="Coming soon!">
+          <div className={routeContainer}>
+            <div className={navLink}>
+              <CursorRayIcon className="tw-h-[18px] -tw-ml-[1px] -tw-mr-[1px]" strokeWidth="2" />
+              <div className={styles.route}>Events</div>
+            </div>
+          </div>
+        </Tooltip>
+        <Tooltip label="Coming soon!">
+          <div className={routeContainer}>
+            <div className={navLink}>
+              <UsersIcon className="tw-h-4 tw-ml-[1px] -tw-mr-[1px]" strokeWidth="2" />
+              <div className={styles.route}>Users</div>
             </div>
           </div>
         </Tooltip>
