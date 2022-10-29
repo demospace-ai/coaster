@@ -31,22 +31,22 @@ export const QuestionCircleIcon: React.FC<IconProps> = props => {
   );
 };
 
-export const CollapseIcon: React.FC<IconProps> = props => {
+export const BoxLeftIcon: React.FC<IconProps> = props => {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" className={props.className} {...props}>
       <path d="M15.5014 15.0013L12.5002 12L15.5014 8.99878" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M8.49856 8.99878V15.0013" strokeLinecap="round" strokeLinejoin="round" />
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M2.99622 16.0016V7.9983C2.99622 5.23572 5.23572 2.99622 7.9983 2.99622H16.0016C18.7642 2.99622 21.0037 5.23572 21.0037 7.9983V16.0016C21.0037 18.7642 18.7642 21.0037 16.0016 21.0037H7.9983C5.23572 21.0037 2.99622 18.7642 2.99622 16.0016Z" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M2.99622 16.0016V7.9983C2.99622 5.23572 5.23572 2.99622 7.9983 2.99622H16.0016C18.7642 2.99622 21.0037 5.23572 21.0037 7.9983V16.0016C21.0037 18.7642 18.7642 21.0037 16.0016 21.0037H7.9983C5.23572 21.0037 2.99622 18.7642 2.99622 16.0016Z" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 };
 
-export const ExpandIcon: React.FC<IconProps> = props => {
+export const BoxRightIcon: React.FC<IconProps> = props => {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" className={props.className} {...props}>
       <path d="M8.4986 15.0013L11.4998 12L8.4986 8.99878" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M15.5014 8.99878V15.0013" strokeLinecap="round" strokeLinejoin="round" />
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M21.0038 16.0016V7.9983C21.0038 5.23572 18.7643 2.99622 16.0017 2.99622H7.9984C5.2358 2.99622 2.9963 5.23572 2.9963 7.9983V16.0016C2.9963 18.7642 5.2358 21.0037 7.9984 21.0037H16.0017C18.7643 21.0037 21.0038 18.7642 21.0038 16.0016Z" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M21.0038 16.0016V7.9983C21.0038 5.23572 18.7643 2.99622 16.0017 2.99622H7.9984C5.2358 2.99622 2.9963 5.23572 2.9963 7.9983V16.0016C2.9963 18.7642 5.2358 21.0037 7.9984 21.0037H16.0017C18.7643 21.0037 21.0038 18.7642 21.0038 16.0016Z" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 };

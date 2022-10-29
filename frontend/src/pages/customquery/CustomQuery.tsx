@@ -1,17 +1,16 @@
 import { Transition } from "@headlessui/react";
-import classNames from "classnames";
 import { editor as EditorLib } from "monaco-editor/esm/vs/editor/editor.api";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import MonacoEditor, { monaco } from "react-monaco-editor";
 import { useNavigate, useParams } from 'react-router-dom';
 import { rudderanalytics } from 'src/app/rudder';
 import { Button } from "src/components/button/Button";
-import { CollapseIcon, ExpandIcon } from "src/components/icons/Icons";
+import { BoxLeftIcon, BoxRightIcon } from "src/components/icons/Icons";
 import { ReportHeader } from "src/components/insight/InsightComponents";
 import { Loading } from 'src/components/loading/Loading';
 import { ConfigureAnalysisModal } from 'src/components/modal/Modal';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
-import { ConnectionSelector, DatasetSelector, TableSelector } from "src/components/selector/Selector";
+import { DatasetSelector, TableSelector } from "src/components/selector/Selector";
 import { Tooltip } from 'src/components/tooltip/Tooltip';
 import { useSelector } from 'src/root/model';
 import { sendRequest } from "src/rpc/ajax";
@@ -51,7 +50,6 @@ export const CustomQuery: React.FC = () => {
   const connectionID = connection?.id;
   const [datasetName, setDatasetName] = useState<string | undefined>(undefined);
   const [tableName, setTableName] = useState<string | undefined>(undefined);
-  const [showSchemaExplorer, setShowSchemaExplorer] = useState<boolean>(true);
 
   const [query, setQuery] = useState<string>("");
   const [schema, setSchema] = useState<Schema | undefined>(undefined);
@@ -135,8 +133,8 @@ export const CustomQuery: React.FC = () => {
 
   // Limit how much the top panel can be resized
   const setTopPanelHeightBounded = (height: number) => {
-    if (height > 700) {
-      setTopPanelHeight(700);
+    if (height > 714) {
+      setTopPanelHeight(714);
       return;
     }
 
@@ -235,48 +233,11 @@ export const CustomQuery: React.FC = () => {
   return (
     <>
       <ConfigureAnalysisModal analysisID={Number(id)} analysisType={AnalysisType.CustomQuery} connection={connection} setConnection={setConnectionAndClear} eventSet={undefined} setEventSet={() => undefined} show={showModal} close={() => setShowModal(false)} />
-      <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0" >
+      <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-scroll" >
         <ReportHeader copied={copied} saving={saving} copyLink={copyLink} save={() => setShouldSave(true)} showModal={() => setShowModal(true)} />
-        <div className='tw-flex tw-flex-1 tw-min-w-0 tw-min-h-0 tw-mt-8'>
-          <Transition
-            as={Fragment}
-            show={showSchemaExplorer}
-            enter="tw-transition tw-ease-out tw-duration-150"
-            enterFrom="tw-transform tw-opacity-0 tw-scale-95"
-            enterTo="tw-transform tw-opacity-100 tw-scale-100"
-            leave="tw-transition tw-ease-in tw-duration-150"
-            leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
-            leaveTo="tw-transform tw-opacity-0 tw-scale-95"
-          >
-            <div id='left-panel' className="tw-w-96 tw-min-w-[20rem] tw-flex tw-flex-col tw-select-none tw-border tw-border-solid tw-border-gray-300 tw-p-5 tw-rounded tw-mb-5">
-              <div className="tw-font-semibold tw-text-lg -tw-mt-1 tw-mb-2 tw-flex tw-flex-row tw-justify-center tw-items-center">
-                Schema Explorer
-                <div className="tw-p-1 tw-rounded-md hover:tw-bg-gray-200 tw-ml-auto tw-cursor-pointer" onClick={() => setShowSchemaExplorer(false)}>
-                  <CollapseIcon className="tw-h-5" />
-                </div>
-              </div>
-              <div className='tw-text-xs tw-uppercase tw-select-none tw-mb-2'>Data Source</div>
-              <ConnectionSelector connection={connection} setConnection={setConnectionAndClear} />
-              <div className='tw-text-xs tw-uppercase tw-select-none tw-mt-4 tw-mb-2'>Dataset</div>
-              <DatasetSelector connection={connection} datasetName={datasetName} setDatasetName={setDatasetAndClear} />
-              <div className='tw-text-xs tw-uppercase tw-select-none tw-mt-4 tw-mb-2'>Table</div>
-              <TableSelector connection={connection} datasetName={datasetName} tableName={tableName} setTableName={setTableName} />
-              {connection && datasetName && tableName &&
-                <>
-                  <div className="tw-mt-5 tw-pt-3 tw-border-t tw-border-solid tw-border-gray-200" />
-                  <div className='tw-text-sm tw-font-semibold tw-select-none tw-mb-2'>{tableName}</div>
-                  <SchemaPreview connectionID={connection.id} datasetName={datasetName} tableName={tableName} />
-                </>
-              }
-            </div>
-          </Transition>
-          {!showSchemaExplorer &&
-            <div className="tw-flex tw-flex-col tw-justify-center tw-items-center hover:tw-bg-gray-200 tw-mr-2 tw-px-2 tw-mb-5 tw-cursor-pointer tw-rounded" onClick={() => setShowSchemaExplorer(true)}>
-              <ExpandIcon className="tw-h-5" />
-            </div>
-          }
-          <div id='right-panel' className={classNames("tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1", showSchemaExplorer && 'tw-ml-10')}>
-            <div id="top-panel" className="tw-h-[40%] tw-border tw-border-solid tw-border-gray-200 tw-p-2 tw-bg-dark tw-rounded-t-[4px]" style={{ height: topPanelHeight + "px" }} ref={topPanelRef}>
+        <div className='tw-flex tw-flex-1 tw-min-w-0 tw-min-h-0 tw-my-8'>
+          <div id='left-panel' className="tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-grow">
+            <div id="top-panel" className="tw-h-[30vh] tw-border tw-border-solid tw-border-gray-300 tw-p-2 tw-bg-dark tw-rounded-t-[4px] tw-shrink-0" style={{ height: topPanelHeight + "px" }} ref={topPanelRef}>
               <MonacoEditor
                 language="sql"
                 theme="fabra"
@@ -304,15 +265,18 @@ export const CustomQuery: React.FC = () => {
                 </div>
               </div>
             </div>
-            <div id="bottom-panel" className='tw-h-[60%] tw-flex tw-flex-col tw-flex-1' style={{ height: "calc(100% - " + topPanelHeight + "px)" }}>
-              <div className="tw-border-solid tw-border-gray-200 tw-border-x tw-p-[10px] tw-flex">
+            <div id="resize-panel" className="tw-rounded-b-[4px] tw-border-x tw-border-b tw-border-solid tw-border-gray-300">
+              <div className="tw-p-[10px] tw-flex">
                 <Tooltip label="⌘ + Enter">
                   <Button className="tw-w-40 tw-h-8 tw-ml-auto" onClick={() => setShouldRun(true)}>{queryLoading ? "Stop" : "Run"}</Button>
                 </Tooltip>
               </div>
-              <div className="tw-mb-5 tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden tw-border-gray-200 tw-border-solid tw-border tw-bg-gray-100 tw-rounded-b-[4px]">
+            </div>
+            <div className="tw-pb-20 tw-mt-5">
+              <span className='tw-uppercase tw-font-bold tw-select-none'>Results</span>
+              <div className="tw-flex tw-h-96 tw-border tw-border-solid tw-border-gray-300 tw-mt-2 tw-bg-gray-200 tw-rounded-[4px] tw-overflow-hidden">
                 {errorMessage &&
-                  <div className="tw-p-5 tw-text-red-600 tw-font-bold tw-border-gray-200 tw-border-solid tw-border-b">
+                  <div className="tw-p-5 tw-text-red-600 tw-font-bold tw-border-gray-300 tw-border-solid tw-border-b">
                     Error: {errorMessage}
                   </div>
                 }
@@ -320,8 +284,68 @@ export const CustomQuery: React.FC = () => {
               </div>
             </div>
           </div>
+          <SchemaExplorer connection={connection} datasetName={datasetName} tableName={tableName} setDatasetAndClear={setDatasetAndClear} setTableName={setTableName} />
         </div>
       </div>
+    </>
+  );
+};
+
+type SchemaExplorerProps = {
+  connection: DataConnection | undefined;
+  datasetName: string | undefined;
+  tableName: string | undefined;
+  setDatasetAndClear: (datasetName: string) => void;
+  setTableName: (datasetName: string) => void;
+};
+
+const SchemaExplorer: React.FC<SchemaExplorerProps> = props => {
+  const { connection, datasetName, tableName, setDatasetAndClear, setTableName } = props;
+  const [showSchemaExplorer, setShowSchemaExplorer] = useState<boolean>(true);
+  const [showExpand, setShowExpand] = useState<boolean>(false);
+
+  return (
+    <>
+      <Transition
+        as={Fragment}
+        show={showSchemaExplorer}
+        enter="tw-transition tw-ease-out tw-duration-250"
+        enterFrom="tw-transform tw-opacity-0 tw-scale-85"
+        enterTo="tw-transform tw-opacity-100 tw-scale-100"
+        leave="tw-transition tw-ease-in tw-duration-150"
+        leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
+        leaveTo="tw-transform tw-opacity-0 tw-scale-95"
+        afterLeave={() => setShowExpand(true)}
+      >
+        <div id='right-panel' className="tw-w-96 tw-min-w-[384px] tw-flex tw-flex-col tw-select-none tw-border tw-border-solid tw-border-gray-300 tw-p-5 tw-rounded tw-ml-10">
+          <div className="tw-font-semibold tw-text-lg -tw-mt-1 tw-mb-2 tw-flex tw-flex-row tw-justify-center tw-items-center">
+            Schema Explorer
+            <div className="tw-p-1 tw-rounded-md hover:tw-bg-gray-200 tw-ml-auto tw-cursor-pointer" onClick={() => setShowSchemaExplorer(false)}>
+              <BoxRightIcon className="tw-h-5" />
+            </div>
+          </div>
+          <div className='tw-text-xs tw-uppercase tw-select-none tw-mt-4 tw-mb-2'>Dataset</div>
+          <DatasetSelector connection={connection} datasetName={datasetName} setDatasetName={setDatasetAndClear} />
+          <div className='tw-text-xs tw-uppercase tw-select-none tw-mt-4 tw-mb-2'>Table</div>
+          <TableSelector connection={connection} datasetName={datasetName} tableName={tableName} setTableName={setTableName} />
+          {connection && datasetName && tableName &&
+            <>
+              <div className="tw-mt-5 tw-pt-3 tw-border-t tw-border-solid tw-border-gray-300" />
+              <div className='tw-text-sm tw-font-semibold tw-select-none tw-mb-2'>{tableName}</div>
+              <SchemaPreview connectionID={connection.id} datasetName={datasetName} tableName={tableName} />
+            </>
+          }
+        </div>
+      </Transition>
+      <Transition
+        as={Fragment}
+        show={showExpand}
+        afterLeave={() => setShowSchemaExplorer(true)}
+      >
+        <div className="tw-flex tw-flex-col tw-justify-center tw-items-center hover:tw-bg-gray-200 tw-ml-2 tw-px-2 tw-mb-5 tw-cursor-pointer tw-rounded" onClick={() => setShowExpand(false)}>
+          <BoxLeftIcon className="tw-h-5" />
+        </div>
+      </Transition>
     </>
   );
 };
@@ -365,7 +389,7 @@ const SchemaPreview: React.FC<SchemaPreviewProps> = props => {
         <ul>
           {schema?.map(columnSchema => (
             <li className="tw-whitespace-nowrap tw-flex tw-flex-row tw-my-0.5">
-              <div className="tw-uppercase tw-pr-16">
+              <div className="tw-uppercase tw-pr-16 tw-select-text">
                 {columnSchema.name}
               </div>
               <div className="tw-uppercase tw-ml-auto tw-text-gray-500">

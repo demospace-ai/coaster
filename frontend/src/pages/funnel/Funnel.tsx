@@ -203,7 +203,7 @@ export const Funnel: React.FC = () => {
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-scroll">
         <ReportHeader copied={copied} saving={saving} copyLink={copyLink} save={updateAllProperties} showModal={() => setShowModal(true)} />
         <div className='tw-flex tw-flex-1 tw-pb-24 tw-mt-8'>
-          <div id='left-panel' className="tw-w-[420px] tw-min-w-[20rem] tw-inline-block tw-select-none tw-pr-10 tw-h-full">
+          <div id='left-panel' className="tw-w-[420px] tw-min-w-[20rem] tw-flex tw-flex-col tw-select-none tw-pr-10">
             <Steps id={Number(id)} connectionID={connectionID} eventSetID={eventSetID} steps={steps} setErrorMessage={setErrorMessage} updateFunnel={updateFunnel} />
             <Tooltip label={"⌘ + Enter"}>
               <Button className="tw-w-40 tw-h-8" onClick={runQuery}>{queryLoading ? "Stop" : "Run"}</Button>

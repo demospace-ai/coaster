@@ -16,9 +16,10 @@ const QueryResultsTable: React.FC<QueryResultsProps> = props => {
     return <Loading />;
   }
 
+  // TODO: implement pagination to not render too many results
   if (props.schema && props.results) {
     return (
-      <div className="tw-overflow-auto tw-overscroll-contain tw-max-h-full">
+      <div className="tw-overflow-auto tw-overscroll-contain tw-max-h-full" style={{ contain: "paint" }}>
         <table className="tw-text-xs">
           <ResultsSchema schema={props.schema} />
           <tbody className="tw-py-2">

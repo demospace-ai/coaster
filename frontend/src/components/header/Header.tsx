@@ -88,7 +88,7 @@ const ProfileDropdown: React.FC = () => {
           enterFrom="tw-transform tw-opacity-0 tw-scale-95"
           enterTo="tw-transform tw-opacity-100 tw-scale-100"
           leave="tw-transition tw-ease-in tw-duration-75"
-          leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
+          leaveFrom="tw-transform tw-opacity-100 tw-scale-97"
           leaveTo="tw-transform tw-opacity-0 tw-scale-95"
         >
           <Menu.Items className="tw-absolute tw-origin-top-right tw-z-10 tw-divide-y tw-right-5 tw-mt-2 tw-mr-2 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none tw-w-56">
