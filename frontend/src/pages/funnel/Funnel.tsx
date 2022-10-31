@@ -1,7 +1,7 @@
 import { Transition } from '@headlessui/react';
 import { FunnelIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Bar, BarChart, ResponsiveContainer, Tooltip as RechartTooltip, XAxis, YAxis } from 'recharts';
 import { Button, DivButton } from 'src/components/button/Button';
 import { ReportHeader } from 'src/components/insight/InsightComponents';
@@ -10,10 +10,10 @@ import { ConfigureAnalysisModal } from 'src/components/modal/Modal';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { ControlledEventSelector, ControlledPropertySelector, FilterSelector, PropertyValueSelector } from "src/components/selector/Selector";
 import { Tooltip } from 'src/components/tooltip/Tooltip';
+import { useAnalysis } from 'src/pages/insights/actions';
 import { getEvents, getProperties, runFunnelQuery } from 'src/queries/queries';
-import { useSelector } from 'src/root/model';
 import { sendRequest } from 'src/rpc/ajax';
-import { AnalysisType, CreateAnalysis, CreateAnalysisRequest, DataConnection, EventSet, FilterType, FunnelStep, FunnelStepInput, GetAnalysis, Property, PropertyGroup, QueryResults, Schema, StepFilter, stepFiltersMatch, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
+import { AnalysisType, DataConnection, EventSet, FilterType, FunnelStep, FunnelStepInput, Property, PropertyGroup, QueryResults, Schema, StepFilter, stepFiltersMatch, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
 import { toEmptyList } from 'src/utils/undefined';
 
 type FunnelParams = {
@@ -45,19 +45,14 @@ TODO: tests
 */
 export const Funnel: React.FC<{ setHeaderTitle: (title: string | undefined) => void; }> = ({ setHeaderTitle }) => {
   const { id } = useParams<FunnelParams>();
-  const navigate = useNavigate();
-  const [initialLoading, setInitialLoading] = useState<boolean>(true);
+
   const [queryLoading, setQueryLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const defaultConnectionID = useSelector(state => state.login.organization?.default_data_connection_id);
-  const defaultEventSetID = useSelector(state => state.login.organization?.default_event_set_id);
-  const [connection, setConnection] = useState<DataConnection | undefined>(undefined);
-  const [eventSet, setEventSet] = useState<EventSet | undefined>(undefined);
-  const [steps, setSteps] = useState<FunnelStep[]>([]);
+
+  const { analysisData, mutate } = useAnalysis(id!);
+
   const [saving, setSaving] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
-  const [title, setTitle] = useState<string | undefined>(undefined);
-  const [description, setDescription] = useState<string | undefined>(undefined);
 
   const [shouldRun, setShouldRun] = useState<boolean>(false);
   const [schema, setSchema] = useState<Schema | undefined>(undefined);
@@ -65,94 +60,48 @@ export const Funnel: React.FC<{ setHeaderTitle: (title: string | undefined) => v
   const [funnelData, setFunnelData] = useState<FunnelResult[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
 
-  const connectionID = connection?.id;
-  const eventSetID = eventSet?.id;
+  const connectionID = analysisData?.connection?.id;
+  const eventSetID = analysisData?.event_set?.id;
 
-  const setTitleAndHeader = useCallback((title: string | undefined) => {
-    setTitle(title);
-    setHeaderTitle(title);
-  }, [setHeaderTitle]);
-
-  // TODO: error out if organization does not have connection and event set configured
-  const createNewFunnel = useCallback(async () => {
-    setInitialLoading(true);
-    const payload: CreateAnalysisRequest = {
-      connection_id: defaultConnectionID,
-      event_set_id: defaultEventSetID,
-      analysis_type: AnalysisType.Funnel,
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    };
-
-    try {
-      const response = await sendRequest(CreateAnalysis, payload);
-      navigate(`/funnel/${response.analysis.id}`);
-    } catch (e) {
-      // TODO: handle error here
+  const setDescription = (description: string | undefined) => {
+    if (analysisData) {
+      analysisData.analysis.description = description;
     }
-    setInitialLoading(false);
-  }, [navigate, defaultConnectionID, defaultEventSetID]);
+  };
 
-  const loadSavedFunnel = useCallback(async (id: string) => {
-    setInitialLoading(true);
-    try {
-      const response = await sendRequest(GetAnalysis, { analysisID: id });
-      setTitleAndHeader(response.analysis.title);
-      if (response.connection) {
-        setConnection(response.connection);
-      }
-      if (response.event_set) {
-        setEventSet(response.event_set);
-      }
-      if (response.analysis.funnel_steps) {
-        setSteps(response.analysis.funnel_steps);
-      }
-    } catch (e) {
-      // TODO: handle error here
-    }
-    setInitialLoading(false);
-  }, [setTitleAndHeader]);
-
-  const updateFunnel = useCallback(async (id: number, updates: FunnelUpdates) => {
+  const updateSteps = useCallback(async (id: number, updates: FunnelUpdates) => {
     const payload: UpdateAnalysisRequest = { analysis_id: Number(id) };
     if (updates.steps) {
       payload.funnel_steps = updates.steps;
     }
 
-    try {
-      const response = await sendRequest(UpdateAnalysis, payload);
-      setSteps(toEmptyList(response.analysis.funnel_steps));
-    } catch (e) {
-      // TODO: handle error here
-    }
-  }, []);
+    mutate(() => {
+      return sendRequest(UpdateAnalysis, payload);
+    }, {
+      rollbackOnError: true,
+      revalidate: false,
+    });
+  }, [mutate]);
 
-  const updateAllProperties = async () => {
+  const updateFunnel = () => {
     setSaving(true);
     const updates: FunnelUpdates = {};
-    if (steps) {
-      updates.steps = steps;
+    if (analysisData?.analysis.funnel_steps) {
+      updates.steps = analysisData.analysis.funnel_steps;
     }
 
-    await updateFunnel(Number(id), updates);
+    updateSteps(Number(id), updates);
     setTimeout(() => setSaving(false), 500);
   };
 
   useEffect(() => {
     // Reset state on new ID since data will be newly loaded
-    setSteps([]);
-    setSchema(undefined);
     setQueryResults(undefined);
-    setFunnelData([]);
-    setTitleAndHeader(undefined);
-
-    if (id === "new") {
-      createNewFunnel();
-    } else if (id != null) {
-      loadSavedFunnel(id);
-    } else {
-      // TODO: use bugsnag here to record bad state
+    setSchema(undefined);
+    if (analysisData) {
+      setHeaderTitle(analysisData.analysis.title);
     }
-  }, [id, createNewFunnel, loadSavedFunnel, setTitleAndHeader]);
+  }, [analysisData, setHeaderTitle]);
 
   const runQuery = useCallback(async () => {
     setQueryLoading(true);
@@ -170,7 +119,7 @@ export const Funnel: React.FC<{ setHeaderTitle: (title: string | undefined) => v
       return;
     }
 
-    if (steps.length < 2) {
+    if (!analysisData || !analysisData.analysis.funnel_steps || analysisData.analysis.funnel_steps.length < 2) {
       setErrorMessage("Must have 2 or more steps!");
       setQueryLoading(false);
       return;
@@ -190,7 +139,7 @@ export const Funnel: React.FC<{ setHeaderTitle: (title: string | undefined) => v
     }
 
     setQueryLoading(false);
-  }, [connectionID, eventSetID, id, steps.length]);
+  }, [connectionID, eventSetID, id, analysisData]);
 
   const copyLink = () => {
     setCopied(true);
@@ -203,18 +152,18 @@ export const Funnel: React.FC<{ setHeaderTitle: (title: string | undefined) => v
     setShouldRun(false);
   }
 
-  if (initialLoading) {
+  if (!analysisData) {
     return <Loading />;
   }
 
   return (
     <>
-      <ConfigureAnalysisModal analysisID={Number(id)} analysisType={AnalysisType.Funnel} connection={connection} setConnection={setConnection} eventSet={eventSet} setEventSet={setEventSet} show={showModal} close={() => setShowModal(false)} />
+      <ConfigureAnalysisModal analysisID={Number(id)} analysisType={AnalysisType.Funnel} connection={analysisData.connection} setConnection={(connection: DataConnection) => analysisData.connection = connection} eventSet={analysisData.event_set} setEventSet={(eventSet: EventSet) => analysisData.event_set = eventSet} show={showModal} close={() => setShowModal(false)} />
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-scroll">
-        <ReportHeader title={title} setTitle={setTitleAndHeader} description={description} setDescription={setDescription} copied={copied} saving={saving} copyLink={copyLink} save={updateAllProperties} showModal={() => setShowModal(true)} />
+        <ReportHeader title={analysisData.analysis.title} setTitle={setHeaderTitle} description={analysisData.analysis.description} setDescription={setDescription} copied={copied} saving={saving} copyLink={copyLink} save={updateFunnel} showModal={() => setShowModal(true)} />
         <div className='tw-flex tw-flex-1 tw-pb-24 tw-mt-8'>
           <div id='left-panel' className="tw-w-[420px] tw-min-w-[20rem] tw-flex tw-flex-col tw-select-none tw-pr-10">
-            <Steps id={Number(id)} connectionID={connectionID} eventSetID={eventSetID} steps={steps} setErrorMessage={setErrorMessage} updateFunnel={updateFunnel} />
+            <Steps id={Number(id)} connectionID={connectionID} eventSetID={eventSetID} steps={toEmptyList(analysisData.analysis.funnel_steps)} setErrorMessage={setErrorMessage} updateFunnel={updateSteps} />
             <Tooltip label={"⌘ + Enter"}>
               <Button className="tw-w-40 tw-h-8" onClick={runQuery}>{queryLoading ? "Stop" : "Run"}</Button>
             </Tooltip>

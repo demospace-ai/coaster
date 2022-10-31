@@ -62,11 +62,11 @@ const Breadcrumbs: React.FC<{ pathname: string; title?: string; }> = props => {
   return (
     <div className='tw-flex tw-flex-row tw-items-center'>
       <NavLink className="tw-text-sm tw-font-medium tw-select-none tw-text-gray-900 hover:tw-text-green-800" to='/'>Home</NavLink>
-      {crumbs.map(crumb => (
-        <>
+      {crumbs.map((crumb, index) => (
+        <div key={index} className="tw-flex tw-flex-row tw-items-center">
           <ChevronRightIcon className="tw-h-3 tw-mx-3" />
           <NavLink className="tw-text-sm tw-font-medium tw-select-none tw-text-gray-900 hover:tw-text-green-800" to={crumb.path}>{crumb.title ? crumb.title : <Loading className='tw-h-4 tw-w-4' />}</NavLink>
-        </>
+        </div>
       ))}
     </div>
   );

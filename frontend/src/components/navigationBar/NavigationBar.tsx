@@ -3,10 +3,12 @@ import { ChartBarIcon, ChevronDownIcon, CommandLineIcon, PresentationChartLineIc
 import { ChartBarSquareIcon, CheckIcon, Cog6ToothIcon, HomeIcon, PlusIcon, UsersIcon } from '@heroicons/react/24/outline';
 import classNames from "classnames";
 import { Fragment } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { CursorRayIcon, DashboardIcon, QuestionCircleIcon } from "src/components/icons/Icons";
 import { Tooltip } from "src/components/tooltip/Tooltip";
+import { useCreateAnalysis } from "src/pages/insights/actions";
 import { useSelector } from "src/root/model";
+import { AnalysisType } from "src/rpc/api";
 import styles from './navigationBar.m.css';
 
 export const NavigationBar: React.FC = () => {
@@ -150,6 +152,11 @@ const OrganizationButton: React.FC = () => {
 };
 
 const NewAnalysisButton: React.FC = () => {
+  const defaultConnectionID = useSelector(state => state.login.organization?.default_data_connection_id);
+  const defaultEventSetID = useSelector(state => state.login.organization?.default_event_set_id);
+  const createAnalysis = useCreateAnalysis();
+  const navigate = useNavigate();
+
   const menuItem = 'tw-flex tw-items-center tw-px-3 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded tw-whitespace-nowrap';
   return (
     /* Z-index of this menu must be more than other items, but less than the Workspace Settings menu */
@@ -170,18 +177,21 @@ const NewAnalysisButton: React.FC = () => {
           <div className="tw-m-1">
             <Menu.Item>
               {({ active }) => (
-                <NavLink
+                <div
                   className={classNames(
                     active ? 'tw-bg-gray-200 tw-text-gray-900' : 'tw-text-gray-700',
                     menuItem
                   )}
-                  to="/funnel/new"
+                  onClick={async () => {
+                    const analysis = await createAnalysis(AnalysisType.Funnel, defaultConnectionID, defaultEventSetID);
+                    navigate("/funnel/" + analysis?.id);
+                  }}
                 >
                   <div className="tw-flex tw-flex-col tw-justify-center">
                     <ChartBarIcon className="tw-inline-block tw-h-4 tw-mr-2 tw-scale-x-[-1]" />
                   </div>
                   Funnel Report
-                </NavLink>
+                </div>
               )}
             </Menu.Item>
             <Menu.Item>
@@ -227,18 +237,21 @@ const NewAnalysisButton: React.FC = () => {
             </Menu.Item>
             <Menu.Item>
               {({ active }) => (
-                <NavLink
+                <div
                   className={classNames(
                     active ? 'tw-bg-gray-200 tw-text-gray-900' : 'tw-text-gray-700',
                     menuItem
                   )}
-                  to="/customquery/new"
+                  onClick={async () => {
+                    const analysis = await createAnalysis(AnalysisType.CustomQuery, defaultConnectionID);
+                    navigate("/customquery/" + analysis?.id);
+                  }}
                 >
                   <div className="tw-flex tw-flex-col tw-justify-center">
                     <CommandLineIcon className="tw-inline-block tw-h-4 tw-mr-2" />
                   </div>
                   Custom Query
-                </NavLink>
+                </div>
               )}
             </Menu.Item>
           </div>

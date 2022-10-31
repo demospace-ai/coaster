@@ -448,6 +448,7 @@ export interface Analysis {
     connection_id?: number;
     event_set_id?: number;
     title?: string;
+    description?: string;
     query?: string;
     funnel_steps?: FunnelStep[];
 }

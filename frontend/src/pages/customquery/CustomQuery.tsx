@@ -2,7 +2,7 @@ import { Transition } from "@headlessui/react";
 import { editor as EditorLib } from "monaco-editor/esm/vs/editor/editor.api";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import MonacoEditor, { monaco } from "react-monaco-editor";
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { rudderanalytics } from 'src/app/rudder';
 import { Button } from "src/components/button/Button";
 import { BoxLeftIcon, BoxRightIcon } from "src/components/icons/Icons";
@@ -12,9 +12,9 @@ import { ConfigureAnalysisModal } from 'src/components/modal/Modal';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { DatasetSelector, TableSelector } from "src/components/selector/Selector";
 import { Tooltip } from 'src/components/tooltip/Tooltip';
-import { useSelector } from 'src/root/model';
+import { useAnalysis, useSchema } from "src/pages/insights/actions";
 import { sendRequest } from "src/rpc/ajax";
-import { AnalysisType, CreateAnalysis, CreateAnalysisRequest, DataConnection, GetAnalysis, GetSchema, GetSchemaRequest, QueryResults, RunCustomQuery, RunCustomQueryRequest, Schema, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
+import { AnalysisType, DataConnection, QueryResults, RunCustomQuery, RunCustomQueryRequest, Schema, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
 import { useDebounce } from 'src/utils/debounce';
 import { createResizeFunction } from 'src/utils/resize';
 
@@ -35,82 +35,36 @@ TODO: tests
 */
 export const CustomQuery: React.FC<{ setHeaderTitle: (title: string | undefined) => void; }> = ({ setHeaderTitle }) => {
   const { id } = useParams<QueryParams>();
-  const navigate = useNavigate();
-  const [initialLoading, setInitialLoading] = useState<boolean>(true);
-  const [queryLoading, setQueryLoading] = useState<boolean>(false);
+  const { analysisData } = useAnalysis(id!);
+  const connectionID = analysisData?.analysis.connection_id;
+
   const [saving, setSaving] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [copied, setCopied] = useState<boolean>(false);
 
   const [topPanelHeight, setTopPanelHeight] = useState<number>();
   const topPanelRef = useRef<HTMLDivElement>(null);
 
-  const defaultConnectionID = useSelector(state => state.login.organization?.default_data_connection_id);
-  const [connection, setConnection] = useState<DataConnection | undefined>(undefined);
-  const connectionID = connection?.id;
-  const [datasetName, setDatasetName] = useState<string | undefined>(undefined);
-  const [tableName, setTableName] = useState<string | undefined>(undefined);
-  const [title, setTitle] = useState<string | undefined>(undefined);
-  const [description, setDescription] = useState<string | undefined>(undefined);
-
-  const [query, setQuery] = useState<string>("");
   const [schema, setSchema] = useState<Schema | undefined>(undefined);
   const [queryResults, setQueryResults] = useState<QueryResults | undefined>(undefined);
+  const [queryLoading, setQueryLoading] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const [shouldRun, setShouldRun] = useState<boolean>(false);
   const [shouldSave, setShouldSave] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
 
   const setTitleAndHeader = useCallback((title: string | undefined) => {
-    setTitle(title);
+    if (analysisData) {
+      analysisData.analysis.title = title;
+    }
     setHeaderTitle(title);
-  }, [setHeaderTitle]);
+  }, [analysisData, setHeaderTitle]);
 
-  const setConnectionAndClear = (dataConnection: DataConnection) => {
-    setConnection(dataConnection);
-    setDatasetName(undefined);
-    setTableName(undefined);
-  };
-
-  const setDatasetAndClear = (datasetName: string) => {
-    setDatasetName(datasetName);
-    setTableName(undefined);
-  };
-
-  // TODO: what should we do if no default connection ID is configured?
-  const createNewCustomQuery = useCallback(async () => {
-    setInitialLoading(true);
-    const payload: CreateAnalysisRequest = {
-      connection_id: defaultConnectionID,
-      analysis_type: AnalysisType.CustomQuery,
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    };
-
-    try {
-      const response = await sendRequest(CreateAnalysis, payload);
-      navigate(`/customquery/${response.analysis.id}`);
-    } catch (e) {
-      // TODO: handle error here
+  const setDescription = (description: string | undefined) => {
+    if (analysisData) {
+      analysisData.analysis.description = description;
     }
-    setInitialLoading(false);
-  }, [navigate, defaultConnectionID]);
-
-  const loadSavedCustomQuery = useCallback(async (id: string) => {
-    setInitialLoading(true);
-    try {
-      const response = await sendRequest(GetAnalysis, { analysisID: id });
-      setTitleAndHeader(response.analysis.title);
-      if (response.connection) {
-        setConnection(response.connection);
-      }
-      if (response.analysis.query) {
-        setQuery(response.analysis.query);
-      }
-    } catch (e) {
-      // TODO: handle error here
-    }
-    setInitialLoading(false);
-  }, [setQuery, setTitleAndHeader]);
+  };
 
   const updateCustomQuery = useCallback(async (id: number, updates: { query?: string; }) => {
     const payload: UpdateAnalysisRequest = { analysis_id: Number(id) };
@@ -127,19 +81,12 @@ export const CustomQuery: React.FC<{ setHeaderTitle: (title: string | undefined)
 
   useEffect(() => {
     // Reset state on new ID since data will be newly loaded
-    setQuery("");
     setQueryResults(undefined);
     setSchema(undefined);
-    setTitleAndHeader(undefined);
-
-    if (id === "new") {
-      createNewCustomQuery();
-    } else if (id != null) {
-      loadSavedCustomQuery(id);
-    } else {
-      // TODO: use bugsnag here to record bad state
+    if (analysisData) {
+      setHeaderTitle(analysisData.analysis.title);
     }
-  }, [id, createNewCustomQuery, loadSavedCustomQuery, setTitleAndHeader]);
+  }, [analysisData, setHeaderTitle]);
 
   // Limit how much the top panel can be resized
   const setTopPanelHeightBounded = (height: number) => {
@@ -159,9 +106,11 @@ export const CustomQuery: React.FC<{ setHeaderTitle: (title: string | undefined)
 
   const debouncedUpdate = useDebounce((id: number, query: string) => updateCustomQuery(id, { query: query }), 1500);
   const onQueryChange = useCallback((query: string) => {
-    setQuery(query);
-    debouncedUpdate(Number(id), query);
-  }, [id, debouncedUpdate]);
+    if (analysisData) {
+      analysisData.analysis.query = query;
+      debouncedUpdate(Number(id), query);
+    }
+  }, [id, debouncedUpdate, analysisData]);
 
   const runQuery = useCallback(async (id: number, query: string) => {
     setQueryLoading(true);
@@ -202,33 +151,17 @@ export const CustomQuery: React.FC<{ setHeaderTitle: (title: string | undefined)
   useEffect(() => {
     if (shouldRun) {
       setShouldRun(false);
-      runQuery(Number(id), query);
+      runQuery(Number(id), analysisData?.analysis.query ? analysisData.analysis.query : "");
     }
 
     if (shouldSave) {
       setShouldSave(false);
       // Only set saving state (and therefore UI feedback) if user interfaction triggered the save
       setSaving(true);
-      updateCustomQuery(Number(id), { query: query });
+      updateCustomQuery(Number(id), { query: analysisData?.analysis.query });
       setTimeout(() => setSaving(false), 500);
     }
-  }, [id, connectionID, query, shouldRun, shouldSave, runQuery, updateCustomQuery]);
-
-  monaco.editor.defineTheme("fabra", {
-    base: "vs-dark",
-    inherit: true,
-    rules: [
-      { token: "predefined.sql", foreground: "#66d9ef", fontStyle: "bold" },
-      { token: "operator.sql", foreground: "#ffffff" },
-      { token: "keyword.sql", fontStyle: "bold" },
-      { token: "identifier.sql", foreground: "#ffffff" },
-      { token: "string.sql", foreground: "#8888ea" }
-    ],
-    colors: {
-      'editor.background': '#161b22',
-      'editor.lineHighlightBackground': '#2c2c2c',
-    }
-  });
+  }, [id, connectionID, analysisData, shouldRun, shouldSave, runQuery, updateCustomQuery]);
 
   const copyLink = () => {
     setCopied(true);
@@ -236,22 +169,22 @@ export const CustomQuery: React.FC<{ setHeaderTitle: (title: string | undefined)
     setTimeout(() => setCopied(false), 1200);
   };
 
-  if (initialLoading) {
+  if (!analysisData) {
     return <Loading />;
   }
 
   return (
     <>
-      <ConfigureAnalysisModal analysisID={Number(id)} analysisType={AnalysisType.CustomQuery} connection={connection} setConnection={setConnectionAndClear} eventSet={undefined} setEventSet={() => undefined} show={showModal} close={() => setShowModal(false)} />
+      <ConfigureAnalysisModal analysisID={Number(id)} analysisType={AnalysisType.CustomQuery} connection={analysisData.connection} setConnection={(connection: DataConnection) => analysisData.connection = connection} eventSet={undefined} setEventSet={() => undefined} show={showModal} close={() => setShowModal(false)} />
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-scroll" >
-        <ReportHeader title={title} setTitle={setTitleAndHeader} description={description} setDescription={setDescription} copied={copied} saving={saving} copyLink={copyLink} save={() => setShouldSave(true)} showModal={() => setShowModal(true)} />
+        <ReportHeader title={analysisData.analysis.title} setTitle={setTitleAndHeader} description={analysisData.analysis.description} setDescription={setDescription} copied={copied} saving={saving} copyLink={copyLink} save={() => setShouldSave(true)} showModal={() => setShowModal(true)} />
         <div className='tw-flex tw-flex-1 tw-min-w-0 tw-min-h-0 tw-my-8'>
           <div id='left-panel' className="tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-grow">
             <div id="top-panel" className="tw-h-[30vh] tw-border tw-border-solid tw-border-gray-300 tw-p-2 tw-bg-dark tw-rounded-t-[4px] tw-shrink-0" style={{ height: topPanelHeight + "px" }} ref={topPanelRef}>
               <MonacoEditor
                 language="sql"
                 theme="fabra"
-                value={query}
+                value={analysisData.analysis.query}
                 options={{
                   minimap: { enabled: false },
                   automaticLayout: true,
@@ -294,7 +227,7 @@ export const CustomQuery: React.FC<{ setHeaderTitle: (title: string | undefined)
               </div>
             </div>
           </div>
-          <SchemaExplorer connection={connection} datasetName={datasetName} tableName={tableName} setDatasetAndClear={setDatasetAndClear} setTableName={setTableName} />
+          <SchemaExplorer connection={analysisData.connection} />
         </div>
       </div>
     </>
@@ -303,16 +236,19 @@ export const CustomQuery: React.FC<{ setHeaderTitle: (title: string | undefined)
 
 type SchemaExplorerProps = {
   connection: DataConnection | undefined;
-  datasetName: string | undefined;
-  tableName: string | undefined;
-  setDatasetAndClear: (datasetName: string) => void;
-  setTableName: (datasetName: string) => void;
 };
 
 const SchemaExplorer: React.FC<SchemaExplorerProps> = props => {
-  const { connection, datasetName, tableName, setDatasetAndClear, setTableName } = props;
+  const { connection } = props;
   const [showSchemaExplorer, setShowSchemaExplorer] = useState<boolean>(true);
   const [showExpand, setShowExpand] = useState<boolean>(false);
+  const [datasetName, setDatasetName] = useState<string | undefined>(undefined);
+  const [tableName, setTableName] = useState<string | undefined>(undefined);
+
+  const setDatasetAndClear = (datasetName: string) => {
+    setDatasetName(datasetName);
+    setTableName(undefined);
+  };
 
   return (
     <>
@@ -368,36 +304,15 @@ type SchemaPreviewProps = {
 
 const SchemaPreview: React.FC<SchemaPreviewProps> = props => {
   const { connectionID, datasetName, tableName } = props;
-  const [schema, setSchema] = useState<Schema | undefined>(undefined);
-  const [schemaLoading, setSchemaLoading] = useState<boolean>(false);
-  useEffect(() => {
-    setSchemaLoading(true);
-    let payload: GetSchemaRequest = {
-      connectionID: connectionID,
-      datasetID: datasetName,
-      tableName: tableName,
-    };
-
-    let ignore = false;
-    sendRequest(GetSchema, payload).then((results) => {
-      if (!ignore) {
-        setSchema(results.schema);
-        setSchemaLoading(false);
-      }
-    });
-
-    return () => {
-      ignore = true;
-    };
-  }, [connectionID, datasetName, tableName]);
+  const { schema } = useSchema(connectionID, datasetName, tableName);
 
   return (
     <div className="tw-overflow-scroll tw-flex-shrink tw-ml-1">
-      {schemaLoading ?
+      {!schema ?
         <Loading className="tw-mt-5" />
         :
         <ul>
-          {schema?.map(columnSchema => (
+          {schema.map(columnSchema => (
             <li className="tw-whitespace-nowrap tw-flex tw-flex-row tw-my-0.5">
               <div className="tw-uppercase tw-pr-16 tw-select-text">
                 {columnSchema.name}
@@ -412,3 +327,19 @@ const SchemaPreview: React.FC<SchemaPreviewProps> = props => {
     </div>
   );
 };
+
+monaco.editor.defineTheme("fabra", {
+  base: "vs-dark",
+  inherit: true,
+  rules: [
+    { token: "predefined.sql", foreground: "#66d9ef", fontStyle: "bold" },
+    { token: "operator.sql", foreground: "#ffffff" },
+    { token: "keyword.sql", fontStyle: "bold" },
+    { token: "identifier.sql", foreground: "#ffffff" },
+    { token: "string.sql", foreground: "#8888ea" }
+  ],
+  colors: {
+    'editor.background': '#161b22',
+    'editor.lineHighlightBackground': '#2c2c2c',
+  }
+});
