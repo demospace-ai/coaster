@@ -8,12 +8,12 @@ import { ReportHeader } from 'src/components/insight/InsightComponents';
 import { Loading } from 'src/components/loading/Loading';
 import { ConfigureAnalysisModal } from 'src/components/modal/Modal';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
-import { ControlledEventSelector, ControlledPropertySelector, FilterSelector, PropertyValueSelector } from "src/components/selector/Selector";
+import { EventSelector, FilterSelector, PropertySelector, PropertyValueSelector } from "src/components/selector/Selector";
 import { Tooltip } from 'src/components/tooltip/Tooltip';
 import { useAnalysis } from 'src/pages/insights/actions';
-import { getEvents, getProperties, runFunnelQuery } from 'src/queries/queries';
+import { runFunnelQuery } from 'src/queries/queries';
 import { sendRequest } from 'src/rpc/ajax';
-import { AnalysisType, DataConnection, EventSet, FilterType, FunnelStep, FunnelStepInput, Property, PropertyGroup, QueryResults, Schema, StepFilter, stepFiltersMatch, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
+import { AnalysisType, DataConnection, EventSet, FilterType, FunnelStep, FunnelStepInput, Property, QueryResults, Schema, StepFilter, stepFiltersMatch, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
 import { toEmptyList } from 'src/utils/undefined';
 
 type FunnelParams = {
@@ -43,7 +43,7 @@ TODO: tests
 - should not trigger update on load
 
 */
-export const Funnel: React.FC<{ setHeaderTitle: (title: string | undefined) => void; }> = ({ setHeaderTitle }) => {
+export const Funnel: React.FC = () => {
   const { id } = useParams<FunnelParams>();
 
   const [queryLoading, setQueryLoading] = useState<boolean>(false);
@@ -62,12 +62,6 @@ export const Funnel: React.FC<{ setHeaderTitle: (title: string | undefined) => v
 
   const connectionID = analysisData?.connection?.id;
   const eventSetID = analysisData?.event_set?.id;
-
-  const setDescription = (description: string | undefined) => {
-    if (analysisData) {
-      analysisData.analysis.description = description;
-    }
-  };
 
   const updateSteps = useCallback(async (id: number, updates: FunnelUpdates) => {
     const payload: UpdateAnalysisRequest = { analysis_id: Number(id) };
@@ -94,15 +88,6 @@ export const Funnel: React.FC<{ setHeaderTitle: (title: string | undefined) => v
     setTimeout(() => setSaving(false), 500);
   };
 
-  useEffect(() => {
-    // Reset state on new ID since data will be newly loaded
-    setQueryResults(undefined);
-    setSchema(undefined);
-    if (analysisData) {
-      setHeaderTitle(analysisData.analysis.title);
-    }
-  }, [analysisData, setHeaderTitle]);
-
   const runQuery = useCallback(async () => {
     setQueryLoading(true);
     setErrorMessage(null);
@@ -126,7 +111,7 @@ export const Funnel: React.FC<{ setHeaderTitle: (title: string | undefined) => v
     }
 
     try {
-      const response = await runFunnelQuery(connectionID, Number(id));
+      const response = await runFunnelQuery(Number(id));
       if (response.success) {
         setSchema(response.schema);
         setQueryResults(response.query_results);
@@ -160,7 +145,7 @@ export const Funnel: React.FC<{ setHeaderTitle: (title: string | undefined) => v
     <>
       <ConfigureAnalysisModal analysisID={Number(id)} analysisType={AnalysisType.Funnel} connection={analysisData.connection} setConnection={(connection: DataConnection) => analysisData.connection = connection} eventSet={analysisData.event_set} setEventSet={(eventSet: EventSet) => analysisData.event_set = eventSet} show={showModal} close={() => setShowModal(false)} />
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-scroll">
-        <ReportHeader title={analysisData.analysis.title} setTitle={setHeaderTitle} description={analysisData.analysis.description} setDescription={setDescription} copied={copied} saving={saving} copyLink={copyLink} save={updateFunnel} showModal={() => setShowModal(true)} />
+        <ReportHeader title={analysisData.analysis.title} description={analysisData.analysis.description} copied={copied} saving={saving} copyLink={copyLink} save={updateFunnel} showModal={() => setShowModal(true)} />
         <div className='tw-flex tw-flex-1 tw-pb-24 tw-mt-8'>
           <div id='left-panel' className="tw-w-[420px] tw-min-w-[20rem] tw-flex tw-flex-col tw-select-none tw-pr-10">
             <Steps id={Number(id)} connectionID={connectionID} eventSetID={eventSetID} steps={toEmptyList(analysisData.analysis.funnel_steps)} setErrorMessage={setErrorMessage} updateFunnel={updateSteps} />
@@ -211,38 +196,6 @@ type StepsProps = {
 
 const Steps: React.FC<StepsProps> = props => {
   const { id, connectionID, eventSetID, steps, setErrorMessage, updateFunnel } = props;
-  const [eventOptions, setEventOptions] = useState<string[]>();
-  const [loading, setLoading] = useState(false);
-  const [eventPropertyOptions, setEventPropertyOptions] = useState<PropertyGroup[]>();
-  const [propertiesLoading, setPropertiesLoading] = useState<boolean>(false);
-  useEffect(() => {
-    if (!connectionID || !eventSetID) {
-      return;
-    }
-
-    let ignore = false;
-
-    setLoading(true);
-    getEvents(connectionID, eventSetID).then((results) => {
-      if (!ignore) {
-        setEventOptions(results);
-        setLoading(false);
-      }
-    });
-
-    setPropertiesLoading(true);
-    getProperties(connectionID, eventSetID).then((results) => {
-      if (!ignore) {
-        // TODO: support additional event property groups
-        setEventPropertyOptions(results);
-        setPropertiesLoading(false);
-      }
-    });
-
-    return () => {
-      ignore = true;
-    };
-  }, [connectionID, eventSetID]);
 
   const onEventSelected = useCallback((value: string, index: number) => {
     if (steps[index].step_name !== value) {
@@ -286,17 +239,13 @@ const Steps: React.FC<StepsProps> = props => {
             index={index}
             step={step}
             setEvent={(event) => onEventSelected(event, index)}
-            eventOptions={eventOptions}
-            eventPropertyOptions={eventPropertyOptions}
-            loading={loading}
-            propertiesLoading={propertiesLoading}
             removeEvent={() => onEventRemoved(index)}
             setStepFilters={(stepFilters) => setStepFilters(stepFilters, index)}
             connectionID={connectionID}
             eventSetID={eventSetID}
           />
         )}
-        <NewStep index={steps.length} addEvent={onEventAdded} eventOptions={eventOptions} loading={loading} />
+        <NewStep index={steps.length} addEvent={onEventAdded} connectionID={connectionID} eventSetID={eventSetID} />
       </div>
     </>
   );
@@ -307,18 +256,15 @@ type StepProp = {
   step: FunnelStep;
   connectionID: number | undefined;
   eventSetID: number | undefined;
-  eventOptions: string[] | undefined;
-  eventPropertyOptions: PropertyGroup[] | undefined;
   setEvent: (event: string) => void;
   removeEvent: () => void;
   setStepFilters: (filters: StepFilter[]) => void;
-  loading: boolean;
-  propertiesLoading: boolean;
 };
 
 const Step: React.FC<StepProp> = props => {
   const [showFilters, setShowFilters] = useState<boolean>(false);
-  const { index, step, connectionID, eventSetID, eventOptions, eventPropertyOptions, setEvent, removeEvent, loading, propertiesLoading, setStepFilters } = props;
+  const { index, step, connectionID, eventSetID, setEvent, removeEvent, setStepFilters } = props;
+
 
   return (
     <div className='tw-flex tw-mb-4'>
@@ -327,7 +273,7 @@ const Step: React.FC<StepProp> = props => {
           <div className='tw-flex tw-mr-2 tw-items-center tw-justify-center tw-shrink-0 tw-rounded-full tw-bg-fabra-green-500 tw-text-white tw-h-6 tw-w-6 tw-my-auto'>
             {index + 1}
           </div>
-          <ControlledEventSelector className="tw-border-none tw-bg-gray-100 hover:tw-bg-green-100" event={step?.step_name} setEvent={setEvent} eventOptions={eventOptions} loading={loading} />
+          <EventSelector className="tw-border-none tw-bg-gray-100 hover:tw-bg-green-100" connectionID={connectionID} eventSetID={eventSetID} event={step?.step_name} setEvent={setEvent} />
           <DivButton className='tw-p-1 tw-ml-2 hover:tw-bg-gray-200 tw-cursor-pointer tw-rounded-md' onClick={() => setShowFilters(!showFilters)}>
             <FunnelIcon className='tw-h-6 tw-stroke-[1.7]' />
             {step.filters.length > 0 &&
@@ -342,7 +288,7 @@ const Step: React.FC<StepProp> = props => {
             <TrashIcon className='tw-h-6 tw-stroke-[1.7]' />
           </DivButton>
         </div>
-        <StepFilters show={showFilters} connectionID={connectionID} eventSetID={eventSetID} filters={step.filters} eventPropertyOptions={eventPropertyOptions} setStepFilters={setStepFilters} propertiesLoading={propertiesLoading} />
+        <StepFilters show={showFilters} connectionID={connectionID} eventSetID={eventSetID} filters={step.filters} setStepFilters={setStepFilters} />
       </div>
     </div>
   );
@@ -350,9 +296,9 @@ const Step: React.FC<StepProp> = props => {
 
 type NewStepProps = {
   index: number;
-  eventOptions: string[] | undefined;
   addEvent: (event: string) => void;
-  loading: boolean;
+  connectionID: number | undefined;
+  eventSetID: number | undefined;
 };
 
 const NewStep: React.FC<NewStepProps> = props => {
@@ -363,7 +309,7 @@ const NewStep: React.FC<NewStepProps> = props => {
           <div className='tw-flex tw-mr-2 tw-items-center tw-justify-center tw-shrink-0 tw-rounded-full tw-bg-fabra-green-500 tw-text-white tw-h-6 tw-w-6 tw-my-auto'>
             {props.index + 1}
           </div>
-          <ControlledEventSelector className="tw-border-none tw-bg-gray-100 hover:tw-bg-green-100" event={undefined} setEvent={props.addEvent} eventOptions={props.eventOptions} loading={props.loading} />
+          <EventSelector className="tw-border-none tw-bg-gray-100 hover:tw-bg-green-100" event={undefined} setEvent={props.addEvent} connectionID={props.connectionID} eventSetID={props.eventSetID} />
           <div className='tw-p-1 tw-ml-2 hover:tw-bg-gray-200 tw-cursor-pointer tw-rounded-md'>
             <FunnelIcon className='tw-h-6 tw-stroke-[1.7]' />
           </div>
@@ -381,13 +327,11 @@ type StepFiltersProp = {
   connectionID: number | undefined;
   eventSetID: number | undefined;
   filters: StepFilter[];
-  eventPropertyOptions: PropertyGroup[] | undefined;
   setStepFilters: (filters: StepFilter[]) => void;
-  propertiesLoading: boolean;
 };
 
 const StepFilters: React.FC<StepFiltersProp> = props => {
-  const { connectionID, eventSetID, filters, eventPropertyOptions, propertiesLoading, setStepFilters } = props;
+  const { connectionID, eventSetID, filters, setStepFilters } = props;
 
   const updateFilter = (filter: StepFilter, index: number) => {
     const updatedFilters = [...filters];
@@ -408,9 +352,9 @@ const StepFilters: React.FC<StepFiltersProp> = props => {
   return (
     <Transition show={props.show}>
       {filters.map((filter, i) =>
-        <StepFilterComponent key={i} index={i} filter={filter} connectionID={connectionID} eventSetID={eventSetID} eventPropertyOptions={eventPropertyOptions} setStepFilter={(filter: StepFilter) => updateFilter(filter, i)} removeFilter={() => removeFilter(i)} propertiesLoading={propertiesLoading} />
+        <StepFilterComponent key={i} index={i} filter={filter} connectionID={connectionID} eventSetID={eventSetID} setStepFilter={(filter: StepFilter) => updateFilter(filter, i)} removeFilter={() => removeFilter(i)} />
       )}
-      <StepFilterComponent index={filters.length} filter={undefined} connectionID={connectionID} eventSetID={eventSetID} eventPropertyOptions={eventPropertyOptions} setStepFilter={(filter: StepFilter) => addFilter(filter)} removeFilter={() => null} propertiesLoading={propertiesLoading} newFilter={true} />
+      <StepFilterComponent index={filters.length} filter={undefined} connectionID={connectionID} eventSetID={eventSetID} setStepFilter={(filter: StepFilter) => addFilter(filter)} removeFilter={() => null} newFilter={true} />
     </Transition>
   );
 };
@@ -420,15 +364,13 @@ type StepFilterProp = {
   filter: StepFilter | undefined;
   connectionID: number | undefined;
   eventSetID: number | undefined;
-  eventPropertyOptions: PropertyGroup[] | undefined;
   setStepFilter: (filter: StepFilter) => void;
   removeFilter: () => void;
-  propertiesLoading: boolean;
   newFilter?: boolean;
 };
 
 const StepFilterComponent: React.FC<StepFilterProp> = props => {
-  const { index, filter, connectionID, eventSetID, eventPropertyOptions, propertiesLoading, setStepFilter, removeFilter, newFilter } = props;
+  const { index, filter, connectionID, eventSetID, setStepFilter, removeFilter, newFilter } = props;
   const [property, setProperty] = useState<Property | undefined>(filter ? filter.property : undefined);
   const [filterType, setFilterType] = useState<FilterType>(filter ? filter.filter_type : FilterType.Equal); // Equal is a good starting value for filter type
   const [propertyValue, setPropertyValue] = useState<string | null | undefined>(filter ? filter.property_value : undefined); // Null is a valid value
@@ -479,7 +421,7 @@ const StepFilterComponent: React.FC<StepFilterProp> = props => {
     <>
       <div className='tw-border-t tw-border-solid tw-border-gray-300 tw-p-2 tw-rounded-b-md tw-flex tw-items-center '>
         {getFilterPrefix(index)}
-        <ControlledPropertySelector className="tw-inline tw-border-none tw-bg-gray-100 hover:tw-bg-green-100" property={property} setProperty={onFilterPropertyChanged} propertyOptions={eventPropertyOptions} loading={propertiesLoading} />
+        <PropertySelector className="tw-inline tw-border-none tw-bg-gray-100 hover:tw-bg-green-100" property={property} setProperty={onFilterPropertyChanged} connectionID={connectionID} eventSetID={eventSetID} />
         <div className='tw-flex tw-shrink-0 tw-relative tw-ml-2 tw-w-8'>
           <div className='tw-absolute tw-top-2 tw-p-1 hover:tw-bg-gray-200 tw-cursor-pointer tw-rounded-md' onClick={removeFilter}>
             <TrashIcon className='tw-h-6 tw-stroke-[1.7]' />

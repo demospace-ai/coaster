@@ -6,9 +6,7 @@ import { Tooltip } from "src/components/tooltip/Tooltip";
 
 type HeaderProps = {
   title: string | undefined;
-  setTitle: (title: string | undefined) => void;
   description: string | undefined;
-  setDescription: (description: string | undefined) => void;
   copied: boolean;
   saving: boolean;
   showModal: () => void;

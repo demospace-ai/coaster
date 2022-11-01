@@ -1,10 +1,11 @@
 import classNames from "classnames";
 import { useEffect, useState } from "react";
 import { ValidatedComboInput, ValidatedDropdownInput } from "src/components/input/Input";
-import { getEvents, getPropertyValues } from "src/queries/queries";
+import { getPropertyValues } from "src/queries/queries";
 import { sendRequest } from "src/rpc/ajax";
-import { DataConnection, EventSet, FilterType, GetDataConnections, GetDatasets, GetEventSets, GetTables, Property, PropertyGroup } from "src/rpc/api";
+import { DataConnection, EventSet, FilterType, GetDataConnections, GetDatasets, GetEvents, GetEventSets, GetEventsRequest, GetEventsResponse, GetProperties, GetPropertiesRequest, GetPropertiesResponse, GetTables, Property, PropertyGroup } from "src/rpc/api";
 import { toNull } from "src/utils/undefined";
+import useSWR, { Fetcher } from "swr";
 
 type ConnectionSelectorProps = {
   connection: DataConnection | undefined;
@@ -182,6 +183,13 @@ export const EventSetSelector: React.FC<EventSetSelectorProps> = props => {
     validated={props.validated} />;
 };
 
+export function useEvents(connectionID: number | undefined, eventSetID: number | undefined) {
+  const fetcher: Fetcher<GetEventsResponse, GetEventsRequest> = (payload: GetEventsRequest) => sendRequest(GetEvents, payload);
+  const shouldFetch = connectionID && eventSetID;
+  const { data, error } = useSWR(() => shouldFetch ? { GetEvents, connectionID, eventSetID } : { data: { events: [] } }, fetcher);
+  return { events: data?.events, error };
+}
+
 type EventSelectorProps = {
   connectionID: number | undefined;
   eventSetID: number | undefined;
@@ -194,33 +202,13 @@ type EventSelectorProps = {
 };
 
 export const EventSelector: React.FC<EventSelectorProps> = props => {
-  const [eventOptions, setEventOptions] = useState<string[]>();
-  const [loading, setLoading] = useState(false);
-  useEffect(() => {
-    if (!props.connectionID || !props.eventSetID) {
-      return;
-    }
-
-    setLoading(true);
-    let ignore = false;
-    getEvents(props.connectionID, props.eventSetID).then((results) => {
-      if (!ignore) {
-        setEventOptions(results);
-        setLoading(false);
-      }
-    });
-
-    return () => {
-      ignore = true;
-    };
-  }, [props.connectionID, props.eventSetID]);
-
+  const { events } = useEvents(props.connectionID, props.eventSetID);
   return <ValidatedComboInput
     className={props.className}
     selected={props.event}
     setSelected={(event: string) => props.setEvent(event)}
-    options={eventOptions}
-    loading={loading}
+    options={events}
+    loading={!events}
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No events available!"}
     placeholder={props.placeholder ? props.placeholder : "Choose event"}
     validated={props.validated} />;
@@ -285,43 +273,28 @@ export const FilterSelector: React.FC<FilterSelectorProps> = props => {
     noCaret={true} />;
 };
 
-type ControlledEventSelectorProps = {
-  event: string | undefined,
-  setEvent: (event: string) => void;
-  className?: string;
-  noOptionsString?: string;
-  placeholder?: string;
-  validated?: boolean;
-  eventOptions?: string[];
-  loading?: boolean;
-};
 
-export const ControlledEventSelector: React.FC<ControlledEventSelectorProps> = props => {
-  return <ValidatedComboInput
-    className={props.className}
-    selected={props.event}
-    setSelected={(event: string) => props.setEvent(event)}
-    options={props.eventOptions}
-    loading={Boolean(props.loading)}
-    noOptionsString={props.noOptionsString ? props.noOptionsString : "No events available!"}
-    placeholder={props.placeholder ? props.placeholder : "Choose event"}
-    validated={props.validated} />;
-};
+export function useEventProperties(connectionID: number | undefined, eventSetID: number | undefined) {
+  const fetcher: Fetcher<GetPropertiesResponse, GetPropertiesRequest> = (payload: GetPropertiesRequest) => sendRequest(GetProperties, payload);
+  const shouldFetch = connectionID && eventSetID;
+  const { data, error } = useSWR(() => shouldFetch ? { GetProperties, connectionID, eventSetID } : { data: { property_groups: [] } }, fetcher);
+  return { properties: data?.property_groups, error };
+}
 
 type PropertySelectorProps = {
   property: Property | undefined,
   setProperty: (property: Property) => void;
+  connectionID: number | undefined;
+  eventSetID: number | undefined;
   className?: string;
   noOptionsString?: string;
   placeholder?: string;
   validated?: boolean;
-  propertyOptions?: PropertyGroup[];
-  loading?: boolean;
 };
 
-export const ControlledPropertySelector: React.FC<PropertySelectorProps> = props => {
-
-  const propertyNames = props.propertyOptions && props.propertyOptions.length > 0 ? props.propertyOptions[0].properties : [];
+export const PropertySelector: React.FC<PropertySelectorProps> = props => {
+  const { properties } = useEventProperties(props.connectionID, props.eventSetID);
+  const propertyNames = properties && properties.length > 0 ? properties[0].properties : [];
 
   return <ValidatedComboInput
     className={props.className}
@@ -329,7 +302,7 @@ export const ControlledPropertySelector: React.FC<PropertySelectorProps> = props
     setSelected={(property: Property) => props.setProperty(property)}
     getElementForDisplay={(property: Property) => property.name}
     options={propertyNames}
-    loading={Boolean(props.loading)}
+    loading={!properties}
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No event properties available!"}
     placeholder={props.placeholder ? props.placeholder : "Choose event property"}
     validated={props.validated} />;

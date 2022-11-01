@@ -33,7 +33,7 @@ TODO: tests
 - should not trigger update when setting the query after the first load
 
 */
-export const CustomQuery: React.FC<{ setHeaderTitle: (title: string | undefined) => void; }> = ({ setHeaderTitle }) => {
+export const CustomQuery: React.FC = () => {
   const { id } = useParams<QueryParams>();
   const { analysisData } = useAnalysis(id!);
   const connectionID = analysisData?.analysis.connection_id;
@@ -53,19 +53,6 @@ export const CustomQuery: React.FC<{ setHeaderTitle: (title: string | undefined)
   const [shouldSave, setShouldSave] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
 
-  const setTitleAndHeader = useCallback((title: string | undefined) => {
-    if (analysisData) {
-      analysisData.analysis.title = title;
-    }
-    setHeaderTitle(title);
-  }, [analysisData, setHeaderTitle]);
-
-  const setDescription = (description: string | undefined) => {
-    if (analysisData) {
-      analysisData.analysis.description = description;
-    }
-  };
-
   const updateCustomQuery = useCallback(async (id: number, updates: { query?: string; }) => {
     const payload: UpdateAnalysisRequest = { analysis_id: Number(id) };
     if (updates.query) {
@@ -78,15 +65,6 @@ export const CustomQuery: React.FC<{ setHeaderTitle: (title: string | undefined)
       // TODO: handle error here
     }
   }, []);
-
-  useEffect(() => {
-    // Reset state on new ID since data will be newly loaded
-    setQueryResults(undefined);
-    setSchema(undefined);
-    if (analysisData) {
-      setHeaderTitle(analysisData.analysis.title);
-    }
-  }, [analysisData, setHeaderTitle]);
 
   // Limit how much the top panel can be resized
   const setTopPanelHeightBounded = (height: number) => {
@@ -146,8 +124,7 @@ export const CustomQuery: React.FC<{ setHeaderTitle: (title: string | undefined)
     setQueryLoading(false);
   }, [updateCustomQuery]);
 
-  // Hack to run/save the query since the Monaco editor will keep a memoized version of the runQuery function
-  // that uses the first query passed to it.
+  // Hack to run/save the query since the Monaco editor will keep a stale version of the runQuery function
   useEffect(() => {
     if (shouldRun) {
       setShouldRun(false);
@@ -156,7 +133,7 @@ export const CustomQuery: React.FC<{ setHeaderTitle: (title: string | undefined)
 
     if (shouldSave) {
       setShouldSave(false);
-      // Only set saving state (and therefore UI feedback) if user interfaction triggered the save
+      // Only set saving state here since this is triggered by user interfaction, versus in other locations
       setSaving(true);
       updateCustomQuery(Number(id), { query: analysisData?.analysis.query });
       setTimeout(() => setSaving(false), 500);
@@ -177,7 +154,7 @@ export const CustomQuery: React.FC<{ setHeaderTitle: (title: string | undefined)
     <>
       <ConfigureAnalysisModal analysisID={Number(id)} analysisType={AnalysisType.CustomQuery} connection={analysisData.connection} setConnection={(connection: DataConnection) => analysisData.connection = connection} eventSet={undefined} setEventSet={() => undefined} show={showModal} close={() => setShowModal(false)} />
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-scroll" >
-        <ReportHeader title={analysisData.analysis.title} setTitle={setTitleAndHeader} description={analysisData.analysis.description} setDescription={setDescription} copied={copied} saving={saving} copyLink={copyLink} save={() => setShouldSave(true)} showModal={() => setShowModal(true)} />
+        <ReportHeader title={analysisData.analysis.title} description={analysisData.analysis.description} copied={copied} saving={saving} copyLink={copyLink} save={() => setShouldSave(true)} showModal={() => setShowModal(true)} />
         <div className='tw-flex tw-flex-1 tw-min-w-0 tw-min-h-0 tw-my-8'>
           <div id='left-panel' className="tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-grow">
             <div id="top-panel" className="tw-h-[30vh] tw-border tw-border-solid tw-border-gray-300 tw-p-2 tw-bg-dark tw-rounded-t-[4px] tw-shrink-0" style={{ height: topPanelHeight + "px" }} ref={topPanelRef}>

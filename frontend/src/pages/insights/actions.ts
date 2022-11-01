@@ -3,19 +3,16 @@ import { sendRequest } from "src/rpc/ajax";
 import { Analysis, AnalysisType, CreateAnalysis, CreateAnalysisRequest, GetAnalysis, GetAnalysisResponse, GetSchema, GetSchemaRequest, GetSchemaResponse } from "src/rpc/api";
 import useSWR, { Fetcher } from 'swr';
 
-export function useAnalysis(id: string) {
-  const fetcher: Fetcher<GetAnalysisResponse, string> = (id: string) => sendRequest(GetAnalysis, { analysisID: id });
-
-  const { data, error, mutate } = useSWR(id, fetcher);
-
+export function useAnalysis(id: string | undefined) {
+  const fetcher: Fetcher<GetAnalysisResponse, { id: string; }> = (value: { id: string; }) => sendRequest(GetAnalysis, { analysisID: value.id });
+  const shouldFetch = id !== undefined;
+  const { data, error, mutate } = useSWR(() => shouldFetch ? { GetAnalysis, id } : null, fetcher);
   return { analysisData: data, error, mutate };
 }
 
 export function useSchema(connectionID: number, datasetName: string, tableName: string) {
   const fetcher: Fetcher<GetSchemaResponse, GetSchemaRequest> = (request: GetSchemaRequest) => sendRequest(GetSchema, request);
-
-  const { data, error } = useSWR({ connectionID, datasetID: datasetName, tableName }, fetcher);
-
+  const { data, error } = useSWR({ GetSchema, connectionID, datasetID: datasetName, tableName }, fetcher);
   return { schema: data?.schema, error };
 }
 

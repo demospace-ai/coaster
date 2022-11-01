@@ -4,10 +4,11 @@ import classNames from 'classnames';
 import React, { Fragment } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Loading } from 'src/components/loading/Loading';
+import { useAnalysis } from 'src/pages/insights/actions';
 import { useLogout } from 'src/pages/login/actions';
 import { useSelector } from 'src/root/model';
 
-export const Header: React.FC<{ title?: string; }> = props => {
+export const Header: React.FC = () => {
   const location = useLocation();
   const isAuthenticated = useSelector(state => state.login.authenticated);
   const organization = useSelector(state => state.login.organization);
@@ -20,7 +21,7 @@ export const Header: React.FC<{ title?: string; }> = props => {
   return (
     <>
       <div className="tw-grid tw-grid-cols-2 tw-box-border tw-min-h-[64px] tw-h-16 tw-px-10 tw-py-3 tw-items-center tw-border-b tw-border-solid tw-border-gray-200">
-        <Breadcrumbs pathname={location.pathname} title={props.title} />
+        <Breadcrumbs pathname={location.pathname} />
         <ProfileDropdown />
       </div>
     </>
@@ -33,21 +34,21 @@ type Breadcrumb = {
 };
 
 // Gluten free
-const Breadcrumbs: React.FC<{ pathname: string; title?: string; }> = props => {
+const Breadcrumbs: React.FC<{ pathname: string; }> = props => {
   const pathTokens = props.pathname.split('/');
+  const { analysisData } = useAnalysis(pathTokens[2]); // This is deduped so don't worry about the extra fetch
   let crumbs: Breadcrumb[] = [];
-  // TODO: figure out how to get customized insight title here
   switch (pathTokens[1]) {
     case '':
       // no crumbs for Home
       break;
     case 'customquery':
       crumbs.push({ title: 'Insights', path: '/insights' });
-      crumbs.push({ title: props.title, path: props.pathname });
+      crumbs.push({ title: analysisData?.analysis.title, path: props.pathname });
       break;
     case 'funnel':
       crumbs.push({ title: 'Insights', path: '/insights' });
-      crumbs.push({ title: props.title, path: props.pathname });
+      crumbs.push({ title: analysisData?.analysis.title, path: props.pathname });
       break;
     case 'insights':
       crumbs.push({ title: 'Insights', path: props.pathname });

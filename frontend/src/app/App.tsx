@@ -1,5 +1,5 @@
-import React, { ReactNode, useEffect, useState } from 'react';
-import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
+import React, { ReactNode, useEffect } from 'react';
+import { Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom';
 import { useStart } from 'src/app/actions';
 import { Header } from 'src/components/header/Header';
 import { Loading } from 'src/components/loading/Loading';
@@ -19,7 +19,7 @@ let needsInit = true;
 export const App: React.FC = () => {
   const loading = useSelector(state => state.app.loading);
   const start = useStart();
-  const [title, setTitle] = useState<string | undefined>(undefined);
+  let location = useLocation();
 
   useEffect(() => {
     // Recommended way to run one-time initialization: https://beta.reactjs.org/learn/you-might-not-need-an-effect#initializing-the-application
@@ -38,12 +38,12 @@ export const App: React.FC = () => {
   return (
     <>
       <Routes>
-        <Route element={<AppLayout title={title} />}>
+        <Route element={<AppLayout />}>
           <Route path='/login' element={<Login />} />
           <Route path='/' element={<RequireAuth element={<Inbox />} />} />
           <Route path='/workspacesettings' element={<RequireAuth element={<WorkspaceSettings />} />} />
-          <Route path='/customquery/:id' element={<RequireAuth element={<CustomQuery setHeaderTitle={setTitle} />} />} />
-          <Route path='/funnel/:id' element={<RequireAuth element={<Funnel setHeaderTitle={setTitle} />} />} />
+          <Route path='/customquery/:id' element={<RequireAuth element={<CustomQuery key={location.pathname} />} />} />
+          <Route path='/funnel/:id' element={<RequireAuth element={<Funnel key={location.pathname} />} />} />
           <Route path='/insights' element={<RequireAuth element={<Insights />} />} />
           <Route path='*' element={<NotFound />} />
         </Route>
@@ -65,12 +65,12 @@ const RequireAuth: React.FC<AuthenticationProps> = props => {
   );
 };
 
-const AppLayout: React.FC<{ title: string | undefined; }> = ({ title }) => {
+const AppLayout: React.FC = () => {
   return (
     <>
       <NavigationBar />
       <div className={styles.content}>
-        <Header title={title} />
+        <Header />
         <Outlet />
       </div>
     </>
