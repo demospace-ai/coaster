@@ -162,17 +162,17 @@ export const Funnel: React.FC = () => {
         </div>
         <div id="funnel-panel" className='tw-flex tw-flex-col tw-flex-1 tw-mb-10'>
           <span className='tw-uppercase tw-font-bold tw-select-none'>Results</span>
-          <div className='tw-flex tw-flex-col tw-flex-1 tw-mt-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md'>
-            <div className="tw-mb-5 tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden">
+          <div className='tw-flex tw-flex-col tw-flex-1 tw-mt-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md tw-p-5'>
+            <div className="tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden">
               {errorMessage &&
                 <div className="tw-p-5 tw-text-red-600 tw-font-bold tw-border-gray-300 tw-border-solid tw-border-b">
                   Error: {errorMessage}
                 </div>
               }
               {!queryLoading && funnelData.length ?
-                <div className='tw-overflow-scroll tw-mt-5'>
+                <div className='tw-overflow-scroll'>
                   <ResponsiveContainer width={300 * funnelData.length} height={320}>
-                    <BarChart data={funnelData} margin={{ top: 5, right: 30, left: 0, bottom: 25 }}>
+                    <BarChart data={funnelData} margin={{ top: 20, right: 30, left: 0, bottom: 10 }}>
                       <XAxis dataKey="name" height={30} />
                       <YAxis ticks={[0, 20, 40, 60, 80, 100]} tickFormatter={tick => tick + "%"} domain={[0, 100]} allowDataOverflow={true} />
                       <RechartTooltip />
