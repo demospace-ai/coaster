@@ -1,9 +1,9 @@
 package models
 
 // TODO: marshal to externally-friendly json
-type FunnelStep struct {
+type Event struct {
 	AnalysisID int64  `json:"analysis_id"`
-	StepName   string `json:"step_name"`
+	Name       string `json:"name"`
 
 	BaseModel
 }

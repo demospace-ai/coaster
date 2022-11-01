@@ -54,7 +54,7 @@ export const NavigationBar: React.FC = () => {
         <Tooltip label="Coming soon!">
           <div className={routeContainer}>
             <div className={navLink}>
-              <CursorRayIcon className="tw-h-[18px] -tw-ml-[1px] -tw-mr-[1px]" strokeWidth="2" />
+              <CursorRayIcon className="tw-h-[18px] -tw-ml-[1px] -tw-mr-[1px]" strokeWidth="1.8" />
               <div className={styles.route}>Events</div>
             </div>
           </div>
@@ -62,7 +62,7 @@ export const NavigationBar: React.FC = () => {
         <Tooltip label="Coming soon!">
           <div className={routeContainer}>
             <div className={navLink}>
-              <UsersIcon className="tw-h-4 tw-ml-[1px] -tw-mr-[1px]" strokeWidth="2" />
+              <UsersIcon className="tw-h-4 tw-ml-[1px] -tw-mr-[0.5px]" strokeWidth="2" />
               <div className={styles.route}>Users</div>
             </div>
           </div>

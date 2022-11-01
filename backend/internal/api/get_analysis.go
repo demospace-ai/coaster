@@ -39,23 +39,23 @@ func (s ApiService) GetAnalysis(auth auth.Authentication, w http.ResponseWriter,
 		return err
 	}
 
-	var funnelSteps []models.FunnelStep
-	var stepFilters []models.StepFilter
+	var funnelSteps []models.Event
+	var stepFilters []models.EventFilter
 	if analysis.AnalysisType == models.AnalysisTypeFunnel {
-		funnelSteps, err = analyses.LoadFunnelStepsByAnalysisID(s.db, analysis.ID)
+		funnelSteps, err = analyses.LoadEventsByAnalysisID(s.db, analysis.ID)
 		if err != nil {
 			return err
 		}
 
-		stepFilters, err = analyses.LoadStepFiltersByAnalysisID(s.db, analysis.ID)
+		stepFilters, err = analyses.LoadEventFiltersByAnalysisID(s.db, analysis.ID)
 		if err != nil {
 			return err
 		}
 	}
 
 	analysisView := views.Analysis{
-		Analysis:    *analysis,
-		FunnelSteps: views.ConvertFunnelSteps(funnelSteps, stepFilters),
+		Analysis: *analysis,
+		Events:   views.ConvertEvents(funnelSteps, stepFilters),
 	}
 
 	var connection *models.DataConnection

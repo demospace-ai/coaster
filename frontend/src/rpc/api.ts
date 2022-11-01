@@ -412,12 +412,17 @@ export interface UpdateAnalysisRequest {
     event_set_id?: number;
     title?: string;
     query?: string;
-    funnel_steps?: FunnelStepInput[];
+    events?: EventInput[];
 }
 
-export interface FunnelStepInput {
-    step_name: string;
-    filters: StepFilter[];
+export interface EventInput {
+    name: string;
+    filters: EventFilter[];
+};
+
+export interface TrendSeriesInput {
+    name: string;
+    filters: EventFilter[];
 };
 
 export interface UpdateAnalysisResponse {
@@ -449,17 +454,17 @@ export interface Analysis {
     event_set_id?: number;
     title?: string;
     description?: string;
-    query?: string;
-    funnel_steps?: FunnelStep[];
+    query?: string; // used for Custom Query analysis type
+    events?: Event[]; // used for Funnel and Trend analysis types
 }
 
-export interface FunnelStep {
+export interface Event {
     id: number;
-    step_name: string;
-    filters: StepFilter[];
+    name: string;
+    filters: EventFilter[];
 }
 
-export interface StepFilter {
+export interface EventFilter {
     property: Property;
     filter_type: FilterType;
     property_value: string | null;
@@ -481,9 +486,9 @@ export enum FilterType {
     NotContains = "not_contains",
 }
 
-export const stepFiltersMatch = (filters1: StepFilter[], filters2: StepFilter[]) => {
+export const filtersMatch = (filters1: EventFilter[], filters2: EventFilter[]) => {
     return filters1.length === filters2.length && filters1.every((filter1, index) => {
-        const filter2: StepFilter = filters2[index];
+        const filter2: EventFilter = filters2[index];
         return filter1.property.name === filter2.property.name
             && filter1.property.type === filter2.property.type
             && filter1.filter_type === filter2.filter_type

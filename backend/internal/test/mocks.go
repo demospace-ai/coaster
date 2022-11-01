@@ -67,7 +67,7 @@ func (qs MockQueryService) RunFunnelQuery(analysis *models.Analysis) (views.Sche
 		return nil, nil, err
 	}
 
-	_, err = analyses.LoadFunnelStepsByAnalysisID(qs.db, analysis.ID)
+	_, err = analyses.LoadEventsByAnalysisID(qs.db, analysis.ID)
 	if err != nil {
 		return nil, nil, err
 	}

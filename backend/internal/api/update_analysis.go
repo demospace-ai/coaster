@@ -14,11 +14,11 @@ import (
 )
 
 type UpdateAnalysisRequest struct {
-	AnalysisID   int64              `json:"analysis_id"`
-	ConnectionID *int64             `json:"connection_id,omitempty"`
-	EventSetID   *int64             `json:"event_set_id,omitempty"`
-	Query        *string            `json:"query,omitempty"`
-	FunnelSteps  []views.FunnelStep `json:"funnel_steps,omitempty"`
+	AnalysisID   int64         `json:"analysis_id"`
+	ConnectionID *int64        `json:"connection_id,omitempty"`
+	EventSetID   *int64        `json:"event_set_id,omitempty"`
+	Query        *string       `json:"query,omitempty"`
+	Events       []views.Event `json:"events,omitempty"`
 }
 
 type UpdateAnalysisResponse struct {
@@ -78,20 +78,21 @@ func (s ApiService) UpdateAnalysis(auth auth.Authentication, w http.ResponseWrit
 		return err
 	}
 
-	var funnelSteps []models.FunnelStep
-	var stepFilters []models.StepFilter
+	var events []models.Event
+	var eventFilters []models.EventFilter
+	// TODO: trend type too (should this copy the condition from create analysis?)
 	if analysis.AnalysisType == models.AnalysisTypeFunnel {
 		err = s.db.Transaction(func(tx *gorm.DB) error {
 			// Always deactivate the steps on a funnel update, since changing any value invalidates the old steps
-			err = analyses.DeactivateFunnelSteps(s.db, analysis.ID)
+			err = analyses.DeactivateEvents(s.db, analysis.ID)
 			if err != nil {
 				return err
 			}
 
 			// Ignore adding funnel steps from request if the connection or event set changed
 			sourceChanged := (analysis.ConnectionID != updatedAnalysis.ConnectionID) || (analysis.EventSetID != updatedAnalysis.EventSetID)
-			if updateAnalysisRequest.FunnelSteps != nil && !sourceChanged {
-				funnelSteps, stepFilters, err = analyses.CreateFunnelStepsAndFilters(s.db, analysis.ID, updateAnalysisRequest.FunnelSteps)
+			if updateAnalysisRequest.Events != nil && !sourceChanged {
+				events, eventFilters, err = analyses.CreateEventsAndFilters(s.db, analysis.ID, updateAnalysisRequest.Events)
 				if err != nil {
 					return err
 				}
@@ -106,8 +107,8 @@ func (s ApiService) UpdateAnalysis(auth auth.Authentication, w http.ResponseWrit
 	}
 
 	analysisView := views.Analysis{
-		Analysis:    *updatedAnalysis,
-		FunnelSteps: views.ConvertFunnelSteps(funnelSteps, stepFilters),
+		Analysis: *updatedAnalysis,
+		Events:   views.ConvertEvents(events, eventFilters),
 	}
 
 	var updatedConnection *models.DataConnection

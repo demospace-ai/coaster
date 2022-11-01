@@ -18,7 +18,7 @@ type CreateAnalysisRequest struct {
 	ConnectionID *int64              `json:"connection_id,omitempty"`
 	EventSetID   *int64              `json:"event_set_id,omitempty"`
 	Query        *string             `json:"query,omitempty"`
-	FunnelSteps  []views.FunnelStep  `json:"funnel_steps,omitempty"`
+	Events       []views.Event       `json:"events,omitempty"`
 	Timezone     string              `json:"timezone"`
 }
 
@@ -84,18 +84,18 @@ func (s ApiService) CreateAnalysis(auth auth.Authentication, w http.ResponseWrit
 		return err
 	}
 
-	var funnelSteps []models.FunnelStep
-	var stepFilters []models.StepFilter
-	if createAnalysisRequest.FunnelSteps != nil {
-		funnelSteps, stepFilters, err = analyses.CreateFunnelStepsAndFilters(s.db, analysis.ID, createAnalysisRequest.FunnelSteps)
+	var events []models.Event
+	var eventFilters []models.EventFilter
+	if createAnalysisRequest.Events != nil {
+		events, eventFilters, err = analyses.CreateEventsAndFilters(s.db, analysis.ID, createAnalysisRequest.Events)
 		if err != nil {
 			return err
 		}
 	}
 
 	analysisView := views.Analysis{
-		Analysis:    *analysis,
-		FunnelSteps: views.ConvertFunnelSteps(funnelSteps, stepFilters),
+		Analysis: *analysis,
+		Events:   views.ConvertEvents(events, eventFilters),
 	}
 
 	// TODO: mask database ID

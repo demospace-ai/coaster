@@ -80,28 +80,28 @@ func UpdateAnalysis(
 	return &analysis, nil
 }
 
-func CreateFunnelStepsAndFilters(
+func CreateEventsAndFilters(
 	db *gorm.DB,
 	analysisID int64,
-	funnelSteps []views.FunnelStep,
-) ([]models.FunnelStep, []models.StepFilter, error) {
-	var createdFunnelSteps []models.FunnelStep
-	var createdStepFilters []models.StepFilter
+	funnelSteps []views.Event,
+) ([]models.Event, []models.EventFilter, error) {
+	var createdEvents []models.Event
+	var createdEventFilters []models.EventFilter
 	for _, funnelStep := range funnelSteps {
-		funnelStepModel := models.FunnelStep{
+		eventModel := models.Event{
 			AnalysisID: analysisID,
-			StepName:   funnelStep.Name,
+			Name:       funnelStep.Name,
 		}
 
-		result := db.Create(&funnelStepModel)
+		result := db.Create(&eventModel)
 		if result.Error != nil {
 			return nil, nil, result.Error
 		}
 
 		for _, filter := range funnelStep.Filters {
-			filterModel := models.StepFilter{
+			filterModel := models.EventFilter{
 				AnalysisID:    analysisID,
-				StepID:        funnelStepModel.ID,
+				EventID:       eventModel.ID,
 				PropertyName:  filter.Property.Name,
 				PropertyType:  filter.Property.Type,
 				FilterType:    filter.FilterType,
@@ -113,21 +113,21 @@ func CreateFunnelStepsAndFilters(
 				return nil, nil, result.Error
 			}
 
-			createdStepFilters = append(createdStepFilters, filterModel)
+			createdEventFilters = append(createdEventFilters, filterModel)
 		}
 
-		createdFunnelSteps = append(createdFunnelSteps, funnelStepModel)
+		createdEvents = append(createdEvents, eventModel)
 	}
 
-	return createdFunnelSteps, createdStepFilters, nil
+	return createdEvents, createdEventFilters, nil
 }
 
-func DeactivateFunnelSteps(
+func DeactivateEvents(
 	db *gorm.DB,
 	analysisID int64,
 ) error {
 	currentTime := time.Now()
-	result := db.Table("funnel_steps").
+	result := db.Table("events").
 		Where("analysis_id = ?", analysisID).
 		Update("deactivated_at", currentTime)
 	if result.Error != nil {
@@ -137,42 +137,42 @@ func DeactivateFunnelSteps(
 	return nil
 }
 
-func LoadFunnelStepsByAnalysisID(
+func LoadEventsByAnalysisID(
 	db *gorm.DB,
 	analysisID int64,
-) ([]models.FunnelStep, error) {
-	var funnelSteps []models.FunnelStep
-	result := db.Table("funnel_steps").
-		Select("funnel_steps.*").
-		Where("funnel_steps.analysis_id = ?", analysisID).
-		Where("funnel_steps.deactivated_at IS NULL").
-		Order("funnel_steps.id ASC").
-		Find(&funnelSteps)
+) ([]models.Event, error) {
+	var events []models.Event
+	result := db.Table("events").
+		Select("events.*").
+		Where("events.analysis_id = ?", analysisID).
+		Where("events.deactivated_at IS NULL").
+		Order("events.id ASC").
+		Find(&events)
 
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
-	return funnelSteps, nil
+	return events, nil
 }
 
-func LoadStepFiltersByAnalysisID(
+func LoadEventFiltersByAnalysisID(
 	db *gorm.DB,
 	analysisID int64,
-) ([]models.StepFilter, error) {
-	var stepFilters []models.StepFilter
-	result := db.Table("step_filters").
-		Select("step_filters.*").
-		Where("step_filters.analysis_id = ?", analysisID).
-		Where("step_filters.deactivated_at IS NULL").
-		Order("step_filters.id ASC").
-		Find(&stepFilters)
+) ([]models.EventFilter, error) {
+	var eventFilters []models.EventFilter
+	result := db.Table("event_filters").
+		Select("event_filters.*").
+		Where("event_filters.analysis_id = ?", analysisID).
+		Where("event_filters.deactivated_at IS NULL").
+		Order("event_filters.id ASC").
+		Find(&eventFilters)
 
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
-	return stepFilters, nil
+	return eventFilters, nil
 }
 
 func LoadAnalysisByID(db *gorm.DB, organizationID int64, analysisID int64) (*models.Analysis, error) {

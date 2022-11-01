@@ -20,9 +20,9 @@ const (
 )
 
 // TODO: marshal to externally-friendly json
-type StepFilter struct {
+type EventFilter struct {
 	AnalysisID    int64        `json:"analysis_id"`
-	StepID        int64        `json:"step_id"`
+	EventID       int64        `json:"event_id"`
 	PropertyName  string       `json:"property_name"`
 	PropertyType  PropertyType `json:"property_type"`
 	FilterType    FilterType   `json:"filter_type"`

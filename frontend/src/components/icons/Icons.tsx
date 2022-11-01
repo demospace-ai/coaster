@@ -54,7 +54,16 @@ export const BoxRightIcon: React.FC<IconProps> = props => {
 export const CursorRayIcon: React.FC<IconProps> = props => {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" className={props.className} {...props}>
-      <path d="M16.493 20.5L14.5 16M14.5 16L11.424 18.825L11.993 9.355L18.75 16H14.5ZM12.25 2.25V4.5M18.084 4.666L16.493 6.257M20.5 10.5H18.25M8.007 14.743L6.417 16.333M6.25 10.5H4M8.007 6.257L6.417 4.667" strokeLinecap="round" strokeLinejoin="round" />
+      <path xmlns="http://www.w3.org/2000/svg" d="M14.7988 5.85343L14.0729 6.59986M10.3256 4L10.339 4.9784M5.85318 5.85343L6.59871 6.57855M4 10.3264L5.04138 10.3107M5.85318 14.8003L6.59871 14.0743M19.892 19.8944L17.1373 17.1382M10.6952 10.6962L13.9945 20.5L16.7204 16.7224L20.5 14.0223L10.6952 10.6962Z" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+};
+
+
+export const RightArrow: React.FC<IconProps> = ({ className }) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 17 17" fill="none">
+      <path d="M12.25 8.25L16 12M16 12L12.25 15.75M16 12H1V-4.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 };

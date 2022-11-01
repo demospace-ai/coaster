@@ -4,5 +4,5 @@ import "fabra/internal/models"
 
 type Analysis struct {
 	models.Analysis
-	FunnelSteps []FunnelStep `json:"funnel_steps"`
+	Events []Event `json:"events"`
 }

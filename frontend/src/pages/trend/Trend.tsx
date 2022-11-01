@@ -17,12 +17,12 @@ import { sendRequest } from 'src/rpc/ajax';
 import { AnalysisType, DataConnection, Event, EventFilter, EventInput, EventSet, filtersMatch, FilterType, Property, QueryResults, Schema, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
 import { toEmptyList } from 'src/utils/undefined';
 
-type FunnelParams = {
+type TrendParams = {
   id: string,
 };
 
-type FunnelUpdates = {
-  steps?: EventInput[],
+type TrendUpdates = {
+  series?: EventInput[],
 };
 
 type FunnelResult = {
@@ -44,8 +44,8 @@ TODO: tests
 - should not trigger update on load
 
 */
-export const Funnel: React.FC = () => {
-  const { id } = useParams<FunnelParams>();
+export const Trend: React.FC = () => {
+  const { id } = useParams<TrendParams>();
 
   const [queryLoading, setQueryLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -64,10 +64,10 @@ export const Funnel: React.FC = () => {
   const connectionID = analysisData?.connection?.id;
   const eventSetID = analysisData?.event_set?.id;
 
-  const updateSteps = useCallback(async (id: number, updates: FunnelUpdates) => {
+  const updateSeries = useCallback(async (id: number, updates: TrendUpdates) => {
     const payload: UpdateAnalysisRequest = { analysis_id: Number(id) };
-    if (updates.steps) {
-      payload.events = updates.steps;
+    if (updates.series) {
+      payload.events = updates.series;
     }
 
     mutate(() => {
@@ -80,12 +80,12 @@ export const Funnel: React.FC = () => {
 
   const updateFunnel = () => {
     setSaving(true);
-    const updates: FunnelUpdates = {};
+    const updates: TrendUpdates = {};
     if (analysisData?.analysis.events) {
-      updates.steps = analysisData.analysis.events;
+      updates.series = analysisData.analysis.events;
     }
 
-    updateSteps(Number(id), updates);
+    updateSeries(Number(id), updates);
     setTimeout(() => setSaving(false), 500);
   };
 
@@ -151,7 +151,7 @@ export const Funnel: React.FC = () => {
           <span className='tw-uppercase tw-font-bold -tw-mt-1'>Steps</span>
           <div id="steps-panel" className='tw-flex tw-flex-1 tw-mt-2 tw-p-5 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md'>
             <div id='left-panel' className="tw-w-1/2 tw-min-w-1/2 tw-flex tw-flex-col tw-select-none tw-pr-10">
-              <Steps id={Number(id)} connectionID={connectionID} eventSetID={eventSetID} steps={toEmptyList(analysisData.analysis.events)} setErrorMessage={setErrorMessage} updateFunnel={updateSteps} />
+              <Steps id={Number(id)} connectionID={connectionID} eventSetID={eventSetID} steps={toEmptyList(analysisData.analysis.events)} setErrorMessage={setErrorMessage} updateFunnel={updateSeries} />
               <Tooltip label={"⌘ + Enter"}>
                 <Button className="tw-w-40 tw-h-8" onClick={runQuery}>{queryLoading ? "Stop" : "Run"}</Button>
               </Tooltip>
@@ -220,7 +220,7 @@ type StepsProps = {
   eventSetID: number | undefined;
   steps: Event[];
   setErrorMessage: (message: string | null) => void;
-  updateFunnel: (id: number, updates: FunnelUpdates) => void;
+  updateFunnel: (id: number, updates: TrendUpdates) => void;
 };
 
 const Steps: React.FC<StepsProps> = props => {
@@ -232,21 +232,21 @@ const Steps: React.FC<StepsProps> = props => {
       const updatedSteps: EventInput[] = [...steps];
       // Clear filters on event selected since they may no longer apply
       updatedSteps[index] = { name: value, filters: [] };
-      updateFunnel(Number(id), { steps: updatedSteps });
+      updateFunnel(Number(id), { series: updatedSteps });
     }
   }, [id, steps, setErrorMessage, updateFunnel]);
 
   const onEventRemoved = useCallback((index: number) => {
     setErrorMessage(null);
     const updatedSteps = steps.filter((_, i) => i !== index);
-    updateFunnel(Number(id), { steps: updatedSteps });
+    updateFunnel(Number(id), { series: updatedSteps });
   }, [id, steps, setErrorMessage, updateFunnel]);
 
   const onEventAdded = useCallback((value: string) => {
     setErrorMessage(null);
     // New events, filters should be empty
     const updatedSteps: EventInput[] = [...steps, { name: value, filters: [] }];
-    updateFunnel(Number(id), { steps: updatedSteps });
+    updateFunnel(Number(id), { series: updatedSteps });
   }, [id, steps, setErrorMessage, updateFunnel]);
 
   const setStepFilters = useCallback((filters: EventFilter[], stepIndex: number) => {
@@ -254,7 +254,7 @@ const Steps: React.FC<StepsProps> = props => {
       setErrorMessage(null);
       const updatedSteps: Event[] = [...steps];
       updatedSteps[stepIndex] = { ...steps[stepIndex], filters: filters };
-      updateFunnel(Number(id), { steps: updatedSteps });
+      updateFunnel(Number(id), { series: updatedSteps });
     }
   }, [id, steps, setErrorMessage, updateFunnel]);
 
