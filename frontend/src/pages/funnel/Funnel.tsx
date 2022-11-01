@@ -162,7 +162,7 @@ export const Funnel: React.FC = () => {
         </div>
         <div id="funnel-panel" className='tw-flex tw-flex-col tw-flex-1 tw-mb-10'>
           <span className='tw-uppercase tw-font-bold tw-select-none'>Results</span>
-          <div className='tw-flex tw-flex-col tw-flex-1 tw-mt-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md tw-p-5'>
+          <div className='tw-flex tw-flex-col tw-flex-1 tw-mt-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md tw-p-5 tw-min-h-[364px]'>
             <div className="tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden">
               {errorMessage &&
                 <div className="tw-p-5 tw-text-red-600 tw-font-bold tw-border-gray-300 tw-border-solid tw-border-b">
@@ -185,12 +185,12 @@ export const Funnel: React.FC = () => {
                 queryLoading ?
                   <Loading />
                   :
-                  <div className='tw-flex tw-flex-col tw-flex-grow tw-justify-center tw-items-center'>
+                  <div className='tw-flex tw-flex-col tw-flex-grow tw-justify-center tw-items-center tw-select-none'>
                     <PlusCircleIcon className='tw-h-12 tw-mb-1' />
                     <div className='tw-text-lg tw-font-medium'>
                       Choose two or more steps to see results!
                     </div>
-                    <div>
+                    <div className="tw-mt-1">
                       Add steps to your conversion funnel by selecting them in the Steps panel above.
                     </div>
                   </div>
@@ -198,16 +198,16 @@ export const Funnel: React.FC = () => {
             </div>
           </div>
         </div>
-        <Transition show={!queryLoading && funnelData.length > 0}>
+        {!queryLoading && schema && queryResults &&
           <div id="breakdown-panel" className='tw-flex tw-flex-col tw-flex-1 tw-mb-20'>
             <span className='tw-uppercase tw-font-bold tw-select-none'>Breakdown</span>
             <div className='tw-flex tw-flex-col tw-flex-1 tw-mt-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md tw-overflow-hidden'>
-              <div className=" tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-max-h-64 tw-overflow-hidden">
-                <MemoizedResultsTable loading={queryLoading} schema={schema} results={queryResults} placeholder="Choose two or more steps to see results!" />
+              <div className="tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-max-h-64 tw-overflow-hidden">
+                <MemoizedResultsTable schema={schema} results={queryResults} />
               </div>
             </div>
           </div>
-        </Transition>
+        }
       </div>
     </>
   );

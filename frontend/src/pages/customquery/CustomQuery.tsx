@@ -1,4 +1,5 @@
 import { Transition } from "@headlessui/react";
+import { CommandLineIcon } from "@heroicons/react/24/outline";
 import { editor as EditorLib } from "monaco-editor/esm/vs/editor/editor.api";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import MonacoEditor, { monaco } from "react-monaco-editor";
@@ -194,13 +195,26 @@ export const CustomQuery: React.FC = () => {
             </div>
             <div id="results-panel" className="tw-mb-20 tw-mt-5">
               <span className='tw-uppercase tw-font-bold tw-select-none'>Results</span>
-              <div className="tw-flex tw-min-h-[100px] tw-max-h-96 tw-border tw-border-solid tw-border-gray-300 tw-mt-2 tw-bg-gray-200 tw-rounded-[4px] tw-overflow-hidden">
+              <div className="tw-flex tw-flex-col tw-min-h-[120px] tw-max-h-96 tw-border tw-border-solid tw-border-gray-300 tw-mt-2 tw-rounded-[4px] tw-overflow-hidden">
                 {errorMessage &&
                   <div className="tw-p-5 tw-text-red-600 tw-font-bold tw-border-gray-300 tw-border-solid tw-border-b">
                     Error: {errorMessage}
                   </div>
                 }
-                <MemoizedResultsTable loading={queryLoading} schema={schema} results={queryResults} />
+                {queryLoading ?
+                  <div className="tw-flex tw-justify-center tw-items-center tw-h-96">
+                    <Loading />
+                  </div>
+                  :
+                  queryResults && schema ?
+                    <MemoizedResultsTable schema={schema} results={queryResults} />
+                    :
+                    <div className="tw-flex tw-flex-col tw-justify-center tw-items-center tw-h-96 tw-select-none ">
+                      <CommandLineIcon className="tw-h-10 tw-mb-1" />
+                      <div className="tw-text-lg tw-font-medium">Run a query to see results!</div>
+                      <div className="tw-mt-1">Once you run a query, the results will appear here.</div>
+                    </div>
+                }
               </div>
             </div>
           </div>
