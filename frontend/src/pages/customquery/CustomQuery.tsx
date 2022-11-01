@@ -192,9 +192,9 @@ export const CustomQuery: React.FC = () => {
                 </Tooltip>
               </div>
             </div>
-            <div className="tw-pb-20 tw-mt-5">
+            <div id="results-panel" className="tw-mb-20 tw-mt-5">
               <span className='tw-uppercase tw-font-bold tw-select-none'>Results</span>
-              <div className="tw-flex tw-h-96 tw-border tw-border-solid tw-border-gray-300 tw-mt-2 tw-bg-gray-200 tw-rounded-[4px] tw-overflow-hidden">
+              <div className="tw-flex tw-min-h-[100px] tw-max-h-96 tw-border tw-border-solid tw-border-gray-300 tw-mt-2 tw-bg-gray-200 tw-rounded-[4px] tw-overflow-hidden">
                 {errorMessage &&
                   <div className="tw-p-5 tw-text-red-600 tw-font-bold tw-border-gray-300 tw-border-solid tw-border-b">
                     Error: {errorMessage}

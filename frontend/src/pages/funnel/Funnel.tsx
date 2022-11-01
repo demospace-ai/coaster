@@ -1,5 +1,5 @@
 import { Transition } from '@headlessui/react';
-import { FunnelIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { FunnelIcon, PlusCircleIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from 'react-router-dom';
 import { Bar, BarChart, ResponsiveContainer, Tooltip as RechartTooltip, XAxis, YAxis } from 'recharts';
@@ -146,40 +146,68 @@ export const Funnel: React.FC = () => {
       <ConfigureAnalysisModal analysisID={Number(id)} analysisType={AnalysisType.Funnel} connection={analysisData.connection} setConnection={(connection: DataConnection) => analysisData.connection = connection} eventSet={analysisData.event_set} setEventSet={(eventSet: EventSet) => analysisData.event_set = eventSet} show={showModal} close={() => setShowModal(false)} />
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-scroll">
         <ReportHeader title={analysisData.analysis.title} description={analysisData.analysis.description} copied={copied} saving={saving} copyLink={copyLink} save={updateFunnel} showModal={() => setShowModal(true)} />
-        <div className='tw-flex tw-flex-1 tw-pb-24 tw-mt-8'>
-          <div id='left-panel' className="tw-w-[420px] tw-min-w-[20rem] tw-flex tw-flex-col tw-select-none tw-pr-10">
-            <Steps id={Number(id)} connectionID={connectionID} eventSetID={eventSetID} steps={toEmptyList(analysisData.analysis.funnel_steps)} setErrorMessage={setErrorMessage} updateFunnel={updateSteps} />
-            <Tooltip label={"⌘ + Enter"}>
-              <Button className="tw-w-40 tw-h-8" onClick={runQuery}>{queryLoading ? "Stop" : "Run"}</Button>
-            </Tooltip>
+        <div className='tw-mt-8 tw-mb-10'>
+          <span className='tw-uppercase tw-font-bold -tw-mt-1'>Steps</span>
+          <div id="steps-panel" className='tw-flex tw-flex-1 tw-mt-2 tw-p-5 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md'>
+            <div id='left-panel' className="tw-w-1/2 tw-min-w-1/2 tw-flex tw-flex-col tw-select-none tw-pr-10">
+              <Steps id={Number(id)} connectionID={connectionID} eventSetID={eventSetID} steps={toEmptyList(analysisData.analysis.funnel_steps)} setErrorMessage={setErrorMessage} updateFunnel={updateSteps} />
+              <Tooltip label={"⌘ + Enter"}>
+                <Button className="tw-w-40 tw-h-8" onClick={runQuery}>{queryLoading ? "Stop" : "Run"}</Button>
+              </Tooltip>
+            </div>
+            <div id='right-panel' className="tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1 tw-ml-2 tw-border-l tw-border-solid tw-border-gray-300">
+              {/*todo*/}
+            </div>
           </div>
-          <div id='right-panel' className="tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1 tw-ml-2">
-            <span className='tw-uppercase tw-font-bold tw-select-none'>Results</span>
-            <div className='tw-flex tw-flex-col tw-flex-1 tw-mt-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md'>
-              <div className="tw-mb-5 tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden">
-                {errorMessage &&
-                  <div className="tw-p-5 tw-text-red-600 tw-font-bold tw-border-gray-300 tw-border-solid tw-border-b">
-                    Error: {errorMessage}
+        </div>
+        <div id="funnel-panel" className='tw-flex tw-flex-col tw-flex-1 tw-mb-10'>
+          <span className='tw-uppercase tw-font-bold tw-select-none'>Results</span>
+          <div className='tw-flex tw-flex-col tw-flex-1 tw-mt-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md'>
+            <div className="tw-mb-5 tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden">
+              {errorMessage &&
+                <div className="tw-p-5 tw-text-red-600 tw-font-bold tw-border-gray-300 tw-border-solid tw-border-b">
+                  Error: {errorMessage}
+                </div>
+              }
+              {!queryLoading && funnelData.length ?
+                <div className='tw-overflow-scroll tw-mt-5'>
+                  <ResponsiveContainer width={300 * funnelData.length} height={320}>
+                    <BarChart data={funnelData} margin={{ top: 5, right: 30, left: 0, bottom: 25 }}>
+                      <XAxis dataKey="name" height={30} />
+                      <YAxis ticks={[0, 20, 40, 60, 80, 100]} tickFormatter={tick => tick + "%"} domain={[0, 100]} allowDataOverflow={true} />
+                      <RechartTooltip />
+                      <Bar dataKey="percentage" barSize={200} fill="#639f63" background={{ fill: '#eee' }} radius={[5, 5, 0, 0]} />
+                      <Bar dataKey="count" barSize={0} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+                :
+                queryLoading ?
+                  <Loading />
+                  :
+                  <div className='tw-flex tw-flex-col tw-flex-grow tw-justify-center tw-items-center'>
+                    <PlusCircleIcon className='tw-h-12 tw-mb-1' />
+                    <div className='tw-text-lg tw-font-medium'>
+                      Choose two or more steps to see results!
+                    </div>
+                    <div>
+                      Add steps to your conversion funnel by selecting them in the Steps panel above.
+                    </div>
                   </div>
-                }
-                <Transition show={!queryLoading && funnelData.length > 0}>
-                  <div className='tw-overflow-scroll tw-mt-5 tw-border-b tw-border-gray-300 tw-border-solid '>
-                    <ResponsiveContainer width={300 * funnelData.length} height={320}>
-                      <BarChart data={funnelData} margin={{ top: 5, right: 30, left: 0, bottom: 25 }}>
-                        <XAxis dataKey="name" height={30} />
-                        <YAxis ticks={[0, 20, 40, 60, 80, 100]} tickFormatter={tick => tick + "%"} domain={[0, 100]} allowDataOverflow={true} />
-                        <RechartTooltip />
-                        <Bar dataKey="percentage" barSize={200} fill="#639f63" background={{ fill: '#eee' }} radius={[5, 5, 0, 0]} />
-                        <Bar dataKey="count" barSize={0} />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </Transition>
+              }
+            </div>
+          </div>
+        </div>
+        <Transition show={!queryLoading && funnelData.length > 0}>
+          <div id="breakdown-panel" className='tw-flex tw-flex-col tw-flex-1 tw-mb-20'>
+            <span className='tw-uppercase tw-font-bold tw-select-none'>Breakdown</span>
+            <div className='tw-flex tw-flex-col tw-flex-1 tw-mt-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md tw-overflow-hidden'>
+              <div className=" tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-max-h-64 tw-overflow-hidden">
                 <MemoizedResultsTable loading={queryLoading} schema={schema} results={queryResults} placeholder="Choose two or more steps to see results!" />
               </div>
             </div>
           </div>
-        </div>
+        </Transition>
       </div>
     </>
   );
@@ -230,24 +258,21 @@ const Steps: React.FC<StepsProps> = props => {
   }, [id, steps, setErrorMessage, updateFunnel]);
 
   return (
-    <>
-      <span className='tw-uppercase tw-font-bold'>Steps</span>
-      <div id="steps" className='tw-mt-2'>
-        {steps.map((step, index) =>
-          <Step
-            key={index}
-            index={index}
-            step={step}
-            setEvent={(event) => onEventSelected(event, index)}
-            removeEvent={() => onEventRemoved(index)}
-            setStepFilters={(stepFilters) => setStepFilters(stepFilters, index)}
-            connectionID={connectionID}
-            eventSetID={eventSetID}
-          />
-        )}
-        <NewStep index={steps.length} addEvent={onEventAdded} connectionID={connectionID} eventSetID={eventSetID} />
-      </div>
-    </>
+    <div id="steps">
+      {steps.map((step, index) =>
+        <Step
+          key={index}
+          index={index}
+          step={step}
+          setEvent={(event) => onEventSelected(event, index)}
+          removeEvent={() => onEventRemoved(index)}
+          setStepFilters={(stepFilters) => setStepFilters(stepFilters, index)}
+          connectionID={connectionID}
+          eventSetID={eventSetID}
+        />
+      )}
+      <NewStep index={steps.length} addEvent={onEventAdded} connectionID={connectionID} eventSetID={eventSetID} />
+    </div>
   );
 };
 
@@ -267,8 +292,8 @@ const Step: React.FC<StepProp> = props => {
 
 
   return (
-    <div className='tw-flex tw-mb-4'>
-      <div className='tw-w-full tw-border tw-border-solid tw-border-gray-300 tw-rounded-t-md tw-rounded-b-md'>
+    <div className='tw-flex tw-mb-4 tw-max-w-md'>
+      <div className='tw-w-full tw-border tw-border-solid tw-border-gray-300 tw-rounded-md'>
         <div className='tw-flex tw-items-center tw-p-2'>
           <div className='tw-flex tw-mr-2 tw-items-center tw-justify-center tw-shrink-0 tw-rounded-full tw-bg-fabra-green-500 tw-text-white tw-h-6 tw-w-6 tw-my-auto'>
             {index + 1}
@@ -303,7 +328,7 @@ type NewStepProps = {
 
 const NewStep: React.FC<NewStepProps> = props => {
   return (
-    <div className='tw-flex tw-mb-4'>
+    <div className='tw-flex tw-mb-4 tw-max-w-md'>
       <div className='tw-w-full tw-mt-[-1px] tw-border tw-border-solid tw-border-gray-300 tw-rounded-t-md tw-rounded-b-md'>
         <div className='tw-flex tw-items-center tw-p-2'>
           <div className='tw-flex tw-mr-2 tw-items-center tw-justify-center tw-shrink-0 tw-rounded-full tw-bg-fabra-green-500 tw-text-white tw-h-6 tw-w-6 tw-my-auto'>
