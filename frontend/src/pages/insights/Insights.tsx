@@ -2,33 +2,19 @@ import { Menu, Transition } from '@headlessui/react';
 import { EllipsisHorizontalIcon } from '@heroicons/react/20/solid';
 import { ChartBarIcon, CommandLineIcon } from '@heroicons/react/24/outline';
 import classNames from 'classnames';
-import React, { Fragment, MouseEvent, ReactNode, useCallback, useEffect, useState } from 'react';
+import React, { Fragment, MouseEvent, ReactNode, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, DivButton } from 'src/components/button/Button';
 import { Loading } from 'src/components/loading/Loading';
 import { Modal } from 'src/components/modal/Modal';
 import { sendRequest } from 'src/rpc/ajax';
-import { Analysis, AnalysisType, DeleteAnalysis, GetAllAnalyses } from 'src/rpc/api';
+import { Analysis, AnalysisType, DeleteAnalysis } from 'src/rpc/api';
+import { useAnalyses } from "src/rpc/data";
 
 export const Insights: React.FC = () => {
   const navigate = useNavigate();
-  const [analyses, setAnalyses] = useState<Analysis[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { analyses, mutate } = useAnalyses();
   const [analysisToDelete, setAnalysisToDelete] = useState<Analysis | null>(null);
-  useEffect(() => {
-    setLoading(true);
-    let ignore = false;
-    sendRequest(GetAllAnalyses).then((results) => {
-      if (!ignore) {
-        setAnalyses(results.analyses);
-        setLoading(false);
-      }
-    });
-
-    return () => {
-      ignore = true;
-    };
-  }, []);
 
   const onClick = (analysis: Analysis) => {
     switch (analysis.analysis_type) {
@@ -43,15 +29,15 @@ export const Insights: React.FC = () => {
 
   const deleteAnalysis = useCallback(async (analysisID: number) => {
     await sendRequest(DeleteAnalysis, { analysisID: analysisID });
-    const updatedAnalyses = analyses.filter(analysis => analysis.id !== analysisID);
-    setAnalyses(updatedAnalyses);
-  }, [analyses]);
+    const updatedAnalyses = analyses ? analyses.filter(analysis => analysis.id !== analysisID) : [];
+    mutate({ analyses: updatedAnalyses });
+  }, [analyses, mutate]);
 
   return (
     <div className='tw-h-full tw-overflow-scroll'>
       <div className='tw-w-full'>
         <DeleteModal analysisToDelete={analysisToDelete} deleteAnalysis={deleteAnalysis} close={() => setAnalysisToDelete(null)} />
-        {loading ? <Loading className='tw-mx-auto tw-mt-32' /> : (
+        {!analyses ? <Loading className='tw-mx-auto tw-mt-32' /> : (
           <ul className='tw-relative tw-z-0 tw-list-none tw-p-0 tw-m-0 tw-pb-24'>
             {analyses.map((analysis, index) =>
               <li key={index} className='tw-relative tw-w-full tw-h-12 tw-border-b tw-border-solid tw-border-gray-200 tw-box-border tw-cursor-pointer tw-select-none tw-text-sm'>

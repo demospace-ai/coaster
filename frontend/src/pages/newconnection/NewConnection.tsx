@@ -5,7 +5,8 @@ import { BackButton, Button, FormButton } from "src/components/button/Button";
 import { ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { sendRequest } from "src/rpc/ajax";
-import { CreateDataConnection, CreateDataConnectionRequest, DataConnectionType, TestDataConnection, TestDataConnectionRequest } from "src/rpc/api";
+import { CreateDataConnection, CreateDataConnectionRequest, DataConnectionType, GetDataConnections, TestDataConnection, TestDataConnectionRequest } from "src/rpc/api";
+import { mutate } from "swr";
 
 import styles from './newconnection.m.css';
 
@@ -106,6 +107,7 @@ const NewConnectionConfiguration: React.FC<NewConnectionConfigurationProps> = pr
 
     try {
       await sendRequest(CreateDataConnection, payload);
+      mutate({ GetDataConnections }); // Tell SWRs to refetch data connections
       setCreateConnectionSuccess(true);
     } catch (e) {
       setCreateConnectionSuccess(false);

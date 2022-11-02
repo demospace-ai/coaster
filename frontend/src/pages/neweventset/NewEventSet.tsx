@@ -6,7 +6,8 @@ import { ValidatedComboInput, ValidatedInput } from "src/components/input/Input"
 import { Loading } from "src/components/loading/Loading";
 import { ConnectionSelector, DatasetSelector, TableSelector } from "src/components/selector/Selector";
 import { sendRequest } from "src/rpc/ajax";
-import { ColumnSchema, CreateEventSet, CreateEventSetRequest, DataConnection, GetSchema, GetSchemaRequest, Schema } from "src/rpc/api";
+import { ColumnSchema, CreateEventSet, CreateEventSetRequest, DataConnection, GetEventSets, GetSchema, GetSchemaRequest, Schema } from "src/rpc/api";
+import { mutate } from "swr";
 
 enum Step {
   One,
@@ -152,7 +153,7 @@ export const NewEventSetStepTwo: React.FC<NewEventSetFormProps> = props => {
   return (
     <>
       <div className="tw-w-full tw-text-center tw-mb-4 tw-font-bold tw-text-md">Step 2/3</div>
-      <Tab.Group onChange={value => setState({ ...state, tableType: value })}>
+      <Tab.Group onChange={value => setState({ ...state, tableType: value })} selectedIndex={state.tableType}>
         <Tab.List className="tw-flex tw-space-x-1 tw-rounded-xl tw-bg-gray-200 tw-p-1">
           <Tab className={tabClass}>Single Table</Tab>
           <Tab className={tabClass}>Custom Join</Tab>
@@ -275,6 +276,7 @@ export const NewEventSetStepThree: React.FC<NewEventSetFormProps & { onComplete:
 
     try {
       await sendRequest(CreateEventSet, payload);
+      mutate({ GetEventSets }); // Tell SWRs to refetch event sets
       setCreateEventSetSuccess(true);
     } catch (e) {
       setCreateEventSetSuccess(false);

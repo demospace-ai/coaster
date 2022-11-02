@@ -4,9 +4,9 @@ import classNames from 'classnames';
 import React, { Fragment } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Loading } from 'src/components/loading/Loading';
-import { useAnalysis } from 'src/pages/insights/actions';
 import { useLogout } from 'src/pages/login/actions';
 import { useSelector } from 'src/root/model';
+import { useAnalysis } from 'src/rpc/data';
 
 export const Header: React.FC = () => {
   const location = useLocation();

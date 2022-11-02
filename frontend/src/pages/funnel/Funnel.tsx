@@ -11,10 +11,10 @@ import { ConfigureAnalysisModal } from 'src/components/modal/Modal';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { EventSelector, FilterSelector, PropertySelector, PropertyValueSelector } from "src/components/selector/Selector";
 import { Tooltip } from 'src/components/tooltip/Tooltip';
-import { useAnalysis } from 'src/pages/insights/actions';
 import { runFunnelQuery } from 'src/queries/queries';
 import { sendRequest } from 'src/rpc/ajax';
-import { AnalysisType, DataConnection, Event, EventFilter, EventInput, EventSet, filtersMatch, FilterType, Property, QueryResults, Schema, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
+import { Event, EventFilter, EventInput, filtersMatch, FilterType, Property, QueryResults, Schema, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
+import { useAnalysis } from "src/rpc/data";
 import { toEmptyList } from 'src/utils/undefined';
 
 type FunnelParams = {
@@ -46,11 +46,10 @@ TODO: tests
 */
 export const Funnel: React.FC = () => {
   const { id } = useParams<FunnelParams>();
+  const { analysis, mutate } = useAnalysis(id);
 
   const [queryLoading, setQueryLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const { analysis, mutate } = useAnalysis(id!);
 
   const [saving, setSaving] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
@@ -60,9 +59,6 @@ export const Funnel: React.FC = () => {
   const [queryResults, setQueryResults] = useState<QueryResults | undefined>(undefined);
   const [funnelData, setFunnelData] = useState<FunnelResult[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
-
-  const connectionID = analysis?.connection?.id;
-  const eventSetID = analysis?.event_set?.id;
 
   const updateSteps = useCallback(async (id: number, updates: FunnelUpdates) => {
     const payload: UpdateAnalysisRequest = { analysis_id: Number(id) };
@@ -89,23 +85,33 @@ export const Funnel: React.FC = () => {
     setTimeout(() => setSaving(false), 500);
   };
 
+  const copyLink = () => {
+    setCopied(true);
+    navigator.clipboard.writeText(window.location.href);
+    setTimeout(() => setCopied(false), 1200);
+  };
+
   const runQuery = useCallback(async () => {
     setQueryLoading(true);
     setErrorMessage(null);
 
-    if (!connectionID) {
+    if (!analysis) {
+      return;
+    }
+
+    if (!analysis.connection) {
       setErrorMessage("Data source is not set!");
       setQueryLoading(false);
       return;
     }
 
-    if (!eventSetID) {
+    if (!analysis.event_set) {
       setErrorMessage("Event set is not set!");
       setQueryLoading(false);
       return;
     }
 
-    if (!analysis || !analysis.events || analysis.events.length < 2) {
+    if (!analysis.events || analysis.events.length < 2) {
       setErrorMessage("Must have 2 or more steps!");
       setQueryLoading(false);
       return;
@@ -125,17 +131,16 @@ export const Funnel: React.FC = () => {
     }
 
     setQueryLoading(false);
-  }, [connectionID, eventSetID, id, analysis]);
-
-  const copyLink = () => {
-    setCopied(true);
-    navigator.clipboard.writeText(window.location.href);
-    setTimeout(() => setCopied(false), 1200);
-  };
+  }, [id, analysis]);
 
   if (shouldRun) {
     runQuery();
     setShouldRun(false);
+  }
+
+  if (!id) {
+    // This should never happen
+    return <Loading />;
   }
 
   if (!analysis) {
@@ -144,14 +149,14 @@ export const Funnel: React.FC = () => {
 
   return (
     <>
-      <ConfigureAnalysisModal analysisID={Number(id)} analysisType={AnalysisType.Funnel} connection={analysis.connection} setConnection={(connection: DataConnection) => analysis.connection = connection} eventSet={analysis.event_set} setEventSet={(eventSet: EventSet) => analysis.event_set = eventSet} show={showModal} close={() => setShowModal(false)} />
+      <ConfigureAnalysisModal analysisID={id} show={showModal} close={() => setShowModal(false)} />
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-scroll">
         <ReportHeader title={analysis.title} description={analysis.description} copied={copied} saving={saving} copyLink={copyLink} save={updateFunnel} showModal={() => setShowModal(true)} />
         <div className='tw-mt-8 tw-mb-10'>
           <span className='tw-uppercase tw-font-bold -tw-mt-1'>Steps</span>
           <div id="steps-panel" className='tw-flex tw-flex-1 tw-mt-2 tw-p-5 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md'>
             <div id='left-panel' className="tw-w-1/2 tw-min-w-1/2 tw-flex tw-flex-col tw-select-none tw-pr-10">
-              <Steps id={Number(id)} connectionID={connectionID} eventSetID={eventSetID} steps={toEmptyList(analysis.events)} setErrorMessage={setErrorMessage} updateFunnel={updateSteps} />
+              <Steps id={Number(id)} connectionID={analysis.connection?.id} eventSetID={analysis.event_set?.id} steps={toEmptyList(analysis.events)} setErrorMessage={setErrorMessage} updateFunnel={updateSteps} />
               <Tooltip label={"⌘ + Enter"}>
                 <Button className="tw-w-40 tw-h-8" onClick={runQuery}>{queryLoading ? "Stop" : "Run"}</Button>
               </Tooltip>

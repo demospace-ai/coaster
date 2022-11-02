@@ -1,10 +1,7 @@
 import classNames from "classnames";
-import { useEffect, useState } from "react";
 import { ValidatedComboInput, ValidatedDropdownInput } from "src/components/input/Input";
-import { getPropertyValues } from "src/queries/queries";
-import { sendRequest } from "src/rpc/ajax";
-import { DataConnection, EventSet, FilterType, GetDataConnections, GetDatasets, GetEvents, GetEventSets, GetEventsRequest, GetEventsResponse, GetProperties, GetPropertiesRequest, GetPropertiesResponse, GetTables, Property, PropertyGroup } from "src/rpc/api";
-import useSWR, { Fetcher } from "swr";
+import { DataConnection, EventSet, FilterType, Property, PropertyGroup } from "src/rpc/api";
+import { useDataConnections, useDatasets, useEventProperties, useEvents, useEventSets, usePropertyValues, useTables } from "src/rpc/data";
 
 type ConnectionSelectorProps = {
   connection: DataConnection | undefined;
@@ -16,31 +13,16 @@ type ConnectionSelectorProps = {
 };
 
 export const ConnectionSelector: React.FC<ConnectionSelectorProps> = props => {
-  const [connectionOptions, setConnectionOptions] = useState<DataConnection[]>();
-  const [loading, setLoading] = useState(false);
-  useEffect(() => {
-    setLoading(true);
-    let ignore = false;
-    sendRequest(GetDataConnections).then((results) => {
-      if (!ignore) {
-        setConnectionOptions(results.data_connections);
-        setLoading(false);
-      }
-    });
-
-    return () => {
-      ignore = true;
-    };
-  }, []);
+  const { connections } = useDataConnections();
 
   return <ValidatedDropdownInput
     by="id"
     className={props.className}
     selected={props.connection}
     setSelected={(connection: DataConnection) => props.setConnection(connection)}
-    options={connectionOptions}
-    getElementForDisplay={(connection: DataConnection | undefined) => connection ? connection.display_name : ""}
-    loading={loading}
+    options={connections}
+    getElementForDisplay={(connection: DataConnection) => connection.display_name}
+    loading={!connections}
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No data sources available!"}
     placeholder={props.placeholder ? props.placeholder : "Choose data source"}
     validated={props.validated} />;
@@ -57,35 +39,14 @@ type DatasetSelectorProps = {
 };
 
 export const DatasetSelector: React.FC<DatasetSelectorProps> = props => {
-  const [datasetOptions, setDatasetOptions] = useState<string[]>();
-  const [loading, setLoading] = useState(false);
-  const connectionID = props.connection?.id;
-  useEffect(() => {
-    if (!connectionID) {
-      return;
-    }
-
-    setLoading(true);
-    let ignore = false;
-    sendRequest(GetDatasets, { connectionID: connectionID }).then((results) => {
-      if (!ignore) {
-        setDatasetOptions(results.datasets);
-      }
-
-      setLoading(false);
-    });
-
-    return () => {
-      ignore = true;
-    };
-  }, [connectionID]);
+  const { datasets } = useDatasets(props.connection?.id);
 
   return <ValidatedDropdownInput
     className={props.className}
     selected={props.datasetName}
     setSelected={(datasetName: string) => props.setDatasetName(datasetName)}
-    options={datasetOptions}
-    loading={loading}
+    options={datasets}
+    loading={!datasets}
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No datasets available!"}
     placeholder={props.placeholder ? props.placeholder : "Choose dataset"}
     validated={props.validated} />;
@@ -103,41 +64,21 @@ type TableSelectorProps = {
 };
 
 export const TableSelector: React.FC<TableSelectorProps> = props => {
-  const [tableOptions, setTableOptions] = useState<string[]>();
-  const [loading, setLoading] = useState(false);
-  const connectionID = props.connection?.id;
-  useEffect(() => {
-    if (!connectionID || !props.datasetName) {
-      return;
-    }
-
-    setLoading(true);
-    let ignore = false;
-    sendRequest(GetTables, { connectionID: connectionID, datasetID: props.datasetName }).then((results) => {
-      if (!ignore) {
-        setTableOptions(results.tables);
-        setLoading(false);
-      }
-    });
-
-    return () => {
-      ignore = true;
-    };
-  }, [connectionID, props.datasetName]);
+  const { tables } = useTables(props.connection?.id, props.datasetName);
 
   return <ValidatedComboInput
     className={props.className}
     selected={props.tableName}
     setSelected={(tableName: string) => props.setTableName(tableName)}
-    options={tableOptions}
-    loading={loading}
+    options={tables}
+    loading={!tables}
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No tables available!"}
     placeholder={props.placeholder ? props.placeholder : "Choose table"}
     validated={props.validated} />;
 };
 
 type EventSetSelectorProps = {
-  connection: DataConnection | undefined;
+  connection: DataConnection | undefined; // TODO: unused, but in the future should use an API that scopes to only event sets for a specific connection
   eventSet: EventSet | undefined;
   setEventSet: (eventSet: EventSet) => void;
   className?: string;
@@ -147,47 +88,20 @@ type EventSetSelectorProps = {
 };
 
 export const EventSetSelector: React.FC<EventSetSelectorProps> = props => {
-  const [eventSetOptions, setEventSetOptions] = useState<EventSet[]>();
-  const [loading, setLoading] = useState(false);
-  const connectionID = props.connection ? props.connection.id : undefined;
-  useEffect(() => {
-    if (!connectionID) {
-      return;
-    }
-
-    setLoading(true);
-    let ignore = false;
-    sendRequest(GetEventSets, { connectionID: connectionID }).then((results) => {
-      if (!ignore) {
-        setEventSetOptions(results.event_sets);
-        setLoading(false);
-      }
-    });
-
-    return () => {
-      ignore = true;
-    };
-  }, [connectionID]);
+  const { eventSets } = useEventSets();
 
   return <ValidatedDropdownInput
     by="id"
     className={props.className}
     selected={props.eventSet}
     setSelected={(eventSet: EventSet) => props.setEventSet(eventSet)}
-    options={eventSetOptions}
+    options={eventSets}
     getElementForDisplay={(eventSet: EventSet) => eventSet.display_name}
-    loading={loading}
+    loading={!eventSets}
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No event sets available!"}
     placeholder={props.placeholder ? props.placeholder : "Choose event set"}
     validated={props.validated} />;
 };
-
-export function useEvents(connectionID: number | undefined, eventSetID: number | undefined) {
-  const fetcher: Fetcher<GetEventsResponse, GetEventsRequest> = (payload: GetEventsRequest) => sendRequest(GetEvents, payload);
-  const shouldFetch = connectionID && eventSetID;
-  const { data, error } = useSWR(() => shouldFetch ? { GetEvents, connectionID, eventSetID } : { data: { events: [] } }, fetcher);
-  return { events: data?.events, error };
-}
 
 type EventSelectorProps = {
   connectionID: number | undefined;
@@ -272,14 +186,6 @@ export const FilterSelector: React.FC<FilterSelectorProps> = props => {
     noCaret={true} />;
 };
 
-
-export function useEventProperties(connectionID: number | undefined, eventSetID: number | undefined) {
-  const fetcher: Fetcher<GetPropertiesResponse, GetPropertiesRequest> = (payload: GetPropertiesRequest) => sendRequest(GetProperties, payload);
-  const shouldFetch = connectionID && eventSetID;
-  const { data, error } = useSWR(() => shouldFetch ? { GetProperties, connectionID, eventSetID } : { data: { property_groups: [] } }, fetcher);
-  return { properties: data?.property_groups, error };
-}
-
 type PropertySelectorProps = {
   property: Property | undefined,
   setProperty: (property: Property) => void;
@@ -323,26 +229,7 @@ type PropertyValueSelectorProps = {
 };
 
 export const PropertyValueSelector: React.FC<PropertyValueSelectorProps> = props => {
-  const [propertyValues, setPropertyValues] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
-  useEffect(() => {
-    if (!props.connectionID || !props.eventSetID || !props.property?.name) {
-      return;
-    }
-
-    setLoading(true);
-    let ignore = false;
-    getPropertyValues(props.connectionID, props.eventSetID, props.property.name).then((results) => {
-      if (!ignore) {
-        setPropertyValues(results);
-        setLoading(false);
-      }
-    });
-
-    return () => {
-      ignore = true;
-    };
-  }, [props.connectionID, props.eventSetID, props.property?.name]);
+  const { propertyValues } = usePropertyValues(props.connectionID, props.eventSetID, props.property?.name);
 
   return <ValidatedComboInput
     className={props.className}
@@ -350,7 +237,7 @@ export const PropertyValueSelector: React.FC<PropertyValueSelectorProps> = props
     setSelected={(eventProperty: string) => props.setPropertyValue(eventProperty)}
     options={propertyValues}
     getElementForDisplay={(propertyValue: string) => propertyValue ? propertyValue : "<empty>"}
-    loading={loading}
+    loading={!propertyValues}
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No properties values available!"}
     placeholder={props.placeholder ? props.placeholder : "Choose property value"}
     validated={props.validated}

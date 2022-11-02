@@ -13,9 +13,9 @@ import { ConfigureAnalysisModal } from 'src/components/modal/Modal';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { DatasetSelector, TableSelector } from "src/components/selector/Selector";
 import { Tooltip } from 'src/components/tooltip/Tooltip';
-import { useAnalysis, useSchema } from "src/pages/insights/actions";
 import { sendRequest } from "src/rpc/ajax";
-import { AnalysisType, DataConnection, QueryResults, RunCustomQuery, RunCustomQueryRequest, Schema, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
+import { DataConnection, QueryResults, RunCustomQuery, RunCustomQueryRequest, Schema, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
+import { useAnalysis, useSchema } from "src/rpc/data";
 import { useDebounce } from 'src/utils/debounce';
 import { createResizeFunction } from 'src/utils/resize';
 
@@ -36,8 +36,7 @@ TODO: tests
 */
 export const CustomQuery: React.FC = () => {
   const { id } = useParams<QueryParams>();
-  const { analysis } = useAnalysis(id!);
-  const connectionID = analysis?.connection?.id;
+  const { analysis } = useAnalysis(id);
 
   const [saving, setSaving] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
@@ -139,7 +138,7 @@ export const CustomQuery: React.FC = () => {
       updateCustomQuery(Number(id), { query: analysis?.query });
       setTimeout(() => setSaving(false), 500);
     }
-  }, [id, connectionID, analysis, shouldRun, shouldSave, runQuery, updateCustomQuery]);
+  }, [id, analysis, shouldRun, shouldSave, runQuery, updateCustomQuery]);
 
   const copyLink = () => {
     setCopied(true);
@@ -147,13 +146,17 @@ export const CustomQuery: React.FC = () => {
     setTimeout(() => setCopied(false), 1200);
   };
 
+  if (!id) {
+    return <Loading />;
+  }
+
   if (!analysis) {
     return <Loading />;
   }
 
   return (
     <>
-      <ConfigureAnalysisModal analysisID={Number(id)} analysisType={AnalysisType.CustomQuery} connection={analysis.connection} setConnection={(connection: DataConnection) => analysis.connection = connection} eventSet={undefined} setEventSet={() => undefined} show={showModal} close={() => setShowModal(false)} />
+      <ConfigureAnalysisModal analysisID={id} show={showModal} close={() => setShowModal(false)} />
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-scroll" >
         <ReportHeader title={analysis.title} description={analysis.description} copied={copied} saving={saving} copyLink={copyLink} save={() => setShouldSave(true)} showModal={() => setShowModal(true)} />
         <div className='tw-flex tw-flex-1 tw-min-w-0 tw-min-h-0 tw-my-8'>

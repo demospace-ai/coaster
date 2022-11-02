@@ -5,6 +5,7 @@ import { Loading } from 'src/components/loading/Loading';
 import { ConnectionSelector, EventSetSelector } from 'src/components/selector/Selector';
 import { sendRequest } from 'src/rpc/ajax';
 import { AnalysisType, DataConnection, EventSet, UpdateAnalysis, UpdateAnalysisRequest } from 'src/rpc/api';
+import { useAnalysis } from 'src/rpc/data';
 import styles from './modal.m.css';
 
 interface ModalProps {
@@ -53,28 +54,23 @@ export const Modal: React.FC<ModalProps> = props => {
 
 
 type ConfigureAnalysisModalProps = {
-  analysisID: number;
-  analysisType: AnalysisType;
-  connection: DataConnection | undefined;
-  setConnection: (dataConnection: DataConnection) => void;
-  eventSet: EventSet | undefined;
-  setEventSet: (eventSet: EventSet) => void;
+  analysisID: string;
   show: boolean;
   close: () => void;
 };
 
 export const ConfigureAnalysisModal: React.FC<ConfigureAnalysisModalProps> = props => {
-  const { connection, setConnection, eventSet, setEventSet } = props;
+  const { analysis, mutate } = useAnalysis(props.analysisID);
+  const [connection, setConnection] = useState<DataConnection | undefined>(analysis?.connection);
+  const [eventSet, setEventSet] = useState<EventSet | undefined>(analysis?.event_set);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const updateAnalysis = async (analysisID: number | null) => {
-    if (analysisID === null) {
+  const updateAnalysis = async (analysisID: number | undefined) => {
+    if (!analysisID) {
       return;
     }
 
     const payload: UpdateAnalysisRequest = { analysis_id: analysisID };
-
-    setLoading(true);
     if (connection) {
       payload.connection_id = connection.id;
     }
@@ -83,8 +79,9 @@ export const ConfigureAnalysisModal: React.FC<ConfigureAnalysisModalProps> = pro
       payload.event_set_id = eventSet.id;
     }
 
+    setLoading(true);
     try {
-      await sendRequest(UpdateAnalysis, payload);
+      mutate(() => sendRequest(UpdateAnalysis, payload), {});
     } catch (e) {
       // TODO: handle error here
     }
@@ -94,16 +91,20 @@ export const ConfigureAnalysisModal: React.FC<ConfigureAnalysisModalProps> = pro
 
   return (
     <Modal show={props.show} close={props.close} title="Configure Analysis" titleStyle='tw-font-bold tw-text-xl'>
-      <div className='tw-w-80 tw-m-6'>
-        <ConnectionSelector connection={connection} setConnection={setConnection} />
-        {props.analysisType === AnalysisType.Funnel && <EventSetSelector className="tw-mt-4" connection={connection} eventSet={eventSet} setEventSet={setEventSet} />}
-        <div className='tw-mt-8 tw-flex'>
-          <div className='tw-ml-auto'>
-            <Button className='tw-bg-white tw-text-gray-800 hover:tw-bg-gray-200 tw-border-0 tw-mr-3' onClick={props.close}>Cancel</Button>
-            <Button className='tw-w-24 tw-bg-fabra-green-500 hover:tw-bg-fabra-green-600 tw-border-0' onClick={() => updateAnalysis(props.analysisID)}>{loading ? <Loading className='tw-inline' /> : "Save"}</Button>
+      {analysis ?
+        <div className='tw-w-80 tw-m-6'>
+          <ConnectionSelector connection={connection} setConnection={setConnection} />
+          {analysis.analysis_type === AnalysisType.Funnel && <EventSetSelector className="tw-mt-4" connection={connection} eventSet={eventSet} setEventSet={setEventSet} />}
+          <div className='tw-mt-8 tw-flex'>
+            <div className='tw-ml-auto'>
+              <Button className='tw-bg-white tw-text-gray-800 hover:tw-bg-gray-200 tw-border-0 tw-mr-3' onClick={props.close}>Cancel</Button>
+              <Button className='tw-w-24 tw-bg-fabra-green-500 hover:tw-bg-fabra-green-600 tw-border-0' onClick={() => updateAnalysis(analysis.id)}>{loading ? <Loading className='tw-inline' /> : "Save"}</Button>
+            </div>
           </div>
         </div>
-      </div>
+        :
+        <Loading />
+      }
     </Modal>
   );
 };

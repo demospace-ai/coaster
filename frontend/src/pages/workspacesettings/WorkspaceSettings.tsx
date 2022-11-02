@@ -1,6 +1,6 @@
 import { PlusCircleIcon } from "@heroicons/react/20/solid";
 import classNames from "classnames";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { Button } from "src/components/button/Button";
 import { Loading } from "src/components/loading/Loading";
 import { Modal } from "src/components/modal/Modal";
@@ -9,7 +9,8 @@ import { NewConnection } from "src/pages/newconnection/NewConnection";
 import { NewEventSet } from "src/pages/neweventset/NewEventSet";
 import { useDispatch } from "src/root/model";
 import { sendRequest } from "src/rpc/ajax";
-import { DataConnection, EventSet, GetDataConnections, GetEventSets, UpdateOrganization } from "src/rpc/api";
+import { DataConnection, EventSet, UpdateOrganization } from "src/rpc/api";
+import { useDataConnections, useEventSets } from "src/rpc/data";
 
 enum Step {
   Initial,
@@ -23,15 +24,15 @@ const tableCellStyle = "tw-whitespace-nowrap tw-px-3 tw-py-4 tw-text-sm tw-text-
 export const WorkspaceSettings: React.FC = () => {
   const dispatch = useDispatch();
   const [step, setStep] = useState<Step>(Step.Initial);
-  const [connectionMap, setConnectionMap] = useState<Map<number, DataConnection> | undefined>(undefined);
-  const [dataConnections, setDataConnections] = useState<DataConnection[] | undefined>(undefined);
-  const [eventSets, setEventSets] = useState<EventSet[] | undefined>(undefined);
+
   const [selectedConnection, setSelectedConnection] = useState<DataConnection | undefined>(undefined);
   const [selectedEventSet, setSelectedEventSet] = useState<EventSet | undefined>(undefined);
+
   const close = () => {
     setSelectedConnection(undefined);
     setSelectedEventSet(undefined);
   };
+
   const setDefault = useCallback(async (connectionID: number | undefined, eventSetID: number | undefined) => {
     try {
       const response = await sendRequest(UpdateOrganization, { connection_id: connectionID, event_set_id: eventSetID });
@@ -43,44 +44,14 @@ export const WorkspaceSettings: React.FC = () => {
     }
   }, [dispatch]);
 
-  // TODO: reload on new data source added
-  useEffect(() => {
-    let ignore = false;
-    sendRequest(GetDataConnections).then((results) => {
-      if (!ignore) {
-        setDataConnections(results.data_connections);
-        setConnectionMap(new Map(results.data_connections.map(i => [i.id, i])));
-      }
-    });
-
-    return () => {
-      ignore = true;
-    };
-  }, [setConnectionMap]);
-
-  // TODO: reload on new event set added
-  useEffect(() => {
-    let ignore = false;
-
-    sendRequest(GetEventSets).then((results) => {
-      if (!ignore) {
-        setEventSets(results.event_sets);
-      }
-    });
-
-    return () => {
-      ignore = true;
-    };
-  }, []);
-
   let content;
   switch (step) {
     case Step.Initial:
       content = (
         <div className='tw-py-14 tw-px-20'>
           <SetDefaultModal connection={selectedConnection} eventSet={selectedEventSet} setDefault={setDefault} close={close} />
-          <DataSourceSettings setStep={setStep} dataConnections={dataConnections} setSelectedConnection={setSelectedConnection} />
-          <EventSetSettings setStep={setStep} connectionMap={connectionMap} eventSets={eventSets} setSelectedEventSet={setSelectedEventSet} />
+          <DataSourceSettings setStep={setStep} setSelectedConnection={setSelectedConnection} />
+          <EventSetSettings setStep={setStep} setSelectedEventSet={setSelectedEventSet} />
         </div>
       );
       break;
@@ -97,11 +68,12 @@ export const WorkspaceSettings: React.FC = () => {
 
 type DataSourceSettingsProps = {
   setStep: (step: Step) => void;
-  dataConnections: DataConnection[] | undefined;
   setSelectedConnection: (connection: DataConnection) => void;
 };
 
-const DataSourceSettings: React.FC<DataSourceSettingsProps> = ({ setStep, dataConnections, setSelectedConnection }) => {
+const DataSourceSettings: React.FC<DataSourceSettingsProps> = ({ setStep, setSelectedConnection }) => {
+  const { connections } = useDataConnections();
+
   return (
     <>
       <div className="tw-flex tw-w-full tw-mb-3">
@@ -116,7 +88,7 @@ const DataSourceSettings: React.FC<DataSourceSettingsProps> = ({ setStep, dataCo
         </Button>
       </div>
       <div className='tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-max-h-64 tw-overflow-x-auto tw-overscroll-contain' >
-        {dataConnections
+        {connections
           ?
           <table className="tw-min-w-full tw-border-separate tw-border-spacing-0">
             <thead className="tw-bg-gray-100">
@@ -128,16 +100,16 @@ const DataSourceSettings: React.FC<DataSourceSettingsProps> = ({ setStep, dataCo
               </tr>
             </thead>
             <tbody>
-              {dataConnections!.length > 0 ? dataConnections!.map((dataConnection, index) => (
+              {connections!.length > 0 ? connections!.map((connection, index) => (
                 <tr key={index} className="tw-border-b tw-border-solid tw-border-gray-200 last:tw-border-0">
                   <td className={tableCellStyle}>
-                    {dataConnection.display_name}
+                    {connection.display_name}
                   </td>
                   <td className={tableCellStyle}>
-                    {dataConnection.connection_type}
+                    {connection.connection_type}
                   </td>
                   <td className={tableCellStyle}>
-                    <div className="tw-cursor-pointer tw-font-medium tw-select-none tw-text-blue-700 hover:tw-text-blue-900" onClick={() => setSelectedConnection(dataConnection)}>Set Default</div>
+                    <div className="tw-cursor-pointer tw-font-medium tw-select-none tw-text-blue-700 hover:tw-text-blue-900" onClick={() => setSelectedConnection(connection)}>Set Default</div>
                   </td>
                   <td className={tableCellStyle}>
                     <div className="tw-cursor-pointer tw-font-medium tw-select-none tw-text-blue-700 hover:tw-text-blue-900" onClick={() => null}>Delete</div>
@@ -156,12 +128,14 @@ const DataSourceSettings: React.FC<DataSourceSettingsProps> = ({ setStep, dataCo
 
 type EventSetSettingsProps = {
   setStep: (step: Step) => void,
-  connectionMap: Map<number, DataConnection> | undefined;
-  eventSets: EventSet[] | undefined;
   setSelectedEventSet: (eventSet: EventSet) => void;
 };
 
-const EventSetSettings: React.FC<EventSetSettingsProps> = ({ setStep, connectionMap, eventSets, setSelectedEventSet }) => {
+const EventSetSettings: React.FC<EventSetSettingsProps> = ({ setStep, setSelectedEventSet }) => {
+  const { connections } = useDataConnections();
+  const connectionMap = new Map(connections?.map(i => [i.id, i]));
+  const { eventSets } = useEventSets();
+
   return (
     <>
       <div className="tw-flex tw-w-full tw-mb-3 tw-mt-8">
