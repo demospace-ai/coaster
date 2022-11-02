@@ -50,7 +50,7 @@ export const Funnel: React.FC = () => {
   const [queryLoading, setQueryLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const { analysisData, mutate } = useAnalysis(id!);
+  const { analysis, mutate } = useAnalysis(id!);
 
   const [saving, setSaving] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
@@ -61,8 +61,8 @@ export const Funnel: React.FC = () => {
   const [funnelData, setFunnelData] = useState<FunnelResult[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
 
-  const connectionID = analysisData?.connection?.id;
-  const eventSetID = analysisData?.event_set?.id;
+  const connectionID = analysis?.connection?.id;
+  const eventSetID = analysis?.event_set?.id;
 
   const updateSteps = useCallback(async (id: number, updates: FunnelUpdates) => {
     const payload: UpdateAnalysisRequest = { analysis_id: Number(id) };
@@ -81,8 +81,8 @@ export const Funnel: React.FC = () => {
   const updateFunnel = () => {
     setSaving(true);
     const updates: FunnelUpdates = {};
-    if (analysisData?.analysis.events) {
-      updates.steps = analysisData.analysis.events;
+    if (analysis?.events) {
+      updates.steps = analysis.events;
     }
 
     updateSteps(Number(id), updates);
@@ -105,7 +105,7 @@ export const Funnel: React.FC = () => {
       return;
     }
 
-    if (!analysisData || !analysisData.analysis.events || analysisData.analysis.events.length < 2) {
+    if (!analysis || !analysis.events || analysis.events.length < 2) {
       setErrorMessage("Must have 2 or more steps!");
       setQueryLoading(false);
       return;
@@ -125,7 +125,7 @@ export const Funnel: React.FC = () => {
     }
 
     setQueryLoading(false);
-  }, [connectionID, eventSetID, id, analysisData]);
+  }, [connectionID, eventSetID, id, analysis]);
 
   const copyLink = () => {
     setCopied(true);
@@ -138,20 +138,20 @@ export const Funnel: React.FC = () => {
     setShouldRun(false);
   }
 
-  if (!analysisData) {
+  if (!analysis) {
     return <Loading />;
   }
 
   return (
     <>
-      <ConfigureAnalysisModal analysisID={Number(id)} analysisType={AnalysisType.Funnel} connection={analysisData.connection} setConnection={(connection: DataConnection) => analysisData.connection = connection} eventSet={analysisData.event_set} setEventSet={(eventSet: EventSet) => analysisData.event_set = eventSet} show={showModal} close={() => setShowModal(false)} />
+      <ConfigureAnalysisModal analysisID={Number(id)} analysisType={AnalysisType.Funnel} connection={analysis.connection} setConnection={(connection: DataConnection) => analysis.connection = connection} eventSet={analysis.event_set} setEventSet={(eventSet: EventSet) => analysis.event_set = eventSet} show={showModal} close={() => setShowModal(false)} />
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-scroll">
-        <ReportHeader title={analysisData.analysis.title} description={analysisData.analysis.description} copied={copied} saving={saving} copyLink={copyLink} save={updateFunnel} showModal={() => setShowModal(true)} />
+        <ReportHeader title={analysis.title} description={analysis.description} copied={copied} saving={saving} copyLink={copyLink} save={updateFunnel} showModal={() => setShowModal(true)} />
         <div className='tw-mt-8 tw-mb-10'>
           <span className='tw-uppercase tw-font-bold -tw-mt-1'>Steps</span>
           <div id="steps-panel" className='tw-flex tw-flex-1 tw-mt-2 tw-p-5 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md'>
             <div id='left-panel' className="tw-w-1/2 tw-min-w-1/2 tw-flex tw-flex-col tw-select-none tw-pr-10">
-              <Steps id={Number(id)} connectionID={connectionID} eventSetID={eventSetID} steps={toEmptyList(analysisData.analysis.events)} setErrorMessage={setErrorMessage} updateFunnel={updateSteps} />
+              <Steps id={Number(id)} connectionID={connectionID} eventSetID={eventSetID} steps={toEmptyList(analysis.events)} setErrorMessage={setErrorMessage} updateFunnel={updateSteps} />
               <Tooltip label={"⌘ + Enter"}>
                 <Button className="tw-w-40 tw-h-8" onClick={runQuery}>{queryLoading ? "Stop" : "Run"}</Button>
               </Tooltip>

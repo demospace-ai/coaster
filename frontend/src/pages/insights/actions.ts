@@ -1,13 +1,13 @@
 import { useCallback } from "react";
 import { sendRequest } from "src/rpc/ajax";
-import { Analysis, AnalysisType, CreateAnalysis, CreateAnalysisRequest, GetAnalysis, GetAnalysisResponse, GetSchema, GetSchemaRequest, GetSchemaResponse } from "src/rpc/api";
+import { Analysis, AnalysisType, CreateAnalysis, CreateAnalysisRequest, GetAnalysis, GetSchema, GetSchemaRequest, GetSchemaResponse } from "src/rpc/api";
 import useSWR, { Fetcher } from 'swr';
 
 export function useAnalysis(id: string | undefined) {
-  const fetcher: Fetcher<GetAnalysisResponse, { id: string; }> = (value: { id: string; }) => sendRequest(GetAnalysis, { analysisID: value.id });
+  const fetcher: Fetcher<Analysis, { id: string; }> = (value: { id: string; }) => sendRequest(GetAnalysis, { analysisID: value.id });
   const shouldFetch = id !== undefined;
   const { data, error, mutate } = useSWR(() => shouldFetch ? { GetAnalysis, id } : null, fetcher);
-  return { analysisData: data, error, mutate };
+  return { analysis: data, error, mutate };
 }
 
 export function useSchema(connectionID: number, datasetName: string, tableName: string) {
@@ -27,8 +27,8 @@ export const useCreateAnalysis = () => {
     };
 
     try {
-      const response = await sendRequest(CreateAnalysis, payload);
-      return response.analysis;
+      const analysis = await sendRequest(CreateAnalysis, payload);
+      return analysis;
     } catch (e) {
       // TODO: handle error here
     }

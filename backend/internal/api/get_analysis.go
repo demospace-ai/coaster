@@ -15,12 +15,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type GetAnalysisResponse struct {
-	Analysis   views.Analysis         `json:"analysis"`
-	Connection *models.DataConnection `json:"connection"`
-	EventSet   *models.EventSet       `json:"event_set"`
-}
-
 func (s ApiService) GetAnalysis(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 
 	vars := mux.Vars(r)
@@ -39,23 +33,18 @@ func (s ApiService) GetAnalysis(auth auth.Authentication, w http.ResponseWriter,
 		return err
 	}
 
-	var funnelSteps []models.Event
-	var stepFilters []models.EventFilter
+	var events []models.Event
+	var eventFilters []models.EventFilter
 	if analysis.AnalysisType == models.AnalysisTypeFunnel {
-		funnelSteps, err = analyses.LoadEventsByAnalysisID(s.db, analysis.ID)
+		events, err = analyses.LoadEventsByAnalysisID(s.db, analysis.ID)
 		if err != nil {
 			return err
 		}
 
-		stepFilters, err = analyses.LoadEventFiltersByAnalysisID(s.db, analysis.ID)
+		eventFilters, err = analyses.LoadEventFiltersByAnalysisID(s.db, analysis.ID)
 		if err != nil {
 			return err
 		}
-	}
-
-	analysisView := views.Analysis{
-		Analysis: *analysis,
-		Events:   views.ConvertEvents(funnelSteps, stepFilters),
 	}
 
 	var connection *models.DataConnection
@@ -75,9 +64,12 @@ func (s ApiService) GetAnalysis(auth auth.Authentication, w http.ResponseWriter,
 		}
 	}
 
-	return json.NewEncoder(w).Encode(GetAnalysisResponse{
-		Analysis:   analysisView,
+	analysisView := views.Analysis{
+		Analysis:   *analysis,
+		Events:     views.ConvertEvents(events, eventFilters),
 		Connection: connection,
 		EventSet:   eventSet,
-	})
+	}
+
+	return json.NewEncoder(w).Encode(analysisView)
 }

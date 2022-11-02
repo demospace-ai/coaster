@@ -4,7 +4,6 @@ import { ValidatedComboInput, ValidatedDropdownInput } from "src/components/inpu
 import { getPropertyValues } from "src/queries/queries";
 import { sendRequest } from "src/rpc/ajax";
 import { DataConnection, EventSet, FilterType, GetDataConnections, GetDatasets, GetEvents, GetEventSets, GetEventsRequest, GetEventsResponse, GetProperties, GetPropertiesRequest, GetPropertiesResponse, GetTables, Property, PropertyGroup } from "src/rpc/api";
-import { toNull } from "src/utils/undefined";
 import useSWR, { Fetcher } from "swr";
 
 type ConnectionSelectorProps = {
@@ -40,7 +39,7 @@ export const ConnectionSelector: React.FC<ConnectionSelectorProps> = props => {
     selected={props.connection}
     setSelected={(connection: DataConnection) => props.setConnection(connection)}
     options={connectionOptions}
-    getElementForDisplay={(connection: DataConnection) => connection.display_name}
+    getElementForDisplay={(connection: DataConnection | undefined) => connection ? connection.display_name : ""}
     loading={loading}
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No data sources available!"}
     placeholder={props.placeholder ? props.placeholder : "Choose data source"}
@@ -326,15 +325,14 @@ type PropertyValueSelectorProps = {
 export const PropertyValueSelector: React.FC<PropertyValueSelectorProps> = props => {
   const [propertyValues, setPropertyValues] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
-  const propertyName = toNull(props.property?.name);
   useEffect(() => {
-    if (!props.connectionID || !props.eventSetID || !propertyName) {
+    if (!props.connectionID || !props.eventSetID || !props.property?.name) {
       return;
     }
 
     setLoading(true);
     let ignore = false;
-    getPropertyValues(props.connectionID, props.eventSetID, propertyName).then((results) => {
+    getPropertyValues(props.connectionID, props.eventSetID, props.property.name).then((results) => {
       if (!ignore) {
         setPropertyValues(results);
         setLoading(false);
@@ -344,7 +342,7 @@ export const PropertyValueSelector: React.FC<PropertyValueSelectorProps> = props
     return () => {
       ignore = true;
     };
-  }, [props.connectionID, props.eventSetID, propertyName]);
+  }, [props.connectionID, props.eventSetID, props.property?.name]);
 
   return <ValidatedComboInput
     className={props.className}

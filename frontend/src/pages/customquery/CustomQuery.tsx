@@ -36,8 +36,8 @@ TODO: tests
 */
 export const CustomQuery: React.FC = () => {
   const { id } = useParams<QueryParams>();
-  const { analysisData } = useAnalysis(id!);
-  const connectionID = analysisData?.analysis.connection_id;
+  const { analysis } = useAnalysis(id!);
+  const connectionID = analysis?.connection?.id;
 
   const [saving, setSaving] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
@@ -85,11 +85,11 @@ export const CustomQuery: React.FC = () => {
 
   const debouncedUpdate = useDebounce((id: number, query: string) => updateCustomQuery(id, { query: query }), 1500);
   const onQueryChange = useCallback((query: string) => {
-    if (analysisData) {
-      analysisData.analysis.query = query;
+    if (analysis) {
+      analysis.query = query;
       debouncedUpdate(Number(id), query);
     }
-  }, [id, debouncedUpdate, analysisData]);
+  }, [id, debouncedUpdate, analysis]);
 
   const runQuery = useCallback(async (id: number, query: string) => {
     setQueryLoading(true);
@@ -129,17 +129,17 @@ export const CustomQuery: React.FC = () => {
   useEffect(() => {
     if (shouldRun) {
       setShouldRun(false);
-      runQuery(Number(id), analysisData?.analysis.query ? analysisData.analysis.query : "");
+      runQuery(Number(id), analysis?.query ? analysis.query : "");
     }
 
     if (shouldSave) {
       setShouldSave(false);
       // Only set saving state here since this is triggered by user interfaction, versus in other locations
       setSaving(true);
-      updateCustomQuery(Number(id), { query: analysisData?.analysis.query });
+      updateCustomQuery(Number(id), { query: analysis?.query });
       setTimeout(() => setSaving(false), 500);
     }
-  }, [id, connectionID, analysisData, shouldRun, shouldSave, runQuery, updateCustomQuery]);
+  }, [id, connectionID, analysis, shouldRun, shouldSave, runQuery, updateCustomQuery]);
 
   const copyLink = () => {
     setCopied(true);
@@ -147,22 +147,22 @@ export const CustomQuery: React.FC = () => {
     setTimeout(() => setCopied(false), 1200);
   };
 
-  if (!analysisData) {
+  if (!analysis) {
     return <Loading />;
   }
 
   return (
     <>
-      <ConfigureAnalysisModal analysisID={Number(id)} analysisType={AnalysisType.CustomQuery} connection={analysisData.connection} setConnection={(connection: DataConnection) => analysisData.connection = connection} eventSet={undefined} setEventSet={() => undefined} show={showModal} close={() => setShowModal(false)} />
+      <ConfigureAnalysisModal analysisID={Number(id)} analysisType={AnalysisType.CustomQuery} connection={analysis.connection} setConnection={(connection: DataConnection) => analysis.connection = connection} eventSet={undefined} setEventSet={() => undefined} show={showModal} close={() => setShowModal(false)} />
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-scroll" >
-        <ReportHeader title={analysisData.analysis.title} description={analysisData.analysis.description} copied={copied} saving={saving} copyLink={copyLink} save={() => setShouldSave(true)} showModal={() => setShowModal(true)} />
+        <ReportHeader title={analysis.title} description={analysis.description} copied={copied} saving={saving} copyLink={copyLink} save={() => setShouldSave(true)} showModal={() => setShowModal(true)} />
         <div className='tw-flex tw-flex-1 tw-min-w-0 tw-min-h-0 tw-my-8'>
           <div id='left-panel' className="tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-grow">
             <div id="top-panel" className="tw-h-[30vh] tw-border tw-border-solid tw-border-gray-300 tw-p-2 tw-bg-dark tw-rounded-t-[4px] tw-shrink-0" style={{ height: topPanelHeight + "px" }} ref={topPanelRef}>
               <MonacoEditor
                 language="sql"
                 theme="fabra"
-                value={analysisData.analysis.query}
+                value={analysis.query}
                 options={{
                   minimap: { enabled: false },
                   automaticLayout: true,
@@ -193,7 +193,7 @@ export const CustomQuery: React.FC = () => {
                 </Tooltip>
               </div>
             </div>
-            <div id="results-panel" className="tw-mb-20 tw-mt-5">
+            <div id="results-panel" className="tw-pb-20 tw-mt-5">
               <span className='tw-uppercase tw-font-bold tw-select-none'>Results</span>
               <div className="tw-flex tw-flex-col tw-min-h-[120px] tw-max-h-96 tw-border tw-border-solid tw-border-gray-300 tw-mt-2 tw-rounded-[4px] tw-overflow-hidden">
                 {errorMessage &&
@@ -218,7 +218,7 @@ export const CustomQuery: React.FC = () => {
               </div>
             </div>
           </div>
-          <SchemaExplorer connection={analysisData.connection} />
+          <SchemaExplorer connection={analysis.connection} />
         </div>
       </div>
     </>

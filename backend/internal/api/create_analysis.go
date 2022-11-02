@@ -22,12 +22,6 @@ type CreateAnalysisRequest struct {
 	Timezone     string              `json:"timezone"`
 }
 
-type CreateAnalysisResponse struct {
-	Analysis   views.Analysis         `json:"analysis"`
-	Connection *models.DataConnection `json:"connection"`
-	EventSet   *models.EventSet       `json:"event_set"`
-}
-
 func (s ApiService) CreateAnalysis(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 
 	decoder := json.NewDecoder(r.Body)
@@ -94,14 +88,12 @@ func (s ApiService) CreateAnalysis(auth auth.Authentication, w http.ResponseWrit
 	}
 
 	analysisView := views.Analysis{
-		Analysis: *analysis,
-		Events:   views.ConvertEvents(events, eventFilters),
+		Analysis:   *analysis,
+		Events:     views.ConvertEvents(events, eventFilters),
+		Connection: connection,
+		EventSet:   eventSet,
 	}
 
 	// TODO: mask database ID
-	return json.NewEncoder(w).Encode(CreateAnalysisResponse{
-		Analysis:   analysisView,
-		Connection: connection,
-		EventSet:   eventSet,
-	})
+	return json.NewEncoder(w).Encode(analysisView)
 }

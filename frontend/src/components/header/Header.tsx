@@ -36,7 +36,7 @@ type Breadcrumb = {
 // Gluten free
 const Breadcrumbs: React.FC<{ pathname: string; }> = props => {
   const pathTokens = props.pathname.split('/');
-  const { analysisData } = useAnalysis(pathTokens[2]); // This is deduped so don't worry about the extra fetch
+  const { analysis } = useAnalysis(pathTokens[2]); // This is deduped so don't worry about the extra fetch
   let crumbs: Breadcrumb[] = [];
   switch (pathTokens[1]) {
     case '':
@@ -44,11 +44,11 @@ const Breadcrumbs: React.FC<{ pathname: string; }> = props => {
       break;
     case 'customquery':
       crumbs.push({ title: 'Insights', path: '/insights' });
-      crumbs.push({ title: analysisData?.analysis.title, path: props.pathname });
+      crumbs.push({ title: analysis?.title, path: props.pathname });
       break;
     case 'funnel':
       crumbs.push({ title: 'Insights', path: '/insights' });
-      crumbs.push({ title: analysisData?.analysis.title, path: props.pathname });
+      crumbs.push({ title: analysis?.title, path: props.pathname });
       break;
     case 'insights':
       crumbs.push({ title: 'Insights', path: props.pathname });

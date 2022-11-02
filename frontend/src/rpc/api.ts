@@ -94,14 +94,14 @@ export const UpdateOrganization: IEndpoint<UpdateOrganizationRequest, UpdateOrga
     track: true,
 };
 
-export const GetAnalysis: IEndpoint<{ analysisID: string; }, GetAnalysisResponse> = {
+export const GetAnalysis: IEndpoint<{ analysisID: string; }, Analysis> = {
     name: 'get_analysis',
     method: 'GET',
     path: '/get_analysis/:analysisID',
     track: true,
 };
 
-export const CreateAnalysis: IEndpoint<CreateAnalysisRequest, CreateAnalysisResponse> = {
+export const CreateAnalysis: IEndpoint<CreateAnalysisRequest, Analysis> = {
     name: 'create_analysis',
     method: 'POST',
     path: '/create_analysis',
@@ -115,7 +115,7 @@ export const DeleteAnalysis: IEndpoint<{ analysisID: number; }, undefined> = {
     track: true,
 };
 
-export const UpdateAnalysis: IEndpoint<UpdateAnalysisRequest, UpdateAnalysisResponse> = {
+export const UpdateAnalysis: IEndpoint<UpdateAnalysisRequest, Analysis> = {
     name: 'update_analysis',
     method: 'PATCH',
     path: '/update_analysis',
@@ -400,12 +400,6 @@ export interface CreateAnalysisRequest {
     timezone: string;
 }
 
-export interface CreateAnalysisResponse {
-    analysis: Analysis;
-    connection?: DataConnection;
-    event_set?: EventSet;
-}
-
 export interface UpdateAnalysisRequest {
     analysis_id: number;
     connection_id?: number;
@@ -425,12 +419,6 @@ export interface TrendSeriesInput {
     filters: EventFilter[];
 };
 
-export interface UpdateAnalysisResponse {
-    analysis: Analysis;
-    connection?: DataConnection;
-    event_set?: EventSet;
-}
-
 export interface SearchRequest {
     search_query: string;
 }
@@ -439,19 +427,13 @@ export interface SearchResponse {
     analyses: Analysis[];
 }
 
-export interface GetAnalysisResponse {
-    analysis: Analysis;
-    connection?: DataConnection;
-    event_set?: EventSet;
-}
-
 export interface Analysis {
     id: number;
     user_id: number;
     organization_id: number;
+    connection?: DataConnection;
+    event_set?: EventSet;
     analysis_type: AnalysisType;
-    connection_id?: number;
-    event_set_id?: number;
     title?: string;
     description?: string;
     query?: string; // used for Custom Query analysis type

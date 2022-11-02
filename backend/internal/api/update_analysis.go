@@ -21,12 +21,6 @@ type UpdateAnalysisRequest struct {
 	Events       []views.Event `json:"events,omitempty"`
 }
 
-type UpdateAnalysisResponse struct {
-	Analysis   views.Analysis         `json:"analysis"`
-	Connection *models.DataConnection `json:"connection"`
-	EventSet   *models.EventSet       `json:"event_set"`
-}
-
 /*
 
 TODO: tests
@@ -106,11 +100,6 @@ func (s ApiService) UpdateAnalysis(auth auth.Authentication, w http.ResponseWrit
 		return err
 	}
 
-	analysisView := views.Analysis{
-		Analysis: *updatedAnalysis,
-		Events:   views.ConvertEvents(events, eventFilters),
-	}
-
 	var updatedConnection *models.DataConnection
 	if updatedAnalysis.ConnectionID.Valid {
 		updatedConnection, err = dataconnections.LoadDataConnectionByID(s.db, auth.Organization.ID, updatedAnalysis.ConnectionID.Int64)
@@ -127,10 +116,13 @@ func (s ApiService) UpdateAnalysis(auth auth.Authentication, w http.ResponseWrit
 		}
 	}
 
-	// TODO: mask database ID
-	return json.NewEncoder(w).Encode(UpdateAnalysisResponse{
-		Analysis:   analysisView,
+	analysisView := views.Analysis{
+		Analysis:   *updatedAnalysis,
+		Events:     views.ConvertEvents(events, eventFilters),
 		Connection: updatedConnection,
 		EventSet:   updatedEventSet,
-	})
+	}
+
+	// TODO: mask database ID
+	return json.NewEncoder(w).Encode(analysisView)
 }
