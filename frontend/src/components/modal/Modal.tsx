@@ -81,12 +81,12 @@ export const ConfigureAnalysisModal: React.FC<ConfigureAnalysisModalProps> = pro
 
     setLoading(true);
     try {
-      mutate(() => sendRequest(UpdateAnalysis, payload), {});
+      await mutate(() => sendRequest(UpdateAnalysis, payload), {});
     } catch (e) {
       // TODO: handle error here
     }
 
-    setLoading(false);
+    setTimeout(() => setLoading(false), 1200);
   };
 
   return (
