@@ -9,135 +9,134 @@ export interface IEndpoint<RequestType, ResponseType> {
 }
 
 export const Login: IEndpoint<LoginRequest, LoginResponse> = {
-    name: 'login',
+    name: 'Login',
     method: 'POST',
     path: '/login',
     track: true,
 };
 
 export const GetAllUsers: IEndpoint<undefined, GetAllUsersResponse> = {
-    name: 'get_all_users',
+    name: 'All Users Fetched',
     method: 'GET',
     path: '/get_all_users',
 };
 
 export const GetAllAnalyses: IEndpoint<{ page: string; }, GetAllAnalysesResponse> = {
-    name: 'get_all_analyses',
+    name: 'All Analyses Fetched',
     method: 'GET',
     path: '/get_all_analyses',
 };
 
 export const GetDataConnections: IEndpoint<undefined, GetDataConnectionsResponse> = {
-    name: 'get_data_connections',
+    name: 'Data Connections Fetched',
     method: 'GET',
     path: '/get_data_connections',
 };
 
 export const GetEventSets: IEndpoint<undefined, GetEventSetsResponse> = {
-    name: 'get_event_sets',
+    name: 'Event Sets Fetched',
     method: 'GET',
     path: '/get_event_sets',
 };
 
 export const GetDatasets: IEndpoint<{ connectionID: number; }, GetDatasetsResponse> = {
-    name: 'get_datasets',
+    name: 'Datasets Fetched',
     method: 'GET',
     path: '/get_datasets',
     queryParams: ['connectionID']
 };
 
 export const GetTables: IEndpoint<{ connectionID: number, datasetID: string; }, GetTablesResponse> = {
-    name: 'get_tables',
+    name: 'Tables Fetched',
     method: 'GET',
     path: '/get_tables',
     queryParams: ['connectionID', 'datasetID'],
 };
 
 export const GetSchema: IEndpoint<GetSchemaRequest, GetSchemaResponse> = {
-    name: 'get_schema',
+    name: 'Schema Fetched',
     method: 'GET',
     path: '/get_schema',
     queryParams: ['connectionID', 'datasetID', 'tableName', 'customJoin'],
 };
 
 export const CheckSession: IEndpoint<undefined, CheckSessionResponse> = {
-    name: 'check_session',
+    name: 'Session Checked',
     method: 'GET',
     path: '/check_session',
 };
 
 export const Logout: IEndpoint<undefined, undefined> = {
-    name: 'logout',
+    name: 'Logout',
     method: 'DELETE',
     path: '/logout',
     track: true,
 };
 
 export const Search: IEndpoint<SearchRequest, SearchResponse> = {
-    name: 'search',
+    name: 'Search',
     method: 'POST',
     path: '/search',
     track: true,
 };
 
 export const SetOrganization: IEndpoint<SetOrganizationRequest, SetOrganizationResponse> = {
-    name: 'set_organization',
+    name: 'Organization Set',
     method: 'POST',
     path: '/set_organization',
     track: true,
 };
 
 export const UpdateOrganization: IEndpoint<UpdateOrganizationRequest, UpdateOrganizationResponse> = {
-    name: 'update_organization',
+    name: 'Organization Updated',
     method: 'PATCH',
     path: '/update_organization',
     track: true,
 };
 
 export const GetAnalysis: IEndpoint<{ analysisID: string; }, Analysis> = {
-    name: 'get_analysis',
+    name: 'Analysis Fetched',
     method: 'GET',
     path: '/get_analysis/:analysisID',
     track: true,
 };
 
 export const CreateAnalysis: IEndpoint<CreateAnalysisRequest, Analysis> = {
-    name: 'create_analysis',
+    name: 'Analysis Created',
     method: 'POST',
     path: '/create_analysis',
     track: true,
 };
 
 export const DeleteAnalysis: IEndpoint<{ analysisID: number; }, undefined> = {
-    name: 'delete_analysis',
+    name: 'Analysis Deleted',
     method: 'DELETE',
     path: '/delete_analysis/:analysisID',
     track: true,
 };
 
 export const UpdateAnalysis: IEndpoint<UpdateAnalysisRequest, Analysis> = {
-    name: 'update_analysis',
+    name: 'Analysis Updated',
     method: 'PATCH',
     path: '/update_analysis',
     track: true,
 };
 
 export const TestDataConnection: IEndpoint<TestDataConnectionRequest, undefined> = {
-    name: 'test_data_connection',
+    name: 'Test Data Connection',
     method: 'POST',
     path: '/test_data_connection',
-    track: true,
 };
 
 export const RunCustomQuery: IEndpoint<RunCustomQueryRequest, RunQueryResponse> = {
-    name: 'run_custom_query',
+    name: 'Custom Query Run',
     method: 'POST',
     path: '/run_custom_query',
     track: true,
 };
 
 export const GetEvents: IEndpoint<GetEventsRequest, GetEventsResponse> = {
-    name: 'get_events',
+    name: 'Events Fetched',
     method: 'GET',
     path: '/get_events',
     queryParams: ['connectionID', 'eventSetID'],
@@ -145,7 +144,7 @@ export const GetEvents: IEndpoint<GetEventsRequest, GetEventsResponse> = {
 };
 
 export const GetProperties: IEndpoint<GetPropertiesRequest, GetPropertiesResponse> = {
-    name: 'get_properties',
+    name: 'Event Properties Fetched',
     method: 'GET',
     path: '/get_properties',
     queryParams: ['connectionID', 'eventSetID'],
@@ -153,7 +152,7 @@ export const GetProperties: IEndpoint<GetPropertiesRequest, GetPropertiesRespons
 };
 
 export const GetPropertyValues: IEndpoint<GetPropertyValuesRequest, GetPropertyValuesResponse> = {
-    name: 'get_property_values',
+    name: 'Event Property Values Fetched',
     method: 'GET',
     path: '/get_property_values',
     queryParams: ['connectionID', 'eventSetID', 'propertyName'],
@@ -161,21 +160,21 @@ export const GetPropertyValues: IEndpoint<GetPropertyValuesRequest, GetPropertyV
 };
 
 export const RunFunnelQuery: IEndpoint<RunFunnelQueryRequest, RunQueryResponse> = {
-    name: 'run_funnel_query',
+    name: 'Funnel Run',
     method: 'POST',
     path: '/run_funnel_query',
     track: true,
 };
 
 export const CreateDataConnection: IEndpoint<CreateDataConnectionRequest, undefined> = {
-    name: 'create_data_connection',
+    name: 'Data Connection Created',
     method: 'POST',
     path: '/create_data_connection',
     track: true,
 };
 
 export const CreateEventSet: IEndpoint<CreateEventSetRequest, undefined> = {
-    name: 'create_event_set',
+    name: 'Event Set Created',
     method: 'POST',
     path: '/create_event_set',
     track: true,

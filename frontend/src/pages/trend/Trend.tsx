@@ -3,6 +3,7 @@ import { FunnelIcon, PlusCircleIcon, TrashIcon } from '@heroicons/react/24/outli
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from 'react-router-dom';
 import { Bar, BarChart, ResponsiveContainer, Tooltip as RechartTooltip, XAxis, YAxis } from 'recharts';
+import { rudderanalytics } from 'src/app/rudder';
 import { Button, DivButton } from 'src/components/button/Button';
 import { RightArrow } from 'src/components/icons/Icons';
 import { ReportHeader } from 'src/components/insight/InsightComponents';
@@ -121,9 +122,11 @@ export const Trend: React.FC = () => {
         setFunnelData(convertData(response.query_results));
       } else {
         setErrorMessage(response.error_message);
+        rudderanalytics.track(`Trend Execution Failed`);
       }
     } catch (e) {
       setErrorMessage((e as Error).message);
+      // TODO: log datadog event here
     }
 
     setQueryLoading(false);

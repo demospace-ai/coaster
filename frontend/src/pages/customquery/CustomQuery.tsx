@@ -113,12 +113,11 @@ export const CustomQuery: React.FC = () => {
         setQueryResults(response.query_results);
       } else {
         setErrorMessage(response.error_message);
-        rudderanalytics.track(`run_query_processing_error`);
+        rudderanalytics.track(`Custom Query Failed`);
       }
     } catch (e) {
       setErrorMessage((e as Error).message);
-      setSchema(undefined);
-      setQueryResults(undefined);
+      // TODO: log datadog event here
     }
 
     setQueryLoading(false);

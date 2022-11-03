@@ -9,10 +9,6 @@ export async function sendRequest<RequestType extends Record<string, any>, Respo
     endpoint: IEndpoint<RequestType, ResponseType>,
     payload?: RequestType,
 ): Promise<ResponseType> {
-    if (endpoint.track) {
-        rudderanalytics.track(`${endpoint.name}_start`);
-    }
-
     const toPath = compile(endpoint.path);
     const path = toPath(payload);
 
@@ -40,14 +36,12 @@ export async function sendRequest<RequestType extends Record<string, any>, Respo
 
     if (!response.ok) {
         const errorMessage = response.statusText ? response.statusText : await response.text();
-        if (endpoint.track) {
-            rudderanalytics.track(`${endpoint.name}_error`);
-        }
+        // TODO: log error in datadog (not the event framework)
         throw new Error(errorMessage);
     }
 
     if (endpoint.track) {
-        rudderanalytics.track(`${endpoint.name}_success`);
+        rudderanalytics.track(`${endpoint.name}`);
     }
 
     // TODO: clean this up
