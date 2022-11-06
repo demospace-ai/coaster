@@ -5,7 +5,6 @@ import (
 	"fabra/internal/analyses"
 	"fabra/internal/auth"
 	"fabra/internal/errors"
-	"fabra/internal/query"
 	"fabra/internal/views"
 	"net/http"
 )
@@ -15,9 +14,7 @@ type RunQueryRequest struct {
 }
 
 type RunQueryResponse struct {
-	Success      bool              `json:"success"`
-	ErrorMessage string            `json:"error_message"`
-	QueryResult  views.QueryResult `json:"query_result"`
+	QueryResult views.QueryResult `json:"query_result"`
 }
 
 func (s ApiService) RunCustomQuery(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
@@ -40,19 +37,8 @@ func (s ApiService) RunCustomQuery(auth auth.Authentication, w http.ResponseWrit
 
 	queryResult, err := s.queryService.RunCustomQuery(analysis)
 	if err != nil {
-		if _, ok := err.(query.Error); ok {
-			// Not actually a failure, the user's query was just wrong. Send the details back to them.
-			return json.NewEncoder(w).Encode(RunQueryResponse{
-				Success:      false,
-				ErrorMessage: err.Error(),
-			})
-		} else {
-			return err
-		}
+		return err
 	}
 
-	return json.NewEncoder(w).Encode(RunQueryResponse{
-		Success:     true,
-		QueryResult: *queryResult,
-	})
+	return json.NewEncoder(w).Encode(*queryResult)
 }

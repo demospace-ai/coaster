@@ -115,9 +115,9 @@ export const Funnel: React.FC = () => {
     try {
       const response = await runFunnelQuery(Number(id));
       if (response.success) {
-        setResultSchema(response.query_result.schema);
-        setResultData(response.query_result.data);
-        setFunnelData(convertData(response.query_result.data));
+        setResultSchema(response.schema);
+        setResultData(response.data);
+        setFunnelData(convertData(response.data));
       } else {
         setErrorMessage(response.error_message);
         rudderanalytics.track(`Funnel Execution Failed`);

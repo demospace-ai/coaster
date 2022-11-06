@@ -109,8 +109,8 @@ export const CustomQuery: React.FC = () => {
     try {
       const response = await sendRequest(RunCustomQuery, payload);
       if (response.success) {
-        setResultSchema(response.query_result.schema);
-        setResultData(response.query_result.data);
+        setResultSchema(response.schema);
+        setResultData(response.data);
       } else {
         setErrorMessage(response.error_message);
         rudderanalytics.track(`Custom Query Failed`);

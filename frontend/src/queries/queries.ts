@@ -1,5 +1,5 @@
 import { sendRequest } from "src/rpc/ajax";
-import { GetPropertyValues, GetPropertyValuesRequest, RunFunnelQuery, RunFunnelQueryRequest, RunQueryResponse } from "src/rpc/api";
+import { GetPropertyValues, GetPropertyValuesRequest, QueryResult, RunFunnelQuery, RunFunnelQueryRequest } from "src/rpc/api";
 
 export const getPropertyValues = async (connectionID: number, eventSetID: number, propertyName: string): Promise<string[]> => {
   const payload: GetPropertyValuesRequest = {
@@ -16,7 +16,7 @@ export const getPropertyValues = async (connectionID: number, eventSetID: number
   }
 };
 
-export const runFunnelQuery = async (analysisID: number): Promise<RunQueryResponse> => {
+export const runFunnelQuery = async (analysisID: number): Promise<QueryResult> => {
   const payload: RunFunnelQueryRequest = {
     analysis_id: analysisID,
   };

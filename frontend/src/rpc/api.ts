@@ -128,7 +128,7 @@ export const TestDataConnection: IEndpoint<TestDataConnectionRequest, undefined>
     path: '/test_data_connection',
 };
 
-export const RunCustomQuery: IEndpoint<RunCustomQueryRequest, RunQueryResponse> = {
+export const RunCustomQuery: IEndpoint<RunCustomQueryRequest, QueryResult> = {
     name: 'Custom Query Run',
     method: 'POST',
     path: '/run_custom_query',
@@ -159,7 +159,7 @@ export const GetPropertyValues: IEndpoint<GetPropertyValuesRequest, GetPropertyV
     track: true,
 };
 
-export const RunFunnelQuery: IEndpoint<RunFunnelQueryRequest, RunQueryResponse> = {
+export const RunFunnelQuery: IEndpoint<RunFunnelQueryRequest, QueryResult> = {
     name: 'Funnel Run',
     method: 'POST',
     path: '/run_funnel_query',
@@ -230,6 +230,8 @@ export interface JSONArray extends Array<JSONValue> { };
 
 export interface ResultRow extends Array<string | number> { }
 export interface QueryResult {
+    success: boolean,
+    error_message: string,
     schema: Schema,
     data: ResultRow[],
 }
@@ -291,12 +293,6 @@ export interface GetPropertyValuesRequest {
 
 export interface GetPropertyValuesResponse {
     property_values: string[];
-}
-
-export interface RunQueryResponse {
-    success: boolean;
-    error_message: string;
-    query_result: QueryResult;
 }
 
 export interface SetOrganizationRequest {

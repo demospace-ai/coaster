@@ -25,7 +25,7 @@ func init() {
 	`))
 }
 
-func (qs QueryServiceImpl) RunTrendQuery(analysis *models.Analysis) (*views.QueryResult, error) {
+func (qs QueryServiceImpl) RunTrendQuery(analysis *models.Analysis) ([]views.QueryResult, error) {
 	if !analysis.ConnectionID.Valid {
 		return nil, errors.NewBadRequest("no data connection configured")
 	}
@@ -58,12 +58,22 @@ func (qs QueryServiceImpl) RunTrendQuery(analysis *models.Analysis) (*views.Quer
 		return nil, err
 	}
 
-	queryString, err := createTrendQuery(eventSet, views.ConvertEvents(events, filters))
+	queries, err := createTrendQuery(eventSet, views.ConvertEvents(events, filters))
 	if err != nil {
 		return nil, err
 	}
 
-	return qs.runQuery(dataConnection, queryString[0])
+	var results []views.QueryResult
+	for _, query := range queries {
+		result, err := qs.runQuery(dataConnection, query)
+		if err != nil {
+			return nil, err
+		}
+
+		results = append(results, *result)
+	}
+
+	return results, nil
 }
 
 func createTrendQuery(eventSet *models.EventSet, events []views.Event) ([]string, error) {
@@ -80,10 +90,13 @@ func createTrendQuery(eventSet *models.EventSet, events []views.Event) ([]string
 	var queryArray []string
 	for _, event := range events {
 		query, err := executeTemplate(trendQueryTemplate, map[string]interface{}{
-			"customTableQuery": customTableQuery,
-			"sourceTable":      sourceTable,
-			"eventName":        event.Name,
-			"filterClauses":    event.Filters,
+			"customTableQuery":     customTableQuery,
+			"sourceTable":          sourceTable,
+			"eventName":            event.Name,
+			"eventTypeColumn":      eventSet.EventTypeColumn,
+			"userIdentifierColumn": eventSet.UserIdentifierColumn,
+			"timestampColumn":      eventSet.TimestampColumn,
+			"filterClauses":        event.Filters,
 		})
 
 		if err != nil {

@@ -11,6 +11,8 @@ type Row []Value
 type Value interface{}
 
 type QueryResult struct {
-	Schema Schema `json:"schema"`
-	Data   []Row  `json:"data"`
+	Success      bool   `json:"success"`
+	ErrorMessage string `json:"error_message"`
+	Schema       Schema `json:"schema"`
+	Data         []Row  `json:"data"`
 }

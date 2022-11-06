@@ -54,8 +54,9 @@ func (qs MockQueryService) RunCustomQuery(analysis *models.Analysis) (*views.Que
 	}
 
 	result := views.QueryResult{
-		Schema: schema,
-		Data:   rows,
+		Success: true,
+		Schema:  schema,
+		Data:    rows,
 	}
 
 	return &result, nil
@@ -87,11 +88,31 @@ func (qs MockQueryService) RunFunnelQuery(analysis *models.Analysis) (*views.Que
 	}
 
 	result := views.QueryResult{
-		Schema: schema,
-		Data:   rows,
+		Success: true,
+		Schema:  schema,
+		Data:    rows,
 	}
 
 	return &result, nil
+}
+
+func (qs MockQueryService) RunTrendQuery(analysis *models.Analysis) ([]views.QueryResult, error) {
+	_, err := dataconnections.LoadDataConnectionByID(qs.db, analysis.OrganizationID, analysis.ConnectionID.Int64)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = eventsets.LoadEventSetByID(qs.db, analysis.OrganizationID, analysis.EventSetID.Int64)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = analyses.LoadEventsByAnalysisID(qs.db, analysis.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
 }
 
 func (qs MockQueryService) GetProperties(dataConnection *models.DataConnection, eventSet *models.EventSet) ([]views.PropertyGroup, error) {

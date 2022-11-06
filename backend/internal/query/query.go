@@ -21,6 +21,7 @@ type QueryService interface {
 	GetPropertyValues(dataConnection *models.DataConnection, eventSet *models.EventSet, propertyName string) ([]views.Value, error)
 	RunFunnelQuery(analysis *models.Analysis) (*views.QueryResult, error)
 	RunCustomQuery(analysis *models.Analysis) (*views.QueryResult, error)
+	RunTrendQuery(analysis *models.Analysis) ([]views.QueryResult, error)
 	GetTableSchema(dataConnection *models.DataConnection, datasetName string, tableName string) (views.Schema, error)
 }
 
@@ -77,11 +78,23 @@ func (qs QueryServiceImpl) runBigQueryQuery(dataConnection *models.DataConnectio
 		return nil, err
 	}
 	status, err := job.Wait(ctx)
+
+	// Both of these are not actually a failure, the query was just wrong. Send the details back to them.
 	if err != nil {
-		return nil, NewError(err)
+		result := views.QueryResult{
+			Success:      false,
+			ErrorMessage: err.Error(),
+		}
+
+		return &result, nil
 	}
 	if err := status.Err(); err != nil {
-		return nil, NewError(err)
+		result := views.QueryResult{
+			Success:      false,
+			ErrorMessage: err.Error(),
+		}
+
+		return &result, nil
 	}
 
 	var results []views.Row
@@ -103,8 +116,9 @@ func (qs QueryServiceImpl) runBigQueryQuery(dataConnection *models.DataConnectio
 	}
 
 	queryResult := views.QueryResult{
-		Schema: ConvertBigQuerySchema(it.Schema),
-		Data:   results,
+		Success: true,
+		Schema:  ConvertBigQuerySchema(it.Schema),
+		Data:    results,
 	}
 	return &queryResult, nil
 }
