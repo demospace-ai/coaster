@@ -1,11 +1,11 @@
 import classNames from "classnames";
 import React from "react";
-import { QueryResults, Schema } from "src/rpc/api";
+import { ResultRow, Schema } from "src/rpc/api";
 
 
 type QueryResultsProps = {
   schema: Schema,
-  results: QueryResults,
+  results: ResultRow[],
 };
 
 const QueryResultsTable: React.FC<QueryResultsProps> = props => {

@@ -9,13 +9,13 @@ func (qs QueryServiceImpl) GetTableSchema(dataConnection *models.DataConnection,
 
 	queryString := "select * from " + datasetName + ".INFORMATION_SCHEMA.COLUMNS where table_name = '" + tableName + "'"
 
-	_, results, err := qs.runQuery(dataConnection, queryString)
+	queryResult, err := qs.runQuery(dataConnection, queryString)
 	if err != nil {
 		return nil, err
 	}
 
 	schema := views.Schema{}
-	for _, row := range results {
+	for _, row := range queryResult.Data {
 		if row[0] == nil {
 			continue
 		}

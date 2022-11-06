@@ -9,3 +9,8 @@ type ColumnSchema struct {
 
 type Row []Value
 type Value interface{}
+
+type QueryResult struct {
+	Schema Schema `json:"schema"`
+	Data   []Row  `json:"data"`
+}

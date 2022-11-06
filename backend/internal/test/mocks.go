@@ -38,10 +38,10 @@ func (qs MockQueryService) GetEvents(dataConnection *models.DataConnection, even
 	return result, nil
 }
 
-func (qs MockQueryService) RunCustomQuery(analysis *models.Analysis) (views.Schema, []views.Row, error) {
+func (qs MockQueryService) RunCustomQuery(analysis *models.Analysis) (*views.QueryResult, error) {
 	_, err := dataconnections.LoadDataConnectionByID(qs.db, analysis.OrganizationID, analysis.ConnectionID.Int64)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	schema := views.Schema{
@@ -53,23 +53,28 @@ func (qs MockQueryService) RunCustomQuery(analysis *models.Analysis) (views.Sche
 		{"value1", "value2"},
 	}
 
-	return schema, rows, nil
+	result := views.QueryResult{
+		Schema: schema,
+		Data:   rows,
+	}
+
+	return &result, nil
 }
 
-func (qs MockQueryService) RunFunnelQuery(analysis *models.Analysis) (views.Schema, []views.Row, error) {
+func (qs MockQueryService) RunFunnelQuery(analysis *models.Analysis) (*views.QueryResult, error) {
 	_, err := dataconnections.LoadDataConnectionByID(qs.db, analysis.OrganizationID, analysis.ConnectionID.Int64)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	_, err = eventsets.LoadEventSetByID(qs.db, analysis.OrganizationID, analysis.EventSetID.Int64)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	_, err = analyses.LoadEventsByAnalysisID(qs.db, analysis.ID)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	schema := views.Schema{
@@ -81,7 +86,12 @@ func (qs MockQueryService) RunFunnelQuery(analysis *models.Analysis) (views.Sche
 		{"value1", "value2"},
 	}
 
-	return schema, rows, nil
+	result := views.QueryResult{
+		Schema: schema,
+		Data:   rows,
+	}
+
+	return &result, nil
 }
 
 func (qs MockQueryService) GetProperties(dataConnection *models.DataConnection, eventSet *models.EventSet) ([]views.PropertyGroup, error) {

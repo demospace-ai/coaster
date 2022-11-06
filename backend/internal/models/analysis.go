@@ -7,6 +7,7 @@ type AnalysisType string
 const (
 	AnalysisTypeCustomQuery AnalysisType = "custom_query"
 	AnalysisTypeFunnel      AnalysisType = "funnel"
+	AnalysisTypeTrend       AnalysisType = "trend"
 )
 
 func (e AnalysisType) ToString() string {
@@ -15,6 +16,8 @@ func (e AnalysisType) ToString() string {
 		return "Custom Query"
 	case AnalysisTypeFunnel:
 		return "Funnel"
+	case AnalysisTypeTrend:
+		return "Trend"
 	default:
 		return ""
 	}

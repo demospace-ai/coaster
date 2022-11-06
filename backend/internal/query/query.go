@@ -19,8 +19,8 @@ type QueryService interface {
 	GetEvents(dataConnection *models.DataConnection, eventSet *models.EventSet) ([]string, error)
 	GetProperties(dataConnection *models.DataConnection, eventSet *models.EventSet) ([]views.PropertyGroup, error)
 	GetPropertyValues(dataConnection *models.DataConnection, eventSet *models.EventSet, propertyName string) ([]views.Value, error)
-	RunFunnelQuery(analysis *models.Analysis) (views.Schema, []views.Row, error)
-	RunCustomQuery(analysis *models.Analysis) (views.Schema, []views.Row, error)
+	RunFunnelQuery(analysis *models.Analysis) (*views.QueryResult, error)
+	RunCustomQuery(analysis *models.Analysis) (*views.QueryResult, error)
 	GetTableSchema(dataConnection *models.DataConnection, datasetName string, tableName string) (views.Schema, error)
 }
 
@@ -36,27 +36,27 @@ func NewQueryService(db *gorm.DB, cryptoService crypto.CryptoService) QueryServi
 	}
 }
 
-func (qs QueryServiceImpl) runQuery(dataConnection *models.DataConnection, queryString string) (views.Schema, []views.Row, error) {
+func (qs QueryServiceImpl) runQuery(dataConnection *models.DataConnection, queryString string) (*views.QueryResult, error) {
 	switch dataConnection.ConnectionType {
 	case models.DataConnectionTypeBigQuery:
 		return qs.runBigQueryQuery(dataConnection, queryString)
 	case models.DataConnectionTypeSnowflake:
 		return qs.runSnowflakeQuery(dataConnection, queryString)
 	default:
-		return nil, nil, errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", dataConnection.ConnectionType))
+		return nil, errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", dataConnection.ConnectionType))
 	}
 }
 
-func (qs QueryServiceImpl) runBigQueryQuery(dataConnection *models.DataConnection, queryString string) (views.Schema, []views.Row, error) {
+func (qs QueryServiceImpl) runBigQueryQuery(dataConnection *models.DataConnection, queryString string) (*views.QueryResult, error) {
 	bigQueryCredentialsString, err := qs.cryptoService.DecryptDataConnectionCredentials(dataConnection.Credentials.String)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	var bigQueryCredentials models.BigQueryCredentials
 	err = json.Unmarshal([]byte(*bigQueryCredentialsString), &bigQueryCredentials)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	credentialOption := option.WithCredentialsJSON([]byte(*bigQueryCredentialsString))
@@ -64,7 +64,7 @@ func (qs QueryServiceImpl) runBigQueryQuery(dataConnection *models.DataConnectio
 	ctx := context.Background()
 	client, err := bigquery.NewClient(ctx, bigQueryCredentials.ProjectID, credentialOption)
 	if err != nil {
-		return nil, nil, fmt.Errorf("bigquery.NewClient: %v", err)
+		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
 	}
 	defer client.Close()
 
@@ -74,20 +74,20 @@ func (qs QueryServiceImpl) runBigQueryQuery(dataConnection *models.DataConnectio
 	// Run the query and print results when the query job is completed.
 	job, err := q.Run(ctx)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	status, err := job.Wait(ctx)
 	if err != nil {
-		return nil, nil, NewError(err)
+		return nil, NewError(err)
 	}
 	if err := status.Err(); err != nil {
-		return nil, nil, NewError(err)
+		return nil, NewError(err)
 	}
 
 	var results []views.Row
 	it, err := job.Read(ctx)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	for {
@@ -97,12 +97,16 @@ func (qs QueryServiceImpl) runBigQueryQuery(dataConnection *models.DataConnectio
 			break
 		}
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 		results = append(results, bigQueryRowtoRow(row))
 	}
 
-	return ConvertBigQuerySchema(it.Schema), results, nil
+	queryResult := views.QueryResult{
+		Schema: ConvertBigQuerySchema(it.Schema),
+		Data:   results,
+	}
+	return &queryResult, nil
 }
 
 func bigQueryRowtoRow(bigQueryRow []bigquery.Value) views.Row {
@@ -114,7 +118,7 @@ func bigQueryRowtoRow(bigQueryRow []bigquery.Value) views.Row {
 	return row
 }
 
-func (qs QueryServiceImpl) runSnowflakeQuery(dataConnection *models.DataConnection, queryString string) (views.Schema, []views.Row, error) {
+func (qs QueryServiceImpl) runSnowflakeQuery(dataConnection *models.DataConnection, queryString string) (*views.QueryResult, error) {
 	// TODO: implement
-	return nil, nil, errors.NewBadRequest("snowflake not supported")
+	return nil, errors.NewBadRequest("snowflake not supported")
 }

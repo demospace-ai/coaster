@@ -14,7 +14,7 @@ import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { DatasetSelector, TableSelector } from "src/components/selector/Selector";
 import { Tooltip } from 'src/components/tooltip/Tooltip';
 import { sendRequest } from "src/rpc/ajax";
-import { DataConnection, QueryResults, RunCustomQuery, RunCustomQueryRequest, Schema, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
+import { DataConnection, ResultRow, RunCustomQuery, RunCustomQueryRequest, Schema, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
 import { useAnalysis, useSchema } from "src/rpc/data";
 import { useDebounce } from 'src/utils/debounce';
 import { createResizeFunction } from 'src/utils/resize';
@@ -44,8 +44,8 @@ export const CustomQuery: React.FC = () => {
   const [topPanelHeight, setTopPanelHeight] = useState<number>();
   const topPanelRef = useRef<HTMLDivElement>(null);
 
-  const [schema, setSchema] = useState<Schema | undefined>(undefined);
-  const [queryResults, setQueryResults] = useState<QueryResults | undefined>(undefined);
+  const [resultSchema, setResultSchema] = useState<Schema | undefined>(undefined);
+  const [resultData, setResultData] = useState<ResultRow[] | undefined>(undefined);
   const [queryLoading, setQueryLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -109,8 +109,8 @@ export const CustomQuery: React.FC = () => {
     try {
       const response = await sendRequest(RunCustomQuery, payload);
       if (response.success) {
-        setSchema(response.schema);
-        setQueryResults(response.query_results);
+        setResultSchema(response.query_result.schema);
+        setResultData(response.query_result.data);
       } else {
         setErrorMessage(response.error_message);
         rudderanalytics.track(`Custom Query Failed`);
@@ -208,8 +208,8 @@ export const CustomQuery: React.FC = () => {
                     <Loading />
                   </div>
                   :
-                  queryResults && schema ?
-                    <MemoizedResultsTable schema={schema} results={queryResults} />
+                  resultData && resultSchema ?
+                    <MemoizedResultsTable schema={resultSchema} results={resultData} />
                     :
                     <div className="tw-flex tw-flex-col tw-justify-center tw-items-center tw-h-96 tw-select-none ">
                       <CommandLineIcon className="tw-h-10 tw-mb-1" />

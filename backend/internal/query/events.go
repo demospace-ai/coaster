@@ -11,13 +11,13 @@ func (qs QueryServiceImpl) GetEvents(dataConnection *models.DataConnection, even
 		return nil, err
 	}
 
-	_, results, err := qs.runQuery(dataConnection, queryString)
+	queryResult, err := qs.runQuery(dataConnection, queryString)
 	if err != nil {
 		return nil, err
 	}
 
 	events := []string{}
-	for _, row := range results {
+	for _, row := range queryResult.Data {
 		if row[0] == nil {
 			continue
 		}

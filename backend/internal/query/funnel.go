@@ -45,42 +45,42 @@ func init() {
 	`))
 }
 
-func (qs QueryServiceImpl) RunFunnelQuery(analysis *models.Analysis) (views.Schema, []views.Row, error) {
+func (qs QueryServiceImpl) RunFunnelQuery(analysis *models.Analysis) (*views.QueryResult, error) {
 	if !analysis.ConnectionID.Valid {
-		return nil, nil, errors.NewBadRequest("no data connection configured")
+		return nil, errors.NewBadRequest("no data connection configured")
 	}
 
 	if !analysis.EventSetID.Valid {
-		return nil, nil, errors.NewBadRequest("no event set configured")
+		return nil, errors.NewBadRequest("no event set configured")
 	}
 
 	if analysis.AnalysisType != models.AnalysisTypeFunnel {
-		return nil, nil, errors.NewBadRequest("wrong analysis type")
+		return nil, errors.NewBadRequest("wrong analysis type")
 	}
 
 	dataConnection, err := dataconnections.LoadDataConnectionByID(qs.db, analysis.OrganizationID, analysis.ConnectionID.Int64)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	eventSet, err := eventsets.LoadEventSetByID(qs.db, analysis.OrganizationID, analysis.EventSetID.Int64)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	steps, err := analyses.LoadEventsByAnalysisID(qs.db, analysis.ID)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	filters, err := analyses.LoadEventFiltersByAnalysisID(qs.db, analysis.ID)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	queryString, err := createFunnelQuery(eventSet, views.ConvertEvents(steps, filters))
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	return qs.runQuery(dataConnection, *queryString)

@@ -15,10 +15,9 @@ type RunFunnelQueryRequest struct {
 }
 
 type RunFunnelQueryResponse struct {
-	Success      bool         `json:"success"`
-	ErrorMessage string       `json:"error_message"`
-	Schema       views.Schema `json:"schema"`
-	QueryResults []views.Row  `json:"query_results"`
+	Success      bool              `json:"success"`
+	ErrorMessage string            `json:"error_message"`
+	QueryResult  views.QueryResult `json:"query_result"`
 }
 
 func (s ApiService) RunFunnelQuery(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
@@ -39,7 +38,7 @@ func (s ApiService) RunFunnelQuery(auth auth.Authentication, w http.ResponseWrit
 		return err
 	}
 
-	schema, queryResults, err := s.queryService.RunFunnelQuery(analysis)
+	queryResult, err := s.queryService.RunFunnelQuery(analysis)
 	if err != nil {
 		if _, ok := err.(query.Error); ok {
 			// Not actually a failure, the user's query was just wrong. Send the details back to them.
@@ -53,8 +52,7 @@ func (s ApiService) RunFunnelQuery(auth auth.Authentication, w http.ResponseWrit
 	}
 
 	return json.NewEncoder(w).Encode(RunQueryResponse{
-		Success:      true,
-		Schema:       schema,
-		QueryResults: queryResults,
+		Success:     true,
+		QueryResult: *queryResult,
 	})
 }

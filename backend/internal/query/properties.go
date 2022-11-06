@@ -12,14 +12,14 @@ func (qs QueryServiceImpl) GetProperties(dataConnection *models.DataConnection, 
 		return nil, err
 	}
 
-	schema, _, err := qs.runQuery(dataConnection, queryString)
+	queryResult, err := qs.runQuery(dataConnection, queryString)
 	if err != nil {
 		return nil, err
 	}
 
 	eventProperties := views.PropertyGroup{
 		Name:       "Event",
-		Properties: schema,
+		Properties: queryResult.Schema,
 	}
 
 	// TODO: fetch custom properties as well
@@ -44,13 +44,13 @@ func (qs QueryServiceImpl) GetPropertyValues(dataConnection *models.DataConnecti
 		return nil, err
 	}
 
-	_, results, err := qs.runQuery(dataConnection, queryString)
+	queryResult, err := qs.runQuery(dataConnection, queryString)
 	if err != nil {
 		return nil, err
 	}
 
 	events := []views.Value{}
-	for _, row := range results {
+	for _, row := range queryResult.Data {
 		events = append(events, row[0])
 	}
 

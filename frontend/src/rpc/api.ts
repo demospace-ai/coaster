@@ -228,8 +228,11 @@ export interface JSONObject {
 
 export interface JSONArray extends Array<JSONValue> { };
 
-export interface QueryResult extends Array<string | number> { }
-export interface QueryResults extends Array<QueryResult> { }
+export interface ResultRow extends Array<string | number> { }
+export interface QueryResult {
+    schema: Schema,
+    data: ResultRow[],
+}
 
 export interface ColumnSchema {
     name: string;
@@ -238,10 +241,10 @@ export interface ColumnSchema {
 
 export interface Schema extends Array<ColumnSchema> { }
 
-export function toCsvData(schema: Schema | undefined, queryResults: QueryResults | undefined): (string | number)[][] {
-    if (schema && queryResults) {
-        const header = schema.map(columnSchema => columnSchema.name);
-        return [header, ...queryResults];
+export function toCsvData(queryResult: QueryResult | undefined): (string | number)[][] {
+    if (queryResult) {
+        const header = queryResult.schema.map(columnSchema => columnSchema.name);
+        return [header, ...queryResult.data];
     }
 
     return [];
@@ -293,8 +296,7 @@ export interface GetPropertyValuesResponse {
 export interface RunQueryResponse {
     success: boolean;
     error_message: string;
-    schema: Schema;
-    query_results: QueryResults;
+    query_result: QueryResult;
 }
 
 export interface SetOrganizationRequest {
