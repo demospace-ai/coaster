@@ -96,7 +96,7 @@ func createFunnelQuery(eventSet *models.EventSet, steps []views.Event) (*string,
 	for i, step := range steps {
 		var previous string
 		if i > 0 {
-			previous = steps[i-1].Name + "_" + fmt.Sprint(i-1)
+			previous = toSubqueryTitle(steps[i-1].Name, i-1)
 		}
 
 		stepSubquery, err := createStepSubquery(eventSet, step, i, previous, eventSet.CustomJoin.Valid)
@@ -121,7 +121,7 @@ func createFunnelQuery(eventSet *models.EventSet, steps []views.Event) (*string,
 }
 
 func createStepSubquery(eventSet *models.EventSet, funnelStep views.Event, order int, previous string, usingCustomTableQuery bool) (*string, error) {
-	tableName := funnelStep.Name + "_" + fmt.Sprint(order)
+	tableName := toSubqueryTitle(funnelStep.Name, order)
 
 	var sourceTable string
 	if usingCustomTableQuery {
@@ -152,8 +152,9 @@ func createStepSubquery(eventSet *models.EventSet, funnelStep views.Event, order
 func createResultsSubquery(eventSet *models.EventSet, steps []views.Event) string {
 	var rollupArray []string
 	for i, step := range steps {
+		subQueryName := toSubqueryTitle(step.Name, i)
 		rollupArray = append(rollupArray,
-			"SELECT COUNT(DISTINCT "+eventSet.UserIdentifierColumn+") AS count, '"+step.Name+"' AS event, "+fmt.Sprint(i)+" AS event_order FROM "+step.Name+"_"+fmt.Sprint(i),
+			"SELECT COUNT(DISTINCT "+eventSet.UserIdentifierColumn+") AS count, '"+step.Name+"' AS event, "+fmt.Sprint(i)+" AS event_order FROM "+subQueryName,
 		)
 	}
 
@@ -191,4 +192,8 @@ func toSQL(tableName string, stepFilter views.EventFilter) string {
 	default:
 		return "true" // This will be added as an AND clause, so just let it pass
 	}
+}
+
+func toSubqueryTitle(eventName string, order int) string {
+	return strings.ReplaceAll(eventName, " ", "_") + fmt.Sprint(order)
 }
