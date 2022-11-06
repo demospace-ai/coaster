@@ -86,7 +86,7 @@ var _ = Describe("RunQueryHandler", func() {
 		response := rr.Result()
 		Expect(response.StatusCode).To(Equal(http.StatusOK))
 
-		var result api.RunQueryResponse
+		var result api.GetEventsResponse
 		err = json.NewDecoder(response.Body).Decode(&result)
 		Expect(err).To(BeNil())
 

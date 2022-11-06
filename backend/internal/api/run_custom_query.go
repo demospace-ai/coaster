@@ -5,16 +5,11 @@ import (
 	"fabra/internal/analyses"
 	"fabra/internal/auth"
 	"fabra/internal/errors"
-	"fabra/internal/views"
 	"net/http"
 )
 
 type RunQueryRequest struct {
 	AnalysisID int64 `json:"analysis_id"`
-}
-
-type RunQueryResponse struct {
-	QueryResult views.QueryResult `json:"query_result"`
 }
 
 func (s ApiService) RunCustomQuery(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {

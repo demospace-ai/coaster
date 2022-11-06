@@ -6,6 +6,7 @@ import (
 	"fabra/internal/auth"
 	"fabra/internal/models"
 	"fabra/internal/test"
+	"fabra/internal/views"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -70,7 +71,7 @@ var _ = Describe("RunQueryHandler", func() {
 		response := rr.Result()
 		Expect(response.StatusCode).To(Equal(http.StatusOK))
 
-		var result api.RunQueryResponse
+		var result views.QueryResult
 		err = json.NewDecoder(response.Body).Decode(&result)
 		Expect(err).To(BeNil())
 

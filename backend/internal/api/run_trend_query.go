@@ -5,18 +5,11 @@ import (
 	"fabra/internal/analyses"
 	"fabra/internal/auth"
 	"fabra/internal/errors"
-	"fabra/internal/views"
 	"net/http"
 )
 
 type RunTrendQueryRequest struct {
 	AnalysisID int64 `json:"analysis_id"`
-}
-
-type RunTrendQueryResponse struct {
-	Success      bool              `json:"success"`
-	ErrorMessage string            `json:"error_message"`
-	QueryResult  views.QueryResult `json:"query_result"`
 }
 
 func (s ApiService) RunTrendQuery(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {

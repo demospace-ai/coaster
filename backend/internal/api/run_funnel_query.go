@@ -5,18 +5,11 @@ import (
 	"fabra/internal/analyses"
 	"fabra/internal/auth"
 	"fabra/internal/errors"
-	"fabra/internal/views"
 	"net/http"
 )
 
 type RunFunnelQueryRequest struct {
 	AnalysisID int64 `json:"analysis_id"`
-}
-
-type RunFunnelQueryResponse struct {
-	Success      bool              `json:"success"`
-	ErrorMessage string            `json:"error_message"`
-	QueryResult  views.QueryResult `json:"query_result"`
 }
 
 func (s ApiService) RunFunnelQuery(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
