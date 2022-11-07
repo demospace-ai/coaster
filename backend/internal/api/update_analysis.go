@@ -84,7 +84,7 @@ func (s ApiService) UpdateAnalysis(auth auth.Authentication, w http.ResponseWrit
 
 			// Ignore adding funnel steps from request if the connection or event set changed
 			sourceChanged := (analysis.ConnectionID != updatedAnalysis.ConnectionID) || (analysis.EventSetID != updatedAnalysis.EventSetID)
-			if updateAnalysisRequest.Events != nil && !sourceChanged {
+			if !sourceChanged {
 				events, eventFilters, err = analyses.CreateEventsAndFilters(s.db, analysis.ID, updateAnalysisRequest.Events)
 				if err != nil {
 					return err

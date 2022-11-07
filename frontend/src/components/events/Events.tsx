@@ -88,7 +88,7 @@ const EventComponent: React.FC<EventProp> = props => {
   const { index, event, connectionID, eventSetID, setEvent, removeEvent, setEventFilters } = props;
 
   return (
-    <div className='tw-flex tw-mb-4 tw-max-w-md'>
+    <div className='tw-flex tw-mb-4'>
       <div className='tw-w-full tw-border tw-border-solid tw-border-gray-300 tw-rounded-md'>
         <div className='tw-flex tw-items-center tw-p-2'>
           <div className='tw-flex tw-mr-2 tw-items-center tw-justify-center tw-shrink-0 tw-rounded-full tw-bg-fabra-green-500 tw-text-white tw-h-6 tw-w-6 tw-my-auto'>
@@ -124,7 +124,7 @@ type NewEventProps = {
 
 const NewEvent: React.FC<NewEventProps> = props => {
   return (
-    <div className='tw-flex tw-mb-4 tw-max-w-md'>
+    <div className='tw-flex tw-mb-4'>
       <div className='tw-w-full tw-mt-[-1px] tw-border tw-border-solid tw-border-gray-300 tw-rounded-t-md tw-rounded-b-md'>
         <div className='tw-flex tw-items-center tw-p-2'>
           <div className='tw-flex tw-mr-2 tw-items-center tw-justify-center tw-shrink-0 tw-rounded-full tw-bg-fabra-green-500 tw-text-white tw-h-6 tw-w-6 tw-my-auto'>

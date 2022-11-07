@@ -1,7 +1,7 @@
 import { PlusCircleIcon } from '@heroicons/react/24/outline';
 import { useCallback, useState } from "react";
 import { useParams } from 'react-router-dom';
-import { Bar, BarChart, Tooltip as RechartTooltip, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, Tooltip as RechartTooltip, XAxis, YAxis } from 'recharts';
 import { rudderanalytics } from 'src/app/rudder';
 import { Button } from 'src/components/button/Button';
 import { Events, EventUpdates } from 'src/components/events/Events';
@@ -173,7 +173,8 @@ export const Funnel: React.FC = () => {
               }
               {!queryLoading && funnelData.length ?
                 <div className='tw-overflow-scroll'>
-                  <BarChart data={funnelData} margin={{ top: 20, right: 30, left: 0, bottom: 10 }} width={300 * funnelData.length} height={320}>
+                  <BarChart className="tw-mx-auto" data={funnelData} margin={{ top: 25, right: 30, left: 0, bottom: 0 }} width={Math.max(300 * funnelData.length, 900)} height={320}>
+                    <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" height={30} />
                     <YAxis ticks={[0, 20, 40, 60, 80, 100]} tickFormatter={tick => tick + "%"} domain={[0, 100]} allowDataOverflow={true} />
                     <RechartTooltip />
