@@ -3,7 +3,7 @@ import './index.css';
 import { ErrorBoundary } from '@highlight-run/react';
 import { H } from 'highlight.run';
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import { App } from 'src/app/App';
@@ -17,7 +17,10 @@ if (isProd()) {
   H.init('7e3vw5g1');
 }
 
-ReactDOM.render(
+const container = document.getElementById('root');
+const root = createRoot(container!);
+
+root.render(
   <React.StrictMode>
     <ErrorBoundary showDialog>
       <Provider store={store}>
@@ -27,5 +30,5 @@ ReactDOM.render(
       </Provider>
     </ErrorBoundary>
   </React.StrictMode>,
-  document.getElementById('root')
+
 );

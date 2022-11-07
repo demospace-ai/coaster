@@ -34,6 +34,7 @@ func (s ApiService) CreateAnalysis(auth auth.Authentication, w http.ResponseWrit
 	switch createAnalysisRequest.AnalysisType {
 	case models.AnalysisTypeCustomQuery:
 	case models.AnalysisTypeFunnel:
+	case models.AnalysisTypeTrend:
 		break
 	default:
 		return errors.NewBadRequest("must provide valid analysis type")

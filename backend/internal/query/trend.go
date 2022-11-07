@@ -7,6 +7,7 @@ import (
 	"fabra/internal/eventsets"
 	"fabra/internal/models"
 	"fabra/internal/views"
+	"sync"
 	"text/template"
 )
 
@@ -17,11 +18,13 @@ func init() {
 		{{ if .customTableQuery }}
 			{{.customTableQuery}},
 		{{ end }}
-		SELECT count(distinct {{.sourceTable}}.{{.userIdentifierColumn}}), event, DATE({{.sourceTable}}.{{.timestampColumn}}) from {{.sourceTable}}
-		WHERE {{.sourceTable}}.{{.eventTypeColumn}} = "{{.eventName}}"
+		SELECT "{{.eventName}}" as event, {{.distinctClause}} as count, DATE({{.timestampColumn}}) as date from {{.sourceTable}}
+		WHERE {{.eventTypeColumn}} = "{{.eventName}}"
 		{{range $filterClause := .filterClauses}}
 			AND {{$filterClause}}
 		{{end}}
+		GROUP BY date
+		ORDER BY date
 	`))
 }
 
@@ -63,14 +66,31 @@ func (qs QueryServiceImpl) RunTrendQuery(analysis *models.Analysis) ([]views.Que
 		return nil, err
 	}
 
-	var results []views.QueryResult
-	for _, query := range queries {
-		result, err := qs.runQuery(dataConnection, query)
+	// these queries take a while so run them synchronously
+	var wg sync.WaitGroup
+	errs := make(chan error)
+	results := make([]views.QueryResult, len(queries))
+	for i, query := range queries {
+		wg.Add(1)
+		go func(i int, query string) {
+			defer wg.Done()
+			result, err := qs.runQuery(dataConnection, query)
+			if err != nil {
+				errs <- err
+			}
+
+			results[i] = *result
+		}(i, query)
+	}
+
+	wg.Wait()
+	close(errs)
+
+	// return the first error
+	for err := range errs {
 		if err != nil {
 			return nil, err
 		}
-
-		results = append(results, *result)
 	}
 
 	return results, nil
@@ -86,10 +106,13 @@ func createTrendQuery(eventSet *models.EventSet, events []views.Event) ([]string
 		sourceTable = eventSet.DatasetName.String + "." + eventSet.TableName.String
 	}
 
+	distinctClause := "count(*)" // TODO: "count(distinct " + userIdentifierColumn + ")"
+
 	// Run separate queries for each event
 	var queryArray []string
 	for _, event := range events {
 		query, err := executeTemplate(trendQueryTemplate, map[string]interface{}{
+			"distinctClause":       distinctClause,
 			"customTableQuery":     customTableQuery,
 			"sourceTable":          sourceTable,
 			"eventName":            event.Name,

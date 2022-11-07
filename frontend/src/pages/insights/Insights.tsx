@@ -1,6 +1,6 @@
 import { Menu, Transition } from '@headlessui/react';
 import { EllipsisHorizontalIcon } from '@heroicons/react/20/solid';
-import { ChartBarIcon, CommandLineIcon } from '@heroicons/react/24/outline';
+import { ChartBarIcon, CommandLineIcon, PresentationChartLineIcon } from '@heroicons/react/24/outline';
 import classNames from 'classnames';
 import React, { Fragment, MouseEvent, ReactNode, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -23,6 +23,9 @@ export const Insights: React.FC = () => {
         break;
       case AnalysisType.Funnel:
         navigate(`/funnel/${analysis.id}`);
+        break;
+      case AnalysisType.Trend:
+        navigate(`/trend/${analysis.id}`);
         break;
     }
   };
@@ -136,10 +139,11 @@ const DeleteModal: React.FC<DeleteModalProps> = props => {
 function getAnalysisIcon(analysisType: AnalysisType): ReactNode {
   switch (analysisType) {
     case AnalysisType.CustomQuery:
-      return <CommandLineIcon className="tw-h-4 tw-mr-2" />
-        ;
+      return <CommandLineIcon className="tw-h-4 tw-mr-2" />;
     case AnalysisType.Funnel:
       return <ChartBarIcon className="tw-h-4 tw-mr-2" />;
+    case AnalysisType.Trend:
+      return <PresentationChartLineIcon className="tw-h-4 tw-mr-2" />;
     default:
       return <></>;
   }

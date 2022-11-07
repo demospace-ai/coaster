@@ -45,6 +45,8 @@ export const SearchResults: React.FC = () => {
         return `/customquery/${analysis.id}`;
       case AnalysisType.Funnel:
         return `/funnel/${analysis.id}`;
+      case AnalysisType.Trend:
+        return `/trend/${analysis.id}`;
     }
   };
 

@@ -1,18 +1,16 @@
 import { PlusCircleIcon } from '@heroicons/react/24/outline';
 import { useCallback, useState } from "react";
 import { useParams } from 'react-router-dom';
-import { Bar, BarChart, ResponsiveContainer, Tooltip as RechartTooltip, XAxis, YAxis } from 'recharts';
+import { Line, LineChart, Tooltip as RechartTooltip, XAxis, YAxis } from 'recharts';
 import { rudderanalytics } from 'src/app/rudder';
 import { Button } from 'src/components/button/Button';
 import { Events, EventUpdates } from 'src/components/events/Events';
 import { ReportHeader } from 'src/components/insight/InsightComponents';
 import { Loading } from 'src/components/loading/Loading';
 import { ConfigureAnalysisModal } from 'src/components/modal/Modal';
-import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { Tooltip } from 'src/components/tooltip/Tooltip';
-import { runFunnelQuery } from 'src/queries/queries';
 import { sendRequest } from 'src/rpc/ajax';
-import { ResultRow, Schema, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
+import { QueryResult, RunTrendQuery, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
 import { useAnalysis } from "src/rpc/data";
 import { toEmptyList } from 'src/utils/undefined';
 
@@ -20,11 +18,14 @@ type TrendParams = {
   id: string,
 };
 
-type FunnelResult = {
+type TrendSeries = {
   name: string,
+  data: TrendResultData[],
+};
+
+type TrendResultData = {
+  date: string,
   count: number,
-  percentage: number,
-  conversionFromPrevious?: number,
 };
 
 /*
@@ -50,9 +51,8 @@ export const Trend: React.FC = () => {
   const [copied, setCopied] = useState<boolean>(false);
 
   const [shouldRun, setShouldRun] = useState<boolean>(false);
-  const [resultSchema, setResultSchema] = useState<Schema | undefined>(undefined);
-  const [resultData, setResultData] = useState<ResultRow[] | undefined>(undefined);
-  const [funnelData, setFunnelData] = useState<FunnelResult[]>([]);
+  const [queryResults, setQueryResults] = useState<QueryResult[] | undefined>(undefined);
+  const [trendData, setTrendData] = useState<TrendSeries[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
 
   const updateSeries = useCallback(async (id: number, updates: EventUpdates) => {
@@ -101,20 +101,23 @@ export const Trend: React.FC = () => {
       return;
     }
 
-    if (!analysis || !analysis.events || analysis.events.length < 2) {
-      setErrorMessage("Must have 2 or more steps!");
+    if (!analysis || !analysis.events) {
+      setErrorMessage("Must have 1 or more events!");
       setQueryLoading(false);
       return;
     }
 
     try {
-      const response = await runFunnelQuery(Number(id));
-      if (response.success) {
-        setResultSchema(response.schema);
-        setResultData(response.data);
-        setFunnelData(convertData(response.data));
+      const response = await sendRequest(RunTrendQuery, {
+        'analysis_id': Number(id),
+      });
+
+      // TODO: if any of the queries failed, show the error message
+      if (response[0].success) {
+        setQueryResults(response);
+        setTrendData(convertData(response));
       } else {
-        setErrorMessage(response.error_message);
+        setErrorMessage(response[0].error_message);
         rudderanalytics.track(`Trend Execution Failed`);
       }
     } catch (e) {
@@ -165,24 +168,23 @@ export const Trend: React.FC = () => {
         </div>
         <div id="funnel-panel" className='tw-flex tw-flex-col tw-flex-1 tw-mb-10'>
           <span className='tw-uppercase tw-font-bold tw-select-none'>Results</span>
-          <div className='tw-flex tw-flex-col tw-flex-1 tw-mt-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md tw-p-5 tw-min-h-[364px]'>
+          <div className='tw-flex tw-flex-col tw-flex-1 tw-mt-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md tw-p-5 tw-min-h-[364px] tw-max-h-[364px]'>
             <div className="tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden">
               {errorMessage &&
                 <div className="tw-p-5 tw-text-red-600 tw-font-bold tw-border-gray-300 tw-border-solid tw-border-b">
                   Error: {errorMessage}
                 </div>
               }
-              {!queryLoading && funnelData.length ?
+              {!queryLoading && trendData.length > 0 ?
                 <div className='tw-overflow-scroll'>
-                  <ResponsiveContainer width={300 * funnelData.length} height={320}>
-                    <BarChart data={funnelData} margin={{ top: 20, right: 30, left: 0, bottom: 10 }}>
-                      <XAxis dataKey="name" height={30} />
-                      <YAxis ticks={[0, 20, 40, 60, 80, 100]} tickFormatter={tick => tick + "%"} domain={[0, 100]} allowDataOverflow={true} />
-                      <RechartTooltip />
-                      <Bar dataKey="percentage" barSize={200} fill="#639f63" background={{ fill: '#eee' }} radius={[5, 5, 0, 0]} />
-                      <Bar dataKey="count" barSize={0} />
-                    </BarChart>
-                  </ResponsiveContainer>
+                  <LineChart data={trendData} margin={{ top: 20, right: 30, left: 20, bottom: 10 }} width={1200} height={320}>
+                    <XAxis dataKey="date" height={30} allowDuplicatedCategory={false} />
+                    <YAxis dataKey="count" />
+                    <RechartTooltip />
+                    {trendData.map((s) => (
+                      <Line dataKey="count" data={s.data} name={s.name} key={s.name} connectNulls={false} />
+                    ))}
+                  </LineChart>
                 </div>
                 :
                 queryLoading ?
@@ -201,28 +203,54 @@ export const Trend: React.FC = () => {
             </div>
           </div>
         </div>
-        {!queryLoading && resultSchema && resultData &&
+        {/* {!queryLoading && queryResults &&
           <div id="breakdown-panel" className='tw-flex tw-flex-col tw-flex-1 tw-mb-20'>
             <span className='tw-uppercase tw-font-bold tw-select-none'>Breakdown</span>
             <div className='tw-flex tw-flex-col tw-flex-1 tw-mt-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md tw-overflow-hidden'>
               <div className="tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-max-h-64 tw-overflow-hidden">
-                <MemoizedResultsTable schema={resultSchema} results={resultData} />
+                <MemoizedResultsTable schema={} results={resultData} />
               </div>
             </div>
           </div>
-        }
+        } */}
       </div>
     </>
   );
 };
 
-const convertData = (results: ResultRow[]): FunnelResult[] => {
+const convertData = (results: QueryResult[]): TrendSeries[] => {
+  // Min and max dates per RFC: http://ecma-international.org/ecma-262/5.1/#sec-15.9.1.1
+  // TODO: use the date range specified in the query itself
+  let minDate: Date = new Date(8640000000000000);
+  let maxDate: Date = new Date(-8640000000000000);
+  results.forEach(result => {
+    result.data.forEach(row => {
+      const date = new Date(row[2] as string);
+      if (date < minDate) {
+        minDate = date;
+      }
+
+      if (date > maxDate) {
+        maxDate = date;
+      }
+    });
+  });
+
   return results.map(result => {
-    return {
-      name: result[1] as string,
-      count: result[0] as number,
-      percentage: +((result[2] as number) * 100).toFixed(2),
-    };
+    const dataMap = new Map(result.data.map(row => {
+      return [
+        new Date(row[2] as string).getDate(),
+        row[1] as number,
+      ];
+    }));
+
+    // All the rows should have the event name as the first column
+    const series: TrendSeries = { name: result.data[0][0] as string, data: [] };
+    for (let d = new Date(minDate); d.getDate() <= maxDate.getDate(); d.setDate(d.getDate() + 1)) {
+      series.data.push({ date: d.toDateString(), count: dataMap.get(d.getDate()) || 0 });
+    }
+
+    return series;
   });
 };
 

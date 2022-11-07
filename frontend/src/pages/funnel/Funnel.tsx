@@ -1,7 +1,7 @@
 import { PlusCircleIcon } from '@heroicons/react/24/outline';
 import { useCallback, useState } from "react";
 import { useParams } from 'react-router-dom';
-import { Bar, BarChart, ResponsiveContainer, Tooltip as RechartTooltip, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, Tooltip as RechartTooltip, XAxis, YAxis } from 'recharts';
 import { rudderanalytics } from 'src/app/rudder';
 import { Button } from 'src/components/button/Button';
 import { Events, EventUpdates } from 'src/components/events/Events';
@@ -10,9 +10,8 @@ import { Loading } from 'src/components/loading/Loading';
 import { ConfigureAnalysisModal } from 'src/components/modal/Modal';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { Tooltip } from 'src/components/tooltip/Tooltip';
-import { runFunnelQuery } from 'src/queries/queries';
 import { sendRequest } from 'src/rpc/ajax';
-import { ResultRow, Schema, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
+import { QueryResult, ResultRow, RunFunnelQuery, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
 import { useAnalysis } from "src/rpc/data";
 import { toEmptyList } from 'src/utils/undefined';
 
@@ -50,8 +49,7 @@ export const Funnel: React.FC = () => {
   const [copied, setCopied] = useState<boolean>(false);
 
   const [shouldRun, setShouldRun] = useState<boolean>(false);
-  const [resultSchema, setResultSchema] = useState<Schema | undefined>(undefined);
-  const [resultData, setResultData] = useState<ResultRow[] | undefined>(undefined);
+  const [queryResult, setQueryResult] = useState<QueryResult | undefined>(undefined);
   const [funnelData, setFunnelData] = useState<FunnelResult[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
 
@@ -113,10 +111,11 @@ export const Funnel: React.FC = () => {
     }
 
     try {
-      const response = await runFunnelQuery(Number(id));
+      const response = await sendRequest(RunFunnelQuery, {
+        'analysis_id': Number(id),
+      });
       if (response.success) {
-        setResultSchema(response.schema);
-        setResultData(response.data);
+        setQueryResult(response);
         setFunnelData(convertData(response.data));
       } else {
         setErrorMessage(response.error_message);
@@ -165,7 +164,7 @@ export const Funnel: React.FC = () => {
         </div>
         <div id="funnel-panel" className='tw-flex tw-flex-col tw-flex-1 tw-mb-10'>
           <span className='tw-uppercase tw-font-bold tw-select-none'>Results</span>
-          <div className='tw-flex tw-flex-col tw-flex-1 tw-mt-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md tw-p-5 tw-min-h-[364px]'>
+          <div className='tw-flex tw-flex-col tw-flex-1 tw-mt-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md tw-p-5 tw-min-h-[364px] tw-max-h-[364px]'>
             <div className="tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden">
               {errorMessage &&
                 <div className="tw-p-5 tw-text-red-600 tw-font-bold tw-border-gray-300 tw-border-solid tw-border-b">
@@ -174,15 +173,13 @@ export const Funnel: React.FC = () => {
               }
               {!queryLoading && funnelData.length ?
                 <div className='tw-overflow-scroll'>
-                  <ResponsiveContainer width={300 * funnelData.length} height={320}>
-                    <BarChart data={funnelData} margin={{ top: 20, right: 30, left: 0, bottom: 10 }}>
-                      <XAxis dataKey="name" height={30} />
-                      <YAxis ticks={[0, 20, 40, 60, 80, 100]} tickFormatter={tick => tick + "%"} domain={[0, 100]} allowDataOverflow={true} />
-                      <RechartTooltip />
-                      <Bar dataKey="percentage" barSize={200} fill="#639f63" background={{ fill: '#eee' }} radius={[5, 5, 0, 0]} />
-                      <Bar dataKey="count" barSize={0} />
-                    </BarChart>
-                  </ResponsiveContainer>
+                  <BarChart data={funnelData} margin={{ top: 20, right: 30, left: 0, bottom: 10 }} width={300 * funnelData.length} height={320}>
+                    <XAxis dataKey="name" height={30} />
+                    <YAxis ticks={[0, 20, 40, 60, 80, 100]} tickFormatter={tick => tick + "%"} domain={[0, 100]} allowDataOverflow={true} />
+                    <RechartTooltip />
+                    <Bar dataKey="percentage" barSize={200} fill="#639f63" background={{ fill: '#eee' }} radius={[5, 5, 0, 0]} />
+                    <Bar dataKey="count" barSize={0} />
+                  </BarChart>
                 </div>
                 :
                 queryLoading ?
@@ -201,12 +198,12 @@ export const Funnel: React.FC = () => {
             </div>
           </div>
         </div>
-        {!queryLoading && resultSchema && resultData &&
+        {!queryLoading && queryResult &&
           <div id="breakdown-panel" className='tw-flex tw-flex-col tw-flex-1 tw-mb-20'>
             <span className='tw-uppercase tw-font-bold tw-select-none'>Breakdown</span>
             <div className='tw-flex tw-flex-col tw-flex-1 tw-mt-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md tw-overflow-hidden'>
               <div className="tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-max-h-64 tw-overflow-hidden">
-                <MemoizedResultsTable schema={resultSchema} results={resultData} />
+                <MemoizedResultsTable schema={queryResult.schema} results={queryResult.data} />
               </div>
             </div>
           </div>

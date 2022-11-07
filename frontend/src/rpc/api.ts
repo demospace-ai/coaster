@@ -482,6 +482,7 @@ export const filtersMatch = (filters1: EventFilter[], filters2: EventFilter[]) =
 export enum AnalysisType {
     CustomQuery = "custom_query",
     Funnel = "funnel",
+    Trend = "trend",
 }
 
 export interface DataConnection {

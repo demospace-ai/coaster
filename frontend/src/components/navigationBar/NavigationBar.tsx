@@ -201,11 +201,15 @@ const NewAnalysisButton: React.FC = () => {
                     active ? 'tw-bg-gray-200 tw-text-gray-900' : 'tw-text-gray-700',
                     menuItem
                   )}
+                  onClick={async () => {
+                    const analysis = await createAnalysis(AnalysisType.Trend, defaultConnectionID, defaultEventSetID);
+                    navigate("/trend/" + analysis?.id);
+                  }}
                 >
                   <div className="tw-flex tw-flex-col tw-justify-center">
                     <PresentationChartLineIcon className="tw-inline-block tw-h-4 tw-mr-2" />
                   </div>
-                  Trend Report (Coming Soon!)
+                  Trend Report
                 </div>
               )}
             </Menu.Item>

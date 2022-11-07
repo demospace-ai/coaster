@@ -74,8 +74,7 @@ func (s ApiService) UpdateAnalysis(auth auth.Authentication, w http.ResponseWrit
 
 	var events []models.Event
 	var eventFilters []models.EventFilter
-	// TODO: trend type too (should this copy the condition from create analysis?)
-	if analysis.AnalysisType == models.AnalysisTypeFunnel {
+	if updateAnalysisRequest.Events != nil {
 		err = s.db.Transaction(func(tx *gorm.DB) error {
 			// Always deactivate the steps on a funnel update, since changing any value invalidates the old steps
 			err = analyses.DeactivateEvents(s.db, analysis.ID)

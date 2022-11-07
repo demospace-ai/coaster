@@ -33,18 +33,14 @@ func (s ApiService) GetAnalysis(auth auth.Authentication, w http.ResponseWriter,
 		return err
 	}
 
-	var events []models.Event
-	var eventFilters []models.EventFilter
-	if analysis.AnalysisType == models.AnalysisTypeFunnel {
-		events, err = analyses.LoadEventsByAnalysisID(s.db, analysis.ID)
-		if err != nil {
-			return err
-		}
+	events, err := analyses.LoadEventsByAnalysisID(s.db, analysis.ID)
+	if err != nil {
+		return err
+	}
 
-		eventFilters, err = analyses.LoadEventFiltersByAnalysisID(s.db, analysis.ID)
-		if err != nil {
-			return err
-		}
+	eventFilters, err := analyses.LoadEventFiltersByAnalysisID(s.db, analysis.ID)
+	if err != nil {
+		return err
 	}
 
 	var connection *models.DataConnection

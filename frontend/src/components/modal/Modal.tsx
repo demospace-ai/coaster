@@ -86,7 +86,7 @@ export const ConfigureAnalysisModal: React.FC<ConfigureAnalysisModalProps> = pro
       // TODO: handle error here
     }
 
-    setTimeout(() => setLoading(false), 1200);
+    setTimeout(() => setLoading(false), 500);
   };
 
   return (

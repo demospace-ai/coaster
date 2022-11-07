@@ -10,6 +10,7 @@ import { Inbox } from 'src/pages/inbox/Inbox';
 import { Insights } from 'src/pages/insights/Insights';
 import { Login } from 'src/pages/login/Login';
 import { NotFound } from 'src/pages/notfound/NotFound';
+import { Trend } from 'src/pages/trend/Trend';
 import { WorkspaceSettings } from 'src/pages/workspacesettings/WorkspaceSettings';
 import { useSelector } from 'src/root/model';
 import styles from './app.m.css';
@@ -44,6 +45,7 @@ export const App: React.FC = () => {
           <Route path='/workspacesettings' element={<RequireAuth element={<WorkspaceSettings />} />} />
           <Route path='/customquery/:id' element={<RequireAuth element={<CustomQuery key={location.pathname} />} />} />
           <Route path='/funnel/:id' element={<RequireAuth element={<Funnel key={location.pathname} />} />} />
+          <Route path='/trend/:id' element={<RequireAuth element={<Trend key={location.pathname} />} />} />
           <Route path='/insights' element={<RequireAuth element={<Insights />} />} />
           <Route path='*' element={<NotFound />} />
         </Route>
