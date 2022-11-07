@@ -128,10 +128,17 @@ export const TestDataConnection: IEndpoint<TestDataConnectionRequest, undefined>
     path: '/test_data_connection',
 };
 
-export const RunCustomQuery: IEndpoint<RunCustomQueryRequest, QueryResult> = {
+export const RunCustomQuery: IEndpoint<RunQueryRequest, QueryResult> = {
     name: 'Custom Query Run',
     method: 'POST',
     path: '/run_custom_query',
+    track: true,
+};
+
+export const RunTrendQuery: IEndpoint<RunQueryRequest, QueryResult[]> = {
+    name: 'Trend Run',
+    method: 'POST',
+    path: '/run_trend_query',
     track: true,
 };
 
@@ -159,7 +166,7 @@ export const GetPropertyValues: IEndpoint<GetPropertyValuesRequest, GetPropertyV
     track: true,
 };
 
-export const RunFunnelQuery: IEndpoint<RunFunnelQueryRequest, QueryResult> = {
+export const RunFunnelQuery: IEndpoint<RunQueryRequest, QueryResult> = {
     name: 'Funnel Run',
     method: 'POST',
     path: '/run_funnel_query',
@@ -259,11 +266,7 @@ export interface PropertyGroup {
     properties: Property[];
 }
 
-export interface RunCustomQueryRequest {
-    analysis_id: number;
-}
-
-export interface RunFunnelQueryRequest {
+export interface RunQueryRequest {
     analysis_id: number;
 }
 

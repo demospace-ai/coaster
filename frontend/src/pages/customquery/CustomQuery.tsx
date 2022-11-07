@@ -14,7 +14,7 @@ import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { DatasetSelector, TableSelector } from "src/components/selector/Selector";
 import { Tooltip } from 'src/components/tooltip/Tooltip';
 import { sendRequest } from "src/rpc/ajax";
-import { DataConnection, ResultRow, RunCustomQuery, RunCustomQueryRequest, Schema, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
+import { DataConnection, ResultRow, RunCustomQuery, Schema, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
 import { useAnalysis, useSchema } from "src/rpc/data";
 import { useDebounce } from 'src/utils/debounce';
 import { createResizeFunction } from 'src/utils/resize';
@@ -102,12 +102,10 @@ export const CustomQuery: React.FC = () => {
       return;
     }
 
-    const payload: RunCustomQueryRequest = {
-      'analysis_id': Number(id),
-    };
-
     try {
-      const response = await sendRequest(RunCustomQuery, payload);
+      const response = await sendRequest(RunCustomQuery, {
+        'analysis_id': Number(id),
+      });
       if (response.success) {
         setResultSchema(response.schema);
         setResultData(response.data);

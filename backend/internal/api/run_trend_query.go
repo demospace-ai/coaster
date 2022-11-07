@@ -30,10 +30,10 @@ func (s ApiService) RunTrendQuery(auth auth.Authentication, w http.ResponseWrite
 		return err
 	}
 
-	queryResult, err := s.queryService.RunTrendQuery(analysis)
+	queryResults, err := s.queryService.RunTrendQuery(analysis)
 	if err != nil {
 		return err
 	}
 
-	return json.NewEncoder(w).Encode(queryResult)
+	return json.NewEncoder(w).Encode(queryResults)
 }
