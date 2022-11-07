@@ -1,12 +1,11 @@
-import { Transition } from "@headlessui/react";
-import { CommandLineIcon } from "@heroicons/react/24/outline";
+import { Dialog, Transition } from "@headlessui/react";
+import { CommandLineIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { editor as EditorLib } from "monaco-editor/esm/vs/editor/editor.api";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import MonacoEditor, { monaco } from "react-monaco-editor";
 import { useParams } from 'react-router-dom';
 import { rudderanalytics } from 'src/app/rudder';
 import { Button } from "src/components/button/Button";
-import { BoxLeftIcon, BoxRightIcon } from "src/components/icons/Icons";
 import { ReportHeader } from "src/components/insight/InsightComponents";
 import { Loading } from 'src/components/loading/Loading';
 import { ConfigureAnalysisModal } from 'src/components/modal/Modal';
@@ -51,6 +50,7 @@ export const CustomQuery: React.FC = () => {
   const [shouldRun, setShouldRun] = useState<boolean>(false);
   const [shouldSave, setShouldSave] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [showSchemaExplorer, setShowSchemaExplorer] = useState<boolean>(false);
 
   const updateCustomQuery = useCallback(async (id: number, updates: { query?: string; }) => {
     const payload: UpdateAnalysisRequest = { analysis_id: Number(id) };
@@ -153,7 +153,7 @@ export const CustomQuery: React.FC = () => {
     <>
       <ConfigureAnalysisModal analysisID={id} show={showModal} close={() => setShowModal(false)} />
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-scroll" >
-        <ReportHeader title={analysis.title} description={analysis.description} copied={copied} saving={saving} copyLink={copyLink} save={() => setShouldSave(true)} showModal={() => setShowModal(true)} />
+        <ReportHeader title={analysis.title} description={analysis.description} copied={copied} saving={saving} copyLink={copyLink} save={() => setShouldSave(true)} showModal={() => setShowModal(true)} showSchemaExplorer={() => setShowSchemaExplorer(true)} />
         <div className='tw-flex tw-flex-1 tw-min-w-0 tw-min-h-0 tw-my-8'>
           <div id='left-panel' className="tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-grow">
             <div id="top-panel" className="tw-h-[30vh] tw-border tw-border-solid tw-border-gray-300 tw-p-2 tw-bg-dark tw-rounded-t-[4px] tw-shrink-0" style={{ height: topPanelHeight + "px" }} ref={topPanelRef}>
@@ -216,7 +216,7 @@ export const CustomQuery: React.FC = () => {
               </div>
             </div>
           </div>
-          <SchemaExplorer connection={analysis.connection} />
+          <SchemaExplorer connection={analysis.connection} showSchemaExplorer={showSchemaExplorer} setShowSchemaExplorer={setShowSchemaExplorer} />
         </div>
       </div>
     </>
@@ -225,12 +225,12 @@ export const CustomQuery: React.FC = () => {
 
 type SchemaExplorerProps = {
   connection: DataConnection | undefined;
+  showSchemaExplorer: boolean;
+  setShowSchemaExplorer: (value: boolean) => void;
 };
 
 const SchemaExplorer: React.FC<SchemaExplorerProps> = props => {
-  const { connection } = props;
-  const [showSchemaExplorer, setShowSchemaExplorer] = useState<boolean>(true);
-  const [showExpand, setShowExpand] = useState<boolean>(false);
+  const { connection, showSchemaExplorer, setShowSchemaExplorer } = props;
   const [datasetName, setDatasetName] = useState<string | undefined>(undefined);
   const [tableName, setTableName] = useState<string | undefined>(undefined);
 
@@ -240,48 +240,70 @@ const SchemaExplorer: React.FC<SchemaExplorerProps> = props => {
   };
 
   return (
-    <>
-      <Transition
-        as={Fragment}
-        show={showSchemaExplorer}
-        enter="tw-transition tw-ease-out tw-duration-250"
-        enterFrom="tw-transform tw-opacity-0 tw-scale-85"
-        enterTo="tw-transform tw-opacity-100 tw-scale-100"
-        leave="tw-transition tw-ease-in tw-duration-150"
-        leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
-        leaveTo="tw-transform tw-opacity-0 tw-scale-95"
-        afterLeave={() => setShowExpand(true)}
-      >
-        <div id='right-panel' className="tw-w-96 tw-min-w-[384px] tw-flex tw-flex-col tw-select-none tw-border tw-border-solid tw-border-gray-300 tw-p-5 tw-rounded tw-ml-10">
-          <div className="tw-font-semibold tw-text-lg -tw-mt-1 tw-mb-2 tw-flex tw-flex-row tw-justify-center tw-items-center">
-            Schema Explorer
-            <div className="tw-p-1 tw-rounded-md hover:tw-bg-gray-200 tw-ml-auto tw-cursor-pointer" onClick={() => setShowSchemaExplorer(false)}>
-              <BoxRightIcon className="tw-h-5" />
+    <Transition.Root show={showSchemaExplorer} as={Fragment}>
+      <Dialog as="div" className="tw-relative tw-z-10" onClose={setShowSchemaExplorer}>
+        <Transition.Child
+          as={Fragment}
+          enter="tw-ease-in-out tw-duration-500"
+          enterFrom="tw-opacity-0"
+          enterTo="tw-opacity-100"
+          leave="tw-ease-in-out tw-duration-500"
+          leaveFrom="tw-opacity-100"
+          leaveTo="tw-opacity-0"
+        >
+          <div className="tw-fixed tw-inset-0 tw-bg-gray-500 tw-bg-opacity-75 tw-transition-opacity" />
+        </Transition.Child>
+        <div className="tw-fixed tw-inset-0 tw-overflow-hidden">
+          <div className="tw-absolute tw-inset-0 tw-overflow-hidden">
+            <div className="tw-pointer-events-none tw-fixed tw-inset-y-0 tw-right-0 tw-flex tw-max-w-full tw-pl-10">
+              <Transition.Child
+                as={Fragment}
+                enter="tw-transform tw-transition tw-ease-in-out tw-duration-500 sm:tw-duration-700"
+                enterFrom="tw-translate-x-full"
+                enterTo="tw-translate-x-0"
+                leave="tw-transform tw-transition tw-ease-in-out tw-duration-500 sm:tw-duration-700"
+                leaveFrom="tw-translate-x-0"
+                leaveTo="tw-translate-x-full"
+              >
+                <Dialog.Panel className="tw-pointer-events-auto tw-w-screen tw-max-w-md">
+                  <div className="tw-flex tw-h-full tw-flex-col tw-overflow-y-scroll tw-bg-white tw-py-6 tw-shadow-xl">
+                    <div className="tw-px-4 sm:tw-px-6">
+                      <div className="tw-flex tw-items-start tw-justify-between">
+                        <Dialog.Title className="tw-text-lg tw-font-medium tw-text-gray-900 tw-select-none">Schema Explorer</Dialog.Title>
+                        <div className="tw-ml-3 tw-flex tw-h-7 tw-items-center">
+                          <div
+                            className="tw-rounded-md tw-bg-white tw-text-gray-400 hover:tw-bg-gray-200 tw-cursor-pointer"
+                            onClick={() => setShowSchemaExplorer(false)}
+                          >
+                            <span className="tw-sr-only">Close panel</span>
+                            <XMarkIcon className="tw-h-6 tw-w-6" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="tw-relative tw-mt-6 tw-flex-1 tw-px-5">
+                      <div id='schema-explorer' className="tw-flex tw-flex-col tw-flex-1 tw-select-none tw-border tw-border-solid tw-border-gray-300 tw-p-5 tw-rounded">
+                        <div className='tw-text-xs tw-uppercase tw-select-none tw-mb-2'>Dataset</div>
+                        <DatasetSelector connection={connection} datasetName={datasetName} setDatasetName={setDatasetAndClear} />
+                        <div className='tw-text-xs tw-uppercase tw-select-none tw-mt-4 tw-mb-2'>Table</div>
+                        <TableSelector connection={connection} datasetName={datasetName} tableName={tableName} setTableName={setTableName} />
+                        {connection && datasetName && tableName &&
+                          <>
+                            <div className="tw-mt-5 tw-pt-3 tw-border-t tw-border-solid tw-border-gray-300" />
+                            <div className='tw-text-sm tw-font-semibold tw-select-none tw-mb-2'>{tableName}</div>
+                            <SchemaPreview connectionID={connection.id} datasetName={datasetName} tableName={tableName} />
+                          </>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
             </div>
           </div>
-          <div className='tw-text-xs tw-uppercase tw-select-none tw-mt-4 tw-mb-2'>Dataset</div>
-          <DatasetSelector connection={connection} datasetName={datasetName} setDatasetName={setDatasetAndClear} />
-          <div className='tw-text-xs tw-uppercase tw-select-none tw-mt-4 tw-mb-2'>Table</div>
-          <TableSelector connection={connection} datasetName={datasetName} tableName={tableName} setTableName={setTableName} />
-          {connection && datasetName && tableName &&
-            <>
-              <div className="tw-mt-5 tw-pt-3 tw-border-t tw-border-solid tw-border-gray-300" />
-              <div className='tw-text-sm tw-font-semibold tw-select-none tw-mb-2'>{tableName}</div>
-              <SchemaPreview connectionID={connection.id} datasetName={datasetName} tableName={tableName} />
-            </>
-          }
         </div>
-      </Transition>
-      <Transition
-        as={Fragment}
-        show={showExpand}
-        afterLeave={() => setShowSchemaExplorer(true)}
-      >
-        <div className="tw-flex tw-flex-col tw-justify-center tw-items-center hover:tw-bg-gray-200 tw-ml-2 tw-px-2 tw-cursor-pointer tw-rounded" onClick={() => setShowExpand(false)}>
-          <BoxLeftIcon className="tw-h-5" />
-        </div>
-      </Transition>
-    </>
+      </Dialog>
+    </Transition.Root>
   );
 };
 

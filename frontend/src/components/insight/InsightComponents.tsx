@@ -1,6 +1,6 @@
 import { CheckIcon, LinkIcon } from "@heroicons/react/24/outline";
 import { Button, MoreOptionsButton } from "src/components/button/Button";
-import { SaveIcon } from "src/components/icons/Icons";
+import { BoxLeftIcon, SaveIcon } from "src/components/icons/Icons";
 import { Loading } from "src/components/loading/Loading";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 
@@ -12,10 +12,11 @@ type HeaderProps = {
   showModal: () => void;
   save: () => void;
   copyLink: () => void;
+  showSchemaExplorer?: () => void;
 };
 
 export const ReportHeader: React.FC<HeaderProps> = props => {
-  const { copied, saving, showModal, save, copyLink } = props;
+  const { copied, saving, showModal, save, copyLink, showSchemaExplorer } = props;
   return (
     <div className="">
       <div className="tw-mb-3 tw-flex tw-flex-row">
@@ -33,6 +34,11 @@ export const ReportHeader: React.FC<HeaderProps> = props => {
               {saving ? <Loading /> : <><SaveIcon className='tw-h-5 tw-inline tw-mr-1' />Save</>}
             </Button>
           </Tooltip>
+          <div className="tw-relative">
+            {showSchemaExplorer &&
+              <BoxLeftIcon className="tw-absolute tw-top-16 tw-right-0 tw-h-5 tw-stroke-[1.5] tw-ml-1 tw-rounded-md tw-cursor-pointer hover:tw-bg-gray-200" onClick={showSchemaExplorer} />
+            }
+          </div>
         </div>
       </div>
       <div>

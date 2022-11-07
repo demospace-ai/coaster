@@ -1,6 +1,6 @@
 import { Menu, Transition } from "@headlessui/react";
 import { ChartBarIcon, ChevronDownIcon, CommandLineIcon, PresentationChartLineIcon } from '@heroicons/react/20/solid';
-import { ChartBarSquareIcon, CheckIcon, Cog6ToothIcon, HomeIcon, PlusIcon, UsersIcon } from '@heroicons/react/24/outline';
+import { ChartBarSquareIcon, CheckIcon, Cog6ToothIcon, HomeIcon, PlusIcon, TableCellsIcon, UsersIcon } from '@heroicons/react/24/outline';
 import classNames from "classnames";
 import { Fragment } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -190,7 +190,7 @@ const NewAnalysisButton: React.FC = () => {
                   <div className="tw-flex tw-flex-col tw-justify-center">
                     <ChartBarIcon className="tw-inline-block tw-h-4 tw-mr-2 tw-scale-x-[-1]" />
                   </div>
-                  Funnel Report
+                  Funnel
                 </div>
               )}
             </Menu.Item>
@@ -209,7 +209,7 @@ const NewAnalysisButton: React.FC = () => {
                   <div className="tw-flex tw-flex-col tw-justify-center">
                     <PresentationChartLineIcon className="tw-inline-block tw-h-4 tw-mr-2" />
                   </div>
-                  Trend Report
+                  Trend
                 </div>
               )}
             </Menu.Item>
@@ -235,7 +235,22 @@ const NewAnalysisButton: React.FC = () => {
                       <rect x="1300" y="1300" width="1000" height="1000" rx="300" />
                     </svg>
                   </div>
-                  Retention Report (Coming Soon!)
+                  Retention (Coming Soon!)
+                </div>
+              )}
+            </Menu.Item>
+            <Menu.Item>
+              {({ active }) => (
+                <div
+                  className={classNames(
+                    active ? 'tw-bg-gray-200 tw-text-gray-900' : 'tw-text-gray-700',
+                    menuItem
+                  )}
+                >
+                  <div className="tw-flex tw-flex-col tw-justify-center">
+                    <TableCellsIcon className="tw-h-4 tw-mr-2 tw-stroke-2" />
+                  </div>
+                  Chart Builder (Coming Soon!)
                 </div>
               )}
             </Menu.Item>

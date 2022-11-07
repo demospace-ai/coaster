@@ -93,8 +93,9 @@ export const ConfigureAnalysisModal: React.FC<ConfigureAnalysisModalProps> = pro
     <Modal show={props.show} close={props.close} title="Configure Analysis" titleStyle='tw-font-bold tw-text-xl'>
       {analysis ?
         <div className='tw-w-80 tw-m-6'>
+          {analysis.analysis_type !== AnalysisType.CustomQuery && <div className="tw-mb-5"><span className='tw-font-bold'>Important:</span> changing the connection or event set will clear any events you've selected.</div>}
           <ConnectionSelector connection={connection} setConnection={setConnection} />
-          {analysis.analysis_type === AnalysisType.Funnel && <EventSetSelector className="tw-mt-4" connection={connection} eventSet={eventSet} setEventSet={setEventSet} />}
+          {analysis.analysis_type !== AnalysisType.CustomQuery && <EventSetSelector className="tw-mt-4" connection={connection} eventSet={eventSet} setEventSet={setEventSet} />}
           <div className='tw-mt-8 tw-flex'>
             <div className='tw-ml-auto'>
               <Button className='tw-bg-white tw-text-gray-800 hover:tw-bg-gray-200 tw-border-0 tw-mr-3' onClick={props.close}>Cancel</Button>
