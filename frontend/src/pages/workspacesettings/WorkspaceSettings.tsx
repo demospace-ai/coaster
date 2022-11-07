@@ -18,7 +18,7 @@ enum Step {
   NewEventSet,
 }
 
-const tableHeaderStyle = "tw-sticky tw-top-0 tw-z-10 tw-border-b tw-border-gray-300 tw-bg-gray-50 tw-bg-opacity-75 tw-py-3.5 tw-pr-4 tw-pl-3 backdrop-blur backdrop-filter sm:tw-pr-6 lg:tw-pr-8 tw-text-left";
+const tableHeaderStyle = "tw-sticky tw-top-0 tw-z-0 tw-border-b tw-border-gray-300 tw-bg-gray-50 tw-bg-opacity-75 tw-py-3.5 tw-pr-4 tw-pl-3 backdrop-blur backdrop-filter sm:tw-pr-6 lg:tw-pr-8 tw-text-left";
 const tableCellStyle = "tw-whitespace-nowrap tw-px-3 tw-py-4 tw-text-sm tw-text-gray-500 tw-hidden sm:tw-table-cell";
 
 export const WorkspaceSettings: React.FC = () => {
