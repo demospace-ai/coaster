@@ -1,16 +1,17 @@
 import { PlusCircleIcon } from '@heroicons/react/24/outline';
 import { useCallback, useState } from "react";
 import { useParams } from 'react-router-dom';
-import { Line, LineChart, Tooltip as RechartTooltip, XAxis, YAxis } from 'recharts';
+import { Line, LineChart, ResponsiveContainer, Tooltip as RechartTooltip, XAxis, YAxis } from 'recharts';
 import { rudderanalytics } from 'src/app/rudder';
 import { Button } from 'src/components/button/Button';
 import { Events, EventUpdates } from 'src/components/events/Events';
 import { ReportHeader } from 'src/components/insight/InsightComponents';
 import { Loading } from 'src/components/loading/Loading';
 import { ConfigureAnalysisModal } from 'src/components/modal/Modal';
+import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { Tooltip } from 'src/components/tooltip/Tooltip';
 import { sendRequest } from 'src/rpc/ajax';
-import { QueryResult, RunTrendQuery, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
+import { QueryResult, ResultRow, RunTrendQuery, Schema, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
 import { useAnalysis } from "src/rpc/data";
 import { toEmptyList } from 'src/utils/undefined';
 
@@ -51,7 +52,7 @@ export const Trend: React.FC = () => {
   const [copied, setCopied] = useState<boolean>(false);
 
   const [shouldRun, setShouldRun] = useState<boolean>(false);
-  const [queryResults, setQueryResults] = useState<QueryResult[] | undefined>(undefined);
+  const [queryResults, setQueryResults] = useState<QueryResult | undefined>(undefined);
   const [trendData, setTrendData] = useState<TrendSeries[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
 
@@ -112,14 +113,16 @@ export const Trend: React.FC = () => {
         'analysis_id': Number(id),
       });
 
-      // TODO: if any of the queries failed, show the error message
-      if (response[0].success) {
-        setQueryResults(response);
-        setTrendData(convertData(response));
-      } else {
-        setErrorMessage(response[0].error_message);
-        rudderanalytics.track(`Trend Execution Failed`);
-      }
+      const breakdown = toBreakdown(response);
+      setQueryResults(breakdown);
+      setTrendData(convertData(breakdown));
+      response.forEach(result => {
+        if (!result.success) {
+          // TODO: still show the successful results, just show a error toast
+          setErrorMessage(result.error_message);
+          rudderanalytics.track(`Trend Execution Failed`);
+        }
+      });
     } catch (e) {
       setErrorMessage((e as Error).message);
       // TODO: log datadog event here
@@ -153,8 +156,8 @@ export const Trend: React.FC = () => {
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-scroll">
         <ReportHeader title={analysis.title} description={analysis.description} copied={copied} saving={saving} copyLink={copyLink} save={updateFunnel} showModal={() => setShowModal(true)} />
         <div className='tw-mt-8 tw-mb-10'>
-          <span className='tw-uppercase tw-font-bold -tw-mt-1'>Steps</span>
-          <div id="steps-panel" className='tw-flex tw-flex-1 tw-mt-2 tw-p-5 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md'>
+          <span className='tw-uppercase tw-font-bold -tw-mt-1'>Series</span>
+          <div id="events-panel" className='tw-flex tw-flex-1 tw-mt-2 tw-p-5 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md'>
             <div id='left-panel' className="tw-w-1/2 tw-min-w-1/2 tw-flex tw-flex-col tw-select-none tw-pr-10">
               <Events id={Number(id)} connectionID={analysis.connection?.id} eventSetID={analysis.event_set?.id} events={toEmptyList(analysis.events)} setErrorMessage={setErrorMessage} updateAnalysis={updateSeries} />
               <Tooltip label={"⌘ + Enter"}>
@@ -177,14 +180,16 @@ export const Trend: React.FC = () => {
               }
               {!queryLoading && trendData.length > 0 ?
                 <div className='tw-overflow-scroll'>
-                  <LineChart data={trendData} margin={{ top: 20, right: 30, left: 20, bottom: 10 }} width={1200} height={320}>
-                    <XAxis dataKey="date" height={30} allowDuplicatedCategory={false} />
-                    <YAxis dataKey="count" />
-                    <RechartTooltip />
-                    {trendData.map((s) => (
-                      <Line dataKey="count" data={s.data} name={s.name} key={s.name} connectNulls={false} />
-                    ))}
-                  </LineChart>
+                  <ResponsiveContainer width="100%" height={320}>
+                    <LineChart data={trendData} margin={{ top: 20, right: 50, left: 10, bottom: 10 }} >
+                      <XAxis dataKey="date" height={30} allowDuplicatedCategory={false} />
+                      <YAxis dataKey="count" />
+                      <RechartTooltip />
+                      {trendData.map((s) => (
+                        <Line dataKey="count" data={s.data} name={s.name} key={s.name} connectNulls={false} />
+                      ))}
+                    </LineChart>
+                  </ResponsiveContainer>
                 </div>
                 :
                 queryLoading ?
@@ -203,22 +208,71 @@ export const Trend: React.FC = () => {
             </div>
           </div>
         </div>
-        {/* {!queryLoading && queryResults &&
+        {!queryLoading && queryResults &&
           <div id="breakdown-panel" className='tw-flex tw-flex-col tw-flex-1 tw-mb-20'>
             <span className='tw-uppercase tw-font-bold tw-select-none'>Breakdown</span>
             <div className='tw-flex tw-flex-col tw-flex-1 tw-mt-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md tw-overflow-hidden'>
               <div className="tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-max-h-64 tw-overflow-hidden">
-                <MemoizedResultsTable schema={} results={resultData} />
+                <MemoizedResultsTable schema={queryResults.schema} results={queryResults.data} />
               </div>
             </div>
           </div>
-        } */}
+        }
       </div>
     </>
   );
 };
 
-const convertData = (results: QueryResult[]): TrendSeries[] => {
+const convertData = (breakdownResult: QueryResult): TrendSeries[] => {
+  return breakdownResult.data.map(eventData => {
+    const data: TrendResultData[] = [];
+    // Start at index 1 since first column is the event name
+    for (let i = 1; i < eventData.length; i++) {
+      data.push({ date: breakdownResult.schema[i].name, count: eventData[i] as number });
+    }
+
+    // First column is the event name in the breakdown data
+    const series: TrendSeries = { name: eventData[0] as string, data: data };
+
+    return series;
+  });
+};
+
+const toBreakdown = (results: QueryResult[]): QueryResult => {
+  const { minDate, maxDate } = getDateRange(results);
+  const range: Date[] = [];
+  for (let d = new Date(minDate); d.getDate() <= maxDate.getDate(); d.setDate(d.getDate() + 1)) {
+    range.push(new Date(d));
+  }
+
+  const schema: Schema = [{ name: "Event", type: "string" }, ...range.map(d => ({ name: d.toDateString(), type: "string" }))];
+  const data = results.map(result => {
+    const dataMap = new Map(result.data.map(row => {
+      return [
+        new Date(row[2] as string).getDate(),
+        row[1] as number,
+      ];
+    }));
+
+    // All the rows should have the event name as the first column
+    const series: ResultRow = [result.data[0][0]];
+    range.forEach(d => {
+      series.push(dataMap.get(d.getDate()) || 0);
+    });
+
+    return series;
+  });
+
+  return { success: true, error_message: "", schema: schema, data: data };
+};
+
+
+type DateRange = {
+  minDate: Date,
+  maxDate: Date,
+};
+
+const getDateRange = (results: QueryResult[]): DateRange => {
   // Min and max dates per RFC: http://ecma-international.org/ecma-262/5.1/#sec-15.9.1.1
   // TODO: use the date range specified in the query itself
   let minDate: Date = new Date(8640000000000000);
@@ -236,23 +290,8 @@ const convertData = (results: QueryResult[]): TrendSeries[] => {
     });
   });
 
-  return results.map(result => {
-    const dataMap = new Map(result.data.map(row => {
-      return [
-        new Date(row[2] as string).getDate(),
-        row[1] as number,
-      ];
-    }));
-
-    // All the rows should have the event name as the first column
-    const series: TrendSeries = { name: result.data[0][0] as string, data: [] };
-    for (let d = new Date(minDate); d.getDate() <= maxDate.getDate(); d.setDate(d.getDate() + 1)) {
-      series.data.push({ date: d.toDateString(), count: dataMap.get(d.getDate()) || 0 });
-    }
-
-    return series;
-  });
-};
+  return { minDate, maxDate };
+}
 
 /*
 const hasResults = Boolean(schema && queryResults);
