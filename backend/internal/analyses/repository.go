@@ -56,6 +56,8 @@ func UpdateAnalysis(
 	analysis models.Analysis,
 	connectionID *int64,
 	eventSetID *int64,
+	title *string,
+	description *string,
 	query *string,
 ) (*models.Analysis, error) {
 	// Any fields left empty will be unchanged
@@ -70,6 +72,14 @@ func UpdateAnalysis(
 
 	if query != nil {
 		analysis.Query = database.NewNullString(*query)
+	}
+
+	if title != nil {
+		analysis.Title = *title
+	}
+
+	if description != nil {
+		analysis.Description = database.NewNullString(*description)
 	}
 
 	// TODO: decide if this should be limited to the original user or not

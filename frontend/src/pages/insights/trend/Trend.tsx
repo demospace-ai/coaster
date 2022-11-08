@@ -155,7 +155,7 @@ export const Trend: React.FC = () => {
                       <YAxis dataKey="count" />
                       <RechartTooltip />
                       {trendData.map((s) => (
-                        <Line dataKey="count" data={s.data} name={s.name} key={s.name} connectNulls={false} />
+                        <Line dataKey="count" data={s.data} name={s.name} key={s.name} connectNulls={false} stroke="#639f63" />
                       ))}
                     </LineChart>
                   </ResponsiveContainer>

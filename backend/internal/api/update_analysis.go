@@ -17,6 +17,8 @@ type UpdateAnalysisRequest struct {
 	AnalysisID   int64         `json:"analysis_id"`
 	ConnectionID *int64        `json:"connection_id,omitempty"`
 	EventSetID   *int64        `json:"event_set_id,omitempty"`
+	Title        *string       `json:"title,omitempty"`
+	Description  *string       `json:"description,omitempty"`
 	Query        *string       `json:"query,omitempty"`
 	Events       []views.Event `json:"events,omitempty"`
 }
@@ -66,6 +68,8 @@ func (s ApiService) UpdateAnalysis(auth auth.Authentication, w http.ResponseWrit
 		*analysis,
 		updateAnalysisRequest.ConnectionID,
 		updateAnalysisRequest.EventSetID,
+		updateAnalysisRequest.Title,
+		updateAnalysisRequest.Description,
 		updateAnalysisRequest.Query,
 	)
 	if err != nil {

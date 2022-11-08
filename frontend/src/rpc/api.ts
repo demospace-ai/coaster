@@ -406,6 +406,7 @@ export interface UpdateAnalysisRequest {
     connection_id?: number;
     event_set_id?: number;
     title?: string;
+    description?: string;
     query?: string;
     events?: EventInput[];
 }

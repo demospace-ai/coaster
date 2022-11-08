@@ -15,10 +15,25 @@ type HeaderProps = {
 
 export const ReportHeader: React.FC<HeaderProps> = props => {
   const { id, onSave, showModal, showSchemaExplorer } = props;
-  const { analysis } = useAnalysis(id);
-
+  const { analysis, updateAnalysis } = useAnalysis(id);
+  const [title, setTitle] = useState<string>(analysis?.title || "");
+  const [description, setDescription] = useState<string>(analysis?.description || "");
   const [saving, setSaving] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
+
+  const copyLink = () => {
+    setCopied(true);
+    navigator.clipboard.writeText(window.location.href);
+    setTimeout(() => setCopied(false), 1200);
+  };
+
+  const updateTitle = () => {
+    updateAnalysis({ analysis_id: Number(id), title });
+  };
+
+  const updateDescription = () => {
+    updateAnalysis({ analysis_id: Number(id), description });
+  };
 
   const manualSave = useCallback(async () => {
     setSaving(true);
@@ -26,6 +41,7 @@ export const ReportHeader: React.FC<HeaderProps> = props => {
     setTimeout(() => setSaving(false), 500);
   }, [onSave]);
 
+  // TODO: allow people to cancel renaming the title/description.
   useEffect(() => {
     const onSave = (event: KeyboardEvent) => {
       if (event.metaKey && event.key.toLowerCase() === "s") {
@@ -39,19 +55,11 @@ export const ReportHeader: React.FC<HeaderProps> = props => {
     };
   });
 
-
-  const copyLink = () => {
-    setCopied(true);
-    navigator.clipboard.writeText(window.location.href);
-    setTimeout(() => setCopied(false), 1200);
-  };
-
   return (
     <div className="">
       <div className="tw-mb-3 tw-flex tw-flex-row">
-        <div className='tw-font-semibold tw-text-2xl'>
-          {analysis?.title}
-        </div>
+        <input className='tw-w-full tw-font-semibold tw-text-2xl tw-peer' onChange={e => setTitle(e.target.value)} value={title} onBlur={updateTitle} />
+        <div className="tw-bg-fabra-green-500 tw-text-white tw-rounded-md tw-justify-center tw-flex tw-items-center tw-px-3 tw-ml-2 tw-cursor-pointer tw-invisible peer-focus:tw-visible hover:tw-bg-fabra-green-600 tw-font-semibold">Save</div>
         <div className='tw-flex tw-ml-auto'>
           <MoreOptionsButton className='tw-flex tw-justify-center tw-align-middle tw-ml-3' showModal={showModal} />
           <div className="tw-inline-block tw-mx-4 tw-my-2 tw-w-[1px] tw-bg-gray-400"></div>
@@ -70,8 +78,9 @@ export const ReportHeader: React.FC<HeaderProps> = props => {
           </div>
         </div>
       </div>
-      <div>
-        Description
+      <div className="tw-flex tw-flex-row">
+        <textarea className="tw-peer tw-w-full tw-resize-none" value={description} onChange={e => setDescription(e.target.value)} placeholder="Description (Optional)" onBlur={updateDescription} />
+        <div className="tw-bg-fabra-green-500 tw-text-white tw-rounded-md tw-justify-center tw-flex tw-items-center tw-px-3 tw-ml-2 tw-cursor-pointer tw-invisible peer-focus:tw-visible hover:tw-bg-fabra-green-600 tw-font-semibold">Save</div>
       </div>
     </div>
   );
