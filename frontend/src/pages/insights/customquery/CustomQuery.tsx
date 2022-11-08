@@ -13,7 +13,7 @@ import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { DatasetSelector, TableSelector } from "src/components/selector/Selector";
 import { Tooltip } from 'src/components/tooltip/Tooltip';
 import { sendRequest } from "src/rpc/ajax";
-import { DataConnection, QueryResult, RunCustomQuery, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
+import { DataConnection, QueryResult, RunCustomQuery, UpdateAnalysisRequest } from "src/rpc/api";
 import { useAnalysis, useSchema } from "src/rpc/data";
 import { useDebounce } from 'src/utils/debounce';
 import { createResizeFunction } from 'src/utils/resize';
@@ -35,10 +35,7 @@ TODO: tests
 */
 export const CustomQuery: React.FC = () => {
   const { id } = useParams<QueryParams>();
-  const { analysis } = useAnalysis(id);
-
-  const [saving, setSaving] = useState<boolean>(false);
-  const [copied, setCopied] = useState<boolean>(false);
+  const { analysis, updateAnalysis } = useAnalysis(id);
 
   const [topPanelHeight, setTopPanelHeight] = useState<number>();
   const topPanelRef = useRef<HTMLDivElement>(null);
@@ -48,22 +45,15 @@ export const CustomQuery: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const [shouldRun, setShouldRun] = useState<boolean>(false);
-  const [shouldSave, setShouldSave] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showSchemaExplorer, setShowSchemaExplorer] = useState<boolean>(false);
 
-  const updateCustomQuery = useCallback(async (id: number, updates: { query?: string; }) => {
-    const payload: UpdateAnalysisRequest = { analysis_id: Number(id) };
-    if (updates.query) {
-      payload.query = updates.query;
+  const manualSave = useCallback(async () => {
+    // Update the query immediately upon manual save
+    if (analysis) {
+      await updateAnalysis({ analysis_id: Number(id), query: analysis?.query });
     }
-
-    try {
-      await sendRequest(UpdateAnalysis, payload);
-    } catch (e) {
-      // TODO: handle error here
-    }
-  }, []);
+  }, [id, analysis, updateAnalysis]);
 
   // Limit how much the top panel can be resized
   const setTopPanelHeightBounded = (height: number) => {
@@ -81,20 +71,20 @@ export const CustomQuery: React.FC = () => {
   };
   const startResize = createResizeFunction(topPanelRef, setTopPanelHeightBounded);
 
-  const debouncedUpdate = useDebounce((id: number, query: string) => updateCustomQuery(id, { query: query }), 1500);
+  const debouncedUpdate = useDebounce((payload: UpdateAnalysisRequest) => updateAnalysis(payload), 1500);
   const onQueryChange = useCallback((query: string) => {
     if (analysis) {
       analysis.query = query;
-      debouncedUpdate(Number(id), query);
+      debouncedUpdate({ analysis_id: Number(id), query: query });
     }
-  }, [id, debouncedUpdate, analysis]);
+  }, [id, analysis, debouncedUpdate]);
 
   const runQuery = useCallback(async (id: number, query: string) => {
     setQueryLoading(true);
     setErrorMessage(null);
 
     // Save the query even if it can't be run
-    await updateCustomQuery(Number(id), { query: query });
+    await updateAnalysis({ analysis_id: Number(id), query: query });
     if (!query.trim()) {
       setErrorMessage("Query cannot be empty!");
       setQueryLoading(false);
@@ -117,29 +107,15 @@ export const CustomQuery: React.FC = () => {
     }
 
     setQueryLoading(false);
-  }, [updateCustomQuery]);
+  }, [updateAnalysis]);
 
-  // Hack to run/save the query since the Monaco editor will keep a stale version of the runQuery function
+  // Hack to run the query since the Monaco editor will keep a stale version of the runQuery function
   useEffect(() => {
     if (shouldRun) {
       setShouldRun(false);
       runQuery(Number(id), analysis?.query ? analysis.query : "");
     }
-
-    if (shouldSave) {
-      setShouldSave(false);
-      // Only set saving state here since this is triggered by user interfaction, versus in other locations
-      setSaving(true);
-      updateCustomQuery(Number(id), { query: analysis?.query });
-      setTimeout(() => setSaving(false), 500);
-    }
-  }, [id, analysis, shouldRun, shouldSave, runQuery, updateCustomQuery]);
-
-  const copyLink = () => {
-    setCopied(true);
-    navigator.clipboard.writeText(window.location.href);
-    setTimeout(() => setCopied(false), 1200);
-  };
+  }, [id, analysis, shouldRun, runQuery]);
 
   if (!id) {
     return <Loading />;
@@ -153,7 +129,7 @@ export const CustomQuery: React.FC = () => {
     <>
       <ConfigureAnalysisModal analysisID={id} show={showModal} close={() => setShowModal(false)} />
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-scroll" >
-        <ReportHeader title={analysis.title} description={analysis.description} copied={copied} saving={saving} copyLink={copyLink} save={() => setShouldSave(true)} showModal={() => setShowModal(true)} showSchemaExplorer={() => setShowSchemaExplorer(true)} />
+        <ReportHeader id={id} onSave={manualSave} showModal={() => setShowModal(true)} showSchemaExplorer={() => setShowSchemaExplorer(true)} />
         <div className='tw-flex tw-flex-1 tw-min-w-0 tw-min-h-0 tw-my-8'>
           <div id='left-panel' className="tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-grow">
             <div id="top-panel" className="tw-h-[30vh] tw-border tw-border-solid tw-border-gray-300 tw-p-2 tw-bg-dark tw-rounded-t-[4px] tw-shrink-0" style={{ height: topPanelHeight + "px" }} ref={topPanelRef}>
@@ -173,7 +149,6 @@ export const CustomQuery: React.FC = () => {
                 onChange={onQueryChange}
                 editorDidMount={(editor: EditorLib.IStandaloneCodeEditor) => {
                   editor.addAction({ id: "run query", label: "run query", keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter], run: () => setShouldRun(true), });
-                  editor.addAction({ id: "save query", label: "save query", keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS], run: () => setShouldSave(true), });
                 }}
               />
               <div id='resize-grabber' className='tw-relative'>

@@ -13,8 +13,7 @@ export const useCreateAnalysis = () => {
     };
 
     try {
-      const analysis = await sendRequest(CreateAnalysis, payload);
-      return analysis;
+      return await sendRequest(CreateAnalysis, payload);
     } catch (e) {
       // TODO: handle error here
     }

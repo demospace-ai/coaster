@@ -4,16 +4,15 @@ import { useParams } from 'react-router-dom';
 import { Line, LineChart, ResponsiveContainer, Tooltip as RechartTooltip, XAxis, YAxis } from 'recharts';
 import { rudderanalytics } from 'src/app/rudder';
 import { Button } from 'src/components/button/Button';
-import { Events, EventUpdates } from 'src/components/events/Events';
+import { Events } from 'src/components/events/Events';
 import { ReportHeader } from 'src/components/insight/InsightComponents';
 import { Loading } from 'src/components/loading/Loading';
 import { ConfigureAnalysisModal } from 'src/components/modal/Modal';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { Tooltip } from 'src/components/tooltip/Tooltip';
 import { sendRequest } from 'src/rpc/ajax';
-import { QueryResult, ResultRow, RunTrendQuery, Schema, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
+import { QueryResult, ResultRow, RunTrendQuery, Schema } from "src/rpc/api";
 import { useAnalysis } from "src/rpc/data";
-import { toEmptyList } from 'src/utils/undefined';
 
 type TrendParams = {
   id: string,
@@ -43,42 +42,18 @@ TODO: tests
 */
 export const Trend: React.FC = () => {
   const { id } = useParams<TrendParams>();
-  const { analysis, mutate } = useAnalysis(id!);
+  const { analysis } = useAnalysis(id!);
 
   const [queryLoading, setQueryLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const [saving, setSaving] = useState<boolean>(false);
-  const [copied, setCopied] = useState<boolean>(false);
 
   const [shouldRun, setShouldRun] = useState<boolean>(false);
   const [queryResults, setQueryResults] = useState<QueryResult | undefined>(undefined);
   const [trendData, setTrendData] = useState<TrendSeries[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
 
-  const updateSeries = useCallback(async (id: number, updates: EventUpdates) => {
-    const payload: UpdateAnalysisRequest = { analysis_id: Number(id) };
-    if (updates.events) {
-      payload.events = updates.events;
-    }
-
-    mutate(() => {
-      return sendRequest(UpdateAnalysis, payload);
-    }, {
-      rollbackOnError: true,
-      revalidate: false,
-    });
-  }, [mutate]);
-
-  const updateFunnel = () => {
-    setSaving(true);
-    const updates: EventUpdates = {};
-    if (analysis?.events) {
-      updates.events = analysis.events;
-    }
-
-    updateSeries(Number(id), updates);
-    setTimeout(() => setSaving(false), 500);
+  const onSave = async () => {
+    // Nothing to actually update here for now
   };
 
   const runQuery = useCallback(async () => {
@@ -131,12 +106,6 @@ export const Trend: React.FC = () => {
     setQueryLoading(false);
   }, [id, analysis]);
 
-  const copyLink = () => {
-    setCopied(true);
-    navigator.clipboard.writeText(window.location.href);
-    setTimeout(() => setCopied(false), 1200);
-  };
-
   if (shouldRun) {
     runQuery();
     setShouldRun(false);
@@ -154,12 +123,12 @@ export const Trend: React.FC = () => {
     <>
       <ConfigureAnalysisModal analysisID={id} show={showModal} close={() => setShowModal(false)} />
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-scroll">
-        <ReportHeader title={analysis.title} description={analysis.description} copied={copied} saving={saving} copyLink={copyLink} save={updateFunnel} showModal={() => setShowModal(true)} />
+        <ReportHeader id={id} onSave={onSave} showModal={() => setShowModal(true)} />
         <div className='tw-mt-8 tw-mb-10'>
           <span className='tw-uppercase tw-font-bold -tw-mt-1'>Series</span>
           <div id="events-panel" className='tw-flex tw-flex-1 tw-mt-2 tw-p-5 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md'>
             <div id='left-panel' className="tw-w-1/2 tw-min-w-1/2 tw-flex tw-flex-col tw-select-none tw-pr-10">
-              <Events id={Number(id)} connectionID={analysis.connection?.id} eventSetID={analysis.event_set?.id} events={toEmptyList(analysis.events)} setErrorMessage={setErrorMessage} updateAnalysis={updateSeries} />
+              <Events analysisID={id} connectionID={analysis.connection?.id} eventSetID={analysis.event_set?.id} setErrorMessage={setErrorMessage} />
               <Tooltip label={"⌘ + Enter"}>
                 <Button className="tw-w-40 tw-h-8" onClick={runQuery}>{queryLoading ? "Stop" : "Run"}</Button>
               </Tooltip>

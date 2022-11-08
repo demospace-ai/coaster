@@ -400,6 +400,7 @@ export interface CreateAnalysisRequest {
     timezone: string;
 }
 
+// Any fields left blank will be left unchanged
 export interface UpdateAnalysisRequest {
     analysis_id: number;
     connection_id?: number;

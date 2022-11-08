@@ -1,26 +1,29 @@
 import { Transition } from "@headlessui/react";
 import { FunnelIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { DivButton } from "src/components/button/Button";
 import { RightArrow } from "src/components/icons/Icons";
 import { EventSelector, FilterSelector, PropertySelector, PropertyValueSelector } from "src/components/selector/Selector";
 import { Event, EventFilter, EventInput, filtersMatch, FilterType, Property } from "src/rpc/api";
+import { useAnalysis } from "src/rpc/data";
 
 export type EventUpdates = {
   events?: EventInput[],
 };
 
 type EventsProps = {
-  id: number;
+  analysisID: string;
   connectionID: number | undefined;
   eventSetID: number | undefined;
-  events: Event[];
   setErrorMessage: (message: string | null) => void;
-  updateAnalysis: (id: number, updates: EventUpdates) => void;
 };
 
 export const Events: React.FC<EventsProps> = props => {
-  const { id, connectionID, eventSetID, events, setErrorMessage, updateAnalysis } = props;
+  const { analysisID, connectionID, eventSetID, setErrorMessage } = props;
+  const { analysis, updateAnalysis } = useAnalysis(analysisID);
+  const events = useMemo(() => {
+    return analysis?.events ? analysis.events : [];
+  }, [analysis]);
 
   const onEventSelected = useCallback((value: string, index: number) => {
     if (events[index].name !== value) {
@@ -28,31 +31,31 @@ export const Events: React.FC<EventsProps> = props => {
       const updatedEvents: EventInput[] = [...events];
       // Clear filters on event selected since they may no longer apply
       updatedEvents[index] = { name: value, filters: [] };
-      updateAnalysis(Number(id), { events: updatedEvents });
+      updateAnalysis({ analysis_id: Number(analysisID), events: updatedEvents });
     }
-  }, [id, events, setErrorMessage, updateAnalysis]);
+  }, [analysisID, events, setErrorMessage, updateAnalysis]);
 
   const onEventRemoved = useCallback((index: number) => {
     setErrorMessage(null);
     const updatedEvents = events.filter((_, i) => i !== index);
-    updateAnalysis(Number(id), { events: updatedEvents });
-  }, [id, events, setErrorMessage, updateAnalysis]);
+    updateAnalysis({ analysis_id: Number(analysisID), events: updatedEvents });
+  }, [analysisID, events, setErrorMessage, updateAnalysis]);
 
   const onEventAdded = useCallback((value: string) => {
     setErrorMessage(null);
     // New events, filters should be empty
     const updatedEvents: EventInput[] = [...events, { name: value, filters: [] }];
-    updateAnalysis(Number(id), { events: updatedEvents });
-  }, [id, events, setErrorMessage, updateAnalysis]);
+    updateAnalysis({ analysis_id: Number(analysisID), events: updatedEvents });
+  }, [analysisID, events, setErrorMessage, updateAnalysis]);
 
   const setEventFilters = useCallback((filters: EventFilter[], eventIndex: number) => {
     if (!filtersMatch(events[eventIndex].filters, filters)) {
       setErrorMessage(null);
       const updatedEvents: Event[] = [...events];
       updatedEvents[eventIndex] = { ...events[eventIndex], filters: filters };
-      updateAnalysis(Number(id), { events: updatedEvents });
+      updateAnalysis({ analysis_id: Number(analysisID), events: updatedEvents });
     }
-  }, [id, events, setErrorMessage, updateAnalysis]);
+  }, [analysisID, events, setErrorMessage, updateAnalysis]);
 
   return (
     <div id="events">

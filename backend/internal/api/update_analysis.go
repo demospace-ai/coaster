@@ -76,7 +76,6 @@ func (s ApiService) UpdateAnalysis(auth auth.Authentication, w http.ResponseWrit
 	var eventFilters []models.EventFilter
 	if updateAnalysisRequest.Events != nil {
 		err = s.db.Transaction(func(tx *gorm.DB) error {
-			// Always deactivate the steps on a funnel update, since changing any value invalidates the old steps
 			err = analyses.DeactivateEvents(s.db, analysis.ID)
 			if err != nil {
 				return err
@@ -93,6 +92,12 @@ func (s ApiService) UpdateAnalysis(auth auth.Authentication, w http.ResponseWrit
 
 			return nil
 		})
+	} else {
+		// Simply load the existing events so the response has the full analysis view
+		events, err = analyses.LoadEventsByAnalysisID(s.db, analysis.ID)
+		if err != nil {
+			return err
+		}
 	}
 
 	if err != nil {

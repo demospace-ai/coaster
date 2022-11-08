@@ -3,8 +3,7 @@ import { useEffect, useState } from 'react';
 import { Button } from 'src/components/button/Button';
 import { Loading } from 'src/components/loading/Loading';
 import { ConnectionSelector, EventSetSelector } from 'src/components/selector/Selector';
-import { sendRequest } from 'src/rpc/ajax';
-import { AnalysisType, DataConnection, EventSet, UpdateAnalysis, UpdateAnalysisRequest } from 'src/rpc/api';
+import { AnalysisType, DataConnection, EventSet, UpdateAnalysisRequest } from 'src/rpc/api';
 import { useAnalysis } from 'src/rpc/data';
 import styles from './modal.m.css';
 
@@ -60,17 +59,17 @@ type ConfigureAnalysisModalProps = {
 };
 
 export const ConfigureAnalysisModal: React.FC<ConfigureAnalysisModalProps> = props => {
-  const { analysis, mutate } = useAnalysis(props.analysisID);
+  const { analysis, updateAnalysis } = useAnalysis(props.analysisID);
   const [connection, setConnection] = useState<DataConnection | undefined>(analysis?.connection);
   const [eventSet, setEventSet] = useState<EventSet | undefined>(analysis?.event_set);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const updateAnalysis = async (analysisID: number | undefined) => {
-    if (!analysisID) {
+  const save = async () => {
+    if (!props.analysisID) {
       return;
     }
 
-    const payload: UpdateAnalysisRequest = { analysis_id: analysisID };
+    const payload: UpdateAnalysisRequest = { analysis_id: Number(props.analysisID) };
     if (connection) {
       payload.connection_id = connection.id;
     }
@@ -80,12 +79,7 @@ export const ConfigureAnalysisModal: React.FC<ConfigureAnalysisModalProps> = pro
     }
 
     setLoading(true);
-    try {
-      await mutate(() => sendRequest(UpdateAnalysis, payload), {});
-    } catch (e) {
-      // TODO: handle error here
-    }
-
+    await updateAnalysis(payload);
     setTimeout(() => setLoading(false), 500);
   };
 
@@ -99,7 +93,7 @@ export const ConfigureAnalysisModal: React.FC<ConfigureAnalysisModalProps> = pro
           <div className='tw-mt-8 tw-flex'>
             <div className='tw-ml-auto'>
               <Button className='tw-bg-white tw-text-gray-800 hover:tw-bg-gray-200 tw-border-0 tw-mr-3' onClick={props.close}>Cancel</Button>
-              <Button className='tw-w-24 tw-bg-fabra-green-500 hover:tw-bg-fabra-green-600 tw-border-0' onClick={() => updateAnalysis(analysis.id)}>{loading ? <Loading className='tw-inline' /> : "Save"}</Button>
+              <Button className='tw-w-24 tw-bg-fabra-green-500 hover:tw-bg-fabra-green-600 tw-border-0' onClick={save}>{loading ? <Loading className='tw-inline' /> : "Save"}</Button>
             </div>
           </div>
         </div>

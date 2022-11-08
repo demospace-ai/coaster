@@ -1,12 +1,25 @@
+import { useCallback } from "react";
 import { sendRequest } from "src/rpc/ajax";
-import { Analysis, GetAllAnalyses, GetAllAnalysesResponse, GetAnalysis, GetDataConnections, GetDataConnectionsResponse, GetDatasets, GetDatasetsResponse, GetEvents, GetEventSets, GetEventSetsResponse, GetEventsRequest, GetEventsResponse, GetProperties, GetPropertiesRequest, GetPropertiesResponse, GetPropertyValues, GetPropertyValuesRequest, GetPropertyValuesResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetTables, GetTablesResponse } from "src/rpc/api";
+import { Analysis, GetAllAnalyses, GetAllAnalysesResponse, GetAnalysis, GetDataConnections, GetDataConnectionsResponse, GetDatasets, GetDatasetsResponse, GetEvents, GetEventSets, GetEventSetsResponse, GetEventsRequest, GetEventsResponse, GetProperties, GetPropertiesRequest, GetPropertiesResponse, GetPropertyValues, GetPropertyValuesRequest, GetPropertyValuesResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetTables, GetTablesResponse, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
 import useSWR, { Fetcher } from "swr";
 
 export function useAnalysis(id: string | undefined) {
   const fetcher: Fetcher<Analysis, { id: string; }> = (value: { id: string; }) => sendRequest(GetAnalysis, { analysisID: value.id });
   const shouldFetch = id !== undefined;
   const { data, error, mutate } = useSWR(shouldFetch ? { GetAnalysis, id } : null, fetcher);
-  return { analysis: data, error, mutate };
+  const updateAnalysis = useCallback(async (payload: UpdateAnalysisRequest) => {
+    try {
+      await mutate(() => {
+        return sendRequest(UpdateAnalysis, payload);
+      }, {
+        rollbackOnError: true,
+        revalidate: false,
+      });
+    } catch (e) {
+      // TODO: handle error
+    }
+  }, [mutate]);
+  return { analysis: data, error, updateAnalysis };
 }
 
 export function useSchema(connectionID: number, datasetName: string, tableName?: string, customJoin?: string) {

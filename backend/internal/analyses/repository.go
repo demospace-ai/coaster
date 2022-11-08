@@ -58,6 +58,7 @@ func UpdateAnalysis(
 	eventSetID *int64,
 	query *string,
 ) (*models.Analysis, error) {
+	// Any fields left empty will be unchanged
 	if connectionID != nil {
 		analysis.ConnectionID = database.NewNullInt64(*connectionID)
 		analysis.EventSetID = database.EmptyNullInt64 // New connection invalidates the event set
