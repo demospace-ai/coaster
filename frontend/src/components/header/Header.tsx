@@ -63,7 +63,7 @@ const Breadcrumbs: React.FC<{ pathname: string; }> = props => {
   }
 
   if (title) {
-    document.title = title;
+    document.title = title + " | Fabra";
   } else {
     document.title = "Fabra";
   }
