@@ -38,6 +38,7 @@ const Breadcrumbs: React.FC<{ pathname: string; }> = props => {
   const pathTokens = props.pathname.split('/');
   const { analysis } = useAnalysis(pathTokens[2]); // This is deduped by SWR so don't worry about the extra fetch
   let crumbs: Breadcrumb[] = [];
+  let title: string | undefined = undefined;
   switch (pathTokens[1]) {
     case '':
       // no crumbs for Home
@@ -45,17 +46,26 @@ const Breadcrumbs: React.FC<{ pathname: string; }> = props => {
     case 'customquery':
     case 'funnel':
     case 'trend':
+      title = analysis?.title;
       crumbs.push({ title: 'Insights', path: '/insights' });
-      crumbs.push({ title: analysis?.title, path: props.pathname });
+      crumbs.push({ title, path: props.pathname });
       break;
     case 'insights':
-      crumbs.push({ title: 'Insights', path: props.pathname });
+      title = "Insights";
+      crumbs.push({ title, path: props.pathname });
       break;
     case 'workspacesettings':
-      crumbs.push({ title: 'WorkspaceSettings', path: props.pathname });
+      title = "Workspace Settings";
+      crumbs.push({ title, path: props.pathname });
       break;
     default:
       break;
+  }
+
+  if (title) {
+    document.title = title;
+  } else {
+    document.title = "Fabra";
   }
 
   return (
