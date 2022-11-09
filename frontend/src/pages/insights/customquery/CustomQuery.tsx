@@ -8,7 +8,6 @@ import { rudderanalytics } from 'src/app/rudder';
 import { Button } from "src/components/button/Button";
 import { ReportHeader } from "src/components/insight/InsightComponents";
 import { Loading } from 'src/components/loading/Loading';
-import { ConfigureAnalysisModal } from 'src/components/modal/Modal';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { DatasetSelector, TableSelector } from "src/components/selector/Selector";
 import { Tooltip } from 'src/components/tooltip/Tooltip';
@@ -45,7 +44,6 @@ export const CustomQuery: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const [shouldRun, setShouldRun] = useState<boolean>(false);
-  const [showModal, setShowModal] = useState<boolean>(false);
   const [showSchemaExplorer, setShowSchemaExplorer] = useState<boolean>(false);
 
   const manualSave = useCallback(async () => {
@@ -127,9 +125,8 @@ export const CustomQuery: React.FC = () => {
 
   return (
     <>
-      <ConfigureAnalysisModal analysisID={id} show={showModal} close={() => setShowModal(false)} />
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-scroll" >
-        <ReportHeader id={id} onSave={manualSave} showModal={() => setShowModal(true)} showSchemaExplorer={() => setShowSchemaExplorer(true)} />
+        <ReportHeader id={id} onSave={manualSave} showSchemaExplorer={() => setShowSchemaExplorer(true)} />
         <div className='tw-flex tw-flex-1 tw-min-w-0 tw-min-h-0 tw-my-8'>
           <div id='left-panel' className="tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-grow">
             <div id="top-panel" className="tw-h-[30vh] tw-border tw-border-solid tw-border-gray-300 tw-p-2 tw-bg-dark tw-rounded-t-[4px] tw-shrink-0" style={{ height: topPanelHeight + "px" }} ref={topPanelRef}>

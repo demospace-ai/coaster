@@ -103,3 +103,45 @@ export const ConfigureAnalysisModal: React.FC<ConfigureAnalysisModalProps> = pro
     </Modal>
   );
 };
+
+
+type DeleteAnalysisModalProps = {
+  analysisID: string;
+  show: boolean;
+  close: () => void;
+  deleteAnalysis: (analysisID: number) => Promise<void>;
+};
+
+export const DeleteAnalysisModal: React.FC<DeleteAnalysisModalProps> = props => {
+  const { analysis } = useAnalysis(props.analysisID);
+  const [loading, setLoading] = useState<boolean>(false);
+  const title = analysis?.title;
+  const analysisID = analysis?.id;
+  const deleteAnalysis = async (analysisID: number | undefined) => {
+    if (!analysisID) {
+      return;
+    }
+
+    setLoading(true);
+    await props.deleteAnalysis(analysisID);
+    props.close();
+    setLoading(false);
+  };
+
+  return (
+    <Modal show={props.show} close={props.close} title="Delete Insight" titleStyle='tw-font-bold tw-text-xl'>
+      <div className='tw-w-96 tw-m-6'>
+        <div>
+          Are you sure you want to delete "<span className="tw-font-bold">{title}</span>"?
+          <br /><br />Deleting an insight is permanent.
+        </div>
+        <div className='tw-mt-8 tw-flex'>
+          <div className='tw-ml-auto'>
+            <Button className='tw-bg-white tw-text-gray-800 hover:tw-bg-gray-200 tw-border-0 tw-mr-3' onClick={props.close}>Cancel</Button>
+            <Button className='tw-w-24 tw-bg-red-600 hover:tw-bg-red-800 tw-border-0' onClick={() => deleteAnalysis(analysisID)}>{loading ? <Loading className='tw-inline' /> : "Delete"}</Button>
+          </div>
+        </div>
+      </div>
+    </Modal>
+  );
+};

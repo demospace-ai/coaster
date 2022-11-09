@@ -7,7 +7,6 @@ import { Button } from 'src/components/button/Button';
 import { Events } from 'src/components/events/Events';
 import { ReportHeader } from 'src/components/insight/InsightComponents';
 import { Loading } from 'src/components/loading/Loading';
-import { ConfigureAnalysisModal } from 'src/components/modal/Modal';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { Tooltip } from 'src/components/tooltip/Tooltip';
 import { sendRequest } from 'src/rpc/ajax';
@@ -50,7 +49,6 @@ export const Trend: React.FC = () => {
   const [shouldRun, setShouldRun] = useState<boolean>(false);
   const [queryResults, setQueryResults] = useState<QueryResult | undefined>(undefined);
   const [trendData, setTrendData] = useState<TrendSeries[]>([]);
-  const [showModal, setShowModal] = useState<boolean>(false);
 
   const onSave = async () => {
     // Nothing to actually update here for now
@@ -121,9 +119,8 @@ export const Trend: React.FC = () => {
 
   return (
     <>
-      <ConfigureAnalysisModal analysisID={id} show={showModal} close={() => setShowModal(false)} />
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-scroll">
-        <ReportHeader id={id} onSave={onSave} showModal={() => setShowModal(true)} />
+        <ReportHeader id={id} onSave={onSave} />
         <div className='tw-mt-8 tw-mb-10'>
           <span className='tw-uppercase tw-font-bold -tw-mt-1'>Series</span>
           <div id="events-panel" className='tw-flex tw-flex-1 tw-mt-2 tw-p-5 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md'>

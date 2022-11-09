@@ -4,9 +4,9 @@ import { ChartBarIcon, CommandLineIcon, PresentationChartLineIcon } from '@heroi
 import classNames from 'classnames';
 import React, { Fragment, MouseEvent, ReactNode, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, DivButton } from 'src/components/button/Button';
+import { DivButton } from 'src/components/button/Button';
 import { Loading } from 'src/components/loading/Loading';
-import { Modal } from 'src/components/modal/Modal';
+import { DeleteAnalysisModal } from 'src/components/modal/Modal';
 import { sendRequest } from 'src/rpc/ajax';
 import { Analysis, AnalysisType, DeleteAnalysis } from 'src/rpc/api';
 import { useAnalyses } from "src/rpc/data";
@@ -39,7 +39,7 @@ export const Insights: React.FC = () => {
   return (
     <div className='tw-h-full tw-overflow-scroll'>
       <div className='tw-w-full'>
-        <DeleteModal analysisToDelete={analysisToDelete} deleteAnalysis={deleteAnalysis} close={() => setAnalysisToDelete(null)} />
+        {analysisToDelete && <DeleteAnalysisModal analysisID={analysisToDelete.id.toString()} show={true} deleteAnalysis={deleteAnalysis} close={() => setAnalysisToDelete(null)} />}
         {!analyses ? <Loading className='tw-mx-auto tw-mt-32' /> : (
           <ul className='tw-relative tw-z-0 tw-list-none tw-p-0 tw-m-0 tw-pb-24'>
             {analyses.map((analysis, index) =>
@@ -47,7 +47,7 @@ export const Insights: React.FC = () => {
                 <DivButton className='tw-flex tw-w-full tw-h-full tw-py-3 tw-px-10 tw-items-center hover:tw-bg-gray-200' onClick={() => onClick(analysis)}>
                   {getAnalysisIcon(analysis.analysis_type)}
                   <div className='tw-mt-[1px]'>
-                    {analysis.title ? analysis.title : `${getAnalysisDraftTitle(analysis.analysis_type)} ${analysis.id}`}
+                    {analysis.title}
                   </div>
                 </DivButton>
                 <ReportOptionsButton triggerDelete={() => setAnalysisToDelete(analysis)} />
@@ -97,45 +97,6 @@ const ReportOptionsButton: React.FC<{ triggerDelete: () => void; }> = props => {
   );
 };
 
-type DeleteModalProps = {
-  deleteAnalysis: (analysisID: number) => Promise<void>;
-  analysisToDelete: Analysis | null;
-  close: () => void;
-};
-
-const DeleteModal: React.FC<DeleteModalProps> = props => {
-  const [loading, setLoading] = useState<boolean>(false);
-  const analysisType = props.analysisToDelete ? props.analysisToDelete.analysis_type : null;
-  const analysisID = props.analysisToDelete ? props.analysisToDelete.id : null;
-  const deleteAnalysis = async (analysisID: number | null) => {
-    if (analysisID === null) {
-      return;
-    }
-
-    setLoading(true);
-    await props.deleteAnalysis(analysisID);
-    props.close();
-    setLoading(false);
-  };
-
-  return (
-    <Modal show={props.analysisToDelete !== null} close={props.close} title="Delete Insight" titleStyle='tw-font-bold tw-text-xl'>
-      <div className='tw-w-96 tw-m-6'>
-        <div>
-          Are you sure you want to delete "<span className="tw-font-bold">{`${getAnalysisDraftTitle(analysisType)} ${analysisID}`}</span>"?
-          <br /><br />Deleting an insight is permanent.
-        </div>
-        <div className='tw-mt-8 tw-flex'>
-          <div className='tw-ml-auto'>
-            <Button className='tw-bg-white tw-text-gray-800 hover:tw-bg-gray-200 tw-border-0 tw-mr-3' onClick={props.close}>Cancel</Button>
-            <Button className='tw-w-24 tw-bg-red-600 hover:tw-bg-red-800 tw-border-0' onClick={() => deleteAnalysis(analysisID)}>{loading ? <Loading className='tw-inline' /> : "Delete"}</Button>
-          </div>
-        </div>
-      </div>
-    </Modal>
-  );
-};
-
 function getAnalysisIcon(analysisType: AnalysisType): ReactNode {
   switch (analysisType) {
     case AnalysisType.CustomQuery:
@@ -146,16 +107,5 @@ function getAnalysisIcon(analysisType: AnalysisType): ReactNode {
       return <PresentationChartLineIcon className="tw-h-4 tw-mr-2" />;
     default:
       return <></>;
-  }
-}
-
-function getAnalysisDraftTitle(analysisType: AnalysisType | null): string {
-  switch (analysisType) {
-    case AnalysisType.CustomQuery:
-      return "Custom Query";
-    case AnalysisType.Funnel:
-      return "Funnel";
-    default:
-      return "Insight";
   }
 }
