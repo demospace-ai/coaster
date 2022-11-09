@@ -58,7 +58,7 @@ export const ReportHeader: React.FC<HeaderProps> = props => {
   return (
     <div className="">
       <div className="tw-mb-3 tw-flex tw-flex-row">
-        <input className='tw-w-full tw-font-semibold tw-text-2xl tw-peer' onChange={e => setTitle(e.target.value)} value={title} onBlur={updateTitle} />
+        <input className='tw-w-full tw-p-0.5 tw-font-semibold tw-text-2xl tw-peer' onChange={e => setTitle(e.target.value)} value={title} onBlur={updateTitle} />
         <div className="tw-bg-fabra-green-500 tw-text-white tw-rounded-md tw-justify-center tw-flex tw-items-center tw-px-3 tw-ml-2 tw-cursor-pointer tw-invisible peer-focus:tw-visible hover:tw-bg-fabra-green-600 tw-font-semibold">Save</div>
         <div className='tw-flex tw-ml-auto'>
           <MoreOptionsButton className='tw-flex tw-justify-center tw-align-middle tw-ml-3' showModal={showModal} />
@@ -79,7 +79,7 @@ export const ReportHeader: React.FC<HeaderProps> = props => {
         </div>
       </div>
       <div className="tw-flex tw-flex-row">
-        <textarea className="tw-peer tw-w-full tw-resize-none" value={description} onChange={e => setDescription(e.target.value)} placeholder="Description (Optional)" onBlur={updateDescription} />
+        <textarea className="tw-peer tw-p-0.5 tw-w-full tw-resize-none" value={description} onChange={e => setDescription(e.target.value)} placeholder="Description (Optional)" onBlur={updateDescription} />
         <div className="tw-bg-fabra-green-500 tw-text-white tw-rounded-md tw-justify-center tw-flex tw-items-center tw-px-3 tw-ml-2 tw-cursor-pointer tw-invisible peer-focus:tw-visible hover:tw-bg-fabra-green-600 tw-font-semibold">Save</div>
       </div>
     </div>
