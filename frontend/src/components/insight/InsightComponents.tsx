@@ -7,6 +7,7 @@ import { Button } from "src/components/button/Button";
 import { BoxLeftIcon, SaveIcon } from "src/components/icons/Icons";
 import { Loading } from "src/components/loading/Loading";
 import { ConfigureAnalysisModal, DeleteAnalysisModal } from "src/components/modal/Modal";
+import { ExpandingTextarea } from "src/components/textarea/Textarea";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { sendRequest } from "src/rpc/ajax";
 import { DeleteAnalysis, GetAllAnalyses } from "src/rpc/api";
@@ -74,12 +75,11 @@ export const ReportHeader: React.FC<HeaderProps> = props => {
   });
 
   return (
-    <div className="">
+    <div>
       <ConfigureAnalysisModal analysisID={id} show={showConfigureModal} close={() => setShowConfigureModal(false)} />
       <DeleteAnalysisModal analysisID={id} show={showDeleteModal} close={() => setShowDeleteModal(false)} deleteAnalysis={deleteAnalysis} />
       <div className="tw-mb-3 tw-flex tw-flex-row">
-        <input className='tw-w-full tw-p-0.5 tw-font-semibold tw-text-2xl tw-peer' onChange={e => setTitle(e.target.value)} value={title} onBlur={updateTitle} />
-        <div className="tw-bg-fabra-green-500 tw-text-white tw-rounded-md tw-justify-center tw-flex tw-items-center tw-px-3 tw-ml-2 tw-cursor-pointer tw-invisible peer-focus:tw-visible hover:tw-bg-fabra-green-600 tw-font-semibold">Save</div>
+        <input className='tw-w-full tw-max-w-5xl tw-p-0.5 tw-font-semibold tw-text-2xl tw-peer' onChange={e => setTitle(e.target.value)} value={title} onBlur={updateTitle} />
         <div className='tw-flex tw-ml-auto'>
           <MoreOptionsButton id={id} className='tw-flex tw-justify-center tw-align-middle tw-ml-3' showConfigureModal={() => setShowConfigureModal(true)} showDeleteModal={() => setShowDeleteModal(true)} />
           <div className="tw-inline-block tw-mx-4 tw-my-2 tw-w-[1px] tw-bg-gray-400"></div>
@@ -98,9 +98,8 @@ export const ReportHeader: React.FC<HeaderProps> = props => {
           </div>
         </div>
       </div>
-      <div className="tw-flex tw-flex-row">
-        <textarea className="tw-peer tw-p-0.5 tw-w-full tw-resize-none" value={description} onChange={e => setDescription(e.target.value)} placeholder="Description (Optional)" onBlur={updateDescription} />
-        <div className="tw-bg-fabra-green-500 tw-text-white tw-rounded-md tw-justify-center tw-flex tw-items-center tw-px-3 tw-ml-2 tw-cursor-pointer tw-invisible peer-focus:tw-visible hover:tw-bg-fabra-green-600 tw-font-semibold">Save</div>
+      <div className="tw-flex tw-flex-row tw-items-center tw-mr-10">
+        <ExpandingTextarea className="tw-p-0.5 tw-w-full tw-max-w-5xl tw-resize-none" value={description} onChange={e => setDescription(e.target.value)} placeholder="Description (Optional)" onBlur={updateDescription} />
       </div>
     </div>
   );
