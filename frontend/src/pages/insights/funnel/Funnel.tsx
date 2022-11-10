@@ -143,7 +143,7 @@ export const Funnel: React.FC = () => {
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" height={30} />
                     <YAxis ticks={[0, 20, 40, 60, 80, 100]} tickFormatter={tick => tick + "%"} domain={[0, 100]} allowDataOverflow={true} />
-                    <RechartTooltip />
+                    <RechartTooltip wrapperClassName='tw-rounded' labelClassName='tw-pb-1 tw-font-bold' />
                     <Bar dataKey="percentage" barSize={200} fill="#639f63" background={{ fill: '#eee' }} radius={[5, 5, 0, 0]} />
                     <Bar dataKey="count" barSize={0} />
                   </BarChart>

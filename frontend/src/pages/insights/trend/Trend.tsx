@@ -150,7 +150,7 @@ export const Trend: React.FC = () => {
                     <LineChart data={trendData} margin={{ top: 20, right: 50, left: 10, bottom: 10 }} >
                       <XAxis dataKey="date" height={30} allowDuplicatedCategory={false} />
                       <YAxis dataKey="count" />
-                      <RechartTooltip />
+                      <RechartTooltip wrapperClassName='tw-rounded' labelClassName='tw-pb-1 tw-font-bold' />
                       {trendData.map((s) => (
                         <Line dataKey="count" data={s.data} name={s.name} key={s.name} connectNulls={false} stroke="#639f63" />
                       ))}
