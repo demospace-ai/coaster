@@ -207,15 +207,15 @@ const convertData = (breakdownResult: QueryResult): TrendSeries[] => {
 const toBreakdown = (results: QueryResult[]): QueryResult => {
   const { minDate, maxDate } = getDateRange(results);
   const range: Date[] = [];
-  for (let d = new Date(minDate); d.getDate() <= maxDate.getDate(); d.setDate(d.getDate() + 1)) {
+  for (let d = new Date(minDate); d.getTime() <= maxDate.getTime(); d.setTime(d.getTime() + 86400000)) {
     range.push(new Date(d));
   }
 
-  const schema: Schema = [{ name: "Event", type: "string" }, ...range.map(d => ({ name: d.toDateString(), type: "string" }))];
+  const schema: Schema = [{ name: "Event", type: "string" }, ...range.map(d => ({ name: getDateStringInUTC(d), type: "string" }))];
   const data = results.map(result => {
     const dataMap = new Map(result.data.map(row => {
       return [
-        new Date(row[2] as string).getDate(),
+        new Date(row[2]).getTime(),
         row[1] as number,
       ];
     }));
@@ -223,7 +223,7 @@ const toBreakdown = (results: QueryResult[]): QueryResult => {
     // All the rows should have the event name as the first column
     const series: ResultRow = [result.data[0][0]];
     range.forEach(d => {
-      series.push(dataMap.get(d.getDate()) || 0);
+      series.push(dataMap.get(d.getTime()) || 0);
     });
 
     return series;
@@ -245,7 +245,7 @@ const getDateRange = (results: QueryResult[]): DateRange => {
   let maxDate: Date = new Date(-8640000000000000);
   results.forEach(result => {
     result.data.forEach(row => {
-      const date = new Date(row[2] as string);
+      const date = new Date(row[2]);
       if (date < minDate) {
         minDate = date;
       }
@@ -257,6 +257,11 @@ const getDateRange = (results: QueryResult[]): DateRange => {
   });
 
   return { minDate, maxDate };
+};
+
+function getDateStringInUTC(d: Date): string {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return months[d.getUTCMonth()] + " " + d.getUTCDate() + " " + d.getUTCFullYear();
 }
 
 /*

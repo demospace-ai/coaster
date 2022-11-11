@@ -61,6 +61,7 @@ type TableSelectorProps = {
   noOptionsString?: string;
   placeholder?: string;
   validated?: boolean;
+  allowCustom?: boolean;
 };
 
 export const TableSelector: React.FC<TableSelectorProps> = props => {
@@ -74,7 +75,8 @@ export const TableSelector: React.FC<TableSelectorProps> = props => {
     loading={!tables}
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No tables available!"}
     placeholder={props.placeholder ? props.placeholder : "Choose table"}
-    validated={props.validated} />;
+    validated={props.validated}
+    allowCustom={props.allowCustom} />;
 };
 
 type EventSetSelectorProps = {

@@ -195,6 +195,7 @@ export const NewEventSetStepTwo: React.FC<NewEventSetFormProps> = props => {
               }}
               noOptionsString="No Tables Available!"
               validated={true}
+              allowCustom={true}
             />
           </>
           :

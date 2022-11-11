@@ -111,6 +111,11 @@ func createTrendQuery(eventSet *models.EventSet, events []views.Event) ([]string
 	// Run separate queries for each event
 	var queryArray []string
 	for _, event := range events {
+		var filterClauses []string
+		for _, filter := range event.Filters {
+			filterClauses = append(filterClauses, toSQL(eventSet.TableName.String, filter))
+		}
+
 		query, err := executeTemplate(trendQueryTemplate, map[string]interface{}{
 			"distinctClause":       distinctClause,
 			"customTableQuery":     customTableQuery,
@@ -119,7 +124,7 @@ func createTrendQuery(eventSet *models.EventSet, events []views.Event) ([]string
 			"eventTypeColumn":      eventSet.EventTypeColumn,
 			"userIdentifierColumn": eventSet.UserIdentifierColumn,
 			"timestampColumn":      eventSet.TimestampColumn,
-			"filterClauses":        event.Filters,
+			"filterClauses":        filterClauses,
 		})
 
 		if err != nil {
