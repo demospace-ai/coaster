@@ -102,6 +102,11 @@ func (s ApiService) UpdateAnalysis(auth auth.Authentication, w http.ResponseWrit
 		if err != nil {
 			return err
 		}
+
+		eventFilters, err = analyses.LoadEventFiltersByAnalysisID(s.db, analysis.ID)
+		if err != nil {
+			return err
+		}
 	}
 
 	if err != nil {

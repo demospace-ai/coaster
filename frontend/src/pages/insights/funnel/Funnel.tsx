@@ -141,7 +141,7 @@ export const Funnel: React.FC = () => {
                 <div className='tw-overflow-scroll'>
                   <BarChart className="tw-mx-auto" data={funnelData} margin={{ top: 25, right: 30, left: 0, bottom: 0 }} width={Math.max(300 * funnelData.length, 900)} height={320}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" height={30} />
+                    <XAxis dataKey="name" height={30} dy={5} />
                     <YAxis ticks={[0, 20, 40, 60, 80, 100]} tickFormatter={tick => tick + "%"} domain={[0, 100]} allowDataOverflow={true} />
                     <RechartTooltip wrapperClassName='tw-rounded' labelClassName='tw-pb-1 tw-font-bold' />
                     <Bar dataKey="percentage" barSize={200} fill="#639f63" background={{ fill: '#eee' }} radius={[5, 5, 0, 0]} />

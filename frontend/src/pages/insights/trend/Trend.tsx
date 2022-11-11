@@ -148,7 +148,7 @@ export const Trend: React.FC = () => {
                 <div className='tw-overflow-scroll'>
                   <ResponsiveContainer width="100%" height={320}>
                     <LineChart data={trendData} margin={{ top: 20, right: 50, left: 10, bottom: 10 }} >
-                      <XAxis dataKey="date" height={30} allowDuplicatedCategory={false} />
+                      <XAxis dataKey="date" height={30} allowDuplicatedCategory={false} minTickGap={30} dy={5} />
                       <YAxis dataKey="count" />
                       <RechartTooltip wrapperClassName='tw-rounded' labelClassName='tw-pb-1 tw-font-bold' />
                       {trendData.map((s) => (

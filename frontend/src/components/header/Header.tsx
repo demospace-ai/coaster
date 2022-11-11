@@ -20,7 +20,7 @@ export const Header: React.FC = () => {
 
   return (
     <>
-      <div className="tw-grid tw-grid-cols-2 tw-box-border tw-min-h-[64px] tw-h-16 tw-px-10 tw-py-3 tw-items-center tw-border-b tw-border-solid tw-border-gray-200">
+      <div className="tw-flex tw-box-border tw-min-h-[64px] tw-h-16 tw-px-10 tw-py-3 tw-items-center tw-border-b tw-border-solid tw-border-gray-200">
         <Breadcrumbs pathname={location.pathname} />
         <ProfileDropdown />
       </div>
@@ -74,7 +74,7 @@ const Breadcrumbs: React.FC<{ pathname: string; }> = props => {
       {crumbs.map((crumb, index) => (
         <div key={index} className="tw-flex tw-flex-row tw-items-center">
           <ChevronRightIcon className="tw-h-3 tw-mx-3" />
-          <NavLink className="tw-text-sm tw-font-medium tw-select-none tw-text-gray-900 hover:tw-text-green-800" to={crumb.path}>{crumb.title ? crumb.title : <Loading className='tw-h-4 tw-w-4' />}</NavLink>
+          <NavLink className="tw-text-sm tw-font-medium tw-select-none tw-text-gray-900 tw-truncate hover:tw-text-green-800" to={crumb.path}>{crumb.title ? crumb.title : <Loading className='tw-h-4 tw-w-4' />}</NavLink>
         </div>
       ))}
     </div>
