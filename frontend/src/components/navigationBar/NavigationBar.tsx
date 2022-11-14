@@ -2,13 +2,13 @@ import { Menu, Transition } from "@headlessui/react";
 import { ChartBarIcon, ChevronDownIcon, CommandLineIcon, PresentationChartLineIcon } from '@heroicons/react/20/solid';
 import { ChartBarSquareIcon, CheckIcon, Cog6ToothIcon, HomeIcon, PlusIcon, TableCellsIcon, UsersIcon } from '@heroicons/react/24/outline';
 import classNames from "classnames";
-import { Fragment } from "react";
+import { Fragment, useCallback } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { CursorRayIcon, DashboardIcon, QuestionCircleIcon } from "src/components/icons/Icons";
 import { Tooltip } from "src/components/tooltip/Tooltip";
-import { useCreateAnalysis } from "src/pages/insights/actions";
 import { useSelector } from "src/root/model";
-import { AnalysisType } from "src/rpc/api";
+import { sendRequest } from "src/rpc/ajax";
+import { Analysis, AnalysisType, CreateAnalysis, CreateAnalysisRequest, CreateDashboard, CreateDashboardRequest, Dashboard } from "src/rpc/api";
 import styles from './navigationBar.m.css';
 
 export const NavigationBar: React.FC = () => {
@@ -40,17 +40,13 @@ export const NavigationBar: React.FC = () => {
           </NavLink>
           <NewAnalysisButton />
         </div>
-        <Tooltip label="Coming soon!">
-          <div className={routeContainer}>
-            <div className={navLink}>
-              <DashboardIcon className="tw-h-4" strokeWidth="2" />
-              <div className={styles.route}>Dashboards</div>
-            </div>
-            <div className="tw-absolute tw-right-1 hover:tw-bg-gray-350 tw-rounded-md tw-p-1">
-              <PlusIcon className="tw-h-4" strokeWidth="2" />
-            </div>
-          </div>
-        </Tooltip>
+        <div className={routeContainer}>
+          <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-gray-300")} to={'/dashboards'}>
+            <DashboardIcon className="tw-h-4" strokeWidth="2" />
+            <div className={styles.route}>Dashboards</div>
+          </NavLink>
+          <NewDashboardButton />
+        </div>
         <Tooltip label="Coming soon!">
           <div className={routeContainer}>
             <div className={navLink}>
@@ -154,8 +150,22 @@ const OrganizationButton: React.FC = () => {
 const NewAnalysisButton: React.FC = () => {
   const defaultConnectionID = useSelector(state => state.login.organization?.default_data_connection_id);
   const defaultEventSetID = useSelector(state => state.login.organization?.default_event_set_id);
-  const createAnalysis = useCreateAnalysis();
   const navigate = useNavigate();
+  const createAnalysis = useCallback(
+    async (analysisType: AnalysisType, defaultConnectionID?: number, defaultEventSetID?: number): Promise<Analysis | undefined> => {
+      const payload: CreateAnalysisRequest = {
+        connection_id: defaultConnectionID,
+        event_set_id: defaultEventSetID,
+        analysis_type: analysisType,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      };
+
+      try {
+        return await sendRequest(CreateAnalysis, payload);
+      } catch (e) {
+        // TODO: handle error here
+      }
+    }, []);
 
   const menuItem = 'tw-flex tw-items-center tw-px-3 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded tw-whitespace-nowrap';
   return (
@@ -277,5 +287,30 @@ const NewAnalysisButton: React.FC = () => {
         </Menu.Items>
       </Transition>
     </Menu>
+  );
+};
+
+const NewDashboardButton: React.FC = () => {
+  const navigate = useNavigate();
+  const createDashboard = useCallback(
+    async (): Promise<Dashboard | undefined> => {
+      const payload: CreateDashboardRequest = {
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      };
+
+      try {
+        return await sendRequest(CreateDashboard, payload);
+      } catch (e) {
+        // TODO: handle error here
+      }
+    }, []);
+
+  return (
+    <div className="tw-absolute tw-right-1 hover:tw-bg-gray-350 tw-rounded-md tw-p-1" onClick={async () => {
+      const dashboard = await createDashboard();
+      navigate("/dashboard/" + dashboard?.id);
+    }}>
+      <PlusIcon className="tw-h-4" strokeWidth="2" />
+    </div>
   );
 };

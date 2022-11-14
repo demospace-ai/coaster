@@ -27,6 +27,40 @@ export const GetAllAnalyses: IEndpoint<{ page: string; }, GetAllAnalysesResponse
     path: '/get_all_analyses',
 };
 
+export const GetAllDashboards: IEndpoint<{ page: string; }, GetAllDashboardsResponse> = {
+    name: 'All Dashboards Fetched',
+    method: 'GET',
+    path: '/get_all_dashboards',
+};
+
+export const GetDashboard: IEndpoint<{ dashboardID: string; }, Dashboard> = {
+    name: 'Dashboard Fetched',
+    method: 'GET',
+    path: '/get_dashboard/:dashboardID',
+    track: true,
+};
+
+export const CreateDashboard: IEndpoint<CreateDashboardRequest, Dashboard> = {
+    name: 'Dashboard Created',
+    method: 'POST',
+    path: '/create_dashboard',
+    track: true,
+};
+
+export const UpdateDashboard: IEndpoint<UpdateDashboardRequest, Dashboard> = {
+    name: 'Dashboard Updated',
+    method: 'PATCH',
+    path: '/update_dashboard',
+    track: true,
+};
+
+export const DeleteDashboard: IEndpoint<{ dashboardID: number; }, undefined> = {
+    name: 'Dashboard Deleted',
+    method: 'DELETE',
+    path: '/delete_dashboard/:dashboardID',
+    track: true,
+};
+
 export const GetDataConnections: IEndpoint<undefined, GetDataConnectionsResponse> = {
     name: 'Data Connections Fetched',
     method: 'GET',
@@ -347,6 +381,10 @@ export interface GetAllAnalysesResponse {
     analyses: Analysis[];
 }
 
+export interface GetAllDashboardsResponse {
+    dashboards: Dashboard[];
+}
+
 export interface GetDataConnectionsResponse {
     data_connections: DataConnection[];
 }
@@ -391,6 +429,18 @@ export interface CheckSessionResponse {
     user: User;
     organization?: Organization,
     suggested_organizations?: Organization[];
+}
+
+export interface CreateDashboardRequest {
+    timezone: string;
+}
+
+// Any fields left blank will be left unchanged
+export interface UpdateDashboardRequest {
+    dashboard_id: number;
+    title?: string;
+    description?: string;
+    panels?: DashboardPanel[];
 }
 
 export interface CreateAnalysisRequest {
@@ -442,6 +492,23 @@ export interface Analysis {
     events?: Event[]; // used for Funnel and Trend analysis types
 }
 
+export interface Dashboard {
+    id: number;
+    user_id: number;
+    organization_id: number;
+    title?: string;
+    description?: string;
+    panels?: DashboardPanel[];
+}
+
+export interface DashboardPanel {
+    id: number;
+    title: string;
+    panel_type: PanelType[];
+    analysis_id?: string;
+    content?: string;
+}
+
 export interface Event {
     id: number;
     name: string;
@@ -485,6 +552,11 @@ export enum AnalysisType {
     CustomQuery = "custom_query",
     Funnel = "funnel",
     Trend = "trend",
+}
+
+export enum PanelType {
+    Insight = "insight",
+    Text = "text",
 }
 
 export interface DataConnection {

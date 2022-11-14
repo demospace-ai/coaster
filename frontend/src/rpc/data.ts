@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { sendRequest } from "src/rpc/ajax";
-import { Analysis, GetAllAnalyses, GetAllAnalysesResponse, GetAnalysis, GetDataConnections, GetDataConnectionsResponse, GetDatasets, GetDatasetsResponse, GetEvents, GetEventSets, GetEventSetsResponse, GetEventsRequest, GetEventsResponse, GetProperties, GetPropertiesRequest, GetPropertiesResponse, GetPropertyValues, GetPropertyValuesRequest, GetPropertyValuesResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetTables, GetTablesResponse, UpdateAnalysis, UpdateAnalysisRequest } from "src/rpc/api";
+import { Analysis, Dashboard, GetAllAnalyses, GetAllAnalysesResponse, GetAllDashboards, GetAllDashboardsResponse, GetAnalysis, GetDashboard, GetDataConnections, GetDataConnectionsResponse, GetDatasets, GetDatasetsResponse, GetEvents, GetEventSets, GetEventSetsResponse, GetEventsRequest, GetEventsResponse, GetProperties, GetPropertiesRequest, GetPropertiesResponse, GetPropertyValues, GetPropertyValuesRequest, GetPropertyValuesResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetTables, GetTablesResponse, UpdateAnalysis, UpdateAnalysisRequest, UpdateDashboard, UpdateDashboardRequest } from "src/rpc/api";
 import useSWR, { Fetcher } from "swr";
 
 export function useAnalysis(id: string | undefined) {
@@ -20,6 +20,25 @@ export function useAnalysis(id: string | undefined) {
     }
   }, [mutate]);
   return { analysis: data, error, updateAnalysis };
+}
+
+export function useDashboard(id: string | undefined) {
+  const fetcher: Fetcher<Dashboard, { id: string; }> = (value: { id: string; }) => sendRequest(GetDashboard, { dashboardID: value.id });
+  const shouldFetch = id !== undefined;
+  const { data, error, mutate } = useSWR(shouldFetch ? { GetDashboard, id } : null, fetcher);
+  const updateDashboard = useCallback(async (payload: UpdateDashboardRequest) => {
+    try {
+      await mutate(() => {
+        return sendRequest(UpdateDashboard, payload);
+      }, {
+        rollbackOnError: true,
+        revalidate: false,
+      });
+    } catch (e) {
+      // TODO: handle error
+    }
+  }, [mutate]);
+  return { dashboard: data, error, updateDashboard };
 }
 
 export function useSchema(connectionID: number, datasetName: string, tableName?: string, customJoin?: string) {
@@ -47,6 +66,12 @@ export function useAnalyses() {
   const fetcher: Fetcher<GetAllAnalysesResponse, {}> = async () => (await sendRequest(GetAllAnalyses));
   const { data, mutate, error } = useSWR({ GetAllAnalyses }, fetcher);
   return { analyses: data?.analyses, mutate, error };
+}
+
+export function useDashboards() {
+  const fetcher: Fetcher<GetAllDashboardsResponse, {}> = async () => (await sendRequest(GetAllDashboards));
+  const { data, mutate, error } = useSWR({ GetAllDashboards }, fetcher);
+  return { dashboards: data?.dashboards, mutate, error };
 }
 
 export function useDataConnections() {

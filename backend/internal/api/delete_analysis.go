@@ -19,7 +19,7 @@ func (s ApiService) DeleteAnalysis(auth auth.Authentication, w http.ResponseWrit
 	vars := mux.Vars(r)
 	strAnalysisID, ok := vars["analysisID"]
 	if !ok {
-		return fmt.Errorf("missing analysis ID from DeleteQuetion request URL: %s", r.URL.RequestURI())
+		return fmt.Errorf("missing analysis ID from DeleteAnalysis request URL: %s", r.URL.RequestURI())
 	}
 
 	analysisID, err := strconv.ParseInt(strAnalysisID, 10, 64)

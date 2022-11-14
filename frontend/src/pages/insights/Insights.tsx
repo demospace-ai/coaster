@@ -50,7 +50,7 @@ export const Insights: React.FC = () => {
                     {analysis.title}
                   </div>
                 </DivButton>
-                <ReportOptionsButton triggerDelete={() => setAnalysisToDelete(analysis)} />
+                <InsightOptionsButton triggerDelete={() => setAnalysisToDelete(analysis)} />
               </li>
             )}
           </ul>
@@ -60,7 +60,7 @@ export const Insights: React.FC = () => {
   );
 };
 
-const ReportOptionsButton: React.FC<{ triggerDelete: () => void; }> = props => {
+const InsightOptionsButton: React.FC<{ triggerDelete: () => void; }> = props => {
   const menuItem = 'tw-flex tw-items-center tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded';
   return (
     <Menu as="div" className='tw-absolute tw-right-11 tw-top-0 tw-bottom-0 tw-flex'>

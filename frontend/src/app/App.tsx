@@ -4,6 +4,8 @@ import { useStart } from 'src/app/actions';
 import { Header } from 'src/components/header/Header';
 import { Loading } from 'src/components/loading/Loading';
 import { NavigationBar } from 'src/components/navigationBar/NavigationBar';
+import { Dashboard } from 'src/pages/dashboards/Dashboard';
+import { Dashboards } from 'src/pages/dashboards/Dashboards';
 import { Inbox } from 'src/pages/inbox/Inbox';
 import { CustomQuery } from 'src/pages/insights/customquery/CustomQuery';
 import { Funnel } from 'src/pages/insights/funnel/Funnel';
@@ -47,6 +49,8 @@ export const App: React.FC = () => {
           <Route path='/funnel/:id' element={<RequireAuth element={<Funnel key={location.pathname} />} />} />
           <Route path='/trend/:id' element={<RequireAuth element={<Trend key={location.pathname} />} />} />
           <Route path='/insights' element={<RequireAuth element={<Insights />} />} />
+          <Route path='/dashboard/:id' element={<RequireAuth element={<Dashboard key={location.pathname} />} />} />
+          <Route path='/dashboards' element={<RequireAuth element={<Dashboards />} />} />
           <Route path='*' element={<NotFound />} />
         </Route>
       </Routes>

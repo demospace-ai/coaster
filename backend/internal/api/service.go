@@ -55,6 +55,18 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.UpdateAnalysis,
 		},
 		{
+			Name:        "Get analysis",
+			Method:      router.GET,
+			Pattern:     "/api/get_analysis/{analysisID}",
+			HandlerFunc: s.GetAnalysis,
+		},
+		{
+			Name:        "Delete analysis",
+			Method:      router.DELETE,
+			Pattern:     "/api/delete_analysis/{analysisID}",
+			HandlerFunc: s.DeleteAnalysis,
+		},
+		{
 			Name:        "Create dashboard",
 			Method:      router.POST,
 			Pattern:     "/api/create_dashboard",
@@ -65,6 +77,18 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			Method:      router.PATCH,
 			Pattern:     "/api/update_dashboard",
 			HandlerFunc: s.UpdateDashboard,
+		},
+		{
+			Name:        "Get dashboard",
+			Method:      router.GET,
+			Pattern:     "/api/get_dashboard/{dashboardID}",
+			HandlerFunc: s.GetDashboard,
+		},
+		{
+			Name:        "Delete dashboard",
+			Method:      router.DELETE,
+			Pattern:     "/api/delete_dashboard/{dashboardID}",
+			HandlerFunc: s.DeleteDashboard,
 		},
 		{
 			Name:        "Create data connection",
@@ -167,24 +191,6 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			Method:      router.POST,
 			Pattern:     "/api/run_trend_query",
 			HandlerFunc: s.RunTrendQuery,
-		},
-		{
-			Name:        "Get analysis",
-			Method:      router.GET,
-			Pattern:     "/api/get_analysis/{analysisID}",
-			HandlerFunc: s.GetAnalysis,
-		},
-		{
-			Name:        "Get dashboard",
-			Method:      router.GET,
-			Pattern:     "/api/get_dashboard/{dashboardID}",
-			HandlerFunc: s.GetDashboard,
-		},
-		{
-			Name:        "Delete analysis",
-			Method:      router.DELETE,
-			Pattern:     "/api/delete_analysis/{analysisID}",
-			HandlerFunc: s.DeleteAnalysis,
 		},
 		{
 			Name:        "Send validation code",

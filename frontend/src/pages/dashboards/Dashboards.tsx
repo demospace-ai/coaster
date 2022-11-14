@@ -1,56 +1,44 @@
 import { Menu, Transition } from '@headlessui/react';
 import { EllipsisHorizontalIcon } from '@heroicons/react/20/solid';
-import { ChartBarIcon, CommandLineIcon, PresentationChartLineIcon } from '@heroicons/react/24/outline';
 import classNames from 'classnames';
-import React, { Fragment, MouseEvent, ReactNode, useCallback, useState } from 'react';
+import React, { Fragment, MouseEvent, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DivButton } from 'src/components/button/Button';
 import { Loading } from 'src/components/loading/Loading';
 import { DeleteAnalysisModal } from 'src/components/modal/Modal';
 import { sendRequest } from 'src/rpc/ajax';
-import { Analysis, AnalysisType, DeleteAnalysis } from 'src/rpc/api';
-import { useAnalyses } from "src/rpc/data";
+import { Dashboard, DeleteDashboard } from 'src/rpc/api';
+import { useDashboards } from "src/rpc/data";
 
-export const Insights: React.FC = () => {
+export const Dashboards: React.FC = () => {
   const navigate = useNavigate();
-  const { analyses, mutate } = useAnalyses();
-  const [analysisToDelete, setAnalysisToDelete] = useState<Analysis | null>(null);
+  const { dashboards, mutate } = useDashboards();
+  const [dashboardToDelete, setDashboardToDelete] = useState<Dashboard | null>(null);
 
-  const onClick = (analysis: Analysis) => {
-    switch (analysis.analysis_type) {
-      case AnalysisType.CustomQuery:
-        navigate(`/customquery/${analysis.id}`);
-        break;
-      case AnalysisType.Funnel:
-        navigate(`/funnel/${analysis.id}`);
-        break;
-      case AnalysisType.Trend:
-        navigate(`/trend/${analysis.id}`);
-        break;
-    }
+  const onClick = (dashboard: Dashboard) => {
+    navigate(`/dashboard/${dashboard.id}`);
   };
 
-  const deleteAnalysis = useCallback(async (analysisID: number) => {
-    await sendRequest(DeleteAnalysis, { analysisID: analysisID });
-    const updatedAnalyses = analyses ? analyses.filter(analysis => analysis.id !== analysisID) : [];
-    mutate({ analyses: updatedAnalyses });
-  }, [analyses, mutate]);
+  const deleteDashboard = useCallback(async (dashboardID: number) => {
+    await sendRequest(DeleteDashboard, { dashboardID });
+    const updatedDashboards = dashboards ? dashboards.filter(dashboard => dashboard.id !== dashboardID) : [];
+    mutate({ dashboards: updatedDashboards });
+  }, [dashboards, mutate]);
 
   return (
     <div className='tw-h-full tw-overflow-scroll'>
       <div className='tw-w-full'>
-        {analysisToDelete && <DeleteAnalysisModal analysisID={analysisToDelete.id.toString()} show={true} deleteAnalysis={deleteAnalysis} close={() => setAnalysisToDelete(null)} />}
-        {!analyses ? <Loading className='tw-mx-auto tw-mt-32' /> : (
+        {dashboardToDelete && <DeleteAnalysisModal analysisID={dashboardToDelete.id.toString()} show={true} deleteAnalysis={deleteDashboard} close={() => setDashboardToDelete(null)} />}
+        {!dashboards ? <Loading className='tw-mx-auto tw-mt-32' /> : (
           <ul className='tw-relative tw-z-0 tw-list-none tw-p-0 tw-m-0 tw-pb-24'>
-            {analyses.map((analysis, index) =>
+            {dashboards.map((dashboard, index) =>
               <li key={index} className='tw-relative tw-w-full tw-h-12 tw-border-b tw-border-solid tw-border-gray-200 tw-box-border tw-cursor-pointer tw-select-none tw-text-sm'>
-                <DivButton className='tw-flex tw-w-full tw-h-full tw-py-3 tw-px-10 tw-items-center hover:tw-bg-gray-200' onClick={() => onClick(analysis)}>
-                  {getAnalysisIcon(analysis.analysis_type)}
+                <DivButton className='tw-flex tw-w-full tw-h-full tw-py-3 tw-px-10 tw-items-center hover:tw-bg-gray-200' onClick={() => onClick(dashboard)}>
                   <div className='tw-mt-[1px]'>
-                    {analysis.title}
+                    {dashboard.title}
                   </div>
                 </DivButton>
-                <ReportOptionsButton triggerDelete={() => setAnalysisToDelete(analysis)} />
+                <DashboardOptionsButton triggerDelete={() => setDashboardToDelete(dashboard)} />
               </li>
             )}
           </ul>
@@ -60,7 +48,7 @@ export const Insights: React.FC = () => {
   );
 };
 
-const ReportOptionsButton: React.FC<{ triggerDelete: () => void; }> = props => {
+const DashboardOptionsButton: React.FC<{ triggerDelete: () => void; }> = props => {
   const menuItem = 'tw-flex tw-items-center tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded';
   return (
     <Menu as="div" className='tw-absolute tw-right-11 tw-top-0 tw-bottom-0 tw-flex'>
@@ -96,16 +84,3 @@ const ReportOptionsButton: React.FC<{ triggerDelete: () => void; }> = props => {
     </Menu>
   );
 };
-
-function getAnalysisIcon(analysisType: AnalysisType): ReactNode {
-  switch (analysisType) {
-    case AnalysisType.CustomQuery:
-      return <CommandLineIcon className="tw-h-4 tw-mr-2" />;
-    case AnalysisType.Funnel:
-      return <ChartBarIcon className="tw-h-4 tw-mr-2" />;
-    case AnalysisType.Trend:
-      return <PresentationChartLineIcon className="tw-h-4 tw-mr-2" />;
-    default:
-      return <></>;
-  }
-}

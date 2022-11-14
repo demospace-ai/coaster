@@ -90,6 +90,10 @@ func CreatePanels(
 			panelModel.AnalysisID = database.NewNullInt64(*panel.AnalysisID)
 		}
 
+		if panel.Content != nil {
+			panelModel.Content = database.NewNullString(*panel.Content)
+		}
+
 		result := db.Create(&panelModel)
 		if result.Error != nil {
 			return nil, result.Error
@@ -152,4 +156,19 @@ func LoadAllDashboards(db *gorm.DB, page int, organizationID int64) ([]models.Da
 	}
 
 	return dashboards, nil
+}
+
+func DeactivateDashboardByID(db *gorm.DB, organizationID int64, dashboardID int64) error {
+	currentTime := time.Now()
+	result := db.Table("dashboards").
+		Where("dashboards.id = ?", dashboardID).
+		Where("dashboards.organization_id = ?", organizationID).
+		Where("dashboards.deactivated_at IS NULL").
+		Update("deactivated_at", currentTime)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
 }

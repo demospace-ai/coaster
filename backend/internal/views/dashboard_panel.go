@@ -6,6 +6,7 @@ type DashboardPanel struct {
 	Title      string           `json:"title"`
 	PanelType  models.PanelType `json:"panel_type"`
 	AnalysisID *int64           `json:"analysis_id"`
+	Content    *string          `json:"content"`
 }
 
 func ConvertDashboardPanels(panels []models.DashboardPanel) []DashboardPanel {

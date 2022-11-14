@@ -4,7 +4,7 @@ import { Button } from 'src/components/button/Button';
 import { Loading } from 'src/components/loading/Loading';
 import { ConnectionSelector, EventSetSelector } from 'src/components/selector/Selector';
 import { AnalysisType, DataConnection, EventSet, UpdateAnalysisRequest } from 'src/rpc/api';
-import { useAnalysis } from 'src/rpc/data';
+import { useAnalysis, useDashboard } from 'src/rpc/data';
 import styles from './modal.m.css';
 
 interface ModalProps {
@@ -50,7 +50,6 @@ export const Modal: React.FC<ModalProps> = props => {
     </div>
   );
 };
-
 
 type ConfigureAnalysisModalProps = {
   analysisID: string;
@@ -104,7 +103,6 @@ export const ConfigureAnalysisModal: React.FC<ConfigureAnalysisModalProps> = pro
   );
 };
 
-
 type DeleteAnalysisModalProps = {
   analysisID: string;
   show: boolean;
@@ -139,6 +137,74 @@ export const DeleteAnalysisModal: React.FC<DeleteAnalysisModalProps> = props => 
           <div className='tw-ml-auto'>
             <Button className='tw-bg-white tw-text-gray-800 hover:tw-bg-gray-200 tw-border-0 tw-mr-3' onClick={props.close}>Cancel</Button>
             <Button className='tw-w-24 tw-bg-red-600 hover:tw-bg-red-800 tw-border-0' onClick={() => deleteAnalysis(analysisID)}>{loading ? <Loading className='tw-inline' /> : "Delete"}</Button>
+          </div>
+        </div>
+      </div>
+    </Modal>
+  );
+};
+
+type ConfigureDashboardModalProps = {
+  dashboardID: string;
+  show: boolean;
+  close: () => void;
+};
+
+export const ConfigureDashboardModal: React.FC<ConfigureDashboardModalProps> = props => {
+  const { dashboard } = useDashboard(props.dashboardID);
+
+  return (
+    <Modal show={props.show} close={props.close} title="Configure Analysis" titleStyle='tw-font-bold tw-text-xl'>
+      {dashboard ?
+        <div className='tw-w-80 tw-m-6'>
+          <div className='tw-mt-8 tw-flex'>
+            <div className='tw-ml-auto'>
+              <Button className='tw-bg-white tw-text-gray-800 hover:tw-bg-gray-200 tw-border-0 tw-mr-3' onClick={props.close}>Cancel</Button>
+              <Button className='tw-w-24 tw-bg-fabra-green-500 hover:tw-bg-fabra-green-600 tw-border-0' onClick={() => null}>{"Save"}</Button>
+            </div>
+          </div>
+        </div>
+        :
+        <Loading />
+      }
+    </Modal>
+  );
+};
+
+type DeleteDashboardModalProps = {
+  dashboardID: string;
+  show: boolean;
+  close: () => void;
+  deleteDashboard: (dashboardID: number) => Promise<void>;
+};
+
+export const DeleteDashboardModal: React.FC<DeleteDashboardModalProps> = props => {
+  const { dashboard } = useDashboard(props.dashboardID);
+  const [loading, setLoading] = useState<boolean>(false);
+  const title = dashboard?.title;
+  const dashboardID = dashboard?.id;
+  const deleteDashboard = async (dashboardID: number | undefined) => {
+    if (!dashboardID) {
+      return;
+    }
+
+    setLoading(true);
+    await props.deleteDashboard(dashboardID);
+    props.close();
+    setLoading(false);
+  };
+
+  return (
+    <Modal show={props.show} close={props.close} title="Delete Insight" titleStyle='tw-font-bold tw-text-xl'>
+      <div className='tw-w-96 tw-m-6'>
+        <div>
+          Are you sure you want to delete "<span className="tw-font-bold">{title}</span>"?
+          <br /><br />Deleting an insight is permanent.
+        </div>
+        <div className='tw-mt-8 tw-flex'>
+          <div className='tw-ml-auto'>
+            <Button className='tw-bg-white tw-text-gray-800 hover:tw-bg-gray-200 tw-border-0 tw-mr-3' onClick={props.close}>Cancel</Button>
+            <Button className='tw-w-24 tw-bg-red-600 hover:tw-bg-red-800 tw-border-0' onClick={() => deleteDashboard(dashboardID)}>{loading ? <Loading className='tw-inline' /> : "Delete"}</Button>
           </div>
         </div>
       </div>
