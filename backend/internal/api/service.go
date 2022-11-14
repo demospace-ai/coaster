@@ -55,6 +55,18 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.UpdateAnalysis,
 		},
 		{
+			Name:        "Create dashboard",
+			Method:      router.POST,
+			Pattern:     "/api/create_dashboard",
+			HandlerFunc: s.CreateDashboard,
+		},
+		{
+			Name:        "Update dashboard",
+			Method:      router.PATCH,
+			Pattern:     "/api/update_dashboard",
+			HandlerFunc: s.UpdateDashboard,
+		},
+		{
 			Name:        "Create data connection",
 			Method:      router.POST,
 			Pattern:     "/api/create_data_connection",
@@ -109,6 +121,12 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.GetAllAnalyses,
 		},
 		{
+			Name:        "Get all dashboards for an organization. Paginated",
+			Method:      router.GET,
+			Pattern:     "/api/get_all_dashboards",
+			HandlerFunc: s.GetAllDashboards,
+		},
+		{
 			Name:        "Get all data connections",
 			Method:      router.GET,
 			Pattern:     "/api/get_data_connections",
@@ -155,6 +173,12 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			Method:      router.GET,
 			Pattern:     "/api/get_analysis/{analysisID}",
 			HandlerFunc: s.GetAnalysis,
+		},
+		{
+			Name:        "Get dashboard",
+			Method:      router.GET,
+			Pattern:     "/api/get_dashboard/{dashboardID}",
+			HandlerFunc: s.GetDashboard,
 		},
 		{
 			Name:        "Delete analysis",

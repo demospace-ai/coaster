@@ -17,7 +17,7 @@ export const Tooltip: React.FC<TooltipProps> = props => {
   return (
     <>
       {React.cloneElement(props.children, { "data-tip": "", "data-for": id })}
-      <ReactTooltip id={id} place={place} effect="solid" className="!tw-rounded-lg !tw-bg-gray-900 !tw-opacity-100 after:!tw-bg-gray-900" delayHide={props.delayHide}>
+      <ReactTooltip id={id} place={place} effect="solid" className="!tw-select-none !tw-rounded-lg !tw-bg-gray-900 !tw-opacity-100 after:!tw-bg-gray-900" delayHide={props.delayHide}>
         {props.label}
       </ReactTooltip>
     </>

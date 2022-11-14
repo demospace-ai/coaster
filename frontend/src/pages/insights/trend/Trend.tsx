@@ -122,7 +122,7 @@ export const Trend: React.FC = () => {
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-scroll">
         <ReportHeader id={id} onSave={onSave} />
         <div className='tw-mt-8 tw-mb-10'>
-          <span className='tw-uppercase tw-font-bold -tw-mt-1'>Series</span>
+          <span className='tw-uppercase tw-font-bold -tw-mt-1 tw-select-none'>Series</span>
           <div id="events-panel" className='tw-flex tw-flex-1 tw-mt-2 tw-p-5 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md'>
             <div id='left-panel' className="tw-w-1/2 tw-min-w-1/2 tw-flex tw-flex-col tw-select-none tw-pr-10">
               <Events analysisID={id} connectionID={analysis.connection?.id} eventSetID={analysis.event_set?.id} setErrorMessage={setErrorMessage} />

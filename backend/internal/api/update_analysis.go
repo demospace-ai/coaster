@@ -96,6 +96,10 @@ func (s ApiService) UpdateAnalysis(auth auth.Authentication, w http.ResponseWrit
 
 			return nil
 		})
+
+		if err != nil {
+			return err
+		}
 	} else {
 		// Simply load the existing events so the response has the full analysis view
 		events, err = analyses.LoadEventsByAnalysisID(s.db, analysis.ID)
@@ -107,10 +111,6 @@ func (s ApiService) UpdateAnalysis(auth auth.Authentication, w http.ResponseWrit
 		if err != nil {
 			return err
 		}
-	}
-
-	if err != nil {
-		return err
 	}
 
 	var updatedConnection *models.DataConnection
