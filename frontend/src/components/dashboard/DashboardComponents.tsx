@@ -119,6 +119,16 @@ const MoreOptionsButton: React.FC<{ id: string; className?: string; showConfigur
           <div className="tw-m-1">
             <Menu.Item>
               {({ active }) => (
+                <div onClick={(e: MouseEvent) => { e.stopPropagation(); props.showConfigureModal(); }} className={classNames(
+                  active ? 'tw-bg-gray-200 tw-text-gray-900' : 'tw-text-gray-700',
+                  menuItem
+                )}>
+                  Configure
+                </div>
+              )}
+            </Menu.Item>
+            <Menu.Item>
+              {({ active }) => (
                 <div onClick={(e: MouseEvent) => { e.stopPropagation(); props.showDeleteModal(); }} className={classNames(
                   active ? 'tw-bg-gray-200 tw-text-gray-900' : 'tw-text-gray-700',
                   menuItem

@@ -5,7 +5,7 @@ import React, { Fragment, MouseEvent, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DivButton } from 'src/components/button/Button';
 import { Loading } from 'src/components/loading/Loading';
-import { DeleteAnalysisModal } from 'src/components/modal/Modal';
+import { DeleteDashboardModal } from 'src/components/modal/Modal';
 import { sendRequest } from 'src/rpc/ajax';
 import { Dashboard, DeleteDashboard } from 'src/rpc/api';
 import { useDashboards } from "src/rpc/data";
@@ -28,7 +28,7 @@ export const Dashboards: React.FC = () => {
   return (
     <div className='tw-h-full tw-overflow-scroll'>
       <div className='tw-w-full'>
-        {dashboardToDelete && <DeleteAnalysisModal analysisID={dashboardToDelete.id.toString()} show={true} deleteAnalysis={deleteDashboard} close={() => setDashboardToDelete(null)} />}
+        {dashboardToDelete && <DeleteDashboardModal dashboardID={dashboardToDelete.id.toString()} show={true} deleteDashboard={deleteDashboard} close={() => setDashboardToDelete(null)} />}
         {!dashboards ? <Loading className='tw-mx-auto tw-mt-32' /> : (
           <ul className='tw-relative tw-z-0 tw-list-none tw-p-0 tw-m-0 tw-pb-24'>
             {dashboards.map((dashboard, index) =>

@@ -83,7 +83,7 @@ export const ConfigureAnalysisModal: React.FC<ConfigureAnalysisModalProps> = pro
   };
 
   return (
-    <Modal show={props.show} close={props.close} title="Configure Analysis" titleStyle='tw-font-bold tw-text-xl'>
+    <Modal show={props.show} close={props.close} title="Configure Insight" titleStyle='tw-font-bold tw-text-xl'>
       {analysis ?
         <div className='tw-w-80 tw-m-6'>
           {analysis.analysis_type !== AnalysisType.CustomQuery && <div className="tw-mb-5"><span className='tw-font-bold'>Important:</span> changing the connection or event set will clear any events you've selected.</div>}
@@ -154,7 +154,7 @@ export const ConfigureDashboardModal: React.FC<ConfigureDashboardModalProps> = p
   const { dashboard } = useDashboard(props.dashboardID);
 
   return (
-    <Modal show={props.show} close={props.close} title="Configure Analysis" titleStyle='tw-font-bold tw-text-xl'>
+    <Modal show={props.show} close={props.close} title="Configure Dashboard" titleStyle='tw-font-bold tw-text-xl'>
       {dashboard ?
         <div className='tw-w-80 tw-m-6'>
           <div className='tw-mt-8 tw-flex'>
@@ -195,11 +195,11 @@ export const DeleteDashboardModal: React.FC<DeleteDashboardModalProps> = props =
   };
 
   return (
-    <Modal show={props.show} close={props.close} title="Delete Insight" titleStyle='tw-font-bold tw-text-xl'>
+    <Modal show={props.show} close={props.close} title="Delete Dashboard" titleStyle='tw-font-bold tw-text-xl'>
       <div className='tw-w-96 tw-m-6'>
         <div>
           Are you sure you want to delete "<span className="tw-font-bold">{title}</span>"?
-          <br /><br />Deleting an insight is permanent.
+          <br /><br />Deleting a dashboard is permanent.
         </div>
         <div className='tw-mt-8 tw-flex'>
           <div className='tw-ml-auto'>
