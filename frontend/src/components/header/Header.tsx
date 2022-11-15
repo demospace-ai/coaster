@@ -6,7 +6,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { Loading } from 'src/components/loading/Loading';
 import { useLogout } from 'src/pages/login/actions';
 import { useSelector } from 'src/root/model';
-import { useAnalysis } from 'src/rpc/data';
+import { useAnalysis, useDashboard } from 'src/rpc/data';
 
 export const Header: React.FC = () => {
   const location = useLocation();
@@ -36,42 +36,61 @@ type Breadcrumb = {
 // Gluten free
 const Breadcrumbs: React.FC<{ pathname: string; }> = props => {
   const pathTokens = props.pathname.split('/');
-  const { analysis } = useAnalysis(pathTokens[2]); // This is deduped by SWR so don't worry about the extra fetch
-  let crumbs: Breadcrumb[] = [];
-  let title: string | undefined = undefined;
   switch (pathTokens[1]) {
     case '':
-      // no crumbs for Home
-      break;
+      return <PageBreadcrumbs pathname={props.pathname} />;
     case 'customquery':
     case 'funnel':
     case 'trend':
-      title = analysis?.title;
-      crumbs.push({ title: 'Insights', path: '/insights' });
-      crumbs.push({ title, path: props.pathname });
-      break;
+      return <InsightBreadcrumbs id={pathTokens[2]} pathname={props.pathname} />;
     case 'insights':
-      title = "Insights";
-      crumbs.push({ title, path: props.pathname });
-      break;
+      return <PageBreadcrumbs title="Insights" pathname={props.pathname} />;
     case 'workspacesettings':
-      title = "Workspace Settings";
-      crumbs.push({ title, path: props.pathname });
-      break;
+      return <PageBreadcrumbs title="Workspace Settings" pathname={props.pathname} />;
+    case 'dashboard':
+      return <DashboardBreadcrumbs id={pathTokens[2]} pathname={props.pathname} />;
+    case 'dashboards':
+      return <PageBreadcrumbs title="Dashboards" pathname={props.pathname} />;
     default:
-      break;
+      return <PageBreadcrumbs pathname={props.pathname} />;
   }
+};
 
-  if (title) {
-    document.title = title + " | Fabra";
+const PageBreadcrumbs: React.FC<{ title?: string, pathname: string; }> = props => {
+  let crumbs: Breadcrumb[] = [];
+  if (props.title) {
+    crumbs.push({ title: props.title, path: props.pathname });
+    document.title = props.title + " | Fabra";
   } else {
     document.title = "Fabra";
   }
 
+  return <BreadcrumbsLayout crumbs={crumbs} />;
+};
+
+const InsightBreadcrumbs: React.FC<{ id: string, pathname: string; }> = props => {
+  const { analysis } = useAnalysis(props.id); // This is deduped by SWR so don't worry about the extra fetch
+  const title = analysis?.title;
+  const crumbs: Breadcrumb[] = [{ title: 'Insights', path: '/insights' }, { title, path: props.pathname }];
+  document.title = title + " | Fabra";
+
+  return <BreadcrumbsLayout crumbs={crumbs} />;
+};
+
+const DashboardBreadcrumbs: React.FC<{ id: string, pathname: string; }> = props => {
+  const { dashboard } = useDashboard(props.id); // This is deduped by SWR so don't worry about the extra fetch
+  const title = dashboard?.title;
+  const crumbs: Breadcrumb[] = [{ title: 'Dashboards', path: '/dashboards' }, { title, path: props.pathname }];
+  document.title = title + " | Fabra";
+
+  return <BreadcrumbsLayout crumbs={crumbs} />;
+};
+
+const BreadcrumbsLayout: React.FC<{ crumbs: Breadcrumb[]; }> = props => {
   return (
     <div className='tw-flex tw-flex-row tw-items-center'>
       <NavLink className="tw-text-sm tw-font-medium tw-select-none tw-text-gray-900 hover:tw-text-green-800" to='/'>Home</NavLink>
-      {crumbs.map((crumb, index) => (
+      {props.crumbs.map((crumb, index) => (
         <div key={index} className="tw-flex tw-flex-row tw-items-center">
           <ChevronRightIcon className="tw-h-3 tw-mx-3" />
           <NavLink className="tw-text-sm tw-font-medium tw-select-none tw-text-gray-900 tw-truncate hover:tw-text-green-800" to={crumb.path}>{crumb.title ? crumb.title : <Loading className='tw-h-4 tw-w-4' />}</NavLink>

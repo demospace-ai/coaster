@@ -1,5 +1,5 @@
 import { PlusCircleIcon } from '@heroicons/react/24/outline';
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams } from 'react-router-dom';
 import { Bar, BarChart, CartesianGrid, Tooltip as RechartTooltip, XAxis, YAxis } from 'recharts';
 import { rudderanalytics } from 'src/app/rudder';
@@ -43,9 +43,21 @@ export const Funnel: React.FC = () => {
   const [queryLoading, setQueryLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const [shouldRun, setShouldRun] = useState<boolean>(false);
   const [queryResult, setQueryResult] = useState<QueryResult | undefined>(undefined);
   const [funnelData, setFunnelData] = useState<FunnelResult[]>([]);
+
+  useEffect(() => {
+    const onSave = (event: KeyboardEvent) => {
+      if (event.metaKey && event.key === "Enter") {
+        runQuery();
+      }
+    };
+
+    document.addEventListener('keydown', onSave);
+    return () => {
+      document.removeEventListener('keydown', onSave);
+    };
+  });
 
   const onSave = async () => {
     // Nothing to actually update here for now
@@ -95,11 +107,6 @@ export const Funnel: React.FC = () => {
 
     setQueryLoading(false);
   }, [id, analysis]);
-
-  if (shouldRun) {
-    runQuery();
-    setShouldRun(false);
-  }
 
   if (!id) {
     // This should never happen

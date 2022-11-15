@@ -15,7 +15,6 @@ type DeleteAnalysisRequest struct {
 }
 
 func (s ApiService) DeleteAnalysis(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
-
 	vars := mux.Vars(r)
 	strAnalysisID, ok := vars["analysisID"]
 	if !ok {

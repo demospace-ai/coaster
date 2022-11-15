@@ -180,7 +180,7 @@ const EventSetSettings: React.FC<EventSetSettingsProps> = ({ setStep, setSelecte
                     {eventSet.table_name}
                   </td>
                   <td className={tableCellStyle}>
-                    <Tooltip label={eventSet.custom_join} delayHide={100}>
+                    <Tooltip label={eventSet.custom_join}>
                       <div className="tw-max-w-[240px] tw-max-h-24 tw-overflow-hidden tw-text-ellipsis tw-whitespace-nowrap">
                         {eventSet.custom_join}
                       </div>

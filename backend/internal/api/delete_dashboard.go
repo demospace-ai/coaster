@@ -15,7 +15,6 @@ type DeleteDashboardRequest struct {
 }
 
 func (s ApiService) DeleteDashboard(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
-
 	vars := mux.Vars(r)
 	strDashboardID, ok := vars["dashboardID"]
 	if !ok {

@@ -1,5 +1,5 @@
 import { PlusCircleIcon } from '@heroicons/react/24/outline';
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams } from 'react-router-dom';
 import { Line, LineChart, ResponsiveContainer, Tooltip as RechartTooltip, XAxis, YAxis } from 'recharts';
 import { rudderanalytics } from 'src/app/rudder';
@@ -46,9 +46,21 @@ export const Trend: React.FC = () => {
   const [queryLoading, setQueryLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const [shouldRun, setShouldRun] = useState<boolean>(false);
   const [queryResults, setQueryResults] = useState<QueryResult | undefined>(undefined);
   const [trendData, setTrendData] = useState<TrendSeries[]>([]);
+
+  useEffect(() => {
+    const onSave = (event: KeyboardEvent) => {
+      if (event.metaKey && event.key === "Enter") {
+        runQuery();
+      }
+    };
+
+    document.addEventListener('keydown', onSave);
+    return () => {
+      document.removeEventListener('keydown', onSave);
+    };
+  });
 
   const onSave = async () => {
     // Nothing to actually update here for now
@@ -103,11 +115,6 @@ export const Trend: React.FC = () => {
 
     setQueryLoading(false);
   }, [id, analysis]);
-
-  if (shouldRun) {
-    runQuery();
-    setShouldRun(false);
-  }
 
   if (!id) {
     return <Loading />;

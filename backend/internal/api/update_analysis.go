@@ -32,7 +32,6 @@ TODO: tests
 
 */
 func (s ApiService) UpdateAnalysis(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
-
 	decoder := json.NewDecoder(r.Body)
 	var updateAnalysisRequest UpdateAnalysisRequest
 	err := decoder.Decode(&updateAnalysisRequest)

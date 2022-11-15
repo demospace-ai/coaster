@@ -1,25 +1,24 @@
-import React, { useId } from 'react';
-import ReactTooltip from 'react-tooltip';
+import Tippy from '@tippyjs/react';
+import React from 'react';
 
 type Place = 'top' | 'right' | 'bottom' | 'left';
 
 type TooltipProps = {
   children: React.ReactElement;
-  label?: string;
+  label?: React.ReactElement | string;
   place?: Place;
-  delayHide?: number;
+  disabled?: boolean;
+  className?: string;
 };
 
 export const Tooltip: React.FC<TooltipProps> = props => {
-  const id = useId();
   const place = props.place ? props.place : "bottom";
 
   return (
     <>
-      {React.cloneElement(props.children, { "data-tip": "", "data-for": id })}
-      <ReactTooltip id={id} place={place} effect="solid" className="!tw-select-none !tw-rounded-lg !tw-bg-gray-900 !tw-opacity-100 after:!tw-bg-gray-900" delayHide={props.delayHide}>
-        {props.label}
-      </ReactTooltip>
+      <Tippy className={props.className} content={props.label} placement={place} delay={0} duration={100} disabled={props.disabled}>
+        {props.children}
+      </Tippy>
     </>
   );
 };
