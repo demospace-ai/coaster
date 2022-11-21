@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { sendRequest } from "src/rpc/ajax";
-import { Analysis, Dashboard, GetAllAnalyses, GetAllAnalysesResponse, GetAllDashboards, GetAllDashboardsResponse, GetAnalysis, GetDashboard, GetDataConnections, GetDataConnectionsResponse, GetDatasets, GetDatasetsResponse, GetEvents, GetEventSets, GetEventSetsResponse, GetEventsRequest, GetEventsResponse, GetProperties, GetPropertiesRequest, GetPropertiesResponse, GetPropertyValues, GetPropertyValuesRequest, GetPropertyValuesResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetTables, GetTablesResponse, UpdateAnalysis, UpdateAnalysisRequest, UpdateDashboard, UpdateDashboardRequest } from "src/rpc/api";
+import { Analysis, Dashboard, GetAllAnalyses, GetAllAnalysesResponse, GetAllDashboards, GetAllDashboardsResponse, GetAnalysis, GetDashboard, GetDataConnections, GetDataConnectionsResponse, GetDatasets, GetDatasetsResponse, GetEvents, GetEventSets, GetEventSetsResponse, GetEventsRequest, GetEventsResponse, GetProperties, GetPropertiesRequest, GetPropertiesResponse, GetPropertyValues, GetPropertyValuesRequest, GetPropertyValuesResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetTables, GetTablesResponse, QueryResult, RunFunnelQuery, RunTrendQuery, UpdateAnalysis, UpdateAnalysisRequest, UpdateDashboard, UpdateDashboardRequest } from "src/rpc/api";
 import useSWR, { Fetcher } from "swr";
 
 export function useAnalysis(id: string | undefined) {
@@ -105,4 +105,58 @@ export function usePropertyValues(connectionID: number | undefined, eventSetID: 
   const shouldFetch = connectionID && eventSetID && propertyName;
   const { data, mutate, error } = useSWR(shouldFetch ? { GetPropertyValues, connectionID, eventSetID, propertyName } : null, fetcher);
   return { propertyValues: data?.property_values, mutate, error };
+}
+
+export function useTrendResults(analysis: Analysis | undefined) {
+  const fetcher: Fetcher<QueryResult[], { id: string; }> = (value: { id: string; }) => {
+    if (!analysis) {
+      throw new Error("this should not happen");
+    }
+
+    if (!analysis.events) {
+      throw new Error("trend must have at least one event");
+    }
+
+    if (!analysis.connection) {
+      throw new Error("trend must have a connection defined");
+    }
+
+    if (!analysis.event_set) {
+      throw new Error("trend must have a event set defined");
+    }
+
+    return sendRequest(RunTrendQuery, {
+      'analysis_id': Number(analysis.id),
+    });
+  };
+  const shouldFetch = analysis !== undefined;
+  const { data, error, mutate } = useSWR(shouldFetch ? { RunTrendQuery, analysis } : null, fetcher);
+  return { trendResults: data, error, mutate };
+}
+
+export function useFunnelResults(analysis: Analysis | undefined) {
+  const fetcher: Fetcher<QueryResult, { id: string; }> = (value: { id: string; }) => {
+    if (!analysis) {
+      throw new Error("this should not happen");
+    }
+
+    if (!analysis.events || analysis.events.length < 2) {
+      throw new Error("funnel must have at least two events");
+    }
+
+    if (!analysis.connection) {
+      throw new Error("funnel must have a connection defined");
+    }
+
+    if (!analysis.event_set) {
+      throw new Error("funnel must have a event set defined");
+    }
+
+    return sendRequest(RunFunnelQuery, {
+      'analysis_id': Number(analysis.id),
+    });
+  };
+  const shouldFetch = analysis !== undefined;
+  const { data, error, mutate } = useSWR(shouldFetch ? { RunFunnelQuery, analysis } : null, fetcher);
+  return { funnelResults: data, error, mutate };
 }

@@ -440,7 +440,7 @@ export interface UpdateDashboardRequest {
     dashboard_id: number;
     title?: string;
     description?: string;
-    panels?: DashboardPanel[];
+    panels?: DashboardPanelInput[];
 }
 
 export interface CreateAnalysisRequest {
@@ -486,7 +486,7 @@ export interface Analysis {
     connection?: DataConnection;
     event_set?: EventSet;
     analysis_type: AnalysisType;
-    title?: string;
+    title: string;
     description?: string;
     query?: string; // used for Custom Query analysis type
     events?: Event[]; // used for Funnel and Trend analysis types
@@ -496,7 +496,7 @@ export interface Dashboard {
     id: number;
     user_id: number;
     organization_id: number;
-    title?: string;
+    title: string;
     description?: string;
     panels?: DashboardPanel[];
 }
@@ -504,10 +504,17 @@ export interface Dashboard {
 export interface DashboardPanel {
     id: number;
     title: string;
-    panel_type: PanelType[];
-    analysis_id?: string;
+    panel_type: PanelType;
+    analysis_id?: number;
     content?: string;
 }
+
+export interface DashboardPanelInput {
+    title: string;
+    panel_type: PanelType;
+    analysis_id?: number;
+    content?: string;
+};
 
 export interface Event {
     id: number;

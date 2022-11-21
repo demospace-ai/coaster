@@ -1,9 +1,9 @@
 import classNames from 'classnames';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button } from 'src/components/button/Button';
 import { Loading } from 'src/components/loading/Loading';
-import { ConnectionSelector, EventSetSelector } from 'src/components/selector/Selector';
-import { AnalysisType, DataConnection, EventSet, UpdateAnalysisRequest } from 'src/rpc/api';
+import { AnalysisSelector, ConnectionSelector, EventSetSelector } from 'src/components/selector/Selector';
+import { Analysis, AnalysisType, DashboardPanelInput, DataConnection, EventSet, PanelType, UpdateAnalysisRequest } from 'src/rpc/api';
 import { useAnalysis, useDashboard } from 'src/rpc/data';
 import styles from './modal.m.css';
 
@@ -205,6 +205,58 @@ export const DeleteDashboardModal: React.FC<DeleteDashboardModalProps> = props =
           <div className='tw-ml-auto'>
             <Button className='tw-bg-white tw-text-gray-800 hover:tw-bg-gray-200 tw-border-0 tw-mr-3' onClick={props.close}>Cancel</Button>
             <Button className='tw-w-24 tw-bg-red-600 hover:tw-bg-red-800 tw-border-0' onClick={() => deleteDashboard(dashboardID)}>{loading ? <Loading className='tw-inline' /> : "Delete"}</Button>
+          </div>
+        </div>
+      </div>
+    </Modal>
+  );
+};
+
+type AddPanelModalProps = {
+  dashboardID: string;
+  show: boolean;
+  close: () => void;
+};
+
+export const AddPanelModal: React.FC<AddPanelModalProps> = props => {
+  const { dashboardID, show, close } = props;
+  const { dashboard, updateDashboard } = useDashboard(props.dashboardID);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [selectedAnalysis, setSelectedAnalysis] = useState<Analysis | undefined>(undefined);
+  const panels = useMemo(() => {
+    return dashboard?.panels ? dashboard.panels : [];
+  }, [dashboard]);
+  const addPanel = useCallback(async (selectedAnalysis: Analysis | undefined) => {
+    if (!dashboardID || !selectedAnalysis) {
+      return;
+    }
+
+    setLoading(true);
+    const newPanel: DashboardPanelInput = {
+      title: selectedAnalysis.title,
+      panel_type: PanelType.Insight,
+      analysis_id: selectedAnalysis.id,
+    };
+
+    await updateDashboard({ dashboard_id: Number(dashboardID), panels: [...panels, newPanel] });
+
+    close();
+
+    // Reset the state for another chart to be added
+    setSelectedAnalysis(undefined);
+    setLoading(false);
+  }, [dashboardID, panels, close, updateDashboard]);
+
+  return (
+    <Modal show={show} close={close} title="Add Chart" titleStyle='tw-font-bold tw-text-xl'>
+      <div className='tw-w-96 tw-m-6'>
+        <div>
+          <AnalysisSelector analysis={selectedAnalysis} setAnalysis={setSelectedAnalysis} />
+        </div>
+        <div className='tw-mt-8 tw-flex'>
+          <div className='tw-ml-auto'>
+            <Button className='tw-bg-white tw-text-gray-800 hover:tw-bg-gray-200 tw-border-0 tw-mr-3' onClick={close}>Cancel</Button>
+            <Button className='tw-w-24 tw-bg-fabra-green-500 hover:tw-bg-fabra-green-600 tw-border-0' onClick={() => addPanel(selectedAnalysis)}>{loading ? <Loading className='tw-inline' /> : "Add"}</Button>
           </div>
         </div>
       </div>

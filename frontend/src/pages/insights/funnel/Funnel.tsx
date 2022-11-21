@@ -10,18 +10,12 @@ import { Loading } from 'src/components/loading/Loading';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { Tooltip } from 'src/components/tooltip/Tooltip';
 import { sendRequest } from 'src/rpc/ajax';
-import { QueryResult, ResultRow, RunFunnelQuery } from "src/rpc/api";
+import { QueryResult, RunFunnelQuery } from "src/rpc/api";
 import { useAnalysis } from "src/rpc/data";
+import { convertFunnelData, FunnelResult } from 'src/utils/queryData';
 
 type FunnelParams = {
   id: string,
-};
-
-type FunnelResult = {
-  name: string,
-  count: number,
-  percentage: number,
-  conversionFromPrevious?: number,
 };
 
 /*
@@ -47,15 +41,15 @@ export const Funnel: React.FC = () => {
   const [funnelData, setFunnelData] = useState<FunnelResult[]>([]);
 
   useEffect(() => {
-    const onSave = (event: KeyboardEvent) => {
+    const onRun = (event: KeyboardEvent) => {
       if (event.metaKey && event.key === "Enter") {
         runQuery();
       }
     };
 
-    document.addEventListener('keydown', onSave);
+    document.addEventListener('keydown', onRun);
     return () => {
-      document.removeEventListener('keydown', onSave);
+      document.removeEventListener('keydown', onRun);
     };
   });
 
@@ -95,7 +89,7 @@ export const Funnel: React.FC = () => {
       });
       if (response.success) {
         setQueryResult(response);
-        setFunnelData(convertData(response.data));
+        setFunnelData(convertFunnelData(response));
       } else {
         setErrorMessage(response.error_message);
         rudderanalytics.track(`Funnel Execution Failed`);
@@ -185,16 +179,6 @@ export const Funnel: React.FC = () => {
       </div>
     </>
   );
-};
-
-const convertData = (results: ResultRow[]): FunnelResult[] => {
-  return results.map(result => {
-    return {
-      name: result[1] as string,
-      count: result[0] as number,
-      percentage: +((result[2] as number) * 100).toFixed(2),
-    };
-  });
 };
 
 /*

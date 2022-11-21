@@ -3,6 +3,7 @@ package views
 import "fabra/internal/models"
 
 type DashboardPanel struct {
+	ID         int64            `json:"id"`
 	Title      string           `json:"title"`
 	PanelType  models.PanelType `json:"panel_type"`
 	AnalysisID *int64           `json:"analysis_id"`
@@ -13,11 +14,13 @@ func ConvertDashboardPanels(panels []models.DashboardPanel) []DashboardPanel {
 	panelViews := []DashboardPanel{}
 	for _, panel := range panels {
 		view := DashboardPanel{
+			ID:        panel.ID,
 			Title:     panel.Title,
 			PanelType: panel.PanelType,
 		}
 		if panel.AnalysisID.Valid {
-			view.AnalysisID = &panel.AnalysisID.Int64
+			analysisID := panel.AnalysisID.Int64
+			view.AnalysisID = &analysisID
 		}
 
 		panelViews = append(panelViews, view)

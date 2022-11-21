@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import { ValidatedComboInput, ValidatedDropdownInput } from "src/components/input/Input";
-import { DataConnection, EventSet, FilterType, Property, PropertyGroup } from "src/rpc/api";
-import { useDataConnections, useDatasets, useEventProperties, useEvents, useEventSets, usePropertyValues, useTables } from "src/rpc/data";
+import { Analysis, DataConnection, EventSet, FilterType, Property } from "src/rpc/api";
+import { useAnalyses, useDataConnections, useDatasets, useEventProperties, useEvents, useEventSets, usePropertyValues, useTables } from "src/rpc/data";
 
 type ConnectionSelectorProps = {
   connection: DataConnection | undefined;
@@ -19,7 +19,7 @@ export const ConnectionSelector: React.FC<ConnectionSelectorProps> = props => {
     by="id"
     className={props.className}
     selected={props.connection}
-    setSelected={(connection: DataConnection) => props.setConnection(connection)}
+    setSelected={props.setConnection}
     options={connections}
     getElementForDisplay={(connection: DataConnection) => connection.display_name}
     loading={!connections}
@@ -44,7 +44,7 @@ export const DatasetSelector: React.FC<DatasetSelectorProps> = props => {
   return <ValidatedDropdownInput
     className={props.className}
     selected={props.datasetName}
-    setSelected={(datasetName: string) => props.setDatasetName(datasetName)}
+    setSelected={props.setDatasetName}
     options={datasets}
     loading={!datasets}
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No datasets available!"}
@@ -70,7 +70,7 @@ export const TableSelector: React.FC<TableSelectorProps> = props => {
   return <ValidatedComboInput
     className={props.className}
     selected={props.tableName}
-    setSelected={(tableName: string) => props.setTableName(tableName)}
+    setSelected={props.setTableName}
     options={tables}
     loading={!tables}
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No tables available!"}
@@ -96,7 +96,7 @@ export const EventSetSelector: React.FC<EventSetSelectorProps> = props => {
     by="id"
     className={props.className}
     selected={props.eventSet}
-    setSelected={(eventSet: EventSet) => props.setEventSet(eventSet)}
+    setSelected={props.setEventSet}
     options={eventSets}
     getElementForDisplay={(eventSet: EventSet) => eventSet.display_name}
     loading={!eventSets}
@@ -121,7 +121,7 @@ export const EventSelector: React.FC<EventSelectorProps> = props => {
   return <ValidatedComboInput
     className={props.className}
     selected={props.event}
-    setSelected={(event: string) => props.setEvent(event)}
+    setSelected={props.setEvent}
     options={events}
     loading={!events}
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No events available!"}
@@ -177,7 +177,7 @@ export const FilterSelector: React.FC<FilterSelectorProps> = props => {
   return <ValidatedDropdownInput
     className={classNames(props.className, "tw-text-center tw-text-[16px]")}
     selected={props.filterType}
-    setSelected={(filterType: FilterType) => props.setFilterType(filterType)}
+    setSelected={props.setFilterType}
     options={Object.values(FilterType)}
     getElementForDisplay={getElementForDisplay}
     getElementForDropdown={getElementForDropdown}
@@ -206,7 +206,7 @@ export const PropertySelector: React.FC<PropertySelectorProps> = props => {
   return <ValidatedComboInput
     className={props.className}
     selected={props.property}
-    setSelected={(property: Property) => props.setProperty(property)}
+    setSelected={props.setProperty}
     getElementForDisplay={(property: Property) => property.name}
     options={propertyNames}
     loading={!properties}
@@ -226,7 +226,6 @@ type PropertyValueSelectorProps = {
   noOptionsString?: string;
   placeholder?: string;
   validated?: boolean;
-  eventPropertyOptions?: PropertyGroup[];
   loading?: boolean;
 };
 
@@ -236,12 +235,38 @@ export const PropertyValueSelector: React.FC<PropertyValueSelectorProps> = props
   return <ValidatedComboInput
     className={props.className}
     selected={props.propertyValue}
-    setSelected={(eventProperty: string) => props.setPropertyValue(eventProperty)}
+    setSelected={props.setPropertyValue}
     options={propertyValues}
     getElementForDisplay={(propertyValue: string) => propertyValue ? propertyValue : "<empty>"}
     loading={!propertyValues}
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No properties values available!"}
     placeholder={props.placeholder ? props.placeholder : "Choose property value"}
+    validated={props.validated}
+    allowCustom={true} />;
+};
+
+type AnalysisSelectorProps = {
+  analysis: Analysis | undefined;
+  setAnalysis: (analysis: Analysis) => void;
+  className?: string;
+  noOptionsString?: string;
+  placeholder?: string;
+  validated?: boolean;
+  loading?: boolean;
+};
+
+export const AnalysisSelector: React.FC<AnalysisSelectorProps> = props => {
+  const { analyses } = useAnalyses();
+
+  return <ValidatedComboInput
+    className={props.className}
+    selected={props.analysis}
+    setSelected={props.setAnalysis}
+    options={analyses}
+    getElementForDisplay={(analysis: Analysis) => analysis.title!}
+    loading={!analyses}
+    noOptionsString={props.noOptionsString ? props.noOptionsString : "No insights available!"}
+    placeholder={props.placeholder ? props.placeholder : "Choose insight"}
     validated={props.validated}
     allowCustom={true} />;
 };

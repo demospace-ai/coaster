@@ -10,21 +10,12 @@ import { Loading } from 'src/components/loading/Loading';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { Tooltip } from 'src/components/tooltip/Tooltip';
 import { sendRequest } from 'src/rpc/ajax';
-import { QueryResult, ResultRow, RunTrendQuery, Schema } from "src/rpc/api";
+import { QueryResult, RunTrendQuery } from "src/rpc/api";
 import { useAnalysis } from "src/rpc/data";
+import { convertTrendData, toTrendBreakdown, TrendSeries } from 'src/utils/queryData';
 
 type TrendParams = {
   id: string,
-};
-
-type TrendSeries = {
-  name: string,
-  data: TrendResultData[],
-};
-
-type TrendResultData = {
-  date: string,
-  count: number,
 };
 
 /*
@@ -50,15 +41,15 @@ export const Trend: React.FC = () => {
   const [trendData, setTrendData] = useState<TrendSeries[]>([]);
 
   useEffect(() => {
-    const onSave = (event: KeyboardEvent) => {
+    const onRun = (event: KeyboardEvent) => {
       if (event.metaKey && event.key === "Enter") {
         runQuery();
       }
     };
 
-    document.addEventListener('keydown', onSave);
+    document.addEventListener('keydown', onRun);
     return () => {
-      document.removeEventListener('keydown', onSave);
+      document.removeEventListener('keydown', onRun);
     };
   });
 
@@ -98,9 +89,9 @@ export const Trend: React.FC = () => {
         'analysis_id': Number(id),
       });
 
-      const breakdown = toBreakdown(response);
+      const breakdown = toTrendBreakdown(response);
       setQueryResults(breakdown);
-      setTrendData(convertData(breakdown));
+      setTrendData(convertTrendData(breakdown));
       response.forEach(result => {
         if (!result.success) {
           // TODO: still show the successful results, just show a error toast
@@ -195,81 +186,6 @@ export const Trend: React.FC = () => {
     </>
   );
 };
-
-const convertData = (breakdownResult: QueryResult): TrendSeries[] => {
-  return breakdownResult.data.map(eventData => {
-    const data: TrendResultData[] = [];
-    // Start at index 1 since first column is the event name
-    for (let i = 1; i < eventData.length; i++) {
-      data.push({ date: breakdownResult.schema[i].name, count: eventData[i] as number });
-    }
-
-    // First column is the event name in the breakdown data
-    const series: TrendSeries = { name: eventData[0] as string, data: data };
-
-    return series;
-  });
-};
-
-const toBreakdown = (results: QueryResult[]): QueryResult => {
-  const { minDate, maxDate } = getDateRange(results);
-  const range: Date[] = [];
-  for (let d = new Date(minDate); d.getTime() <= maxDate.getTime(); d.setTime(d.getTime() + 86400000)) {
-    range.push(new Date(d));
-  }
-
-  const schema: Schema = [{ name: "Event", type: "string" }, ...range.map(d => ({ name: getDateStringInUTC(d), type: "string" }))];
-  const data = results.map(result => {
-    const dataMap = new Map(result.data.map(row => {
-      return [
-        new Date(row[2]).getTime(),
-        row[1] as number,
-      ];
-    }));
-
-    // All the rows should have the event name as the first column
-    const series: ResultRow = [result.data[0][0]];
-    range.forEach(d => {
-      series.push(dataMap.get(d.getTime()) || 0);
-    });
-
-    return series;
-  });
-
-  return { success: true, error_message: "", schema: schema, data: data };
-};
-
-
-type DateRange = {
-  minDate: Date,
-  maxDate: Date,
-};
-
-const getDateRange = (results: QueryResult[]): DateRange => {
-  // Min and max dates per RFC: http://ecma-international.org/ecma-262/5.1/#sec-15.9.1.1
-  // TODO: use the date range specified in the query itself
-  let minDate: Date = new Date(8640000000000000);
-  let maxDate: Date = new Date(-8640000000000000);
-  results.forEach(result => {
-    result.data.forEach(row => {
-      const date = new Date(row[2]);
-      if (date < minDate) {
-        minDate = date;
-      }
-
-      if (date > maxDate) {
-        maxDate = date;
-      }
-    });
-  });
-
-  return { minDate, maxDate };
-};
-
-function getDateStringInUTC(d: Date): string {
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return months[d.getUTCMonth()] + " " + d.getUTCDate() + " " + d.getUTCFullYear();
-}
 
 /*
 const hasResults = Boolean(schema && queryResults);

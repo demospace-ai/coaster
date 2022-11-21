@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Button, MoreOptionsButton } from "src/components/button/Button";
 import { SaveIcon } from "src/components/icons/Icons";
 import { Loading } from "src/components/loading/Loading";
-import { ConfigureDashboardModal, DeleteDashboardModal } from "src/components/modal/Modal";
+import { AddPanelModal, ConfigureDashboardModal, DeleteDashboardModal } from "src/components/modal/Modal";
 import { ExpandingTextarea } from "src/components/textarea/Textarea";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { sendRequest } from "src/rpc/ajax";
@@ -27,7 +27,7 @@ export const DashboardHeader: React.FC<HeaderProps> = props => {
   const [copied, setCopied] = useState<boolean>(false);
   const [showConfigureModal, setShowConfigureModal] = useState<boolean>(false);
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
-  const [showNewPanelModal, setShowNewPanelModal] = useState<boolean>(false);
+  const [showAddPanelModal, setShowAddPanelModal] = useState<boolean>(false);
   const navigate = useNavigate();
   const { mutate } = useSWRConfig();
 
@@ -84,10 +84,11 @@ export const DashboardHeader: React.FC<HeaderProps> = props => {
     <div>
       <ConfigureDashboardModal dashboardID={id} show={showConfigureModal} close={() => setShowConfigureModal(false)} />
       <DeleteDashboardModal dashboardID={id} show={showDeleteModal} close={() => setShowDeleteModal(false)} deleteDashboard={deleteDashboard} />
+      <AddPanelModal dashboardID={id} show={showAddPanelModal} close={() => setShowAddPanelModal(false)} />
       <div className="tw-mb-3 tw-flex tw-flex-row">
         <input className='tw-w-full tw-max-w-5xl tw-p-0.5 tw-font-semibold tw-text-2xl tw-peer' onChange={e => setTitle(e.target.value)} value={title} onBlur={updateTitle} />
         <div className='tw-flex tw-ml-auto'>
-          <Button className="tw-flex tw-justify-center tw-items-center tw-ml-2 tw-w-36 tw-h-8 tw-bg-white tw-border-gray-400 tw-text-gray-800 hover:tw-bg-gray-200" onClick={() => setShowNewPanelModal(true)}>
+          <Button className="tw-flex tw-justify-center tw-items-center tw-ml-2 tw-w-36 tw-h-8 tw-bg-white tw-border-gray-400 tw-text-gray-800 hover:tw-bg-gray-200" onClick={() => setShowAddPanelModal(true)}>
             <PlusIcon className='tw-h-4 tw-stroke-2 tw-inline tw-mr-1.5' />
             <span>Add Chart</span>
           </Button>
