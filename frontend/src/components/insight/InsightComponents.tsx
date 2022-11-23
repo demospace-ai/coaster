@@ -70,6 +70,7 @@ export const ReportHeader: React.FC<HeaderProps> = props => {
   useEffect(() => {
     const onSave = (event: KeyboardEvent) => {
       if (event.metaKey && event.key.toLowerCase() === "s") {
+        event.preventDefault();
         manualSave();
       }
     };
