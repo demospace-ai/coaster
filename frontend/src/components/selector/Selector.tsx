@@ -268,5 +268,5 @@ export const AnalysisSelector: React.FC<AnalysisSelectorProps> = props => {
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No insights available!"}
     placeholder={props.placeholder ? props.placeholder : "Choose insight"}
     validated={props.validated}
-    allowCustom={true} />;
+  />;
 };

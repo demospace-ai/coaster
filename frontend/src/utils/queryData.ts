@@ -33,26 +33,38 @@ export const toTrendBreakdown = (results: QueryResult[]): QueryResult => {
   }
 
   const schema: Schema = [{ name: "Event", type: "string" }, ...range.map(d => ({ name: getDateStringInUTC(d), type: "string" }))];
-  const data = results.map(result => {
-    const dataMap = new Map(result.data.map(row => {
+  const data: ResultRow[] = [];
+
+  results.forEach(result => {
+    const dataMap: Map<string, Map<number, number>> = new Map(result.data.map(row => {
       return [
-        new Date(row[2]).getTime(),
-        row[1] as number,
+        row[3] as string, // The fourth column should be the group by key
+        new Map(),
       ];
     }));
 
-    // All the rows should have the event name as the first column
-    const series: ResultRow = [result.data[0][0]];
-    range.forEach(d => {
-      series.push(dataMap.get(d.getTime()) || 0);
+    result.data.forEach(row => {
+      dataMap.get(row[3] as string)?.set(new Date(row[2]).getTime(), row[1] as number);
     });
 
-    return series;
+    const seriesList: ResultRow[] = [];
+    dataMap.forEach((value, key) => {
+      // All the rows should have the event name as the first column
+      const eventName = result.data[0][0];
+      // Key will be undefined if this result set doesn't have a breakdown
+      const breakdownKey = key ? " (" + key + ")" : "";
+      const series: ResultRow = [eventName + breakdownKey];
+      range.forEach(d => {
+        series.push(value.get(d.getTime()) || 0);
+      });
+      seriesList.push(series);
+    });
+
+    data.push(...seriesList);
   });
 
   return { success: true, error_message: "", schema: schema, data: data };
 };
-
 
 export type DateRange = {
   minDate: Date,

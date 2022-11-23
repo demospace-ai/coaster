@@ -459,6 +459,7 @@ export interface UpdateAnalysisRequest {
     description?: string;
     query?: string;
     events?: EventInput[];
+    breakdown?: Property;
 }
 
 export interface EventInput {
@@ -489,6 +490,7 @@ export interface Analysis {
     title: string;
     description?: string;
     query?: string; // used for Custom Query analysis type
+    breakdown?: Property;
     events?: Event[]; // used for Funnel and Trend analysis types
 }
 

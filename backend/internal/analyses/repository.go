@@ -59,6 +59,7 @@ func UpdateAnalysis(
 	title *string,
 	description *string,
 	query *string,
+	breakdown *views.Property,
 ) (*models.Analysis, error) {
 	// Any fields left empty will be unchanged
 	if connectionID != nil {
@@ -80,6 +81,11 @@ func UpdateAnalysis(
 
 	if description != nil {
 		analysis.Description = database.NewNullString(*description)
+	}
+
+	if breakdown != nil {
+		analysis.BreakdownPropertyName = database.NewNullString(breakdown.Name)
+		analysis.BreakdownPropertyType = breakdown.Type
 	}
 
 	// TODO: decide if this should be limited to the original user or not

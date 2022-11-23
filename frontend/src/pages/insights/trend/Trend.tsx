@@ -5,7 +5,7 @@ import { rudderanalytics } from 'src/app/rudder';
 import { Button } from 'src/components/button/Button';
 import { Events } from 'src/components/events/Events';
 import { TrendChart } from 'src/components/insight/Charts';
-import { ReportHeader } from 'src/components/insight/InsightComponents';
+import { BreakdownSection, ReportHeader } from 'src/components/insight/InsightComponents';
 import { Loading } from 'src/components/loading/Loading';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { Tooltip } from 'src/components/tooltip/Tooltip';
@@ -120,7 +120,7 @@ export const Trend: React.FC = () => {
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-scroll">
         <ReportHeader id={id} onSave={onSave} />
         <div className='tw-mt-8 tw-mb-10'>
-          <span className='tw-uppercase tw-font-bold -tw-mt-1 tw-select-none'>Series</span>
+          <span className='tw-uppercase tw-font-bold -tw-mt-1 tw-select-none'>Definition</span>
           <div id="events-panel" className='tw-flex tw-flex-1 tw-mt-2 tw-p-5 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md'>
             <div id='left-panel' className="tw-w-1/2 tw-min-w-1/2 tw-flex tw-flex-col tw-select-none tw-pr-10">
               <Events analysisID={id} connectionID={analysis.connection?.id} eventSetID={analysis.event_set?.id} setErrorMessage={setErrorMessage} />
@@ -129,7 +129,9 @@ export const Trend: React.FC = () => {
               </Tooltip>
             </div>
             <div id='right-panel' className="tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1 tw-ml-2 tw-border-l tw-border-solid tw-border-gray-300">
-              {/*todo*/}
+              <div className='tw-ml-5'>
+                <BreakdownSection analysisID={id} />
+              </div>
             </div>
           </div>
         </div>

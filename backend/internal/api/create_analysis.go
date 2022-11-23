@@ -88,12 +88,13 @@ func (s ApiService) CreateAnalysis(auth auth.Authentication, w http.ResponseWrit
 		}
 	}
 
-	analysisView := views.Analysis{
-		Analysis:   *analysis,
-		Events:     views.ConvertEvents(events, eventFilters),
-		Connection: connection,
-		EventSet:   eventSet,
-	}
+	analysisView := views.ConvertAnalysis(
+		analysis,
+		events,
+		eventFilters,
+		connection,
+		eventSet,
+	)
 
 	// TODO: mask database ID
 	return json.NewEncoder(w).Encode(analysisView)

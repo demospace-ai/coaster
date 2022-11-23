@@ -14,13 +14,14 @@ import (
 )
 
 type UpdateAnalysisRequest struct {
-	AnalysisID   int64         `json:"analysis_id"`
-	ConnectionID *int64        `json:"connection_id,omitempty"`
-	EventSetID   *int64        `json:"event_set_id,omitempty"`
-	Title        *string       `json:"title,omitempty"`
-	Description  *string       `json:"description,omitempty"`
-	Query        *string       `json:"query,omitempty"`
-	Events       []views.Event `json:"events,omitempty"`
+	AnalysisID   int64           `json:"analysis_id"`
+	ConnectionID *int64          `json:"connection_id,omitempty"`
+	EventSetID   *int64          `json:"event_set_id,omitempty"`
+	Title        *string         `json:"title,omitempty"`
+	Description  *string         `json:"description,omitempty"`
+	Query        *string         `json:"query,omitempty"`
+	Breakdown    *views.Property `json:"breakdown,omitempty"`
+	Events       []views.Event   `json:"events,omitempty"`
 }
 
 /*
@@ -70,6 +71,7 @@ func (s ApiService) UpdateAnalysis(auth auth.Authentication, w http.ResponseWrit
 		updateAnalysisRequest.Title,
 		updateAnalysisRequest.Description,
 		updateAnalysisRequest.Query,
+		updateAnalysisRequest.Breakdown,
 	)
 	if err != nil {
 		return err
@@ -128,12 +130,13 @@ func (s ApiService) UpdateAnalysis(auth auth.Authentication, w http.ResponseWrit
 		}
 	}
 
-	analysisView := views.Analysis{
-		Analysis:   *updatedAnalysis,
-		Events:     views.ConvertEvents(events, eventFilters),
-		Connection: updatedConnection,
-		EventSet:   updatedEventSet,
-	}
+	analysisView := views.ConvertAnalysis(
+		updatedAnalysis,
+		events,
+		eventFilters,
+		updatedConnection,
+		updatedEventSet,
+	)
 
 	// TODO: mask database ID
 	return json.NewEncoder(w).Encode(analysisView)

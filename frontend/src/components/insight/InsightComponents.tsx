@@ -5,10 +5,11 @@ import { MoreOptionsButton } from "src/components/button/Button";
 import { BoxLeftIcon, SaveIcon } from "src/components/icons/Icons";
 import { Loading } from "src/components/loading/Loading";
 import { ConfigureAnalysisModal, DeleteAnalysisModal } from "src/components/modal/Modal";
+import { PropertySelector } from "src/components/selector/Selector";
 import { ExpandingTextarea } from "src/components/textarea/Textarea";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { sendRequest } from "src/rpc/ajax";
-import { DeleteAnalysis, GetAllAnalyses } from "src/rpc/api";
+import { DeleteAnalysis, GetAllAnalyses, Property, UpdateAnalysisRequest } from "src/rpc/api";
 import { useAnalysis } from "src/rpc/data";
 import { useSWRConfig } from "swr";
 
@@ -111,5 +112,33 @@ export const ReportHeader: React.FC<HeaderProps> = props => {
         <ExpandingTextarea className="-tw-ml-0.5 tw-p-0.5 tw-w-full tw-max-w-5xl tw-resize-none" value={description} onChange={e => setDescription(e.target.value)} placeholder="Description (Optional)" onBlur={updateDescription} />
       </div>
     </div>
+  );
+};
+
+export const BreakdownSection: React.FC<{ analysisID: string; }> = ({ analysisID }) => {
+  const { analysis, updateAnalysis } = useAnalysis(analysisID);
+
+  const updateBreakdown = async (updatedBreakdown: Property) => {
+    if (!analysisID || !analysis) {
+      return;
+    }
+
+    if (updatedBreakdown === analysis.breakdown) {
+      return;
+    }
+
+    const payload: UpdateAnalysisRequest = {
+      analysis_id: Number(analysisID),
+      breakdown: updatedBreakdown,
+    };
+
+    await updateAnalysis(payload);
+  };
+
+  return (
+    <>
+      <div className='tw-uppercase tw-font-bold -tw-mt-1 tw-mb-1 tw-select-none'>Breakdown</div>
+      <PropertySelector property={analysis?.breakdown} setProperty={updateBreakdown} connectionID={analysis?.connection?.id} eventSetID={analysis?.event_set?.id} />
+    </>
   );
 };

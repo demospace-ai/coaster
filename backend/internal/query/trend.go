@@ -2,6 +2,7 @@ package query
 
 import (
 	"fabra/internal/analyses"
+	"fabra/internal/database"
 	"fabra/internal/dataconnections"
 	"fabra/internal/errors"
 	"fabra/internal/eventsets"
@@ -18,12 +19,12 @@ func init() {
 		{{ if .customTableQuery }}
 			{{.customTableQuery}},
 		{{ end }}
-		SELECT "{{.eventName}}" as event, {{.distinctClause}} as count, DATE({{.timestampColumn}}) as date from {{.sourceTable}}
+		SELECT "{{.eventName}}" as event, {{.distinctClause}} as count, DATE({{.timestampColumn}}) as date {{ if .breakdown }} , {{.breakdown}} {{ end }} from {{.sourceTable}}
 		WHERE {{.eventTypeColumn}} = "{{.eventName}}"
 		{{range $filterClause := .filterClauses}}
 			AND {{$filterClause}}
 		{{end}}
-		GROUP BY date
+		GROUP BY date {{ if .breakdown }} , {{.breakdown}} {{ end }}
 		ORDER BY date
 	`))
 }
@@ -61,7 +62,7 @@ func (qs QueryServiceImpl) RunTrendQuery(analysis *models.Analysis) ([]views.Que
 		return nil, err
 	}
 
-	queries, err := createTrendQuery(eventSet, views.ConvertEvents(events, filters))
+	queries, err := createTrendQuery(eventSet, views.ConvertEvents(events, filters), analysis.BreakdownPropertyName)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +97,7 @@ func (qs QueryServiceImpl) RunTrendQuery(analysis *models.Analysis) ([]views.Que
 	return results, nil
 }
 
-func createTrendQuery(eventSet *models.EventSet, events []views.Event) ([]string, error) {
+func createTrendQuery(eventSet *models.EventSet, events []views.Event, breakdown database.NullString) ([]string, error) {
 	var customTableQuery string
 	var sourceTable string
 	if eventSet.CustomJoin.Valid {
@@ -104,6 +105,11 @@ func createTrendQuery(eventSet *models.EventSet, events []views.Event) ([]string
 		sourceTable = "custom_events"
 	} else {
 		sourceTable = eventSet.DatasetName.String + "." + eventSet.TableName.String
+	}
+
+	var breakdownPtr *string
+	if breakdown.Valid {
+		breakdownPtr = &breakdown.String
 	}
 
 	distinctClause := "count(*)" // TODO: "count(distinct " + userIdentifierColumn + ")"
@@ -125,6 +131,7 @@ func createTrendQuery(eventSet *models.EventSet, events []views.Event) ([]string
 			"userIdentifierColumn": eventSet.UserIdentifierColumn,
 			"timestampColumn":      eventSet.TimestampColumn,
 			"filterClauses":        filterClauses,
+			"breakdown":            breakdownPtr,
 		})
 
 		if err != nil {

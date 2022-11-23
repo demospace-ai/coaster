@@ -60,12 +60,13 @@ func (s ApiService) GetAnalysis(auth auth.Authentication, w http.ResponseWriter,
 		}
 	}
 
-	analysisView := views.Analysis{
-		Analysis:   *analysis,
-		Events:     views.ConvertEvents(events, eventFilters),
-		Connection: connection,
-		EventSet:   eventSet,
-	}
+	analysisView := views.ConvertAnalysis(
+		analysis,
+		events,
+		eventFilters,
+		connection,
+		eventSet,
+	)
 
 	return json.NewEncoder(w).Encode(analysisView)
 }
