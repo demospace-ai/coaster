@@ -1,10 +1,10 @@
 import { PlusCircleIcon } from '@heroicons/react/24/outline';
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from 'react-router-dom';
-import { Line, LineChart, ResponsiveContainer, Tooltip as RechartTooltip, XAxis, YAxis } from 'recharts';
 import { rudderanalytics } from 'src/app/rudder';
 import { Button } from 'src/components/button/Button';
 import { Events } from 'src/components/events/Events';
+import { TrendChart } from 'src/components/insight/Charts';
 import { ReportHeader } from 'src/components/insight/InsightComponents';
 import { Loading } from 'src/components/loading/Loading';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
@@ -143,18 +143,7 @@ export const Trend: React.FC = () => {
                 </div>
               }
               {!queryLoading && trendData.length > 0 ?
-                <div className='tw-overflow-scroll'>
-                  <ResponsiveContainer width="100%" height={320}>
-                    <LineChart data={trendData} margin={{ top: 20, right: 50, left: 10, bottom: 10 }} >
-                      <XAxis dataKey="date" height={30} allowDuplicatedCategory={false} minTickGap={30} dy={5} />
-                      <YAxis dataKey="count" />
-                      <RechartTooltip wrapperClassName='tw-rounded' labelClassName='tw-pb-1 tw-font-bold' />
-                      {trendData.map((s) => (
-                        <Line dataKey="count" data={s.data} name={s.name} key={s.name} connectNulls={false} stroke="#639f63" />
-                      ))}
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
+                <TrendChart trendData={trendData} />
                 :
                 queryLoading ?
                   <Loading />

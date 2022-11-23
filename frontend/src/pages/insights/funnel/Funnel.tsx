@@ -1,10 +1,10 @@
 import { PlusCircleIcon } from '@heroicons/react/24/outline';
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from 'react-router-dom';
-import { Bar, BarChart, CartesianGrid, Tooltip as RechartTooltip, XAxis, YAxis } from 'recharts';
 import { rudderanalytics } from 'src/app/rudder';
 import { Button } from 'src/components/button/Button';
 import { Events } from 'src/components/events/Events';
+import { FunnelChart } from 'src/components/insight/Charts';
 import { ReportHeader } from 'src/components/insight/InsightComponents';
 import { Loading } from 'src/components/loading/Loading';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
@@ -139,16 +139,7 @@ export const Funnel: React.FC = () => {
                 </div>
               }
               {!queryLoading && funnelData.length ?
-                <div className='tw-overflow-scroll'>
-                  <BarChart className="tw-mx-auto" data={funnelData} margin={{ top: 25, right: 30, left: 0, bottom: 0 }} width={Math.max(300 * funnelData.length, 900)} height={320}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" height={30} dy={5} />
-                    <YAxis ticks={[0, 20, 40, 60, 80, 100]} tickFormatter={tick => tick + "%"} domain={[0, 100]} allowDataOverflow={true} />
-                    <RechartTooltip wrapperClassName='tw-rounded' labelClassName='tw-pb-1 tw-font-bold' />
-                    <Bar dataKey="percentage" barSize={200} fill="#639f63" background={{ fill: '#eee' }} radius={[5, 5, 0, 0]} />
-                    <Bar dataKey="count" barSize={0} />
-                  </BarChart>
-                </div>
+                <FunnelChart funnelData={funnelData} />
                 :
                 queryLoading ?
                   <Loading />
