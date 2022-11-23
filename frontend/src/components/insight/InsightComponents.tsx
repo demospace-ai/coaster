@@ -86,7 +86,7 @@ export const ReportHeader: React.FC<HeaderProps> = props => {
       <ConfigureAnalysisModal analysisID={id} show={showConfigureModal} close={() => setShowConfigureModal(false)} />
       <DeleteAnalysisModal analysisID={id} show={showDeleteModal} close={() => setShowDeleteModal(false)} deleteAnalysis={deleteAnalysis} />
       <div className="tw-mb-3 tw-flex tw-flex-row">
-        <input className='tw-w-full tw-max-w-5xl tw-p-0.5 tw-font-semibold tw-text-2xl tw-peer' onChange={e => setTitle(e.target.value)} value={title} onBlur={updateTitle} />
+        <input className='tw-w-full -tw-ml-0.5 tw-max-w-5xl tw-p-0.5 tw-font-semibold tw-text-2xl tw-peer' onChange={e => setTitle(e.target.value)} value={title} onBlur={updateTitle} />
         <div className='tw-flex tw-ml-auto'>
           <div className="tw-inline-block tw-mx-4 tw-my-2 tw-w-[1px] tw-bg-gray-400"></div>
           <Tooltip label="Copy Link">
@@ -108,7 +108,7 @@ export const ReportHeader: React.FC<HeaderProps> = props => {
         </div>
       </div>
       <div className="tw-flex tw-flex-row tw-items-center tw-mr-10">
-        <ExpandingTextarea className="tw-p-0.5 tw-w-full tw-max-w-5xl tw-resize-none" value={description} onChange={e => setDescription(e.target.value)} placeholder="Description (Optional)" onBlur={updateDescription} />
+        <ExpandingTextarea className="-tw-ml-0.5 tw-p-0.5 tw-w-full tw-max-w-5xl tw-resize-none" value={description} onChange={e => setDescription(e.target.value)} placeholder="Description (Optional)" onBlur={updateDescription} />
       </div>
     </div>
   );
