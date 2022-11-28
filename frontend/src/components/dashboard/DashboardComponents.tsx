@@ -86,8 +86,8 @@ export const DashboardHeader: React.FC<HeaderProps> = props => {
       <ConfigureDashboardModal dashboardID={id} show={showConfigureModal} close={() => setShowConfigureModal(false)} />
       <DeleteDashboardModal dashboardID={id} show={showDeleteModal} close={() => setShowDeleteModal(false)} deleteDashboard={deleteDashboard} />
       <AddPanelModal dashboardID={id} show={showAddPanelModal} close={() => setShowAddPanelModal(false)} />
-      <div className="tw-mb-3 tw-flex tw-flex-row">
-        <input className='tw-w-full tw-max-w-5xl -tw-ml-0.5 tw-p-0.5 tw-font-semibold tw-text-2xl tw-peer' onChange={e => setTitle(e.target.value)} value={title} onBlur={updateTitle} />
+      <div className="tw-mb-2 tw-flex tw-flex-row">
+        <input className='tw-w-full tw-max-w-5xl -tw-ml-1 tw-p-1 tw-font-semibold tw-text-2xl tw-peer' onChange={e => setTitle(e.target.value)} value={title} onBlur={updateTitle} />
         <div className='tw-flex tw-ml-auto'>
           <Button className="tw-flex tw-justify-center tw-items-center tw-ml-2 tw-w-36 tw-h-8 tw-bg-white tw-border-gray-400 tw-text-gray-800 hover:tw-bg-gray-200" onClick={() => setShowAddPanelModal(true)}>
             <PlusIcon className='tw-h-4 tw-stroke-2 tw-inline tw-mr-1.5' />
@@ -108,7 +108,7 @@ export const DashboardHeader: React.FC<HeaderProps> = props => {
         </div>
       </div>
       <div className="tw-flex tw-flex-row tw-items-center tw-mr-10">
-        <ExpandingTextarea className="-tw-ml-0.5 tw-p-0.5 tw-w-full tw-max-w-5xl tw-resize-none" value={description} onChange={e => setDescription(e.target.value)} placeholder="Description (Optional)" onBlur={updateDescription} />
+        <ExpandingTextarea className="-tw-ml-1 tw-p-1 tw-box-border tw-w-full tw-max-w-5xl tw-resize-none" value={description} onChange={e => setDescription(e.target.value)} placeholder="Description (Optional)" onBlur={updateDescription} />
       </div>
     </div>
   );
