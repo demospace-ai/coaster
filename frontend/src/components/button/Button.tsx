@@ -76,7 +76,7 @@ export const BackButton: React.FC<Partial<ButtonProps>> = props => {
 export const NavButton: React.FC<NavLinkProps> = props => {
   return (
     <NavLink
-      className={classNames(props.className, 'tw-bg-fabra-green-500 tw-text-white tw-rounded-md tw-block tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-font-bold tw-text-center tw-transition-colors hover:tw-bg-fabra-green-600 tw-border tw-border-solid tw-border-[#508368]')}
+      className={classNames('tw-bg-fabra-green-500 tw-text-white tw-rounded-md tw-block tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-font-bold tw-text-center tw-transition-colors hover:tw-bg-fabra-green-600 tw-border tw-border-solid tw-border-[#508368]', props.className as string)}
       to={props.to}>
       {props.children}
     </NavLink>

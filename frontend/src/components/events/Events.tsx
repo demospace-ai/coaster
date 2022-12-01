@@ -91,13 +91,13 @@ const EventComponent: React.FC<EventProp> = props => {
   const { index, event, connectionID, eventSetID, setEvent, removeEvent, setEventFilters } = props;
 
   return (
-    <div className='tw-flex tw-mb-4'>
-      <div className='tw-w-full tw-border tw-border-solid tw-border-gray-300 tw-rounded-md'>
+    <div className='tw-flex tw-mb-1'>
+      <div className='tw-w-full'>
         <div className='tw-flex tw-items-center tw-p-2'>
-          <div className='tw-flex tw-mr-2 tw-items-center tw-justify-center tw-shrink-0 tw-rounded-full tw-bg-fabra-green-500 tw-text-white tw-h-6 tw-w-6 tw-my-auto'>
+          <div className='tw-flex tw-mr-2 tw-items-center tw-justify-center tw-shrink-0 tw-rounded-full tw-h-6 tw-w-6 tw-my-auto tw-border-[2px] tw-border-gray-300 tw-font-bold'>
             {index + 1}
           </div>
-          <EventSelector className="tw-border-none tw-bg-gray-100 hover:tw-bg-green-100" connectionID={connectionID} eventSetID={eventSetID} event={event?.name} setEvent={setEvent} />
+          <EventSelector className="hover:tw-bg-green-100" connectionID={connectionID} eventSetID={eventSetID} event={event?.name} setEvent={setEvent} />
           <DivButton className='tw-p-1 tw-ml-2 hover:tw-bg-gray-200 tw-cursor-pointer tw-rounded-md' onClick={() => setShowFilters(!showFilters)}>
             <FunnelIcon className='tw-h-6 tw-stroke-[1.7]' />
             {event.filters.length > 0 &&
@@ -128,12 +128,12 @@ type NewEventProps = {
 const NewEvent: React.FC<NewEventProps> = props => {
   return (
     <div className='tw-flex tw-mb-4'>
-      <div className='tw-w-full tw-mt-[-1px] tw-border tw-border-solid tw-border-gray-300 tw-rounded-t-md tw-rounded-b-md'>
+      <div className='tw-w-full tw-mt-[-1px]'>
         <div className='tw-flex tw-items-center tw-p-2'>
-          <div className='tw-flex tw-mr-2 tw-items-center tw-justify-center tw-shrink-0 tw-rounded-full tw-bg-fabra-green-500 tw-text-white tw-h-6 tw-w-6 tw-my-auto'>
+          <div className='tw-flex tw-mr-2 tw-items-center tw-justify-center tw-shrink-0 tw-rounded-full tw-h-6 tw-w-6 tw-my-auto tw-border-[2px] tw-border-gray-300 tw-font-bold'>
             {props.index + 1}
           </div>
-          <EventSelector className="tw-border-none tw-bg-gray-100 hover:tw-bg-green-100" event={undefined} setEvent={props.addEvent} connectionID={props.connectionID} eventSetID={props.eventSetID} />
+          <EventSelector event={undefined} setEvent={props.addEvent} connectionID={props.connectionID} eventSetID={props.eventSetID} />
           <div className='tw-p-1 tw-ml-2 hover:tw-bg-gray-200 tw-cursor-pointer tw-rounded-md'>
             <FunnelIcon className='tw-h-6 tw-stroke-[1.7]' />
           </div>

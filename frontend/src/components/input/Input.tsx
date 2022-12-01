@@ -102,7 +102,7 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = pro
   return (
     <Listbox by={props.by} value={value} onChange={value => { props.setSelected(value); setIsValid(true); }}>
       <Listbox.Button
-        className={classNames("tw-flex tw-justify-center tw-w-full tw-rounded-md tw-py-2 tw-pl-3 tw-pr-3 tw-text-left tw-border tw-border-solid tw-border-gray-300 focus:tw-outline-none", props.className, props.validated && !isValid && 'tw-border-red-600 tw-outline-none')}
+        className={classNames("tw-flex tw-justify-center tw-w-full tw-rounded-md tw-py-2 tw-pl-3 tw-pr-3 tw-text-left tw-border tw-border-solid tw-border-gray-300 focus:tw-outline-none hover:tw-bg-green-100 hover:tw-border-green-600 aria-expanded:tw-bg-green-100 aria-expanded:tw-border-green-600", props.className, props.validated && !isValid && 'tw-border-red-600 tw-outline-none')}
       >
         <div className={classNames("tw-inline-block tw-w-[calc(100%-20px)] tw-truncate tw-overflow-none", !props.selected && "tw-text-gray-400")}>
           {value !== UNSET ? getElementForDisplay(props.selected) : props.placeholder}
@@ -237,9 +237,9 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
   return (
     <Combobox as="div" className="tw-flex tw-w-full" by={props.by} value={value} onChange={(value: number) => { props.setSelected(value); setIsValid(true); }}>
       <div className="tw-relative tw-w-full">
-        <div className={classNames("tw-flex tw-h-10 tw-w-full tw-rounded-md tw-bg-white tw-pl-2 tw-pr-2 tw-text-left tw-border tw-border-solid tw-border-gray-300", props.className, props.validated && !isValid && 'tw-border-red-600 tw-outline-none')}>
+        <div className={classNames("tw-flex tw-h-10 tw-w-full tw-rounded-md tw-bg-white tw-pl-2 tw-pr-2 tw-text-left tw-border tw-border-solid tw-border-gray-300 hover:tw-bg-green-100 hover:tw-border-green-600 focus-within:tw-bg-green-100 focus-within:tw-border-green-600", props.className, props.validated && !isValid && 'tw-border-red-600 tw-outline-none')}>
           <Combobox.Input
-            className={"tw-inline tw-bg-transparent tw-w-[calc(100%-20px)] tw-border-none tw-pr-2 tw-text-sm tw-leading-5 tw-text-gray-900 tw-outline-none tw-text-ellipsis"}
+            className={"tw-inline tw-bg-transparent tw-w-[calc(100%-20px)] tw-border-none tw-pr-2 tw-text-sm tw-leading-5 tw-text-gray-900 tw-outline-none tw-text-ellipsis tw-cursor-pointer focus:tw-cursor-text"}
             displayValue={selected => selected !== UNSET ? getElementForDisplay(selected) : ""}
             onChange={event => setQuery(event.target.value)}
             placeholder={props.placeholder}
