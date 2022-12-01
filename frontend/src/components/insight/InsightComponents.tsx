@@ -137,7 +137,7 @@ export const BreakdownSection: React.FC<{ analysisID: string; }> = ({ analysisID
 
   return (
     <>
-      <div className='tw-uppercase tw-font-bold tw-mb-2 tw-text-xs tw-select-none'>Breakdown by</div>
+      <div className='tw-uppercase tw-font-bold tw-mb-3 tw-text-xs tw-select-none'>Breakdown by</div>
       <PropertySelector property={analysis?.breakdown} setProperty={updateBreakdown} connectionID={analysis?.connection?.id} eventSetID={analysis?.event_set?.id} />
     </>
   );

@@ -122,11 +122,10 @@ export const Trend: React.FC = () => {
         <div className='tw-mt-8 tw-mb-10'>
           <span className='tw-uppercase tw-font-bold -tw-mt-1 tw-select-none'>Definition</span>
           <div id="events-panel" className='tw-flex tw-flex-1 tw-mt-2 tw-p-5 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md'>
-            <div id='left-panel' className="tw-w-1/2 tw-min-w-1/2 tw-flex tw-flex-col tw-select-none tw-pr-10">
-              <span className='tw-uppercase tw-font-bold tw-mb-2 tw-text-xs tw-select-none'>Events</span>
+            <div id='left-panel' className="tw-w-1/2 tw-min-w-1/2 tw-flex tw-flex-col tw-select-none tw-pr-5">
               <Events analysisID={id} connectionID={analysis.connection?.id} eventSetID={analysis.event_set?.id} setErrorMessage={setErrorMessage} />
               <Tooltip label={"⌘ + Enter"}>
-                <Button className="tw-w-40 tw-h-8" onClick={runQuery}>{queryLoading ? "Stop" : "Run"}</Button>
+                <Button className="tw-w-40 tw-h-8 tw-mt-4" onClick={runQuery}>{queryLoading ? "Stop" : "Run"}</Button>
               </Tooltip>
             </div>
             <div id='right-panel' className="tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1 tw-ml-2 tw-border-l tw-border-solid tw-border-gray-300">

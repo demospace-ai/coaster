@@ -58,21 +58,24 @@ export const Events: React.FC<EventsProps> = props => {
   }, [analysisID, events, setErrorMessage, updateAnalysis]);
 
   return (
-    <div id="events">
-      {events.map((event, index) =>
-        <EventComponent
-          key={index}
-          index={index}
-          event={event}
-          setEvent={(event) => onEventSelected(event, index)}
-          removeEvent={() => onEventRemoved(index)}
-          setEventFilters={(eventFilters) => setEventFilters(eventFilters, index)}
-          connectionID={connectionID}
-          eventSetID={eventSetID}
-        />
-      )}
-      <NewEvent index={events.length} addEvent={onEventAdded} connectionID={connectionID} eventSetID={eventSetID} />
-    </div>
+    <>
+      <span className='tw-uppercase tw-font-bold tw-mb-3 tw-text-xs tw-select-none'>Events</span>
+      <div id="events">
+        {events.map((event, index) =>
+          <EventComponent
+            key={index}
+            index={index}
+            event={event}
+            setEvent={(event) => onEventSelected(event, index)}
+            removeEvent={() => onEventRemoved(index)}
+            setEventFilters={(eventFilters) => setEventFilters(eventFilters, index)}
+            connectionID={connectionID}
+            eventSetID={eventSetID}
+          />
+        )}
+        <NewEvent index={events.length} addEvent={onEventAdded} connectionID={connectionID} eventSetID={eventSetID} />
+      </div>
+    </>
   );
 };
 
@@ -91,9 +94,9 @@ const EventComponent: React.FC<EventProp> = props => {
   const { index, event, connectionID, eventSetID, setEvent, removeEvent, setEventFilters } = props;
 
   return (
-    <div className='tw-flex tw-mb-1'>
+    <div className='tw-flex tw-mb-4'>
       <div className='tw-w-full'>
-        <div className='tw-flex tw-items-center tw-p-2'>
+        <div className='tw-flex tw-items-center'>
           <div className='tw-flex tw-mr-2 tw-items-center tw-justify-center tw-shrink-0 tw-rounded-full tw-h-6 tw-w-6 tw-my-auto tw-border-[2px] tw-border-gray-300 tw-font-bold'>
             {index + 1}
           </div>
@@ -128,8 +131,8 @@ type NewEventProps = {
 const NewEvent: React.FC<NewEventProps> = props => {
   return (
     <div className='tw-flex tw-mb-4'>
-      <div className='tw-w-full tw-mt-[-1px]'>
-        <div className='tw-flex tw-items-center tw-p-2'>
+      <div className='tw-w-full'>
+        <div className='tw-flex tw-items-center'>
           <div className='tw-flex tw-mr-2 tw-items-center tw-justify-center tw-shrink-0 tw-rounded-full tw-h-6 tw-w-6 tw-my-auto tw-border-[2px] tw-border-gray-300 tw-font-bold'>
             {props.index + 1}
           </div>
