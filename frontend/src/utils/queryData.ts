@@ -97,19 +97,48 @@ export const getDateStringInUTC = (d: Date): string => {
   return months[d.getUTCMonth()] + " " + d.getUTCDate() + " " + d.getUTCFullYear();
 };
 
-export type FunnelResult = {
+export interface FunnelResult {
+  stepResults: FunnelStepResult[];
+  breakdownValues: string[];
+}
+
+export interface FunnelStepResult extends Record<string, any> {
+  name: string,
+  count?: number,
+  percentage?: number,
+};
+
+export type BreakdownResult = {
   name: string,
   count: number,
   percentage: number,
-  conversionFromPrevious?: number,
 };
 
-export const convertFunnelData = (results: QueryResult): FunnelResult[] => {
-  return results.data.map(result => {
-    return {
-      name: result[1] as string,
-      count: result[0] as number,
-      percentage: +((result[2] as number) * 100).toFixed(2),
-    };
+export const convertFunnelData = (results: QueryResult): FunnelResult => {
+  const breakdown = results.schema.length > 4;
+  const dataMap: Map<number, FunnelStepResult> = new Map(results.data.map(result => {
+    return [result[2] as number, { name: result[1] as string, breakdown: [] }];
+  }));
+
+  results.data.forEach(result => {
+    const data = dataMap.get(result[2] as number);
+    if (data === undefined) {
+      return;
+    }
+
+    if (breakdown) {
+      data[result[4]] = {
+        count: result[0] as number,
+        percentage: +((result[3] as number) * 100).toFixed(2),
+      };
+    } else {
+      data.count = result[0] as number;
+      data.percentage = +((result[3] as number) * 100).toFixed(2);
+    }
   });
+
+  return {
+    stepResults: Array.from(dataMap.values()),
+    breakdownValues: breakdown ? Array.from(new Set(results.data.map(result => result[4] as string))) : [],
+  };
 };

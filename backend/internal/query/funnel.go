@@ -14,6 +14,7 @@ import (
 
 var funnelQueryTemplate *template.Template
 var stepSubqueryTemplate *template.Template
+var rollupQueryTemplate *template.Template
 
 func init() {
 	funnelQueryTemplate = template.Must(template.New("funnelQuery").Parse(`
@@ -24,12 +25,23 @@ func init() {
 		{{ end }}
 		{{.stepSubqueryString}},
 		{{.resultSubquery}}
-		SELECT count, event, IFNULL(count / NULLIF((SELECT MAX(count) FROM results), 0), 0) as percent from results ORDER BY results.event_order
+		SELECT
+			sum(count) as count,
+			event,
+			event_order,
+			IFNULL((0.0+SUM(count))/NULLIF(MAX(MAX(count)) OVER({{ if .breakdown }} PARTITION BY {{.breakdown}} {{ end }}), 0), 0) AS percent,
+			{{ if .breakdown }} {{.breakdown}}, {{ end }}
+		FROM results
+		GROUP BY event, event_order {{ if .breakdown }} , {{.breakdown}} {{ end }}
+		ORDER BY event_order
 	`))
 
 	stepSubqueryTemplate = template.Must(template.New("stepSubQuery").Parse(`
 		{{.tableName}} AS (
-			SELECT DISTINCT {{.tableName}}.{{.userIdentifierColumn}}, {{.tableName}}.{{.timestampColumn}}
+			SELECT
+				DISTINCT {{.tableName}}.{{.userIdentifierColumn}},
+				{{.tableName}}.{{.timestampColumn}},
+				{{ if .breakdown }} {{.tableName}}.{{.breakdown}}, {{ end }}
 			FROM {{.sourceTable}} AS {{.tableName}}
 			{{ if .previous }}
 				JOIN {{.previous}} ON {{.previous}}.{{.userIdentifierColumn}} = {{.tableName}}.{{.userIdentifierColumn}}
@@ -42,6 +54,16 @@ func init() {
 				AND {{.previous}}.{{.timestampColumn}} < {{.tableName}}.{{.timestampColumn}}
 			{{ end }}
 		)
+	`))
+
+	rollupQueryTemplate = template.Must(template.New("rollupQuery").Parse(`
+		SELECT
+			COUNT(DISTINCT {{.userIdentifierColumn}}) AS count,
+			'{{.stepName}}' AS event,
+			{{.eventOrder}} AS event_order,
+			{{ if .breakdown }} {{.breakdown}}, {{ end }}
+		FROM {{.subQueryName}}
+		{{ if .breakdown }} GROUP BY {{.breakdown}} {{ end }}
 	`))
 }
 
@@ -78,7 +100,12 @@ func (qs QueryServiceImpl) RunFunnelQuery(analysis *models.Analysis) (*views.Que
 		return nil, err
 	}
 
-	queryString, err := createFunnelQuery(eventSet, views.ConvertEvents(steps, filters))
+	var breakdownPtr *string
+	if analysis.BreakdownPropertyName.Valid {
+		breakdownPtr = &analysis.BreakdownPropertyName.String
+	}
+
+	queryString, err := createFunnelQuery(eventSet, views.ConvertEvents(steps, filters), breakdownPtr)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +113,7 @@ func (qs QueryServiceImpl) RunFunnelQuery(analysis *models.Analysis) (*views.Que
 	return qs.runQuery(dataConnection, *queryString)
 }
 
-func createFunnelQuery(eventSet *models.EventSet, steps []views.Event) (*string, error) {
+func createFunnelQuery(eventSet *models.EventSet, steps []views.Event, breakdownPtr *string) (*string, error) {
 	var customTableQuery string
 	if eventSet.CustomJoin.Valid {
 		customTableQuery = createCustomTableQuery(eventSet)
@@ -99,7 +126,7 @@ func createFunnelQuery(eventSet *models.EventSet, steps []views.Event) (*string,
 			previous = toSubqueryTitle(steps[i-1].Name, i-1)
 		}
 
-		stepSubquery, err := createStepSubquery(eventSet, step, i, previous, eventSet.CustomJoin.Valid)
+		stepSubquery, err := createStepSubquery(eventSet, step, i, previous, eventSet.CustomJoin.Valid, breakdownPtr)
 		if err != nil {
 			return nil, err
 		}
@@ -109,18 +136,22 @@ func createFunnelQuery(eventSet *models.EventSet, steps []views.Event) (*string,
 
 	stepSubqueryString := strings.Join(stepSubqueryArray, ", ")
 
-	resultSubquery := createResultsSubquery(eventSet, steps)
+	resultSubquery, err := createResultsSubquery(eventSet, steps, breakdownPtr)
+	if err != nil {
+		return nil, err
+	}
 
 	query, err := executeTemplate(funnelQueryTemplate, map[string]interface{}{
 		"customTableQuery":   customTableQuery,
 		"stepSubqueryString": stepSubqueryString,
 		"resultSubquery":     resultSubquery,
+		"breakdown":          breakdownPtr,
 	})
 
 	return query, err
 }
 
-func createStepSubquery(eventSet *models.EventSet, funnelStep views.Event, order int, previous string, usingCustomTableQuery bool) (*string, error) {
+func createStepSubquery(eventSet *models.EventSet, funnelStep views.Event, order int, previous string, usingCustomTableQuery bool, breakdownPtr *string) (*string, error) {
 	tableName := toSubqueryTitle(funnelStep.Name, order)
 
 	var sourceTable string
@@ -144,21 +175,31 @@ func createStepSubquery(eventSet *models.EventSet, funnelStep views.Event, order
 		"previous":             previous,
 		"stepName":             funnelStep.Name,
 		"filterClauses":        filterClauses,
+		"breakdown":            breakdownPtr,
 	})
 
 	return queryArray, err
 }
 
-func createResultsSubquery(eventSet *models.EventSet, steps []views.Event) string {
+func createResultsSubquery(eventSet *models.EventSet, steps []views.Event, breakdownPtr *string) (string, error) {
 	var rollupArray []string
 	for i, step := range steps {
 		subQueryName := toSubqueryTitle(step.Name, i)
-		rollupArray = append(rollupArray,
-			"SELECT COUNT(DISTINCT "+eventSet.UserIdentifierColumn+") AS count, '"+step.Name+"' AS event, "+fmt.Sprint(i)+" AS event_order FROM "+subQueryName,
-		)
+		rollupQuery, err := executeTemplate(rollupQueryTemplate, map[string]interface{}{
+			"subQueryName":         subQueryName,
+			"stepName":             step.Name,
+			"userIdentifierColumn": eventSet.UserIdentifierColumn,
+			"eventOrder":           fmt.Sprint(i),
+			"breakdown":            breakdownPtr,
+		})
+		if err != nil {
+			return "", err
+		}
+
+		rollupArray = append(rollupArray, *rollupQuery)
 	}
 
-	return "results AS ( " + strings.Join(rollupArray, " UNION ALL ") + " )"
+	return "results AS ( " + strings.Join(rollupArray, " UNION ALL ") + " )", nil
 }
 
 func toSQL(tableName string, stepFilter views.EventFilter) string {

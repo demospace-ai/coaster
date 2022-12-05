@@ -38,7 +38,7 @@ export const Funnel: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const [queryResult, setQueryResult] = useState<QueryResult | undefined>(undefined);
-  const [funnelData, setFunnelData] = useState<FunnelResult[]>([]);
+  const [funnelData, setFunnelData] = useState<FunnelResult | undefined>(undefined);
 
   useEffect(() => {
     const onRun = (event: KeyboardEvent) => {
@@ -134,14 +134,14 @@ export const Funnel: React.FC = () => {
         <div id="funnel-panel" className='tw-flex tw-flex-col tw-flex-1 tw-mb-10'>
           <span className='tw-uppercase tw-font-bold tw-select-none'>Results</span>
           <div className='tw-flex tw-flex-col tw-flex-1 tw-mt-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md tw-p-5 tw-min-h-[364px] tw-max-h-[364px]'>
-            <div className="tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden">
+            <div className="tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-none">
               {errorMessage &&
                 <div className="tw-p-5 tw-text-red-600 tw-font-bold tw-border-gray-300 tw-border-solid tw-border-b">
                   Error: {errorMessage}
                 </div>
               }
-              {!queryLoading && funnelData.length ?
-                <FunnelChart funnelData={funnelData} />
+              {!queryLoading && funnelData ?
+                <FunnelChart funnelData={funnelData} breakdown={analysis.breakdown !== undefined} />
                 :
                 queryLoading ?
                   <Loading />
