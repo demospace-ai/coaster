@@ -116,8 +116,17 @@ export type BreakdownResult = {
 
 export const convertFunnelData = (results: QueryResult): FunnelResult => {
   const breakdown = results.schema.length > 4;
+  const breakdownValues = breakdown ? Array.from(new Set(results.data.map(result => result[4] as string))) : [];
   const dataMap: Map<number, FunnelStepResult> = new Map(results.data.map(result => {
-    return [result[2] as number, { name: result[1] as string, breakdown: [] }];
+    const data: FunnelStepResult = { name: result[1] as string };
+    // Initialize values to 0 because query will return nothing if there were no events
+    breakdownValues.forEach(value => {
+      data[value] = {
+        count: 0,
+        percentage: 0,
+      };
+    });
+    return [result[2] as number, data];
   }));
 
   results.data.forEach(result => {
@@ -139,6 +148,6 @@ export const convertFunnelData = (results: QueryResult): FunnelResult => {
 
   return {
     stepResults: Array.from(dataMap.values()),
-    breakdownValues: breakdown ? Array.from(new Set(results.data.map(result => result[4] as string))) : [],
+    breakdownValues,
   };
 };

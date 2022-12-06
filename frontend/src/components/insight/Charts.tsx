@@ -26,7 +26,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({ funnelData, breakdown 
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" height={30} dy={5} />
           <YAxis ticks={[0, 20, 40, 60, 80, 100]} tickFormatter={tick => tick + "%"} domain={[0, 100]} allowDataOverflow={true} />
-          <RechartTooltip wrapperClassName='tw-rounded' labelClassName='tw-pb-1 tw-font-bold' content={<FunnelTooltip />} shared={false} />
+          <RechartTooltip wrapperClassName='tw-rounded' filterNull={false} labelClassName='tw-pb-1 tw-font-bold' content={<FunnelTooltip />} shared={false} />
           <Bar dataKey={"percentage"} fill="#639f63" background={{ fill: '#eee' }} radius={[5, 5, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
@@ -35,7 +35,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({ funnelData, breakdown 
 };
 
 const FunnelTooltip: React.FC<any> = ({ active, payload, breakdown }: any) => {
-  if (active && payload && payload.length) {
+  if (active && payload && payload.length > 0) {
     if (breakdown) {
       const group = payload[0].dataKey.split(".")[0];
       return (
