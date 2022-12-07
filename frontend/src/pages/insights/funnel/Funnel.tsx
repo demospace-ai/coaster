@@ -139,7 +139,7 @@ export const Funnel: React.FC = () => {
           <div id="breakdown-panel" className='tw-flex tw-flex-col tw-flex-1 tw-mb-20'>
             <span className='tw-uppercase tw-font-bold tw-select-none'>Detailed Results</span>
             <div className='tw-flex tw-flex-col tw-flex-1 tw-mt-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md tw-overflow-hidden'>
-              <div className="tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-max-h-64 tw-overflow-hidden">
+              <div className="tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-max-h-[260px] tw-overflow-hidden">
                 <MemoizedResultsTable schema={formatSchema(queryResult.schema)} results={queryResult.data} />
               </div>
             </div>
