@@ -1,17 +1,17 @@
 import { PlusCircleIcon } from '@heroicons/react/24/outline';
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useParams } from 'react-router-dom';
 import { rudderanalytics } from 'src/app/rudder';
 import { Button } from 'src/components/button/Button';
 import { Events } from 'src/components/events/Events';
 import { TrendChart } from 'src/components/insight/Charts';
-import { BreakdownSection, ReportHeader } from 'src/components/insight/InsightComponents';
+import { BreakdownSection, ReportHeader, useInitializeAnalysis } from 'src/components/insight/InsightComponents';
 import { Loading } from 'src/components/loading/Loading';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { DateRangeSelector } from 'src/components/selector/Selector';
 import { Tooltip } from 'src/components/tooltip/Tooltip';
 import { sendRequest } from 'src/rpc/ajax';
-import { QueryResult, RunTrendQuery } from "src/rpc/api";
+import { Analysis, AnalysisType, QueryResult, RunTrendQuery } from "src/rpc/api";
 import { useAnalysis } from "src/rpc/data";
 import { convertTrendData, toTrendBreakdown, TrendSeries } from 'src/utils/queryData';
 
@@ -42,29 +42,13 @@ export const Trend: React.FC = () => {
   const [trendData, setTrendData] = useState<TrendSeries[]>([]);
   const [dateRange, setDateRange] = useState<string | undefined>(undefined);
 
+  const validateError = validateAnalysis(analysis);
   const runQuery = useCallback(async () => {
     setQueryLoading(true);
     setErrorMessage(null);
 
-    if (!analysis) {
-      // TODO: handle this
-      return;
-    }
-
-    if (!analysis.connection) {
-      setErrorMessage("Data source is not set!");
-      setQueryLoading(false);
-      return;
-    }
-
-    if (!analysis.event_set) {
-      setErrorMessage("Event set is not set!");
-      setQueryLoading(false);
-      return;
-    }
-
-    if (!analysis || !analysis.events) {
-      setErrorMessage("Must have 1 or more events!");
+    if (validateError) {
+      setErrorMessage(validateError);
       setQueryLoading(false);
       return;
     }
@@ -90,28 +74,9 @@ export const Trend: React.FC = () => {
     }
 
     setQueryLoading(false);
-  }, [id, analysis]);
+  }, [id, validateError]);
 
-  useEffect(() => {
-    runQuery(); // run query on startup
-  }, [runQuery]);
-
-  useEffect(() => {
-    const onRun = (event: KeyboardEvent) => {
-      if (event.metaKey && event.key === "Enter") {
-        runQuery();
-      }
-    };
-
-    document.addEventListener('keydown', onRun);
-    return () => {
-      document.removeEventListener('keydown', onRun);
-    };
-  }, [runQuery]);
-
-  const onSave = async () => {
-    runQuery();
-  };
+  useInitializeAnalysis(analysis, runQuery);
 
   if (!id) {
     return <Loading />;
@@ -124,7 +89,7 @@ export const Trend: React.FC = () => {
   return (
     <>
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-auto">
-        <ReportHeader id={id} onSave={onSave} />
+        <ReportHeader id={id} />
         <div className='tw-mt-8 tw-mb-10'>
           <span className='tw-uppercase tw-font-bold -tw-mt-1 tw-select-none'>Definition</span>
           <div id="events-panel" className='tw-flex tw-flex-1 tw-mt-2 tw-p-5 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md'>
@@ -191,6 +156,28 @@ export const Trend: React.FC = () => {
     </>
   );
 };
+
+const validateAnalysis = (analysis: Analysis | undefined): string | undefined => {
+  if (!analysis) {
+    return "Missing analysis!";
+  }
+
+  if (analysis.analysis_type !== AnalysisType.Trend) {
+    return "Wrong analysis type!";
+  }
+
+  if (!analysis.connection) {
+    return "Data source is not set!";
+  }
+
+  if (!analysis.event_set) {
+    return "Event set is not set!";
+  }
+
+  if (!analysis.events || analysis.events.length < 1) {
+    return "Must have 1 or more events!";
+  }
+}
 
 /*
 const hasResults = Boolean(schema && queryResults);

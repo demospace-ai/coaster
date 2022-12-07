@@ -9,18 +9,19 @@ import { PropertySelector } from "src/components/selector/Selector";
 import { ExpandingTextarea } from "src/components/textarea/Textarea";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { sendRequest } from "src/rpc/ajax";
-import { DeleteAnalysis, GetAllAnalyses, Property, UpdateAnalysisRequest } from "src/rpc/api";
+import { Analysis, DeleteAnalysis, GetAllAnalyses, Property, UpdateAnalysisRequest } from "src/rpc/api";
 import { useAnalysis } from "src/rpc/data";
 import { useSWRConfig } from "swr";
 
 type HeaderProps = {
   id: string;
-  onSave: () => Promise<void>;
+  onManualSave?: () => Promise<void>;
+  onQueryChange?: () => Promise<void>;
   showSchemaExplorer?: () => void;
 };
 
 export const ReportHeader: React.FC<HeaderProps> = props => {
-  const { id, onSave, showSchemaExplorer } = props;
+  const { id, onManualSave, showSchemaExplorer } = props;
   const { analysis, updateAnalysis } = useAnalysis(id);
   const [title, setTitle] = useState<string>(analysis?.title || "");
   const [description, setDescription] = useState<string>(analysis?.description || "");
@@ -48,7 +49,9 @@ export const ReportHeader: React.FC<HeaderProps> = props => {
 
   const manualSave = useCallback(async () => {
     setSaving(true);
-    await onSave();
+    if (onManualSave) {
+      await onManualSave();
+    }
     setTimeout(() => {
       setSaveDone(true);
       setSaving(false);
@@ -57,7 +60,7 @@ export const ReportHeader: React.FC<HeaderProps> = props => {
       }, 1000);
     }, 500);
 
-  }, [onSave]);
+  }, [onManualSave]);
 
   const deleteAnalysis = async () => {
     await sendRequest(DeleteAnalysis, { analysisID: Number(id) });
@@ -80,7 +83,7 @@ export const ReportHeader: React.FC<HeaderProps> = props => {
     return () => {
       document.removeEventListener('keydown', onSave);
     };
-  });
+  }, [manualSave]);
 
   return (
     <div>
@@ -141,4 +144,29 @@ export const BreakdownSection: React.FC<{ analysisID: string; }> = ({ analysisID
       <PropertySelector property={analysis?.breakdown} setProperty={updateBreakdown} connectionID={analysis?.connection?.id} eventSetID={analysis?.event_set?.id} />
     </>
   );
+};
+
+// Does some common stuff for analyses:
+// - Run the query on initialization
+// - Run the query whenever a change is made that modifies the result
+// - Add the keyboard shortcut for running the query
+export const useInitializeAnalysis = (analysis: Analysis | undefined, runQuery: () => Promise<void>) => {
+  const eventsString = JSON.stringify(analysis?.events);
+  const breakdownString = JSON.stringify(analysis?.breakdown);
+  useEffect(() => {
+    runQuery(); // run query on startup and whenever query params change
+  }, [runQuery, eventsString, breakdownString]);
+
+  useEffect(() => {
+    const onRun = (event: KeyboardEvent) => {
+      if (event.metaKey && event.key === "Enter") {
+        runQuery();
+      }
+    };
+
+    document.addEventListener('keydown', onRun);
+    return () => {
+      document.removeEventListener('keydown', onRun);
+    };
+  }, [runQuery]);
 };

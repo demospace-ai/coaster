@@ -126,7 +126,7 @@ export const CustomQuery: React.FC = () => {
   return (
     <>
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-scroll" >
-        <ReportHeader id={id} onSave={manualSave} showSchemaExplorer={() => setShowSchemaExplorer(true)} />
+        <ReportHeader id={id} onManualSave={manualSave} showSchemaExplorer={() => setShowSchemaExplorer(true)} />
         <div className='tw-flex tw-flex-1 tw-min-w-0 tw-min-h-0 tw-my-8'>
           <div id='left-panel' className="tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-grow">
             <div id="top-panel" className="tw-h-[30vh] tw-border tw-border-solid tw-border-gray-300 tw-p-2 tw-bg-dark tw-rounded-t-[4px] tw-shrink-0" style={{ height: topPanelHeight + "px" }} ref={topPanelRef}>
