@@ -177,7 +177,7 @@ const EventFilters: React.FC<EventFiltersProp> = props => {
   };
 
   return (
-    <Transition show={props.show}>
+    <Transition as="div" className="tw-mt-1" show={props.show}>
       {filters.map((filter, i) =>
         <EventFilterComponent key={i} index={i} filter={filter} connectionID={connectionID} eventSetID={eventSetID} setEventFilter={(filter: EventFilter) => updateFilter(filter, i)} removeFilter={() => removeFilter(i)} />
       )}
@@ -246,11 +246,11 @@ const EventFilterComponent: React.FC<EventFilterProp> = props => {
 
   return (
     <>
-      <div className='tw-border-t tw-border-solid tw-border-gray-300 tw-p-2 tw-rounded-b-md tw-flex tw-items-center '>
+      <div className='tw-p-2 tw-rounded-b-md tw-flex tw-items-center '>
         {getFilterPrefix(index)}
         <PropertySelector className="tw-inline tw-border-none tw-bg-gray-100 hover:tw-bg-green-100" property={property} setProperty={onFilterPropertyChanged} connectionID={connectionID} eventSetID={eventSetID} />
         <div className='tw-flex tw-shrink-0 tw-relative tw-ml-2 tw-w-8'>
-          <div className='tw-absolute tw-top-2 tw-p-1 hover:tw-bg-gray-200 tw-cursor-pointer tw-rounded-md' onClick={removeFilter}>
+          <div className='tw-absolute tw-top-2 tw-left-2 tw-p-1 hover:tw-bg-gray-200 tw-cursor-pointer tw-rounded-md' onClick={removeFilter}>
             <TrashIcon className='tw-h-6 tw-stroke-[1.7]' />
           </div>
         </div>
@@ -278,7 +278,7 @@ function getFilterPrefix(index: number): React.ReactNode {
   } else {
     return (
       <div className='tw-flex tw-shrink-0 tw-w-24 tw-mr-2'>
-        <RightArrow className='tw-mt-[-4px] tw-ml-2 tw-h-6 tw-stroke-gray-400 tw-stroke-[1.2]' />
+        <RightArrow className='tw-mt-[-4px] tw-ml-1 tw-h-6 tw-stroke-gray-400 tw-stroke-[1.2]' />
         <span className='tw-bg-orange-200 tw-rounded-md tw-ml-auto tw-px-2 tw-py-1 tw-uppercase tw-font-bold tw-text-xs'>where</span>
       </div>
     );
