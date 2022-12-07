@@ -88,7 +88,7 @@ export const Trend: React.FC = () => {
     <>
       <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-auto">
         <ReportHeader id={id} />
-        <div className='tw-mt-8 tw-mb-10'>
+        <div className='tw-mt-8 tw-mb-5'>
           <span className='tw-uppercase tw-font-bold -tw-mt-1 tw-select-none'>Definition</span>
           <div id="events-panel" className='tw-flex tw-flex-1 tw-mt-2 tw-p-5 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md'>
             <div id='left-panel' className="tw-w-1/2 tw-min-w-1/2 tw-flex tw-flex-col tw-select-none tw-pr-5">
@@ -101,7 +101,7 @@ export const Trend: React.FC = () => {
             </div>
           </div>
         </div>
-        <div id="trend-panel" className='tw-flex tw-flex-col tw-flex-1 tw-mb-10'>
+        <div id="trend-panel" className='tw-flex tw-flex-col tw-flex-1 tw-mb-7'>
           <div className='tw-flex tw-flex-col tw-flex-1 tw-mt-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md tw-min-h-[500px] tw-max-h-[500px]'>
             <div className='tw-flex tw-flex-row tw-items-center tw-border-b tw-border-gray-300 tw-p-3'>
               <span className='tw-font-semibold tw-ml-2 tw-mr-4'>Date Range</span>
