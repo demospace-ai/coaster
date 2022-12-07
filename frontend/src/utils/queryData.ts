@@ -151,3 +151,12 @@ export const convertFunnelData = (results: QueryResult): FunnelResult => {
     breakdownValues,
   };
 };
+
+export const formatSchema = (schema: Schema): Schema => {
+  return schema.map(columnSchema => {
+    return {
+      name: columnSchema.name.replaceAll("_", " "),
+      type: columnSchema.type,
+    };
+  });
+};

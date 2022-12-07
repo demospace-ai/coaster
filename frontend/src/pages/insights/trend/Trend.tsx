@@ -8,6 +8,7 @@ import { TrendChart } from 'src/components/insight/Charts';
 import { BreakdownSection, ReportHeader } from 'src/components/insight/InsightComponents';
 import { Loading } from 'src/components/loading/Loading';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
+import { DateRangeSelector } from 'src/components/selector/Selector';
 import { Tooltip } from 'src/components/tooltip/Tooltip';
 import { sendRequest } from 'src/rpc/ajax';
 import { QueryResult, RunTrendQuery } from "src/rpc/api";
@@ -39,23 +40,7 @@ export const Trend: React.FC = () => {
 
   const [queryResults, setQueryResults] = useState<QueryResult | undefined>(undefined);
   const [trendData, setTrendData] = useState<TrendSeries[]>([]);
-
-  useEffect(() => {
-    const onRun = (event: KeyboardEvent) => {
-      if (event.metaKey && event.key === "Enter") {
-        runQuery();
-      }
-    };
-
-    document.addEventListener('keydown', onRun);
-    return () => {
-      document.removeEventListener('keydown', onRun);
-    };
-  });
-
-  const onSave = async () => {
-    // Nothing to actually update here for now
-  };
+  const [dateRange, setDateRange] = useState<string | undefined>(undefined);
 
   const runQuery = useCallback(async () => {
     setQueryLoading(true);
@@ -107,6 +92,27 @@ export const Trend: React.FC = () => {
     setQueryLoading(false);
   }, [id, analysis]);
 
+  useEffect(() => {
+    runQuery(); // run query on startup
+  }, [runQuery]);
+
+  useEffect(() => {
+    const onRun = (event: KeyboardEvent) => {
+      if (event.metaKey && event.key === "Enter") {
+        runQuery();
+      }
+    };
+
+    document.addEventListener('keydown', onRun);
+    return () => {
+      document.removeEventListener('keydown', onRun);
+    };
+  }, [runQuery]);
+
+  const onSave = async () => {
+    runQuery();
+  };
+
   if (!id) {
     return <Loading />;
   }
@@ -117,7 +123,7 @@ export const Trend: React.FC = () => {
 
   return (
     <>
-      <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-scroll">
+      <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-auto">
         <ReportHeader id={id} onSave={onSave} />
         <div className='tw-mt-8 tw-mb-10'>
           <span className='tw-uppercase tw-font-bold -tw-mt-1 tw-select-none'>Definition</span>
@@ -135,10 +141,18 @@ export const Trend: React.FC = () => {
             </div>
           </div>
         </div>
-        <div id="funnel-panel" className='tw-flex tw-flex-col tw-flex-1 tw-mb-10'>
-          <span className='tw-uppercase tw-font-bold tw-select-none'>Results</span>
-          <div className='tw-flex tw-flex-col tw-flex-1 tw-mt-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md tw-p-5 tw-min-h-[364px] tw-max-h-[364px]'>
-            <div className="tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-hidden">
+        <div id="trend-panel" className='tw-flex tw-flex-col tw-flex-1 tw-mb-10'>
+          <div className='tw-flex tw-flex-col tw-flex-1 tw-mt-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md tw-min-h-[400px] tw-max-h-[400px]'>
+            <div className='tw-flex tw-flex-row tw-items-center tw-border-b tw-border-gray-300 tw-p-3'>
+              <span className='tw-font-semibold tw-ml-2 tw-mr-4'>Date Range</span>
+              <div>
+                <DateRangeSelector dateRange={dateRange} setDateRange={setDateRange} className="tw-w-60" />
+              </div>
+              <Tooltip label={"⌘ + Enter"}>
+                <div className="tw-ml-auto tw-w-fit tw-text-blue-600 tw-font-medium tw-cursor-pointer hover:tw-bg-blue-200 tw-px-2 tw-py-0.5 tw-rounded-md" onClick={runQuery}>Refresh</div>
+              </Tooltip>
+            </div>
+            <div className="tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-none tw-p-5 tw-pt-1">
               {errorMessage &&
                 <div className="tw-p-5 tw-text-red-600 tw-font-bold tw-border-gray-300 tw-border-solid tw-border-b">
                   Error: {errorMessage}

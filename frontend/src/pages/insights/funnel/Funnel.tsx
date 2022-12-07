@@ -2,17 +2,17 @@ import { PlusCircleIcon } from '@heroicons/react/24/outline';
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from 'react-router-dom';
 import { rudderanalytics } from 'src/app/rudder';
-import { Button } from 'src/components/button/Button';
 import { Events } from 'src/components/events/Events';
 import { FunnelChart } from 'src/components/insight/Charts';
 import { BreakdownSection, ReportHeader } from 'src/components/insight/InsightComponents';
 import { Loading } from 'src/components/loading/Loading';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
+import { DateRangeSelector } from 'src/components/selector/Selector';
 import { Tooltip } from 'src/components/tooltip/Tooltip';
 import { sendRequest } from 'src/rpc/ajax';
 import { QueryResult, RunFunnelQuery } from "src/rpc/api";
 import { useAnalysis } from "src/rpc/data";
-import { convertFunnelData, FunnelResult } from 'src/utils/queryData';
+import { convertFunnelData, formatSchema, FunnelResult } from 'src/utils/queryData';
 
 type FunnelParams = {
   id: string,
@@ -39,23 +39,7 @@ export const Funnel: React.FC = () => {
 
   const [queryResult, setQueryResult] = useState<QueryResult | undefined>(undefined);
   const [funnelData, setFunnelData] = useState<FunnelResult | undefined>(undefined);
-
-  useEffect(() => {
-    const onRun = (event: KeyboardEvent) => {
-      if (event.metaKey && event.key === "Enter") {
-        runQuery();
-      }
-    };
-
-    document.addEventListener('keydown', onRun);
-    return () => {
-      document.removeEventListener('keydown', onRun);
-    };
-  });
-
-  const onSave = async () => {
-    // Nothing to actually update here for now
-  };
+  const [dateRange, setDateRange] = useState<string | undefined>(undefined);
 
   const runQuery = useCallback(async () => {
     setQueryLoading(true);
@@ -102,6 +86,27 @@ export const Funnel: React.FC = () => {
     setQueryLoading(false);
   }, [id, analysis]);
 
+  useEffect(() => {
+    runQuery(); // run query on startup
+  }, [runQuery]);
+
+  useEffect(() => {
+    const onRun = (event: KeyboardEvent) => {
+      if (event.metaKey && event.key === "Enter") {
+        runQuery();
+      }
+    };
+
+    document.addEventListener('keydown', onRun);
+    return () => {
+      document.removeEventListener('keydown', onRun);
+    };
+  }, [runQuery]);
+
+  const onSave = async () => {
+    runQuery();
+  };
+
   if (!id) {
     // This should never happen
     return <Loading />;
@@ -113,16 +118,13 @@ export const Funnel: React.FC = () => {
 
   return (
     <>
-      <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-scroll">
+      <div className="tw-px-10 tw-pt-5 tw-flex tw-flex-1 tw-flex-col tw-min-w-0 tw-min-h-0 tw-overflow-auto">
         <ReportHeader id={id} onSave={onSave} />
         <div className='tw-mt-8 tw-mb-10'>
           <span className='tw-uppercase tw-font-bold -tw-mt-1 tw-select-none'>Definition</span>
           <div id="steps-panel" className='tw-flex tw-flex-1 tw-mt-2 tw-p-5 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md'>
             <div id='left-panel' className="tw-w-1/2 tw-min-w-1/2 tw-flex tw-flex-col tw-select-none tw-pr-5">
               <Events analysisID={id} connectionID={analysis.connection?.id} eventSetID={analysis.event_set?.id} setErrorMessage={setErrorMessage} />
-              <Tooltip label={"⌘ + Enter"}>
-                <Button className="tw-w-40 tw-h-8 tw-mt-4" onClick={runQuery}>{queryLoading ? "Stop" : "Run"}</Button>
-              </Tooltip>
             </div>
             <div id='right-panel' className="tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1 tw-ml-2 tw-border-l tw-border-solid tw-border-gray-300">
               <div className='tw-ml-5'>
@@ -132,9 +134,17 @@ export const Funnel: React.FC = () => {
           </div>
         </div>
         <div id="funnel-panel" className='tw-flex tw-flex-col tw-flex-1 tw-mb-10'>
-          <span className='tw-uppercase tw-font-bold tw-select-none'>Results</span>
-          <div className='tw-flex tw-flex-col tw-flex-1 tw-mt-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md tw-p-5 tw-min-h-[364px] tw-max-h-[364px]'>
-            <div className="tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-none">
+          <div className='tw-flex tw-flex-col tw-flex-1 tw-mt-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md tw-min-h-[400px] tw-max-h-[400px]'>
+            <div className='tw-flex tw-flex-row tw-items-center tw-border-b tw-border-gray-300 tw-p-3'>
+              <span className='tw-font-semibold tw-ml-2 tw-mr-4'>Date Range</span>
+              <div>
+                <DateRangeSelector dateRange={dateRange} setDateRange={setDateRange} className="tw-w-60" />
+              </div>
+              <Tooltip label={"⌘ + Enter"}>
+                <div className="tw-ml-auto tw-w-fit tw-text-blue-600 tw-font-medium tw-cursor-pointer hover:tw-bg-blue-200 tw-px-2 tw-py-0.5 tw-rounded-md" onClick={runQuery}>Refresh</div>
+              </Tooltip>
+            </div>
+            <div className="tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-none tw-p-5 tw-pt-1">
               {errorMessage &&
                 <div className="tw-p-5 tw-text-red-600 tw-font-bold tw-border-gray-300 tw-border-solid tw-border-b">
                   Error: {errorMessage}
@@ -161,10 +171,10 @@ export const Funnel: React.FC = () => {
         </div>
         {!queryLoading && queryResult &&
           <div id="breakdown-panel" className='tw-flex tw-flex-col tw-flex-1 tw-mb-20'>
-            <span className='tw-uppercase tw-font-bold tw-select-none'>Breakdown</span>
+            <span className='tw-uppercase tw-font-bold tw-select-none'>Detailed Results</span>
             <div className='tw-flex tw-flex-col tw-flex-1 tw-mt-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md tw-overflow-hidden'>
               <div className="tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-max-h-64 tw-overflow-hidden">
-                <MemoizedResultsTable schema={queryResult.schema} results={queryResult.data} />
+                <MemoizedResultsTable schema={formatSchema(queryResult.schema)} results={queryResult.data} />
               </div>
             </div>
           </div>

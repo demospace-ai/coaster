@@ -270,3 +270,24 @@ export const AnalysisSelector: React.FC<AnalysisSelectorProps> = props => {
     validated={props.validated}
   />;
 };
+
+type DateRangeSelectorProps = {
+  dateRange: string | undefined;
+  setDateRange: (dateRange: string) => void;
+  className?: string;
+  placeholder?: string;
+  validated?: boolean;
+};
+
+export const DateRangeSelector: React.FC<DateRangeSelectorProps> = props => {
+  return <ValidatedDropdownInput
+    className={props.className}
+    selected={props.dateRange}
+    setSelected={props.setDateRange}
+    options={["Today", "Last 7 days", "Last 14 days", "Last 30 days", "Last 60 days", "Last 90 days", "Last 365 days", "Year to date", "All time"]}
+    loading={false}
+    noOptionsString=""
+    placeholder={props.placeholder ? props.placeholder : "Choose date range"}
+    validated={props.validated}
+  />;
+};
