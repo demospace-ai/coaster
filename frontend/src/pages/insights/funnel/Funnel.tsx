@@ -4,11 +4,10 @@ import { useParams } from 'react-router-dom';
 import { rudderanalytics } from 'src/app/rudder';
 import { Events } from 'src/components/events/Events';
 import { FunnelChart } from 'src/components/insight/Charts';
-import { BreakdownSection, ReportHeader, useInitializeAnalysis } from 'src/components/insight/InsightComponents';
+import { BreakdownSection, RefreshButton, ReportHeader, useInitializeAnalysis } from 'src/components/insight/InsightComponents';
 import { Loading } from 'src/components/loading/Loading';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { DateRangeSelector } from 'src/components/selector/Selector';
-import { Tooltip } from 'src/components/tooltip/Tooltip';
 import { sendRequest } from 'src/rpc/ajax';
 import { Analysis, AnalysisType, QueryResult, RunFunnelQuery } from "src/rpc/api";
 import { useAnalysis } from "src/rpc/data";
@@ -106,9 +105,7 @@ export const Funnel: React.FC = () => {
               <div>
                 <DateRangeSelector dateRange={dateRange} setDateRange={setDateRange} className="tw-w-60" />
               </div>
-              <Tooltip label={"⌘ + Enter"}>
-                <div className="tw-ml-auto tw-w-fit tw-text-blue-600 tw-font-medium tw-cursor-pointer hover:tw-bg-blue-200 tw-px-2 tw-py-0.5 tw-rounded-md" onClick={runQuery}>Refresh</div>
-              </Tooltip>
+              <RefreshButton queryLoading={queryLoading} runQuery={runQuery} />
             </div>
             <div className="tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-none tw-p-5 tw-pt-1">
               {errorMessage &&

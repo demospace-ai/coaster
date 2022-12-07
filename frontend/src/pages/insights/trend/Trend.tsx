@@ -2,14 +2,12 @@ import { PlusCircleIcon } from '@heroicons/react/24/outline';
 import { useCallback, useState } from "react";
 import { useParams } from 'react-router-dom';
 import { rudderanalytics } from 'src/app/rudder';
-import { Button } from 'src/components/button/Button';
 import { Events } from 'src/components/events/Events';
 import { TrendChart } from 'src/components/insight/Charts';
-import { BreakdownSection, ReportHeader, useInitializeAnalysis } from 'src/components/insight/InsightComponents';
+import { BreakdownSection, RefreshButton, ReportHeader, useInitializeAnalysis } from 'src/components/insight/InsightComponents';
 import { Loading } from 'src/components/loading/Loading';
 import { MemoizedResultsTable } from 'src/components/queryResults/QueryResults';
 import { DateRangeSelector } from 'src/components/selector/Selector';
-import { Tooltip } from 'src/components/tooltip/Tooltip';
 import { sendRequest } from 'src/rpc/ajax';
 import { Analysis, AnalysisType, QueryResult, RunTrendQuery } from "src/rpc/api";
 import { useAnalysis } from "src/rpc/data";
@@ -95,9 +93,6 @@ export const Trend: React.FC = () => {
           <div id="events-panel" className='tw-flex tw-flex-1 tw-mt-2 tw-p-5 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md'>
             <div id='left-panel' className="tw-w-1/2 tw-min-w-1/2 tw-flex tw-flex-col tw-select-none tw-pr-5">
               <Events analysisID={id} connectionID={analysis.connection?.id} eventSetID={analysis.event_set?.id} setErrorMessage={setErrorMessage} />
-              <Tooltip label={"⌘ + Enter"}>
-                <Button className="tw-w-40 tw-h-8 tw-mt-4" onClick={runQuery}>{queryLoading ? "Stop" : "Run"}</Button>
-              </Tooltip>
             </div>
             <div id='right-panel' className="tw-min-w-0 tw-min-h-0 tw-flex tw-flex-col tw-flex-1 tw-ml-2 tw-border-l tw-border-solid tw-border-gray-300">
               <div className='tw-ml-5'>
@@ -107,17 +102,15 @@ export const Trend: React.FC = () => {
           </div>
         </div>
         <div id="trend-panel" className='tw-flex tw-flex-col tw-flex-1 tw-mb-10'>
-          <div className='tw-flex tw-flex-col tw-flex-1 tw-mt-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md tw-min-h-[400px] tw-max-h-[400px]'>
+          <div className='tw-flex tw-flex-col tw-flex-1 tw-mt-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md tw-min-h-[500px] tw-max-h-[500px]'>
             <div className='tw-flex tw-flex-row tw-items-center tw-border-b tw-border-gray-300 tw-p-3'>
               <span className='tw-font-semibold tw-ml-2 tw-mr-4'>Date Range</span>
               <div>
                 <DateRangeSelector dateRange={dateRange} setDateRange={setDateRange} className="tw-w-60" />
               </div>
-              <Tooltip label={"⌘ + Enter"}>
-                <div className="tw-ml-auto tw-w-fit tw-text-blue-600 tw-font-medium tw-cursor-pointer hover:tw-bg-blue-200 tw-px-2 tw-py-0.5 tw-rounded-md" onClick={runQuery}>Refresh</div>
-              </Tooltip>
+              <RefreshButton queryLoading={queryLoading} runQuery={runQuery} />
             </div>
-            <div className="tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-none tw-p-5 tw-pt-1">
+            <div className="tw-flex tw-flex-col tw-flex-auto tw-min-h-0 tw-overflow-none tw-p-5 tw-pl-1">
               {errorMessage &&
                 <div className="tw-p-5 tw-text-red-600 tw-font-bold tw-border-gray-300 tw-border-solid tw-border-b">
                   Error: {errorMessage}

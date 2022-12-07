@@ -1,4 +1,5 @@
 import { CheckIcon, LinkIcon } from "@heroicons/react/24/outline";
+import classNames from "classnames";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MoreOptionsButton } from "src/components/button/Button";
@@ -169,4 +170,12 @@ export const useInitializeAnalysis = (analysis: Analysis | undefined, runQuery: 
       document.removeEventListener('keydown', onRun);
     };
   }, [runQuery]);
+};
+
+export const RefreshButton: React.FC<{ queryLoading: boolean, runQuery: () => Promise<void>; }> = ({ queryLoading, runQuery }) => {
+  return (
+    <Tooltip label={"⌘ + Enter"} disabled={queryLoading}>
+      <div className={classNames("tw-select-none tw-ml-auto tw-w-fit tw-text-gray-400 tw-cursor-not-allowed tw-font-medium tw-px-2 tw-py-0.5 tw-rounded-md", !queryLoading && "tw-text-blue-600 !tw-cursor-pointer hover:tw-bg-blue-200")} onClick={() => { if (!queryLoading) runQuery(); }}>Refresh</div>
+    </Tooltip>
+  );
 };
