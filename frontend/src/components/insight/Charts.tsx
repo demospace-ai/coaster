@@ -70,7 +70,7 @@ export const TrendChart: React.FC<TrendChartProps> = ({ trendData }) => {
         <CartesianGrid strokeDasharray="3 3" vertical={false} />
         <XAxis dataKey="date" height={30} allowDuplicatedCategory={false} minTickGap={30} dy={5} />
         <YAxis dataKey="count" tick={{ fontSize: 12, fontWeight: 500 }} tickLine={{ stroke: "lightgray" }} axisLine={{ stroke: "lightgray" }} />
-        <RechartTooltip wrapperClassName='tw-rounded' labelClassName='tw-pb-1 tw-font-bold' />
+        <RechartTooltip wrapperClassName='tw-rounded tw-overflow-auto' labelClassName='tw-pb-1 tw-font-bold' itemSorter={(item) => item.value as number * -1} />
         {trendData.map((s) => (
           <Line dataKey="count" data={s.data} name={s.name} key={s.name} connectNulls={false} stroke="#639f63" />
         ))}
