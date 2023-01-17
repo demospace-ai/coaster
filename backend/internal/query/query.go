@@ -56,14 +56,13 @@ func (qs QueryServiceImpl) runBigQueryQuery(dataConnection *models.DataConnectio
 		return nil, err
 	}
 
-	warehouse := fabra.Warehouse{
-		Type: fabra.WarehouseType(dataConnection.ConnectionType),
-		Config: map[string]interface{}{
+	client, err := fabra.NewAPIClient(
+		fabra.WarehouseType(dataConnection.ConnectionType),
+		map[string]interface{}{
 			fabra.GCPProjectID:   &bigQueryCredentials.ProjectID,
 			fabra.GCPCredentials: bigQueryCredentialsString,
 		},
-	}
-	client, err := fabra.NewAPIClient(warehouse)
+	)
 	if err != nil {
 		return nil, err
 	}

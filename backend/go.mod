@@ -6,7 +6,7 @@ require (
 	cloud.google.com/go/bigquery v1.45.0
 	cloud.google.com/go/kms v1.6.0
 	cloud.google.com/go/secretmanager v1.9.0
-	github.com/fabra-io/go-sdk v0.0.0-20230117062326-7bed0776b218
+	github.com/fabra-io/go-sdk v0.0.0-20230117063254-d84769154f5e
 	github.com/go-playground/validator/v10 v10.11.0
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/gorilla/mux v1.8.0

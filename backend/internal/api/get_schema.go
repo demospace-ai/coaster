@@ -87,25 +87,7 @@ func (s ApiService) getSchemaForCustomJoin(dataConnection models.DataConnection,
 }
 
 func (s ApiService) getBigQuerySchemaForCustom(dataConnection models.DataConnection, customJoin string) (fabra.Schema, error) {
-	bigQueryCredentialsString, err := s.cryptoService.DecryptDataConnectionCredentials(dataConnection.Credentials.String)
-	if err != nil {
-		return nil, err
-	}
-
-	var bigQueryCredentials models.BigQueryCredentials
-	err = json.Unmarshal([]byte(*bigQueryCredentialsString), &bigQueryCredentials)
-	if err != nil {
-		return nil, err
-	}
-
-	warehouse := fabra.Warehouse{
-		Type: fabra.WarehouseType(dataConnection.ConnectionType),
-		Config: map[string]interface{}{
-			fabra.GCPProjectID:   &bigQueryCredentials.ProjectID,
-			fabra.GCPCredentials: bigQueryCredentialsString,
-		},
-	}
-	client, err := fabra.NewAPIClient(warehouse)
+	client, err := s.NewBigQueryClient(dataConnection)
 	if err != nil {
 		return nil, err
 	}
@@ -119,25 +101,7 @@ func (s ApiService) getBigQuerySchemaForCustom(dataConnection models.DataConnect
 }
 
 func (s ApiService) getBigQuerySchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (fabra.Schema, error) {
-	bigQueryCredentialsString, err := s.cryptoService.DecryptDataConnectionCredentials(dataConnection.Credentials.String)
-	if err != nil {
-		return nil, err
-	}
-
-	var bigQueryCredentials models.BigQueryCredentials
-	err = json.Unmarshal([]byte(*bigQueryCredentialsString), &bigQueryCredentials)
-	if err != nil {
-		return nil, err
-	}
-
-	warehouse := fabra.Warehouse{
-		Type: fabra.WarehouseType(dataConnection.ConnectionType),
-		Config: map[string]interface{}{
-			fabra.GCPProjectID:   &bigQueryCredentials.ProjectID,
-			fabra.GCPCredentials: bigQueryCredentialsString,
-		},
-	}
-	client, err := fabra.NewAPIClient(warehouse)
+	client, err := s.NewBigQueryClient(dataConnection)
 	if err != nil {
 		return nil, err
 	}
