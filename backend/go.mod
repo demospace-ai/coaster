@@ -6,6 +6,7 @@ require (
 	cloud.google.com/go/bigquery v1.45.0
 	cloud.google.com/go/kms v1.6.0
 	cloud.google.com/go/secretmanager v1.9.0
+	github.com/fabra-io/go-sdk v0.0.0-20230117055412-d3da14f0425d
 	github.com/go-playground/validator/v10 v10.11.0
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/gorilla/mux v1.8.0
@@ -30,7 +31,6 @@ require (
 	github.com/docker/docker v20.10.18+incompatible // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
-	github.com/fabra-io/go-sdk v0.0.0-20230117021530-317577112cb6 // indirect
 	github.com/facebookgo/ensure v0.0.0-20200202191622-63f1cf65ac4c // indirect
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
 	github.com/facebookgo/subset v0.0.0-20200203212716-c811ad88dec4 // indirect

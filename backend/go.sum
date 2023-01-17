@@ -66,6 +66,8 @@ github.com/envoyproxy/go-control-plane v0.9.4/go.mod h1:6rpuAdCZL397s3pYoYcLgu1m
 github.com/envoyproxy/protoc-gen-validate v0.1.0/go.mod h1:iSmxcyjqTsJpI2R4NaDN7+kN2VEUnK/pcBlmesArF7c=
 github.com/fabra-io/go-sdk v0.0.0-20230117021530-317577112cb6 h1:s0Mri1cWh1s6ozgk7Z2uFoKQCoxUAJyha9tC0foCWEM=
 github.com/fabra-io/go-sdk v0.0.0-20230117021530-317577112cb6/go.mod h1:vWW+oXSE01ZGuefHtLk5urb5rEW1iuhLce+QAWAbDAE=
+github.com/fabra-io/go-sdk v0.0.0-20230117055412-d3da14f0425d h1:CDFzLaPcEg5vlm5YrpmVMOAHjzWaByAdbuwdagVcY9I=
+github.com/fabra-io/go-sdk v0.0.0-20230117055412-d3da14f0425d/go.mod h1:vWW+oXSE01ZGuefHtLk5urb5rEW1iuhLce+QAWAbDAE=
 github.com/facebookgo/ensure v0.0.0-20200202191622-63f1cf65ac4c h1:8ISkoahWXwZR41ois5lSJBSVw4D0OV19Ht/JSTzvSv0=
 github.com/facebookgo/ensure v0.0.0-20200202191622-63f1cf65ac4c/go.mod h1:Yg+htXGokKKdzcwhuNDwVvN+uBxDGXJ7G/VN1d8fa64=
 github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 h1:JWuenKqqX8nojtoVVWjGfOF9635RETekkoH6Cc9SX0A=
