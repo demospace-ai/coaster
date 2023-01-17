@@ -1,19 +1,13 @@
 package api
 
 import (
-	"context"
 	"encoding/json"
 	"fabra/internal/auth"
 	"fabra/internal/dataconnections"
 	"fabra/internal/errors"
-	"fabra/internal/models"
 	"fmt"
 	"net/http"
 	"strconv"
-
-	"cloud.google.com/go/bigquery"
-	"google.golang.org/api/iterator"
-	"google.golang.org/api/option"
 )
 
 type GetDatasetsRequest struct {
@@ -46,7 +40,12 @@ func (s ApiService) GetDatasets(auth auth.Authentication, w http.ResponseWriter,
 		return err
 	}
 
-	datasets, err := s.getDatasets(*dataConnection)
+	client, err := s.NewBigQueryClient(*dataConnection)
+	if err != nil {
+		return err
+	}
+
+	datasets, err := client.GetDatasets()
 	if err != nil {
 		return err
 	}
@@ -54,59 +53,4 @@ func (s ApiService) GetDatasets(auth auth.Authentication, w http.ResponseWriter,
 	return json.NewEncoder(w).Encode(GetDatasetsResponse{
 		Datasets: datasets,
 	})
-}
-
-func (s ApiService) getDatasets(dataConnection models.DataConnection) ([]string, error) {
-	switch dataConnection.ConnectionType {
-	case models.DataConnectionTypeBigQuery:
-		return s.getBigQueryDatasets(dataConnection)
-	case models.DataConnectionTypeSnowflake:
-		return s.getSnowflakeDatasets(dataConnection)
-	default:
-		return nil, errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", dataConnection.ConnectionType))
-	}
-}
-
-func (s ApiService) getBigQueryDatasets(dataConnection models.DataConnection) ([]string, error) {
-	bigQueryCredentialsString, err := s.cryptoService.DecryptDataConnectionCredentials(dataConnection.Credentials.String)
-	if err != nil {
-		return nil, err
-	}
-
-	var bigQueryCredentials models.BigQueryCredentials
-	err = json.Unmarshal([]byte(*bigQueryCredentialsString), &bigQueryCredentials)
-	if err != nil {
-		return nil, err
-	}
-
-	credentialOption := option.WithCredentialsJSON([]byte(*bigQueryCredentialsString))
-
-	ctx := context.Background()
-	client, err := bigquery.NewClient(ctx, bigQueryCredentials.ProjectID, credentialOption)
-	if err != nil {
-		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
-	}
-
-	defer client.Close()
-
-	ts := client.Datasets(ctx)
-	var results []string
-	for {
-		dataset, err := ts.Next()
-		if err == iterator.Done {
-			break
-		}
-		if err != nil {
-			return nil, err
-		}
-
-		results = append(results, dataset.DatasetID)
-	}
-
-	return results, nil
-}
-
-func (s ApiService) getSnowflakeDatasets(dataConnection models.DataConnection) ([]string, error) {
-	// TODO: implement
-	return nil, errors.NewBadRequest("snowflake not supported")
 }
