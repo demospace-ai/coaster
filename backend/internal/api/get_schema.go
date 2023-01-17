@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"fabra/internal/auth"
 	"fabra/internal/dataconnections"
@@ -87,12 +88,13 @@ func (s ApiService) getSchemaForCustomJoin(dataConnection models.DataConnection,
 }
 
 func (s ApiService) getBigQuerySchemaForCustom(dataConnection models.DataConnection, customJoin string) (fabra.Schema, error) {
+	ctx := context.Background()
 	client, err := s.NewBigQueryClient(dataConnection)
 	if err != nil {
 		return nil, err
 	}
 
-	result, err := client.RunQuery(customJoin)
+	result, err := client.RunQuery(ctx, customJoin)
 	if err != nil {
 		return nil, err
 	}
@@ -101,12 +103,13 @@ func (s ApiService) getBigQuerySchemaForCustom(dataConnection models.DataConnect
 }
 
 func (s ApiService) getBigQuerySchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (fabra.Schema, error) {
+	ctx := context.Background()
 	client, err := s.NewBigQueryClient(dataConnection)
 	if err != nil {
 		return nil, err
 	}
 
-	return client.GetTableSchema(datasetID, tableName)
+	return client.GetTableSchema(ctx, datasetID, tableName)
 }
 
 func (s ApiService) getSnowflakeSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (fabra.Schema, error) {

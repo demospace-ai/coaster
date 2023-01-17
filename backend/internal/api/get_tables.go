@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"fabra/internal/auth"
 	"fabra/internal/dataconnections"
@@ -15,7 +16,7 @@ type GetTablesResponse struct {
 }
 
 func (s ApiService) GetTables(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
-
+	ctx := context.Background()
 	if auth.Organization == nil {
 		return errors.NewBadRequest("must setup organization first")
 	}
@@ -46,7 +47,7 @@ func (s ApiService) GetTables(auth auth.Authentication, w http.ResponseWriter, r
 		return err
 	}
 
-	tables, err := client.GetTables(datasetID)
+	tables, err := client.GetTables(ctx, datasetID)
 	if err != nil {
 		return err
 	}

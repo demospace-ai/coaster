@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"fabra/internal/auth"
 	"fabra/internal/dataconnections"
@@ -19,7 +20,7 @@ type GetDatasetsResponse struct {
 }
 
 func (s ApiService) GetDatasets(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
-
+	ctx := context.Background()
 	if auth.Organization == nil {
 		return errors.NewBadRequest("must setup organization first")
 	}
@@ -45,7 +46,7 @@ func (s ApiService) GetDatasets(auth auth.Authentication, w http.ResponseWriter,
 		return err
 	}
 
-	datasets, err := client.GetDatasets()
+	datasets, err := client.GetDatasets(ctx)
 	if err != nil {
 		return err
 	}

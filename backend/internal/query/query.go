@@ -1,6 +1,7 @@
 package query
 
 import (
+	"context"
 	"encoding/json"
 	"fabra/internal/crypto"
 	"fabra/internal/errors"
@@ -45,6 +46,7 @@ func (qs QueryServiceImpl) runQuery(dataConnection *models.DataConnection, query
 }
 
 func (qs QueryServiceImpl) runBigQueryQuery(dataConnection *models.DataConnection, queryString string) (*fabra.QueryResult, error) {
+	ctx := context.Background()
 	bigQueryCredentialsString, err := qs.cryptoService.DecryptDataConnectionCredentials(dataConnection.Credentials.String)
 	if err != nil {
 		return nil, err
@@ -67,7 +69,7 @@ func (qs QueryServiceImpl) runBigQueryQuery(dataConnection *models.DataConnectio
 		return nil, err
 	}
 
-	return client.RunQuery(queryString)
+	return client.RunQuery(ctx, queryString)
 }
 
 func (qs QueryServiceImpl) runSnowflakeQuery(dataConnection *models.DataConnection, queryString string) (*fabra.QueryResult, error) {

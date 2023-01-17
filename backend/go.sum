@@ -76,6 +76,8 @@ github.com/fabra-io/go-sdk v0.0.0-20230117063254-d84769154f5e h1:dG8elOO42kqgzv0
 github.com/fabra-io/go-sdk v0.0.0-20230117063254-d84769154f5e/go.mod h1:0csGMw2yw0oPWNuQxGDR+skOmHMuU7/DgvqAHqE9I6U=
 github.com/fabra-io/go-sdk v0.1.0 h1:EWxkAGW20UuXHuPKuqR4nlt0WUuC1AdKd7v4TJPwZzQ=
 github.com/fabra-io/go-sdk v0.1.0/go.mod h1:0csGMw2yw0oPWNuQxGDR+skOmHMuU7/DgvqAHqE9I6U=
+github.com/fabra-io/go-sdk v0.1.1 h1:TWnrfnIh8izJzq1k/w6fc8KQoqumMCnLJ0LXzHLPOiE=
+github.com/fabra-io/go-sdk v0.1.1/go.mod h1:0csGMw2yw0oPWNuQxGDR+skOmHMuU7/DgvqAHqE9I6U=
 github.com/facebookgo/ensure v0.0.0-20200202191622-63f1cf65ac4c h1:8ISkoahWXwZR41ois5lSJBSVw4D0OV19Ht/JSTzvSv0=
 github.com/facebookgo/ensure v0.0.0-20200202191622-63f1cf65ac4c/go.mod h1:Yg+htXGokKKdzcwhuNDwVvN+uBxDGXJ7G/VN1d8fa64=
 github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 h1:JWuenKqqX8nojtoVVWjGfOF9635RETekkoH6Cc9SX0A=
