@@ -1,6 +1,8 @@
 package views
 
+import "github.com/fabra-io/go-sdk/fabra"
+
 type PropertyGroup struct {
-	Name       string         `json:"name"`
-	Properties []ColumnSchema `json:"properties"`
+	Name       string               `json:"name"`
+	Properties []fabra.ColumnSchema `json:"properties"`
 }

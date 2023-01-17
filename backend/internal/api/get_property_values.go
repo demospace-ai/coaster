@@ -5,14 +5,15 @@ import (
 	"fabra/internal/auth"
 	"fabra/internal/dataconnections"
 	"fabra/internal/eventsets"
-	"fabra/internal/views"
 	"fmt"
 	"net/http"
 	"strconv"
+
+	"github.com/fabra-io/go-sdk/fabra"
 )
 
 type GetPropertyValuesResponse struct {
-	PropertyValues []views.Value `json:"property_values"`
+	PropertyValues []fabra.Value `json:"property_values"`
 }
 
 func (s ApiService) GetPropertyValues(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {

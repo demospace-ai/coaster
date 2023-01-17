@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"strings"
 	"text/template"
+
+	"github.com/fabra-io/go-sdk/fabra"
 )
 
 var funnelQueryTemplate *template.Template
@@ -67,7 +69,7 @@ func init() {
 	`))
 }
 
-func (qs QueryServiceImpl) RunFunnelQuery(analysis *models.Analysis) (*views.QueryResult, error) {
+func (qs QueryServiceImpl) RunFunnelQuery(analysis *models.Analysis) (*fabra.QueryResult, error) {
 	if !analysis.ConnectionID.Valid {
 		return nil, errors.NewBadRequest("no data connection configured")
 	}

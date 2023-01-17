@@ -4,10 +4,11 @@ import (
 	"fabra/internal/dataconnections"
 	"fabra/internal/errors"
 	"fabra/internal/models"
-	"fabra/internal/views"
+
+	"github.com/fabra-io/go-sdk/fabra"
 )
 
-func (qs QueryServiceImpl) RunCustomQuery(analysis *models.Analysis) (*views.QueryResult, error) {
+func (qs QueryServiceImpl) RunCustomQuery(analysis *models.Analysis) (*fabra.QueryResult, error) {
 	if !analysis.ConnectionID.Valid {
 		return nil, errors.NewBadRequest("no data connection configured")
 	}

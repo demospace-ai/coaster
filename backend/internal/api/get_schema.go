@@ -1,25 +1,20 @@
 package api
 
 import (
-	"context"
 	"encoding/json"
 	"fabra/internal/auth"
 	"fabra/internal/dataconnections"
 	"fabra/internal/errors"
 	"fabra/internal/models"
-	"fabra/internal/query"
-	"fabra/internal/views"
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 
-	"cloud.google.com/go/bigquery"
-	"google.golang.org/api/option"
+	"github.com/fabra-io/go-sdk/fabra"
 )
 
 type GetSchemaResponse struct {
-	Schema views.Schema `json:"schema"`
+	Schema fabra.Schema `json:"schema"`
 }
 
 func (s ApiService) GetSchema(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
@@ -51,7 +46,7 @@ func (s ApiService) GetSchema(auth auth.Authentication, w http.ResponseWriter, r
 		return err
 	}
 
-	var schema views.Schema
+	var schema fabra.Schema
 	if len(customJoin) > 0 {
 		schema, err = s.getSchemaForCustomJoin(*dataConnection, customJoin)
 		if err != nil {
@@ -69,7 +64,7 @@ func (s ApiService) GetSchema(auth auth.Authentication, w http.ResponseWriter, r
 	})
 }
 
-func (s ApiService) getSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (views.Schema, error) {
+func (s ApiService) getSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (fabra.Schema, error) {
 	switch dataConnection.ConnectionType {
 	case models.DataConnectionTypeBigQuery:
 		return s.getBigQuerySchemaForTable(dataConnection, datasetID, tableName)
@@ -80,7 +75,7 @@ func (s ApiService) getSchemaForTable(dataConnection models.DataConnection, data
 	}
 }
 
-func (s ApiService) getSchemaForCustomJoin(dataConnection models.DataConnection, customJoin string) (views.Schema, error) {
+func (s ApiService) getSchemaForCustomJoin(dataConnection models.DataConnection, customJoin string) (fabra.Schema, error) {
 	switch dataConnection.ConnectionType {
 	case models.DataConnectionTypeBigQuery:
 		return s.getBigQuerySchemaForCustom(dataConnection, customJoin)
@@ -91,7 +86,7 @@ func (s ApiService) getSchemaForCustomJoin(dataConnection models.DataConnection,
 	}
 }
 
-func (s ApiService) getBigQuerySchemaForCustom(dataConnection models.DataConnection, customJoin string) (views.Schema, error) {
+func (s ApiService) getBigQuerySchemaForCustom(dataConnection models.DataConnection, customJoin string) (fabra.Schema, error) {
 	bigQueryCredentialsString, err := s.cryptoService.DecryptDataConnectionCredentials(dataConnection.Credentials.String)
 	if err != nil {
 		return nil, err
@@ -103,57 +98,59 @@ func (s ApiService) getBigQuerySchemaForCustom(dataConnection models.DataConnect
 		return nil, err
 	}
 
-	credentialOption := option.WithCredentialsJSON([]byte(*bigQueryCredentialsString))
-
-	ctx := context.Background()
-	client, err := bigquery.NewClient(ctx, bigQueryCredentials.ProjectID, credentialOption)
-	if err != nil {
-		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
+	warehouse := fabra.Warehouse{
+		Type: fabra.WarehouseType(dataConnection.ConnectionType),
+		Config: map[string]interface{}{
+			fabra.GCPProjectID:   &bigQueryCredentials.ProjectID,
+			fabra.GCPCredentials: bigQueryCredentialsString,
+		},
 	}
-
-	defer client.Close()
-
-	// Make sure there is no trailing semicolon, and limit to 1 since we only care about the schema
-	queryString := customJoin
-	queryString = strings.TrimRight(queryString, ";")
-	queryString = queryString + " LIMIT 1"
-
-	q := client.Query(queryString)
-	// Location must match that of the dataset(s) referenced in the query.
-	q.Location = "US"
-	// Run the query and print results when the query job is completed.
-	job, err := q.Run(ctx)
-	if err != nil {
-		return nil, err
-	}
-	status, err := job.Wait(ctx)
-	if err != nil {
-		return nil, query.NewError(err)
-	}
-	if err := status.Err(); err != nil {
-		return nil, query.NewError(err)
-	}
-
-	it, err := job.Read(ctx)
+	client, err := fabra.NewAPIClient(warehouse)
 	if err != nil {
 		return nil, err
 	}
 
-	schema := query.ConvertBigQuerySchema(it.Schema)
+	result, err := client.RunQuery(customJoin)
+	if err != nil {
+		return nil, err
+	}
 
-	return schema, nil
+	return result.Schema, nil
 }
 
-func (s ApiService) getBigQuerySchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (views.Schema, error) {
-	return s.queryService.GetTableSchema(&dataConnection, datasetID, tableName)
+func (s ApiService) getBigQuerySchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (fabra.Schema, error) {
+	bigQueryCredentialsString, err := s.cryptoService.DecryptDataConnectionCredentials(dataConnection.Credentials.String)
+	if err != nil {
+		return nil, err
+	}
+
+	var bigQueryCredentials models.BigQueryCredentials
+	err = json.Unmarshal([]byte(*bigQueryCredentialsString), &bigQueryCredentials)
+	if err != nil {
+		return nil, err
+	}
+
+	warehouse := fabra.Warehouse{
+		Type: fabra.WarehouseType(dataConnection.ConnectionType),
+		Config: map[string]interface{}{
+			fabra.GCPProjectID:   &bigQueryCredentials.ProjectID,
+			fabra.GCPCredentials: bigQueryCredentialsString,
+		},
+	}
+	client, err := fabra.NewAPIClient(warehouse)
+	if err != nil {
+		return nil, err
+	}
+
+	return client.GetTableSchema(datasetID, tableName)
 }
 
-func (s ApiService) getSnowflakeSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (views.Schema, error) {
+func (s ApiService) getSnowflakeSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (fabra.Schema, error) {
 	// TODO: implement
 	return nil, errors.NewBadRequest("snowflake not supported")
 }
 
-func (s ApiService) getSnowflakeSchemaForCustom(dataConnection models.DataConnection, customJoin string) (views.Schema, error) {
+func (s ApiService) getSnowflakeSchemaForCustom(dataConnection models.DataConnection, customJoin string) (fabra.Schema, error) {
 	// TODO: implement
 	return nil, errors.NewBadRequest("snowflake not supported")
 }

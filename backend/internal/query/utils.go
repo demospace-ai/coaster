@@ -3,10 +3,7 @@ package query
 import (
 	"bytes"
 	"fabra/internal/models"
-	"fabra/internal/views"
 	"text/template"
-
-	"cloud.google.com/go/bigquery"
 )
 
 type Error struct {
@@ -34,19 +31,4 @@ func executeTemplate(tmpl *template.Template, args map[string]interface{}) (*str
 
 	result := resultBytes.String()
 	return &result, nil
-}
-
-func ConvertBigQuerySchema(bigQuerySchema bigquery.Schema) views.Schema {
-	schema := views.Schema{}
-
-	for _, bigQuerySchemaField := range bigQuerySchema {
-		columnSchema := views.ColumnSchema{
-			Name: bigQuerySchemaField.Name,
-			Type: string(bigQuerySchemaField.Type),
-		}
-
-		schema = append(schema, columnSchema)
-	}
-
-	return schema
 }

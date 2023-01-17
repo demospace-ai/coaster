@@ -6,11 +6,11 @@ import (
 	"fabra/internal/auth"
 	"fabra/internal/models"
 	"fabra/internal/test"
-	"fabra/internal/views"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 
+	"github.com/fabra-io/go-sdk/fabra"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -71,7 +71,7 @@ var _ = Describe("RunQueryHandler", func() {
 		response := rr.Result()
 		Expect(response.StatusCode).To(Equal(http.StatusOK))
 
-		var result views.QueryResult
+		var result fabra.QueryResult
 		err = json.NewDecoder(response.Body).Decode(&result)
 		Expect(err).To(BeNil())
 

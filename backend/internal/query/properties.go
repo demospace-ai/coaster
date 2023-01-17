@@ -4,6 +4,8 @@ import (
 	"fabra/internal/errors"
 	"fabra/internal/models"
 	"fabra/internal/views"
+
+	"github.com/fabra-io/go-sdk/fabra"
 )
 
 func (qs QueryServiceImpl) GetProperties(dataConnection *models.DataConnection, eventSet *models.EventSet) ([]views.PropertyGroup, error) {
@@ -38,7 +40,7 @@ func createPropertiesQuery(eventSet *models.EventSet) (string, error) {
 	return "", errors.Newf("bad event set: %v", eventSet)
 }
 
-func (qs QueryServiceImpl) GetPropertyValues(dataConnection *models.DataConnection, eventSet *models.EventSet, propertyName string) ([]views.Value, error) {
+func (qs QueryServiceImpl) GetPropertyValues(dataConnection *models.DataConnection, eventSet *models.EventSet, propertyName string) ([]fabra.Value, error) {
 	queryString, err := createGetPropertyValuesQuery(eventSet, propertyName)
 	if err != nil {
 		return nil, err
@@ -49,7 +51,7 @@ func (qs QueryServiceImpl) GetPropertyValues(dataConnection *models.DataConnecti
 		return nil, err
 	}
 
-	events := []views.Value{}
+	events := []fabra.Value{}
 	for _, row := range queryResult.Data {
 		events = append(events, row[0])
 	}

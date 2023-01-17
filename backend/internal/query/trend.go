@@ -10,6 +10,8 @@ import (
 	"fabra/internal/views"
 	"sync"
 	"text/template"
+
+	"github.com/fabra-io/go-sdk/fabra"
 )
 
 var trendQueryTemplate *template.Template
@@ -29,7 +31,7 @@ func init() {
 	`))
 }
 
-func (qs QueryServiceImpl) RunTrendQuery(analysis *models.Analysis) ([]views.QueryResult, error) {
+func (qs QueryServiceImpl) RunTrendQuery(analysis *models.Analysis) ([]fabra.QueryResult, error) {
 	if !analysis.ConnectionID.Valid {
 		return nil, errors.NewBadRequest("no data connection configured")
 	}
@@ -70,7 +72,7 @@ func (qs QueryServiceImpl) RunTrendQuery(analysis *models.Analysis) ([]views.Que
 	// these queries take a while so run them synchronously
 	var wg sync.WaitGroup
 	errs := make(chan error)
-	results := make([]views.QueryResult, len(queries))
+	results := make([]fabra.QueryResult, len(queries))
 	for i, query := range queries {
 		wg.Add(1)
 		go func(i int, query string) {

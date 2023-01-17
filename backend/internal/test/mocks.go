@@ -7,6 +7,7 @@ import (
 	"fabra/internal/models"
 	"fabra/internal/views"
 
+	"github.com/fabra-io/go-sdk/fabra"
 	"gorm.io/gorm"
 )
 
@@ -38,22 +39,22 @@ func (qs MockQueryService) GetEvents(dataConnection *models.DataConnection, even
 	return result, nil
 }
 
-func (qs MockQueryService) RunCustomQuery(analysis *models.Analysis) (*views.QueryResult, error) {
+func (qs MockQueryService) RunCustomQuery(analysis *models.Analysis) (*fabra.QueryResult, error) {
 	_, err := dataconnections.LoadDataConnectionByID(qs.db, analysis.OrganizationID, analysis.ConnectionID.Int64)
 	if err != nil {
 		return nil, err
 	}
 
-	schema := views.Schema{
-		views.ColumnSchema{Name: "Column 1", Type: "string"},
-		views.ColumnSchema{Name: "Column 2", Type: "number"},
+	schema := fabra.Schema{
+		fabra.ColumnSchema{Name: "Column 1", Type: "string"},
+		fabra.ColumnSchema{Name: "Column 2", Type: "number"},
 	}
 
-	rows := []views.Row{
+	rows := []fabra.Row{
 		{"value1", "value2"},
 	}
 
-	result := views.QueryResult{
+	result := fabra.QueryResult{
 		Success: true,
 		Schema:  schema,
 		Data:    rows,
@@ -62,7 +63,7 @@ func (qs MockQueryService) RunCustomQuery(analysis *models.Analysis) (*views.Que
 	return &result, nil
 }
 
-func (qs MockQueryService) RunFunnelQuery(analysis *models.Analysis) (*views.QueryResult, error) {
+func (qs MockQueryService) RunFunnelQuery(analysis *models.Analysis) (*fabra.QueryResult, error) {
 	_, err := dataconnections.LoadDataConnectionByID(qs.db, analysis.OrganizationID, analysis.ConnectionID.Int64)
 	if err != nil {
 		return nil, err
@@ -78,16 +79,16 @@ func (qs MockQueryService) RunFunnelQuery(analysis *models.Analysis) (*views.Que
 		return nil, err
 	}
 
-	schema := views.Schema{
-		views.ColumnSchema{Name: "Column 1", Type: "string"},
-		views.ColumnSchema{Name: "Column 2", Type: "number"},
+	schema := fabra.Schema{
+		fabra.ColumnSchema{Name: "Column 1", Type: "string"},
+		fabra.ColumnSchema{Name: "Column 2", Type: "number"},
 	}
 
-	rows := []views.Row{
+	rows := []fabra.Row{
 		{"value1", "value2"},
 	}
 
-	result := views.QueryResult{
+	result := fabra.QueryResult{
 		Success: true,
 		Schema:  schema,
 		Data:    rows,
@@ -96,7 +97,7 @@ func (qs MockQueryService) RunFunnelQuery(analysis *models.Analysis) (*views.Que
 	return &result, nil
 }
 
-func (qs MockQueryService) RunTrendQuery(analysis *models.Analysis) ([]views.QueryResult, error) {
+func (qs MockQueryService) RunTrendQuery(analysis *models.Analysis) ([]fabra.QueryResult, error) {
 	_, err := dataconnections.LoadDataConnectionByID(qs.db, analysis.OrganizationID, analysis.ConnectionID.Int64)
 	if err != nil {
 		return nil, err
@@ -119,10 +120,10 @@ func (qs MockQueryService) GetProperties(dataConnection *models.DataConnection, 
 	return nil, nil
 }
 
-func (qs MockQueryService) GetPropertyValues(dataConnection *models.DataConnection, eventSet *models.EventSet, propertyName string) ([]views.Value, error) {
+func (qs MockQueryService) GetPropertyValues(dataConnection *models.DataConnection, eventSet *models.EventSet, propertyName string) ([]fabra.Value, error) {
 	return nil, nil
 }
 
-func (qs MockQueryService) GetTableSchema(dataConnection *models.DataConnection, datasetName string, tableName string) (views.Schema, error) {
+func (qs MockQueryService) GetTableSchema(dataConnection *models.DataConnection, datasetName string, tableName string) (fabra.Schema, error) {
 	return nil, nil
 }

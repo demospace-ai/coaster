@@ -11,7 +11,6 @@ import (
 	"strconv"
 
 	"github.com/fabra-io/go-sdk/fabra"
-	"github.com/fabra-io/go-sdk/fabra/bigquery"
 )
 
 type GetTablesResponse struct {
@@ -59,8 +58,8 @@ func (s ApiService) GetTables(auth auth.Authentication, w http.ResponseWriter, r
 	warehouse := fabra.Warehouse{
 		Type: fabra.WarehouseType(dataConnection.ConnectionType),
 		Config: map[string]interface{}{
-			bigquery.GCPProjectID:   &bigQueryCredentials.ProjectID,
-			bigquery.GCPCredentials: bigQueryCredentialsString,
+			fabra.GCPProjectID:   &bigQueryCredentials.ProjectID,
+			fabra.GCPCredentials: bigQueryCredentialsString,
 		},
 	}
 	client, err := fabra.NewAPIClient(warehouse)
