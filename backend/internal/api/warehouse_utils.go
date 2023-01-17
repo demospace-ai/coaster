@@ -22,8 +22,8 @@ func (s ApiService) NewBigQueryClient(dataConnection models.DataConnection) (fab
 	return fabra.NewAPIClient(
 		fabra.WarehouseType(dataConnection.ConnectionType),
 		map[string]interface{}{
-			fabra.GCPProjectID:   &bigQueryCredentials.ProjectID,
-			fabra.GCPCredentials: bigQueryCredentialsString,
+			fabra.GCPProjectID:   bigQueryCredentials.ProjectID,
+			fabra.GCPCredentials: *bigQueryCredentialsString,
 		},
 	)
 }
