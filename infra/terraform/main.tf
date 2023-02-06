@@ -98,8 +98,8 @@ resource "google_cloudbuild_trigger" "terraform-build-trigger" {
   included_files = ["infra/terraform/**"]
 
   github {
-    name  = "Fabra"
-    owner = "nfiacco"
+    name  = "fabra"
+    owner = "fabra-io"
 
     push {
       branch       = "main"
@@ -117,8 +117,8 @@ resource "google_cloudbuild_trigger" "backend-build-trigger" {
   ignored_files = ["backend/migrations/**"]
 
   github {
-    name  = "Fabra"
-    owner = "nfiacco"
+    name  = "fabra"
+    owner = "fabra-io"
 
     push {
       branch       = "main"
@@ -210,8 +210,8 @@ resource "google_cloudbuild_trigger" "database-migration-trigger" {
   included_files = ["backend/migrations/**"]
 
   github {
-    name  = "Fabra"
-    owner = "nfiacco"
+    name  = "fabra"
+    owner = "fabra-io"
 
     push {
       branch       = "main"
@@ -373,8 +373,8 @@ resource "google_cloudbuild_trigger" "frontend-build-trigger" {
   included_files = ["frontend/**"]
 
   github {
-    name  = "Fabra"
-    owner = "nfiacco"
+    name  = "fabra"
+    owner = "fabra-io"
 
     push {
       branch       = "main"
