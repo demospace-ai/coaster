@@ -42,12 +42,7 @@ func (s ApiService) GetTables(auth auth.Authentication, w http.ResponseWriter, r
 		return err
 	}
 
-	client, err := s.NewBigQueryClient(*dataConnection)
-	if err != nil {
-		return err
-	}
-
-	tables, err := client.GetTables(ctx, datasetID)
+	tables, err := s.queryService.GetTables(ctx, dataConnection, datasetID)
 	if err != nil {
 		return err
 	}

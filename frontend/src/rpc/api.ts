@@ -21,56 +21,16 @@ export const GetAllUsers: IEndpoint<undefined, GetAllUsersResponse> = {
     path: '/get_all_users',
 };
 
-export const GetAllAnalyses: IEndpoint<{ page: string; }, GetAllAnalysesResponse> = {
-    name: 'All Analyses Fetched',
-    method: 'GET',
-    path: '/get_all_analyses',
-};
-
-export const GetAllDashboards: IEndpoint<{ page: string; }, GetAllDashboardsResponse> = {
-    name: 'All Dashboards Fetched',
-    method: 'GET',
-    path: '/get_all_dashboards',
-};
-
-export const GetDashboard: IEndpoint<{ dashboardID: string; }, Dashboard> = {
-    name: 'Dashboard Fetched',
-    method: 'GET',
-    path: '/get_dashboard/:dashboardID',
-    track: true,
-};
-
-export const CreateDashboard: IEndpoint<CreateDashboardRequest, Dashboard> = {
-    name: 'Dashboard Created',
-    method: 'POST',
-    path: '/create_dashboard',
-    track: true,
-};
-
-export const UpdateDashboard: IEndpoint<UpdateDashboardRequest, Dashboard> = {
-    name: 'Dashboard Updated',
-    method: 'PATCH',
-    path: '/update_dashboard',
-    track: true,
-};
-
-export const DeleteDashboard: IEndpoint<{ dashboardID: number; }, undefined> = {
-    name: 'Dashboard Deleted',
-    method: 'DELETE',
-    path: '/delete_dashboard/:dashboardID',
-    track: true,
-};
-
 export const GetDataConnections: IEndpoint<undefined, GetDataConnectionsResponse> = {
     name: 'Data Connections Fetched',
     method: 'GET',
     path: '/get_data_connections',
 };
 
-export const GetEventSets: IEndpoint<undefined, GetEventSetsResponse> = {
-    name: 'Event Sets Fetched',
+export const GetSyncConfigurations: IEndpoint<undefined, GetSyncConfigurationsResponse> = {
+    name: 'Sync Configurations Fetched',
     method: 'GET',
-    path: '/get_event_sets',
+    path: '/get_sync_configurations',
 };
 
 export const GetDatasets: IEndpoint<{ connectionID: number; }, GetDatasetsResponse> = {
@@ -107,52 +67,10 @@ export const Logout: IEndpoint<undefined, undefined> = {
     track: true,
 };
 
-export const Search: IEndpoint<SearchRequest, SearchResponse> = {
-    name: 'Search',
-    method: 'POST',
-    path: '/search',
-    track: true,
-};
-
 export const SetOrganization: IEndpoint<SetOrganizationRequest, SetOrganizationResponse> = {
     name: 'Organization Set',
     method: 'POST',
     path: '/set_organization',
-    track: true,
-};
-
-export const UpdateOrganization: IEndpoint<UpdateOrganizationRequest, UpdateOrganizationResponse> = {
-    name: 'Organization Updated',
-    method: 'PATCH',
-    path: '/update_organization',
-    track: true,
-};
-
-export const GetAnalysis: IEndpoint<{ analysisID: string; }, Analysis> = {
-    name: 'Analysis Fetched',
-    method: 'GET',
-    path: '/get_analysis/:analysisID',
-    track: true,
-};
-
-export const CreateAnalysis: IEndpoint<CreateAnalysisRequest, Analysis> = {
-    name: 'Analysis Created',
-    method: 'POST',
-    path: '/create_analysis',
-    track: true,
-};
-
-export const DeleteAnalysis: IEndpoint<{ analysisID: number; }, undefined> = {
-    name: 'Analysis Deleted',
-    method: 'DELETE',
-    path: '/delete_analysis/:analysisID',
-    track: true,
-};
-
-export const UpdateAnalysis: IEndpoint<UpdateAnalysisRequest, Analysis> = {
-    name: 'Analysis Updated',
-    method: 'PATCH',
-    path: '/update_analysis',
     track: true,
 };
 
@@ -162,41 +80,11 @@ export const TestDataConnection: IEndpoint<TestDataConnectionRequest, undefined>
     path: '/test_data_connection',
 };
 
-export const RunCustomQuery: IEndpoint<RunQueryRequest, QueryResult> = {
-    name: 'Custom Query Run',
-    method: 'POST',
-    path: '/run_custom_query',
-    track: true,
-};
-
-export const RunTrendQuery: IEndpoint<RunQueryRequest, QueryResult[]> = {
-    name: 'Trend Run',
-    method: 'POST',
-    path: '/run_trend_query',
-    track: true,
-};
-
-export const GetEvents: IEndpoint<GetEventsRequest, GetEventsResponse> = {
-    name: 'Events Fetched',
+export const GetColumnValues: IEndpoint<GetColumnValuesRequest, GetColumnValuesResponse> = {
+    name: 'Column Values Fetched',
     method: 'GET',
-    path: '/get_events',
-    queryParams: ['connectionID', 'eventSetID'],
-    track: true,
-};
-
-export const GetProperties: IEndpoint<GetPropertiesRequest, GetPropertiesResponse> = {
-    name: 'Event Properties Fetched',
-    method: 'GET',
-    path: '/get_properties',
-    queryParams: ['connectionID', 'eventSetID'],
-    track: true,
-};
-
-export const GetPropertyValues: IEndpoint<GetPropertyValuesRequest, GetPropertyValuesResponse> = {
-    name: 'Event Property Values Fetched',
-    method: 'GET',
-    path: '/get_property_values',
-    queryParams: ['connectionID', 'eventSetID', 'propertyName'],
+    path: '/get_column_values',
+    queryParams: ['connectionID', 'datasetName', 'tableName', 'columnName'],
     track: true,
 };
 
@@ -214,10 +102,10 @@ export const CreateDataConnection: IEndpoint<CreateDataConnectionRequest, undefi
     track: true,
 };
 
-export const CreateEventSet: IEndpoint<CreateEventSetRequest, undefined> = {
-    name: 'Event Set Created',
+export const CreateSyncConfiguration: IEndpoint<CreateSyncConfigurationRequest, undefined> = {
+    name: 'Sync Configuration Created',
     method: 'POST',
-    path: '/create_event_set',
+    path: '/create_sync_configuration',
     track: true,
 };
 
@@ -245,14 +133,11 @@ export interface CreateDataConnectionRequest {
     account?: string;
 }
 
-export interface CreateEventSetRequest {
+export interface CreateSyncConfigurationRequest {
     display_name: string;
     connection_id: number;
     dataset_name: string;
     table_name: string;
-    event_type_column: string;
-    timestamp_column: string;
-    user_identifier_column: string;
     custom_join?: string;
 }
 
@@ -293,43 +178,19 @@ export function toCsvData(queryResult: QueryResult | undefined): (string | numbe
     return [];
 }
 
-export type Property = ColumnSchema;
-
-export interface PropertyGroup {
-    name: string;
-    properties: Property[];
-}
-
 export interface RunQueryRequest {
     analysis_id: number;
 }
 
-export interface GetEventsRequest {
+export interface GetColumnValuesRequest {
     connectionID: number;
-    eventSetID: number;
+    datasetName: string;
+    tableName: string;
+    columnName: string;
 }
 
-export interface GetEventsResponse {
-    events: string[];
-}
-
-export interface GetPropertiesRequest {
-    connectionID: number;
-    eventSetID: number;
-}
-
-export interface GetPropertiesResponse {
-    property_groups: PropertyGroup[];
-}
-
-export interface GetPropertyValuesRequest {
-    connectionID: number;
-    eventSetID: number;
-    propertyName: string;
-}
-
-export interface GetPropertyValuesResponse {
-    property_values: string[];
+export interface GetColumnValuesResponse {
+    column_values: string[];
 }
 
 export interface SetOrganizationRequest {
@@ -341,27 +202,12 @@ export interface SetOrganizationResponse {
     organization: Organization;
 }
 
-export interface UpdateOrganizationRequest {
-    connection_id?: number;
-    event_set_id?: number;
-}
-
-export interface UpdateOrganizationResponse {
-    organization: Organization;
-}
-
 export interface ValidationCodeRequest {
     email: string;
 }
 
-export interface EmailAuthentication {
-    email: string;
-    validation_code: string;
-}
-
 export interface LoginRequest {
     id_token?: string;
-    email_authentication?: EmailAuthentication;
     organization_name?: string;
     organization_id?: string;
 }
@@ -377,20 +223,12 @@ export interface GetAllUsersResponse {
     users: User[];
 }
 
-export interface GetAllAnalysesResponse {
-    analyses: Analysis[];
-}
-
-export interface GetAllDashboardsResponse {
-    dashboards: Dashboard[];
-}
-
 export interface GetDataConnectionsResponse {
     data_connections: DataConnection[];
 }
 
-export interface GetEventSetsResponse {
-    event_sets: EventSet[];
+export interface GetSyncConfigurationsResponse {
+    sync_configurations: SyncConfiguration[];
 }
 
 export interface GetDatasetsResponse {
@@ -431,141 +269,10 @@ export interface CheckSessionResponse {
     suggested_organizations?: Organization[];
 }
 
-export interface CreateDashboardRequest {
-    timezone: string;
-}
-
-// Any fields left blank will be left unchanged
-export interface UpdateDashboardRequest {
-    dashboard_id: number;
-    title?: string;
-    description?: string;
-    panels?: DashboardPanelInput[];
-}
-
-export interface CreateAnalysisRequest {
-    connection_id?: number;
-    event_set_id?: number;
-    analysis_type: AnalysisType;
-    timezone: string;
-}
-
-// Any fields left blank will be left unchanged
-export interface UpdateAnalysisRequest {
-    analysis_id: number;
-    connection_id?: number;
-    event_set_id?: number;
-    title?: string;
-    description?: string;
-    query?: string;
-    events?: EventInput[];
-    breakdown?: Property;
-}
-
-export interface EventInput {
-    name: string;
-    filters: EventFilter[];
-};
-
-export interface TrendSeriesInput {
-    name: string;
-    filters: EventFilter[];
-};
-
-export interface SearchRequest {
-    search_query: string;
-}
-
-export interface SearchResponse {
-    analyses: Analysis[];
-}
-
-export interface Analysis {
-    id: number;
-    user_id: number;
-    organization_id: number;
-    connection?: DataConnection;
-    event_set?: EventSet;
-    analysis_type: AnalysisType;
-    title: string;
-    description?: string;
-    query?: string; // used for Custom Query analysis type
-    breakdown?: Property;
-    events?: Event[]; // used for Funnel and Trend analysis types
-}
-
-export interface Dashboard {
-    id: number;
-    user_id: number;
-    organization_id: number;
-    title: string;
-    description?: string;
-    panels?: DashboardPanel[];
-}
-
-export interface DashboardPanel {
-    id: number;
-    title: string;
-    panel_type: PanelType;
-    analysis_id?: number;
-    content?: string;
-}
-
-export interface DashboardPanelInput {
-    title: string;
-    panel_type: PanelType;
-    analysis_id?: number;
-    content?: string;
-};
-
-export interface Event {
-    id: number;
-    name: string;
-    filters: EventFilter[];
-}
-
-export interface EventFilter {
-    property: Property;
-    filter_type: FilterType;
-    property_value: string | null;
-    custom_property_group_id?: number;
-}
-
 export enum ColumnType {
     String = "STRING",
     Integer = "INTEGER",
     Timestamp = "TIMESTAMP"
-}
-
-export enum FilterType {
-    Equal = "equal",
-    NotEqual = "not_equal",
-    GreaterThan = "greater_than",
-    LessThan = "less_than",
-    Contains = "contains",
-    NotContains = "not_contains",
-}
-
-export const filtersMatch = (filters1: EventFilter[], filters2: EventFilter[]) => {
-    return filters1.length === filters2.length && filters1.every((filter1, index) => {
-        const filter2: EventFilter = filters2[index];
-        return filter1.property.name === filter2.property.name
-            && filter1.property.type === filter2.property.type
-            && filter1.filter_type === filter2.filter_type
-            && filter1.property_value === filter2.property_value
-            && filter1.custom_property_group_id === filter2.custom_property_group_id;
-    });
-};
-
-export enum AnalysisType {
-    CustomQuery = "custom_query",
-    Funnel = "funnel",
-    Trend = "trend",
-}
-
-export enum PanelType {
-    Insight = "insight",
-    Text = "text",
 }
 
 export interface DataConnection {
@@ -574,15 +281,12 @@ export interface DataConnection {
     connection_type: DataConnectionType;
 }
 
-export interface EventSet {
+export interface SyncConfiguration {
     id: number;
     display_name: string;
     connection_id: number;
     dataset_name: string;
     table_name: string;
-    event_type_column: string;
-    timestamp_column: string;
-    user_identifier_column: string;
     custom_join: string | undefined;
 }
 

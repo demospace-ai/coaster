@@ -1,13 +1,10 @@
 package test
 
 import (
-	"fabra/internal/analyses"
-	"fabra/internal/dataconnections"
-	"fabra/internal/eventsets"
+	"context"
 	"fabra/internal/models"
-	"fabra/internal/views"
+	"fabra/internal/query"
 
-	"github.com/fabra-io/go-sdk/fabra"
 	"gorm.io/gorm"
 )
 
@@ -34,96 +31,22 @@ func NewMockQueryService(db *gorm.DB) MockQueryService {
 	}
 }
 
-func (qs MockQueryService) GetEvents(dataConnection *models.DataConnection, eventSet *models.EventSet) ([]string, error) {
-	result := []string{"decrypted"}
-	return result, nil
-}
-
-func (qs MockQueryService) RunCustomQuery(analysis *models.Analysis) (*fabra.QueryResult, error) {
-	_, err := dataconnections.LoadDataConnectionByID(qs.db, analysis.OrganizationID, analysis.ConnectionID.Int64)
-	if err != nil {
-		return nil, err
-	}
-
-	schema := fabra.Schema{
-		fabra.ColumnSchema{Name: "Column 1", Type: "string"},
-		fabra.ColumnSchema{Name: "Column 2", Type: "number"},
-	}
-
-	rows := []fabra.Row{
-		{"value1", "value2"},
-	}
-
-	result := fabra.QueryResult{
-		Success: true,
-		Schema:  schema,
-		Data:    rows,
-	}
-
-	return &result, nil
-}
-
-func (qs MockQueryService) RunFunnelQuery(analysis *models.Analysis) (*fabra.QueryResult, error) {
-	_, err := dataconnections.LoadDataConnectionByID(qs.db, analysis.OrganizationID, analysis.ConnectionID.Int64)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = eventsets.LoadEventSetByID(qs.db, analysis.OrganizationID, analysis.EventSetID.Int64)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = analyses.LoadEventsByAnalysisID(qs.db, analysis.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	schema := fabra.Schema{
-		fabra.ColumnSchema{Name: "Column 1", Type: "string"},
-		fabra.ColumnSchema{Name: "Column 2", Type: "number"},
-	}
-
-	rows := []fabra.Row{
-		{"value1", "value2"},
-	}
-
-	result := fabra.QueryResult{
-		Success: true,
-		Schema:  schema,
-		Data:    rows,
-	}
-
-	return &result, nil
-}
-
-func (qs MockQueryService) RunTrendQuery(analysis *models.Analysis) ([]fabra.QueryResult, error) {
-	_, err := dataconnections.LoadDataConnectionByID(qs.db, analysis.OrganizationID, analysis.ConnectionID.Int64)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = eventsets.LoadEventSetByID(qs.db, analysis.OrganizationID, analysis.EventSetID.Int64)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = analyses.LoadEventsByAnalysisID(qs.db, analysis.ID)
-	if err != nil {
-		return nil, err
-	}
-
+func (qs MockQueryService) GetDatasets(ctx context.Context, dataConnection *models.DataConnection) ([]string, error) {
 	return nil, nil
 }
 
-func (qs MockQueryService) GetProperties(dataConnection *models.DataConnection, eventSet *models.EventSet) ([]views.PropertyGroup, error) {
+func (qs MockQueryService) GetTables(ctx context.Context, dataConnection *models.DataConnection, datasetName string) ([]string, error) {
 	return nil, nil
 }
 
-func (qs MockQueryService) GetPropertyValues(dataConnection *models.DataConnection, eventSet *models.EventSet, propertyName string) ([]fabra.Value, error) {
+func (qs MockQueryService) GetTableSchema(ctx context.Context, dataConnection *models.DataConnection, datasetName string, tableName string) ([]query.ColumnSchema, error) {
 	return nil, nil
 }
 
-func (qs MockQueryService) GetTableSchema(dataConnection *models.DataConnection, datasetName string, tableName string) (fabra.Schema, error) {
+func (qs MockQueryService) GetColumnValues(ctx context.Context, dataConnection *models.DataConnection, datasetName string, tableName string, columnName string) ([]query.Value, error) {
+	return nil, nil
+}
+
+func (qs MockQueryService) RunQuery(ctx context.Context, dataConnection *models.DataConnection, queryString string) (*query.QueryResult, error) {
 	return nil, nil
 }

@@ -2,7 +2,6 @@ package query
 
 import (
 	"bytes"
-	"fabra/internal/models"
 	"text/template"
 )
 
@@ -18,8 +17,8 @@ func (e Error) Error() string {
 	return e.err.Error()
 }
 
-func createCustomTableQuery(eventSet *models.EventSet) string {
-	return "WITH custom_events AS (" + eventSet.CustomJoin.String + ")"
+func createCustomTableQuery(customJoin string) string {
+	return "WITH custom_events AS (" + customJoin + ")"
 }
 
 func executeTemplate(tmpl *template.Template, args map[string]interface{}) (*string, error) {

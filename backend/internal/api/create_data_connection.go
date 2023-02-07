@@ -6,7 +6,6 @@ import (
 	"fabra/internal/dataconnections"
 	"fabra/internal/errors"
 	"fabra/internal/models"
-	"fabra/internal/organizations"
 	"fmt"
 	"net/http"
 )
@@ -76,10 +75,6 @@ func (s ApiService) CreateDataConnection(auth auth.Authentication, w http.Respon
 
 	if err != nil {
 		return err
-	}
-
-	if createDataConnectionRequest.SetDefault {
-		organizations.SetOrganizationDefaultDataConnection(s.db, auth.Organization, dataConnection.ID)
 	}
 
 	return json.NewEncoder(w).Encode(CreateDataConnectionResponse{

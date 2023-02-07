@@ -41,12 +41,7 @@ func (s ApiService) GetDatasets(auth auth.Authentication, w http.ResponseWriter,
 		return err
 	}
 
-	client, err := s.NewBigQueryClient(*dataConnection)
-	if err != nil {
-		return err
-	}
-
-	datasets, err := client.GetDatasets(ctx)
+	datasets, err := s.queryService.GetDatasets(ctx, dataConnection)
 	if err != nil {
 		return err
 	}

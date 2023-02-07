@@ -3,10 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fabra/internal/auth"
-	"fabra/internal/dataconnections"
-	"fabra/internal/eventsets"
 	"fabra/internal/models"
-	"fabra/internal/organizations"
 	"net/http"
 )
 
@@ -29,30 +26,6 @@ func (s ApiService) UpdateOrganization(auth auth.Authentication, w http.Response
 	}
 
 	organization := auth.Organization
-
-	if updateOrganizationRequest.ConnectionID != nil {
-		_, err = dataconnections.LoadDataConnectionByID(s.db, auth.Organization.ID, *updateOrganizationRequest.ConnectionID)
-		if err != nil {
-			return err
-		}
-
-		organization, err = organizations.SetOrganizationDefaultDataConnection(s.db, organization, *updateOrganizationRequest.ConnectionID)
-		if err != nil {
-			return err
-		}
-	}
-
-	if updateOrganizationRequest.EventSetID != nil {
-		_, err = eventsets.LoadEventSetByID(s.db, auth.Organization.ID, *updateOrganizationRequest.EventSetID)
-		if err != nil {
-			return err
-		}
-
-		organization, err = organizations.SetOrganizationDefaultEventSet(s.db, organization, *updateOrganizationRequest.EventSetID)
-		if err != nil {
-			return err
-		}
-	}
 
 	// TODO: mask database ID
 	return json.NewEncoder(w).Encode(UpdateOrganizationResponse{

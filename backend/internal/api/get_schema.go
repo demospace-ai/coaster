@@ -7,15 +7,14 @@ import (
 	"fabra/internal/dataconnections"
 	"fabra/internal/errors"
 	"fabra/internal/models"
+	"fabra/internal/query"
 	"fmt"
 	"net/http"
 	"strconv"
-
-	"github.com/fabra-io/go-sdk/fabra"
 )
 
 type GetSchemaResponse struct {
-	Schema fabra.Schema `json:"schema"`
+	Schema query.Schema `json:"schema"`
 }
 
 func (s ApiService) GetSchema(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
@@ -47,7 +46,7 @@ func (s ApiService) GetSchema(auth auth.Authentication, w http.ResponseWriter, r
 		return err
 	}
 
-	var schema fabra.Schema
+	var schema query.Schema
 	if len(customJoin) > 0 {
 		schema, err = s.getSchemaForCustomJoin(*dataConnection, customJoin)
 		if err != nil {
@@ -65,7 +64,7 @@ func (s ApiService) GetSchema(auth auth.Authentication, w http.ResponseWriter, r
 	})
 }
 
-func (s ApiService) getSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (fabra.Schema, error) {
+func (s ApiService) getSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (query.Schema, error) {
 	switch dataConnection.ConnectionType {
 	case models.DataConnectionTypeBigQuery:
 		return s.getBigQuerySchemaForTable(dataConnection, datasetID, tableName)
@@ -76,7 +75,7 @@ func (s ApiService) getSchemaForTable(dataConnection models.DataConnection, data
 	}
 }
 
-func (s ApiService) getSchemaForCustomJoin(dataConnection models.DataConnection, customJoin string) (fabra.Schema, error) {
+func (s ApiService) getSchemaForCustomJoin(dataConnection models.DataConnection, customJoin string) (query.Schema, error) {
 	switch dataConnection.ConnectionType {
 	case models.DataConnectionTypeBigQuery:
 		return s.getBigQuerySchemaForCustom(dataConnection, customJoin)
@@ -87,14 +86,9 @@ func (s ApiService) getSchemaForCustomJoin(dataConnection models.DataConnection,
 	}
 }
 
-func (s ApiService) getBigQuerySchemaForCustom(dataConnection models.DataConnection, customJoin string) (fabra.Schema, error) {
+func (s ApiService) getBigQuerySchemaForCustom(dataConnection models.DataConnection, customJoin string) (query.Schema, error) {
 	ctx := context.Background()
-	client, err := s.NewBigQueryClient(dataConnection)
-	if err != nil {
-		return nil, err
-	}
-
-	result, err := client.RunQuery(ctx, customJoin)
+	result, err := s.queryService.RunQuery(ctx, &dataConnection, customJoin)
 	if err != nil {
 		return nil, err
 	}
@@ -102,22 +96,17 @@ func (s ApiService) getBigQuerySchemaForCustom(dataConnection models.DataConnect
 	return result.Schema, nil
 }
 
-func (s ApiService) getBigQuerySchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (fabra.Schema, error) {
+func (s ApiService) getBigQuerySchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (query.Schema, error) {
 	ctx := context.Background()
-	client, err := s.NewBigQueryClient(dataConnection)
-	if err != nil {
-		return nil, err
-	}
-
-	return client.GetTableSchema(ctx, datasetID, tableName)
+	return s.queryService.GetTableSchema(ctx, &dataConnection, datasetID, tableName)
 }
 
-func (s ApiService) getSnowflakeSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (fabra.Schema, error) {
+func (s ApiService) getSnowflakeSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (query.Schema, error) {
 	// TODO: implement
 	return nil, errors.NewBadRequest("snowflake not supported")
 }
 
-func (s ApiService) getSnowflakeSchemaForCustom(dataConnection models.DataConnection, customJoin string) (fabra.Schema, error) {
+func (s ApiService) getSnowflakeSchemaForCustom(dataConnection models.DataConnection, customJoin string) (query.Schema, error) {
 	// TODO: implement
 	return nil, errors.NewBadRequest("snowflake not supported")
 }

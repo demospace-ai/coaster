@@ -47,44 +47,13 @@ func CreateDataConnection(db *gorm.DB, organizationID int64) *models.DataConnect
 	return &dataConnection
 }
 
-func CreateFunnelAnalysis(db *gorm.DB, userID int64, organizationID int64, connectionID int64, eventSetID int64) *models.Analysis {
-	analysis := models.Analysis{
-		UserID:         userID,
-		OrganizationID: organizationID,
-		ConnectionID:   database.NewNullInt64(connectionID),
-		EventSetID:     database.NewNullInt64(eventSetID),
-		AnalysisType:   models.AnalysisTypeFunnel,
-	}
-
-	db.Create(&analysis)
-
-	return &analysis
-}
-
-func CreateCustomQueryAnalysis(db *gorm.DB, userID int64, organizationID int64, connectionID int64) *models.Analysis {
-	analysis := models.Analysis{
-		UserID:         userID,
-		OrganizationID: organizationID,
-		ConnectionID:   database.NewNullInt64(connectionID),
-		AnalysisType:   models.AnalysisTypeCustomQuery,
-		Query:          database.NewNullString("select * from table"),
-	}
-
-	db.Create(&analysis)
-
-	return &analysis
-}
-
-func CreateEventSet(db *gorm.DB, organizationID int64, connectionID int64) *models.EventSet {
-	eventSet := models.EventSet{
+func CreateSyncConfiguration(db *gorm.DB, organizationID int64, connectionID int64) *models.SyncConfiguration {
+	eventSet := models.SyncConfiguration{
 		DisplayName:          "Test Event Set",
 		OrganizationID:       organizationID,
 		ConnectionID:         connectionID,
 		DatasetName:          database.NewNullString("testDataset"),
 		TableName:            database.NewNullString("testTable"),
-		EventTypeColumn:      "event_type",
-		TimestampColumn:      "timestamp",
-		UserIdentifierColumn: "user_id",
 	}
 
 	db.Create(&eventSet)

@@ -6,7 +6,6 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { Loading } from 'src/components/loading/Loading';
 import { useLogout } from 'src/pages/login/actions';
 import { useSelector } from 'src/root/model';
-import { useAnalysis, useDashboard } from 'src/rpc/data';
 
 export const Header: React.FC = () => {
   const location = useLocation();
@@ -39,20 +38,12 @@ const Breadcrumbs: React.FC<{ pathname: string; }> = props => {
   switch (pathTokens[1]) {
     case '':
       return <PageBreadcrumbs pathname={props.pathname} />;
-    case 'customquery':
-    case 'funnel':
-    case 'trend':
-      return <InsightBreadcrumbs id={pathTokens[2]} pathname={props.pathname} />;
-    case 'insights':
-      return <PageBreadcrumbs title="Insights" pathname={props.pathname} />;
-    case 'workspacesettings':
-      return <PageBreadcrumbs title="Workspace Settings" pathname={props.pathname} />;
-    case 'dashboard':
-      return <DashboardBreadcrumbs id={pathTokens[2]} pathname={props.pathname} />;
-    case 'dashboards':
-      return <PageBreadcrumbs title="Dashboards" pathname={props.pathname} />;
+    case 'logs':
+      return <PageBreadcrumbs title="Logs" pathname={props.pathname} />;
+    case 'settings':
+      return <PageBreadcrumbs title="Settings" pathname={props.pathname} />;
     default:
-      return <PageBreadcrumbs pathname={props.pathname} />;
+      return <PageBreadcrumbs title={pathTokens[1]} pathname={props.pathname} />;
   }
 };
 
@@ -67,25 +58,6 @@ const PageBreadcrumbs: React.FC<{ title?: string, pathname: string; }> = props =
 
   return <BreadcrumbsLayout crumbs={crumbs} />;
 };
-
-const InsightBreadcrumbs: React.FC<{ id: string, pathname: string; }> = props => {
-  const { analysis } = useAnalysis(props.id); // This is deduped by SWR so don't worry about the extra fetch
-  const title = analysis?.title;
-  const crumbs: Breadcrumb[] = [{ title: 'Insights', path: '/insights' }, { title, path: props.pathname }];
-  document.title = title + " | Fabra";
-
-  return <BreadcrumbsLayout crumbs={crumbs} />;
-};
-
-const DashboardBreadcrumbs: React.FC<{ id: string, pathname: string; }> = props => {
-  const { dashboard } = useDashboard(props.id); // This is deduped by SWR so don't worry about the extra fetch
-  const title = dashboard?.title;
-  const crumbs: Breadcrumb[] = [{ title: 'Dashboards', path: '/dashboards' }, { title, path: props.pathname }];
-  document.title = title + " | Fabra";
-
-  return <BreadcrumbsLayout crumbs={crumbs} />;
-};
-
 const BreadcrumbsLayout: React.FC<{ crumbs: Breadcrumb[]; }> = props => {
   return (
     <div className='tw-flex tw-flex-row tw-items-center'>
