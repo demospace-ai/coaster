@@ -1,7 +1,7 @@
-import { Cog6ToothIcon, HomeIcon, UserGroupIcon } from '@heroicons/react/24/outline';
+import { AdjustmentsHorizontalIcon, Cog6ToothIcon, DocumentTextIcon, HomeIcon, KeyIcon, MapIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 import classNames from "classnames";
 import { NavLink } from "react-router-dom";
-import { DashboardIcon, QuestionCircleIcon } from "src/components/icons/Icons";
+import { QuestionCircleIcon } from "src/components/icons/Icons";
 import { Tooltip } from 'src/components/tooltip/Tooltip';
 import { useSelector } from "src/root/model";
 import logo from './logo.png';
@@ -24,7 +24,7 @@ export const NavigationBar: React.FC = () => {
       <div className="tw-min-w-[240px] tw-w-60 tw-h-full tw-flex tw-flex-col tw-box-border tw-border-r tw-border-solid tw-border-gray-200 tw-bg-gray-100">
         <NavLink className="tw-py-4 tw-px-4 tw-flex tw-flex-row tw-h-16 tw-box-border tw-cursor-pointer tw-w-full tw-mb-4" to="/">
           <img src={logo} className='tw-h-6 tw-w-6 tw-justify-center tw-items-center tw-rounded tw-flex tw-my-auto tw-select-none' alt="fabra logo" />
-          <div className='tw-my-auto tw-ml-3 tw-max-w-[150px] tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-bold tw-font-[Montserrat] tw-text-2xl'>
+          <div className='tw-my-auto tw-ml-2.5 tw-max-w-[150px] tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-bold tw-font-[Montserrat] tw-text-2xl'>
             fabra
           </div>
         </NavLink>
@@ -48,8 +48,38 @@ export const NavigationBar: React.FC = () => {
         <div className={routeContainer}>
           <Tooltip label="Coming soon!">
             <div className={navLink}>
-              <DashboardIcon className="tw-h-4" strokeWidth="2" />
+              <DocumentTextIcon className="tw-h-4" strokeWidth="2" />
               <div className={route}>Logs</div>
+            </div>
+          </Tooltip>
+        </div>
+        <div className="tw-my-5 tw-px-3">
+          <div className="tw-border-b tw-border-solid tw-border-gray-300" />
+        </div>
+        <div className="tw-mx-4 tw-my-2 tw-uppercase tw-text-xs tw-text-gray-500 tw-font-medium">
+          Develop
+        </div>
+        <div className={routeContainer}>
+          <Tooltip label="Coming soon!">
+            <div className={navLink}>
+              <KeyIcon className="tw-h-4" strokeWidth="2" />
+              <div className={route}>API Keys</div>
+            </div>
+          </Tooltip>
+        </div>
+        <div className={routeContainer}>
+          <Tooltip label="Coming soon!">
+            <div className={navLink}>
+              <AdjustmentsHorizontalIcon className="tw-h-4" strokeWidth="2" />
+              <div className={route}>Configuration</div>
+            </div>
+          </Tooltip>
+        </div>
+        <div className={routeContainer}>
+          <Tooltip label="Coming soon!">
+            <div className={navLink}>
+              <MapIcon className="tw-h-4" strokeWidth="2" />
+              <div className={route}>Documentation</div>
             </div>
           </Tooltip>
         </div>
