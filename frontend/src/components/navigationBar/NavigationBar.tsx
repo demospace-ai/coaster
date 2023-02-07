@@ -1,4 +1,4 @@
-import { AdjustmentsHorizontalIcon, Cog6ToothIcon, DocumentTextIcon, HomeIcon, KeyIcon, MapIcon, UserGroupIcon } from '@heroicons/react/24/outline';
+import { ArrowPathIcon, ArrowTopRightOnSquareIcon, BellIcon, CircleStackIcon, CubeIcon, DocumentTextIcon, HomeIcon, KeyIcon, MapIcon, UserPlusIcon } from '@heroicons/react/24/outline';
 import classNames from "classnames";
 import { NavLink } from "react-router-dom";
 import { QuestionCircleIcon } from "src/components/icons/Icons";
@@ -40,8 +40,8 @@ export const NavigationBar: React.FC = () => {
         <div className={routeContainer}>
           <Tooltip label="Coming soon!">
             <div className={navLink}>
-              <UserGroupIcon className="tw-h-4" strokeWidth="2" />
-              <div className={route}>Linked Accounts</div>
+              <ArrowPathIcon className="tw-h-4" strokeWidth="2" />
+              <div className={route}>Syncs</div>
             </div>
           </Tooltip>
         </div>
@@ -53,7 +53,15 @@ export const NavigationBar: React.FC = () => {
             </div>
           </Tooltip>
         </div>
-        <div className="tw-my-5 tw-px-3">
+        <div className={routeContainer}>
+          <Tooltip label="Coming soon!">
+            <div className={navLink}>
+              <BellIcon className="tw-h-4" strokeWidth="2" />
+              <div className={route}>Notifications</div>
+            </div>
+          </Tooltip>
+        </div>
+        <div className="tw-my-5 tw-px-4">
           <div className="tw-border-b tw-border-solid tw-border-gray-300" />
         </div>
         <div className="tw-mx-4 tw-my-2 tw-uppercase tw-text-xs tw-text-gray-500 tw-font-medium">
@@ -70,8 +78,16 @@ export const NavigationBar: React.FC = () => {
         <div className={routeContainer}>
           <Tooltip label="Coming soon!">
             <div className={navLink}>
-              <AdjustmentsHorizontalIcon className="tw-h-4" strokeWidth="2" />
-              <div className={route}>Configuration</div>
+              <CircleStackIcon className="tw-h-4" strokeWidth="2" />
+              <div className={route}>Destinations</div>
+            </div>
+          </Tooltip>
+        </div>
+        <div className={routeContainer}>
+          <Tooltip label="Coming soon!">
+            <div className={navLink}>
+              <CubeIcon className="tw-h-4" strokeWidth="2" />
+              <div className={route}>Models</div>
             </div>
           </Tooltip>
         </div>
@@ -80,14 +96,18 @@ export const NavigationBar: React.FC = () => {
             <div className={navLink}>
               <MapIcon className="tw-h-4" strokeWidth="2" />
               <div className={route}>Documentation</div>
+              <ArrowTopRightOnSquareIcon className='tw-h-4 tw-ml-auto tw-mr-3' />
             </div>
           </Tooltip>
         </div>
-        <div id="bottomSection" className="tw-mt-auto tw-mb-5">
+        <div id="bottomSection" className="tw-mt-auto tw-mb-4">
+          <div className="tw-mx-4 tw-mb-2 tw-uppercase tw-text-xs tw-text-gray-500 tw-font-medium">
+            Account
+          </div>
           <div className={routeContainer}>
-            <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-gray-300")} to="/settings">
-              <Cog6ToothIcon className="tw-h-4 tw-ml-[1px] -tw-mr-[0.5px]" strokeWidth="2" />
-              <div className={route}>Settings</div>
+            <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-gray-300")} to="/team">
+              <UserPlusIcon className="tw-h-4 tw-ml-[1px] -tw-mr-[0.5px]" strokeWidth="2" />
+              <div className={route}>Team</div>
             </NavLink>
           </div>
           <div className={routeContainer}>

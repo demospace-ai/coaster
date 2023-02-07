@@ -7,7 +7,7 @@ import { NavigationBar } from 'src/components/navigationBar/NavigationBar';
 import { Inbox } from 'src/pages/inbox/Inbox';
 import { Login } from 'src/pages/login/Login';
 import { NotFound } from 'src/pages/notfound/NotFound';
-import { WorkspaceSettings } from 'src/pages/workspacesettings/WorkspaceSettings';
+import { Team } from 'src/pages/team/Team';
 import { useSelector } from 'src/root/model';
 import styles from './app.m.css';
 
@@ -37,7 +37,7 @@ export const App: React.FC = () => {
         <Route element={<AppLayout />}>
           <Route path='/login' element={<Login />} />
           <Route path='/' element={<RequireAuth element={<Inbox />} />} />
-          <Route path='/settings' element={<RequireAuth element={<WorkspaceSettings />} />} />
+          <Route path='/team' element={<RequireAuth element={<Team />} />} />
           <Route path='*' element={<NotFound />} />
         </Route>
       </Routes>

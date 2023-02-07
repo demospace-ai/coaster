@@ -6,6 +6,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { Loading } from 'src/components/loading/Loading';
 import { useLogout } from 'src/pages/login/actions';
 import { useSelector } from 'src/root/model';
+import { toTitleCase } from 'src/utils/string';
 
 export const Header: React.FC = () => {
   const location = useLocation();
@@ -36,14 +37,8 @@ type Breadcrumb = {
 const Breadcrumbs: React.FC<{ pathname: string; }> = props => {
   const pathTokens = props.pathname.split('/');
   switch (pathTokens[1]) {
-    case '':
-      return <PageBreadcrumbs pathname={props.pathname} />;
-    case 'logs':
-      return <PageBreadcrumbs title="Logs" pathname={props.pathname} />;
-    case 'settings':
-      return <PageBreadcrumbs title="Settings" pathname={props.pathname} />;
     default:
-      return <PageBreadcrumbs title={pathTokens[1]} pathname={props.pathname} />;
+      return <PageBreadcrumbs title={toTitleCase(pathTokens[1])} pathname={props.pathname} />;
   }
 };
 

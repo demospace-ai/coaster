@@ -1,5 +1,5 @@
 import { sendRequest } from "src/rpc/ajax";
-import { GetColumnValues, GetColumnValuesRequest, GetColumnValuesResponse, GetDataConnections, GetDataConnectionsResponse, GetDatasets, GetDatasetsResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetSyncConfigurations, GetSyncConfigurationsResponse, GetTables, GetTablesResponse } from "src/rpc/api";
+import { GetAllUsers, GetAllUsersResponse, GetColumnValues, GetColumnValuesRequest, GetColumnValuesResponse, GetDataConnections, GetDataConnectionsResponse, GetDatasets, GetDatasetsResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetSyncConfigurations, GetSyncConfigurationsResponse, GetTables, GetTablesResponse } from "src/rpc/api";
 import useSWR, { Fetcher } from "swr";
 
 export function useSchema(connectionID: number, datasetName: string, tableName?: string, customJoin?: string) {
@@ -7,6 +7,12 @@ export function useSchema(connectionID: number, datasetName: string, tableName?:
   const shouldFetch = connectionID && ((datasetName && tableName) || customJoin);
   const { data, error } = useSWR(shouldFetch ? { GetSchema, connectionID, datasetID: datasetName, tableName, customJoin } : null, fetcher);
   return { schema: data?.schema, error };
+}
+
+export function useUsers() {
+  const fetcher: Fetcher<GetAllUsersResponse, {}> = () => sendRequest(GetAllUsers);
+  const { data, mutate, error } = useSWR({ GetAllUsers }, fetcher);
+  return { users: data?.users, mutate, error };
 }
 
 export function useDataConnections() {
