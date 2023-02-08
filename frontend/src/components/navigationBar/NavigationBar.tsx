@@ -76,12 +76,10 @@ export const NavigationBar: React.FC = () => {
           </Tooltip>
         </div>
         <div className={routeContainer}>
-          <Tooltip label="Coming soon!">
-            <div className={navLink}>
-              <CircleStackIcon className="tw-h-4" strokeWidth="2" />
-              <div className={route}>Destinations</div>
-            </div>
-          </Tooltip>
+          <NavLink className={navLink} to="/destinations">
+            <CircleStackIcon className="tw-h-4" strokeWidth="2" />
+            <div className={route}>Destinations</div>
+          </NavLink>
         </div>
         <div className={routeContainer}>
           <Tooltip label="Coming soon!">

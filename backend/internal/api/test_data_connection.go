@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fabra/internal/auth"
 	"fabra/internal/errors"
+	"fabra/internal/input"
 	"fabra/internal/models"
 	"fmt"
 	"net/http"
@@ -15,15 +16,10 @@ import (
 )
 
 type TestDataConnectionRequest struct {
-	DisplayName    string                    `json:"display_name"`
-	ConnectionType models.DataConnectionType `json:"connection_type"`
-	Username       *string                   `json:"username,omitempty"`
-	Password       *string                   `json:"password,omitempty"`
-	Credentials    *string                   `json:"credentials,omitempty"`
-	WarehouseName  *string                   `json:"warehouse_name,omitempty"`
-	DatabaseName   *string                   `json:"database_name,omitempty"`
-	Role           *string                   `json:"role,omitempty"`
-	Account        *string                   `json:"account,omitempty"`
+	DisplayName     string                 `json:"display_name"`
+	ConnectionType  models.ConnectionType  `json:"connection_type"`
+	BigQueryConfig  *input.BigQueryConfig  `json:"bigquery_config,omitempty"`
+	SnowflakeConfig *input.SnowflakeConfig `json:"snowflake_config,omitempty"`
 }
 
 func (s ApiService) TestDataConnection(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
@@ -33,21 +29,21 @@ func (s ApiService) TestDataConnection(auth auth.Authentication, w http.Response
 	}
 
 	decoder := json.NewDecoder(r.Body)
-	var createDataConnectionRequest CreateDataConnectionRequest
-	err := decoder.Decode(&createDataConnectionRequest)
+	var testDataConnectionRequest TestDataConnectionRequest
+	err := decoder.Decode(&testDataConnectionRequest)
 	if err != nil {
 		return err
 	}
 
-	err = validateCreateDataConnectionRequest(createDataConnectionRequest)
+	err = validateTestDataConnectionRequest(testDataConnectionRequest)
 	if err != nil {
 		return err
 	}
 
-	switch createDataConnectionRequest.ConnectionType {
-	case models.DataConnectionTypeBigQuery:
-		return testBigQueryConnection(*createDataConnectionRequest.Credentials)
-	case models.DataConnectionTypeSnowflake:
+	switch testDataConnectionRequest.ConnectionType {
+	case models.ConnectionTypeBigQuery:
+		return testBigQueryConnection(testDataConnectionRequest.BigQueryConfig.Credentials)
+	case models.ConnectionTypeSnowflake:
 		// TODO: implement test for Snowflake
 		return nil
 	}
@@ -77,6 +73,43 @@ func testBigQueryConnection(credentials string) error {
 	if err != nil && err != iterator.Done {
 		return err
 	}
+
+	return nil
+}
+
+func validateTestDataConnectionRequest(request TestDataConnectionRequest) error {
+	switch request.ConnectionType {
+	case models.ConnectionTypeBigQuery:
+		return validateTestBigQueryConnection(request)
+	case models.ConnectionTypeSnowflake:
+		return validateTestSnowflakeConnection(request)
+	default:
+		return errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", request.ConnectionType))
+	}
+}
+
+func validateTestBigQueryConnection(request TestDataConnectionRequest) error {
+	if request.BigQueryConfig == nil {
+		return errors.NewBadRequest("missing BigQuery configuration")
+	}
+
+	var bigQueryCredentials models.BigQueryCredentials
+	err := json.Unmarshal([]byte(request.BigQueryConfig.Credentials), &bigQueryCredentials)
+	if err != nil {
+		return err
+	}
+
+	// TODO: validate the fields all exist in the credentials object
+
+	return nil
+}
+
+func validateTestSnowflakeConnection(request TestDataConnectionRequest) error {
+	if request.SnowflakeConfig == nil {
+		return errors.NewBadRequest("missing Snowflake configuration")
+	}
+
+	// TODO: validate the fields all exist in the credentials object
 
 	return nil
 }

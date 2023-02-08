@@ -37,10 +37,10 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.Logout,
 		},
 		{
-			Name:        "Create data connection",
+			Name:        "Create destination",
 			Method:      router.POST,
-			Pattern:     "/api/create_data_connection",
-			HandlerFunc: s.CreateDataConnection,
+			Pattern:     "/api/create_destination",
+			HandlerFunc: s.CreateDestination,
 		},
 		{
 			Name:        "Create sync configuration",
@@ -79,10 +79,10 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.GetAllUsers,
 		},
 		{
-			Name:        "Get all data connections",
+			Name:        "Get all destinations",
 			Method:      router.GET,
-			Pattern:     "/api/get_data_connections",
-			HandlerFunc: s.GetDataConnections,
+			Pattern:     "/api/get_destinations",
+			HandlerFunc: s.GetDestinations,
 		},
 		{
 			Name:        "Get all sync configurations",

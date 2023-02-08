@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fabra/internal/auth"
-	"fabra/internal/dataconnections"
+	"fabra/internal/connections"
 	"fabra/internal/errors"
 	"fabra/internal/models"
 	"fabra/internal/query"
@@ -41,19 +41,19 @@ func (s ApiService) GetSchema(auth auth.Authentication, w http.ResponseWriter, r
 	}
 
 	// TODO: write test to make sure only authorized users can use the data connection
-	dataConnection, err := dataconnections.LoadDataConnectionByID(s.db, auth.Organization.ID, connectionID)
+	connection, err := connections.LoadConnectionByID(s.db, auth.Organization.ID, connectionID)
 	if err != nil {
 		return err
 	}
 
 	var schema query.Schema
 	if len(customJoin) > 0 {
-		schema, err = s.getSchemaForCustomJoin(*dataConnection, customJoin)
+		schema, err = s.getSchemaForCustomJoin(*connection, customJoin)
 		if err != nil {
 			return err
 		}
 	} else {
-		schema, err = s.getSchemaForTable(*dataConnection, datasetID, tableName)
+		schema, err = s.getSchemaForTable(*connection, datasetID, tableName)
 		if err != nil {
 			return err
 		}
@@ -64,31 +64,31 @@ func (s ApiService) GetSchema(auth auth.Authentication, w http.ResponseWriter, r
 	})
 }
 
-func (s ApiService) getSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (query.Schema, error) {
-	switch dataConnection.ConnectionType {
-	case models.DataConnectionTypeBigQuery:
-		return s.getBigQuerySchemaForTable(dataConnection, datasetID, tableName)
-	case models.DataConnectionTypeSnowflake:
-		return s.getSnowflakeSchemaForTable(dataConnection, datasetID, tableName)
+func (s ApiService) getSchemaForTable(connection models.Connection, datasetID string, tableName string) (query.Schema, error) {
+	switch connection.ConnectionType {
+	case models.ConnectionTypeBigQuery:
+		return s.getBigQuerySchemaForTable(connection, datasetID, tableName)
+	case models.ConnectionTypeSnowflake:
+		return s.getSnowflakeSchemaForTable(connection, datasetID, tableName)
 	default:
-		return nil, errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", dataConnection.ConnectionType))
+		return nil, errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", connection.ConnectionType))
 	}
 }
 
-func (s ApiService) getSchemaForCustomJoin(dataConnection models.DataConnection, customJoin string) (query.Schema, error) {
-	switch dataConnection.ConnectionType {
-	case models.DataConnectionTypeBigQuery:
-		return s.getBigQuerySchemaForCustom(dataConnection, customJoin)
-	case models.DataConnectionTypeSnowflake:
-		return s.getSnowflakeSchemaForCustom(dataConnection, customJoin)
+func (s ApiService) getSchemaForCustomJoin(connection models.Connection, customJoin string) (query.Schema, error) {
+	switch connection.ConnectionType {
+	case models.ConnectionTypeBigQuery:
+		return s.getBigQuerySchemaForCustom(connection, customJoin)
+	case models.ConnectionTypeSnowflake:
+		return s.getSnowflakeSchemaForCustom(connection, customJoin)
 	default:
-		return nil, errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", dataConnection.ConnectionType))
+		return nil, errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", connection.ConnectionType))
 	}
 }
 
-func (s ApiService) getBigQuerySchemaForCustom(dataConnection models.DataConnection, customJoin string) (query.Schema, error) {
+func (s ApiService) getBigQuerySchemaForCustom(connection models.Connection, customJoin string) (query.Schema, error) {
 	ctx := context.Background()
-	result, err := s.queryService.RunQuery(ctx, &dataConnection, customJoin)
+	result, err := s.queryService.RunQuery(ctx, &connection, customJoin)
 	if err != nil {
 		return nil, err
 	}
@@ -96,17 +96,17 @@ func (s ApiService) getBigQuerySchemaForCustom(dataConnection models.DataConnect
 	return result.Schema, nil
 }
 
-func (s ApiService) getBigQuerySchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (query.Schema, error) {
+func (s ApiService) getBigQuerySchemaForTable(connection models.Connection, datasetID string, tableName string) (query.Schema, error) {
 	ctx := context.Background()
-	return s.queryService.GetTableSchema(ctx, &dataConnection, datasetID, tableName)
+	return s.queryService.GetTableSchema(ctx, &connection, datasetID, tableName)
 }
 
-func (s ApiService) getSnowflakeSchemaForTable(dataConnection models.DataConnection, datasetID string, tableName string) (query.Schema, error) {
+func (s ApiService) getSnowflakeSchemaForTable(connection models.Connection, datasetID string, tableName string) (query.Schema, error) {
 	// TODO: implement
 	return nil, errors.NewBadRequest("snowflake not supported")
 }
 
-func (s ApiService) getSnowflakeSchemaForCustom(dataConnection models.DataConnection, customJoin string) (query.Schema, error) {
+func (s ApiService) getSnowflakeSchemaForCustom(connection models.Connection, customJoin string) (query.Schema, error) {
 	// TODO: implement
 	return nil, errors.NewBadRequest("snowflake not supported")
 }

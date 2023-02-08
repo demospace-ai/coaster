@@ -15,10 +15,10 @@ type apiClient interface {
 	RunQuery(ctx context.Context, queryString string) (*QueryResult, error)
 }
 
-func (qs QueryServiceImpl) newAPIClient(ctx context.Context, dataConnection *models.DataConnection) (apiClient, error) {
+func (qs QueryServiceImpl) newAPIClient(ctx context.Context, dataConnection *models.Connection) (apiClient, error) {
 	switch dataConnection.ConnectionType {
-	case models.DataConnectionTypeBigQuery:
-		bigQueryCredentialsString, err := qs.cryptoService.DecryptDataConnectionCredentials(dataConnection.Credentials.String)
+	case models.ConnectionTypeBigQuery:
+		bigQueryCredentialsString, err := qs.cryptoService.DecryptConnectionCredentials(dataConnection.Credentials.String)
 		if err != nil {
 			return nil, err
 		}

@@ -7,15 +7,15 @@ import (
 	"hash/crc32"
 
 	kms "cloud.google.com/go/kms/apiv1"
-	kmspb "google.golang.org/genproto/googleapis/cloud/kms/v1"
+	"cloud.google.com/go/kms/apiv1/kmspb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
-const DATA_CONNECTION_KEY = "projects/fabra-344902/locations/global/keyRings/data-connection-keyring/cryptoKeys/data-connection-key"
+const CONNECTION_KEY = "projects/fabra-344902/locations/global/keyRings/data-connection-keyring/cryptoKeys/data-connection-key"
 
 type CryptoService interface {
-	DecryptDataConnectionCredentials(credentials string) (*string, error)
-	EncryptDataConnectionCredentials(credentials string) (*string, error)
+	DecryptConnectionCredentials(credentials string) (*string, error)
+	EncryptConnectionCredentials(credentials string) (*string, error)
 }
 
 type CryptoServiceImpl struct {
@@ -101,8 +101,8 @@ func decrypt(keyName string, ciphertextString string) (*string, error) {
 	return &plaintext, nil
 }
 
-func (cs CryptoServiceImpl) DecryptDataConnectionCredentials(credentials string) (*string, error) {
-	credentialsString, err := decrypt(DATA_CONNECTION_KEY, credentials)
+func (cs CryptoServiceImpl) DecryptConnectionCredentials(credentials string) (*string, error) {
+	credentialsString, err := decrypt(CONNECTION_KEY, credentials)
 	if err != nil {
 		return nil, err
 	}
@@ -110,8 +110,8 @@ func (cs CryptoServiceImpl) DecryptDataConnectionCredentials(credentials string)
 	return credentialsString, nil
 }
 
-func (cs CryptoServiceImpl) EncryptDataConnectionCredentials(credentials string) (*string, error) {
-	encryptedCredentials, err := encrypt(DATA_CONNECTION_KEY, credentials)
+func (cs CryptoServiceImpl) EncryptConnectionCredentials(credentials string) (*string, error) {
+	encryptedCredentials, err := encrypt(CONNECTION_KEY, credentials)
 	if err != nil {
 		return nil, err
 	}

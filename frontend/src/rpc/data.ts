@@ -1,5 +1,5 @@
 import { sendRequest } from "src/rpc/ajax";
-import { GetAllUsers, GetAllUsersResponse, GetColumnValues, GetColumnValuesRequest, GetColumnValuesResponse, GetDataConnections, GetDataConnectionsResponse, GetDatasets, GetDatasetsResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetSyncConfigurations, GetSyncConfigurationsResponse, GetTables, GetTablesResponse } from "src/rpc/api";
+import { GetAllUsers, GetAllUsersResponse, GetColumnValues, GetColumnValuesRequest, GetColumnValuesResponse, GetDatasets, GetDatasetsResponse, GetDestinations, GetDestinationsResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetSyncConfigurations, GetSyncConfigurationsResponse, GetTables, GetTablesResponse } from "src/rpc/api";
 import useSWR, { Fetcher } from "swr";
 
 export function useSchema(connectionID: number, datasetName: string, tableName?: string, customJoin?: string) {
@@ -15,23 +15,23 @@ export function useUsers() {
   return { users: data?.users, mutate, error };
 }
 
-export function useDataConnections() {
-  const fetcher: Fetcher<GetDataConnectionsResponse, {}> = () => sendRequest(GetDataConnections);
-  const { data, mutate, error } = useSWR({ GetDataConnections }, fetcher);
-  return { connections: data?.data_connections, mutate, error };
+export function useDestinations() {
+  const fetcher: Fetcher<GetDestinationsResponse, {}> = () => sendRequest(GetDestinations);
+  const { data, mutate, error } = useSWR({ GetDestinations }, fetcher);
+  return { destinations: data?.destinations, mutate, error };
 }
 
 export function useDatasets(connectionID: number | undefined) {
   const fetcher: Fetcher<GetDatasetsResponse, { connectionID: number; }> = (payload: { connectionID: number; }) => sendRequest(GetDatasets, payload);
   const shouldFetch = connectionID;
-  const { data, mutate, error } = useSWR(shouldFetch ? { GetDataConnections, connectionID } : null, fetcher);
+  const { data, mutate, error } = useSWR(shouldFetch ? { GetDatasets, connectionID } : null, fetcher);
   return { datasets: data?.datasets, mutate, error };
 }
 
 export function useTables(connectionID: number | undefined, datasetID: string | undefined) {
   const fetcher: Fetcher<GetTablesResponse, { connectionID: number, datasetID: string; }> = (payload: { connectionID: number, datasetID: string; }) => sendRequest(GetTables, payload);
   const shouldFetch = connectionID && datasetID;
-  const { data, mutate, error } = useSWR(shouldFetch ? { GetDataConnections, connectionID, datasetID } : null, fetcher);
+  const { data, mutate, error } = useSWR(shouldFetch ? { GetTables, connectionID, datasetID } : null, fetcher);
   return { tables: data?.tables, mutate, error };
 }
 

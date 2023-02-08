@@ -9,11 +9,11 @@ import (
 )
 
 type QueryService interface {
-	GetDatasets(ctx context.Context, dataConnection *models.DataConnection) ([]string, error)
-	GetTables(ctx context.Context, dataConnection *models.DataConnection, datasetName string) ([]string, error)
-	GetTableSchema(ctx context.Context, dataConnection *models.DataConnection, datasetName string, tableName string) ([]ColumnSchema, error)
-	GetColumnValues(ctx context.Context, dataConnection *models.DataConnection, datasetName string, tableName string, columnName string) ([]Value, error)
-	RunQuery(ctx context.Context, dataConnection *models.DataConnection, queryString string) (*QueryResult, error)
+	GetDatasets(ctx context.Context, dataConnection *models.Connection) ([]string, error)
+	GetTables(ctx context.Context, dataConnection *models.Connection, datasetName string) ([]string, error)
+	GetTableSchema(ctx context.Context, dataConnection *models.Connection, datasetName string, tableName string) ([]ColumnSchema, error)
+	GetColumnValues(ctx context.Context, dataConnection *models.Connection, datasetName string, tableName string, columnName string) ([]Value, error)
+	RunQuery(ctx context.Context, dataConnection *models.Connection, queryString string) (*QueryResult, error)
 }
 
 type QueryServiceImpl struct {
@@ -28,7 +28,7 @@ func NewQueryService(db *gorm.DB, cryptoService crypto.CryptoService) QueryServi
 	}
 }
 
-func (qs QueryServiceImpl) RunQuery(ctx context.Context, dataConnection *models.DataConnection, queryString string) (*QueryResult, error) {
+func (qs QueryServiceImpl) RunQuery(ctx context.Context, dataConnection *models.Connection, queryString string) (*QueryResult, error) {
 	client, err := qs.newAPIClient(ctx, dataConnection)
 	if err != nil {
 		return nil, err
@@ -37,7 +37,7 @@ func (qs QueryServiceImpl) RunQuery(ctx context.Context, dataConnection *models.
 	return client.RunQuery(ctx, queryString)
 }
 
-func (qs QueryServiceImpl) GetDatasets(ctx context.Context, dataConnection *models.DataConnection) ([]string, error) {
+func (qs QueryServiceImpl) GetDatasets(ctx context.Context, dataConnection *models.Connection) ([]string, error) {
 	client, err := qs.newAPIClient(ctx, dataConnection)
 	if err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func (qs QueryServiceImpl) GetDatasets(ctx context.Context, dataConnection *mode
 	return client.GetDatasets(ctx)
 }
 
-func (qs QueryServiceImpl) GetTables(ctx context.Context, dataConnection *models.DataConnection, datasetName string) ([]string, error) {
+func (qs QueryServiceImpl) GetTables(ctx context.Context, dataConnection *models.Connection, datasetName string) ([]string, error) {
 	client, err := qs.newAPIClient(ctx, dataConnection)
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func (qs QueryServiceImpl) GetTables(ctx context.Context, dataConnection *models
 	return client.GetTables(ctx, datasetName)
 }
 
-func (qs QueryServiceImpl) GetTableSchema(ctx context.Context, dataConnection *models.DataConnection, datasetName string, tableName string) ([]ColumnSchema, error) {
+func (qs QueryServiceImpl) GetTableSchema(ctx context.Context, dataConnection *models.Connection, datasetName string, tableName string) ([]ColumnSchema, error) {
 	client, err := qs.newAPIClient(ctx, dataConnection)
 	if err != nil {
 		return nil, err
@@ -64,7 +64,7 @@ func (qs QueryServiceImpl) GetTableSchema(ctx context.Context, dataConnection *m
 	return client.GetTableSchema(ctx, datasetName, tableName)
 }
 
-func (qs QueryServiceImpl) GetColumnValues(ctx context.Context, dataConnection *models.DataConnection, datasetName string, tableName string, columnName string) ([]Value, error) {
+func (qs QueryServiceImpl) GetColumnValues(ctx context.Context, dataConnection *models.Connection, datasetName string, tableName string, columnName string) ([]Value, error) {
 	client, err := qs.newAPIClient(ctx, dataConnection)
 	if err != nil {
 		return nil, err

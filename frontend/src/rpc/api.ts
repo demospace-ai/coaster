@@ -21,10 +21,10 @@ export const GetAllUsers: IEndpoint<undefined, GetAllUsersResponse> = {
     path: '/get_all_users',
 };
 
-export const GetDataConnections: IEndpoint<undefined, GetDataConnectionsResponse> = {
-    name: 'Data Connections Fetched',
+export const GetDestinations: IEndpoint<undefined, GetDestinationsResponse> = {
+    name: 'Destinations Fetched',
     method: 'GET',
-    path: '/get_data_connections',
+    path: '/get_destinations',
 };
 
 export const GetSyncConfigurations: IEndpoint<undefined, GetSyncConfigurationsResponse> = {
@@ -88,17 +88,10 @@ export const GetColumnValues: IEndpoint<GetColumnValuesRequest, GetColumnValuesR
     track: true,
 };
 
-export const RunFunnelQuery: IEndpoint<RunQueryRequest, QueryResult> = {
-    name: 'Funnel Run',
+export const CreateDestination: IEndpoint<CreateDestinationRequest, undefined> = {
+    name: 'Destination Created',
     method: 'POST',
-    path: '/run_funnel_query',
-    track: true,
-};
-
-export const CreateDataConnection: IEndpoint<CreateDataConnectionRequest, undefined> = {
-    name: 'Data Connection Created',
-    method: 'POST',
-    path: '/create_data_connection',
+    path: '/create_destination',
     track: true,
 };
 
@@ -111,26 +104,29 @@ export const CreateSyncConfiguration: IEndpoint<CreateSyncConfigurationRequest, 
 
 export interface TestDataConnectionRequest {
     display_name: string;
-    connection_type: DataConnectionType;
-    credentials?: string;
-    username?: string;
-    password?: string;
-    database_name?: string;
-    warehouse_name?: string;
-    role?: string;
-    account?: string;
+    connection_type: ConnectionType;
+    bigquery_config?: BigQueryConfig;
+    snowflake_config?: SnowflakeConfig;
 }
 
-export interface CreateDataConnectionRequest {
+export interface CreateDestinationRequest {
     display_name: string;
-    connection_type: DataConnectionType;
-    credentials?: string;
-    username?: string;
-    password?: string;
-    database_name?: string;
-    warehouse_name?: string;
-    role?: string;
-    account?: string;
+    connection_type: ConnectionType;
+    bigquery_config?: BigQueryConfig;
+    snowflake_config?: SnowflakeConfig;
+}
+
+export interface BigQueryConfig {
+    credentials: string;
+}
+
+export interface SnowflakeConfig {
+    username: string;
+    password: string;
+    database_name: string;
+    warehouse_name: string;
+    role: string;
+    account: string;
 }
 
 export interface CreateSyncConfigurationRequest {
@@ -223,8 +219,8 @@ export interface GetAllUsersResponse {
     users: User[];
 }
 
-export interface GetDataConnectionsResponse {
-    data_connections: DataConnection[];
+export interface GetDestinationsResponse {
+    destinations: Destination[];
 }
 
 export interface GetSyncConfigurationsResponse {
@@ -259,8 +255,6 @@ export interface LoginResponse {
 export interface Organization {
     id: number;
     name: string;
-    default_data_connection_id?: number;
-    default_event_set_id?: number;
 }
 
 export interface CheckSessionResponse {
@@ -275,10 +269,15 @@ export enum ColumnType {
     Timestamp = "TIMESTAMP"
 }
 
-export interface DataConnection {
+export interface Destination {
     id: number;
     display_name: string;
-    connection_type: DataConnectionType;
+    connection: Connection;
+}
+
+export interface Connection {
+    id: number;
+    connection_type: ConnectionType;
 }
 
 export interface SyncConfiguration {
@@ -290,7 +289,7 @@ export interface SyncConfiguration {
     custom_join: string | undefined;
 }
 
-export enum DataConnectionType {
+export enum ConnectionType {
     BigQuery = "bigquery",
     Snowflake = "snowflake",
 }

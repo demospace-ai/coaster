@@ -11,12 +11,12 @@ import (
 type MockCryptoService struct {
 }
 
-func (cs MockCryptoService) DecryptDataConnectionCredentials(_ string) (*string, error) {
+func (cs MockCryptoService) DecryptConnectionCredentials(_ string) (*string, error) {
 	result := "decrypted"
 	return &result, nil
 }
 
-func (cs MockCryptoService) EncryptDataConnectionCredentials(_ string) (*string, error) {
+func (cs MockCryptoService) EncryptConnectionCredentials(_ string) (*string, error) {
 	result := "encrypted"
 	return &result, nil
 }
@@ -31,22 +31,22 @@ func NewMockQueryService(db *gorm.DB) MockQueryService {
 	}
 }
 
-func (qs MockQueryService) GetDatasets(ctx context.Context, dataConnection *models.DataConnection) ([]string, error) {
+func (qs MockQueryService) GetDatasets(ctx context.Context, dataConnection *models.Connection) ([]string, error) {
 	return nil, nil
 }
 
-func (qs MockQueryService) GetTables(ctx context.Context, dataConnection *models.DataConnection, datasetName string) ([]string, error) {
+func (qs MockQueryService) GetTables(ctx context.Context, dataConnection *models.Connection, datasetName string) ([]string, error) {
 	return nil, nil
 }
 
-func (qs MockQueryService) GetTableSchema(ctx context.Context, dataConnection *models.DataConnection, datasetName string, tableName string) ([]query.ColumnSchema, error) {
+func (qs MockQueryService) GetTableSchema(ctx context.Context, dataConnection *models.Connection, datasetName string, tableName string) ([]query.ColumnSchema, error) {
 	return nil, nil
 }
 
-func (qs MockQueryService) GetColumnValues(ctx context.Context, dataConnection *models.DataConnection, datasetName string, tableName string, columnName string) ([]query.Value, error) {
+func (qs MockQueryService) GetColumnValues(ctx context.Context, dataConnection *models.Connection, datasetName string, tableName string, columnName string) ([]query.Value, error) {
 	return nil, nil
 }
 
-func (qs MockQueryService) RunQuery(ctx context.Context, dataConnection *models.DataConnection, queryString string) (*query.QueryResult, error) {
+func (qs MockQueryService) RunQuery(ctx context.Context, dataConnection *models.Connection, queryString string) (*query.QueryResult, error) {
 	return nil, nil
 }

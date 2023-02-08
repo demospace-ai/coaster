@@ -2,11 +2,11 @@ package models
 
 import "fabra/internal/database"
 
-type DataConnectionType string
+type ConnectionType string
 
 const (
-	DataConnectionTypeSnowflake DataConnectionType = "snowflake"
-	DataConnectionTypeBigQuery  DataConnectionType = "bigquery"
+	ConnectionTypeSnowflake ConnectionType = "snowflake"
+	ConnectionTypeBigQuery  ConnectionType = "bigquery"
 )
 
 type BigQueryCredentials struct {
@@ -22,10 +22,10 @@ type BigQueryCredentials struct {
 	ClientX509CertUrl       string `json:"client_x509_cert_url"`
 }
 
-type DataConnection struct {
+type Connection struct {
 	OrganizationID int64
 	DisplayName    string              `json:"display_name"`
-	ConnectionType DataConnectionType  `json:"connection_type"`
+	ConnectionType ConnectionType      `json:"connection_type"`
 	Username       database.NullString `json:"-"`
 	Password       database.NullString `json:"-"`
 	Credentials    database.NullString `json:"-"`

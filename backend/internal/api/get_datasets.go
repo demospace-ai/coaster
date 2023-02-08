@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fabra/internal/auth"
-	"fabra/internal/dataconnections"
+	"fabra/internal/connections"
 	"fabra/internal/errors"
 	"fmt"
 	"net/http"
@@ -36,7 +36,7 @@ func (s ApiService) GetDatasets(auth auth.Authentication, w http.ResponseWriter,
 	}
 
 	// TODO: write test to make sure only authorized users can use the data connection
-	dataConnection, err := dataconnections.LoadDataConnectionByID(s.db, auth.Organization.ID, connectionID)
+	dataConnection, err := connections.LoadConnectionByID(s.db, auth.Organization.ID, connectionID)
 	if err != nil {
 		return err
 	}

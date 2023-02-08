@@ -5,13 +5,13 @@ import { BackButton, Button, FormButton } from "src/components/button/Button";
 import { ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { sendRequest } from "src/rpc/ajax";
-import { CreateDataConnection, CreateDataConnectionRequest, DataConnectionType, GetDataConnections, TestDataConnection, TestDataConnectionRequest } from "src/rpc/api";
+import { ConnectionType, CreateDestination, CreateDestinationRequest, GetDestinations, TestDataConnection, TestDataConnectionRequest } from "src/rpc/api";
 import { mutate } from "swr";
 
 import styles from './newconnection.m.css';
 
 export const NewConnection: React.FC<{ onComplete: () => void; }> = props => {
-  const [connectionType, setConnectionType] = useState<DataConnectionType | null>(null);
+  const [connectionType, setConnectionType] = useState<ConnectionType | null>(null);
   const onBack = () => {
     if (connectionType) {
       setConnectionType(null);
@@ -38,8 +38,8 @@ export const NewConnection: React.FC<{ onComplete: () => void; }> = props => {
 };
 
 type NewConnectionConfigurationProps = {
-  connectionType: DataConnectionType;
-  setConnectionType: (connectionType: DataConnectionType | null) => void;
+  connectionType: ConnectionType;
+  setConnectionType: (connectionType: ConnectionType | null) => void;
   onComplete: () => void;
 };
 
@@ -65,9 +65,9 @@ const INITIAL_CONNECTION_STATE: NewConnectionState = {
   account: "",
 };
 
-const validateAll = (connectionType: DataConnectionType, state: NewConnectionState): boolean => {
+const validateAll = (connectionType: ConnectionType, state: NewConnectionState): boolean => {
   switch (connectionType) {
-    case DataConnectionType.Snowflake:
+    case ConnectionType.Snowflake:
       return state.displayName.length > 0
         && state.username.length > 0
         && state.password.length > 0
@@ -75,7 +75,7 @@ const validateAll = (connectionType: DataConnectionType, state: NewConnectionSta
         && state.warehouseName.length > 0
         && state.role.length > 0
         && state.account.length > 0;
-    case DataConnectionType.BigQuery:
+    case ConnectionType.BigQuery:
       return state.displayName.length > 0 && state.credentials.length > 0;
   }
 };
@@ -85,7 +85,7 @@ const NewConnectionConfiguration: React.FC<NewConnectionConfigurationProps> = pr
   const [saveLoading, setSaveLoading] = useState(false);
   const [createConnectionSuccess, setCreateConnectionSuccess] = useState<boolean | null>(null);
 
-  const createNewDataConnection = async (e: FormEvent) => {
+  const createNewConnection = async (e: FormEvent) => {
     e.preventDefault();
     setSaveLoading(true);
     if (!validateAll(props.connectionType, state)) {
@@ -93,21 +93,34 @@ const NewConnectionConfiguration: React.FC<NewConnectionConfigurationProps> = pr
       return;
     }
 
-    const payload: CreateDataConnectionRequest = {
+    const payload: CreateDestinationRequest = {
       'display_name': state.displayName,
       'connection_type': props.connectionType,
-      'credentials': state.credentials,
-      'username': state.username,
-      'password': state.password,
-      'database_name': state.databaseName,
-      'warehouse_name': state.warehouseName,
-      'role': state.role,
-      'account': state.account,
     };
 
+    switch (props.connectionType) {
+      case ConnectionType.BigQuery:
+        payload.bigquery_config = {
+          'credentials': state.credentials,
+        };
+        break;
+      case ConnectionType.Snowflake:
+        payload.snowflake_config = {
+          'username': state.username,
+          'password': state.password,
+          'database_name': state.databaseName,
+          'warehouse_name': state.warehouseName,
+          'role': state.role,
+          'account': state.account,
+        };
+        break;
+      default:
+      // TODO: throw an error here
+    }
+
     try {
-      await sendRequest(CreateDataConnection, payload);
-      mutate({ GetDataConnections }); // Tell SWRs to refetch data connections
+      await sendRequest(CreateDestination, payload);
+      mutate({ GetDestinations }); // Tell SWRs to refetch destinatinos connections
       setCreateConnectionSuccess(true);
     } catch (e) {
       setCreateConnectionSuccess(false);
@@ -118,10 +131,10 @@ const NewConnectionConfiguration: React.FC<NewConnectionConfigurationProps> = pr
 
   let inputs: React.ReactElement;
   switch (props.connectionType) {
-    case DataConnectionType.Snowflake:
+    case ConnectionType.Snowflake:
       inputs = <SnowflakeInputs state={state} setState={setState} />;
       break;
-    case DataConnectionType.BigQuery:
+    case ConnectionType.BigQuery:
       inputs = <BigQueryInputs state={state} setState={setState} />;
       break;
   };
@@ -138,7 +151,7 @@ const NewConnectionConfiguration: React.FC<NewConnectionConfigurationProps> = pr
   return (
     <>
       <div className={styles.connectionSelectorTitle}>Enter your data source configuration:</div>
-      <form onSubmit={createNewDataConnection}>
+      <form onSubmit={createNewConnection}>
         {inputs}
         <TestConnectionButton state={state} connectionType={props.connectionType} />
         <FormButton className={styles.submit}>{saveLoading ? <Loading /> : "Continue"}</FormButton>
@@ -151,7 +164,7 @@ const NewConnectionConfiguration: React.FC<NewConnectionConfigurationProps> = pr
   );
 };
 
-const TestConnectionButton: React.FC<{ state: NewConnectionState, connectionType: DataConnectionType; }> = props => {
+const TestConnectionButton: React.FC<{ state: NewConnectionState, connectionType: ConnectionType; }> = props => {
   const [testLoading, setTestLoading] = useState(false);
   const [testConnectionSuccess, setTestConnectionSuccess] = useState<boolean | null>(null);
   const state = props.state;
@@ -166,14 +179,27 @@ const TestConnectionButton: React.FC<{ state: NewConnectionState, connectionType
     const payload: TestDataConnectionRequest = {
       'display_name': state.displayName,
       'connection_type': props.connectionType,
-      'credentials': state.credentials,
-      'username': state.username,
-      'password': state.password,
-      'database_name': state.databaseName,
-      'warehouse_name': state.warehouseName,
-      'role': state.role,
-      'account': state.account,
     };
+
+    switch (props.connectionType) {
+      case ConnectionType.BigQuery:
+        payload.bigquery_config = {
+          'credentials': state.credentials,
+        };
+        break;
+      case ConnectionType.Snowflake:
+        payload.snowflake_config = {
+          'username': state.username,
+          'password': state.password,
+          'database_name': state.databaseName,
+          'warehouse_name': state.warehouseName,
+          'role': state.role,
+          'account': state.account,
+        };
+        break;
+      default:
+      // TODO: throw an error here
+    }
 
     try {
       await sendRequest(TestDataConnection, payload);
@@ -234,7 +260,7 @@ const BigQueryInputs: React.FC<ConnectionConfigurationProps> = props => {
 };
 
 type ConnectionTypeSelectorProps = {
-  setConnectionType: (connectionType: DataConnectionType) => void;
+  setConnectionType: (connectionType: ConnectionType) => void;
 };
 
 const ConnectionTypeSelector: React.FC<ConnectionTypeSelectorProps> = props => {
@@ -242,8 +268,8 @@ const ConnectionTypeSelector: React.FC<ConnectionTypeSelectorProps> = props => {
     <>
       <div className={styles.connectionSelectorTitle}>Choose your data warehouse:</div>
       <div className={styles.connectionSelector}>
-        <Button className={styles.connectionSelection} onClick={() => props.setConnectionType(DataConnectionType.Snowflake)}>Snowflake</Button>
-        <Button className={styles.connectionSelection} onClick={() => props.setConnectionType(DataConnectionType.BigQuery)}>BigQuery</Button>
+        <Button className={styles.connectionSelection} onClick={() => props.setConnectionType(ConnectionType.Snowflake)}>Snowflake</Button>
+        <Button className={styles.connectionSelection} onClick={() => props.setConnectionType(ConnectionType.BigQuery)}>BigQuery</Button>
       </div>
     </>
   );

@@ -1,7 +1,6 @@
 package syncconfigurations
 
 import (
-	"fabra/internal/database"
 	"fabra/internal/models"
 
 	"gorm.io/gorm"
@@ -10,24 +9,20 @@ import (
 func CreateSyncConfiguration(
 	db *gorm.DB,
 	organizationID int64,
+	endCustomerID int64,
 	displayName string,
-	connectionID int64,
-	datasetName *string,
-	tableName *string,
-	customJoin *string,
+	destinationID int64,
+	sourceID int64,
+	modelID int64,
 ) (*models.SyncConfiguration, error) {
 
 	syncConfiguration := models.SyncConfiguration{
 		OrganizationID: organizationID,
+		EndCustomerID:  endCustomerID,
 		DisplayName:    displayName,
-		ConnectionID:   connectionID,
-	}
-
-	if tableName != nil && datasetName != nil {
-		syncConfiguration.DatasetName = database.NewNullString(*datasetName)
-		syncConfiguration.TableName = database.NewNullString(*tableName)
-	} else if customJoin != nil {
-		syncConfiguration.CustomJoin = database.NewNullString(*customJoin)
+		DestinationID:  destinationID,
+		SourceID:       sourceID,
+		ModelID:        modelID,
 	}
 
 	result := db.Create(&syncConfiguration)
@@ -58,17 +53,17 @@ func LoadAllSyncConfigurations(
 	db *gorm.DB,
 	organizationID int64,
 ) ([]models.SyncConfiguration, error) {
-	var eventSets []models.SyncConfiguration
-	result := db.Table("sync_configuration").
+	var syncConfiguration []models.SyncConfiguration
+	result := db.Table("sync_configurations").
 		Select("sync_configurations.*").
 		Where("sync_configurations.organization_id = ?", organizationID).
 		Where("sync_configurations.deactivated_at IS NULL").
 		Order("sync_configurations.created_at ASC").
-		Find(&eventSets)
+		Find(&syncConfiguration)
 
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
-	return eventSets, nil
+	return syncConfiguration, nil
 }

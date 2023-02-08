@@ -1,14 +1,12 @@
 package models
 
-import "fabra/internal/database"
-
 type SyncConfiguration struct {
 	OrganizationID int64
-	DisplayName    string              `json:"display_name"`
-	ConnectionID   int64               `json:"connection_id"`
-	DatasetName    database.NullString `json:"dataset_name"`
-	TableName      database.NullString `json:"table_name"`
-	CustomJoin     database.NullString `json:"custom_join"`
+	EndCustomerID  int64
+	DisplayName    string `json:"display_name"`
+	DestinationID  int64  `json:"destination_id"`
+	SourceID       int64  `json:"source_id"`
+	ModelID        int64  `json:"model_id"`
 
 	BaseModel
 }

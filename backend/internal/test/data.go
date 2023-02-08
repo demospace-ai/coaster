@@ -34,31 +34,17 @@ func CreateUser(db *gorm.DB, organizationID int64) *models.User {
 	return &user
 }
 
-func CreateDataConnection(db *gorm.DB, organizationID int64) *models.DataConnection {
-	dataConnection := models.DataConnection{
+func CreateConnection(db *gorm.DB, organizationID int64) *models.Connection {
+	connection := models.Connection{
 		DisplayName:    "Test Data Connection",
 		OrganizationID: organizationID,
-		ConnectionType: models.DataConnectionTypeBigQuery,
+		ConnectionType: models.ConnectionTypeBigQuery,
 		Credentials:    database.NewNullString("testCredentials"),
 	}
 
-	db.Create(&dataConnection)
+	db.Create(&connection)
 
-	return &dataConnection
-}
-
-func CreateSyncConfiguration(db *gorm.DB, organizationID int64, connectionID int64) *models.SyncConfiguration {
-	eventSet := models.SyncConfiguration{
-		DisplayName:          "Test Event Set",
-		OrganizationID:       organizationID,
-		ConnectionID:         connectionID,
-		DatasetName:          database.NewNullString("testDataset"),
-		TableName:            database.NewNullString("testTable"),
-	}
-
-	db.Create(&eventSet)
-
-	return &eventSet
+	return &connection
 }
 
 func CreateActiveSession(db *gorm.DB, userID int64) string {

@@ -1,34 +1,9 @@
 import { ValidatedComboInput, ValidatedDropdownInput } from "src/components/input/Input";
-import { ColumnSchema, DataConnection } from "src/rpc/api";
-import { useColumnValues, useDataConnections, useDatasets, useTables } from "src/rpc/data";
-
-type ConnectionSelectorProps = {
-  connection: DataConnection | undefined;
-  setConnection: (connection: DataConnection) => void;
-  className?: string;
-  noOptionsString?: string;
-  placeholder?: string;
-  validated?: boolean;
-};
-
-export const ConnectionSelector: React.FC<ConnectionSelectorProps> = props => {
-  const { connections } = useDataConnections();
-
-  return <ValidatedDropdownInput
-    by="id"
-    className={props.className}
-    selected={props.connection}
-    setSelected={props.setConnection}
-    options={connections}
-    getElementForDisplay={(connection: DataConnection) => connection.display_name}
-    loading={!connections}
-    noOptionsString={props.noOptionsString ? props.noOptionsString : "No data sources available!"}
-    placeholder={props.placeholder ? props.placeholder : "Choose data source"}
-    validated={props.validated} />;
-};
+import { ColumnSchema, Connection } from "src/rpc/api";
+import { useColumnValues, useDatasets, useTables } from "src/rpc/data";
 
 type DatasetSelectorProps = {
-  connection: DataConnection | undefined;
+  connection: Connection | undefined;
   datasetName: string | undefined;
   setDatasetName: (datasetName: string) => void;
   className?: string;
@@ -52,7 +27,7 @@ export const DatasetSelector: React.FC<DatasetSelectorProps> = props => {
 };
 
 type TableSelectorProps = {
-  connection: DataConnection | undefined;
+  connection: Connection | undefined;
   datasetName: string | undefined;
   tableName: string | undefined;
   setTableName: (tableName: string) => void;
