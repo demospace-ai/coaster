@@ -1,6 +1,12 @@
 import { sendRequest } from "src/rpc/ajax";
-import { GetAllUsers, GetAllUsersResponse, GetColumnValues, GetColumnValuesRequest, GetColumnValuesResponse, GetDatasets, GetDatasetsResponse, GetDestinations, GetDestinationsResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetSyncConfigurations, GetSyncConfigurationsResponse, GetTables, GetTablesResponse } from "src/rpc/api";
+import { GetAllUsers, GetAllUsersResponse, GetApiKey, GetColumnValues, GetColumnValuesRequest, GetColumnValuesResponse, GetDatasets, GetDatasetsResponse, GetDestinations, GetDestinationsResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetSyncConfigurations, GetSyncConfigurationsResponse, GetTables, GetTablesResponse } from "src/rpc/api";
 import useSWR, { Fetcher } from "swr";
+
+export function useApiKey() {
+  const fetcher: Fetcher<string, {}> = () => sendRequest(GetApiKey);
+  const { data, error } = useSWR({ GetApiKey }, fetcher);
+  return { apiKey: data, error };
+}
 
 export function useSchema(connectionID: number, datasetName: string, tableName?: string, customJoin?: string) {
   const fetcher: Fetcher<GetSchemaResponse, GetSchemaRequest> = (request: GetSchemaRequest) => sendRequest(GetSchema, request);

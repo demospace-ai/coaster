@@ -61,6 +61,12 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.GetDatasets,
 		},
 		{
+			Name:        "Get API key",
+			Method:      router.GET,
+			Pattern:     "/api/get_api_key",
+			HandlerFunc: s.GetApiKey,
+		},
+		{
 			Name:        "Get tables for a given data source and dataset",
 			Method:      router.GET,
 			Pattern:     "/api/get_tables",

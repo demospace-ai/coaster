@@ -9,6 +9,7 @@ type TooltipProps = {
   place?: Place;
   disabled?: boolean;
   className?: string;
+  hideOnClick?: boolean;
 };
 
 export const Tooltip: React.FC<TooltipProps> = props => {
@@ -16,7 +17,7 @@ export const Tooltip: React.FC<TooltipProps> = props => {
 
   return (
     <>
-      <Tippy className={props.className} content={props.label} placement={place} delay={0} duration={100} disabled={props.disabled}>
+      <Tippy className={props.className} content={props.label} placement={place} delay={0} duration={100} disabled={props.disabled} hideOnClick={props.hideOnClick}>
         {props.children}
       </Tippy>
     </>

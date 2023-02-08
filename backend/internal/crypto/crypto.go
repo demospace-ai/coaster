@@ -12,10 +12,13 @@ import (
 )
 
 const CONNECTION_KEY = "projects/fabra-344902/locations/global/keyRings/data-connection-keyring/cryptoKeys/data-connection-key"
+const API_KEY_KEY = "projects/fabra-344902/locations/global/keyRings/api-key-keyring/cryptoKeys/api-key-key"
 
 type CryptoService interface {
-	DecryptConnectionCredentials(credentials string) (*string, error)
+	DecryptConnectionCredentials(encryptedCredentials string) (*string, error)
 	EncryptConnectionCredentials(credentials string) (*string, error)
+	DecryptApiKey(encryptedApiKey string) (*string, error)
+	EncryptApiKey(apiKey string) (*string, error)
 }
 
 type CryptoServiceImpl struct {
@@ -101,13 +104,13 @@ func decrypt(keyName string, ciphertextString string) (*string, error) {
 	return &plaintext, nil
 }
 
-func (cs CryptoServiceImpl) DecryptConnectionCredentials(credentials string) (*string, error) {
-	credentialsString, err := decrypt(CONNECTION_KEY, credentials)
+func (cs CryptoServiceImpl) DecryptConnectionCredentials(encryptedCredentials string) (*string, error) {
+	credentials, err := decrypt(CONNECTION_KEY, encryptedCredentials)
 	if err != nil {
 		return nil, err
 	}
 
-	return credentialsString, nil
+	return credentials, nil
 }
 
 func (cs CryptoServiceImpl) EncryptConnectionCredentials(credentials string) (*string, error) {
@@ -117,4 +120,22 @@ func (cs CryptoServiceImpl) EncryptConnectionCredentials(credentials string) (*s
 	}
 
 	return encryptedCredentials, nil
+}
+
+func (cs CryptoServiceImpl) DecryptApiKey(encryptedApiKey string) (*string, error) {
+	apiKey, err := decrypt(API_KEY_KEY, encryptedApiKey)
+	if err != nil {
+		return nil, err
+	}
+
+	return apiKey, nil
+}
+
+func (cs CryptoServiceImpl) EncryptApiKey(apiKey string) (*string, error) {
+	encryptedApiKey, err := encrypt(API_KEY_KEY, apiKey)
+	if err != nil {
+		return nil, err
+	}
+
+	return encryptedApiKey, nil
 }

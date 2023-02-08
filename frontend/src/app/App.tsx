@@ -4,6 +4,7 @@ import { useStart } from 'src/app/actions';
 import { Header } from 'src/components/header/Header';
 import { Loading } from 'src/components/loading/Loading';
 import { NavigationBar } from 'src/components/navigationBar/NavigationBar';
+import { ApiKey } from 'src/pages/apikey/ApiKey';
 import { Destinations } from 'src/pages/destinations/Destinations';
 import { Inbox } from 'src/pages/inbox/Inbox';
 import { Login } from 'src/pages/login/Login';
@@ -38,6 +39,7 @@ export const App: React.FC = () => {
         <Route element={<AppLayout />}>
           <Route path='/login' element={<Login />} />
           <Route path='/' element={<RequireAuth element={<Inbox />} />} />
+          <Route path='/apikey' element={<RequireAuth element={<ApiKey />} />} />
           <Route path='/team' element={<RequireAuth element={<Team />} />} />
           <Route path='/destinations' element={<RequireAuth element={<Destinations />} />} />
           <Route path='*' element={<NotFound />} />

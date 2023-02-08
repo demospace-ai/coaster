@@ -37,6 +37,8 @@ type Breadcrumb = {
 const Breadcrumbs: React.FC<{ pathname: string; }> = props => {
   const pathTokens = props.pathname.split('/');
   switch (pathTokens[1]) {
+    case "apikey":
+      return <PageBreadcrumbs title={"API Keys"} pathname={props.pathname} />;
     default:
       return <PageBreadcrumbs title={toTitleCase(pathTokens[1])} pathname={props.pathname} />;
   }

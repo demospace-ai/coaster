@@ -6,6 +6,7 @@ export interface IEndpoint<RequestType, ResponseType> {
     path: string;
     track?: boolean;
     queryParams?: string[]; // These will be used as query params instead of being used as path params
+    noJson?: boolean; // TODO: do this better
 }
 
 export const Login: IEndpoint<LoginRequest, LoginResponse> = {
@@ -52,6 +53,13 @@ export const GetSchema: IEndpoint<GetSchemaRequest, GetSchemaResponse> = {
     method: 'GET',
     path: '/get_schema',
     queryParams: ['connectionID', 'datasetID', 'tableName', 'customJoin'],
+};
+
+export const GetApiKey: IEndpoint<undefined, string> = {
+    name: 'API Key Fetched',
+    method: 'GET',
+    path: '/get_api_key',
+    noJson: true,
 };
 
 export const CheckSession: IEndpoint<undefined, CheckSessionResponse> = {

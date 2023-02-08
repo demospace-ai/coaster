@@ -68,12 +68,10 @@ export const NavigationBar: React.FC = () => {
           Develop
         </div>
         <div className={routeContainer}>
-          <Tooltip label="Coming soon!">
-            <div className={navLink}>
-              <KeyIcon className="tw-h-4" strokeWidth="2" />
-              <div className={route}>API Keys</div>
-            </div>
-          </Tooltip>
+          <NavLink className={navLink} to="/apikey">
+            <KeyIcon className="tw-h-4" strokeWidth="2" />
+            <div className={route}>API Keys</div>
+          </NavLink>
         </div>
         <div className={routeContainer}>
           <NavLink className={navLink} to="/destinations">

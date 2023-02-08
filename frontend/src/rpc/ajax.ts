@@ -47,5 +47,8 @@ export async function sendRequest<RequestType extends Record<string, any>, Respo
     // TODO: clean this up
     // not all AJAX requests have a response. the ones that do will be formatted as JSON
     // so just catch any error from trying to fetch the json and do nothing with it
+    if (endpoint.noJson) {
+        return response.text() as ResponseType;
+    }
     return response.json().catch(() => null);
 }

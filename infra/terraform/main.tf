@@ -405,3 +405,24 @@ resource "google_kms_key_ring_iam_member" "data-connection-key-ring-cloud-run-ro
   role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
   member        = "serviceAccount:932264813910-compute@developer.gserviceaccount.com"
 }
+
+resource "google_kms_key_ring" "api-key-keyring" {
+  name     = "api-key-keyring"
+  location = "global"
+}
+
+resource "google_kms_crypto_key" "api-key-key" {
+  name            = "api-key-key"
+  key_ring        = google_kms_key_ring.api-key-keyring.id
+  rotation_period = "100000s"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "google_kms_key_ring_iam_member" "api-key-key-ring-cloud-run-role" {
+  key_ring_id = google_kms_key_ring.api-key-keyring.id
+  role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+  member        = "serviceAccount:932264813910-compute@developer.gserviceaccount.com"
+}
