@@ -4,14 +4,14 @@ import { Button } from "src/components/button/Button";
 import { Loading } from "src/components/loading/Loading";
 import { useUsers } from "src/rpc/data";
 
-const tableHeaderStyle = "tw-sticky tw-top-0 tw-z-0 tw-border-b tw-border-slate-300 tw-bg-slate-50 tw-bg-opacity-75 tw-py-3.5 tw-pr-4 tw-pl-3 backdrop-blur backdrop-filter sm:tw-pr-6 lg:tw-pr-8 tw-text-left";
+const tableHeaderStyle = "tw-sticky tw-top-0 tw-z-0 tw-border-b tw-border-slate-300 tw-py-3.5 tw-pr-4 tw-pl-3 backdrop-blur backdrop-filter sm:tw-pr-6 lg:tw-pr-8 tw-text-left";
 const tableCellStyle = "tw-whitespace-nowrap tw-px-3 tw-py-4 tw-text-sm tw-text-slate-500 tw-hidden sm:tw-table-cell";
 
 export const Team: React.FC = () => {
   const { users } = useUsers();
   return (
     <div className='tw-py-5 tw-px-10'>
-      <div className="tw-flex tw-w-full tw-mb-3">
+      <div className="tw-flex tw-w-full tw-mb-5 tw-mt-2">
         <div className="tw-flex tw-flex-col tw-justify-end tw-font-bold tw-text-lg">Users</div>
         <Button className='tw-ml-auto tw-flex' onClick={() => { }}>
           <div className="tw-flex tw-flex-col tw-justify-center tw-h-full">
@@ -22,11 +22,11 @@ export const Team: React.FC = () => {
           </div>
         </Button>
       </div>
-      <div className='tw-border tw-border-solid tw-border-slate-300 tw-rounded-lg tw-max-h-64 tw-overflow-x-auto tw-overscroll-contain' >
+      <div className='tw-border tw-border-solid tw-border-slate-300 tw-rounded-lg tw-max-h-64 tw-overflow-x-auto tw-overscroll-contain tw-bg-white tw-shadow-md' >
         {users
           ?
           <table className="tw-min-w-full tw-border-separate tw-border-spacing-0">
-            <thead className="tw-bg-slate-100">
+            <thead className="tw-bg-slate-600 tw-text-white">
               <tr>
                 <th scope="col" className={tableHeaderStyle}>Name</th>
                 <th scope="col" className={tableHeaderStyle}>Email</th>
