@@ -36,7 +36,6 @@ func CreateUser(db *gorm.DB, organizationID int64) *models.User {
 
 func CreateConnection(db *gorm.DB, organizationID int64) *models.Connection {
 	connection := models.Connection{
-		DisplayName:    "Test Data Connection",
 		OrganizationID: organizationID,
 		ConnectionType: models.ConnectionTypeBigQuery,
 		Credentials:    database.NewNullString("testCredentials"),

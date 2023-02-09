@@ -62,7 +62,7 @@ func (s ApiService) CreateSyncConfiguration(auth auth.Authentication, w http.Res
 			return err
 		}
 		connection, err = connections.CreateBigQueryConnection(
-			s.db, auth.Organization.ID, createSourceRequest.DisplayName, *encryptedCredentials,
+			s.db, auth.Organization.ID, *encryptedCredentials,
 		)
 	case models.ConnectionTypeSnowflake:
 		encryptedCredentials, err = s.cryptoService.EncryptConnectionCredentials(createSourceRequest.SnowflakeConfig.Password)
@@ -71,7 +71,6 @@ func (s ApiService) CreateSyncConfiguration(auth auth.Authentication, w http.Res
 		}
 		connection, err = connections.CreateSnowflakeConnection(
 			s.db, auth.Organization.ID,
-			createSourceRequest.DisplayName,
 			*createSourceRequest.SnowflakeConfig,
 			*encryptedCredentials,
 		)

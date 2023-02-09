@@ -6,7 +6,7 @@ type SnowflakeConfig struct {
 	WarehouseName string `json:"warehouse_name,omitempty"`
 	DatabaseName  string `json:"database_name,omitempty"`
 	Role          string `json:"role,omitempty"`
-	Account       string `json:"account,omitempty"`
+	Host          string `json:"host,omitempty"`
 }
 
 type BigQueryConfig struct {

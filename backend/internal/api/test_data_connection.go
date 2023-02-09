@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fabra/internal/auth"
 	"fabra/internal/errors"
@@ -9,8 +10,10 @@ import (
 	"fabra/internal/models"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"cloud.google.com/go/bigquery"
+	sf "github.com/snowflakedb/gosnowflake"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 )
@@ -42,23 +45,22 @@ func (s ApiService) TestDataConnection(auth auth.Authentication, w http.Response
 
 	switch testDataConnectionRequest.ConnectionType {
 	case models.ConnectionTypeBigQuery:
-		return testBigQueryConnection(testDataConnectionRequest.BigQueryConfig.Credentials)
+		return testBigQueryConnection(*testDataConnectionRequest.BigQueryConfig)
 	case models.ConnectionTypeSnowflake:
-		// TODO: implement test for Snowflake
-		return nil
+		return testSnowflakeConnection(*testDataConnectionRequest.SnowflakeConfig)
 	}
 
 	return nil
 }
 
-func testBigQueryConnection(credentials string) error {
+func testBigQueryConnection(bigqueryConfig input.BigQueryConfig) error {
 	var bigQueryCredentials models.BigQueryCredentials
-	err := json.Unmarshal([]byte(credentials), &bigQueryCredentials)
+	err := json.Unmarshal([]byte(bigqueryConfig.Credentials), &bigQueryCredentials)
 	if err != nil {
 		return err
 	}
 
-	credentialOption := option.WithCredentialsJSON([]byte(credentials))
+	credentialOption := option.WithCredentialsJSON([]byte(bigqueryConfig.Credentials))
 
 	ctx := context.Background()
 	client, err := bigquery.NewClient(ctx, bigQueryCredentials.ProjectID, credentialOption)
@@ -71,6 +73,31 @@ func testBigQueryConnection(credentials string) error {
 	_, err = it.Next()
 
 	if err != nil && err != iterator.Done {
+		return err
+	}
+
+	return nil
+}
+
+func testSnowflakeConnection(snowflakeConfig input.SnowflakeConfig) error {
+	account := strings.Split(snowflakeConfig.Host, ".")[0] // TODO: remove the https/http
+	config := sf.Config{
+		Account:   account,
+		User:      snowflakeConfig.Username,
+		Password:  snowflakeConfig.Password,
+		Warehouse: snowflakeConfig.WarehouseName,
+		Database:  snowflakeConfig.DatabaseName,
+		Role:      snowflakeConfig.Role,
+		Host:      snowflakeConfig.Host,
+	}
+
+	dsn, err := sf.DSN(&config)
+	if err != nil {
+		return err
+	}
+
+	_, err = sql.Open("snowflake", dsn)
+	if err != nil {
 		return err
 	}
 

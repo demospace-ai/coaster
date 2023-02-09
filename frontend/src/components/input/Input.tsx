@@ -1,7 +1,7 @@
 import { Combobox, Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import classNames from "classnames";
-import { Fragment, useRef, useState } from "react";
+import { Fragment, HTMLInputTypeAttribute, useRef, useState } from "react";
 import { Loading } from "src/components/loading/Loading";
 
 const UNSET: any = { "undefined": true };
@@ -13,6 +13,7 @@ type ValidatedInputProps = {
   setValue: (value: string) => void;
   className?: string;
   textarea?: boolean;
+  type?: HTMLInputTypeAttribute;
 };
 
 export const ValidatedInput: React.FC<ValidatedInputProps> = props => {
@@ -52,7 +53,7 @@ export const ValidatedInput: React.FC<ValidatedInputProps> = props => {
         />
         :
         <input
-          type='text'
+          type={props.type ? props.type : 'text'}
           id={props.id}
           name={props.id}
           autoComplete={props.id}

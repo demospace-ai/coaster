@@ -21,6 +21,16 @@ func (cs MockCryptoService) EncryptConnectionCredentials(_ string) (*string, err
 	return &result, nil
 }
 
+func (cs MockCryptoService) DecryptApiKey(_ string) (*string, error) {
+	result := "decrypted"
+	return &result, nil
+}
+
+func (cs MockCryptoService) EncryptApiKey(_ string) (*string, error) {
+	result := "encrypted"
+	return &result, nil
+}
+
 type MockQueryService struct {
 	db *gorm.DB
 }

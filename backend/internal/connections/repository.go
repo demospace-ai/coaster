@@ -40,10 +40,9 @@ func LoadConnectionByID(db *gorm.DB, organizationID int64, connectionID int64) (
 	return &connection, nil
 }
 
-func CreateBigQueryConnection(db *gorm.DB, organizationID int64, displayName string, encryptedCredentials string) (*models.Connection, error) {
+func CreateBigQueryConnection(db *gorm.DB, organizationID int64, encryptedCredentials string) (*models.Connection, error) {
 	connection := models.Connection{
 		OrganizationID: organizationID,
-		DisplayName:    displayName,
 		ConnectionType: models.ConnectionTypeBigQuery,
 		Credentials:    database.NewNullString(encryptedCredentials),
 	}
@@ -59,20 +58,18 @@ func CreateBigQueryConnection(db *gorm.DB, organizationID int64, displayName str
 func CreateSnowflakeConnection(
 	db *gorm.DB,
 	organizationID int64,
-	displayName string,
 	snowflakeConfig input.SnowflakeConfig,
 	encryptedPassword string,
 ) (*models.Connection, error) {
 	connection := models.Connection{
 		OrganizationID: organizationID,
-		DisplayName:    displayName,
 		ConnectionType: models.ConnectionTypeSnowflake,
 		Username:       database.NewNullString(snowflakeConfig.Username),
 		Password:       database.NewNullString(encryptedPassword),
 		DatabaseName:   database.NewNullString(snowflakeConfig.DatabaseName),
 		WarehouseName:  database.NewNullString(snowflakeConfig.WarehouseName),
 		Role:           database.NewNullString(snowflakeConfig.Role),
-		Account:        database.NewNullString(snowflakeConfig.Account),
+		Host:           database.NewNullString(snowflakeConfig.Host),
 	}
 
 	result := db.Create(&connection)

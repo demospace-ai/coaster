@@ -134,7 +134,7 @@ export interface SnowflakeConfig {
     database_name: string;
     warehouse_name: string;
     role: string;
-    account: string;
+    host: string;
 }
 
 export interface CreateSyncConfigurationRequest {
@@ -300,4 +300,13 @@ export interface SyncConfiguration {
 export enum ConnectionType {
     BigQuery = "bigquery",
     Snowflake = "snowflake",
+}
+
+export function getConnectionType(connectionType: ConnectionType): string {
+    switch (connectionType) {
+        case ConnectionType.BigQuery:
+            return "BigQuery";
+        case ConnectionType.Snowflake:
+            return "Snowflake";
+    }
 }
