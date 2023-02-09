@@ -26,10 +26,10 @@ type CreateSourceRequest struct {
 }
 
 type CreateSourceResponse struct {
-	Source views.Source
+	Source views.Source `json:"source"`
 }
 
-func (s ApiService) CreateSyncConfiguration(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) CreateSource(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 
 	if auth.Organization == nil {
 		return errors.NewBadRequest("must setup organization first")

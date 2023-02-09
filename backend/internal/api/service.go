@@ -37,16 +37,16 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.Logout,
 		},
 		{
-			Name:        "Create destination",
+			Name:        "Create destination for sync",
 			Method:      router.POST,
 			Pattern:     "/api/create_destination",
 			HandlerFunc: s.CreateDestination,
 		},
 		{
-			Name:        "Create sync configuration",
+			Name:        "Create source for sync",
 			Method:      router.POST,
-			Pattern:     "/api/create_sync_configuration",
-			HandlerFunc: s.CreateSyncConfiguration,
+			Pattern:     "/api/create_source",
+			HandlerFunc: s.CreateSource,
 		},
 		{
 			Name:        "Test data connection",

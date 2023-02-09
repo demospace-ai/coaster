@@ -22,6 +22,22 @@ type Connection struct {
 	ConnectionType models.ConnectionType `json:"connection_type"`
 }
 
+type Model struct {
+	ID               int64        `json:"id"`
+	DisplayName      string       `json:"display_name"`
+	DestinationID    int64        `json:"destination_id"`
+	Namespace        string       `json:"namespace"`
+	TableName        string       `json:"table_name"`
+	CustomJoin       string       `json:"custom_join"`
+	CustomerIdColumn string       `json:"customer_id_column"`
+	ModelFields      []ModelField `json:"model_fields"`
+}
+
+type ModelField struct {
+	Name string
+	Type string
+}
+
 func ConvertDestination(destination models.Destination, connection models.Connection) Destination {
 	return Destination{
 		DisplayName: destination.DisplayName,
@@ -57,5 +73,25 @@ func ConvertSource(source models.Source, connection models.Connection) Source {
 		Namespace:  source.Namespace.String,
 		TableName:  source.TableName.String,
 		CustomJoin: source.CustomJoin.String,
+	}
+}
+
+func ConvertModel(model models.Model, modelFields []models.ModelField) Model {
+	var viewModelFields []ModelField
+	for _, modelField := range modelFields {
+		viewModelFields = append(viewModelFields, ModelField{
+			Name: modelField.Name,
+			Type: modelField.Type,
+		})
+	}
+
+	return Model{
+		DisplayName:      model.DisplayName,
+		DestinationID:    model.DestinationID,
+		Namespace:        model.Namespace.String,
+		TableName:        model.TableName.String,
+		CustomJoin:       model.CustomJoin.String,
+		CustomerIdColumn: model.CustomerIdColumn,
+		ModelFields:      viewModelFields,
 	}
 }
