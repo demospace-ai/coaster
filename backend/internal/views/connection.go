@@ -5,11 +5,13 @@ import (
 )
 
 type Destination struct {
+	ID          int64      `json:"id"`
 	DisplayName string     `json:"display_name"`
 	Connection  Connection `json:"connection"`
 }
 
 type Source struct {
+	ID          int64
 	DisplayName string
 	Connection  Connection
 	Namespace   string `json:"namespace"`
@@ -40,6 +42,7 @@ type ModelField struct {
 
 func ConvertDestination(destination models.Destination, connection models.Connection) Destination {
 	return Destination{
+		ID:          destination.ID,
 		DisplayName: destination.DisplayName,
 		Connection: Connection{
 			ID:             connection.ID,
@@ -52,6 +55,7 @@ func ConvertDestinationConnections(destinationConnections []models.DestinationCo
 	destinations := []Destination{}
 	for _, destinationConnection := range destinationConnections {
 		destinations = append(destinations, Destination{
+			ID:          destinationConnection.ID,
 			DisplayName: destinationConnection.DisplayName,
 			Connection: Connection{
 				ID:             destinationConnection.ConnectionID,
@@ -65,6 +69,7 @@ func ConvertDestinationConnections(destinationConnections []models.DestinationCo
 
 func ConvertSource(source models.Source, connection models.Connection) Source {
 	return Source{
+		ID:          source.ID,
 		DisplayName: source.DisplayName,
 		Connection: Connection{
 			ID:             connection.ID,
@@ -86,6 +91,7 @@ func ConvertModel(model models.Model, modelFields []models.ModelField) Model {
 	}
 
 	return Model{
+		ID:               model.ID,
 		DisplayName:      model.DisplayName,
 		DestinationID:    model.DestinationID,
 		Namespace:        model.Namespace.String,

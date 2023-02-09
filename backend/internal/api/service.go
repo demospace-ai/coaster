@@ -49,16 +49,16 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.CreateSource,
 		},
 		{
+			Name:        "Create model for sync",
+			Method:      router.POST,
+			Pattern:     "/api/create_model",
+			HandlerFunc: s.CreateModel,
+		},
+		{
 			Name:        "Test data connection",
 			Method:      router.POST,
 			Pattern:     "/api/test_data_connection",
 			HandlerFunc: s.TestDataConnection,
-		},
-		{
-			Name:        "Get datasets",
-			Method:      router.GET,
-			Pattern:     "/api/get_datasets",
-			HandlerFunc: s.GetDatasets,
 		},
 		{
 			Name:        "Get API key",
@@ -67,7 +67,13 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.GetApiKey,
 		},
 		{
-			Name:        "Get tables for a given data source and dataset",
+			Name:        "Get namespace",
+			Method:      router.GET,
+			Pattern:     "/api/get_namespaces",
+			HandlerFunc: s.GetNamespaces,
+		},
+		{
+			Name:        "Get tables for a given data source and namespace",
 			Method:      router.GET,
 			Pattern:     "/api/get_tables",
 			HandlerFunc: s.GetTables,
@@ -89,6 +95,12 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			Method:      router.GET,
 			Pattern:     "/api/get_destinations",
 			HandlerFunc: s.GetDestinations,
+		},
+		{
+			Name:        "Get all models",
+			Method:      router.GET,
+			Pattern:     "/api/get_models",
+			HandlerFunc: s.GetModels,
 		},
 		{
 			Name:        "Get all sync configurations",

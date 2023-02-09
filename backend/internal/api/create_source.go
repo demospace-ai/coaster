@@ -45,7 +45,7 @@ func (s ApiService) CreateSource(auth auth.Authentication, w http.ResponseWriter
 	validate := validator.New()
 	err = validate.Struct(createSourceRequest)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	if (createSourceRequest.TableName == nil || createSourceRequest.Namespace == nil) && createSourceRequest.CustomJoin == nil {

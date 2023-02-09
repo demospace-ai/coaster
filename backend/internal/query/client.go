@@ -8,17 +8,17 @@ import (
 )
 
 type apiClient interface {
-	GetTables(ctx context.Context, datasetName string) ([]string, error)
-	GetTableSchema(ctx context.Context, datasetName string, tableName string) (Schema, error)
-	GetDatasets(ctx context.Context) ([]string, error)
-	GetColumnValues(ctx context.Context, datasetName string, tableName string, columnName string) ([]Value, error)
+	GetTables(ctx context.Context, namespace string) ([]string, error)
+	GetTableSchema(ctx context.Context, namespace string, tableName string) (Schema, error)
+	GetNamespaces(ctx context.Context) ([]string, error)
+	GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]Value, error)
 	RunQuery(ctx context.Context, queryString string) (*QueryResult, error)
 }
 
-func (qs QueryServiceImpl) newAPIClient(ctx context.Context, dataConnection *models.Connection) (apiClient, error) {
-	switch dataConnection.ConnectionType {
+func (qs QueryServiceImpl) newAPIClient(ctx context.Context, connection *models.Connection) (apiClient, error) {
+	switch connection.ConnectionType {
 	case models.ConnectionTypeBigQuery:
-		bigQueryCredentialsString, err := qs.cryptoService.DecryptConnectionCredentials(dataConnection.Credentials.String)
+		bigQueryCredentialsString, err := qs.cryptoService.DecryptConnectionCredentials(connection.Credentials.String)
 		if err != nil {
 			return nil, err
 		}

@@ -11,15 +11,15 @@ import (
 	"strconv"
 )
 
-type GetDatasetsRequest struct {
+type GetNamespacesRequest struct {
 	ConnectionID int64 `json:"connection_id,omitempty"`
 }
 
-type GetDatasetsResponse struct {
-	Datasets []string `json:"datasets"`
+type GetNamespacesResponse struct {
+	Namespaces []string `json:"namespaces"`
 }
 
-func (s ApiService) GetDatasets(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) GetNamespaces(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	ctx := context.Background()
 	if auth.Organization == nil {
 		return errors.NewBadRequest("must setup organization first")
@@ -36,17 +36,17 @@ func (s ApiService) GetDatasets(auth auth.Authentication, w http.ResponseWriter,
 	}
 
 	// TODO: write test to make sure only authorized users can use the data connection
-	dataConnection, err := connections.LoadConnectionByID(s.db, auth.Organization.ID, connectionID)
+	connection, err := connections.LoadConnectionByID(s.db, auth.Organization.ID, connectionID)
 	if err != nil {
 		return err
 	}
 
-	datasets, err := s.queryService.GetDatasets(ctx, dataConnection)
+	namespaces, err := s.queryService.GetNamespaces(ctx, connection)
 	if err != nil {
 		return err
 	}
 
-	return json.NewEncoder(w).Encode(GetDatasetsResponse{
-		Datasets: datasets,
+	return json.NewEncoder(w).Encode(GetNamespacesResponse{
+		Namespaces: namespaces,
 	})
 }

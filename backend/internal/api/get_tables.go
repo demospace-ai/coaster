@@ -31,18 +31,18 @@ func (s ApiService) GetTables(auth auth.Authentication, w http.ResponseWriter, r
 		return nil
 	}
 
-	datasetID := r.URL.Query().Get("datasetID")
-	if len(datasetID) == 0 {
-		return fmt.Errorf("missing dataset ID from GetTables request URL: %s", r.URL.RequestURI())
+	namespace := r.URL.Query().Get("namespace")
+	if len(namespace) == 0 {
+		return fmt.Errorf("missing namespace from GetTables request URL: %s", r.URL.RequestURI())
 	}
 
 	// TODO: write test to make sure only authorized users can use the data connection
-	dataConnection, err := connections.LoadConnectionByID(s.db, auth.Organization.ID, connectionID)
+	connection, err := connections.LoadConnectionByID(s.db, auth.Organization.ID, connectionID)
 	if err != nil {
 		return err
 	}
 
-	tables, err := s.queryService.GetTables(ctx, dataConnection, datasetID)
+	tables, err := s.queryService.GetTables(ctx, connection, namespace)
 	if err != nil {
 		return err
 	}

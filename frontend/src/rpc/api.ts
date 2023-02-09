@@ -28,31 +28,37 @@ export const GetDestinations: IEndpoint<undefined, GetDestinationsResponse> = {
     path: '/get_destinations',
 };
 
+export const GetModels: IEndpoint<undefined, GetModelsResponse> = {
+    name: 'Models Fetched',
+    method: 'GET',
+    path: '/get_models',
+};
+
 export const GetSyncConfigurations: IEndpoint<undefined, GetSyncConfigurationsResponse> = {
     name: 'Sync Configurations Fetched',
     method: 'GET',
     path: '/get_sync_configurations',
 };
 
-export const GetDatasets: IEndpoint<{ connectionID: number; }, GetDatasetsResponse> = {
-    name: 'Datasets Fetched',
+export const GetNamespaces: IEndpoint<{ connectionID: number; }, GetNamespacesResponse> = {
+    name: 'Namespaces Fetched',
     method: 'GET',
-    path: '/get_datasets',
+    path: '/get_namespaces',
     queryParams: ['connectionID']
 };
 
-export const GetTables: IEndpoint<{ connectionID: number, datasetID: string; }, GetTablesResponse> = {
+export const GetTables: IEndpoint<{ connectionID: number, namespace: string; }, GetTablesResponse> = {
     name: 'Tables Fetched',
     method: 'GET',
     path: '/get_tables',
-    queryParams: ['connectionID', 'datasetID'],
+    queryParams: ['connectionID', 'namespace'],
 };
 
 export const GetSchema: IEndpoint<GetSchemaRequest, GetSchemaResponse> = {
     name: 'Schema Fetched',
     method: 'GET',
     path: '/get_schema',
-    queryParams: ['connectionID', 'datasetID', 'tableName', 'customJoin'],
+    queryParams: ['connectionID', 'namespace', 'tableName', 'customJoin'],
 };
 
 export const GetApiKey: IEndpoint<undefined, string> = {
@@ -92,7 +98,7 @@ export const GetColumnValues: IEndpoint<GetColumnValuesRequest, GetColumnValuesR
     name: 'Column Values Fetched',
     method: 'GET',
     path: '/get_column_values',
-    queryParams: ['connectionID', 'datasetName', 'tableName', 'columnName'],
+    queryParams: ['connectionID', 'namespace', 'tableName', 'columnName'],
     track: true,
 };
 
@@ -100,6 +106,14 @@ export const CreateDestination: IEndpoint<CreateDestinationRequest, undefined> =
     name: 'Destination Created',
     method: 'POST',
     path: '/create_destination',
+    track: true,
+};
+
+
+export const CreateModel: IEndpoint<CreateModelRequest, undefined> = {
+    name: 'Model Created',
+    method: 'POST',
+    path: '/create_model',
     track: true,
 };
 
@@ -122,6 +136,22 @@ export interface CreateDestinationRequest {
     connection_type: ConnectionType;
     bigquery_config?: BigQueryConfig;
     snowflake_config?: SnowflakeConfig;
+}
+
+
+export interface CreateModelRequest {
+    display_name: string;
+    destination_id: number;
+    namespace?: string;
+    table_name?: string;
+    custom_join?: string;
+    customer_id_column: string;
+    model_fields: ModelField[];
+}
+
+export interface ModelField {
+    name: string;
+    type: string;
 }
 
 export interface BigQueryConfig {
@@ -231,12 +261,27 @@ export interface GetDestinationsResponse {
     destinations: Destination[];
 }
 
+
+export interface GetModelsResponse {
+    models: Model[];
+}
+
+export interface Model {
+    id: number;
+    display_name: string;
+    destination_id: number;
+    namespace?: string;
+    table_name?: string;
+    custom_join?: string;
+    model_fields: ModelField[];
+}
+
 export interface GetSyncConfigurationsResponse {
     sync_configurations: SyncConfiguration[];
 }
 
-export interface GetDatasetsResponse {
-    datasets: string[];
+export interface GetNamespacesResponse {
+    namespaces: string[];
 }
 
 export interface GetTablesResponse {
@@ -245,7 +290,7 @@ export interface GetTablesResponse {
 
 export interface GetSchemaRequest {
     connectionID: number,
-    datasetID?: string,
+    namespace?: string,
     tableName?: string,
     customJoin?: string,
 }

@@ -9,11 +9,11 @@ import (
 )
 
 type QueryService interface {
-	GetDatasets(ctx context.Context, dataConnection *models.Connection) ([]string, error)
-	GetTables(ctx context.Context, dataConnection *models.Connection, datasetName string) ([]string, error)
-	GetTableSchema(ctx context.Context, dataConnection *models.Connection, datasetName string, tableName string) ([]ColumnSchema, error)
-	GetColumnValues(ctx context.Context, dataConnection *models.Connection, datasetName string, tableName string, columnName string) ([]Value, error)
-	RunQuery(ctx context.Context, dataConnection *models.Connection, queryString string) (*QueryResult, error)
+	GetNamespaces(ctx context.Context, connection *models.Connection) ([]string, error)
+	GetTables(ctx context.Context, connection *models.Connection, namespace string) ([]string, error)
+	GetTableSchema(ctx context.Context, connection *models.Connection, namespace string, tableName string) ([]ColumnSchema, error)
+	GetColumnValues(ctx context.Context, connection *models.Connection, namespace string, tableName string, columnName string) ([]Value, error)
+	RunQuery(ctx context.Context, connection *models.Connection, queryString string) (*QueryResult, error)
 }
 
 type QueryServiceImpl struct {
@@ -28,8 +28,8 @@ func NewQueryService(db *gorm.DB, cryptoService crypto.CryptoService) QueryServi
 	}
 }
 
-func (qs QueryServiceImpl) RunQuery(ctx context.Context, dataConnection *models.Connection, queryString string) (*QueryResult, error) {
-	client, err := qs.newAPIClient(ctx, dataConnection)
+func (qs QueryServiceImpl) RunQuery(ctx context.Context, connection *models.Connection, queryString string) (*QueryResult, error) {
+	client, err := qs.newAPIClient(ctx, connection)
 	if err != nil {
 		return nil, err
 	}
@@ -37,38 +37,38 @@ func (qs QueryServiceImpl) RunQuery(ctx context.Context, dataConnection *models.
 	return client.RunQuery(ctx, queryString)
 }
 
-func (qs QueryServiceImpl) GetDatasets(ctx context.Context, dataConnection *models.Connection) ([]string, error) {
-	client, err := qs.newAPIClient(ctx, dataConnection)
+func (qs QueryServiceImpl) GetNamespaces(ctx context.Context, connection *models.Connection) ([]string, error) {
+	client, err := qs.newAPIClient(ctx, connection)
 	if err != nil {
 		return nil, err
 	}
 
-	return client.GetDatasets(ctx)
+	return client.GetNamespaces(ctx)
 }
 
-func (qs QueryServiceImpl) GetTables(ctx context.Context, dataConnection *models.Connection, datasetName string) ([]string, error) {
-	client, err := qs.newAPIClient(ctx, dataConnection)
+func (qs QueryServiceImpl) GetTables(ctx context.Context, connection *models.Connection, namespace string) ([]string, error) {
+	client, err := qs.newAPIClient(ctx, connection)
 	if err != nil {
 		return nil, err
 	}
 
-	return client.GetTables(ctx, datasetName)
+	return client.GetTables(ctx, namespace)
 }
 
-func (qs QueryServiceImpl) GetTableSchema(ctx context.Context, dataConnection *models.Connection, datasetName string, tableName string) ([]ColumnSchema, error) {
-	client, err := qs.newAPIClient(ctx, dataConnection)
+func (qs QueryServiceImpl) GetTableSchema(ctx context.Context, connection *models.Connection, namespace string, tableName string) ([]ColumnSchema, error) {
+	client, err := qs.newAPIClient(ctx, connection)
 	if err != nil {
 		return nil, err
 	}
 
-	return client.GetTableSchema(ctx, datasetName, tableName)
+	return client.GetTableSchema(ctx, namespace, tableName)
 }
 
-func (qs QueryServiceImpl) GetColumnValues(ctx context.Context, dataConnection *models.Connection, datasetName string, tableName string, columnName string) ([]Value, error) {
-	client, err := qs.newAPIClient(ctx, dataConnection)
+func (qs QueryServiceImpl) GetColumnValues(ctx context.Context, connection *models.Connection, namespace string, tableName string, columnName string) ([]Value, error) {
+	client, err := qs.newAPIClient(ctx, connection)
 	if err != nil {
 		return nil, err
 	}
 
-	return client.GetColumnValues(ctx, datasetName, tableName, columnName)
+	return client.GetColumnValues(ctx, namespace, tableName, columnName)
 }

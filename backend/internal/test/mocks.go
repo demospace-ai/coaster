@@ -41,22 +41,22 @@ func NewMockQueryService(db *gorm.DB) MockQueryService {
 	}
 }
 
-func (qs MockQueryService) GetDatasets(ctx context.Context, dataConnection *models.Connection) ([]string, error) {
+func (qs MockQueryService) GetNamespaces(ctx context.Context, connection *models.Connection) ([]string, error) {
 	return nil, nil
 }
 
-func (qs MockQueryService) GetTables(ctx context.Context, dataConnection *models.Connection, datasetName string) ([]string, error) {
+func (qs MockQueryService) GetTables(ctx context.Context, connection *models.Connection, namespace string) ([]string, error) {
 	return nil, nil
 }
 
-func (qs MockQueryService) GetTableSchema(ctx context.Context, dataConnection *models.Connection, datasetName string, tableName string) ([]query.ColumnSchema, error) {
+func (qs MockQueryService) GetTableSchema(ctx context.Context, connection *models.Connection, namespace string, tableName string) ([]query.ColumnSchema, error) {
 	return nil, nil
 }
 
-func (qs MockQueryService) GetColumnValues(ctx context.Context, dataConnection *models.Connection, datasetName string, tableName string, columnName string) ([]query.Value, error) {
+func (qs MockQueryService) GetColumnValues(ctx context.Context, connection *models.Connection, namespace string, tableName string, columnName string) ([]query.Value, error) {
 	return nil, nil
 }
 
-func (qs MockQueryService) RunQuery(ctx context.Context, dataConnection *models.Connection, queryString string) (*query.QueryResult, error) {
+func (qs MockQueryService) RunQuery(ctx context.Context, connection *models.Connection, queryString string) (*query.QueryResult, error) {
 	return nil, nil
 }

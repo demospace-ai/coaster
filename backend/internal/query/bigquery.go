@@ -27,7 +27,7 @@ func (ac BigQueryApiClient) openConnection(ctx context.Context) (*bigquery.Clien
 	return bigquery.NewClient(ctx, *ac.GCPProjectID, credentialOption)
 }
 
-func (ac BigQueryApiClient) GetTables(ctx context.Context, datasetName string) ([]string, error) {
+func (ac BigQueryApiClient) GetTables(ctx context.Context, namespace string) ([]string, error) {
 	client, err := ac.openConnection(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
@@ -35,7 +35,7 @@ func (ac BigQueryApiClient) GetTables(ctx context.Context, datasetName string) (
 
 	defer client.Close()
 
-	ts := client.Dataset(datasetName).Tables(ctx)
+	ts := client.Dataset(namespace).Tables(ctx)
 	var results []string
 	for {
 		table, err := ts.Next()
@@ -52,8 +52,8 @@ func (ac BigQueryApiClient) GetTables(ctx context.Context, datasetName string) (
 	return results, nil
 }
 
-func (ac BigQueryApiClient) GetTableSchema(ctx context.Context, datasetName string, tableName string) (Schema, error) {
-	queryString := "select * from " + datasetName + ".INFORMATION_SCHEMA.COLUMNS where table_name = '" + tableName + "'"
+func (ac BigQueryApiClient) GetTableSchema(ctx context.Context, namespace string, tableName string) (Schema, error) {
+	queryString := "select * from " + namespace + ".INFORMATION_SCHEMA.COLUMNS where table_name = '" + tableName + "'"
 
 	queryResult, err := ac.RunQuery(ctx, queryString)
 	if err != nil {
@@ -72,8 +72,8 @@ func (ac BigQueryApiClient) GetTableSchema(ctx context.Context, datasetName stri
 	return schema, nil
 }
 
-func (ac BigQueryApiClient) GetColumnValues(ctx context.Context, datasetName string, tableName string, columnName string) ([]Value, error) {
-	queryString := "SELECT DISTINCT " + columnName + " FROM " + datasetName + "." + tableName + " LIMIT 50"
+func (ac BigQueryApiClient) GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]Value, error) {
+	queryString := "SELECT DISTINCT " + columnName + " FROM " + namespace + "." + tableName + " LIMIT 50"
 
 	queryResult, err := ac.RunQuery(ctx, queryString)
 	if err != nil {
@@ -92,7 +92,7 @@ func (ac BigQueryApiClient) GetColumnValues(ctx context.Context, datasetName str
 	return values, nil
 }
 
-func (ac BigQueryApiClient) GetDatasets(ctx context.Context) ([]string, error) {
+func (ac BigQueryApiClient) GetNamespaces(ctx context.Context) ([]string, error) {
 	client, err := ac.openConnection(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("bigquery.NewClient: %v", err)

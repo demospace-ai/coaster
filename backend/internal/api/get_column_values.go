@@ -26,9 +26,9 @@ func (s ApiService) GetColumnValues(auth auth.Authentication, w http.ResponseWri
 		return nil
 	}
 
-	datasetName := r.URL.Query().Get("datasetName")
-	if len(datasetName) == 0 {
-		return fmt.Errorf("missing dataset name from GetColumnValues request URL: %s", r.URL.RequestURI())
+	namespace := r.URL.Query().Get("namespace")
+	if len(namespace) == 0 {
+		return fmt.Errorf("missing namespace from GetColumnValues request URL: %s", r.URL.RequestURI())
 	}
 
 	tableName := r.URL.Query().Get("tableName")
@@ -42,14 +42,14 @@ func (s ApiService) GetColumnValues(auth auth.Authentication, w http.ResponseWri
 	}
 
 	// TODO: write test to make sure only authorized users can use the data connection
-	dataConnection, err := connections.LoadConnectionByID(s.db, auth.Organization.ID, connectionID)
+	connection, err := connections.LoadConnectionByID(s.db, auth.Organization.ID, connectionID)
 	if err != nil {
 		return err
 	}
 
 	// TODO: support getting property values for custom property group
 	ctx := context.Background()
-	columnValues, err := s.queryService.GetColumnValues(ctx, dataConnection, datasetName, tableName, columnName)
+	columnValues, err := s.queryService.GetColumnValues(ctx, connection, namespace, tableName, columnName)
 	if err != nil {
 		return err
 	}

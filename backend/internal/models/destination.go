@@ -9,6 +9,7 @@ type Destination struct {
 }
 
 type DestinationConnection struct {
+	ID             int64
 	OrganizationID int64
 	DisplayName    string
 	ConnectionID   int64

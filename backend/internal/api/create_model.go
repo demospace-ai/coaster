@@ -13,14 +13,13 @@ import (
 )
 
 type CreateModelRequest struct {
-	EndCustomerID    int64              `json:"end_customer_id" validate:"required"`
 	DisplayName      string             `json:"display_name" validate:"required"`
 	DestinationID    int64              `json:"destination_id" validate:"required"`
 	Namespace        *string            `json:"namespace,omitempty"`
 	TableName        *string            `json:"table_name,omitempty"`
 	CustomJoin       *string            `json:"custom_join,omitempty"`
 	CustomerIdColumn string             `json:"customer_id_column" validate:"required"`
-	ModelFields      []input.ModelField `json:"model_fields" validate:"required"`
+	ModelFields      []input.ModelField `json:"model_fields"`
 }
 
 type CreateModelResponse struct {
@@ -43,7 +42,7 @@ func (s ApiService) CreateModel(auth auth.Authentication, w http.ResponseWriter,
 	validate := validator.New()
 	err = validate.Struct(createModelRequest)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	if (createModelRequest.TableName == nil || createModelRequest.Namespace == nil) && createModelRequest.CustomJoin == nil {

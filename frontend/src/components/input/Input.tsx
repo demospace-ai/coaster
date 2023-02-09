@@ -217,6 +217,7 @@ type ValidatedComboInputProps = {
   className?: string;
   validated?: boolean;
   allowCustom?: boolean;
+  label?: string;
 };
 
 export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => {

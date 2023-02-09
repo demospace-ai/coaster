@@ -1,34 +1,59 @@
 import { ValidatedComboInput, ValidatedDropdownInput } from "src/components/input/Input";
-import { ColumnSchema, Connection } from "src/rpc/api";
-import { useColumnValues, useDatasets, useTables } from "src/rpc/data";
+import { ColumnSchema, Connection, Destination } from "src/rpc/api";
+import { useColumnValues, useDestinations, useNamespaces, useTables } from "src/rpc/data";
 
-type DatasetSelectorProps = {
-  connection: Connection | undefined;
-  datasetName: string | undefined;
-  setDatasetName: (datasetName: string) => void;
+
+type DestinationSelectorProps = {
+  destination: Destination | undefined;
+  setDestination: (destination: Destination) => void;
   className?: string;
   noOptionsString?: string;
   placeholder?: string;
   validated?: boolean;
 };
 
-export const DatasetSelector: React.FC<DatasetSelectorProps> = props => {
-  const { datasets } = useDatasets(props.connection?.id);
+export const DestinationSelector: React.FC<DestinationSelectorProps> = props => {
+  const { destinations } = useDestinations();
 
   return <ValidatedDropdownInput
     className={props.className}
-    selected={props.datasetName}
-    setSelected={props.setDatasetName}
-    options={datasets}
-    loading={!datasets}
-    noOptionsString={props.noOptionsString ? props.noOptionsString : "No datasets available!"}
-    placeholder={props.placeholder ? props.placeholder : "Choose dataset"}
+    selected={props.destination}
+    setSelected={props.setDestination}
+    getElementForDisplay={(destination: Destination) => destination.display_name}
+    options={destinations}
+    loading={!destinations}
+    noOptionsString={props.noOptionsString ? props.noOptionsString : "No destinations available!"}
+    placeholder={props.placeholder ? props.placeholder : "Choose destination"}
+    validated={props.validated} />;
+};
+
+type NamespaceSelectorProps = {
+  connection: Connection | undefined;
+  namespace: string | undefined;
+  setNamespace: (datasetName: string) => void;
+  className?: string;
+  noOptionsString?: string;
+  placeholder?: string;
+  validated?: boolean;
+};
+
+export const NamespaceSelector: React.FC<NamespaceSelectorProps> = props => {
+  const { namespaces } = useNamespaces(props.connection?.id);
+
+  return <ValidatedDropdownInput
+    className={props.className}
+    selected={props.namespace}
+    setSelected={props.setNamespace}
+    options={namespaces}
+    loading={!namespaces}
+    noOptionsString={props.noOptionsString ? props.noOptionsString : "No namespaces available!"}
+    placeholder={props.placeholder ? props.placeholder : "Choose namespace"}
     validated={props.validated} />;
 };
 
 type TableSelectorProps = {
   connection: Connection | undefined;
-  datasetName: string | undefined;
+  namespace: string | undefined;
   tableName: string | undefined;
   setTableName: (tableName: string) => void;
   className?: string;
@@ -39,7 +64,7 @@ type TableSelectorProps = {
 };
 
 export const TableSelector: React.FC<TableSelectorProps> = props => {
-  const { tables } = useTables(props.connection?.id, props.datasetName);
+  const { tables } = useTables(props.connection?.id, props.namespace);
 
   return <ValidatedComboInput
     className={props.className}
@@ -53,11 +78,11 @@ export const TableSelector: React.FC<TableSelectorProps> = props => {
     allowCustom={props.allowCustom} />;
 };
 
-type PropertyValueSelectorProps = {
-  connectionID: number | undefined;
-  eventSetID: number | undefined;
+type ColumnValueSelectorProps = {
+  connection: Connection | undefined;
+  namespace: string | undefined;
+  tableName: string | undefined;
   column: ColumnSchema | undefined;
-  customPropertyGroupID?: number;
   columnValue: string | number | null | undefined,
   setColumnValue: (columnName: string) => void;
   className?: string;
@@ -67,8 +92,8 @@ type PropertyValueSelectorProps = {
   loading?: boolean;
 };
 
-export const ColumnValueSelector: React.FC<PropertyValueSelectorProps> = props => {
-  const { columnValues } = useColumnValues(props.connectionID, props.eventSetID, props.column?.name);
+export const ColumnValueSelector: React.FC<ColumnValueSelectorProps> = props => {
+  const { columnValues } = useColumnValues(props.connection?.id, props.namespace, props.tableName, props.column?.name);
 
   return <ValidatedComboInput
     className={props.className}
