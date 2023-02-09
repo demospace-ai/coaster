@@ -2,6 +2,7 @@ import React, { FormEvent, useState } from "react";
 import { BackButton, Button, FormButton } from "src/components/button/Button";
 import bigquery from "src/components/images/bigquery.svg";
 import snowflake from "src/components/images/snowflake.svg";
+import { getConnectionTypeImg } from "src/components/images/warehouses";
 import { ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { sendRequest } from "src/rpc/ajax";
@@ -21,15 +22,13 @@ export const NewDestination: React.FC<{ onComplete: () => void; }> = props => {
   return (
     <>
       <BackButton className="tw-mt-3" onClick={onBack} />
-      <div className="tw-flex tw-justify-center tw-h-full">
-        <div className='tw-flex tw-flex-col tw-w-[800px] tw-py-10 tw-px-10 tw-mx-auto tw-mt-10 tw-bg-white tw-rounded-lg tw-shadow-md tw-items-center'>
-          <div className="tw-w-full tw-text-center tw-mb-5 tw-font-bold tw-text-lg">New Destination</div>
-          {connectionType ?
-            <NewDestinationConfiguration connectionType={connectionType} setConnectionType={setConnectionType} onComplete={props.onComplete} />
-            :
-            <ConnectionTypeSelector setConnectionType={setConnectionType} />
-          }
-        </div>
+      <div className='tw-flex tw-flex-col tw-w-[800px] tw-py-12 tw-px-10 tw-mx-auto tw-mb-20 tw-mt-8 tw-bg-white tw-rounded-lg tw-shadow-md tw-items-center'>
+        <div className="tw-w-full tw-text-center tw-mb-5 tw-font-bold tw-text-lg">New Destination</div>
+        {connectionType ?
+          <NewDestinationConfiguration connectionType={connectionType} setConnectionType={setConnectionType} onComplete={props.onComplete} />
+          :
+          <ConnectionTypeSelector setConnectionType={setConnectionType} />
+        }
       </div>
     </>
   );
@@ -139,7 +138,10 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = p
 
   return (
     <div className="tw-w-[500px]">
-      <div className="tw-text-center tw-mb-5">Enter your {getConnectionType(props.connectionType)} configuration:</div>
+      <div className="tw-flex tw-justify-center tw-items-center tw-mb-5">
+        <img src={getConnectionTypeImg(props.connectionType)} alt="icon" className="tw-h-6 tw-mr-1" />
+        <div>Enter your {getConnectionType(props.connectionType)} configuration:</div>
+      </div>
       <form onSubmit={createNewDestination}>
         {inputs}
         <TestConnectionButton state={state} connectionType={props.connectionType} />
@@ -211,13 +213,13 @@ const SnowflakeInputs: React.FC<ConnectionConfigurationProps> = props => {
   const state = props.state;
   return (
     <>
-      <ValidatedInput id='displayName' value={state.displayName} setValue={(value) => { props.setState({ ...state, displayName: value }); }} placeholder='DisplayName' />
-      <ValidatedInput id='username' value={state.snowflakeConfig.username} setValue={(value) => { props.setState({ ...state, snowflakeConfig: { ...state.snowflakeConfig, username: value } }); }} placeholder='Username' />
-      <ValidatedInput id='password' type="password" value={state.snowflakeConfig.password} setValue={(value) => { props.setState({ ...state, snowflakeConfig: { ...state.snowflakeConfig, password: value } }); }} placeholder='Password' />
-      <ValidatedInput id='databaseName' value={state.snowflakeConfig.database_name} setValue={(value) => { props.setState({ ...state, snowflakeConfig: { ...state.snowflakeConfig, database_name: value } }); }} placeholder='Database Name' />
-      <ValidatedInput id='warehouseName' value={state.snowflakeConfig.warehouse_name} setValue={(value) => { props.setState({ ...state, snowflakeConfig: { ...state.snowflakeConfig, warehouse_name: value } }); }} placeholder='Warehouse Name' />
-      <ValidatedInput id='role' value={state.snowflakeConfig.role} setValue={(value) => { props.setState({ ...state, snowflakeConfig: { ...state.snowflakeConfig, role: value } }); }} placeholder='Role' />
-      <ValidatedInput id='host' value={state.snowflakeConfig.host} setValue={(value) => { props.setState({ ...state, snowflakeConfig: { ...state.snowflakeConfig, host: value } }); }} placeholder='Host' />
+      <ValidatedInput id='displayName' value={state.displayName} setValue={(value) => { props.setState({ ...state, displayName: value }); }} placeholder='Display Name' label="Display Name" />
+      <ValidatedInput id='username' value={state.snowflakeConfig.username} setValue={(value) => { props.setState({ ...state, snowflakeConfig: { ...state.snowflakeConfig, username: value } }); }} placeholder='Username' label="Username" />
+      <ValidatedInput id='password' type="password" value={state.snowflakeConfig.password} setValue={(value) => { props.setState({ ...state, snowflakeConfig: { ...state.snowflakeConfig, password: value } }); }} placeholder='Password' label="Password" />
+      <ValidatedInput id='databaseName' value={state.snowflakeConfig.database_name} setValue={(value) => { props.setState({ ...state, snowflakeConfig: { ...state.snowflakeConfig, database_name: value } }); }} placeholder='Database Name' label="Database Name" />
+      <ValidatedInput id='warehouseName' value={state.snowflakeConfig.warehouse_name} setValue={(value) => { props.setState({ ...state, snowflakeConfig: { ...state.snowflakeConfig, warehouse_name: value } }); }} placeholder='Warehouse Name' label="Warehouse Name" />
+      <ValidatedInput id='role' value={state.snowflakeConfig.role} setValue={(value) => { props.setState({ ...state, snowflakeConfig: { ...state.snowflakeConfig, role: value } }); }} placeholder='Role' label="Role" />
+      <ValidatedInput id='host' value={state.snowflakeConfig.host} setValue={(value) => { props.setState({ ...state, snowflakeConfig: { ...state.snowflakeConfig, host: value } }); }} placeholder='Host' label="Host" />
     </>
   );
 };
@@ -226,7 +228,7 @@ const BigQueryInputs: React.FC<ConnectionConfigurationProps> = props => {
   const state = props.state;
   return (
     <>
-      <ValidatedInput id='displayName' value={state.displayName} setValue={(value) => { props.setState({ ...state, displayName: value }); }} placeholder='DisplayName' />
+      <ValidatedInput id='displayName' value={state.displayName} setValue={(value) => { props.setState({ ...state, displayName: value }); }} placeholder='Display Name' label="Display Name" />
       <ValidatedInput
         className="tw-h-24 tw-min-h-[40px] tw-max-h-80"
         id='credentials'
@@ -234,6 +236,7 @@ const BigQueryInputs: React.FC<ConnectionConfigurationProps> = props => {
         setValue={(value) => { props.setState({ ...state, bigqueryConfig: { ...state.bigqueryConfig, credentials: value } }); }}
         placeholder='Credentials (paste JSON here)'
         textarea={true}
+        label="Credentials"
       />
     </>
   );

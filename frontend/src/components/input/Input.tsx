@@ -14,11 +14,13 @@ type ValidatedInputProps = {
   className?: string;
   textarea?: boolean;
   type?: HTMLInputTypeAttribute;
+  label?: string;
 };
 
 export const ValidatedInput: React.FC<ValidatedInputProps> = props => {
   const [isValid, setIsValid] = useState(true);
-  let classes = ['tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2 tw-px-3 tw-w-full tw-box-border tw-my-1 tw-mx-0', props.className];
+  const [focused, setFocused] = useState(false);
+  let classes = ['tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border tw-my-1 tw-mx-0', props.className];
   if (!isValid) {
     classes.push('tw-border-red-600 tw-outline-none');
   }
@@ -36,19 +38,37 @@ export const ValidatedInput: React.FC<ValidatedInputProps> = props => {
     return valid;
   };
 
+  const showLabel = props.label !== undefined && (focused || (props.value !== undefined && props.value.length > 0));
+
   return (
-    <>
+    <div className={classNames("tw-relative", props.label && "tw-mt-3")}>
+      <Transition
+        show={showLabel}
+        enter="tw-transition tw-ease tw-duration-200 tw-transform"
+        enterFrom="tw-translate-y-4 tw-opacity-10"
+        enterTo="tw-translate-y-0"
+        leave="tw-transition tw-ease tw-duration-200 tw-transform"
+        leaveFrom="tw-translate-y-0"
+        leaveTo="tw-translate-y-4 tw-opacity-10"
+      >
+        <label
+          htmlFor="name"
+          className="tw-absolute -tw-top-0.5 tw-left-2 -tw-mt-px tw-inline-block tw-bg-white tw-px-1 tw-text-xs tw-font-medium tw-text-gray-900"
+        >
+          {props.label}
+        </label>
+      </Transition>
       {props.textarea ?
         <textarea
           id={props.id}
           name={props.id}
           autoComplete={props.id}
-          placeholder={props.placeholder}
+          placeholder={focused ? undefined : props.placeholder}
           className={classNames(classes)}
           onKeyDown={onKeydown}
-          onFocus={() => setIsValid(true)}
+          onFocus={() => { setIsValid(true); setFocused(true); }}
           onChange={e => props.setValue(e.target.value)}
-          onBlur={() => validateNotEmpty(props.value)}
+          onBlur={() => { validateNotEmpty(props.value); setFocused(false); }}
           value={props.value ? props.value : ""}
         />
         :
@@ -57,16 +77,16 @@ export const ValidatedInput: React.FC<ValidatedInputProps> = props => {
           id={props.id}
           name={props.id}
           autoComplete={props.id}
-          placeholder={props.placeholder}
+          placeholder={focused ? undefined : props.placeholder}
           className={classNames(classes)}
           onKeyDown={onKeydown}
-          onFocus={() => setIsValid(true)}
+          onFocus={() => { setIsValid(true); setFocused(true); }}
           onChange={e => props.setValue(e.target.value)}
-          onBlur={() => validateNotEmpty(props.value)}
+          onBlur={() => { validateNotEmpty(props.value); setFocused(false); }}
           value={props.value ? props.value : ""}
         />
       }
-    </>
+    </div>
   );
 };
 

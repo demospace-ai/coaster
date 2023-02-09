@@ -6,6 +6,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        'gray-10': '#fcfdff',
         'gray-350': '#b9bdc3',
       },
       boxShadow: {

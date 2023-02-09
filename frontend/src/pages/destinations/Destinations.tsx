@@ -31,7 +31,7 @@ export const Destinations: React.FC = () => {
       content = <></>;
   }
   return (
-    <div className='tw-py-5 tw-px-10'>
+    <div className='tw-py-5 tw-px-10 tw-h-full tw-overflow-scroll'>
       {content}
     </div>
   );

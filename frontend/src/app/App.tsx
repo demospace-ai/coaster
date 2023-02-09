@@ -65,7 +65,7 @@ const AppLayout: React.FC = () => {
   return (
     <>
       <NavigationBar />
-      <div className="tw-flex tw-flex-col tw-h-full tw-w-full tw-bg-slate-50">
+      <div className="tw-flex tw-flex-col tw-h-full tw-w-full tw-bg-gray-10 tw-overflow-hidden">
         <Header />
         <Outlet />
       </div>
