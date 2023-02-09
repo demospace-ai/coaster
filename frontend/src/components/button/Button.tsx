@@ -19,7 +19,6 @@ export const Button: React.FC<ButtonProps> = forwardRef<HTMLButtonElement, Butto
     props.className,
     'tw-text-white tw-bg-slate-600 hover:tw-bg-slate-800',
     'tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition tw-select-none',
-    'tw-border tw-border-slate-800 tw-border-solid',
     props.secondary && 'tw-bg-white tw-text-slate-800 tw-font-normal',
   );
   return (
@@ -44,7 +43,6 @@ export const FormButton: React.FC<FormButtonProps> = props => {
   const buttonStyle = classNames(
     'tw-text-white tw-bg-slate-600 hover:tw-bg-slate-800',
     'tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition tw-select-none',
-    'tw-border tw-border-slate-800 tw-border-solid',
     props.className
   );
   return (
@@ -110,7 +108,7 @@ export const MoreOptionsButton: React.FC<{ id: string; className?: string; showC
         beforeEnter={() => setTooltipDisabled(true)}
         beforeLeave={() => setTooltipDisabled(false)}
       >
-        <Menu.Items className="tw-z-10 tw-absolute tw-origin-top-right tw-right-0 tw-top-10 tw-w-fit tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none" onClick={(e: MouseEvent) => e.stopPropagation()}>
+        <Menu.Items className="tw-z-10 tw-absolute tw-origin-top-right tw-right-0 tw-top-10 tw-w-fit tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none" onClick={(e: MouseEvent) => e.stopPropagation()}>
           <div className="tw-m-1">
             <Menu.Item>
               {({ active }) => (

@@ -127,7 +127,7 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = pro
         afterLeave={() => validateNotUndefined(props.selected)}
       >
         <div className="tw-relative tw-z-10">
-          <Listbox.Options className="tw-absolute tw-z-20 tw-mt-1 tw-max-h-60 tw-min-w-full tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm">
+          <Listbox.Options className="tw-absolute tw-z-20 tw-mt-1 tw-max-h-60 tw-min-w-full tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm">
             <DropdownOptions loading={props.loading} options={props.options} noOptionsString={props.noOptionsString} getElementForDisplay={getElementForDropdown} />
           </Listbox.Options>
         </div>
@@ -267,7 +267,7 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
           afterLeave={() => { validateNotUndefined(props.selected); setQuery(''); }}
         >
           <div className="tw-relative tw-z-10">
-            <Combobox.Options className="tw-absolute tw-z-20 tw-mt-1 tw-min-w-full tw-max-h-60 tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm">
+            <Combobox.Options className="tw-absolute tw-z-20 tw-mt-1 tw-min-w-full tw-max-h-60 tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm">
               <ComboOptions loading={props.loading} options={filteredOptions} noOptionsString={props.noOptionsString} getElementForDisplay={getElementForDisplay} query={query} allowCustom={props.allowCustom} />
             </Combobox.Options>
           </div>

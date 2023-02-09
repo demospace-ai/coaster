@@ -57,7 +57,7 @@ export const Login: React.FC = () => {
   }
 
   return (
-    <div className={styles.loginPage}>
+    <div className="tw-flex tw-flex-row tw-h-full tw-bg-slate-100">
       <div className={styles.loginPane}>
         <div className={classNames(styles.title, "tw-text-3xl", "tw-font-bold")}>fabra</div>
         <div className={styles.loginGroup}>
@@ -136,7 +136,7 @@ const OrganizationInput: React.FC<OrganizationInputProps> = props => {
   const [isValid, setIsValid] = useState(true);
   const [overrideCreate, setOverrideCreate] = useState(false);
 
-  let classes = [styles.input];
+  let classes = ["tw-border tw-border-slate-400 tw-rounded-md tw-px-3 tw-py-2 tw-w-full tw-box-border"];
   if (!isValid) {
     classes.push(styles.invalidBorder);
   }

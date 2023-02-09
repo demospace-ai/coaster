@@ -28,7 +28,7 @@ export const Notification: React.FC<NotificationProps> = ({ show, setShow }) => 
             leaveFrom="tw-opacity-100"
             leaveTo="tw-opacity-0"
           >
-            <div className="tw-pointer-events-auto tw-w-full tw-max-w-sm tw-overflow-hidden tw-rounded-lg tw-bg-white tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5">
+            <div className="tw-pointer-events-auto tw-w-full tw-max-w-sm tw-overflow-hidden tw-rounded-lg tw-bg-white tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5">
               <div className="tw-p-4">
                 <div className="tw-flex tw-items-center">
                   <div className="tw-flex tw-w-0 tw-flex-1 tw-justify-between">

@@ -52,10 +52,10 @@ const DestinationList: React.FC<{ setStep: (step: Step) => void; }> = ({ setStep
           </div>
         </Button>
       </div>
-      <div className='tw-border tw-border-solid tw-border-slate-300 tw-rounded-lg tw-max-h-64 tw-overflow-x-auto tw-overscroll-contain tw-shadow-md' >
+      <div className='tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-lg tw-max-h-64 tw-overflow-x-auto tw-overscroll-contain tw-shadow-md' >
         {destinations
           ?
-          <table className="tw-min-w-full tw-border-spacing-0 tw-bg-white">
+          <table className="tw-min-w-full tw-border-spacing-0">
             <thead className="tw-bg-slate-600 tw-text-white">
               <tr>
                 <th scope="col" className={tableHeaderStyle}>Name</th>

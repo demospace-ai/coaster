@@ -49,7 +49,7 @@ func ConvertDestination(destination models.Destination, connection models.Connec
 }
 
 func ConvertDestinationConnections(destinationConnections []models.DestinationConnection) []Destination {
-	var destinations []Destination
+	destinations := []Destination{}
 	for _, destinationConnection := range destinationConnections {
 		destinations = append(destinations, Destination{
 			DisplayName: destinationConnection.DisplayName,
@@ -77,7 +77,7 @@ func ConvertSource(source models.Source, connection models.Connection) Source {
 }
 
 func ConvertModel(model models.Model, modelFields []models.ModelField) Model {
-	var viewModelFields []ModelField
+	viewModelFields := []ModelField{}
 	for _, modelField := range modelFields {
 		viewModelFields = append(viewModelFields, ModelField{
 			Name: modelField.Name,
