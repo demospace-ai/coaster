@@ -18,7 +18,7 @@ type ValidatedInputProps = {
 
 export const ValidatedInput: React.FC<ValidatedInputProps> = props => {
   const [isValid, setIsValid] = useState(true);
-  let classes = ['tw-border tw-border-solid tw-border-gray-300 tw-rounded-md tw-py-2 tw-px-3 tw-w-full tw-box-border tw-my-1 tw-mx-0', props.className];
+  let classes = ['tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2 tw-px-3 tw-w-full tw-box-border tw-my-1 tw-mx-0', props.className];
   if (!isValid) {
     classes.push('tw-border-red-600 tw-outline-none');
   }
@@ -103,15 +103,15 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = pro
   return (
     <Listbox by={props.by} value={value} onChange={value => { props.setSelected(value); setIsValid(true); }}>
       <Listbox.Button
-        className={classNames("tw-flex tw-justify-center tw-w-full tw-rounded-md tw-py-2 tw-pl-3 tw-pr-3 tw-text-left tw-border tw-border-solid tw-border-gray-300 focus:tw-outline-none hover:tw-bg-green-100 hover:tw-border-green-600 aria-expanded:tw-bg-green-100 aria-expanded:tw-border-green-600", props.className, props.validated && !isValid && 'tw-border-red-600 tw-outline-none')}
+        className={classNames("tw-flex tw-justify-center tw-w-full tw-rounded-md tw-py-2 tw-pl-3 tw-pr-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 focus:tw-outline-none hover:tw-bg-green-100 hover:tw-border-green-600 aria-expanded:tw-bg-green-100 aria-expanded:tw-border-green-600", props.className, props.validated && !isValid && 'tw-border-red-600 tw-outline-none')}
       >
-        <div className={classNames("tw-inline-block tw-w-[calc(100%-20px)] tw-truncate tw-overflow-none", !props.selected && "tw-text-gray-400")}>
+        <div className={classNames("tw-inline-block tw-w-[calc(100%-20px)] tw-truncate tw-overflow-none", !props.selected && "tw-text-slate-400")}>
           {value !== UNSET ? getElementForDisplay(props.selected) : props.placeholder}
         </div>
         {!props.noCaret &&
           <span className="tw-pointer-events-none pr-2">
             <ChevronUpDownIcon
-              className="tw-inline tw-float-right tw-h-5 tw-w-5 tw-text-gray-400"
+              className="tw-inline tw-float-right tw-h-5 tw-w-5 tw-text-slate-400"
               aria-hidden="true"
             />
           </span>}
@@ -157,7 +157,7 @@ const DropdownOptions: React.FC<DropdownOptionsProps> = props => {
       <>
         {props.options!.map((option: any, index: number) => (
           <Listbox.Option key={index} value={option} className={({ active, selected }) =>
-            `tw-relative tw-cursor-pointer tw-select-none tw-py-2 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-green-100 tw-text-green-900' : 'tw-text-gray-900'
+            `tw-relative tw-cursor-pointer tw-select-none tw-py-2 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-green-100 tw-text-green-900' : 'tw-text-slate-900'
             }`
           }>
             {({ selected }) => (
@@ -238,9 +238,9 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
   return (
     <Combobox as="div" className="tw-flex tw-w-full" by={props.by} value={value} onChange={(value: number) => { props.setSelected(value); setIsValid(true); }}>
       <div className="tw-relative tw-w-full">
-        <div className={classNames("tw-flex tw-h-10 tw-w-full tw-rounded-md tw-bg-white tw-pl-2 tw-pr-2 tw-text-left tw-border tw-border-solid tw-border-gray-300 hover:tw-bg-green-100 hover:tw-border-green-600 focus-within:tw-bg-green-100 focus-within:tw-border-green-600", props.className, props.validated && !isValid && 'tw-border-red-600 tw-outline-none')}>
+        <div className={classNames("tw-flex tw-h-10 tw-w-full tw-rounded-md tw-bg-white tw-pl-2 tw-pr-2 tw-text-left tw-border tw-border-solid tw-border-slate-300 hover:tw-bg-green-100 hover:tw-border-green-600 focus-within:tw-bg-green-100 focus-within:tw-border-green-600", props.className, props.validated && !isValid && 'tw-border-red-600 tw-outline-none')}>
           <Combobox.Input
-            className={"tw-inline tw-bg-transparent tw-w-[calc(100%-20px)] tw-border-none tw-pr-2 tw-text-sm tw-leading-5 tw-text-gray-900 tw-outline-none tw-text-ellipsis tw-cursor-pointer focus:tw-cursor-text"}
+            className={"tw-inline tw-bg-transparent tw-w-[calc(100%-20px)] tw-border-none tw-pr-2 tw-text-sm tw-leading-5 tw-text-slate-900 tw-outline-none tw-text-ellipsis tw-cursor-pointer focus:tw-cursor-text"}
             displayValue={selected => selected !== UNSET ? getElementForDisplay(selected) : ""}
             onChange={event => setQuery(event.target.value)}
             placeholder={props.placeholder}
@@ -250,7 +250,7 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
           <Combobox.Button className="tw-inline-block tw-h-full" ref={buttonRef}>
             <span className="tw-pointer-events-none pr-2">
               <ChevronUpDownIcon
-                className="tw-inline tw-float-right tw-h-5 tw-w-5 tw-text-gray-400"
+                className="tw-inline tw-float-right tw-h-5 tw-w-5 tw-text-slate-400"
                 aria-hidden="true"
               />
             </span>
@@ -300,7 +300,7 @@ const ComboOptions: React.FC<ComboOptionsProps> = props => {
       <>
         {props.allowCustom && props.query.length > 0 && (
           <Combobox.Option value={props.query} className={({ active, selected }) =>
-            `tw-relative tw-cursor-pointer tw-select-none tw-py-2 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-green-100 tw-text-green-900' : 'tw-text-gray-900'
+            `tw-relative tw-cursor-pointer tw-select-none tw-py-2 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-green-100 tw-text-green-900' : 'tw-text-slate-900'
             }`
           }>
             Custom: "{props.query}"
@@ -308,7 +308,7 @@ const ComboOptions: React.FC<ComboOptionsProps> = props => {
         )}
         {props.options!.map((option: any, index: number) => (
           <Combobox.Option key={index} value={option} className={({ active, selected }) =>
-            `tw-relative tw-cursor-pointer tw-select-none tw-py-2 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-green-100 tw-text-green-900' : 'tw-text-gray-900'
+            `tw-relative tw-cursor-pointer tw-select-none tw-py-2 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-green-100 tw-text-green-900' : 'tw-text-slate-900'
             }`
           }>
             {({ selected }) => (
@@ -334,7 +334,7 @@ const ComboOptions: React.FC<ComboOptionsProps> = props => {
         {props.allowCustom ?
           props.allowCustom && props.query.length > 0 && (
             <Combobox.Option value={props.query} className={({ active, selected }) =>
-              `tw-relative tw-cursor-pointer tw-select-none tw-py-2 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-green-100 tw-text-green-900' : 'tw-text-gray-900'
+              `tw-relative tw-cursor-pointer tw-select-none tw-py-2 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-green-100 tw-text-green-900' : 'tw-text-slate-900'
               }`
             }>
               Custom: "{props.query}"

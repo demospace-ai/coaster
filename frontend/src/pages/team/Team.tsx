@@ -4,8 +4,8 @@ import { Button } from "src/components/button/Button";
 import { Loading } from "src/components/loading/Loading";
 import { useUsers } from "src/rpc/data";
 
-const tableHeaderStyle = "tw-sticky tw-top-0 tw-z-0 tw-border-b tw-border-gray-300 tw-bg-gray-50 tw-bg-opacity-75 tw-py-3.5 tw-pr-4 tw-pl-3 backdrop-blur backdrop-filter sm:tw-pr-6 lg:tw-pr-8 tw-text-left";
-const tableCellStyle = "tw-whitespace-nowrap tw-px-3 tw-py-4 tw-text-sm tw-text-gray-500 tw-hidden sm:tw-table-cell";
+const tableHeaderStyle = "tw-sticky tw-top-0 tw-z-0 tw-border-b tw-border-slate-300 tw-bg-slate-50 tw-bg-opacity-75 tw-py-3.5 tw-pr-4 tw-pl-3 backdrop-blur backdrop-filter sm:tw-pr-6 lg:tw-pr-8 tw-text-left";
+const tableCellStyle = "tw-whitespace-nowrap tw-px-3 tw-py-4 tw-text-sm tw-text-slate-500 tw-hidden sm:tw-table-cell";
 
 export const Team: React.FC = () => {
   const { users } = useUsers();
@@ -22,11 +22,11 @@ export const Team: React.FC = () => {
           </div>
         </Button>
       </div>
-      <div className='tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-max-h-64 tw-overflow-x-auto tw-overscroll-contain' >
+      <div className='tw-border tw-border-solid tw-border-slate-300 tw-rounded-lg tw-max-h-64 tw-overflow-x-auto tw-overscroll-contain' >
         {users
           ?
           <table className="tw-min-w-full tw-border-separate tw-border-spacing-0">
-            <thead className="tw-bg-gray-100">
+            <thead className="tw-bg-slate-100">
               <tr>
                 <th scope="col" className={tableHeaderStyle}>Name</th>
                 <th scope="col" className={tableHeaderStyle}>Email</th>
@@ -36,7 +36,7 @@ export const Team: React.FC = () => {
             </thead>
             <tbody>
               {users!.length > 0 ? users!.map((user, index) => (
-                <tr key={index} className="tw-border-b tw-border-solid tw-border-gray-200 last:tw-border-0">
+                <tr key={index} className="tw-border-b tw-border-solid tw-border-slate-200 last:tw-border-0">
                   <td className={tableCellStyle}>
                     {user.first_name + " " + user.last_name}
                   </td>

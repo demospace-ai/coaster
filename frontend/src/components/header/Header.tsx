@@ -20,7 +20,7 @@ export const Header: React.FC = () => {
 
   return (
     <>
-      <div className="tw-flex tw-box-border tw-min-h-[64px] tw-h-16 tw-px-10 tw-py-3 tw-items-center tw-border-b tw-border-solid tw-border-gray-200">
+      <div className="tw-flex tw-box-border tw-min-h-[64px] tw-h-16 tw-px-10 tw-py-3 tw-items-center tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white">
         <Breadcrumbs pathname={location.pathname} />
         <ProfileDropdown />
       </div>
@@ -58,11 +58,11 @@ const PageBreadcrumbs: React.FC<{ title?: string, pathname: string; }> = props =
 const BreadcrumbsLayout: React.FC<{ crumbs: Breadcrumb[]; }> = props => {
   return (
     <div className='tw-flex tw-flex-row tw-items-center'>
-      <NavLink className="tw-text-sm tw-font-medium tw-select-none tw-text-gray-900 hover:tw-text-green-800" to='/'>Home</NavLink>
+      <NavLink className="tw-text-sm tw-font-medium tw-select-none tw-text-slate-900 hover:tw-text-slate-600" to='/'>Home</NavLink>
       {props.crumbs.map((crumb, index) => (
         <div key={index} className="tw-flex tw-flex-row tw-items-center">
           <ChevronRightIcon className="tw-h-3 tw-mx-3" />
-          <NavLink className="tw-text-sm tw-font-medium tw-select-none tw-text-gray-900 tw-truncate hover:tw-text-green-800" to={crumb.path}>{crumb.title ? crumb.title : <Loading className='tw-h-4 tw-w-4' />}</NavLink>
+          <NavLink className="tw-text-sm tw-font-medium tw-select-none tw-text-slate-900 tw-truncate hover:tw-text-slate-600" to={crumb.path}>{crumb.title ? crumb.title : <Loading className='tw-h-4 tw-w-4' />}</NavLink>
         </div>
       ))}
     </div>
@@ -96,17 +96,17 @@ const ProfileDropdown: React.FC = () => {
                 {({ active }) => (
                   <div
                     className={classNames(
-                      active ? 'tw-bg-gray-200 tw-text-gray-900' : 'tw-text-gray-700',
+                      active ? 'tw-bg-slate-200 tw-text-slate-900' : 'tw-text-slate-700',
                       menuItem,
                       'tw-pl-2'
                     )}
                   >
-                    <div className="tw-bg-gray-400 tw-text-white tw-rounded-full tw-w-7 tw-h-7 tw-select-none tw-flex tw-items-center tw-justify-center tw-mr-3">
+                    <div className="tw-bg-slate-400 tw-text-white tw-rounded-full tw-w-7 tw-h-7 tw-select-none tw-flex tw-items-center tw-justify-center tw-mr-3">
                       {user!.first_name.charAt(0)}
                     </div>
                     <div className='tw-flex tw-flex-col'>
-                      <p className="tw-truncate tw-text-sm tw-font-semibold tw-text-gray-900">{user?.first_name} {user?.last_name}</p>
-                      <p className="tw-truncate tw-text-sm tw-font-medium tw-text-gray-900">{user?.email}</p>
+                      <p className="tw-truncate tw-text-sm tw-font-semibold tw-text-slate-900">{user?.first_name} {user?.last_name}</p>
+                      <p className="tw-truncate tw-text-sm tw-font-medium tw-text-slate-900">{user?.email}</p>
                     </div>
                   </div>
                 )}
@@ -117,7 +117,7 @@ const ProfileDropdown: React.FC = () => {
                 {({ active }) => (
                   <div
                     className={classNames(
-                      active ? 'tw-bg-gray-200 tw-text-gray-900' : 'tw-text-gray-700',
+                      active ? 'tw-bg-slate-200 tw-text-slate-900' : 'tw-text-slate-700',
                       menuItem
                     )}
                     onClick={logout}

@@ -6,11 +6,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'fabra-green-400': '#508368',
-        'fabra-green-500': '#449e6e',
-        'fabra-green-600': '#378159',
         'gray-350': '#b9bdc3',
-        'dark': '#161b22',
       },
       boxShadow: {
         'centered': 'rgba(99, 99, 99, 0.2) 0 0 10px',

@@ -18,7 +18,7 @@ export const ApiKey: React.FC = () => {
       <div className="tw-flex tw-w-full tw-mb-3">
         <div className="tw-flex tw-flex-col tw-justify-end tw-font-bold tw-text-lg">API Key</div>
       </div>
-      <div className='tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-max-w-lg tw-overflow-x-auto tw-overscroll-contain tw-p-2' >
+      <div className='tw-border tw-border-solid tw-border-slate-300 tw-rounded-lg tw-max-w-lg tw-overflow-x-auto tw-overscroll-contain tw-p-2 tw-bg-white' >
         {visible ?
           (<div className="tw-flex tw-items-center">
             <EyeSlashIcon className="tw-h-4 tw-ml-1 tw-mr-2 tw-cursor-pointer" onClick={() => setVisible(false)} />

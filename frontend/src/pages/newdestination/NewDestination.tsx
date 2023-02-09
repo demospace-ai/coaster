@@ -20,9 +20,9 @@ export const NewDestination: React.FC<{ onComplete: () => void; }> = props => {
 
   return (
     <>
-      <BackButton className="tw-mt-2" onClick={onBack} />
+      <BackButton className="tw-mt-3" onClick={onBack} />
       <div className="tw-flex tw-justify-center tw-h-full">
-        <div className='tw-w-[600px] tw-pb-10 tw-px-8 tw-mx-auto tw-mt-10'>
+        <div className='tw-flex tw-flex-col tw-w-[800px] tw-py-10 tw-px-10 tw-mx-auto tw-mt-10 tw-bg-white tw-rounded-lg tw-shadow-md tw-items-center'>
           <div className="tw-w-full tw-text-center tw-mb-5 tw-font-bold tw-text-lg">New Destination</div>
           {connectionType ?
             <NewDestinationConfiguration connectionType={connectionType} setConnectionType={setConnectionType} onComplete={props.onComplete} />
@@ -138,7 +138,7 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = p
   }
 
   return (
-    <>
+    <div className="tw-w-[500px]">
       <div className="tw-text-center tw-mb-5">Enter your {getConnectionType(props.connectionType)} configuration:</div>
       <form onSubmit={createNewDestination}>
         {inputs}
@@ -149,7 +149,7 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = p
           <div className="tw-mt-3 tw-text-center">{createConnectionSuccess ? "Success!" : "Failure"}</div>
         }
       </form >
-    </>
+    </div>
   );
 };
 
@@ -193,7 +193,7 @@ const TestConnectionButton: React.FC<{ state: NewDestinationState, connectionTyp
 
   return (
     <>
-      <Button className="tw-mt-8 tw-bg-gray-500 tw-border-gray-500 tw-w-full tw-h-10" onClick={testConnection}>{testLoading ? <Loading /> : "Test"}</Button>
+      <Button className="tw-mt-8 tw-bg-slate-200 tw-text-slate-900 hover:tw-bg-slate-300 tw-border-slate-200 tw-w-full tw-h-10" onClick={testConnection}>{testLoading ? <Loading /> : "Test"}</Button>
       {testConnectionSuccess !== null &&
         /* TODO: return error message here */
         <div className="tw-mt-3 tw-text-center">{testConnectionSuccess ? "Success!" : "Failure"}</div>
@@ -246,13 +246,13 @@ type ConnectionTypeSelectorProps = {
 const ConnectionTypeSelector: React.FC<ConnectionTypeSelectorProps> = props => {
   return (
     <>
-      <div className="tw-text-center tw-mb-5">Choose your data warehouse:</div>
+      <div className="tw-text-center tw-mb-10">Choose your data warehouse:</div>
       <div className="tw-flex tw-flex-row tw-justify-center">
-        <Button className="tw-flex tw-flex-row tw-justify-center tw-items-center tw-mt-5 tw-mx-10 !tw-py-5 !tw-px-20 tw-rounded-md tw-cursor-pointer tw-bg-white tw-text-slate-800 tw-border-gray-400 hover:tw-bg-green-100" onClick={() => props.setConnectionType(ConnectionType.Snowflake)}>
+        <Button className="tw-flex tw-flex-row tw-justify-center tw-items-center tw-mr-10 tw-py-5 tw-px-20 tw-rounded-md tw-cursor-pointer tw-bg-white tw-text-slate-800 tw-border-slate-300 hover:tw-bg-slate-100" onClick={() => props.setConnectionType(ConnectionType.Snowflake)}>
           <img src={snowflake} alt="data source logo" className="tw-h-6 tw-mr-1" />
           Snowflake
         </Button>
-        <Button className="tw-flex tw-flex-row tw-justify-center tw-items-center tw-mt-5 tw-mx-10 !tw-py-5 !tw-px-20 tw-rounded-md tw-cursor-pointer tw-bg-white tw-text-slate-800 tw-border-gray-400 hover:tw-bg-green-100" onClick={() => props.setConnectionType(ConnectionType.BigQuery)}>
+        <Button className="tw-flex tw-flex-row tw-justify-center tw-items-center tw-py-5 tw-px-20 tw-rounded-md tw-cursor-pointer tw-bg-white tw-text-slate-800 tw-border-slate-300 hover:tw-bg-slate-100" onClick={() => props.setConnectionType(ConnectionType.BigQuery)}>
           <img src={bigquery} alt="data source logo" className="tw-h-6 tw-mr-1" />
           BigQuery
         </Button>
