@@ -37,7 +37,7 @@ type LoginResponse struct {
 
 func (s ApiService) Login(w http.ResponseWriter, r *http.Request) error {
 	// Login is not an authenticated endpoint, but we can still short-circuit if the user is already logged-in
-	authResult, err := auth.GetAuthentication(s.db, r)
+	authResult, err := s.authService.GetAuthentication(r)
 	if err != nil {
 		return err
 	}

@@ -22,7 +22,7 @@ func TestRouter(t *testing.T) {
 
 var _ = BeforeSuite(func() {
 	db, cleanup = test.SetupDatabase()
-	r = router.NewRouter(db)
+	r = router.NewRouter(test.MockAuthService{})
 })
 
 var _ = AfterSuite((func() {

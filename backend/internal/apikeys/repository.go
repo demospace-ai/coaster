@@ -1,15 +1,18 @@
 package apikeys
 
 import (
+	"crypto/sha256"
+	"encoding/base64"
 	"fabra/internal/models"
 
 	"gorm.io/gorm"
 )
 
-func CreateApiKey(db *gorm.DB, organizationID int64, encryptedApiKey string) (*models.ApiKey, error) {
+func CreateApiKey(db *gorm.DB, organizationID int64, encryptedApiKey string, hashedKey string) (*models.ApiKey, error) {
 	apiKey := models.ApiKey{
 		OrganizationID: organizationID,
 		ApiKey:         encryptedApiKey,
+		HashedKey:      hashedKey,
 	}
 
 	result := db.Create(&apiKey)
@@ -33,4 +36,9 @@ func LoadApiKeyForOrganization(db *gorm.DB, organizationID int64) (*models.ApiKe
 	}
 
 	return &apiKey, nil
+}
+
+func HashKey(key string) string {
+	h := sha256.Sum256([]byte(key))
+	return base64.StdEncoding.EncodeToString(h[:])
 }

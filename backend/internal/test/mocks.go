@@ -2,11 +2,20 @@ package test
 
 import (
 	"context"
+	"fabra/internal/auth"
 	"fabra/internal/models"
 	"fabra/internal/query"
+	"net/http"
 
 	"gorm.io/gorm"
 )
+
+type MockAuthService struct {
+}
+
+func (as MockAuthService) GetAuthentication(r *http.Request) (*auth.Authentication, error) {
+	return nil, nil
+}
 
 type MockCryptoService struct {
 }

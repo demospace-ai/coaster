@@ -47,3 +47,18 @@ func LoadOrganizationsByEmailDomain(db *gorm.DB, emailDomain string) ([]models.O
 
 	return organizations, nil
 }
+
+func LoadOrganizationByApiKey(db *gorm.DB, hashedKey string) (*models.Organization, error) {
+	var organization models.Organization
+	result := db.Table("organizations").
+		Select("organizations.*").
+		Joins("JOIN api_keys ON api_keys.organization_id = organizations.id").
+		Where("api_keys.hashed_key = ?", hashedKey).
+		Where("organizations.deactivated_at IS NULL").
+		Take(&organization)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &organization, nil
+}

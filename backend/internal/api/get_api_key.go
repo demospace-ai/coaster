@@ -39,7 +39,7 @@ func (s ApiService) GetOrCreateApiKey(organizationID int64) (*string, error) {
 				return nil, err
 			}
 
-			_, err = apikeys.CreateApiKey(s.db, organizationID, *encryptedApiKey)
+			_, err = apikeys.CreateApiKey(s.db, organizationID, *encryptedApiKey, apikeys.HashKey(rawApiKey))
 			if err != nil {
 				return nil, err
 			}

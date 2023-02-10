@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
-	"gorm.io/gorm"
 )
 
 var ALLOWED_ORIGINS = []string{"https://app.fabra.io"}
@@ -21,17 +20,17 @@ type Service interface {
 }
 
 type Router struct {
-	db     *gorm.DB
-	router *mux.Router
+	router      *mux.Router
+	authService auth.AuthService
 }
 
-func NewRouter(db *gorm.DB) Router {
+func NewRouter(authService auth.AuthService) Router {
 	// No HTTPS needed since TLS is terminated by Google Cloud Run
 	router := mux.NewRouter()
 
 	return Router{
-		db:     db,
-		router: router,
+		router:      router,
+		authService: authService,
 	}
 }
 
@@ -70,7 +69,7 @@ func (r Router) wrapUnauthenticatedRoute(handler ErrorHandlerFunc) http.Handler 
 
 func (r Router) wrapWithAuth(handler AuthenticatedHandlerFunc) ErrorHandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) error {
-		auth, err := auth.GetAuthentication(r.db, req)
+		auth, err := r.authService.GetAuthentication(req)
 		if err != nil {
 			return err
 		}

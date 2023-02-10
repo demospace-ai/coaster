@@ -2,6 +2,7 @@ package main
 
 import (
 	"fabra/internal/api"
+	"fabra/internal/auth"
 	"fabra/internal/config"
 	"fabra/internal/crypto"
 	"fabra/internal/database"
@@ -28,9 +29,10 @@ func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	cryptoService := crypto.NewCryptoService()
+	authService := auth.NewAuthService(db, cryptoService)
 	queryService := query.NewQueryService(db, cryptoService)
-	apiService := api.NewApiService(db, cryptoService, queryService)
+	apiService := api.NewApiService(db, authService, cryptoService, queryService)
 
-	router := router.NewRouter(db)
+	router := router.NewRouter(authService)
 	router.RunService(apiService)
 }

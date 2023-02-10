@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fabra/internal/auth"
 	"fabra/internal/crypto"
 	"fabra/internal/query"
 	"fabra/internal/router"
@@ -10,13 +11,15 @@ import (
 
 type ApiService struct {
 	db            *gorm.DB
+	authService   auth.AuthService
 	cryptoService crypto.CryptoService
 	queryService  query.QueryService
 }
 
-func NewApiService(db *gorm.DB, cryptoService crypto.CryptoService, queryService query.QueryService) ApiService {
+func NewApiService(db *gorm.DB, authService auth.AuthService, cryptoService crypto.CryptoService, queryService query.QueryService) ApiService {
 	return ApiService{
 		db:            db,
+		authService:   authService,
 		cryptoService: cryptoService,
 		queryService:  queryService,
 	}

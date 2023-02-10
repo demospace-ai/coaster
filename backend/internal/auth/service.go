@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"fabra/internal/apikeys"
+	"fabra/internal/crypto"
 	"fabra/internal/errors"
 	"fabra/internal/models"
 	"fabra/internal/organizations"
@@ -12,6 +14,22 @@ import (
 )
 
 const SESSION_COOKIE_NAME = "X-Session-Token"
+
+type AuthService interface {
+	GetAuthentication(r *http.Request) (*Authentication, error)
+}
+
+type AuthServiceImpl struct {
+	db            *gorm.DB
+	cryptoService crypto.CryptoService
+}
+
+func NewAuthService(db *gorm.DB, cryptoService crypto.CryptoService) AuthService {
+	return AuthServiceImpl{
+		db:            db,
+		cryptoService: cryptoService,
+	}
+}
 
 func addCookie(w http.ResponseWriter, name string, value string) {
 	cookie := http.Cookie{
@@ -28,18 +46,18 @@ func AddSessionCookie(w http.ResponseWriter, token string) {
 	addCookie(w, SESSION_COOKIE_NAME, token)
 }
 
-func authenticate(db *gorm.DB, r *http.Request) (*models.Session, error) {
+func (as AuthServiceImpl) authenticate(r *http.Request) (*models.Session, error) {
 	cookie, err := r.Cookie(SESSION_COOKIE_NAME)
 	if err != nil {
 		return nil, err
 	}
 
-	session, err := sessions.LoadValidByToken(db, cookie.Value)
+	session, err := sessions.LoadValidByToken(as.db, cookie.Value)
 	if err != nil {
 		return nil, err
 	}
 
-	refreshed, err := sessions.Refresh(db, session)
+	refreshed, err := sessions.Refresh(as.db, session)
 	if err != nil {
 		return nil, err
 	}
@@ -47,15 +65,37 @@ func authenticate(db *gorm.DB, r *http.Request) (*models.Session, error) {
 	return refreshed, nil
 }
 
-func GetAuthentication(db *gorm.DB, r *http.Request) (*Authentication, error) {
-	session, err := authenticate(db, r)
+func (as AuthServiceImpl) authApiKey(r *http.Request) (*models.Organization, error) {
+	apiKey := r.Header.Get("X-Api-Key")
+	if apiKey != "" {
+		hashedKey := apikeys.HashKey(apiKey)
+		organization, err := organizations.LoadOrganizationByApiKey(as.db, hashedKey)
+		if err != nil {
+			return nil, err
+		}
+
+		return organization, nil
+	} else {
+		return nil, nil
+	}
+}
+
+func (as AuthServiceImpl) GetAuthentication(r *http.Request) (*Authentication, error) {
+	session, err := as.authenticate(r)
 
 	// no session found
 	if errors.IsRecordNotFound(err) || errors.IsCookieNotFound(err) {
+		// check for API key authentication too
+		organization, err := as.authApiKey(r)
+		if err != nil && !errors.IsRecordNotFound(err) {
+			return nil, err
+		}
+
 		return &Authentication{
 			Session:         nil,
 			User:            nil,
-			IsAuthenticated: false,
+			Organization:    organization,
+			IsAuthenticated: organization != nil,
 		}, nil
 	}
 
@@ -64,7 +104,7 @@ func GetAuthentication(db *gorm.DB, r *http.Request) (*Authentication, error) {
 		return nil, errors.Wrap(err, "Unexpected error checking authentication")
 	}
 
-	user, err := users.LoadUserByID(db, session.UserID)
+	user, err := users.LoadUserByID(as.db, session.UserID)
 	if err != nil {
 		return nil, errors.Wrap(err, "Unexpected error fetching user")
 	}
@@ -72,7 +112,7 @@ func GetAuthentication(db *gorm.DB, r *http.Request) (*Authentication, error) {
 	// If organization is null, this means the user still needs to set their organization
 	var organization *models.Organization
 	if user.OrganizationID.Valid {
-		organization, err = organizations.LoadOrganizationByID(db, user.OrganizationID.Int64)
+		organization, err = organizations.LoadOrganizationByID(as.db, user.OrganizationID.Int64)
 		if err != nil {
 			return nil, errors.Wrap(err, "Unexpected error fetching organization")
 		}
