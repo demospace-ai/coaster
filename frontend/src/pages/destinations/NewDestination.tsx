@@ -129,7 +129,7 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = p
 
   if (createConnectionSuccess) {
     return (
-      <div className="tw-w-[200%] tw-translate-x-[-25%]">
+      <div>
         <div className='tw-mt-10 tw-text-center tw-font-bold tw-text-lg'>🎉 Congratulations! Your destination is set up. 🎉</div>
         <Button className='tw-block tw-mt-8 tw-mx-auto tw-mb-10 tw-w-32' onClick={props.onComplete}>Done</Button>
       </div>

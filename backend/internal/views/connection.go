@@ -30,7 +30,6 @@ type Model struct {
 	DestinationID    int64        `json:"destination_id"`
 	Namespace        string       `json:"namespace"`
 	TableName        string       `json:"table_name"`
-	CustomJoin       string       `json:"custom_join"`
 	CustomerIdColumn string       `json:"customer_id_column"`
 	ModelFields      []ModelField `json:"model_fields"`
 }
@@ -94,9 +93,8 @@ func ConvertModel(model models.Model, modelFields []models.ModelField) Model {
 		ID:               model.ID,
 		DisplayName:      model.DisplayName,
 		DestinationID:    model.DestinationID,
-		Namespace:        model.Namespace.String,
-		TableName:        model.TableName.String,
-		CustomJoin:       model.CustomJoin.String,
+		Namespace:        model.Namespace,
+		TableName:        model.TableName,
 		CustomerIdColumn: model.CustomerIdColumn,
 		ModelFields:      viewModelFields,
 	}

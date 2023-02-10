@@ -1,7 +1,6 @@
 package customermodels
 
 import (
-	"fabra/internal/database"
 	"fabra/internal/input"
 	"fabra/internal/models"
 
@@ -13,9 +12,8 @@ func CreateModel(
 	organizationID int64,
 	displayName string,
 	destinationID int64,
-	namespace *string,
-	tableName *string,
-	customJoin *string,
+	namespace string,
+	tableName string,
 	customerIdColumn string,
 ) (*models.Model, error) {
 
@@ -23,14 +21,9 @@ func CreateModel(
 		OrganizationID:   organizationID,
 		DisplayName:      displayName,
 		DestinationID:    destinationID,
+		Namespace:        namespace,
+		TableName:        tableName,
 		CustomerIdColumn: customerIdColumn,
-	}
-
-	if tableName != nil && namespace != nil {
-		model.Namespace = database.NewNullString(*namespace)
-		model.TableName = database.NewNullString(*tableName)
-	} else if customJoin != nil {
-		model.CustomJoin = database.NewNullString(*customJoin)
 	}
 
 	result := db.Create(&model)

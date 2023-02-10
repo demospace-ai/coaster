@@ -123,7 +123,7 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = pro
   return (
     <Listbox by={props.by} value={value} onChange={value => { props.setSelected(value); setIsValid(true); }}>
       <Listbox.Button
-        className={classNames("tw-flex tw-justify-center tw-w-full tw-rounded-md tw-py-2 tw-pl-3 tw-pr-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 focus:tw-outline-none hover:tw-bg-green-100 hover:tw-border-green-600 aria-expanded:tw-bg-green-100 aria-expanded:tw-border-green-600", props.className, props.validated && !isValid && 'tw-border-red-600 tw-outline-none')}
+        className={classNames("tw-flex tw-justify-center tw-w-full tw-rounded-md tw-py-2.5 tw-pl-3 tw-pr-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 focus:tw-outline-none hover:tw-bg-green-100 hover:tw-border-green-600 aria-expanded:tw-bg-green-100 aria-expanded:tw-border-green-600", props.className, props.validated && !isValid && 'tw-border-red-600 tw-outline-none')}
       >
         <div className={classNames("tw-inline-block tw-w-[calc(100%-20px)] tw-truncate tw-overflow-none", !props.selected && "tw-text-slate-400")}>
           {value !== UNSET ? getElementForDisplay(props.selected) : props.placeholder}
@@ -177,7 +177,7 @@ const DropdownOptions: React.FC<DropdownOptionsProps> = props => {
       <>
         {props.options!.map((option: any, index: number) => (
           <Listbox.Option key={index} value={option} className={({ active, selected }) =>
-            `tw-relative tw-cursor-pointer tw-select-none tw-py-2 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-green-100 tw-text-green-900' : 'tw-text-slate-900'
+            `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-green-100 tw-text-green-900' : 'tw-text-slate-900'
             }`
           }>
             {({ selected }) => (
@@ -321,7 +321,7 @@ const ComboOptions: React.FC<ComboOptionsProps> = props => {
       <>
         {props.allowCustom && props.query.length > 0 && (
           <Combobox.Option value={props.query} className={({ active, selected }) =>
-            `tw-relative tw-cursor-pointer tw-select-none tw-py-2 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-green-100 tw-text-green-900' : 'tw-text-slate-900'
+            `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-green-100 tw-text-green-900' : 'tw-text-slate-900'
             }`
           }>
             Custom: "{props.query}"
@@ -329,7 +329,7 @@ const ComboOptions: React.FC<ComboOptionsProps> = props => {
         )}
         {props.options!.map((option: any, index: number) => (
           <Combobox.Option key={index} value={option} className={({ active, selected }) =>
-            `tw-relative tw-cursor-pointer tw-select-none tw-py-2 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-green-100 tw-text-green-900' : 'tw-text-slate-900'
+            `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-green-100 tw-text-green-900' : 'tw-text-slate-900'
             }`
           }>
             {({ selected }) => (
@@ -355,7 +355,7 @@ const ComboOptions: React.FC<ComboOptionsProps> = props => {
         {props.allowCustom ?
           props.allowCustom && props.query.length > 0 && (
             <Combobox.Option value={props.query} className={({ active, selected }) =>
-              `tw-relative tw-cursor-pointer tw-select-none tw-py-2 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-green-100 tw-text-green-900' : 'tw-text-slate-900'
+              `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-green-100 tw-text-green-900' : 'tw-text-slate-900'
               }`
             }>
               Custom: "{props.query}"

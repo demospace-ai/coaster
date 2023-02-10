@@ -15,9 +15,8 @@ import (
 type CreateModelRequest struct {
 	DisplayName      string             `json:"display_name" validate:"required"`
 	DestinationID    int64              `json:"destination_id" validate:"required"`
-	Namespace        *string            `json:"namespace,omitempty"`
-	TableName        *string            `json:"table_name,omitempty"`
-	CustomJoin       *string            `json:"custom_join,omitempty"`
+	Namespace        string             `json:"namespace,omitempty" validate:"required"`
+	TableName        string             `json:"table_name,omitempty" validate:"required"`
 	CustomerIdColumn string             `json:"customer_id_column" validate:"required"`
 	ModelFields      []input.ModelField `json:"model_fields"`
 }
@@ -45,10 +44,6 @@ func (s ApiService) CreateModel(auth auth.Authentication, w http.ResponseWriter,
 		return err
 	}
 
-	if (createModelRequest.TableName == nil || createModelRequest.Namespace == nil) && createModelRequest.CustomJoin == nil {
-		return errors.NewBadRequest("must have table_name and namespace or custom_join")
-	}
-
 	// TODO: create model and fields in a transaction
 	model, err := customermodels.CreateModel(
 		s.db,
@@ -57,7 +52,6 @@ func (s ApiService) CreateModel(auth auth.Authentication, w http.ResponseWriter,
 		createModelRequest.DestinationID,
 		createModelRequest.Namespace,
 		createModelRequest.TableName,
-		createModelRequest.CustomJoin,
 		createModelRequest.CustomerIdColumn,
 	)
 	if err != nil {

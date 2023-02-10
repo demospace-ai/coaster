@@ -142,9 +142,8 @@ export interface CreateDestinationRequest {
 export interface CreateModelRequest {
     display_name: string;
     destination_id: number;
-    namespace?: string;
-    table_name?: string;
-    custom_join?: string;
+    namespace: string;
+    table_name: string;
     customer_id_column: string;
     model_fields: ModelField[];
 }

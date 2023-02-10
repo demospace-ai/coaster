@@ -8,7 +8,7 @@ export function useApiKey() {
   return { apiKey: data, error };
 }
 
-export function useSchema(connectionID: number | undefined, namespace: string | undefined, tableName: string | undefined, customJoin: string | undefined) {
+export function useSchema(connectionID: number | undefined, namespace?: string, tableName?: string, customJoin?: string) {
   const fetcher: Fetcher<GetSchemaResponse, GetSchemaRequest> = (request: GetSchemaRequest) => sendRequest(GetSchema, request);
   const shouldFetch = connectionID && ((namespace && tableName) || customJoin);
   const { data, error } = useSWR(shouldFetch ? { GetSchema, connectionID, namespace, tableName, customJoin } : null, fetcher);
