@@ -1,1 +1,0 @@
-ALTER TABLE api_keys ADD COLUMN hashed_key VARCHAR(64) NOT NULL DEFAULT '';

@@ -1,2 +1,0 @@
-DROP TABLE IF EXISTS funnel_steps;
-DROP TABLE IF EXISTS analyses;

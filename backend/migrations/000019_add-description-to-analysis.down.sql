@@ -1,2 +1,0 @@
-ALTER TABLE analyses ALTER COLUMN title DROP NOT NULL;
-ALTER TABLE analyses DROP COLUMN description;
