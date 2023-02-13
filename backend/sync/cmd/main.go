@@ -7,5 +7,5 @@ import (
 )
 
 func main() {
-	fmt.Printf(crypto.CONNECTION_KEY)
+	fmt.Printf("%+v", crypto.API_KEY_KEY)
 }

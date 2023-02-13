@@ -2,7 +2,7 @@ steps:
 - id: test-backend
   name: 'golang:1.18'
   script: |
-    cd backend;
+    cd backend/server;
     go test -v ./...;
   env:
     - 'IS_CLOUD_BUILD=true'
@@ -10,7 +10,7 @@ steps:
 
 - id: build-backend
   name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/fabra-344902/fabra:$COMMIT_SHA', '-t', 'gcr.io/fabra-344902/fabra:latest', 'backend/']
+  args: ['build', '-t', 'gcr.io/fabra-344902/fabra:$COMMIT_SHA', '-t', 'gcr.io/fabra-344902/fabra:latest', 'backend/server/']
   waitFor: ['test-backend']
 
 - id: push-backend
