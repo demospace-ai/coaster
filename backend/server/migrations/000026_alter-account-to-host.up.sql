@@ -1,1 +1,0 @@
-ALTER TABLE connections RENAME COLUMN account TO host;
