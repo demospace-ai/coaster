@@ -33,11 +33,11 @@ func CreateSyncConfiguration(
 	return &syncConfiguration, nil
 }
 
-func LoadSyncConfigurationByID(db *gorm.DB, organizationID int64, eventSetID int64) (*models.SyncConfiguration, error) {
+func LoadSyncConfigurationByID(db *gorm.DB, organizationID int64, syncConfigurationID int64) (*models.SyncConfiguration, error) {
 	var eventSet models.SyncConfiguration
 	result := db.Table("sync_configurations").
 		Select("sync_configurations.*").
-		Where("sync_configurations.id = ?", eventSetID).
+		Where("sync_configurations.id = ?", syncConfigurationID).
 		Where("sync_configurations.organization_id = ?", organizationID).
 		Where("sync_configurations.deactivated_at IS NULL").
 		Take(&eventSet)

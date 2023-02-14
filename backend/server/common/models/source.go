@@ -12,3 +12,14 @@ type Source struct {
 
 	BaseModel
 }
+
+type SourceConnection struct {
+	ID             int64
+	OrganizationID int64
+	DisplayName    string
+	ConnectionID   int64
+	Namespace      database.NullString
+	TableName      database.NullString
+	CustomJoin     database.NullString
+	ConnectionType ConnectionType
+}

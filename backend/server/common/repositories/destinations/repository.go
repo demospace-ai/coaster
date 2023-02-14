@@ -27,6 +27,7 @@ func CreateDestination(
 	return &destination, nil
 }
 
+// TODO: test that connection credentials are not exposed
 func LoadDestinationByID(db *gorm.DB, organizationID int64, destinationID int64) (*models.DestinationConnection, error) {
 	var destinationConnection models.DestinationConnection
 	result := db.Table("destinations").
@@ -35,6 +36,7 @@ func LoadDestinationByID(db *gorm.DB, organizationID int64, destinationID int64)
 		Where("destinations.id = ?", destinationID).
 		Where("destinations.organization_id = ?", organizationID).
 		Where("destinations.deactivated_at IS NULL").
+		Where("connections.deactivated_at IS NULL").
 		Take(&destinationConnection)
 
 	if result.Error != nil {
@@ -55,6 +57,7 @@ func LoadAllDestinations(
 		Where("destinations.organization_id = ?", organizationID).
 		Where("destinations.deactivated_at IS NULL").
 		Order("destinations.created_at ASC").
+		Where("connections.deactivated_at IS NULL").
 		Find(&destinations)
 
 	if result.Error != nil {
