@@ -10,21 +10,30 @@ import (
 )
 
 type BigQueryApiClient struct {
-	GCPProjectID   *string
-	GCPCredentials *string
+	ProjectID   *string
+	Credentials *string
+	Location    *string
+}
+
+type BigQueryIterator struct {
+	Iterator *bigquery.RowIterator
+}
+
+func (it BigQueryIterator) Next() (Row, error) {
+	return nil, nil
 }
 
 func (ac BigQueryApiClient) openConnection(ctx context.Context) (*bigquery.Client, error) {
-	if ac.GCPProjectID == nil {
+	if ac.ProjectID == nil {
 		return nil, fmt.Errorf("missing project ID")
 	}
 
 	var credentialOption option.ClientOption
-	if ac.GCPCredentials != nil {
-		credentialOption = option.WithCredentialsJSON([]byte(*ac.GCPCredentials))
+	if ac.Credentials != nil {
+		credentialOption = option.WithCredentialsJSON([]byte(*ac.Credentials))
 	}
 
-	return bigquery.NewClient(ctx, *ac.GCPProjectID, credentialOption)
+	return bigquery.NewClient(ctx, *ac.ProjectID, credentialOption)
 }
 
 func (ac BigQueryApiClient) GetTables(ctx context.Context, namespace string) ([]string, error) {
@@ -125,16 +134,18 @@ func (ac BigQueryApiClient) RunQuery(ctx context.Context, queryString string) (*
 	defer client.Close()
 
 	q := client.Query(queryString)
+
 	// Location must match that of the dataset(s) referenced in the query.
-	q.Location = "US"
+	q.Location = *ac.Location
+
 	// Run the query and print results when the query job is completed.
 	job, err := q.Run(ctx)
 	if err != nil {
 		return nil, err
 	}
-	status, err := job.Wait(ctx)
 
-	// Both of these are not actually a failure, the query was just wrong. Send the details back to them.
+	// If an error happens here it isn't actually a failure, the query was just wrong. Send the details back.
+	status, err := job.Wait(ctx)
 	if err != nil {
 		result := QueryResult{
 			Success:      false,
@@ -176,6 +187,40 @@ func (ac BigQueryApiClient) RunQuery(ctx context.Context, queryString string) (*
 		Data:    results,
 	}
 	return &queryResult, nil
+}
+
+func (ac BigQueryApiClient) GetQueryIterator(ctx context.Context, queryString string) (RowIterator, error) {
+	client, err := ac.openConnection(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
+	}
+	defer client.Close()
+
+	q := client.Query(queryString)
+
+	// Location must match that of the dataset(s) referenced in the query.
+	q.Location = *ac.Location
+
+	// Run the query and print results when the query job is completed.
+	job, err := q.Run(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// Both of these are not actually a failure, the query was just wrong. Send the details back to them.
+	_, err = job.Wait(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	it, err := job.Read(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return BigQueryIterator{
+		Iterator: it,
+	}, nil
 }
 
 func convertBigQueryRow(bigQueryRow []bigquery.Value) Row {

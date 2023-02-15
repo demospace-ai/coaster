@@ -51,6 +51,7 @@ const INITIAL_DESTINATION_STATE: NewDestinationState = {
   displayName: "",
   bigqueryConfig: {
     credentials: "",
+    location: "",
   },
   snowflakeConfig: {
     username: "",
@@ -229,6 +230,7 @@ const BigQueryInputs: React.FC<ConnectionConfigurationProps> = props => {
   return (
     <>
       <ValidatedInput id='displayName' value={state.displayName} setValue={(value) => { props.setState({ ...state, displayName: value }); }} placeholder='Display Name' label="Display Name" />
+      <ValidatedInput id='location' value={state.bigqueryConfig.location} setValue={(value) => { props.setState({ ...state, bigqueryConfig: { ...state.bigqueryConfig, location: value } }); }} placeholder='Location' label="Location" />
       <ValidatedInput
         className="tw-h-24 tw-min-h-[40px] tw-max-h-80"
         id='credentials'

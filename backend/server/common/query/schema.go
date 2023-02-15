@@ -16,3 +16,7 @@ type QueryResult struct {
 	Schema       Schema `json:"schema"`
 	Data         []Row  `json:"data"`
 }
+
+type RowIterator interface {
+	Next() (Row, error)
+}

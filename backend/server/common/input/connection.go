@@ -11,6 +11,7 @@ type SnowflakeConfig struct {
 
 type BigQueryConfig struct {
 	Credentials string `json:"credentials,omitempty"`
+	Location    string `json:"location,omitempty"`
 }
 
 type ModelField struct {

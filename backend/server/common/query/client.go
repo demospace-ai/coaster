@@ -30,9 +30,14 @@ func (qs QueryServiceImpl) newAPIClient(ctx context.Context, connection *models.
 			return nil, err
 		}
 
+		if !connection.Location.Valid {
+			return nil, errors.New("bigquery connection must have location defined")
+		}
+
 		return BigQueryApiClient{
-			GCPProjectID:   &bigQueryCredentials.ProjectID,
-			GCPCredentials: bigQueryCredentialsString,
+			ProjectID:   &bigQueryCredentials.ProjectID,
+			Credentials: bigQueryCredentialsString,
+			Location:    &connection.Location.String,
 		}, nil
 	default:
 		return nil, errors.New("unrecognized warehouse type")

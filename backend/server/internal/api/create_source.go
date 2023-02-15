@@ -43,6 +43,7 @@ func (s ApiService) CreateSource(auth auth.Authentication, w http.ResponseWriter
 		return err
 	}
 
+	// TODO: validate connection parameters
 	validate := validator.New()
 	err = validate.Struct(createSourceRequest)
 	if err != nil {
@@ -63,7 +64,7 @@ func (s ApiService) CreateSource(auth auth.Authentication, w http.ResponseWriter
 			return err
 		}
 		connection, err = connections.CreateBigQueryConnection(
-			s.db, auth.Organization.ID, *encryptedCredentials,
+			s.db, auth.Organization.ID, *encryptedCredentials, createSourceRequest.BigQueryConfig.Location,
 		)
 	case models.ConnectionTypeSnowflake:
 		encryptedCredentials, err = s.cryptoService.EncryptConnectionCredentials(createSourceRequest.SnowflakeConfig.Password)

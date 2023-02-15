@@ -40,11 +40,12 @@ func LoadConnectionByID(db *gorm.DB, organizationID int64, connectionID int64) (
 	return &connection, nil
 }
 
-func CreateBigQueryConnection(db *gorm.DB, organizationID int64, encryptedCredentials string) (*models.Connection, error) {
+func CreateBigQueryConnection(db *gorm.DB, organizationID int64, encryptedCredentials string, location string) (*models.Connection, error) {
 	connection := models.Connection{
 		OrganizationID: organizationID,
 		ConnectionType: models.ConnectionTypeBigQuery,
 		Credentials:    database.NewNullString(encryptedCredentials),
+		Location:       database.NewNullString(location),
 	}
 
 	result := db.Create(&connection)

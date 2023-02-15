@@ -53,7 +53,7 @@ func (s ApiService) CreateDestination(auth auth.Authentication, w http.ResponseW
 			return err
 		}
 		connection, err = connections.CreateBigQueryConnection(
-			s.db, auth.Organization.ID, *encryptedCredentials,
+			s.db, auth.Organization.ID, *encryptedCredentials, createDestinationRequest.BigQueryConfig.Location,
 		)
 	case models.ConnectionTypeSnowflake:
 		encryptedCredentials, err = s.cryptoService.EncryptConnectionCredentials(createDestinationRequest.SnowflakeConfig.Password)

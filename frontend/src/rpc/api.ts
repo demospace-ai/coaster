@@ -155,6 +155,7 @@ export interface ModelField {
 
 export interface BigQueryConfig {
     credentials: string;
+    location: string;
 }
 
 export interface SnowflakeConfig {
