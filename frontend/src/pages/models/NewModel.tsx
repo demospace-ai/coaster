@@ -108,7 +108,7 @@ export const NewModelForm: React.FC<NewModelFormProps> = props => {
         placeholder='Display Name'
         label="Display Name" />
       <DestinationSelector
-        className='tw-mt-4'
+        className='tw-mt-5'
         validated={true}
         destination={state.destination}
         setDestination={(value: Destination) => {
@@ -148,7 +148,8 @@ export const NewModelForm: React.FC<NewModelFormProps> = props => {
         selected={state.customerIdColumn}
         setSelected={(value: ColumnSchema) => { setState({ ...state, customerIdColumn: value }); }}
         getElementForDisplay={(value: ColumnSchema) => value.name}
-        placeholder='Customer ID Column'
+        placeholder='End Customer ID Column'
+        label='End Customer ID Column'
         noOptionsString="No Columns Available! (Return to previous step)"
         loading={!schema}
         validated={true}

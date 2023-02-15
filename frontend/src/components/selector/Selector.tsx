@@ -2,7 +2,6 @@ import { ValidatedComboInput, ValidatedDropdownInput } from "src/components/inpu
 import { ColumnSchema, Connection, Destination } from "src/rpc/api";
 import { useColumnValues, useDestinations, useNamespaces, useTables } from "src/rpc/data";
 
-
 type DestinationSelectorProps = {
   destination: Destination | undefined;
   setDestination: (destination: Destination) => void;
@@ -24,6 +23,7 @@ export const DestinationSelector: React.FC<DestinationSelectorProps> = props => 
     loading={!destinations}
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No destinations available!"}
     placeholder={props.placeholder ? props.placeholder : "Choose destination"}
+    label="Destination"
     validated={props.validated} />;
 };
 
@@ -48,6 +48,7 @@ export const NamespaceSelector: React.FC<NamespaceSelectorProps> = props => {
     loading={!namespaces}
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No namespaces available!"}
     placeholder={props.placeholder ? props.placeholder : "Choose namespace"}
+    label="Namespace"
     validated={props.validated} />;
 };
 
@@ -74,6 +75,7 @@ export const TableSelector: React.FC<TableSelectorProps> = props => {
     loading={!tables}
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No tables available!"}
     placeholder={props.placeholder ? props.placeholder : "Choose table"}
+    label="Table"
     validated={props.validated}
     allowCustom={props.allowCustom} />;
 };
@@ -102,8 +104,8 @@ export const ColumnValueSelector: React.FC<ColumnValueSelectorProps> = props => 
     options={columnValues}
     getElementForDisplay={(propertyValue: string) => propertyValue ? propertyValue : "<empty>"}
     loading={!columnValues}
-    noOptionsString={props.noOptionsString ? props.noOptionsString : "No properties values available!"}
-    placeholder={props.placeholder ? props.placeholder : "Choose property value"}
+    noOptionsString={props.noOptionsString ? props.noOptionsString : "No column values available!"}
+    placeholder={props.placeholder ? props.placeholder : "Choose column value"}
     validated={props.validated}
     allowCustom={true} />;
 };
