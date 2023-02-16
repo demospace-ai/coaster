@@ -8,8 +8,8 @@ import { ApiKey } from 'src/pages/apikey/ApiKey';
 import { Destinations } from 'src/pages/destinations/Destinations';
 import { Home } from 'src/pages/home/Home';
 import { Login } from 'src/pages/login/Login';
-import { Models } from 'src/pages/models/Models';
 import { NotFound } from 'src/pages/notfound/NotFound';
+import { Objects } from 'src/pages/objects/Objects';
 import { Team } from 'src/pages/team/Team';
 import { useSelector } from 'src/root/model';
 
@@ -42,7 +42,7 @@ export const App: React.FC = () => {
           <Route path='/apikey' element={<RequireAuth element={<ApiKey />} />} />
           <Route path='/team' element={<RequireAuth element={<Team />} />} />
           <Route path='/destinations' element={<RequireAuth element={<Destinations />} />} />
-          <Route path='/models' element={<RequireAuth element={<Models />} />} />
+          <Route path='/objects' element={<RequireAuth element={<Objects />} />} />
           <Route path='*' element={<NotFound />} />
         </Route>
       </Routes>

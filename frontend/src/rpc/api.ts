@@ -28,10 +28,10 @@ export const GetDestinations: IEndpoint<undefined, GetDestinationsResponse> = {
     path: '/get_destinations',
 };
 
-export const GetModels: IEndpoint<undefined, GetModelsResponse> = {
-    name: 'Models Fetched',
+export const GetObjects: IEndpoint<undefined, GetObjectsResponse> = {
+    name: 'Objects Fetched',
     method: 'GET',
-    path: '/get_models',
+    path: '/get_objects',
 };
 
 export const GetSyncConfigurations: IEndpoint<undefined, GetSyncConfigurationsResponse> = {
@@ -110,10 +110,10 @@ export const CreateDestination: IEndpoint<CreateDestinationRequest, undefined> =
 };
 
 
-export const CreateModel: IEndpoint<CreateModelRequest, undefined> = {
-    name: 'Model Created',
+export const CreateObject: IEndpoint<CreateObjectRequest, undefined> = {
+    name: 'Object Created',
     method: 'POST',
-    path: '/create_model',
+    path: '/create_object',
     track: true,
 };
 
@@ -139,16 +139,16 @@ export interface CreateDestinationRequest {
 }
 
 
-export interface CreateModelRequest {
+export interface CreateObjectRequest {
     display_name: string;
     destination_id: number;
     namespace: string;
     table_name: string;
     customer_id_column: string;
-    model_fields: ModelField[];
+    object_fields: ObjectField[];
 }
 
-export interface ModelField {
+export interface ObjectField {
     name: string;
     type: string;
 }
@@ -262,18 +262,18 @@ export interface GetDestinationsResponse {
 }
 
 
-export interface GetModelsResponse {
-    models: Model[];
+export interface GetObjectsResponse {
+    objects: Object[];
 }
 
-export interface Model {
+export interface Object {
     id: number;
     display_name: string;
     destination_id: number;
     namespace?: string;
     table_name?: string;
     custom_join?: string;
-    model_fields: ModelField[];
+    model_fields: ObjectField[];
 }
 
 export interface GetSyncConfigurationsResponse {

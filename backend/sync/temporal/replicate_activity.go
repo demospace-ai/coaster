@@ -62,15 +62,15 @@ func getQueryStringForSource(source *models.SourceConnection) string {
 	return ""
 }
 
-func getInsertStringForModel(model *models.Model, destination *models.DestinationConnection) string {
-	if model == nil || destination == nil {
+func getInsertStringForModel(object *models.Object, destination *models.DestinationConnection) string {
+	if object == nil || destination == nil {
 		return "" // TODO: throw error
 	}
 
 	switch destination.ConnectionType {
 	case (models.ConnectionTypeBigQuery):
 	case (models.ConnectionTypeSnowflake):
-		return "INSERT INTO " + model.Namespace + "." + model.TableName + " SELECT * FROM VALUES\n"
+		return "INSERT INTO " + object.Namespace + "." + object.TableName + " SELECT * FROM VALUES\n"
 	}
 
 	return ""

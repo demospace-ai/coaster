@@ -14,7 +14,7 @@ type BigQueryConfig struct {
 	Location    string `json:"location,omitempty"`
 }
 
-type ModelField struct {
+type ObjectField struct {
 	Name string `json:"name"`
 	Type string `json:"type"`
 }

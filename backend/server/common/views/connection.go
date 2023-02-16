@@ -24,17 +24,17 @@ type Connection struct {
 	ConnectionType models.ConnectionType `json:"connection_type"`
 }
 
-type Model struct {
-	ID               int64        `json:"id"`
-	DisplayName      string       `json:"display_name"`
-	DestinationID    int64        `json:"destination_id"`
-	Namespace        string       `json:"namespace"`
-	TableName        string       `json:"table_name"`
-	CustomerIdColumn string       `json:"customer_id_column"`
-	ModelFields      []ModelField `json:"model_fields"`
+type Object struct {
+	ID               int64         `json:"id"`
+	DisplayName      string        `json:"display_name"`
+	DestinationID    int64         `json:"destination_id"`
+	Namespace        string        `json:"namespace"`
+	TableName        string        `json:"table_name"`
+	CustomerIdColumn string        `json:"customer_id_column"`
+	ObjectFields     []ObjectField `json:"object_fields"`
 }
 
-type ModelField struct {
+type ObjectField struct {
 	Name string
 	Type string
 }
@@ -80,22 +80,22 @@ func ConvertSource(source models.Source, connection models.Connection) Source {
 	}
 }
 
-func ConvertModel(model models.Model, modelFields []models.ModelField) Model {
-	viewModelFields := []ModelField{}
-	for _, modelField := range modelFields {
-		viewModelFields = append(viewModelFields, ModelField{
+func ConvertObject(model models.Object, objectFields []models.ObjectField) Object {
+	viewObjectFields := []ObjectField{}
+	for _, modelField := range objectFields {
+		viewObjectFields = append(viewObjectFields, ObjectField{
 			Name: modelField.Name,
 			Type: modelField.Type,
 		})
 	}
 
-	return Model{
+	return Object{
 		ID:               model.ID,
 		DisplayName:      model.DisplayName,
 		DestinationID:    model.DestinationID,
 		Namespace:        model.Namespace,
 		TableName:        model.TableName,
 		CustomerIdColumn: model.CustomerIdColumn,
-		ModelFields:      viewModelFields,
+		ObjectFields:     viewObjectFields,
 	}
 }

@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"go.fabra.io/server/common/repositories/connections"
-	"go.fabra.io/server/common/repositories/customer_models"
 	"go.fabra.io/server/common/repositories/destinations"
+	"go.fabra.io/server/common/repositories/objects"
 	"go.fabra.io/server/common/repositories/sources"
 	"go.fabra.io/server/common/repositories/sync_configurations"
 	"gorm.io/gorm"
@@ -43,7 +43,7 @@ func FetchConfiguration(ctx context.Context, input FetchConfigurationInput) (*Sy
 		return nil, err
 	}
 
-	model, err := customer_models.LoadModelByID(input.db, input.organizationID, syncConfiguration.ModelID)
+	object, err := objects.LoadObjectByID(input.db, input.organizationID, syncConfiguration.ModelID)
 	if err != nil {
 		return nil, err
 	}
@@ -54,6 +54,6 @@ func FetchConfiguration(ctx context.Context, input FetchConfigurationInput) (*Sy
 		SourceConnection:      sourceConnection,
 		Destination:           destination,
 		DestinationConnection: destinationConnection,
-		Model:                 model,
+		Object:                object,
 	}, nil
 }

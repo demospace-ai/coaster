@@ -16,5 +16,5 @@ type SyncConfiguration struct {
 	SourceConnection      *models.Connection
 	Destination           *models.DestinationConnection
 	DestinationConnection *models.Connection
-	Model                 *models.Model
+	Object                *models.Object
 }

@@ -52,10 +52,10 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.CreateSource,
 		},
 		{
-			Name:        "Create model for sync",
+			Name:        "Create object for sync",
 			Method:      router.POST,
-			Pattern:     "/api/create_model",
-			HandlerFunc: s.CreateModel,
+			Pattern:     "/api/create_object",
+			HandlerFunc: s.CreateObject,
 		},
 		{
 			Name:        "Test data connection",
@@ -100,10 +100,10 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.GetDestinations,
 		},
 		{
-			Name:        "Get all models",
+			Name:        "Get all objects",
 			Method:      router.GET,
-			Pattern:     "/api/get_models",
-			HandlerFunc: s.GetModels,
+			Pattern:     "/api/get_objects",
+			HandlerFunc: s.GetObjects,
 		},
 		{
 			Name:        "Get all sync configurations",

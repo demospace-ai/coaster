@@ -80,9 +80,9 @@ export const NavigationBar: React.FC = () => {
           </NavLink>
         </div>
         <div className={routeContainer}>
-          <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-slate-200")} to={'/models'}>
+          <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-slate-200")} to={'/objects'}>
             <CubeIcon className="tw-h-4" strokeWidth="2" />
-            <div className={route}>Models</div>
+            <div className={route}>Objects</div>
           </NavLink>
         </div>
         <div className={routeContainer}>

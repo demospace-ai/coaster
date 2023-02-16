@@ -1,5 +1,5 @@
 import { sendRequest } from "src/rpc/ajax";
-import { GetAllUsers, GetAllUsersResponse, GetApiKey, GetColumnValues, GetColumnValuesRequest, GetColumnValuesResponse, GetDestinations, GetDestinationsResponse, GetModels, GetModelsResponse, GetNamespaces, GetNamespacesResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetSyncConfigurations, GetSyncConfigurationsResponse, GetTables, GetTablesResponse } from "src/rpc/api";
+import { GetAllUsers, GetAllUsersResponse, GetApiKey, GetColumnValues, GetColumnValuesRequest, GetColumnValuesResponse, GetDestinations, GetDestinationsResponse, GetNamespaces, GetNamespacesResponse, GetObjects, GetObjectsResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetSyncConfigurations, GetSyncConfigurationsResponse, GetTables, GetTablesResponse } from "src/rpc/api";
 import useSWR, { Fetcher } from "swr";
 
 export function useApiKey() {
@@ -27,10 +27,10 @@ export function useDestinations() {
   return { destinations: data?.destinations, mutate, error };
 }
 
-export function useModels() {
-  const fetcher: Fetcher<GetModelsResponse, {}> = () => sendRequest(GetModels);
-  const { data, mutate, error } = useSWR({ GetModels }, fetcher);
-  return { models: data?.models, mutate, error };
+export function useObjects() {
+  const fetcher: Fetcher<GetObjectsResponse, {}> = () => sendRequest(GetObjects);
+  const { data, mutate, error } = useSWR({ GetObjects }, fetcher);
+  return { objects: data?.objects, mutate, error };
 }
 
 export function useNamespaces(connectionID: number | undefined) {
