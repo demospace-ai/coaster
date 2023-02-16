@@ -14,7 +14,7 @@ export const Home: React.FC = () => {
       </div>
       <div className={setupStep}>
         <div className={stepNumber}>2</div>
-        Define models that customers can send to you
+        Define objects that customers can send to you
       </div>
       <div className={setupStep}>
         <div className={stepNumber}>3</div>
