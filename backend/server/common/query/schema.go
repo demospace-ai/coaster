@@ -1,5 +1,7 @@
 package query
 
+import "errors"
+
 type Schema []ColumnSchema
 
 type ColumnSchema struct {
@@ -16,6 +18,8 @@ type QueryResult struct {
 	Schema       Schema `json:"schema"`
 	Data         []Row  `json:"data"`
 }
+
+var Done = errors.New("no more items in fabra iterator")
 
 type RowIterator interface {
 	Next() (Row, error)

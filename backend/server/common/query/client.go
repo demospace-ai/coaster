@@ -14,6 +14,7 @@ type apiClient interface {
 	GetNamespaces(ctx context.Context) ([]string, error)
 	GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]Value, error)
 	RunQuery(ctx context.Context, queryString string) (*QueryResult, error)
+	GetQueryIterator(ctx context.Context, queryString string) (RowIterator, error)
 }
 
 func (qs QueryServiceImpl) newAPIClient(ctx context.Context, connection *models.Connection) (apiClient, error) {

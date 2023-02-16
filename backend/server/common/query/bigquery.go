@@ -20,7 +20,17 @@ type BigQueryIterator struct {
 }
 
 func (it BigQueryIterator) Next() (Row, error) {
-	return nil, nil
+	var row []bigquery.Value
+	err := it.Iterator.Next(&row)
+	if err == iterator.Done {
+		return nil, Done
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return convertBigQueryRow(row), nil
 }
 
 func (ac BigQueryApiClient) openConnection(ctx context.Context) (*bigquery.Client, error) {
