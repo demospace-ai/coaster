@@ -273,7 +273,7 @@ export interface Object {
     namespace?: string;
     table_name?: string;
     custom_join?: string;
-    model_fields: ObjectField[];
+    object_fields: ObjectField[];
 }
 
 export interface GetSyncConfigurationsResponse {
