@@ -68,9 +68,9 @@ func (s ApiService) GetSchema(auth auth.Authentication, w http.ResponseWriter, r
 func (s ApiService) getSchemaForTable(connection models.Connection, namespace string, tableName string) (query.Schema, error) {
 	switch connection.ConnectionType {
 	case models.ConnectionTypeBigQuery:
-		return s.getBigQuerySchemaForTable(connection, namespace, tableName)
+		fallthrough
 	case models.ConnectionTypeSnowflake:
-		return s.getSnowflakeSchemaForTable(connection, namespace, tableName)
+		return s.queryService.GetTableSchema(context.Background(), &connection, namespace, tableName)
 	default:
 		return nil, errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", connection.ConnectionType))
 	}
@@ -79,35 +79,10 @@ func (s ApiService) getSchemaForTable(connection models.Connection, namespace st
 func (s ApiService) getSchemaForCustomJoin(connection models.Connection, customJoin string) (query.Schema, error) {
 	switch connection.ConnectionType {
 	case models.ConnectionTypeBigQuery:
-		return s.getBigQuerySchemaForCustom(connection, customJoin)
+		fallthrough
 	case models.ConnectionTypeSnowflake:
-		return s.getSnowflakeSchemaForCustom(connection, customJoin)
+		return nil, errors.NewBadRequest("custom join not supported")
 	default:
 		return nil, errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", connection.ConnectionType))
 	}
-}
-
-func (s ApiService) getBigQuerySchemaForCustom(connection models.Connection, customJoin string) (query.Schema, error) {
-	ctx := context.Background()
-	result, err := s.queryService.RunQuery(ctx, &connection, customJoin)
-	if err != nil {
-		return nil, err
-	}
-
-	return result.Schema, nil
-}
-
-func (s ApiService) getBigQuerySchemaForTable(connection models.Connection, namespace string, tableName string) (query.Schema, error) {
-	ctx := context.Background()
-	return s.queryService.GetTableSchema(ctx, &connection, namespace, tableName)
-}
-
-func (s ApiService) getSnowflakeSchemaForTable(connection models.Connection, namespace string, tableName string) (query.Schema, error) {
-	// TODO: implement
-	return nil, errors.NewBadRequest("snowflake not supported")
-}
-
-func (s ApiService) getSnowflakeSchemaForCustom(connection models.Connection, customJoin string) (query.Schema, error) {
-	// TODO: implement
-	return nil, errors.NewBadRequest("snowflake not supported")
 }

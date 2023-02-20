@@ -13,7 +13,7 @@ type apiClient interface {
 	GetTableSchema(ctx context.Context, namespace string, tableName string) (Schema, error)
 	GetNamespaces(ctx context.Context) ([]string, error)
 	GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]Value, error)
-	RunQuery(ctx context.Context, queryString string) (*QueryResult, error)
+	RunQuery(ctx context.Context, queryString string, args ...any) ([]Row, error)
 	GetQueryIterator(ctx context.Context, queryString string) (RowIterator, error)
 }
 
@@ -40,6 +40,22 @@ func (qs QueryServiceImpl) newAPIClient(ctx context.Context, connection *models.
 			Credentials: bigQueryCredentialsString,
 			Location:    &connection.Location.String,
 		}, nil
+	case models.ConnectionTypeSnowflake:
+		snowflakePassword, err := qs.cryptoService.DecryptConnectionCredentials(connection.Password.String)
+		if err != nil {
+			return nil, err
+		}
+
+		// TODO: validate all connection params
+		return SnowflakeApiClient{
+			Username:      connection.Username.String,
+			Password:      *snowflakePassword,
+			WarehouseName: connection.WarehouseName.String,
+			DatabaseName:  connection.DatabaseName.String,
+			Role:          connection.Role.String,
+			Host:          connection.Host.String,
+		}, nil
+
 	default:
 		return nil, errors.New("unrecognized warehouse type")
 	}

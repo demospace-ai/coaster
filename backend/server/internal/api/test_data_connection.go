@@ -14,7 +14,7 @@ import (
 	"go.fabra.io/server/common/models"
 
 	"cloud.google.com/go/bigquery"
-	sf "github.com/snowflakedb/gosnowflake"
+	"github.com/snowflakedb/gosnowflake"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 )
@@ -82,7 +82,7 @@ func testBigQueryConnection(bigqueryConfig input.BigQueryConfig) error {
 
 func testSnowflakeConnection(snowflakeConfig input.SnowflakeConfig) error {
 	account := strings.Split(snowflakeConfig.Host, ".")[0] // TODO: remove the https/http
-	config := sf.Config{
+	config := gosnowflake.Config{
 		Account:   account,
 		User:      snowflakeConfig.Username,
 		Password:  snowflakeConfig.Password,
@@ -92,7 +92,7 @@ func testSnowflakeConnection(snowflakeConfig input.SnowflakeConfig) error {
 		Host:      snowflakeConfig.Host,
 	}
 
-	dsn, err := sf.DSN(&config)
+	dsn, err := gosnowflake.DSN(&config)
 	if err != nil {
 		return err
 	}

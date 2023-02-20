@@ -23,7 +23,7 @@ func (it BigQueryIterator) Next() (Row, error) {
 	var row []bigquery.Value
 	err := it.Iterator.Next(&row)
 	if err == iterator.Done {
-		return nil, Done
+		return nil, ErrDone
 	}
 
 	if err != nil {
@@ -72,15 +72,15 @@ func (ac BigQueryApiClient) GetTables(ctx context.Context, namespace string) ([]
 }
 
 func (ac BigQueryApiClient) GetTableSchema(ctx context.Context, namespace string, tableName string) (Schema, error) {
-	queryString := "select * from " + namespace + ".INFORMATION_SCHEMA.COLUMNS where table_name = '" + tableName + "'"
+	queryString := "SELECT * FROM " + namespace + ".INFORMATION_SCHEMA.COLUMNS WHERE table_name = '" + tableName + "'"
 
-	queryResult, err := ac.RunQuery(ctx, queryString)
+	rows, err := ac.RunQuery(ctx, queryString)
 	if err != nil {
 		return nil, err
 	}
 
 	schema := Schema{}
-	for _, row := range queryResult.Data {
+	for _, row := range rows {
 		if row[0] == nil {
 			continue
 		}
@@ -94,13 +94,13 @@ func (ac BigQueryApiClient) GetTableSchema(ctx context.Context, namespace string
 func (ac BigQueryApiClient) GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]Value, error) {
 	queryString := "SELECT DISTINCT " + columnName + " FROM " + namespace + "." + tableName + " LIMIT 50"
 
-	queryResult, err := ac.RunQuery(ctx, queryString)
+	rows, err := ac.RunQuery(ctx, queryString)
 	if err != nil {
 		return nil, err
 	}
 
 	values := []Value{}
-	for _, row := range queryResult.Data {
+	for _, row := range rows {
 		if row[0] == nil {
 			continue
 		}
@@ -136,7 +136,7 @@ func (ac BigQueryApiClient) GetNamespaces(ctx context.Context) ([]string, error)
 	return results, nil
 }
 
-func (ac BigQueryApiClient) RunQuery(ctx context.Context, queryString string) (*QueryResult, error) {
+func (ac BigQueryApiClient) RunQuery(ctx context.Context, queryString string, args ...any) ([]Row, error) {
 	client, err := ac.openConnection(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
@@ -144,6 +144,9 @@ func (ac BigQueryApiClient) RunQuery(ctx context.Context, queryString string) (*
 	defer client.Close()
 
 	q := client.Query(queryString)
+	for arg := range args {
+		q.Parameters = append(q.Parameters, bigquery.QueryParameter{Value: arg})
+	}
 
 	// Location must match that of the dataset(s) referenced in the query.
 	q.Location = *ac.Location
@@ -155,22 +158,13 @@ func (ac BigQueryApiClient) RunQuery(ctx context.Context, queryString string) (*
 	}
 
 	// If an error happens here it isn't actually a failure, the query was just wrong. Send the details back.
+	// TODO: make special error type for this
 	status, err := job.Wait(ctx)
 	if err != nil {
-		result := QueryResult{
-			Success:      false,
-			ErrorMessage: err.Error(),
-		}
-
-		return &result, nil
+		return nil, err
 	}
 	if err := status.Err(); err != nil {
-		result := QueryResult{
-			Success:      false,
-			ErrorMessage: err.Error(),
-		}
-
-		return &result, nil
+		return nil, err
 	}
 
 	var results []Row
@@ -191,12 +185,7 @@ func (ac BigQueryApiClient) RunQuery(ctx context.Context, queryString string) (*
 		results = append(results, convertBigQueryRow(row))
 	}
 
-	queryResult := QueryResult{
-		Success: true,
-		Schema:  convertBigQuerySchema(it.Schema),
-		Data:    results,
-	}
-	return &queryResult, nil
+	return results, nil
 }
 
 func (ac BigQueryApiClient) GetQueryIterator(ctx context.Context, queryString string) (RowIterator, error) {
@@ -240,19 +229,4 @@ func convertBigQueryRow(bigQueryRow []bigquery.Value) Row {
 	}
 
 	return row
-}
-
-func convertBigQuerySchema(bigQuerySchema bigquery.Schema) Schema {
-	schema := Schema{}
-
-	for _, bigQuerySchemaField := range bigQuerySchema {
-		columnSchema := ColumnSchema{
-			Name: bigQuerySchemaField.Name,
-			Type: string(bigQuerySchemaField.Type),
-		}
-
-		schema = append(schema, columnSchema)
-	}
-
-	return schema
 }

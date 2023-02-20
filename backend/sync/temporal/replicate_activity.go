@@ -23,7 +23,7 @@ func Replicate(ctx context.Context, replicateInput ReplicateInput) error {
 	// write to temporary table in destination
 	for {
 		row, err := it.Next()
-		if err == query.Done {
+		if err == query.ErrDone {
 			break
 		}
 
@@ -44,6 +44,7 @@ func Replicate(ctx context.Context, replicateInput ReplicateInput) error {
 	return nil
 }
 
+// TODO: only read 10,000 rows at once or something
 func getQueryStringForSource(source *models.SourceConnection) string {
 	if source == nil {
 		return "" // TODO: throw error
@@ -60,6 +61,24 @@ func getQueryStringForSource(source *models.SourceConnection) string {
 	}
 
 	return ""
+}
+
+func getTempInsertStringForModel(object *models.Object, destination *models.DestinationConnection) string {
+	if object == nil || destination == nil {
+		return "" // TODO: throw error
+	}
+
+	switch destination.ConnectionType {
+	case (models.ConnectionTypeBigQuery):
+	case (models.ConnectionTypeSnowflake):
+		return "INSERT INTO " + getTempTableName(object.Namespace, object.TableName) + " SELECT * FROM VALUES\n"
+	}
+
+	return ""
+}
+
+func getTempTableName(namespace string, tableName string) string {
+	return namespace + ".tmp_" + tableName
 }
 
 func getInsertStringForModel(object *models.Object, destination *models.DestinationConnection) string {

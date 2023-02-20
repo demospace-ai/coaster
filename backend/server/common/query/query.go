@@ -14,7 +14,7 @@ type QueryService interface {
 	GetTables(ctx context.Context, connection *models.Connection, namespace string) ([]string, error)
 	GetTableSchema(ctx context.Context, connection *models.Connection, namespace string, tableName string) ([]ColumnSchema, error)
 	GetColumnValues(ctx context.Context, connection *models.Connection, namespace string, tableName string, columnName string) ([]Value, error)
-	RunQuery(ctx context.Context, connection *models.Connection, queryString string) (*QueryResult, error)
+	RunQuery(ctx context.Context, connection *models.Connection, queryString string) ([]Row, error)
 	GetQueryIterator(ctx context.Context, connection *models.Connection, queryString string) (RowIterator, error)
 }
 
@@ -30,7 +30,7 @@ func NewQueryService(db *gorm.DB, cryptoService crypto.CryptoService) QueryServi
 	}
 }
 
-func (qs QueryServiceImpl) RunQuery(ctx context.Context, connection *models.Connection, queryString string) (*QueryResult, error) {
+func (qs QueryServiceImpl) RunQuery(ctx context.Context, connection *models.Connection, queryString string) ([]Row, error) {
 	client, err := qs.newAPIClient(ctx, connection)
 	if err != nil {
 		return nil, err
