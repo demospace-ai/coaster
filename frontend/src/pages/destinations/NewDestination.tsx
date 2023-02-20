@@ -1,12 +1,13 @@
 import React, { FormEvent, useState } from "react";
 import { BackButton, Button, FormButton } from "src/components/button/Button";
 import bigquery from "src/components/images/bigquery.svg";
+import redshift from "src/components/images/redshift.svg";
 import snowflake from "src/components/images/snowflake.svg";
 import { getConnectionTypeImg } from "src/components/images/warehouses";
 import { ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { sendRequest } from "src/rpc/ajax";
-import { BigQueryConfig, ConnectionType, CreateDestination, CreateDestinationRequest, getConnectionType, GetDestinations, SnowflakeConfig, TestDataConnection, TestDataConnectionRequest } from "src/rpc/api";
+import { BigQueryConfig, ConnectionType, CreateDestination, CreateDestinationRequest, getConnectionType, GetDestinations, RedshiftConfig, SnowflakeConfig, TestDataConnection, TestDataConnectionRequest } from "src/rpc/api";
 import { mutate } from "swr";
 
 export const NewDestination: React.FC<{ onComplete: () => void; }> = props => {
@@ -22,7 +23,7 @@ export const NewDestination: React.FC<{ onComplete: () => void; }> = props => {
   return (
     <>
       <BackButton className="tw-mt-3" onClick={onBack} />
-      <div className='tw-flex tw-flex-col tw-w-[800px] tw-py-12 tw-px-10 tw-mx-auto tw-mb-20 tw-mt-8 tw-bg-white tw-rounded-lg tw-shadow-md tw-items-center'>
+      <div className='tw-flex tw-flex-col tw-w-[900px] tw-py-12 tw-px-10 tw-mx-auto tw-mb-20 tw-mt-8 tw-bg-white tw-rounded-lg tw-shadow-md tw-items-center'>
         <div className="tw-w-full tw-text-center tw-mb-5 tw-font-bold tw-text-lg">New Destination</div>
         {connectionType ?
           <NewDestinationConfiguration connectionType={connectionType} setConnectionType={setConnectionType} onComplete={props.onComplete} />
@@ -44,6 +45,7 @@ type NewDestinationState = {
   displayName: string;
   bigqueryConfig: BigQueryConfig;
   snowflakeConfig: SnowflakeConfig;
+  redshiftConfig: RedshiftConfig;
 };
 
 // Values must be empty strings otherwise the input will be uncontrolled
@@ -61,6 +63,13 @@ const INITIAL_DESTINATION_STATE: NewDestinationState = {
     role: "",
     host: "",
   },
+  redshiftConfig: {
+    username: "",
+    password: "",
+    database_name: "",
+    port: "",
+    host: "",
+  },
 };
 
 const validateAll = (connectionType: ConnectionType, state: NewDestinationState): boolean => {
@@ -74,6 +83,8 @@ const validateAll = (connectionType: ConnectionType, state: NewDestinationState)
         && state.snowflakeConfig.role.length > 0
         && state.snowflakeConfig.host.length > 0;
     case ConnectionType.BigQuery:
+      return state.displayName.length > 0 && state.bigqueryConfig.credentials.length > 0;
+    case ConnectionType.Redshift:
       return state.displayName.length > 0 && state.bigqueryConfig.credentials.length > 0;
   }
 };
@@ -103,6 +114,9 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = p
       case ConnectionType.Snowflake:
         payload.snowflake_config = state.snowflakeConfig;
         break;
+      case ConnectionType.Redshift:
+        payload.redshift_config = state.redshiftConfig;
+        break;
       default:
       // TODO: throw an error here
     }
@@ -126,6 +140,9 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = p
     case ConnectionType.BigQuery:
       inputs = <BigQueryInputs state={state} setState={setState} />;
       break;
+    case ConnectionType.Redshift:
+      inputs = <RedshiftInputs state={state} setState={setState} />;
+      break;
   };
 
   if (createConnectionSuccess) {
@@ -140,7 +157,7 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = p
   return (
     <div className="tw-w-[500px]">
       <div className="tw-flex tw-justify-center tw-items-center tw-mb-5">
-        <img src={getConnectionTypeImg(props.connectionType)} alt="icon" className="tw-h-6 tw-mr-1" />
+        <img src={getConnectionTypeImg(props.connectionType)} alt="icon" className="tw-h-6 tw-mr-1.5" />
         <div>Enter your {getConnectionType(props.connectionType)} configuration:</div>
       </div>
       <form onSubmit={createNewDestination}>
@@ -225,6 +242,21 @@ const SnowflakeInputs: React.FC<ConnectionConfigurationProps> = props => {
   );
 };
 
+const RedshiftInputs: React.FC<ConnectionConfigurationProps> = props => {
+  const state = props.state;
+  return (
+    <>
+      <ValidatedInput id='displayName' value={state.displayName} setValue={(value) => { props.setState({ ...state, displayName: value }); }} placeholder='Display Name' label="Display Name" />
+      <ValidatedInput id='username' value={state.redshiftConfig.username} setValue={(value) => { props.setState({ ...state, redshiftConfig: { ...state.redshiftConfig, username: value } }); }} placeholder='Username' label="Username" />
+      <ValidatedInput id='password' type="password" value={state.redshiftConfig.password} setValue={(value) => { props.setState({ ...state, redshiftConfig: { ...state.redshiftConfig, password: value } }); }} placeholder='Password' label="Password" />
+      <ValidatedInput id='databaseName' value={state.redshiftConfig.database_name} setValue={(value) => { props.setState({ ...state, redshiftConfig: { ...state.redshiftConfig, database_name: value } }); }} placeholder='Database Name' label="Database Name" />
+      <ValidatedInput id='host' value={state.redshiftConfig.host} setValue={(value) => { props.setState({ ...state, redshiftConfig: { ...state.redshiftConfig, host: value } }); }} placeholder='Host' label="Host" />
+      <ValidatedInput id='port' value={state.redshiftConfig.port} setValue={(value) => { props.setState({ ...state, redshiftConfig: { ...state.redshiftConfig, port: value } }); }} placeholder='Port' label="Port" />
+    </>
+  );
+};
+
+
 const BigQueryInputs: React.FC<ConnectionConfigurationProps> = props => {
   const state = props.state;
   return (
@@ -253,14 +285,18 @@ const ConnectionTypeSelector: React.FC<ConnectionTypeSelectorProps> = props => {
   return (
     <>
       <div className="tw-text-center tw-mb-10">Choose your data warehouse:</div>
-      <div className="tw-flex tw-flex-row tw-gap-12">
+      <div className="tw-flex tw-flex-row tw-gap-10">
         <Button className={connectionButton} onClick={() => props.setConnectionType(ConnectionType.Snowflake)}>
-          <img src={snowflake} alt="data source logo" className="tw-h-6 tw-mr-1" />
+          <img src={snowflake} alt="data source logo" className="tw-h-6 tw-mr-1.5" />
           Snowflake
         </Button>
         <Button className={connectionButton} onClick={() => props.setConnectionType(ConnectionType.BigQuery)}>
-          <img src={bigquery} alt="data source logo" className="tw-h-6 tw-mr-1" />
+          <img src={bigquery} alt="data source logo" className="tw-h-6 tw-mr-1.5" />
           BigQuery
+        </Button>
+        <Button className={connectionButton} onClick={() => props.setConnectionType(ConnectionType.Redshift)}>
+          <img src={redshift} alt="data source logo" className="tw-h-6 tw-mr-1.5" />
+          Redshift
         </Button>
       </div>
     </>

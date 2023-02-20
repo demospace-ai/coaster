@@ -39,7 +39,7 @@ export const NewObject: React.FC<{ onComplete: () => void; }> = props => {
   return (
     <>
       <BackButton className="tw-mt-3" onClick={props.onComplete} />
-      <div className='tw-flex tw-flex-col tw-w-[800px] tw-py-12 tw-px-10 tw-mx-auto tw-mb-20 tw-mt-8 tw-bg-white tw-rounded-lg tw-shadow-md tw-items-center'>
+      <div className='tw-flex tw-flex-col tw-w-[900px] tw-py-12 tw-px-10 tw-mx-auto tw-mb-20 tw-mt-8 tw-bg-white tw-rounded-lg tw-shadow-md tw-items-center'>
         <NewObjectForm state={state} setState={setState} onComplete={props.onComplete} />
       </div>
     </>

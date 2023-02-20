@@ -21,6 +21,7 @@ type CreateSourceRequest struct {
 	ConnectionType  models.ConnectionType  `json:"connection_type"`
 	BigQueryConfig  *input.BigQueryConfig  `json:"bigquery_config,omitempty"`
 	SnowflakeConfig *input.SnowflakeConfig `json:"snowflake_config,omitempty"`
+	RedshiftConfig  *input.RedshiftConfig  `json:"redshift_config,omitempty"`
 	Namespace       *string                `json:"namespace,omitempty"`
 	TableName       *string                `json:"table_name,omitempty"`
 	CustomJoin      *string                `json:"custom_join,omitempty"`
@@ -72,9 +73,15 @@ func (s ApiService) CreateSource(auth auth.Authentication, w http.ResponseWriter
 			return err
 		}
 		connection, err = connections.CreateSnowflakeConnection(
-			s.db, auth.Organization.ID,
-			*createSourceRequest.SnowflakeConfig,
-			*encryptedCredentials,
+			s.db, auth.Organization.ID, *createSourceRequest.SnowflakeConfig, *encryptedCredentials,
+		)
+	case models.ConnectionTypeRedshift:
+		encryptedCredentials, err = s.cryptoService.EncryptConnectionCredentials(createSourceRequest.RedshiftConfig.Password)
+		if err != nil {
+			return err
+		}
+		connection, err = connections.CreateRedshiftConnection(
+			s.db, auth.Organization.ID, *createSourceRequest.RedshiftConfig, *encryptedCredentials,
 		)
 	}
 

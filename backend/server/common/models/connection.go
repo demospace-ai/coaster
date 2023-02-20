@@ -7,6 +7,7 @@ type ConnectionType string
 const (
 	ConnectionTypeSnowflake ConnectionType = "snowflake"
 	ConnectionTypeBigQuery  ConnectionType = "bigquery"
+	ConnectionTypeRedshift  ConnectionType = "redshift"
 )
 
 type BigQueryCredentials struct {
@@ -33,6 +34,7 @@ type Connection struct {
 	DatabaseName   database.NullString
 	Role           database.NullString
 	Host           database.NullString
+	Port           database.NullString
 
 	BaseModel
 }

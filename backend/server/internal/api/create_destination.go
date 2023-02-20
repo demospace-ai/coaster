@@ -19,6 +19,7 @@ type CreateDestinationRequest struct {
 	ConnectionType  models.ConnectionType  `json:"connection_type"`
 	BigQueryConfig  *input.BigQueryConfig  `json:"bigquery_config,omitempty"`
 	SnowflakeConfig *input.SnowflakeConfig `json:"snowflake_config,omitempty"`
+	RedshiftConfig  *input.RedshiftConfig  `json:"redshift_config,omitempty"`
 }
 
 type CreateDestinationResponse struct {
@@ -61,9 +62,15 @@ func (s ApiService) CreateDestination(auth auth.Authentication, w http.ResponseW
 			return err
 		}
 		connection, err = connections.CreateSnowflakeConnection(
-			s.db, auth.Organization.ID,
-			*createDestinationRequest.SnowflakeConfig,
-			*encryptedCredentials,
+			s.db, auth.Organization.ID, *createDestinationRequest.SnowflakeConfig, *encryptedCredentials,
+		)
+	case models.ConnectionTypeRedshift:
+		encryptedCredentials, err = s.cryptoService.EncryptConnectionCredentials(createDestinationRequest.RedshiftConfig.Password)
+		if err != nil {
+			return err
+		}
+		connection, err = connections.CreateRedshiftConnection(
+			s.db, auth.Organization.ID, *createDestinationRequest.RedshiftConfig, *encryptedCredentials,
 		)
 	}
 
@@ -96,6 +103,8 @@ func validateCreateDestinationRequest(request CreateDestinationRequest) error {
 		return validateCreateBigQueryDestination(request)
 	case models.ConnectionTypeSnowflake:
 		return validateCreateSnowflakeDestination(request)
+	case models.ConnectionTypeRedshift:
+		return validateCreateRedshiftDestination(request)
 	default:
 		return errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", request.ConnectionType))
 	}
@@ -120,6 +129,16 @@ func validateCreateBigQueryDestination(request CreateDestinationRequest) error {
 func validateCreateSnowflakeDestination(request CreateDestinationRequest) error {
 	if request.SnowflakeConfig == nil {
 		return errors.NewBadRequest("missing Snowflake configuration")
+	}
+
+	// TODO: validate the fields all exist in the credentials object
+
+	return nil
+}
+
+func validateCreateRedshiftDestination(request CreateDestinationRequest) error {
+	if request.RedshiftConfig == nil {
+		return errors.NewBadRequest("missing Redshift configuration")
 	}
 
 	// TODO: validate the fields all exist in the credentials object
