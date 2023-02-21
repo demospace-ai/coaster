@@ -22,9 +22,6 @@ type CreateSourceRequest struct {
 	BigQueryConfig  *input.BigQueryConfig  `json:"bigquery_config,omitempty"`
 	SnowflakeConfig *input.SnowflakeConfig `json:"snowflake_config,omitempty"`
 	RedshiftConfig  *input.RedshiftConfig  `json:"redshift_config,omitempty"`
-	Namespace       *string                `json:"namespace,omitempty"`
-	TableName       *string                `json:"table_name,omitempty"`
-	CustomJoin      *string                `json:"custom_join,omitempty"`
 }
 
 type CreateSourceResponse struct {
@@ -49,10 +46,6 @@ func (s ApiService) CreateSource(auth auth.Authentication, w http.ResponseWriter
 	err = validate.Struct(createSourceRequest)
 	if err != nil {
 		return err
-	}
-
-	if (createSourceRequest.TableName == nil || createSourceRequest.Namespace == nil) && createSourceRequest.CustomJoin == nil {
-		return errors.NewBadRequest("must have table_name and namespace or custom_join")
 	}
 
 	// TODO: Create connection + source in a transaction
@@ -93,10 +86,8 @@ func (s ApiService) CreateSource(auth auth.Authentication, w http.ResponseWriter
 		s.db,
 		auth.Organization.ID,
 		createSourceRequest.DisplayName,
+		createSourceRequest.EndCustomerID,
 		connection.ID,
-		createSourceRequest.Namespace,
-		createSourceRequest.TableName,
-		createSourceRequest.CustomJoin,
 	)
 	if err != nil {
 		return err

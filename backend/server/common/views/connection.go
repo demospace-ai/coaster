@@ -74,9 +74,6 @@ func ConvertSource(source models.Source, connection models.Connection) Source {
 			ID:             connection.ID,
 			ConnectionType: connection.ConnectionType,
 		},
-		Namespace:  source.Namespace.String,
-		TableName:  source.TableName.String,
-		CustomJoin: source.CustomJoin.String,
 	}
 }
 

@@ -22,7 +22,7 @@ func main() {
 	w := worker.New(c, temporal.SyncTaskQueue, worker.Options{})
 	w.RegisterActivity(temporal.FetchConfiguration)
 	w.RegisterActivity(temporal.Replicate)
-	w.RegisterWorkflow(temporal.Sync)
+	w.RegisterWorkflow(temporal.SyncWorkflow)
 
 	// Start listening to the Task Queue
 	err = w.Run(worker.InterruptCh())

@@ -15,7 +15,7 @@ type SyncInput struct {
 	SyncID         int64
 }
 
-func Sync(ctx workflow.Context, input SyncInput) error {
+func SyncWorkflow(ctx workflow.Context, input SyncInput) error {
 	// RetryPolicy specifies how to automatically handle retries if an Activity fails.
 	retrypolicy := &temporal.RetryPolicy{
 		InitialInterval:    time.Second,
@@ -45,15 +45,15 @@ func Sync(ctx workflow.Context, input SyncInput) error {
 		organizationID: input.OrganizationID,
 		syncID:         input.SyncID,
 	}
-	var syncConfiguration SyncConfiguration
-	err = workflow.ExecuteActivity(ctx, FetchConfiguration, fetchConfigurationInput).Get(ctx, &syncConfiguration)
+	var sync SyncDetails
+	err = workflow.ExecuteActivity(ctx, FetchConfiguration, fetchConfigurationInput).Get(ctx, &sync)
 	if err != nil {
 		return err
 	}
 
 	replicateInput := ReplicateInput{
-		syncConfiguration: syncConfiguration,
-		queryService:      queryService,
+		sync:         sync,
+		queryService: queryService,
 	}
 	err = workflow.ExecuteActivity(ctx, Replicate, replicateInput).Get(ctx, nil)
 	if err != nil {

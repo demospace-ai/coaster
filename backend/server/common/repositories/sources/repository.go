@@ -1,7 +1,6 @@
 package sources
 
 import (
-	"go.fabra.io/server/common/database"
 	"go.fabra.io/server/common/models"
 
 	"gorm.io/gorm"
@@ -11,23 +10,15 @@ func CreateSource(
 	db *gorm.DB,
 	organizationID int64,
 	displayName string,
+	endCustomerID int64,
 	connectionID int64,
-	namespace *string,
-	tableName *string,
-	customJoin *string,
 ) (*models.Source, error) {
 
 	source := models.Source{
 		OrganizationID: organizationID,
 		DisplayName:    displayName,
+		EndCustomerID:  endCustomerID,
 		ConnectionID:   connectionID,
-	}
-
-	if tableName != nil && namespace != nil {
-		source.Namespace = database.NewNullString(*namespace)
-		source.TableName = database.NewNullString(*tableName)
-	} else if customJoin != nil {
-		source.CustomJoin = database.NewNullString(*customJoin)
 	}
 
 	result := db.Create(&source)

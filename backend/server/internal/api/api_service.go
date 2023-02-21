@@ -58,6 +58,12 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.CreateObject,
 		},
 		{
+			Name:        "Create sync",
+			Method:      router.POST,
+			Pattern:     "/api/create_sync",
+			HandlerFunc: s.CreateSync,
+		},
+		{
 			Name:        "Test data connection",
 			Method:      router.POST,
 			Pattern:     "/api/test_data_connection",
@@ -108,8 +114,8 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 		{
 			Name:        "Get all sync configurations",
 			Method:      router.GET,
-			Pattern:     "/api/get_sync_configurations",
-			HandlerFunc: s.GetSyncConfigurations,
+			Pattern:     "/api/get_syncs",
+			HandlerFunc: s.GetSyncs,
 		},
 		{
 			Name:        "Get values for a specified column",

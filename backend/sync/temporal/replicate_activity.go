@@ -8,13 +8,13 @@ import (
 )
 
 type ReplicateInput struct {
-	queryService      query.QueryService
-	syncConfiguration SyncConfiguration
+	queryService query.QueryService
+	sync         SyncDetails
 }
 
 func Replicate(ctx context.Context, replicateInput ReplicateInput) error {
-	queryString := getQueryStringForSource(replicateInput.syncConfiguration.Source)
-	it, err := replicateInput.queryService.GetQueryIterator(ctx, replicateInput.syncConfiguration.SourceConnection, queryString)
+	queryString := getQueryStringForSource(replicateInput.sync.Source, replicateInput.sync.Sync)
+	it, err := replicateInput.queryService.GetQueryIterator(ctx, replicateInput.sync.SourceConnection, queryString)
 	if err != nil {
 		return err
 	}
@@ -45,19 +45,19 @@ func Replicate(ctx context.Context, replicateInput ReplicateInput) error {
 }
 
 // TODO: only read 10,000 rows at once or something
-func getQueryStringForSource(source *models.SourceConnection) string {
+func getQueryStringForSource(source *models.SourceConnection, sync *models.Sync) string {
 	if source == nil {
 		return "" // TODO: throw error
 	}
 
-	if source.CustomJoin.Valid {
-		return source.CustomJoin.String
+	if sync.CustomJoin.Valid {
+		return sync.CustomJoin.String
 	}
 
 	switch source.ConnectionType {
 	case (models.ConnectionTypeBigQuery):
 	case (models.ConnectionTypeSnowflake):
-		return "SELECT * FROM " + source.Namespace.String + "." + source.TableName.String
+		return "SELECT * FROM " + sync.Namespace.String + "." + sync.TableName.String
 	}
 
 	return ""

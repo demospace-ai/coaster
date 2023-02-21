@@ -7,7 +7,7 @@ import (
 	"go.fabra.io/server/common/repositories/destinations"
 	"go.fabra.io/server/common/repositories/objects"
 	"go.fabra.io/server/common/repositories/sources"
-	"go.fabra.io/server/common/repositories/sync_configurations"
+	"go.fabra.io/server/common/repositories/syncs"
 	"gorm.io/gorm"
 )
 
@@ -17,13 +17,13 @@ type FetchConfigurationInput struct {
 	syncID         int64
 }
 
-func FetchConfiguration(ctx context.Context, input FetchConfigurationInput) (*SyncConfiguration, error) {
-	syncConfiguration, err := sync_configurations.LoadSyncConfigurationByID(input.db, input.organizationID, input.syncID)
+func FetchConfiguration(ctx context.Context, input FetchConfigurationInput) (*SyncDetails, error) {
+	sync, err := syncs.LoadSyncByID(input.db, input.organizationID, input.syncID)
 	if err != nil {
 		return nil, err
 	}
 
-	source, err := sources.LoadSourceByID(input.db, input.organizationID, syncConfiguration.SourceID)
+	source, err := sources.LoadSourceByID(input.db, input.organizationID, sync.SourceID)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func FetchConfiguration(ctx context.Context, input FetchConfigurationInput) (*Sy
 		return nil, err
 	}
 
-	destination, err := destinations.LoadDestinationByID(input.db, input.organizationID, syncConfiguration.DestinationID)
+	destination, err := destinations.LoadDestinationByID(input.db, input.organizationID, sync.DestinationID)
 	if err != nil {
 		return nil, err
 	}
@@ -43,13 +43,13 @@ func FetchConfiguration(ctx context.Context, input FetchConfigurationInput) (*Sy
 		return nil, err
 	}
 
-	object, err := objects.LoadObjectByID(input.db, input.organizationID, syncConfiguration.ModelID)
+	object, err := objects.LoadObjectByID(input.db, input.organizationID, sync.ObjectID)
 	if err != nil {
 		return nil, err
 	}
 
-	return &SyncConfiguration{
-		EndCustomerID:         syncConfiguration.EndCustomerID,
+	return &SyncDetails{
+		Sync:                  sync,
 		Source:                source,
 		SourceConnection:      sourceConnection,
 		Destination:           destination,
