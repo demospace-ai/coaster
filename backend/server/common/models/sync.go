@@ -5,8 +5,10 @@ import "go.fabra.io/server/common/database"
 type SyncMode string
 
 const (
-	SyncModeFullRefresh SyncMode = "full_refresh"
-	SyncModeIncremental SyncMode = "incremental"
+	SyncModeFullOverwrite     SyncMode = "full_overwrite"
+	SyncModeFullAppend        SyncMode = "full_append"
+	SyncModeIncrementalAppend SyncMode = "incremental_append"
+	SyncModeIncrementalUpdate SyncMode = "incremental_update"
 )
 
 type FrequencyUnits string

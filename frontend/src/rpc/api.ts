@@ -34,10 +34,10 @@ export const GetObjects: IEndpoint<undefined, GetObjectsResponse> = {
     path: '/get_objects',
 };
 
-export const GetSyncConfigurations: IEndpoint<undefined, GetSyncConfigurationsResponse> = {
-    name: 'Sync Configurations Fetched',
+export const GetSyncs: IEndpoint<undefined, GetSyncsResponse> = {
+    name: 'Syncs Fetched',
     method: 'GET',
-    path: '/get_sync_configurations',
+    path: '/get_syncs',
 };
 
 export const GetNamespaces: IEndpoint<{ connectionID: number; }, GetNamespacesResponse> = {
@@ -117,10 +117,10 @@ export const CreateObject: IEndpoint<CreateObjectRequest, undefined> = {
     track: true,
 };
 
-export const CreateSyncConfiguration: IEndpoint<CreateSyncConfigurationRequest, undefined> = {
-    name: 'Sync Configuration Created',
+export const CreateSync: IEndpoint<CreateSyncRequest, CreateSyncResponse> = {
+    name: 'Sync Created',
     method: 'POST',
-    path: '/create_sync_configuration',
+    path: '/create_sync',
     track: true,
 };
 
@@ -185,12 +185,16 @@ export interface MongoDbConfig {
     connection_options: string;
 }
 
-export interface CreateSyncConfigurationRequest {
+export interface CreateSyncRequest {
     display_name: string;
     connection_id: number;
-    dataset_name: string;
+    namespace: string;
     table_name: string;
     custom_join?: string;
+}
+
+export interface CreateSyncResponse {
+    sync: Sync;
 }
 
 export type JSONValue =
@@ -236,7 +240,7 @@ export interface RunQueryRequest {
 
 export interface GetColumnValuesRequest {
     connectionID: number;
-    datasetName: string;
+    namespace: string;
     tableName: string;
     columnName: string;
 }
@@ -294,8 +298,8 @@ export interface Object {
     object_fields: ObjectField[];
 }
 
-export interface GetSyncConfigurationsResponse {
-    sync_configurations: SyncConfiguration[];
+export interface GetSyncsResponse {
+    syncs: Sync[];
 }
 
 export interface GetNamespacesResponse {
@@ -346,18 +350,16 @@ export interface Destination {
     connection: Connection;
 }
 
+export interface Source {
+    id: number;
+    display_name: string;
+    connection: Connection;
+    end_customer_id: number;
+}
+
 export interface Connection {
     id: number;
     connection_type: ConnectionType;
-}
-
-export interface SyncConfiguration {
-    id: number;
-    display_name: string;
-    connection_id: number;
-    dataset_name: string;
-    table_name: string;
-    custom_join: string | undefined;
 }
 
 export enum ConnectionType {
@@ -365,6 +367,36 @@ export enum ConnectionType {
     Snowflake = "snowflake",
     Redshift = "redshift",
     MongoDb = "mongodb",
+}
+
+export interface Sync {
+    id: number;
+    display_name: string;
+    destination: Destination;
+    source: Source;
+    object_id: number;
+    namespace: string | undefined;
+    table_name: string | undefined;
+    custom_join: string | undefined;
+    cursor_field: string | undefined;
+    primary_key: string | undefined;
+    sync_mode: SyncMode;
+    frequency: number;
+    frequency_units: FrequencyUnits;
+}
+
+export enum SyncMode {
+    FullOverwrite = "full_overwrite",
+    FullAppend = "full_append",
+    IncrementalAppend = "incremental_append",
+    IncrementalUpdate = "incremental_update",
+}
+
+export enum FrequencyUnits {
+    Minutes = "minutes",
+    Hours = "hours",
+    Days = "days",
+    Weeks = "weeks",
 }
 
 export function getConnectionType(connectionType: ConnectionType): string {

@@ -38,12 +38,10 @@ export const NavigationBar: React.FC = () => {
           </NavLink>
         </div>
         <div className={routeContainer}>
-          <Tooltip label="Coming soon!">
-            <div className={navLink}>
-              <ArrowPathIcon className="tw-h-4" strokeWidth="2" />
-              <div className={route}>Syncs</div>
-            </div>
-          </Tooltip>
+          <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-slate-200")} to={'/syncs'}>
+            <ArrowPathIcon className="tw-h-4" strokeWidth="2" />
+            <div className={route}>Syncs</div>
+          </NavLink>
         </div>
         <div className={routeContainer}>
           <Tooltip label="Coming soon!">
@@ -86,13 +84,11 @@ export const NavigationBar: React.FC = () => {
           </NavLink>
         </div>
         <div className={routeContainer}>
-          <Tooltip label="Coming soon!">
-            <div className={navLink}>
-              <MapIcon className="tw-h-4" strokeWidth="2" />
-              <div className={route}>Documentation</div>
-              <ArrowTopRightOnSquareIcon className='tw-h-4 tw-ml-auto tw-mr-3' />
-            </div>
-          </Tooltip>
+          <a className={navLink} href='https://fabra.readme.io/' target="_blank" rel="noreferrer">
+            <MapIcon className="tw-h-4" strokeWidth="2" />
+            <div className={route}>Documentation</div>
+            <ArrowTopRightOnSquareIcon className='tw-h-4 tw-ml-auto tw-mr-3' />
+          </a>
         </div>
         <div id="bottomSection" className="tw-mt-auto tw-mb-4">
           <div className="tw-mx-4 tw-mb-2 tw-uppercase tw-text-xs tw-text-slate-500 tw-font-medium">

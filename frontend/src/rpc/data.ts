@@ -1,5 +1,5 @@
 import { sendRequest } from "src/rpc/ajax";
-import { GetAllUsers, GetAllUsersResponse, GetApiKey, GetColumnValues, GetColumnValuesRequest, GetColumnValuesResponse, GetDestinations, GetDestinationsResponse, GetNamespaces, GetNamespacesResponse, GetObjects, GetObjectsResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetSyncConfigurations, GetSyncConfigurationsResponse, GetTables, GetTablesResponse } from "src/rpc/api";
+import { GetAllUsers, GetAllUsersResponse, GetApiKey, GetColumnValues, GetColumnValuesRequest, GetColumnValuesResponse, GetDestinations, GetDestinationsResponse, GetNamespaces, GetNamespacesResponse, GetObjects, GetObjectsResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetSyncs, GetSyncsResponse, GetTables, GetTablesResponse } from "src/rpc/api";
 import useSWR, { Fetcher } from "swr";
 
 export function useApiKey() {
@@ -47,10 +47,10 @@ export function useTables(connectionID: number | undefined, namespace: string | 
   return { tables: data?.tables, mutate, error };
 }
 
-export function useSyncConfigurations() {
-  const fetcher: Fetcher<GetSyncConfigurationsResponse, {}> = () => sendRequest(GetSyncConfigurations);
-  const { data, mutate, error } = useSWR({ GetSyncConfigurations }, fetcher);
-  return { syncConfigurations: data?.sync_configurations, mutate, error };
+export function useSyncs() {
+  const fetcher: Fetcher<GetSyncsResponse, {}> = () => sendRequest(GetSyncs);
+  const { data, mutate, error } = useSWR({ GetSyncs }, fetcher);
+  return { syncs: data?.syncs, mutate, error };
 }
 
 export function useColumnValues(connectionID: number | undefined, namespace: string | undefined, tableName: string | undefined, columnName: string | undefined) {
