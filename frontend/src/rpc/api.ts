@@ -129,6 +129,7 @@ export interface TestDataConnectionRequest {
     connection_type: ConnectionType;
     bigquery_config?: BigQueryConfig;
     snowflake_config?: SnowflakeConfig;
+    mongodb_config?: MongoDbConfig;
 }
 
 export interface CreateDestinationRequest {
@@ -137,6 +138,7 @@ export interface CreateDestinationRequest {
     bigquery_config?: BigQueryConfig;
     snowflake_config?: SnowflakeConfig;
     redshift_config?: RedshiftConfig;
+    mongodb_config?: MongoDbConfig;
 }
 
 
@@ -174,6 +176,13 @@ export interface RedshiftConfig {
     database_name: string;
     port: string;
     host: string;
+}
+
+export interface MongoDbConfig {
+    username: string;
+    password: string;
+    host: string;
+    connection_options: string;
 }
 
 export interface CreateSyncConfigurationRequest {
@@ -354,7 +363,8 @@ export interface SyncConfiguration {
 export enum ConnectionType {
     BigQuery = "bigquery",
     Snowflake = "snowflake",
-    Redshift = "redshift"
+    Redshift = "redshift",
+    MongoDb = "mongodb",
 }
 
 export function getConnectionType(connectionType: ConnectionType): string {
@@ -365,5 +375,7 @@ export function getConnectionType(connectionType: ConnectionType): string {
             return "Snowflake";
         case ConnectionType.Redshift:
             return "Redshift";
+        case ConnectionType.MongoDb:
+            return "MongoDB";
     }
 }

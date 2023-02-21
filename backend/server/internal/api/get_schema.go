@@ -54,7 +54,7 @@ func (s ApiService) GetSchema(auth auth.Authentication, w http.ResponseWriter, r
 			return err
 		}
 	} else {
-		schema, err = s.getSchemaForTable(*connection, namespace, tableName)
+		schema, err = s.queryService.GetTableSchema(context.Background(), connection, namespace, tableName)
 		if err != nil {
 			return err
 		}
@@ -63,17 +63,6 @@ func (s ApiService) GetSchema(auth auth.Authentication, w http.ResponseWriter, r
 	return json.NewEncoder(w).Encode(GetSchemaResponse{
 		Schema: schema,
 	})
-}
-
-func (s ApiService) getSchemaForTable(connection models.Connection, namespace string, tableName string) (query.Schema, error) {
-	switch connection.ConnectionType {
-	case models.ConnectionTypeBigQuery:
-		fallthrough
-	case models.ConnectionTypeSnowflake:
-		return s.queryService.GetTableSchema(context.Background(), &connection, namespace, tableName)
-	default:
-		return nil, errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", connection.ConnectionType))
-	}
 }
 
 func (s ApiService) getSchemaForCustomJoin(connection models.Connection, customJoin string) (query.Schema, error) {

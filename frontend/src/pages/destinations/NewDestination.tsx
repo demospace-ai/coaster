@@ -1,13 +1,14 @@
 import React, { FormEvent, useState } from "react";
 import { BackButton, Button, FormButton } from "src/components/button/Button";
 import bigquery from "src/components/images/bigquery.svg";
+import mongodb from "src/components/images/mongodb.svg";
 import redshift from "src/components/images/redshift.svg";
 import snowflake from "src/components/images/snowflake.svg";
 import { getConnectionTypeImg } from "src/components/images/warehouses";
 import { ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { sendRequest } from "src/rpc/ajax";
-import { BigQueryConfig, ConnectionType, CreateDestination, CreateDestinationRequest, getConnectionType, GetDestinations, RedshiftConfig, SnowflakeConfig, TestDataConnection, TestDataConnectionRequest } from "src/rpc/api";
+import { BigQueryConfig, ConnectionType, CreateDestination, CreateDestinationRequest, getConnectionType, GetDestinations, MongoDbConfig, RedshiftConfig, SnowflakeConfig, TestDataConnection, TestDataConnectionRequest } from "src/rpc/api";
 import { mutate } from "swr";
 
 export const NewDestination: React.FC<{ onComplete: () => void; }> = props => {
@@ -46,6 +47,7 @@ type NewDestinationState = {
   bigqueryConfig: BigQueryConfig;
   snowflakeConfig: SnowflakeConfig;
   redshiftConfig: RedshiftConfig;
+  mongodbConfig: MongoDbConfig;
 };
 
 // Values must be empty strings otherwise the input will be uncontrolled
@@ -70,6 +72,12 @@ const INITIAL_DESTINATION_STATE: NewDestinationState = {
     port: "",
     host: "",
   },
+  mongodbConfig: {
+    username: "",
+    password: "",
+    host: "",
+    connection_options: "",
+  },
 };
 
 const validateAll = (connectionType: ConnectionType, state: NewDestinationState): boolean => {
@@ -85,7 +93,16 @@ const validateAll = (connectionType: ConnectionType, state: NewDestinationState)
     case ConnectionType.BigQuery:
       return state.displayName.length > 0 && state.bigqueryConfig.credentials.length > 0;
     case ConnectionType.Redshift:
-      return state.displayName.length > 0 && state.bigqueryConfig.credentials.length > 0;
+      return state.displayName.length > 0
+        && state.redshiftConfig.username.length > 0
+        && state.redshiftConfig.password.length > 0
+        && state.redshiftConfig.database_name.length > 0
+        && state.redshiftConfig.host.length > 0;
+    case ConnectionType.MongoDb:
+      return state.displayName.length > 0
+        && state.mongodbConfig.username.length > 0
+        && state.mongodbConfig.password.length > 0
+        && state.mongodbConfig.host.length > 0; // connection options is optional
   }
 };
 
@@ -117,6 +134,9 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = p
       case ConnectionType.Redshift:
         payload.redshift_config = state.redshiftConfig;
         break;
+      case ConnectionType.MongoDb:
+        payload.mongodb_config = state.mongodbConfig;
+        break;
       default:
       // TODO: throw an error here
     }
@@ -142,6 +162,9 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = p
       break;
     case ConnectionType.Redshift:
       inputs = <RedshiftInputs state={state} setState={setState} />;
+      break;
+    case ConnectionType.MongoDb:
+      inputs = <MongoDbInputs state={state} setState={setState} />;
       break;
   };
 
@@ -196,6 +219,9 @@ const TestConnectionButton: React.FC<{ state: NewDestinationState, connectionTyp
         break;
       case ConnectionType.Snowflake:
         payload.snowflake_config = state.snowflakeConfig;
+        break;
+      case ConnectionType.MongoDb:
+        payload.mongodb_config = state.mongodbConfig;
         break;
       default:
       // TODO: throw an error here
@@ -256,6 +282,18 @@ const RedshiftInputs: React.FC<ConnectionConfigurationProps> = props => {
   );
 };
 
+const MongoDbInputs: React.FC<ConnectionConfigurationProps> = props => {
+  const state = props.state;
+  return (
+    <>
+      <ValidatedInput id='displayName' value={state.displayName} setValue={(value) => { props.setState({ ...state, displayName: value }); }} placeholder='Display Name' label="Display Name" />
+      <ValidatedInput id='username' value={state.mongodbConfig.username} setValue={(value) => { props.setState({ ...state, mongodbConfig: { ...state.mongodbConfig, username: value } }); }} placeholder='Username' label="Username" />
+      <ValidatedInput id='password' type="password" value={state.mongodbConfig.password} setValue={(value) => { props.setState({ ...state, mongodbConfig: { ...state.mongodbConfig, password: value } }); }} placeholder='Password' label="Password" />
+      <ValidatedInput id='host' value={state.mongodbConfig.host} setValue={(value) => { props.setState({ ...state, mongodbConfig: { ...state.mongodbConfig, host: value } }); }} placeholder='Host' label="Host" />
+      <ValidatedInput id='connectionOptions' value={state.mongodbConfig.connection_options} setValue={(value) => { props.setState({ ...state, mongodbConfig: { ...state.mongodbConfig, connection_options: value } }); }} placeholder='Connection Options' label="Connection Options" />
+    </>
+  );
+};
 
 const BigQueryInputs: React.FC<ConnectionConfigurationProps> = props => {
   const state = props.state;
@@ -281,11 +319,11 @@ type ConnectionTypeSelectorProps = {
 };
 
 const ConnectionTypeSelector: React.FC<ConnectionTypeSelectorProps> = props => {
-  const connectionButton = "tw-flex tw-flex-row tw-justify-center tw-items-center tw-py-5 tw-px-20 tw-rounded-md tw-cursor-pointer tw-bg-white tw-text-slate-800 tw-border tw-border-slate-300 hover:tw-bg-slate-100";
+  const connectionButton = "tw-flex tw-flex-row tw-justify-center tw-items-center tw-py-5 tw-w-64 tw-rounded-md tw-cursor-pointer tw-bg-white tw-text-slate-800 tw-border tw-border-slate-300 hover:tw-bg-slate-100";
   return (
     <>
       <div className="tw-text-center tw-mb-10">Choose your data warehouse:</div>
-      <div className="tw-flex tw-flex-row tw-gap-10">
+      <div className="tw-flex tw-flex-row tw-gap-5">
         <Button className={connectionButton} onClick={() => props.setConnectionType(ConnectionType.Snowflake)}>
           <img src={snowflake} alt="data source logo" className="tw-h-6 tw-mr-1.5" />
           Snowflake
@@ -297,6 +335,12 @@ const ConnectionTypeSelector: React.FC<ConnectionTypeSelectorProps> = props => {
         <Button className={connectionButton} onClick={() => props.setConnectionType(ConnectionType.Redshift)}>
           <img src={redshift} alt="data source logo" className="tw-h-6 tw-mr-1.5" />
           Redshift
+        </Button>
+      </div>
+      <div className="tw-flex tw-flex-row tw-mt-10">
+        <Button className={connectionButton} onClick={() => props.setConnectionType(ConnectionType.MongoDb)}>
+          <img src={mongodb} alt="data source logo" className="tw-h-6 tw-mr-1.5" />
+          MongoDB
         </Button>
       </div>
     </>

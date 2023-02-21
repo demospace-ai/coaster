@@ -114,6 +114,8 @@ func validateCreateDestinationRequest(request CreateDestinationRequest) error {
 		return validateCreateSnowflakeDestination(request)
 	case models.ConnectionTypeRedshift:
 		return validateCreateRedshiftDestination(request)
+	case models.ConnectionTypeMongoDb:
+		return validateCreateMongoDbDestination(request)
 	default:
 		return errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", request.ConnectionType))
 	}
@@ -148,6 +150,16 @@ func validateCreateSnowflakeDestination(request CreateDestinationRequest) error 
 func validateCreateRedshiftDestination(request CreateDestinationRequest) error {
 	if request.RedshiftConfig == nil {
 		return errors.NewBadRequest("missing Redshift configuration")
+	}
+
+	// TODO: validate the fields all exist in the credentials object
+
+	return nil
+}
+
+func validateCreateMongoDbDestination(request CreateDestinationRequest) error {
+	if request.MongoDbConfig == nil {
+		return errors.NewBadRequest("missing MongoDB configuration")
 	}
 
 	// TODO: validate the fields all exist in the credentials object

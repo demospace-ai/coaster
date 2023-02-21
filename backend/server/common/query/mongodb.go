@@ -61,7 +61,7 @@ func (sc MongoDbApiClient) GetTables(ctx context.Context, namespace string) ([]s
 	defer client.Disconnect(ctx)
 
 	db := client.Database(namespace)
-	return db.ListCollectionNames(ctx, nil)
+	return db.ListCollectionNames(ctx, bson.D{})
 }
 
 func (sc MongoDbApiClient) GetTableSchema(ctx context.Context, namespace string, tableName string) (Schema, error) {
@@ -100,7 +100,7 @@ func (sc MongoDbApiClient) GetNamespaces(ctx context.Context) ([]string, error) 
 
 	defer client.Disconnect(ctx)
 
-	databaseNames, err := client.ListDatabaseNames(ctx, nil)
+	databaseNames, err := client.ListDatabaseNames(ctx, bson.D{})
 	if err != nil {
 		return nil, err
 	}
