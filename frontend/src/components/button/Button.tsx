@@ -34,6 +34,32 @@ export const Button: React.FC<ButtonProps> = forwardRef<HTMLButtonElement, Butto
   );
 });
 
+type LinkButtonProps = {
+  href: string;
+  className?: string;
+  children: React.ReactNode;
+};
+
+export const LinkButton: React.FC<LinkButtonProps> = forwardRef<HTMLAnchorElement, LinkButtonProps>((props, ref) => {
+  const { href, className, children, ...remaining } = props;
+
+  const buttonStyle = classNames(
+    props.className,
+    'tw-text-white tw-bg-slate-600 hover:tw-bg-slate-800',
+    'tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition tw-select-none',
+  );
+  return (
+    <a
+      className={buttonStyle}
+      ref={ref}
+      href={props.href}
+      {...remaining}
+    >
+      {props.children}
+    </a>
+  );
+});
+
 type FormButtonProps = {
   className?: string;
   children: React.ReactNode;

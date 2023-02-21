@@ -1,6 +1,6 @@
 import { PlusCircleIcon } from "@heroicons/react/20/solid";
 import classNames from "classnames";
-import { Button } from "src/components/button/Button";
+import { LinkButton } from "src/components/button/Button";
 import { Loading } from "src/components/loading/Loading";
 import { useUsers } from "src/rpc/data";
 
@@ -13,14 +13,14 @@ export const Team: React.FC = () => {
     <div className='tw-py-5 tw-px-10'>
       <div className="tw-flex tw-w-full tw-mb-5 tw-mt-2">
         <div className="tw-flex tw-flex-col tw-justify-end tw-font-bold tw-text-lg">Users</div>
-        <Button className='tw-ml-auto tw-flex' onClick={() => { }}>
+        <LinkButton className='tw-ml-auto tw-flex' href='mailto:nick@fabra.io?subject=Join me on Fabra!&body=Sign up here: https://app.fabra.io'>
           <div className="tw-flex tw-flex-col tw-justify-center tw-h-full">
             <PlusCircleIcon className='tw-h-4 tw-inline-block tw-mr-2' />
           </div>
           <div className="tw-flex tw-flex-col tw-justify-center tw-mr-0.5">
             Invite teammate
           </div>
-        </Button>
+        </LinkButton>
       </div>
       <div className='tw-border tw-border-solid tw-border-slate-300 tw-rounded-lg tw-max-h-64 tw-overflow-x-auto tw-overscroll-contain tw-bg-white tw-shadow-md' >
         {users
