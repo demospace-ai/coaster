@@ -27,6 +27,7 @@ type CreateSyncRequest struct {
 	PrimaryKey     *string                  `json:"primary_key,omitempty"`
 	SyncMode       models.SyncMode          `json:"sync_mode"`
 	Frequency      int64                    `json:"frequency"`
+	FrequencyUnits models.FrequencyUnits    `json:"frequency_units"`
 	FieldMappings  []input.SyncFieldMapping `json:"field_mappings"`
 }
 
