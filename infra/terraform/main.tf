@@ -167,7 +167,7 @@ resource "google_cloud_run_service" "fabra" {
         # Use the VPC Connector
         "run.googleapis.com/vpc-access-connector" = google_vpc_access_connector.connector.id
         # all egress from the service should go through the VPC Connector
-        "run.googleapis.com/vpc-access-egress" = "private-ranges-only"
+        "run.googleapis.com/vpc-access-egress" = "all-traffic"
         "run.googleapis.com/client-name"       = "cloud-console"
       }
     }
@@ -425,4 +425,26 @@ resource "google_kms_key_ring_iam_member" "api-key-key-ring-cloud-run-role" {
   key_ring_id = google_kms_key_ring.api-key-keyring.id
   role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
   member        = "serviceAccount:932264813910-compute@developer.gserviceaccount.com"
+}
+
+resource "google_compute_router" "fabra-ip-router" {
+  name     = "fabra-ip-router"
+  network  = google_compute_network.vpc.name
+  region   = "us-west1"
+}
+
+resource "google_compute_address" "egress-ip-address" {
+  name     = "egress-statis-ip"
+  region   = "us-west1"
+}
+
+resource "google_compute_router_nat" "fabra-nat" {
+  name     = "fabra-static-nat"
+  router   = google_compute_router.fabra-ip-router.name
+  region   = "us-west1"
+
+  nat_ip_allocate_option = "MANUAL_ONLY"
+  nat_ips                = [google_compute_address.egress-ip-address.self_link]
+
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
 }
