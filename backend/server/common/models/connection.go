@@ -8,6 +8,7 @@ const (
 	ConnectionTypeSnowflake ConnectionType = "snowflake"
 	ConnectionTypeBigQuery  ConnectionType = "bigquery"
 	ConnectionTypeRedshift  ConnectionType = "redshift"
+	ConnectionTypeMongoDb   ConnectionType = "mongodb"
 )
 
 type BigQueryCredentials struct {
@@ -24,17 +25,18 @@ type BigQueryCredentials struct {
 }
 
 type Connection struct {
-	OrganizationID int64
-	ConnectionType ConnectionType      `json:"connection_type"`
-	Credentials    database.NullString `json:"-"`
-	Username       database.NullString `json:"-"`
-	Password       database.NullString `json:"-"`
-	Location       database.NullString
-	WarehouseName  database.NullString
-	DatabaseName   database.NullString
-	Role           database.NullString
-	Host           database.NullString
-	Port           database.NullString
+	OrganizationID    int64
+	ConnectionType    ConnectionType      `json:"connection_type"`
+	Credentials       database.NullString `json:"-"`
+	Username          database.NullString `json:"-"`
+	Password          database.NullString `json:"-"`
+	Location          database.NullString
+	WarehouseName     database.NullString
+	DatabaseName      database.NullString
+	Role              database.NullString
+	Host              database.NullString
+	Port              database.NullString
+	ConnectionOptions database.NullString
 
 	BaseModel
 }

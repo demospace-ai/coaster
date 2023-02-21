@@ -22,6 +22,7 @@ type CreateSourceRequest struct {
 	BigQueryConfig  *input.BigQueryConfig  `json:"bigquery_config,omitempty"`
 	SnowflakeConfig *input.SnowflakeConfig `json:"snowflake_config,omitempty"`
 	RedshiftConfig  *input.RedshiftConfig  `json:"redshift_config,omitempty"`
+	MongoDbConfig   *input.MongoDbConfig   `json:"mongodb_config,omitempty"`
 }
 
 type CreateSourceResponse struct {
@@ -75,6 +76,14 @@ func (s ApiService) CreateSource(auth auth.Authentication, w http.ResponseWriter
 		}
 		connection, err = connections.CreateRedshiftConnection(
 			s.db, auth.Organization.ID, *createSourceRequest.RedshiftConfig, *encryptedCredentials,
+		)
+	case models.ConnectionTypeMongoDb:
+		encryptedCredentials, err = s.cryptoService.EncryptConnectionCredentials(createSourceRequest.MongoDbConfig.Password)
+		if err != nil {
+			return err
+		}
+		connection, err = connections.CreateMongoDbConnection(
+			s.db, auth.Organization.ID, *createSourceRequest.MongoDbConfig, *encryptedCredentials,
 		)
 	}
 

@@ -20,6 +20,7 @@ type CreateDestinationRequest struct {
 	BigQueryConfig  *input.BigQueryConfig  `json:"bigquery_config,omitempty"`
 	SnowflakeConfig *input.SnowflakeConfig `json:"snowflake_config,omitempty"`
 	RedshiftConfig  *input.RedshiftConfig  `json:"redshift_config,omitempty"`
+	MongoDbConfig   *input.MongoDbConfig   `json:"mongodb_config,omitempty"`
 }
 
 type CreateDestinationResponse struct {
@@ -71,6 +72,14 @@ func (s ApiService) CreateDestination(auth auth.Authentication, w http.ResponseW
 		}
 		connection, err = connections.CreateRedshiftConnection(
 			s.db, auth.Organization.ID, *createDestinationRequest.RedshiftConfig, *encryptedCredentials,
+		)
+	case models.ConnectionTypeMongoDb:
+		encryptedCredentials, err = s.cryptoService.EncryptConnectionCredentials(createDestinationRequest.MongoDbConfig.Password)
+		if err != nil {
+			return err
+		}
+		connection, err = connections.CreateMongoDbConnection(
+			s.db, auth.Organization.ID, *createDestinationRequest.MongoDbConfig, *encryptedCredentials,
 		)
 	}
 

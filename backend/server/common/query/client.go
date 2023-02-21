@@ -55,7 +55,19 @@ func (qs QueryServiceImpl) newAPIClient(ctx context.Context, connection *models.
 			Role:          connection.Role.String,
 			Host:          connection.Host.String,
 		}, nil
+	case models.ConnectionTypeMongoDb:
+		mongodbPassword, err := qs.cryptoService.DecryptConnectionCredentials(connection.Password.String)
+		if err != nil {
+			return nil, err
+		}
 
+		// TODO: validate all connection params
+		return MongoDbApiClient{
+			Username:          connection.Username.String,
+			Password:          *mongodbPassword,
+			Host:              connection.Host.String,
+			ConnectionOptions: connection.ConnectionOptions.String,
+		}, nil
 	default:
 		return nil, errors.New("unrecognized warehouse type")
 	}

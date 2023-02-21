@@ -17,6 +17,13 @@ type RedshiftConfig struct {
 	Host         string `json:"host,omitempty"`
 }
 
+type MongoDbConfig struct {
+	Username          string `json:"username,omitempty"`
+	Password          string `json:"password,omitempty"`
+	Host              string `json:"host,omitempty"`
+	ConnectionOptions string `json:"connection_options,omitempty"`
+}
+
 type BigQueryConfig struct {
 	Credentials string `json:"credentials,omitempty"`
 	Location    string `json:"location,omitempty"`

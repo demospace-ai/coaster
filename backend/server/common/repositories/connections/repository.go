@@ -81,7 +81,6 @@ func CreateSnowflakeConnection(
 	return &connection, nil
 }
 
-
 func CreateRedshiftConnection(
 	db *gorm.DB,
 	organizationID int64,
@@ -90,12 +89,35 @@ func CreateRedshiftConnection(
 ) (*models.Connection, error) {
 	connection := models.Connection{
 		OrganizationID: organizationID,
-		ConnectionType: models.ConnectionTypeSnowflake,
+		ConnectionType: models.ConnectionTypeRedshift,
 		Username:       database.NewNullString(redshiftConfig.Username),
 		Password:       database.NewNullString(encryptedPassword),
 		DatabaseName:   database.NewNullString(redshiftConfig.DatabaseName),
 		Port:           database.NewNullString(redshiftConfig.Port),
 		Host:           database.NewNullString(redshiftConfig.Host),
+	}
+
+	result := db.Create(&connection)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &connection, nil
+}
+
+func CreateMongoDbConnection(
+	db *gorm.DB,
+	organizationID int64,
+	mongodbConfig input.MongoDbConfig,
+	encryptedPassword string,
+) (*models.Connection, error) {
+	connection := models.Connection{
+		OrganizationID:    organizationID,
+		ConnectionType:    models.ConnectionTypeMongoDb,
+		Username:          database.NewNullString(mongodbConfig.Username),
+		Password:          database.NewNullString(encryptedPassword),
+		Host:              database.NewNullString(mongodbConfig.Host),
+		ConnectionOptions: database.NewNullString(mongodbConfig.ConnectionOptions),
 	}
 
 	result := db.Create(&connection)
