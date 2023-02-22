@@ -67,7 +67,7 @@ func (as AuthServiceImpl) authenticate(r *http.Request) (*models.Session, error)
 }
 
 func (as AuthServiceImpl) authApiKey(r *http.Request) (*models.Organization, error) {
-	apiKey := r.Header.Get("X-Api-Key")
+	apiKey := r.Header.Get("X-API-KEY")
 	if apiKey != "" {
 		hashedKey := api_keys.HashKey(apiKey)
 		organization, err := organizations.LoadOrganizationByApiKey(as.db, hashedKey)
