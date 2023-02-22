@@ -529,6 +529,8 @@ components:
       required:
         - display_name
         - destination_id
+        - namespace
+        - table_name
         - customer_id_column
       properties:
         display_name:

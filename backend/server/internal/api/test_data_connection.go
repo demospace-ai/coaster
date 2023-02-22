@@ -112,12 +112,17 @@ func testSnowflakeConnection(snowflakeConfig input.SnowflakeConfig) error {
 }
 
 func testMongoDbConnection(mongodbConfig input.MongoDbConfig) error {
+	connectionOptions := ""
+	if mongodbConfig.ConnectionOptions != nil {
+		connectionOptions = *mongodbConfig.ConnectionOptions
+	}
+
 	connectionString := fmt.Sprintf(
 		"mongodb+srv://%s:%s@%s/?%s",
 		mongodbConfig.Username,
 		mongodbConfig.Password,
 		mongodbConfig.Host,
-		mongodbConfig.ConnectionOptions,
+		connectionOptions,
 	)
 	serverAPIOptions := options.ServerAPI(options.ServerAPIVersion1)
 	clientOptions := options.Client().
