@@ -6,7 +6,7 @@ info:
     email: nick@fabra.io
   version: 0.1.0
 servers:
-  - url: https://api.fabra.io
+  - url: https://app.fabra.io/api
 security:
   - ApiKeyAuth: []
 tags:
