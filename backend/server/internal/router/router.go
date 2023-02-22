@@ -12,7 +12,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var ALLOWED_ORIGINS = []string{"https://app.go.fabra.io"}
+var ALLOWED_ORIGINS = []string{"https://app.fabra.io"}
 var ALLOWED_HEADERS = []string{"Content-Type"}
 
 type Service interface {
