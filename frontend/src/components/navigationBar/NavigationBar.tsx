@@ -84,7 +84,7 @@ export const NavigationBar: React.FC = () => {
           </NavLink>
         </div>
         <div className={routeContainer}>
-          <a className={navLink} href='https://fabra.readme.io/' target="_blank" rel="noreferrer">
+          <a className={navLink} href='https://docs.fabra.io/' target="_blank" rel="noreferrer">
             <MapIcon className="tw-h-4" strokeWidth="2" />
             <div className={route}>Documentation</div>
             <ArrowTopRightOnSquareIcon className='tw-h-4 tw-ml-auto tw-mr-3' />
