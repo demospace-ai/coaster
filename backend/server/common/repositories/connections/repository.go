@@ -112,12 +112,15 @@ func CreateMongoDbConnection(
 	encryptedPassword string,
 ) (*models.Connection, error) {
 	connection := models.Connection{
-		OrganizationID:    organizationID,
-		ConnectionType:    models.ConnectionTypeMongoDb,
-		Username:          database.NewNullString(mongodbConfig.Username),
-		Password:          database.NewNullString(encryptedPassword),
-		Host:              database.NewNullString(mongodbConfig.Host),
-		ConnectionOptions: database.NewNullString(mongodbConfig.ConnectionOptions),
+		OrganizationID: organizationID,
+		ConnectionType: models.ConnectionTypeMongoDb,
+		Username:       database.NewNullString(mongodbConfig.Username),
+		Password:       database.NewNullString(encryptedPassword),
+		Host:           database.NewNullString(mongodbConfig.Host),
+	}
+
+	if mongodbConfig.ConnectionOptions != nil {
+		connection.ConnectionOptions = database.NewNullString(*mongodbConfig.ConnectionOptions)
 	}
 
 	result := db.Create(&connection)

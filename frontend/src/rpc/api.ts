@@ -19,52 +19,52 @@ export const Login: IEndpoint<LoginRequest, LoginResponse> = {
 export const GetAllUsers: IEndpoint<undefined, GetAllUsersResponse> = {
     name: 'All Users Fetched',
     method: 'GET',
-    path: '/get_all_users',
+    path: '/users',
 };
 
 export const GetDestinations: IEndpoint<undefined, GetDestinationsResponse> = {
     name: 'Destinations Fetched',
     method: 'GET',
-    path: '/get_destinations',
+    path: '/destinations',
 };
 
 export const GetObjects: IEndpoint<undefined, GetObjectsResponse> = {
     name: 'Objects Fetched',
     method: 'GET',
-    path: '/get_objects',
+    path: '/objects',
 };
 
 export const GetSyncs: IEndpoint<undefined, GetSyncsResponse> = {
     name: 'Syncs Fetched',
     method: 'GET',
-    path: '/get_syncs',
+    path: '/syncs',
 };
 
 export const GetNamespaces: IEndpoint<{ connectionID: number; }, GetNamespacesResponse> = {
     name: 'Namespaces Fetched',
     method: 'GET',
-    path: '/get_namespaces',
+    path: '/connection/namespaces',
     queryParams: ['connectionID']
 };
 
 export const GetTables: IEndpoint<{ connectionID: number, namespace: string; }, GetTablesResponse> = {
     name: 'Tables Fetched',
     method: 'GET',
-    path: '/get_tables',
+    path: '/connection/tables',
     queryParams: ['connectionID', 'namespace'],
 };
 
 export const GetSchema: IEndpoint<GetSchemaRequest, GetSchemaResponse> = {
     name: 'Schema Fetched',
     method: 'GET',
-    path: '/get_schema',
+    path: '/connection/schema',
     queryParams: ['connectionID', 'namespace', 'tableName', 'customJoin'],
 };
 
 export const GetApiKey: IEndpoint<undefined, string> = {
     name: 'API Key Fetched',
     method: 'GET',
-    path: '/get_api_key',
+    path: '/api_key',
     noJson: true,
 };
 
@@ -84,20 +84,20 @@ export const Logout: IEndpoint<undefined, undefined> = {
 export const SetOrganization: IEndpoint<SetOrganizationRequest, SetOrganizationResponse> = {
     name: 'Organization Set',
     method: 'POST',
-    path: '/set_organization',
+    path: '/organization',
     track: true,
 };
 
 export const TestDataConnection: IEndpoint<TestDataConnectionRequest, undefined> = {
     name: 'Test Data Connection',
     method: 'POST',
-    path: '/test_data_connection',
+    path: '/connection/test',
 };
 
 export const GetColumnValues: IEndpoint<GetColumnValuesRequest, GetColumnValuesResponse> = {
     name: 'Column Values Fetched',
     method: 'GET',
-    path: '/get_column_values',
+    path: '/connection/column_values',
     queryParams: ['connectionID', 'namespace', 'tableName', 'columnName'],
     track: true,
 };
@@ -105,7 +105,7 @@ export const GetColumnValues: IEndpoint<GetColumnValuesRequest, GetColumnValuesR
 export const CreateDestination: IEndpoint<CreateDestinationRequest, undefined> = {
     name: 'Destination Created',
     method: 'POST',
-    path: '/create_destination',
+    path: '/destination',
     track: true,
 };
 
@@ -113,14 +113,14 @@ export const CreateDestination: IEndpoint<CreateDestinationRequest, undefined> =
 export const CreateObject: IEndpoint<CreateObjectRequest, undefined> = {
     name: 'Object Created',
     method: 'POST',
-    path: '/create_object',
+    path: '/object',
     track: true,
 };
 
 export const CreateSync: IEndpoint<CreateSyncRequest, CreateSyncResponse> = {
     name: 'Sync Created',
     method: 'POST',
-    path: '/create_sync',
+    path: '/sync',
     track: true,
 };
 

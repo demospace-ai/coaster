@@ -15,7 +15,6 @@ import (
 )
 
 type CreateSyncRequest struct {
-	OrganizationID int64                    `json:"organization_id"`
 	DisplayName    string                   `json:"display_name"`
 	DestinationID  int64                    `json:"destination_id"`
 	SourceID       int64                    `json:"source_id"`
@@ -63,7 +62,7 @@ func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, 
 	// TODO: create field mappings in DB using transaction
 	sync, err := syncs.CreateSync(
 		s.db,
-		createSyncRequest.OrganizationID,
+		auth.Organization.ID,
 		createSyncRequest.DisplayName,
 		createSyncRequest.DestinationID,
 		createSyncRequest.SourceID,
@@ -81,7 +80,7 @@ func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, 
 	}
 
 	fieldMappings, err := syncs.CreateFieldMappings(
-		s.db, createSyncRequest.OrganizationID, sync.ID, createSyncRequest.FieldMappings,
+		s.db, auth.Organization.ID, sync.ID, createSyncRequest.FieldMappings,
 	)
 	if err != nil {
 		return err
