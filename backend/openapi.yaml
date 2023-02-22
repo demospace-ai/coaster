@@ -349,10 +349,7 @@ components:
           type: string
           example: event_id
         frequency:
-          type: array
-          items:
-            $ref: '#/components/schemas/FieldMapping'
-          example: event_id
+          type: integer
         frequency_units:
           $ref: '#/components/schemas/FrequencyUnits'
         field_mappings:
