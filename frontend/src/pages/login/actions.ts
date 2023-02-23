@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { rudderanalytics } from 'src/app/rudder';
 import { useDispatch } from 'src/root/model';
 import { sendRequest } from 'src/rpc/ajax';
-import { GetAllUsers, Login, Logout, Organization, SetOrganization, User } from 'src/rpc/api';
+import { Login, Logout, Organization, SetOrganization, User } from 'src/rpc/api';
 
 export type GoogleLoginResponse = {
   credential: string;
@@ -60,7 +60,6 @@ export function useSetOrganization() {
 }
 
 export function useOnLoginSuccess() {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   return useCallback(async (user: User, organization: Organization | undefined) => {
@@ -71,16 +70,7 @@ export function useOnLoginSuccess() {
       navigate("/login");
       return;
     }
-
-    try {
-      const allUsers = await sendRequest(GetAllUsers);
-      dispatch({
-        type: 'login.allUsers',
-        users: allUsers.users,
-      });
-    } catch (e) {
-    }
-  }, [dispatch, navigate]);
+  }, [navigate]);
 }
 
 export function useLogout() {

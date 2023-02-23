@@ -8,7 +8,6 @@ import {
 } from 'src/pages/login/actions';
 import { useSelector } from 'src/root/model';
 import useWindowDimensions from 'src/utils/window';
-import styles from './login.m.css';
 
 const GOOGLE_CLIENT_ID = '932264813910-egpk1omo3v2cedd89k8go851uko6djpa.apps.googleusercontent.com';
 
@@ -58,9 +57,9 @@ export const Login: React.FC = () => {
 
   return (
     <div className="tw-flex tw-flex-row tw-h-full tw-bg-slate-100">
-      <div className={styles.loginPane}>
-        <div className={classNames(styles.title, "tw-text-3xl", "tw-font-bold")}>fabra</div>
-        <div className={styles.loginGroup}>
+      <div className="tw-mt-48 tw-mb-auto tw-mx-auto tw-w-[400px] tw-py-20 tw-px-8 tw-rounded-lg tw-shadow-md tw-bg-white">
+        <div className="tw-font-[Montserrat] tw-text-3xl tw-font-bold tw-mb-5 tw-text-center">fabra</div>
+        <div className="tw-w-[350px] tw-text-center tw-my-2">
           {loginContent}
         </div>
       </div>
@@ -79,7 +78,7 @@ const StartContent: React.FC<StartContentProps> = props => {
 
   return (
     <>
-      <div className={styles.signInText}>Sign in to your account</div>
+      <div className="tw-text-center tw-mb-10">Sign in to your account</div>
       <GoogleLogin onGoogleSignIn={props.onGoogleSignIn} width={googleButtonWidth} />
     </>
   );
@@ -138,7 +137,7 @@ const OrganizationInput: React.FC<OrganizationInputProps> = props => {
 
   let classes = ["tw-border tw-border-slate-400 tw-rounded-md tw-px-3 tw-py-2 tw-w-full tw-box-border"];
   if (!isValid) {
-    classes.push(styles.invalidBorder);
+    classes.push("tw-border-red-500 tw-outline-none");
   }
 
   const validateOrganization = (): boolean => {
@@ -173,8 +172,8 @@ const OrganizationInput: React.FC<OrganizationInputProps> = props => {
 
   if (!suggestedOrganizations || suggestedOrganizations.length === 0 || overrideCreate) {
     return (
-      <form className={styles.marginTop} onSubmit={createNewOrganization}>
-        <div className={styles.organizationMessage}>Welcome, {user!.first_name}! Let's build out your team.</div>
+      <form className="tw-mt-5" onSubmit={createNewOrganization}>
+        <div className="tw-mb-5">Welcome, {user!.first_name}! Let's build out your team.</div>
         <input
           type='text'
           id='organization'
@@ -187,26 +186,26 @@ const OrganizationInput: React.FC<OrganizationInputProps> = props => {
           onChange={e => setOrganizationInput(e.target.value)}
           onBlur={validateOrganization}
         />
-        {!isValid && <div className={styles.invalidLabel}>Please enter a valid organization name.</div>}
-        <FormButton className={styles.submit}>Continue</FormButton>
+        {!isValid && <div className="tw-text-red-500 tw-mt-1 -tw-mb-1 tw-text-[15px] tw-text-left">Please enter a valid organization name.</div>}
+        <FormButton className="tw-mt-5 tw-h-10 tw-w-full">Continue</FormButton>
       </form>
     );
   }
 
   return (
-    <div className={styles.marginTop} >
-      <div className={styles.organizationMessage}>Welcome, {user!.first_name}! Join your team.</div>
+    <div className="tw-mt-5" >
+      <div className="tw-mb-5">Welcome, {user!.first_name}! Join your team.</div>
       {suggestedOrganizations.map((suggestion, index) => (
-        <li key={index} className={styles.suggestion}>
-          <Button className={styles.joinButton} onClick={() => joinOrganization(suggestion.id)}>Join</Button>
-          <div className={styles.teamInfo}>
-            <div className={styles.teamName}>{suggestion.name}</div>
+        <li key={index} className="tw-border tw-border-black tw-rounded-md tw-list-none tw-p-8 tw-text-left tw-flex tw-flex-row">
+          <Button className="tw-inline-block tw-mr-8 tw-h-10 tw-w-1/2" onClick={() => joinOrganization(suggestion.id)}>Join</Button>
+          <div className="tw-inline-block tw-h-10 tw-w-1/2 tw-text-center">
+            <div className="tw-overflow-hidden tw-text-ellipsis">{suggestion.name}</div>
             {/* TODO: add team size */}
           </div>
         </li>
       ))}
-      <div className={styles.orDivider}>or</div>
-      <Button className={styles.createNewButton} onClick={() => setOverrideCreate(true)} secondary={true}>Create new organization</Button>
+      <div className='tw-my-5 tw-mx-0'>or</div>
+      <Button className="tw-w-full" onClick={() => setOverrideCreate(true)} secondary={true}>Create new organization</Button>
     </div>
   );
 };

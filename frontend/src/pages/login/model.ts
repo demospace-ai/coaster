@@ -12,7 +12,6 @@ export interface LoginState {
   organization?: Organization;
   suggestedOrganizations?: Organization[];
   email?: string;
-  users?: User[];
 }
 
 export type LoginAction =
@@ -32,10 +31,6 @@ export type LoginAction =
   | {
     type: 'login.organizationSet',
     organization: Organization,
-  }
-  | {
-    type: 'login.allUsers',
-    users: User[],
   };
 
 export function loginReducer(state: LoginState = INITIAL_LOGIN_STATE, action: LoginAction): LoginState {
@@ -61,11 +56,6 @@ export function loginReducer(state: LoginState = INITIAL_LOGIN_STATE, action: Lo
       return {
         ...state,
         organization: action.organization,
-      };
-    case 'login.allUsers':
-      return {
-        ...state,
-        users: action.users,
       };
     default:
       return state;

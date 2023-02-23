@@ -1,13 +1,12 @@
 import React from 'react';
-import styles from './notfound.m.css';
 
 export const NotFound: React.FC = () => {
   return (
     <>
-      <div className={styles.title}>
+      <div className="tw-text-center tw-mt-24 tw-text-xl">
         <div>Not Found!</div>
       </div>
-      <div className={styles.body}>
+      <div className="tw-text-center tw-mt-16">
       </div>
     </>
   );
