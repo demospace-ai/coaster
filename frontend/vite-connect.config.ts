@@ -8,12 +8,10 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        webapp: 'index.html',
         connect: 'connect.html',
       },
       output: [
         {
-          name: 'webapp',
           dir: 'build',
         }
       ]

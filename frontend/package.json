@@ -27,8 +27,9 @@
     "typescript": "^4.6.4"
   },
   "scripts": {
-    "start": "vite dev",
-    "build": "vite build"
+    "start": "vite dev --config vite-app.config.ts",
+    "build": "vite build --config vite-app.config.ts",
+    "build-connect": "vite build --config vite-connect.config.ts"
   },
   "eslintConfig": {
     "extends": [

@@ -1,0 +1,18 @@
+steps:
+  - id: install-dependencies
+    name: node
+    entrypoint: npm
+    args: ['--prefix', 'frontend/', 'install']
+    waitFor: ['-']
+
+  - id: build-connect
+    name: node
+    entrypoint: npm
+    args: ['--prefix', 'frontend/', 'run', 'build-connect']
+    waitFor: ['install-dependencies']
+
+  - id: deploy-connect
+    name: 'gcr.io/cloud-builders/gsutil'
+    entrypoint: gsutil
+    args: ['cp', '-r', 'frontend/build/*', 'gs://fabra-connect-bucket']
+    waitFor: ['build-connect']
