@@ -5,7 +5,7 @@ import { H } from 'highlight.run';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import { Connect } from 'src/connect/Connect';
+import { App } from 'src/connect/App';
 import { isProd } from 'src/utils/env';
 
 // Initialize Highlight tracking for production
@@ -20,7 +20,7 @@ root.render(
   <React.StrictMode>
     <ErrorBoundary showDialog>
       <BrowserRouter>
-        <Connect />
+        <App />
       </BrowserRouter>
     </ErrorBoundary>
   </React.StrictMode>,
