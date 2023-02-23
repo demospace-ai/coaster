@@ -6,7 +6,18 @@ import viteTsconfigPaths from 'vite-tsconfig-paths';
 export default defineConfig({
   plugins: [react(), viteTsconfigPaths()],
   build: {
-    outDir: 'build',
+    rollupOptions: {
+      input: {
+        webapp: 'index.html',
+        connect: 'connect.html',
+      },
+      output: [
+        {
+          name: 'webapp',
+          dir: 'build',
+        }
+      ]
+    }
   },
   server: {
     port: 3000,
