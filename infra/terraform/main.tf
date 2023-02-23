@@ -271,14 +271,25 @@ resource "google_compute_global_forwarding_rule" "https" {
     target                = google_compute_target_https_proxy.default.id
 }
 
-resource "google_compute_managed_ssl_certificate" "default" {
-    name                      = "fabra-lb-cert"
+locals {
+    managed_domains = tolist(["app.fabra.io", "connect.fabra.io"])
+}
+
+resource "random_id" "cert-name" {
+    byte_length = 4
+    prefix      = "issue6147-cert-"
+
+    keepers = {
+      domains = join(",", local.managed_domains)
+    }
+}
+
+resource "google_compute_managed_ssl_certificate" "cert" {
+    name                      = random_id.cert-name.hex
     type                      = "MANAGED"
 
     managed {
-        domains = [
-            "app.fabra.io",
-        ]
+        domains = local.managed_domains
     }
 }
 
@@ -338,7 +349,7 @@ resource "google_compute_target_https_proxy" "default" {
     proxy_bind         = false
     quic_override      = "NONE"
     ssl_certificates   = [
-        google_compute_managed_ssl_certificate.default.id,
+        google_compute_managed_ssl_certificate.cert.id,
     ]
     url_map            = google_compute_url_map.default.id
 }
