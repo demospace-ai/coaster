@@ -1,22 +1,21 @@
-import React, { FormEvent, useImperativeHandle, useState } from "react";
+import classNames from "classnames";
+import React, { FormEvent, useState } from "react";
 import { Button } from "src/components/button/Button";
 import { getConnectionTypeImg } from "src/components/images/warehouses";
 import { ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
-import { SetupStep } from "src/connect/App";
+import { SetupSyncState } from "src/connect/App";
 import { sendRequest } from "src/rpc/ajax";
-import { BigQueryConfig, ConnectionType, getConnectionType, GetSources, LinkCreateSource, LinkCreateSourceRequest, MongoDbConfig, RedshiftConfig, SnowflakeConfig, Source, TestDataConnection, TestDataConnectionRequest } from "src/rpc/api";
+import { BigQueryConfig, ConnectionType, getConnectionType, GetSources, LinkCreateSource, LinkCreateSourceRequest, LinkGetSources, MongoDbConfig, RedshiftConfig, SnowflakeConfig, TestDataConnection, TestDataConnectionRequest } from "src/rpc/api";
 import { mutate } from "swr";
 
 type NewConnectionConfigurationProps = {
-  connectionType: ConnectionType;
   linkToken: string;
-  nextStep: () => void;
-  previousStep: () => void;
-  setSource: (source: Source) => void;
+  state: SetupSyncState;
+  setState: (state: SetupSyncState) => void;
 };
 
-type NewSourceState = {
+export type NewSourceState = {
   success: boolean | null;
   displayName: string;
   bigqueryConfig: BigQueryConfig;
@@ -26,7 +25,7 @@ type NewSourceState = {
 };
 
 // Values must be empty strings otherwise the input will be uncontrolled
-const INITIAL_DESTINATION_STATE: NewSourceState = {
+export const INITIAL_SOURCE_STATE: NewSourceState = {
   success: null,
   displayName: "",
   bigqueryConfig: {
@@ -56,7 +55,56 @@ const INITIAL_DESTINATION_STATE: NewSourceState = {
   },
 };
 
-const validateAll = (connectionType: ConnectionType, state: NewSourceState): boolean => {
+export const NewSourceConfiguration: React.FC<NewConnectionConfigurationProps> = (props) => {
+  const state = props.state.newSourceState;
+  const setState = (newSourceState: NewSourceState) => props.setState({ ...props.state, newSourceState: newSourceState });
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    createNewSource(props.linkToken, props.state, props.setState);
+  };
+
+  const connectionType = props.state.connectionType;
+  if (!connectionType) {
+    // TODO: handle error, this should never happen
+    return <></>;
+  }
+
+  let inputs: React.ReactElement;
+  switch (props.state.connectionType!) {
+    case ConnectionType.Snowflake:
+      inputs = <SnowflakeInputs state={props.state.newSourceState} setState={setState} />;
+      break;
+    case ConnectionType.BigQuery:
+      inputs = <BigQueryInputs state={state} setState={setState} />;
+      break;
+    case ConnectionType.Redshift:
+      inputs = <RedshiftInputs state={state} setState={setState} />;
+      break;
+    case ConnectionType.MongoDb:
+      inputs = <MongoDbInputs state={state} setState={setState} />;
+      break;
+  };
+
+  return (
+    <div className="tw-w-[500px] tw-flex tw-flex-col">
+      <div className="tw-flex tw-justify-center tw-items-center tw-text-center tw-mb-2 tw-text-2xl tw-font-bold">
+        <img src={getConnectionTypeImg(connectionType)} alt="icon" className="tw-h-8 tw-mr-1.5" />
+        Connect to {getConnectionType(connectionType)}
+      </div>
+      <div className="tw-text-center tw-mb-2 tw-text-slate-600">Provide the settings and credentials for your data source.</div>
+      <form className="tw-pb-16" onSubmit={submit}>
+        {inputs}
+        <TestConnectionButton state={state} connectionType={connectionType} />
+      </form >
+    </div>
+  );
+};
+
+const validateAll = (connectionType: ConnectionType | undefined, state: NewSourceState): boolean => {
+  if (!connectionType) {
+    return false;
+  }
+
   switch (connectionType) {
     case ConnectionType.Snowflake:
       return state.displayName.length > 0
@@ -82,93 +130,60 @@ const validateAll = (connectionType: ConnectionType, state: NewSourceState): boo
   }
 };
 
-// TODO: figure out what this type is
-export const NewSourceConfiguration = React.forwardRef<SetupStep, NewConnectionConfigurationProps>((props, ref) => {
-  const [state, setState] = useState<NewSourceState>(INITIAL_DESTINATION_STATE);
-  useImperativeHandle(ref, () => {
-    return {
-      continue: async () => {
-        return createNewSource();
-      }
-    };
-  });
+export const createNewSource = async (
+  linkToken: string,
+  state: SetupSyncState,
+  setState: (state: SetupSyncState) => void,
+) => {
+  if (!validateAll(state.connectionType, state.newSourceState)) {
+    return;
+  }
 
-  const submit = async (e: FormEvent) => {
-    e.preventDefault();
-    createNewSource();
+  if (state.newSourceState.success) {
+    // TODO: clear success if one of the inputs change and just update the already created source
+    // Already created the source, just continue again
+    setState({ ...state, step: state.step + 1, prevStep: state.step });
+    return;
+  }
+
+  const payload: LinkCreateSourceRequest = {
+    'display_name': state.newSourceState.displayName,
+    'connection_type': state.connectionType!,
   };
 
-  const createNewSource = async () => {
-    if (!validateAll(props.connectionType, state)) {
-      return;
-    }
-
-    const payload: LinkCreateSourceRequest = {
-      'display_name': state.displayName,
-      'connection_type': props.connectionType,
-    };
-
-    switch (props.connectionType) {
-      case ConnectionType.BigQuery:
-        payload.bigquery_config = state.bigqueryConfig;
-        break;
-      case ConnectionType.Snowflake:
-        payload.snowflake_config = state.snowflakeConfig;
-        break;
-      case ConnectionType.Redshift:
-        payload.redshift_config = state.redshiftConfig;
-        break;
-      case ConnectionType.MongoDb:
-        payload.mongodb_config = state.mongodbConfig;
-        break;
-      default:
-      // TODO: throw an error here
-    }
-
-    try {
-      const response = await sendRequest(LinkCreateSource, payload, [["X-LINK-TOKEN", props.linkToken]]);
-      mutate({ GetSources }); // Tell SWRs to refetch destinatinos connections
-      props.setSource(response.source);
-      props.nextStep();
-    } catch (e) {
-      setState({ ...state, success: false });
-    }
-  };
-
-  let inputs: React.ReactElement;
-  switch (props.connectionType) {
-    case ConnectionType.Snowflake:
-      inputs = <SnowflakeInputs state={state} setState={setState} />;
-      break;
+  switch (state.connectionType) {
     case ConnectionType.BigQuery:
-      inputs = <BigQueryInputs state={state} setState={setState} />;
+      payload.bigquery_config = state.newSourceState.bigqueryConfig;
+      break;
+    case ConnectionType.Snowflake:
+      payload.snowflake_config = state.newSourceState.snowflakeConfig;
       break;
     case ConnectionType.Redshift:
-      inputs = <RedshiftInputs state={state} setState={setState} />;
+      payload.redshift_config = state.newSourceState.redshiftConfig;
       break;
     case ConnectionType.MongoDb:
-      inputs = <MongoDbInputs state={state} setState={setState} />;
+      payload.mongodb_config = state.newSourceState.mongodbConfig;
       break;
-  };
+    default:
+    // TODO: throw an error here
+  }
 
-  return (
-    <div className="tw-w-[500px] tw-flex tw-flex-col">
-      <div className="tw-flex tw-justify-center tw-items-center tw-text-center tw-mb-2 tw-text-2xl tw-font-bold">
-        <img src={getConnectionTypeImg(props.connectionType)} alt="icon" className="tw-h-8 tw-mr-1.5" />
-        Connect to {getConnectionType(props.connectionType)}
-      </div>
-      <div className="tw-text-center tw-mb-5 tw-text-slate-700">Provide the settings and credentials for your data source.</div>
-      <form className="tw-pb-16" onSubmit={submit}>
-        {inputs}
-        <TestConnectionButton state={state} connectionType={props.connectionType} />
-        {state.success !== null &&
-          /* TODO: return error message here */
-          <div className="tw-mt-3 tw-text-center">{state.success ? "Success!" : "Failure"}</div>
-        }
-      </form >
-    </div>
-  );
-});
+  try {
+    const response = await sendRequest(LinkCreateSource, payload, [["X-LINK-TOKEN", linkToken]]);
+    // Tell SWRs to refetch sources
+    mutate({ GetSources });
+    mutate({ LinkGetSources }); // Tell SWRs to refetch sources
+    setState({
+      ...state,
+      source: response.source,
+      step: state.step + 1,
+      prevStep: state.step,
+      newSourceState: { ...state.newSourceState, success: true },
+    });
+  } catch (e) {
+    setState({ ...state, newSourceState: { ...state.newSourceState, success: false } });
+  }
+};
 
 const TestConnectionButton: React.FC<{ state: NewSourceState, connectionType: ConnectionType; }> = props => {
   const [testLoading, setTestLoading] = useState(false);
@@ -211,14 +226,9 @@ const TestConnectionButton: React.FC<{ state: NewSourceState, connectionType: Co
     setTestLoading(false);
   };
 
+  const testColor = testConnectionSuccess === null ? null : testConnectionSuccess ? "tw-bg-green-700" : "tw-bg-red-700";
   return (
-    <>
-      <Button className="tw-mt-8 tw-bg-slate-200 tw-text-slate-900 hover:tw-bg-slate-300 tw-border-slate-200 tw-w-full tw-h-10" onClick={testConnection}>{testLoading ? <Loading /> : "Test"}</Button>
-      {testConnectionSuccess !== null &&
-        /* TODO: return error message here */
-        <div className="tw-mt-3 tw-text-center">{testConnectionSuccess ? "Success!" : "Failure"}</div>
-      }
-    </>
+    <Button className={classNames("tw-mt-8 tw-bg-slate-200 tw-text-slate-900 hover:tw-bg-slate-300 tw-border-slate-200 tw-w-full tw-h-10", testColor)} onClick={testConnection}>{testLoading ? <Loading /> : "Test"}</Button>
   );
 };
 

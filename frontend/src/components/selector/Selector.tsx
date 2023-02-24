@@ -115,6 +115,7 @@ type SourceNamespaceSelectorProps = {
   placeholder?: string;
   validated?: boolean;
   linkToken: string;
+  dropdownHeight?: string;
 };
 
 export const SourceNamespaceSelector: React.FC<SourceNamespaceSelectorProps> = props => {
@@ -129,7 +130,9 @@ export const SourceNamespaceSelector: React.FC<SourceNamespaceSelectorProps> = p
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No namespaces available!"}
     placeholder={props.placeholder ? props.placeholder : "Choose namespace"}
     label="Namespace"
-    validated={props.validated} />;
+    validated={props.validated}
+    dropdownHeight={props.dropdownHeight}
+  />;
 };
 
 type SourceTableSelectorProps = {
@@ -143,6 +146,7 @@ type SourceTableSelectorProps = {
   validated?: boolean;
   allowCustom?: boolean;
   linkToken: string;
+  dropdownHeight?: string;
 };
 
 export const SourceTableSelector: React.FC<SourceTableSelectorProps> = props => {
@@ -158,7 +162,9 @@ export const SourceTableSelector: React.FC<SourceTableSelectorProps> = props => 
     placeholder={props.placeholder ? props.placeholder : "Choose table"}
     label="Table"
     validated={props.validated}
-    allowCustom={props.allowCustom} />;
+    allowCustom={props.allowCustom}
+    dropdownHeight={props.dropdownHeight}
+  />;
 };
 
 type ObjectSelectorProps = {

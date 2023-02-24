@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import React, { FormEvent, useState } from "react";
 import { BackButton, Button, FormButton } from "src/components/button/Button";
 import bigquery from "src/components/images/bigquery.svg";
@@ -143,7 +144,7 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = p
 
     try {
       await sendRequest(CreateDestination, payload);
-      mutate({ GetDestinations }); // Tell SWRs to refetch destinatinos connections
+      mutate({ GetDestinations }); // Tell SWRs to refetch destinations
       setCreateConnectionSuccess(true);
     } catch (e) {
       setCreateConnectionSuccess(false);
@@ -237,14 +238,9 @@ const TestConnectionButton: React.FC<{ state: NewDestinationState, connectionTyp
     setTestLoading(false);
   };
 
+  const testColor = testConnectionSuccess === null ? null : testConnectionSuccess ? "tw-bg-green-700" : "tw-bg-red-700";
   return (
-    <>
-      <Button className="tw-mt-8 tw-bg-slate-200 tw-text-slate-900 hover:tw-bg-slate-300 tw-border-slate-200 tw-w-full tw-h-10" onClick={testConnection}>{testLoading ? <Loading /> : "Test"}</Button>
-      {testConnectionSuccess !== null &&
-        /* TODO: return error message here */
-        <div className="tw-mt-3 tw-text-center">{testConnectionSuccess ? "Success!" : "Failure"}</div>
-      }
-    </>
+    <Button className={classNames("tw-mt-8 tw-bg-slate-200 tw-text-slate-900 hover:tw-bg-slate-300 tw-border-slate-200 tw-w-full tw-h-10", testColor)} onClick={testConnection}>{testLoading ? <Loading /> : "Test"}</Button>
   );
 };
 
@@ -319,11 +315,11 @@ type ConnectionTypeSelectorProps = {
 };
 
 const ConnectionTypeSelector: React.FC<ConnectionTypeSelectorProps> = props => {
-  const connectionButton = "tw-flex tw-flex-row tw-justify-center tw-items-center tw-py-5 tw-font-bold tw-w-64 tw-rounded-md tw-cursor-pointer tw-bg-white tw-text-slate-800 tw-border tw-border-slate-300 hover:tw-bg-slate-100 tw-tracking-[1px] tw-shadow-md tw-select-none";
+  const connectionButton = "tw-flex tw-flex-row tw-justify-center tw-items-center tw-py-5 tw-font-bold tw-w-56 tw-rounded-md tw-cursor-pointer tw-bg-white tw-text-slate-800 tw-border tw-border-slate-300 hover:tw-bg-slate-100 tw-tracking-[1px] tw-shadow-md tw-select-none";
   return (
     <>
       <div className="tw-text-center tw-mb-10">Choose your data warehouse:</div>
-      <div className="tw-flex tw-flex-row tw-gap-5">
+      <div className="tw-flex tw-flex-row tw-gap-5 tw-flex-wrap tw-justify-center">
         <button className={connectionButton} onClick={() => props.setConnectionType(ConnectionType.Snowflake)}>
           <img src={snowflake} alt="data source logo" className="tw-h-6 tw-mr-1.5" />
           Snowflake

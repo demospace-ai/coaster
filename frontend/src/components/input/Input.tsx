@@ -104,6 +104,7 @@ type ValidatedDropdownInputProps = {
   validated?: boolean;
   noCaret?: boolean;
   label?: string;
+  dropdownHeight?: string;
 };
 
 export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = props => {
@@ -168,7 +169,7 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = pro
           afterLeave={() => { validateNotUndefined(props.selected); setFocused(false); }}
         >
           <div className="tw-relative tw-z-10">
-            <Listbox.Options className="tw-absolute tw-z-20 tw-mt-1 tw-max-h-60 tw-min-w-full tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm">
+            <Listbox.Options className={classNames("tw-absolute tw-z-20 tw-mt-1 tw-max-h-60 tw-min-w-full tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm", props.dropdownHeight)}>
               <DropdownOptions loading={props.loading} options={props.options} noOptionsString={props.noOptionsString} getElementForDisplay={getElementForDropdown} />
             </Listbox.Options>
           </div>
@@ -199,7 +200,7 @@ const DropdownOptions: React.FC<DropdownOptionsProps> = props => {
       <>
         {props.options!.map((option: any, index: number) => (
           <Listbox.Option key={index} value={option} className={({ active, selected }) =>
-            `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-green-100 tw-text-green-900' : 'tw-text-slate-900'
+            `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-slate-100 tw-text-slate-900' : 'tw-text-slate-900'
             }`
           }>
             {({ selected }) => (
@@ -208,7 +209,7 @@ const DropdownOptions: React.FC<DropdownOptionsProps> = props => {
                   {props.getElementForDisplay(option)}
                 </span>
                 {selected ? (
-                  <span className="tw-absolute tw-inset-y-0 tw-right-0 tw-flex tw-items-center tw-pr-3 tw-text-green-600">
+                  <span className="tw-absolute tw-inset-y-0 tw-right-0 tw-flex tw-items-center tw-pr-3 tw-text-slate-600">
                     <CheckIcon className="tw-h-5 tw-w-5" aria-hidden="true" />
                   </span>
                 ) : null}
@@ -240,6 +241,7 @@ type ValidatedComboInputProps = {
   validated?: boolean;
   allowCustom?: boolean;
   label?: string;
+  dropdownHeight?: string;
 };
 
 export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => {
@@ -328,7 +330,7 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
           afterLeave={() => { validateNotUndefined(props.selected); setQuery(''); setFocused(false); }}
         >
           <div className="tw-relative tw-z-10">
-            <Combobox.Options className="tw-absolute tw-z-20 tw-mt-1 tw-min-w-full tw-max-h-60 tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm">
+            <Combobox.Options className={classNames("tw-absolute tw-z-20 tw-mt-1 tw-min-w-full tw-max-h-60 tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm", props.dropdownHeight)}>
               <ComboOptions loading={props.loading} options={filteredOptions} noOptionsString={props.noOptionsString} getElementForDisplay={getElementForDisplay} query={query} allowCustom={props.allowCustom} />
             </Combobox.Options>
           </div>
@@ -361,7 +363,7 @@ const ComboOptions: React.FC<ComboOptionsProps> = props => {
       <>
         {props.allowCustom && props.query.length > 0 && (
           <Combobox.Option value={props.query} className={({ active, selected }) =>
-            `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-green-100 tw-text-green-900' : 'tw-text-slate-900'
+            `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-slate-100 tw-text-slate-900' : 'tw-text-slate-900'
             }`
           }>
             Custom: "{props.query}"
@@ -369,7 +371,7 @@ const ComboOptions: React.FC<ComboOptionsProps> = props => {
         )}
         {props.options!.map((option: any, index: number) => (
           <Combobox.Option key={index} value={option} className={({ active, selected }) =>
-            `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-green-100 tw-text-green-900' : 'tw-text-slate-900'
+            `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-slate-100 tw-text-slate-900' : 'tw-text-slate-900'
             }`
           }>
             {({ selected }) => (
@@ -378,7 +380,7 @@ const ComboOptions: React.FC<ComboOptionsProps> = props => {
                   {props.getElementForDisplay(option)}
                 </span>
                 {selected ? (
-                  <span className="tw-absolute tw-inset-y-0 tw-right-0 tw-flex tw-items-center tw-pr-3 tw-text-green-600">
+                  <span className="tw-absolute tw-inset-y-0 tw-right-0 tw-flex tw-items-center tw-pr-3 tw-text-slate-600">
                     <CheckIcon className="tw-h-5 tw-w-5" aria-hidden="true" />
                   </span>
                 ) : null}
@@ -395,7 +397,7 @@ const ComboOptions: React.FC<ComboOptionsProps> = props => {
         {props.allowCustom ?
           props.allowCustom && props.query.length > 0 && (
             <Combobox.Option value={props.query} className={({ active, selected }) =>
-              `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-green-100 tw-text-green-900' : 'tw-text-slate-900'
+              `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-slate-100 tw-text-slate-900' : 'tw-text-slate-900'
               }`
             }>
               Custom: "{props.query}"
