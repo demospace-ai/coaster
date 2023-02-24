@@ -28,8 +28,8 @@ export const ObjectSetup = React.forwardRef<SetupStep, ObjectSetupProps>((props,
       <div className="tw-text-center tw-mb-10 tw-text-slate-700">Choose the data warehouse, database, or data lake to connect.</div>
       <div className="tw-z-[99] tw-h-full">
         <ObjectSelector object={object} setObject={setObject} linkToken={props.linkToken} />
-        <SourceNamespaceSelector namespace={namespace} setNamespace={setNamespace} linkToken={props.linkToken} source={undefined} />
-        <SourceTableSelector tableName={tableName} setTableName={setTableName} linkToken={props.linkToken} source={undefined} namespace={namespace} />
+        <SourceNamespaceSelector namespace={namespace} setNamespace={setNamespace} linkToken={props.linkToken} source={props.source} />
+        <SourceTableSelector tableName={tableName} setTableName={setTableName} linkToken={props.linkToken} source={props.source} namespace={namespace} />
       </div>
     </div>
   );

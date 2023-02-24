@@ -11,12 +11,10 @@ type Destination struct {
 }
 
 type Source struct {
-	ID          int64
-	DisplayName string
-	Connection  Connection
-	Namespace   string `json:"namespace"`
-	TableName   string `json:"table_name"`
-	CustomJoin  string `json:"custom_join"`
+	ID            int64      `json:"id"`
+	DisplayName   string     `json:"display_name"`
+	EndCustomerId int64      `json:"end_customer_id"`
+	Connection    Connection `json:"connection"`
 }
 
 type Connection struct {
@@ -68,13 +66,31 @@ func ConvertDestinationConnections(destinationConnections []models.DestinationCo
 
 func ConvertSource(source models.Source, connection models.Connection) Source {
 	return Source{
-		ID:          source.ID,
-		DisplayName: source.DisplayName,
+		ID:            source.ID,
+		DisplayName:   source.DisplayName,
+		EndCustomerId: source.EndCustomerID,
 		Connection: Connection{
 			ID:             connection.ID,
 			ConnectionType: connection.ConnectionType,
 		},
 	}
+}
+
+func ConvertSourceConnections(sourceConnections []models.SourceConnection) []Source {
+	sources := []Source{}
+	for _, sourceConnection := range sourceConnections {
+		sources = append(sources, Source{
+			ID:            sourceConnection.ID,
+			DisplayName:   sourceConnection.DisplayName,
+			EndCustomerId: sourceConnection.EndCustomerID,
+			Connection: Connection{
+				ID:             sourceConnection.ConnectionID,
+				ConnectionType: sourceConnection.ConnectionType,
+			},
+		})
+	}
+
+	return sources
 }
 
 func ConvertObject(model models.Object, objectFields []models.ObjectField) Object {

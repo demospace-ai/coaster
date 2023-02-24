@@ -31,7 +31,6 @@ type TestDataConnectionRequest struct {
 }
 
 func (s ApiService) TestDataConnection(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
-
 	if auth.Organization == nil {
 		return errors.NewBadRequest("must setup organization first")
 	}

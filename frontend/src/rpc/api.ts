@@ -67,6 +67,12 @@ export const GetSchema: IEndpoint<GetSchemaRequest, GetSchemaResponse> = {
     queryParams: ['connectionID', 'namespace', 'tableName', 'customJoin'],
 };
 
+export const LinkGetSources: IEndpoint<undefined, GetSourcesResponse> = {
+    name: 'Sources Fetched',
+    method: 'GET',
+    path: '/link/sources',
+};
+
 export const LinkGetNamespaces: IEndpoint<{ sourceID: number; }, GetNamespacesResponse> = {
     name: 'Namespaces Fetched',
     method: 'GET',

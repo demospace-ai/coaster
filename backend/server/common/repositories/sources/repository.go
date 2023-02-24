@@ -52,12 +52,14 @@ func LoadSourceByID(db *gorm.DB, organizationID int64, endCustomerID int64, sour
 func LoadAllSources(
 	db *gorm.DB,
 	organizationID int64,
+	endCustomerID int64,
 ) ([]models.SourceConnection, error) {
 	var sources []models.SourceConnection
 	result := db.Table("sources").
 		Select("sources.*, connections.connection_type").
 		Joins("JOIN connections ON sources.connection_id = connections.id").
 		Where("sources.organization_id = ?", organizationID).
+		Where("sources.end_customer_id = ?", endCustomerID).
 		Where("sources.deactivated_at IS NULL").
 		Order("sources.created_at ASC").
 		Where("connections.deactivated_at IS NULL").

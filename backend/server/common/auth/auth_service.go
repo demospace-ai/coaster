@@ -177,8 +177,8 @@ func (as AuthServiceImpl) GetAuthentication(r *http.Request) (*Authentication, e
 }
 
 func (as AuthServiceImpl) GetLinkAuthentication(r *http.Request) (*Authentication, error) {
-	// all link authenticated routes should also work with regular authentication
-	authentication, err := as.GetAuthentication(r)
+	// try link token first since some methods depends on it
+	authentication, err := as.authLinkToken(r)
 	if err != nil {
 		return nil, err
 	}
@@ -186,8 +186,8 @@ func (as AuthServiceImpl) GetLinkAuthentication(r *http.Request) (*Authenticatio
 		return authentication, nil
 	}
 
-	// try link token if other methods didn't work
-	authentication, err = as.authLinkToken(r)
+	// some link authenticated routes should also work with regular authentication
+	authentication, err = as.GetAuthentication(r)
 	if err != nil {
 		return nil, err
 	}

@@ -106,6 +106,12 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.CreateSync,
 		},
 		{
+			Name:        "Create link token",
+			Method:      router.POST,
+			Pattern:     "/api/link_token",
+			HandlerFunc: s.CreateLinkToken,
+		},
+		{
 			Name:        "Get values for a specified column",
 			Method:      router.GET,
 			Pattern:     "/api/connection/column_values",
@@ -145,6 +151,12 @@ func (s ApiService) LinkAuthenticatedRoutes() []router.LinkAuthenticatedRoute {
 			Method:      router.GET,
 			Pattern:     "/api/objects",
 			HandlerFunc: s.GetObjects,
+		},
+		{
+			Name:        "Get all sources",
+			Method:      router.GET,
+			Pattern:     "/api/link/sources",
+			HandlerFunc: s.LinkGetSources,
 		},
 		{
 			Name:        "Get source namespaces",

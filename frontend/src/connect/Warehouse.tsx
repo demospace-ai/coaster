@@ -1,16 +1,33 @@
+import React, { useImperativeHandle, useState } from "react";
 import bigquery from "src/components/images/bigquery.svg";
 import mongodb from "src/components/images/mongodb.svg";
 import redshift from "src/components/images/redshift.svg";
 import snowflake from "src/components/images/snowflake.svg";
-import { ConnectionType } from "src/rpc/api";
+import { SourceSelector } from "src/components/selector/Selector";
+import { SetupStep } from "src/connect/App";
+import { ConnectionType, Source } from "src/rpc/api";
 
 type WarehouseSelectorProps = {
+  linkToken: string;
   setConnectionType: (connectionType: ConnectionType) => void;
   nextStep: () => void;
+  skipConnection: (source: Source) => void;
 };
 
-export const WarehouseSelector: React.FC<WarehouseSelectorProps> = props => {
+export const WarehouseSelector = React.forwardRef<SetupStep, WarehouseSelectorProps>((props, ref) => {
+  const [source, setSource] = useState<Source | undefined>(undefined);
   const connectionButton = "tw-flex tw-flex-row tw-justify-center tw-items-center tw-py-5 tw-font-bold tw-w-64 tw-rounded-md tw-cursor-pointer tw-bg-white tw-text-slate-800 tw-border tw-border-slate-300 hover:tw-bg-slate-100 tw-tracking-[1px] tw-shadow-md tw-select-none";
+  useImperativeHandle(ref, () => {
+    return {
+      continue: async () => {
+        if (!source) {
+          return;
+        }
+        props.skipConnection(source);
+      }
+    };
+  });
+
   const onClick = (connectionType: ConnectionType) => {
     props.setConnectionType(connectionType);
     props.nextStep();
@@ -38,8 +55,12 @@ export const WarehouseSelector: React.FC<WarehouseSelectorProps> = props => {
           MongoDB
         </button>
       </div>
-      <div className="tw-flex tw-flex-row tw-mt-10">
+      <div className="tw-text-center tw-mt-12 tw-text-slate-700">Or, choose an existing source:</div>
+      <div className="tw-flex tw-flex-row tw-items-center tw-justify-center tw-w-full">
+        <div className="tw-w-64">
+          <SourceSelector source={source} setSource={setSource} linkToken={props.linkToken} />
+        </div>
       </div>
     </div>
   );
-};
+});

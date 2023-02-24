@@ -44,14 +44,18 @@ type AppContentProps = {
 const AppContent: React.FC<AppContentProps> = props => {
   const [connectionType, setConnectionType] = useState<ConnectionType | null>(null);
   const [source, setSource] = useState<Source | null>(null);
-  const linkToken = "123abc"; // TODO: get real link token from parent window
+  const linkToken = "123"; // TODO: get real link token from parent window
   const nextStep = () => { props.setStep(props.step + 1); };
   const previousStep = () => { props.setStep(props.step - 1); };
+  const skipConnection = (source: Source) => {
+    setSource(source);
+    props.setStep(2);
+  };
 
   let content: React.ReactNode;
   switch (props.step) {
     case 0:
-      content = <WarehouseSelector setConnectionType={setConnectionType} nextStep={nextStep} />;
+      content = <WarehouseSelector ref={props.stepRef} setConnectionType={setConnectionType} nextStep={nextStep} skipConnection={skipConnection} linkToken={linkToken} />;
       break;
     case 1:
       content = <NewSourceConfiguration ref={props.stepRef} connectionType={connectionType!} linkToken={linkToken} nextStep={nextStep} previousStep={previousStep} setSource={setSource} />;
@@ -100,7 +104,7 @@ export const Footer: React.FC<FooterProps> = props => {
   return (
     <div className='tw-flex tw-flex-row tw-w-full tw-h-20 tw-min-h-[80px] tw-border-t tw-border-slate-200 tw-mt-auto tw-items-center'>
       <button className='tw-border tw-border-slate-300 tw-font-medium tw-rounded-md tw-w-20 tw-h-10 tw-ml-20' onClick={props.back}>Back</button>
-      {props.stepRef && <button onClick={onClick} className='tw-border tw-text-white tw-font-medium tw-bg-slate-700 tw-rounded-md tw-w-28 tw-h-10 tw-ml-auto tw-mr-20'>{loading ? <Loading light /> : "Continue"}</button>}
+      <button onClick={onClick} className='tw-border tw-text-white tw-font-medium tw-bg-slate-700 tw-rounded-md tw-w-28 tw-h-10 tw-ml-auto tw-mr-20'>{loading ? <Loading light /> : "Continue"}</button>
     </div>
   );
 };

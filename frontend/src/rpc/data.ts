@@ -1,5 +1,5 @@
 import { sendLinkTokenRequest, sendRequest } from "src/rpc/ajax";
-import { GetAllUsers, GetAllUsersResponse, GetApiKey, GetColumnValues, GetColumnValuesRequest, GetColumnValuesResponse, GetDestinations, GetDestinationsResponse, GetNamespaces, GetNamespacesResponse, GetObjects, GetObjectsResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetSyncs, GetSyncsResponse, GetTables, GetTablesResponse, LinkGetNamespaces, LinkGetTables } from "src/rpc/api";
+import { GetAllUsers, GetAllUsersResponse, GetApiKey, GetColumnValues, GetColumnValuesRequest, GetColumnValuesResponse, GetDestinations, GetDestinationsResponse, GetNamespaces, GetNamespacesResponse, GetObjects, GetObjectsResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetSourcesResponse, GetSyncs, GetSyncsResponse, GetTables, GetTablesResponse, LinkGetNamespaces, LinkGetSources, LinkGetTables } from "src/rpc/api";
 import useSWR, { Fetcher } from "swr";
 
 export function useApiKey() {
@@ -54,18 +54,24 @@ export function useTables(connectionID: number | undefined, namespace: string | 
   return { tables: data?.tables, mutate, error };
 }
 
-export function useSourceNamespaces(sourceID: number | undefined, linkToken: string) {
-  const fetcher: Fetcher<GetNamespacesResponse, { sourceID: number; }> = (payload: { sourceID: number; }) => sendRequest(LinkGetNamespaces, payload);
+export function useLinkNamespaces(sourceID: number | undefined, linkToken: string) {
+  const fetcher: Fetcher<GetNamespacesResponse, { sourceID: number; }> = (payload: { sourceID: number; }) => sendLinkTokenRequest(LinkGetNamespaces, linkToken, payload);
   const shouldFetch = sourceID;
   const { data, mutate, error } = useSWR(shouldFetch ? { GetNamespaces, sourceID } : null, fetcher);
   return { namespaces: data?.namespaces, mutate, error };
 }
 
-export function useSourceTables(sourceID: number | undefined, namespace: string | undefined, linkToken: string) {
-  const fetcher: Fetcher<GetTablesResponse, { sourceID: number, namespace: string; }> = (payload: { sourceID: number, namespace: string; }) => sendRequest(LinkGetTables, payload);
+export function useLinkTables(sourceID: number | undefined, namespace: string | undefined, linkToken: string) {
+  const fetcher: Fetcher<GetTablesResponse, { sourceID: number, namespace: string; }> = (payload: { sourceID: number, namespace: string; }) => sendLinkTokenRequest(LinkGetTables, linkToken, payload);
   const shouldFetch = sourceID && namespace;
   const { data, mutate, error } = useSWR(shouldFetch ? { GetTables, sourceID, namespace } : null, fetcher);
   return { tables: data?.tables, mutate, error };
+}
+
+export function useLinkSources(linkToken: string) {
+  const fetcher: Fetcher<GetSourcesResponse, {}> = () => sendLinkTokenRequest(LinkGetSources, linkToken);
+  const { data, mutate, error } = useSWR({ LinkGetSources }, fetcher);
+  return { sources: data?.sources, mutate, error };
 }
 
 export function useSyncs() {
