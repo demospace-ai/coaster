@@ -23,7 +23,7 @@ export const ObjectSetup: React.FC<ObjectSetupProps> = (props) => {
         <div className="tw-text-slate-600">This is the object that will be created from the data you define in this sync configuration.</div>
         <ObjectSelector object={props.state.object} setObject={setObject} linkToken={props.linkToken} />
         <div className="tw-text-base tw-font-semibold tw-mt-8 tw-mb-1">Select a table to sync from</div>
-        <div className="tw-text-slate-400">This is where the data will be pulled from in your own data warehouse.</div>
+        <div className="tw-text-slate-600">This is where the data will be pulled from in your own data warehouse.</div>
         <SourceNamespaceSelector namespace={props.state.namespace} setNamespace={setNamespace} linkToken={props.linkToken} source={props.state.source} dropdownHeight="tw-max-h-40" />
         <SourceTableSelector tableName={props.state.tableName} setTableName={setTableName} linkToken={props.linkToken} source={props.state.source} namespace={props.state.namespace} dropdownHeight="tw-max-h-40" />
         <div className="tw-pb-52"></div>

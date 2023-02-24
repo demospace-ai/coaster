@@ -102,7 +102,7 @@ export const SourceSelector: React.FC<SourceSelectorProps> = props => {
     loading={!sources}
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No sources available!"}
     placeholder={props.placeholder ? props.placeholder : "Choose source"}
-    label="Existing Source"
+    label="Source"
     validated={props.validated} />;
 };
 
