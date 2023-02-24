@@ -1,4 +1,4 @@
-import { sendRequest } from "src/rpc/ajax";
+import { sendLinkTokenRequest, sendRequest } from "src/rpc/ajax";
 import { GetAllUsers, GetAllUsersResponse, GetApiKey, GetColumnValues, GetColumnValuesRequest, GetColumnValuesResponse, GetDestinations, GetDestinationsResponse, GetNamespaces, GetNamespacesResponse, GetObjects, GetObjectsResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetSyncs, GetSyncsResponse, GetTables, GetTablesResponse } from "src/rpc/api";
 import useSWR, { Fetcher } from "swr";
 
@@ -27,8 +27,15 @@ export function useDestinations() {
   return { destinations: data?.destinations, mutate, error };
 }
 
-export function useObjects() {
-  const fetcher: Fetcher<GetObjectsResponse, {}> = () => sendRequest(GetObjects);
+export function useObjects(linkToken?: string) {
+  let fetchFn;
+  if (linkToken) {
+    fetchFn = () => sendLinkTokenRequest(GetObjects, linkToken);
+  } else {
+    fetchFn = () => sendRequest(GetObjects);
+  }
+
+  const fetcher: Fetcher<GetObjectsResponse, {}> = fetchFn;
   const { data, mutate, error } = useSWR({ GetObjects }, fetcher);
   return { objects: data?.objects, mutate, error };
 }

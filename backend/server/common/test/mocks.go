@@ -18,6 +18,10 @@ func (as MockAuthService) GetAuthentication(r *http.Request) (*auth.Authenticati
 	return &auth.Authentication{}, nil
 }
 
+func (as MockAuthService) GetLinkAuthentication(r *http.Request) (*auth.Authentication, error) {
+	return &auth.Authentication{}, nil
+}
+
 type MockCryptoService struct {
 }
 

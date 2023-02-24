@@ -5,9 +5,18 @@ import { IEndpoint } from 'src/rpc/api';
 const IS_PROD = process.env.NODE_ENV === 'production';
 const ROOT_DOMAIN = IS_PROD ? 'https://app.fabra.io/api' : 'http://localhost:8080/api';
 
+export async function sendLinkTokenRequest<RequestType extends Record<string, any>, ResponseType>(
+    endpoint: IEndpoint<RequestType, ResponseType>,
+    linkToken: string,
+    payload?: RequestType,
+): Promise<ResponseType> {
+    return sendRequest(endpoint, payload, [["X-LINK-TOKEN", linkToken]]);
+}
+
 export async function sendRequest<RequestType extends Record<string, any>, ResponseType>(
     endpoint: IEndpoint<RequestType, ResponseType>,
     payload?: RequestType,
+    extraHeaders?: [string, string][],
 ): Promise<ResponseType> {
     const toPath = compile(endpoint.path);
     const path = toPath(payload);
@@ -22,9 +31,11 @@ export async function sendRequest<RequestType extends Record<string, any>, Respo
         });
     }
 
+    const extraHeadersList = extraHeaders ? extraHeaders : [];
+    const headers = new Headers([['Content-Type', 'application/json'], ...extraHeadersList]);
     let options: RequestInit = {
         method: endpoint.method,
-        headers: new Headers({ 'Content-Type': 'application/json' }),
+        headers: headers,
         credentials: 'include',
     };
 

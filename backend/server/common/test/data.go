@@ -3,9 +3,9 @@ package test
 import (
 	"time"
 
+	"go.fabra.io/server/common/crypto"
 	"go.fabra.io/server/common/database"
 	"go.fabra.io/server/common/models"
-	"go.fabra.io/server/common/repositories/api_keys"
 	"go.fabra.io/server/common/repositories/sessions"
 
 	"gorm.io/gorm"
@@ -80,7 +80,7 @@ func CreateApiKey(db *gorm.DB, organizationID int64) string {
 	rawKey := "apikey"
 	cryptoService := MockCryptoService{}
 	encrypted, _ := cryptoService.EncryptApiKey(rawKey)
-	hashedKey := api_keys.HashKey(rawKey)
+	hashedKey := crypto.HashString(rawKey)
 	apiKey := models.ApiKey{
 		ApiKey:         *encrypted,
 		OrganizationID: organizationID,
@@ -90,4 +90,18 @@ func CreateApiKey(db *gorm.DB, organizationID int64) string {
 	db.Create(&apiKey)
 
 	return rawKey
+}
+
+func CreateLinkToken(db *gorm.DB, organizationID int64, endCustomerId int64) string {
+	rawToken := "linkToken"
+	hashedToken := crypto.HashString(rawToken)
+	linkToken := models.LinkToken{
+		EndCustomerID:  endCustomerId,
+		OrganizationID: organizationID,
+		HashedToken:    hashedToken,
+	}
+
+	db.Create(&linkToken)
+
+	return rawToken
 }

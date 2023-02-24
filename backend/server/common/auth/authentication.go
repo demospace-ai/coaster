@@ -6,5 +6,6 @@ type Authentication struct {
 	Session         *models.Session
 	User            *models.User
 	Organization    *models.Organization
+	LinkToken       *models.LinkToken
 	IsAuthenticated bool
 }

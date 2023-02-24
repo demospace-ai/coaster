@@ -148,3 +148,21 @@ func (s ApiService) UnauthenticatedRoutes() []router.UnauthenticatedRoute {
 		},
 	}
 }
+
+// Only a subset of the APIs should be accessible with Link Token Authentication
+func (s ApiService) LinkAuthenticatedRoutes() []router.LinkAuthenticatedRoute {
+	return []router.LinkAuthenticatedRoute{
+		{
+			Name:        "Create source for sync",
+			Method:      router.POST,
+			Pattern:     "/api/source",
+			HandlerFunc: s.CreateSource,
+		},
+		{
+			Name:        "Get all objects",
+			Method:      router.GET,
+			Pattern:     "/api/objects",
+			HandlerFunc: s.GetObjects,
+		},
+	}
+}

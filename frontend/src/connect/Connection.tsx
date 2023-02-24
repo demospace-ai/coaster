@@ -10,7 +10,7 @@ import { mutate } from "swr";
 
 type NewConnectionConfigurationProps = {
   connectionType: ConnectionType;
-  endCustomerId: number;
+  linkToken: string;
   nextStep: () => void;
   previousStep: () => void;
   setSource: (source: Source) => void;
@@ -88,8 +88,8 @@ export const NewSourceConfiguration = React.forwardRef<SetupStep, NewConnectionC
   useImperativeHandle(ref, () => {
     return {
       continue: async () => {
-        console.log("hi");
-        return new Promise(resolve => setTimeout(resolve, 10000));
+        validateAll(props.connectionType, state);
+        return new Promise(resolve => setTimeout(resolve, 1000));
       }
     };
   });
@@ -107,7 +107,6 @@ export const NewSourceConfiguration = React.forwardRef<SetupStep, NewConnectionC
     const payload: CreateSourceRequest = {
       'display_name': state.displayName,
       'connection_type': props.connectionType,
-      'end_customer_id': props.endCustomerId,
     };
 
     switch (props.connectionType) {
@@ -128,7 +127,7 @@ export const NewSourceConfiguration = React.forwardRef<SetupStep, NewConnectionC
     }
 
     try {
-      const response = await sendRequest(CreateSource, payload);
+      const response = await sendRequest(CreateSource, payload, [["X-LINK-TOKEN", props.linkToken]]);
       mutate({ GetSources }); // Tell SWRs to refetch destinatinos connections
       props.setSource(response.source);
       props.nextStep();

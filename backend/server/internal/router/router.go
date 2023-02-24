@@ -12,12 +12,13 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var ALLOWED_ORIGINS = []string{"https://app.fabra.io"}
-var ALLOWED_HEADERS = []string{"Content-Type"}
+var ALLOWED_ORIGINS = []string{"https://app.fabra.io", "https://connect.fabra.io"}
+var ALLOWED_HEADERS = []string{"Content-Type", "X-LINK-TOKEN", "X-API-TOKEN"}
 
-type Service interface {
+type ApiService interface {
 	AuthenticatedRoutes() []AuthenticatedRoute
 	UnauthenticatedRoutes() []UnauthenticatedRoute
+	LinkAuthenticatedRoutes() []LinkAuthenticatedRoute
 }
 
 type Router struct {
@@ -35,7 +36,7 @@ func NewRouter(authService auth.AuthService) Router {
 	}
 }
 
-func (r Router) RunService(service Service) {
+func (r Router) RunService(service ApiService) {
 	// We factor out registering the routes so we can use that for testing without
 	// actually running the server on a live port
 	r.RegisterRoutes(service)
@@ -43,7 +44,7 @@ func (r Router) RunService(service Service) {
 }
 
 // Exported for testing
-func (r Router) RegisterRoutes(service Service) {
+func (r Router) RegisterRoutes(service ApiService) {
 	for _, route := range service.AuthenticatedRoutes() {
 		wrapped := r.wrapAuthenticatedRoute(route.HandlerFunc)
 		r.router.Handle(route.Pattern, wrapped).Methods(route.Method.String(), "OPTIONS")
@@ -51,6 +52,11 @@ func (r Router) RegisterRoutes(service Service) {
 
 	for _, route := range service.UnauthenticatedRoutes() {
 		wrapped := r.wrapUnauthenticatedRoute(route.HandlerFunc)
+		r.router.Handle(route.Pattern, wrapped).Methods(route.Method.String(), "OPTIONS")
+	}
+
+	for _, route := range service.LinkAuthenticatedRoutes() {
+		wrapped := r.wrapLinkAuthenticatedRoute(route.HandlerFunc)
 		r.router.Handle(route.Pattern, wrapped).Methods(route.Method.String(), "OPTIONS")
 	}
 
@@ -63,6 +69,12 @@ func (r Router) wrapAuthenticatedRoute(handler AuthenticatedHandlerFunc) http.Ha
 	return withError
 }
 
+func (r Router) wrapLinkAuthenticatedRoute(handler AuthenticatedHandlerFunc) http.Handler {
+	withAuth := r.wrapWithLinkAuth(handler)
+	withError := r.wrapWithErrorHandling(withAuth)
+	return withError
+}
+
 func (r Router) wrapUnauthenticatedRoute(handler ErrorHandlerFunc) http.Handler {
 	withError := r.wrapWithErrorHandling(handler)
 	return withError
@@ -71,6 +83,22 @@ func (r Router) wrapUnauthenticatedRoute(handler ErrorHandlerFunc) http.Handler 
 func (r Router) wrapWithAuth(handler AuthenticatedHandlerFunc) ErrorHandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) error {
 		auth, err := r.authService.GetAuthentication(req)
+		if err != nil {
+			return err
+		}
+
+		if !auth.IsAuthenticated {
+			w.WriteHeader(http.StatusUnauthorized)
+			return nil
+		}
+
+		return handler(*auth, w, req)
+	}
+}
+
+func (r Router) wrapWithLinkAuth(handler AuthenticatedHandlerFunc) ErrorHandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) error {
+		auth, err := r.authService.GetLinkAuthentication(req)
 		if err != nil {
 			return err
 		}

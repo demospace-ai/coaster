@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"go.fabra.io/server/common/auth"
+	"go.fabra.io/server/common/crypto"
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/repositories/api_keys"
 )
@@ -40,7 +41,7 @@ func (s ApiService) GetOrCreateApiKey(organizationID int64) (*string, error) {
 				return nil, err
 			}
 
-			_, err = api_keys.CreateApiKey(s.db, organizationID, *encryptedApiKey, api_keys.HashKey(rawApiKey))
+			_, err = api_keys.CreateApiKey(s.db, organizationID, *encryptedApiKey, crypto.HashString(rawApiKey))
 			if err != nil {
 				return nil, err
 			}

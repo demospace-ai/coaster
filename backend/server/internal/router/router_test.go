@@ -37,6 +37,17 @@ func (s FakeService) UnauthenticatedRoutes() []router.UnauthenticatedRoute {
 	}
 }
 
+func (s FakeService) LinkAuthenticatedRoutes() []router.LinkAuthenticatedRoute {
+	return []router.LinkAuthenticatedRoute{
+		{
+			Name:        "LinkAuthenticated",
+			Method:      router.GET,
+			Pattern:     "/linkauthenticated",
+			HandlerFunc: s.LinkAuthenticated,
+		},
+	}
+}
+
 func (s FakeService) Authenticated(_ auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
@@ -45,11 +56,16 @@ func (s FakeService) Unauthenticated(w http.ResponseWriter, r *http.Request) err
 	return nil
 }
 
+func (s FakeService) LinkAuthenticated(_ auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+	return nil
+}
+
 var _ = Describe("Router", func() {
 	var (
 		activeSessionCookie  *http.Cookie
 		expiredSessionCookie *http.Cookie
 		apiKey               string
+		linkToken            string
 	)
 
 	BeforeEach(func() {
@@ -69,6 +85,7 @@ var _ = Describe("Router", func() {
 			Value: expiredSessionToken,
 		}
 		apiKey = test.CreateApiKey(db, org.ID)
+		linkToken = test.CreateLinkToken(db, org.ID, 123)
 	})
 
 	It("returns 401 when no session token provided for authenticated route", func() {
@@ -111,6 +128,30 @@ var _ = Describe("Router", func() {
 		req, err := http.NewRequest("GET", "/authenticated", nil)
 		Expect(err).To(BeNil())
 		req.Header.Add("X-API-KEY", apiKey)
+
+		r.ServeHTTP(rr, req)
+
+		result := rr.Result()
+		Expect(result.StatusCode).To(Equal(http.StatusOK))
+	})
+
+	It("returns 401 when active link token provided for authenticated route", func() {
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequest("GET", "/authenticated", nil)
+		Expect(err).To(BeNil())
+		req.Header.Add("X-LINK-TOKEN", linkToken)
+
+		r.ServeHTTP(rr, req)
+
+		result := rr.Result()
+		Expect(result.StatusCode).To(Equal(http.StatusUnauthorized))
+	})
+
+	It("returns 200 when active link token provided for link authenticated route", func() {
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequest("GET", "/linkauthenticated", nil)
+		Expect(err).To(BeNil())
+		req.Header.Add("X-LINK-TOKEN", linkToken)
 
 		r.ServeHTTP(rr, req)
 

@@ -55,6 +55,7 @@ func LoadOrganizationByApiKey(db *gorm.DB, hashedKey string) (*models.Organizati
 		Joins("JOIN api_keys ON api_keys.organization_id = organizations.id").
 		Where("api_keys.hashed_key = ?", hashedKey).
 		Where("organizations.deactivated_at IS NULL").
+		Where("api_keys.deactivated_at IS NULL").
 		Take(&organization)
 	if result.Error != nil {
 		return nil, result.Error

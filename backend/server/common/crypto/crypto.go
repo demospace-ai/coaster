@@ -2,6 +2,8 @@ package crypto
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"hash/crc32"
@@ -26,6 +28,11 @@ type CryptoServiceImpl struct {
 
 func NewCryptoService() CryptoService {
 	return CryptoServiceImpl{}
+}
+
+func HashString(input string) string {
+	h := sha256.Sum256([]byte(input))
+	return base64.StdEncoding.EncodeToString(h[:])
 }
 
 func encrypt(keyName string, plaintextString string) (*string, error) {

@@ -1,6 +1,6 @@
 import { ValidatedComboInput, ValidatedDropdownInput } from "src/components/input/Input";
-import { ColumnSchema, Connection, Destination } from "src/rpc/api";
-import { useColumnValues, useDestinations, useNamespaces, useTables } from "src/rpc/data";
+import { ColumnSchema, Connection, Destination, Object } from "src/rpc/api";
+import { useColumnValues, useDestinations, useNamespaces, useObjects, useTables } from "src/rpc/data";
 
 type DestinationSelectorProps = {
   destination: Destination | undefined;
@@ -76,6 +76,34 @@ export const TableSelector: React.FC<TableSelectorProps> = props => {
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No tables available!"}
     placeholder={props.placeholder ? props.placeholder : "Choose table"}
     label="Table"
+    validated={props.validated}
+    allowCustom={props.allowCustom} />;
+};
+
+type ObjectSelectorProps = {
+  linkToken?: string;
+  object: Object | undefined;
+  setObject: (object: Object) => void;
+  className?: string;
+  noOptionsString?: string;
+  placeholder?: string;
+  validated?: boolean;
+  allowCustom?: boolean;
+};
+
+export const ObjectSelector: React.FC<ObjectSelectorProps> = props => {
+  const { objects } = useObjects(props.linkToken);
+
+  return <ValidatedComboInput
+    className={props.className}
+    selected={props.object}
+    setSelected={props.setObject}
+    getElementForDisplay={(object: Object) => object.display_name}
+    options={objects}
+    loading={!objects}
+    noOptionsString={props.noOptionsString ? props.noOptionsString : "No objects available!"}
+    placeholder={props.placeholder ? props.placeholder : "Choose object"}
+    label="Object"
     validated={props.validated}
     allowCustom={props.allowCustom} />;
 };

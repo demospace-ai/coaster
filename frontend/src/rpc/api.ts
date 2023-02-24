@@ -155,8 +155,8 @@ export interface CreateDestinationRequest {
 
 export interface CreateSourceRequest {
     display_name: string;
-    end_customer_id: number;
     connection_type: ConnectionType;
+    end_customer_id?: number; // Not needed only if using link token
     bigquery_config?: BigQueryConfig;
     snowflake_config?: SnowflakeConfig;
     redshift_config?: RedshiftConfig;

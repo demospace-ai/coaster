@@ -48,3 +48,10 @@ type UnauthenticatedRoute struct {
 	Pattern     string
 	HandlerFunc ErrorHandlerFunc
 }
+
+type LinkAuthenticatedRoute struct {
+	Name        string
+	Method      Method
+	Pattern     string
+	HandlerFunc AuthenticatedHandlerFunc
+}

@@ -1,9 +1,6 @@
 package api_keys
 
 import (
-	"crypto/sha256"
-	"encoding/base64"
-
 	"go.fabra.io/server/common/models"
 
 	"gorm.io/gorm"
@@ -37,9 +34,4 @@ func LoadApiKeyForOrganization(db *gorm.DB, organizationID int64) (*models.ApiKe
 	}
 
 	return &apiKey, nil
-}
-
-func HashKey(key string) string {
-	h := sha256.Sum256([]byte(key))
-	return base64.StdEncoding.EncodeToString(h[:])
 }
