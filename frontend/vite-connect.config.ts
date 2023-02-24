@@ -7,9 +7,7 @@ export default defineConfig({
   plugins: [react(), viteTsconfigPaths(), splitVendorChunkPlugin()],
   build: {
     rollupOptions: {
-      input: {
-        connect: 'connect.html',
-      },
+      input: 'connect.html',
       output: [
         {
           dir: 'build',

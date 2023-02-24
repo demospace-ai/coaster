@@ -4,7 +4,7 @@ import { ErrorBoundary } from '@highlight-run/react';
 import { H } from 'highlight.run';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 import { App } from 'src/connect/App';
 import { isProd } from 'src/utils/env';
 
@@ -19,10 +19,9 @@ const root = createRoot(container!);
 root.render(
   <React.StrictMode>
     <ErrorBoundary showDialog>
-      <BrowserRouter>
+      <MemoryRouter>
         <App />
-      </BrowserRouter>
+      </MemoryRouter>
     </ErrorBoundary>
-  </React.StrictMode>,
-
+  </React.StrictMode>
 );

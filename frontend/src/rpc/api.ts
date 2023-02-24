@@ -28,6 +28,12 @@ export const GetDestinations: IEndpoint<undefined, GetDestinationsResponse> = {
     path: '/destinations',
 };
 
+export const GetSources: IEndpoint<undefined, GetSourcesResponse> = {
+    name: 'Sources Fetched',
+    method: 'GET',
+    path: '/sources',
+};
+
 export const GetObjects: IEndpoint<undefined, GetObjectsResponse> = {
     name: 'Objects Fetched',
     method: 'GET',
@@ -109,6 +115,12 @@ export const CreateDestination: IEndpoint<CreateDestinationRequest, undefined> =
     track: true,
 };
 
+export const CreateSource: IEndpoint<CreateSourceRequest, CreateSourceResponse> = {
+    name: 'Source Created',
+    method: 'POST',
+    path: '/source',
+    track: true,
+};
 
 export const CreateObject: IEndpoint<CreateObjectRequest, undefined> = {
     name: 'Object Created',
@@ -141,6 +153,19 @@ export interface CreateDestinationRequest {
     mongodb_config?: MongoDbConfig;
 }
 
+export interface CreateSourceRequest {
+    display_name: string;
+    end_customer_id: number;
+    connection_type: ConnectionType;
+    bigquery_config?: BigQueryConfig;
+    snowflake_config?: SnowflakeConfig;
+    redshift_config?: RedshiftConfig;
+    mongodb_config?: MongoDbConfig;
+}
+
+export interface CreateSourceResponse {
+    source: Source;
+}
 
 export interface CreateObjectRequest {
     display_name: string;
@@ -283,6 +308,9 @@ export interface GetDestinationsResponse {
     destinations: Destination[];
 }
 
+export interface GetSourcesResponse {
+    sources: Source[];
+}
 
 export interface GetObjectsResponse {
     objects: Object[];

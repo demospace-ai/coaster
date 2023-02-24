@@ -29,6 +29,5 @@ root.render(
         </BrowserRouter>
       </Provider>
     </ErrorBoundary>
-  </React.StrictMode>,
-
+  </React.StrictMode>
 );

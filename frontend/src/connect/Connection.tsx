@@ -1,48 +1,23 @@
-import React, { FormEvent, useState } from "react";
-import { BackButton, Button, FormButton } from "src/components/button/Button";
-import bigquery from "src/components/images/bigquery.svg";
-import mongodb from "src/components/images/mongodb.svg";
-import redshift from "src/components/images/redshift.svg";
-import snowflake from "src/components/images/snowflake.svg";
+import React, { FormEvent, useImperativeHandle, useState } from "react";
+import { Button } from "src/components/button/Button";
 import { getConnectionTypeImg } from "src/components/images/warehouses";
 import { ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
+import { SetupStep } from "src/connect/App";
 import { sendRequest } from "src/rpc/ajax";
-import { BigQueryConfig, ConnectionType, CreateDestination, CreateDestinationRequest, getConnectionType, GetDestinations, MongoDbConfig, RedshiftConfig, SnowflakeConfig, TestDataConnection, TestDataConnectionRequest } from "src/rpc/api";
+import { BigQueryConfig, ConnectionType, CreateSource, CreateSourceRequest, getConnectionType, GetSources, MongoDbConfig, RedshiftConfig, SnowflakeConfig, Source, TestDataConnection, TestDataConnectionRequest } from "src/rpc/api";
 import { mutate } from "swr";
-
-export const NewDestination: React.FC<{ onComplete: () => void; }> = props => {
-  const [connectionType, setConnectionType] = useState<ConnectionType | null>(null);
-  const onBack = () => {
-    if (connectionType) {
-      setConnectionType(null);
-    } else {
-      props.onComplete();
-    }
-  };
-
-  return (
-    <>
-      <BackButton className="tw-mt-3" onClick={onBack} />
-      <div className='tw-flex tw-flex-col tw-w-[900px] tw-py-12 tw-px-10 tw-mx-auto tw-mb-20 tw-mt-8 tw-bg-white tw-rounded-lg tw-shadow-md tw-items-center'>
-        <div className="tw-w-full tw-text-center tw-mb-5 tw-font-bold tw-text-lg">New Destination</div>
-        {connectionType ?
-          <NewDestinationConfiguration connectionType={connectionType} setConnectionType={setConnectionType} onComplete={props.onComplete} />
-          :
-          <ConnectionTypeSelector setConnectionType={setConnectionType} />
-        }
-      </div>
-    </>
-  );
-};
 
 type NewConnectionConfigurationProps = {
   connectionType: ConnectionType;
-  setConnectionType: (connectionType: ConnectionType | null) => void;
-  onComplete: () => void;
+  endCustomerId: number;
+  nextStep: () => void;
+  previousStep: () => void;
+  setSource: (source: Source) => void;
 };
 
-type NewDestinationState = {
+type NewSourceState = {
+  success: boolean | null;
   displayName: string;
   bigqueryConfig: BigQueryConfig;
   snowflakeConfig: SnowflakeConfig;
@@ -51,7 +26,8 @@ type NewDestinationState = {
 };
 
 // Values must be empty strings otherwise the input will be uncontrolled
-const INITIAL_DESTINATION_STATE: NewDestinationState = {
+const INITIAL_DESTINATION_STATE: NewSourceState = {
+  success: null,
   displayName: "",
   bigqueryConfig: {
     credentials: "",
@@ -80,7 +56,7 @@ const INITIAL_DESTINATION_STATE: NewDestinationState = {
   },
 };
 
-const validateAll = (connectionType: ConnectionType, state: NewDestinationState): boolean => {
+const validateAll = (connectionType: ConnectionType, state: NewSourceState): boolean => {
   switch (connectionType) {
     case ConnectionType.Snowflake:
       return state.displayName.length > 0
@@ -106,22 +82,32 @@ const validateAll = (connectionType: ConnectionType, state: NewDestinationState)
   }
 };
 
-const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = props => {
-  const [state, setState] = useState<NewDestinationState>(INITIAL_DESTINATION_STATE);
-  const [saveLoading, setSaveLoading] = useState(false);
-  const [createConnectionSuccess, setCreateConnectionSuccess] = useState<boolean | null>(null);
+// TODO: figure out what this type is
+export const NewSourceConfiguration = React.forwardRef<SetupStep, NewConnectionConfigurationProps>((props, ref) => {
+  const [state, setState] = useState<NewSourceState>(INITIAL_DESTINATION_STATE);
+  useImperativeHandle(ref, () => {
+    return {
+      continue: async () => {
+        console.log("hi");
+        return new Promise(resolve => setTimeout(resolve, 10000));
+      }
+    };
+  });
 
-  const createNewDestination = async (e: FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault();
-    setSaveLoading(true);
+    createNewSource();
+  };
+
+  const createNewSource = async () => {
     if (!validateAll(props.connectionType, state)) {
-      setSaveLoading(false);
       return;
     }
 
-    const payload: CreateDestinationRequest = {
+    const payload: CreateSourceRequest = {
       'display_name': state.displayName,
       'connection_type': props.connectionType,
+      'end_customer_id': props.endCustomerId,
     };
 
     switch (props.connectionType) {
@@ -142,14 +128,13 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = p
     }
 
     try {
-      await sendRequest(CreateDestination, payload);
-      mutate({ GetDestinations }); // Tell SWRs to refetch destinatinos connections
-      setCreateConnectionSuccess(true);
+      const response = await sendRequest(CreateSource, payload);
+      mutate({ GetSources }); // Tell SWRs to refetch destinatinos connections
+      props.setSource(response.source);
+      props.nextStep();
     } catch (e) {
-      setCreateConnectionSuccess(false);
+      setState({ ...state, success: false });
     }
-
-    setSaveLoading(false);
   };
 
   let inputs: React.ReactElement;
@@ -168,35 +153,26 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = p
       break;
   };
 
-  if (createConnectionSuccess) {
-    return (
-      <div>
-        <div className='tw-mt-10 tw-text-center tw-font-bold tw-text-lg'>🎉 Congratulations! Your destination is set up. 🎉</div>
-        <Button className='tw-block tw-mt-8 tw-mx-auto tw-mb-10 tw-w-32' onClick={props.onComplete}>Done</Button>
-      </div>
-    );
-  }
-
   return (
-    <div className="tw-w-[500px]">
-      <div className="tw-flex tw-justify-center tw-items-center tw-mb-5">
-        <img src={getConnectionTypeImg(props.connectionType)} alt="icon" className="tw-h-6 tw-mr-1.5" />
-        <div>Enter your {getConnectionType(props.connectionType)} configuration:</div>
+    <div className="tw-w-[500px] tw-flex tw-flex-col">
+      <div className="tw-flex tw-justify-center tw-items-center tw-text-center tw-mb-2 tw-text-2xl tw-font-bold">
+        <img src={getConnectionTypeImg(props.connectionType)} alt="icon" className="tw-h-8 tw-mr-1.5" />
+        Connect to {getConnectionType(props.connectionType)}
       </div>
-      <form onSubmit={createNewDestination}>
+      <div className="tw-text-center tw-mb-5 tw-text-slate-700">Provide the settings and credentials for your data source.</div>
+      <form className="tw-pb-16" onSubmit={submit}>
         {inputs}
         <TestConnectionButton state={state} connectionType={props.connectionType} />
-        <FormButton className="tw-mt-5 tw-w-full tw-h-10">{saveLoading ? <Loading /> : "Continue"}</FormButton>
-        {createConnectionSuccess !== null &&
+        {state.success !== null &&
           /* TODO: return error message here */
-          <div className="tw-mt-3 tw-text-center">{createConnectionSuccess ? "Success!" : "Failure"}</div>
+          <div className="tw-mt-3 tw-text-center">{state.success ? "Success!" : "Failure"}</div>
         }
       </form >
     </div>
   );
-};
+});
 
-const TestConnectionButton: React.FC<{ state: NewDestinationState, connectionType: ConnectionType; }> = props => {
+const TestConnectionButton: React.FC<{ state: NewSourceState, connectionType: ConnectionType; }> = props => {
   const [testLoading, setTestLoading] = useState(false);
   const [testConnectionSuccess, setTestConnectionSuccess] = useState<boolean | null>(null);
   const state = props.state;
@@ -249,8 +225,8 @@ const TestConnectionButton: React.FC<{ state: NewDestinationState, connectionTyp
 };
 
 type ConnectionConfigurationProps = {
-  state: NewDestinationState;
-  setState: (state: NewDestinationState) => void;
+  state: NewSourceState;
+  setState: (state: NewSourceState) => void;
 };
 
 const SnowflakeInputs: React.FC<ConnectionConfigurationProps> = props => {
@@ -312,37 +288,4 @@ const BigQueryInputs: React.FC<ConnectionConfigurationProps> = props => {
       />
     </>
   );
-};
-
-type ConnectionTypeSelectorProps = {
-  setConnectionType: (connectionType: ConnectionType) => void;
-};
-
-const ConnectionTypeSelector: React.FC<ConnectionTypeSelectorProps> = props => {
-  const connectionButton = "tw-flex tw-flex-row tw-justify-center tw-items-center tw-py-5 tw-font-bold tw-w-64 tw-rounded-md tw-cursor-pointer tw-bg-white tw-text-slate-800 tw-border tw-border-slate-300 hover:tw-bg-slate-100 tw-tracking-[1px] tw-shadow-md tw-select-none";
-  return (
-    <>
-      <div className="tw-text-center tw-mb-10">Choose your data warehouse:</div>
-      <div className="tw-flex tw-flex-row tw-gap-5">
-        <button className={connectionButton} onClick={() => props.setConnectionType(ConnectionType.Snowflake)}>
-          <img src={snowflake} alt="data source logo" className="tw-h-6 tw-mr-1.5" />
-          Snowflake
-        </button>
-        <button className={connectionButton} onClick={() => props.setConnectionType(ConnectionType.BigQuery)}>
-          <img src={bigquery} alt="data source logo" className="tw-h-6 tw-mr-1.5" />
-          BigQuery
-        </button>
-        <button className={connectionButton} onClick={() => props.setConnectionType(ConnectionType.Redshift)}>
-          <img src={redshift} alt="data source logo" className="tw-h-6 tw-mr-1.5" />
-          Redshift
-        </button>
-      </div>
-      <div className="tw-flex tw-flex-row tw-mt-10">
-        <button className={connectionButton} onClick={() => props.setConnectionType(ConnectionType.MongoDb)}>
-          <img src={mongodb} alt="data source logo" className="tw-h-6 tw-mr-1.5" />
-          MongoDB
-        </button>
-      </div>
-    </>
-  );
-};
+};;
