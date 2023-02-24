@@ -12,10 +12,6 @@ import (
 	"go.fabra.io/server/common/repositories/connections"
 )
 
-type GetNamespacesRequest struct {
-	ConnectionID int64 `json:"connection_id,omitempty"`
-}
-
 type GetNamespacesResponse struct {
 	Namespaces []string `json:"namespaces"`
 }
@@ -28,7 +24,7 @@ func (s ApiService) GetNamespaces(auth auth.Authentication, w http.ResponseWrite
 
 	strConnectionID := r.URL.Query().Get("connectionID")
 	if len(strConnectionID) == 0 {
-		return fmt.Errorf("missing connection ID from GetDatasets request URL: %s", r.URL.RequestURI())
+		return fmt.Errorf("missing connection ID from GetNamespaces request URL: %s", r.URL.RequestURI())
 	}
 
 	connectionID, err := strconv.ParseInt(strConnectionID, 10, 64)

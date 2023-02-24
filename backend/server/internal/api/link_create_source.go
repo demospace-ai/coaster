@@ -15,8 +15,7 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-type CreateSourceRequest struct {
-	EndCustomerID   int64                  `json:"end_customer_id" validate:"required"`
+type CreateSourceLinkRequest struct {
 	DisplayName     string                 `json:"display_name" validate:"required"`
 	ConnectionType  models.ConnectionType  `json:"connection_type"`
 	BigQueryConfig  *input.BigQueryConfig  `json:"bigquery_config,omitempty"`
@@ -25,17 +24,17 @@ type CreateSourceRequest struct {
 	MongoDbConfig   *input.MongoDbConfig   `json:"mongodb_config,omitempty"`
 }
 
-type CreateSourceResponse struct {
-	Source views.Source `json:"source"`
-}
-
-func (s ApiService) CreateSource(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) LinkCreateSource(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
 		return errors.NewBadRequest("must setup organization first")
 	}
 
+	if auth.LinkToken == nil {
+		return errors.NewBadRequest("must send link token")
+	}
+
 	decoder := json.NewDecoder(r.Body)
-	var createSourceRequest CreateSourceRequest
+	var createSourceRequest CreateSourceLinkRequest
 	err := decoder.Decode(&createSourceRequest)
 	if err != nil {
 		return err
@@ -94,7 +93,7 @@ func (s ApiService) CreateSource(auth auth.Authentication, w http.ResponseWriter
 		s.db,
 		auth.Organization.ID,
 		createSourceRequest.DisplayName,
-		createSourceRequest.EndCustomerID,
+		auth.LinkToken.EndCustomerID,
 		connection.ID,
 	)
 	if err != nil {

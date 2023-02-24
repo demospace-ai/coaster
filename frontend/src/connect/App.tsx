@@ -11,7 +11,7 @@ export type SetupStep = {
 
 export const App: React.FC = () => {
   // TODO: figure out how to prevent Redux from being used in this app
-  const [step, setStep] = useState<number>(2);
+  const [step, setStep] = useState<number>(0);
   const stepRef = useRef<SetupStep>(null);
   const close = () => {
     // TODO: close the window
@@ -23,6 +23,7 @@ export const App: React.FC = () => {
       close();
     }
   };
+
   return (
     <div className='tw-fixed tw-bg-[rgb(0,0,0,0.2)] tw-w-full tw-h-full'>
       <div className='tw-fixed tw-bg-white tw-flex tw-flex-col tw-w-[70%] tw-h-[70%] tw-top-[48%] tw-left-1/2 -tw-translate-y-1/2 -tw-translate-x-1/2 tw-rounded-lg tw-shadow-modal tw-items-center'>
@@ -46,7 +47,6 @@ const AppContent: React.FC<AppContentProps> = props => {
   const linkToken = "123abc"; // TODO: get real link token from parent window
   const nextStep = () => { props.setStep(props.step + 1); };
   const previousStep = () => { props.setStep(props.step - 1); };
-  const close = () => { };
 
   let content: React.ReactNode;
   switch (props.step) {
@@ -57,7 +57,7 @@ const AppContent: React.FC<AppContentProps> = props => {
       content = <NewSourceConfiguration ref={props.stepRef} connectionType={connectionType!} linkToken={linkToken} nextStep={nextStep} previousStep={previousStep} setSource={setSource} />;
       break;
     case 2:
-      content = <ObjectSetup nextStep={nextStep} linkToken={linkToken} />;
+      content = <ObjectSetup ref={props.stepRef} nextStep={nextStep} linkToken={linkToken} source={source!} />;
       break;
     default:
       content = <div />;
@@ -65,7 +65,7 @@ const AppContent: React.FC<AppContentProps> = props => {
   }
 
   return (
-    <div className='tw-overflow-auto tw-w-full tw-flex tw-justify-center tw-py-10 tw-bg-transparent'>
+    <div className='tw-overflow-auto tw-w-full tw-h-full tw-flex tw-justify-center tw-pt-10 tw-bg-transparent'>
       {content}
     </div>
   );

@@ -23,7 +23,7 @@ func FetchConfiguration(ctx context.Context, input FetchConfigurationInput) (*Sy
 		return nil, err
 	}
 
-	source, err := sources.LoadSourceByID(input.db, input.organizationID, sync.SourceID)
+	source, err := sources.LoadSourceByID(input.db, input.organizationID, sync.EndCustomerId, sync.SourceID)
 	if err != nil {
 		return nil, err
 	}

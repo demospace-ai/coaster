@@ -67,6 +67,27 @@ export const GetSchema: IEndpoint<GetSchemaRequest, GetSchemaResponse> = {
     queryParams: ['connectionID', 'namespace', 'tableName', 'customJoin'],
 };
 
+export const LinkGetNamespaces: IEndpoint<{ sourceID: number; }, GetNamespacesResponse> = {
+    name: 'Namespaces Fetched',
+    method: 'GET',
+    path: '/link/namespaces',
+    queryParams: ['sourceID']
+};
+
+export const LinkGetTables: IEndpoint<{ sourceID: number, namespace: string; }, GetTablesResponse> = {
+    name: 'Tables Fetched',
+    method: 'GET',
+    path: '/link/tables',
+    queryParams: ['sourceID', 'namespace'],
+};
+
+export const LinkGetSchema: IEndpoint<LinkGetSchemaRequest, GetSchemaResponse> = {
+    name: 'Schema Fetched',
+    method: 'GET',
+    path: '/link/schema',
+    queryParams: ['sourceID', 'namespace', 'tableName', 'customJoin'],
+};
+
 export const GetApiKey: IEndpoint<undefined, string> = {
     name: 'API Key Fetched',
     method: 'GET',
@@ -115,10 +136,10 @@ export const CreateDestination: IEndpoint<CreateDestinationRequest, undefined> =
     track: true,
 };
 
-export const CreateSource: IEndpoint<CreateSourceRequest, CreateSourceResponse> = {
+export const LinkCreateSource: IEndpoint<LinkCreateSourceRequest, CreateSourceResponse> = {
     name: 'Source Created',
     method: 'POST',
-    path: '/source',
+    path: '/link/source',
     track: true,
 };
 
@@ -153,10 +174,9 @@ export interface CreateDestinationRequest {
     mongodb_config?: MongoDbConfig;
 }
 
-export interface CreateSourceRequest {
+export interface LinkCreateSourceRequest {
     display_name: string;
     connection_type: ConnectionType;
-    end_customer_id?: number; // Not needed only if using link token
     bigquery_config?: BigQueryConfig;
     snowflake_config?: SnowflakeConfig;
     redshift_config?: RedshiftConfig;
@@ -340,6 +360,13 @@ export interface GetTablesResponse {
 
 export interface GetSchemaRequest {
     connectionID: number,
+    namespace?: string,
+    tableName?: string,
+    customJoin?: string,
+}
+
+export interface LinkGetSchemaRequest {
+    sourceID: number,
     namespace?: string,
     tableName?: string,
     customJoin?: string,

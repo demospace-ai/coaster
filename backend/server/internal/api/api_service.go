@@ -52,10 +52,22 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.GetDestinations,
 		},
 		{
-			Name:        "Get all objects",
+			Name:        "Get namespaces",
 			Method:      router.GET,
-			Pattern:     "/api/objects",
-			HandlerFunc: s.GetObjects,
+			Pattern:     "/api/connection/namespaces",
+			HandlerFunc: s.GetNamespaces,
+		},
+		{
+			Name:        "Get tables for a given namespace",
+			Method:      router.GET,
+			Pattern:     "/api/connection/tables",
+			HandlerFunc: s.GetTables,
+		},
+		{
+			Name:        "Get schema for a given table",
+			Method:      router.GET,
+			Pattern:     "/api/connection/schema",
+			HandlerFunc: s.GetSchema,
 		},
 		{
 			Name:        "Get all sync configurations",
@@ -94,30 +106,6 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.CreateSync,
 		},
 		{
-			Name:        "Test data connection",
-			Method:      router.POST,
-			Pattern:     "/api/connection/test",
-			HandlerFunc: s.TestDataConnection,
-		},
-		{
-			Name:        "Get namespace",
-			Method:      router.GET,
-			Pattern:     "/api/connection/namespaces",
-			HandlerFunc: s.GetNamespaces,
-		},
-		{
-			Name:        "Get tables for a given data source and namespace",
-			Method:      router.GET,
-			Pattern:     "/api/connection/tables",
-			HandlerFunc: s.GetTables,
-		},
-		{
-			Name:        "Get schema for a given table",
-			Method:      router.GET,
-			Pattern:     "/api/connection/schema",
-			HandlerFunc: s.GetSchema,
-		},
-		{
 			Name:        "Get values for a specified column",
 			Method:      router.GET,
 			Pattern:     "/api/connection/column_values",
@@ -153,16 +141,46 @@ func (s ApiService) UnauthenticatedRoutes() []router.UnauthenticatedRoute {
 func (s ApiService) LinkAuthenticatedRoutes() []router.LinkAuthenticatedRoute {
 	return []router.LinkAuthenticatedRoute{
 		{
-			Name:        "Create source for sync",
-			Method:      router.POST,
-			Pattern:     "/api/source",
-			HandlerFunc: s.CreateSource,
-		},
-		{
 			Name:        "Get all objects",
 			Method:      router.GET,
 			Pattern:     "/api/objects",
 			HandlerFunc: s.GetObjects,
+		},
+		{
+			Name:        "Get source namespaces",
+			Method:      router.GET,
+			Pattern:     "/api/link/namespaces",
+			HandlerFunc: s.LinkGetNamespaces,
+		},
+		{
+			Name:        "Get tables for a given source and namespace",
+			Method:      router.GET,
+			Pattern:     "/api/link/tables",
+			HandlerFunc: s.LinkGetTables,
+		},
+		{
+			Name:        "Get schema for a given table",
+			Method:      router.GET,
+			Pattern:     "/api/link/schema",
+			HandlerFunc: s.LinkGetSchema,
+		},
+		{
+			Name:        "Create source for sync",
+			Method:      router.POST,
+			Pattern:     "/api/link/source",
+			HandlerFunc: s.LinkCreateSource,
+		},
+		{
+			Name:        "Create sync",
+			Method:      router.POST,
+			Pattern:     "/api/link/sync",
+			HandlerFunc: s.LinkCreateSync,
+		},
+		{
+			Name:        "Test data connection",
+			Method:      router.POST,
+			Pattern:     "/api/connection/test",
+			HandlerFunc: s.TestDataConnection,
 		},
 	}
 }

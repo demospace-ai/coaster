@@ -1,6 +1,6 @@
 import { ValidatedComboInput, ValidatedDropdownInput } from "src/components/input/Input";
-import { ColumnSchema, Connection, Destination, Object } from "src/rpc/api";
-import { useColumnValues, useDestinations, useNamespaces, useObjects, useTables } from "src/rpc/data";
+import { ColumnSchema, Connection, Destination, Object, Source } from "src/rpc/api";
+import { useColumnValues, useDestinations, useNamespaces, useObjects, useSourceNamespaces, useSourceTables, useTables } from "src/rpc/data";
 
 type DestinationSelectorProps = {
   destination: Destination | undefined;
@@ -80,8 +80,63 @@ export const TableSelector: React.FC<TableSelectorProps> = props => {
     allowCustom={props.allowCustom} />;
 };
 
+
+type SourceNamespaceSelectorProps = {
+  source: Source | undefined;
+  namespace: string | undefined;
+  setNamespace: (datasetName: string) => void;
+  className?: string;
+  noOptionsString?: string;
+  placeholder?: string;
+  validated?: boolean;
+  linkToken: string;
+};
+
+export const SourceNamespaceSelector: React.FC<SourceNamespaceSelectorProps> = props => {
+  const { namespaces } = useSourceNamespaces(props.source?.id, props.linkToken);
+
+  return <ValidatedDropdownInput
+    className={props.className}
+    selected={props.namespace}
+    setSelected={props.setNamespace}
+    options={namespaces}
+    loading={!namespaces}
+    noOptionsString={props.noOptionsString ? props.noOptionsString : "No namespaces available!"}
+    placeholder={props.placeholder ? props.placeholder : "Choose namespace"}
+    label="Namespace"
+    validated={props.validated} />;
+};
+
+type SourceTableSelectorProps = {
+  source: Source | undefined;
+  namespace: string | undefined;
+  tableName: string | undefined;
+  setTableName: (tableName: string) => void;
+  className?: string;
+  noOptionsString?: string;
+  placeholder?: string;
+  validated?: boolean;
+  allowCustom?: boolean;
+  linkToken: string;
+};
+
+export const SourceTableSelector: React.FC<SourceTableSelectorProps> = props => {
+  const { tables } = useSourceTables(props.source?.id, props.namespace, props.linkToken);
+
+  return <ValidatedComboInput
+    className={props.className}
+    selected={props.tableName}
+    setSelected={props.setTableName}
+    options={tables}
+    loading={!tables}
+    noOptionsString={props.noOptionsString ? props.noOptionsString : "No tables available!"}
+    placeholder={props.placeholder ? props.placeholder : "Choose table"}
+    label="Table"
+    validated={props.validated}
+    allowCustom={props.allowCustom} />;
+};
+
 type ObjectSelectorProps = {
-  linkToken?: string;
   object: Object | undefined;
   setObject: (object: Object) => void;
   className?: string;
@@ -89,6 +144,7 @@ type ObjectSelectorProps = {
   placeholder?: string;
   validated?: boolean;
   allowCustom?: boolean;
+  linkToken?: string;
 };
 
 export const ObjectSelector: React.FC<ObjectSelectorProps> = props => {

@@ -124,7 +124,7 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = pro
   const value = props.selected === undefined ? UNSET : props.selected;
 
   return (
-    <Listbox by={props.by} value={value} onChange={value => { props.setSelected(value); setIsValid(true); }}>
+    <Listbox as="div" className="tw-flex tw-w-full" by={props.by} value={value} onChange={value => { props.setSelected(value); setIsValid(true); }}>
       <div className="tw-relative tw-w-full">
         <Transition
           show={showLabel}
@@ -267,7 +267,6 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
     return [];
   };
   const filteredOptions = getFilteredOptions();
-
   const getElementForDisplay = props.getElementForDisplay ? props.getElementForDisplay : (value: any) => value;
   const showLabel = props.label !== undefined && (focused || (props.selected !== undefined));
 

@@ -103,8 +103,29 @@ func testSnowflakeConnection(snowflakeConfig input.SnowflakeConfig) error {
 		return err
 	}
 
-	_, err = sql.Open("snowflake", dsn)
+	db, err := sql.Open("snowflake", dsn)
 	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	rows, err := db.Query("SELECT 1")
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	var v int
+	for rows.Next() {
+		err := rows.Scan(&v)
+		if err != nil {
+			return err
+		}
+		if v != 1 {
+			return err
+		}
+	}
+	if rows.Err() != nil {
 		return err
 	}
 

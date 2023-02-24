@@ -14,9 +14,8 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-type CreateSyncRequest struct {
+type CreateSyncLinkRequest struct {
 	DisplayName    string                   `json:"display_name"`
-	EndCustomerId  int64                    `json:"end_customer_id"`
 	DestinationID  int64                    `json:"destination_id"`
 	SourceID       int64                    `json:"source_id"`
 	ObjectID       int64                    `json:"object_id"`
@@ -31,18 +30,17 @@ type CreateSyncRequest struct {
 	FieldMappings  []input.SyncFieldMapping `json:"field_mappings"`
 }
 
-type CreateSyncResponse struct {
-	Sync views.Sync `json:"sync"`
-}
-
-func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
-
+func (s ApiService) LinkCreateSync(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
 		return errors.NewBadRequest("must setup organization first")
 	}
 
+	if auth.LinkToken == nil {
+		return errors.NewBadRequest("must send link token")
+	}
+
 	decoder := json.NewDecoder(r.Body)
-	var createSyncRequest CreateSyncRequest
+	var createSyncRequest CreateSyncLinkRequest
 	err := decoder.Decode(&createSyncRequest)
 	if err != nil {
 		return err
@@ -65,7 +63,7 @@ func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, 
 		s.db,
 		auth.Organization.ID,
 		createSyncRequest.DisplayName,
-		createSyncRequest.EndCustomerId,
+		auth.LinkToken.EndCustomerID,
 		createSyncRequest.DestinationID,
 		createSyncRequest.SourceID,
 		createSyncRequest.ObjectID,

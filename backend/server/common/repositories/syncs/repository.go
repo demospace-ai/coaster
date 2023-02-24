@@ -12,6 +12,7 @@ func CreateSync(
 	db *gorm.DB,
 	organizationID int64,
 	displayName string,
+	endCustomerID int64,
 	destinationID int64,
 	sourceID int64,
 	objectID int64,
@@ -27,6 +28,7 @@ func CreateSync(
 	sync := models.Sync{
 		OrganizationID: organizationID,
 		DisplayName:    displayName,
+		EndCustomerId:  endCustomerID,
 		DestinationID:  destinationID,
 		SourceID:       sourceID,
 		ObjectID:       objectID,

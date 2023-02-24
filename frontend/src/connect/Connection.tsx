@@ -5,7 +5,7 @@ import { ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { SetupStep } from "src/connect/App";
 import { sendRequest } from "src/rpc/ajax";
-import { BigQueryConfig, ConnectionType, CreateSource, CreateSourceRequest, getConnectionType, GetSources, MongoDbConfig, RedshiftConfig, SnowflakeConfig, Source, TestDataConnection, TestDataConnectionRequest } from "src/rpc/api";
+import { BigQueryConfig, ConnectionType, getConnectionType, GetSources, LinkCreateSource, LinkCreateSourceRequest, MongoDbConfig, RedshiftConfig, SnowflakeConfig, Source, TestDataConnection, TestDataConnectionRequest } from "src/rpc/api";
 import { mutate } from "swr";
 
 type NewConnectionConfigurationProps = {
@@ -88,8 +88,7 @@ export const NewSourceConfiguration = React.forwardRef<SetupStep, NewConnectionC
   useImperativeHandle(ref, () => {
     return {
       continue: async () => {
-        validateAll(props.connectionType, state);
-        return new Promise(resolve => setTimeout(resolve, 1000));
+        return createNewSource();
       }
     };
   });
@@ -104,7 +103,7 @@ export const NewSourceConfiguration = React.forwardRef<SetupStep, NewConnectionC
       return;
     }
 
-    const payload: CreateSourceRequest = {
+    const payload: LinkCreateSourceRequest = {
       'display_name': state.displayName,
       'connection_type': props.connectionType,
     };
@@ -127,7 +126,7 @@ export const NewSourceConfiguration = React.forwardRef<SetupStep, NewConnectionC
     }
 
     try {
-      const response = await sendRequest(CreateSource, payload, [["X-LINK-TOKEN", props.linkToken]]);
+      const response = await sendRequest(LinkCreateSource, payload, [["X-LINK-TOKEN", props.linkToken]]);
       mutate({ GetSources }); // Tell SWRs to refetch destinatinos connections
       props.setSource(response.source);
       props.nextStep();
