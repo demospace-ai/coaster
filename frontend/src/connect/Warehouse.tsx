@@ -6,20 +6,13 @@ import redshift from "src/components/images/redshift.svg";
 import snowflake from "src/components/images/snowflake.svg";
 import { SourceSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
-import { SetupSyncState } from "src/connect/App";
+import { SetupSyncProps } from "src/connect/App";
 import { ConnectionType, Source } from "src/rpc/api";
 
-
-type WarehouseSelectorProps = {
-  linkToken: string;
-  state: SetupSyncState;
-  setState: (state: SetupSyncState) => void;
-};
-
-export const WarehouseSelector: React.FC<WarehouseSelectorProps> = (props) => {
+export const WarehouseSelector: React.FC<SetupSyncProps> = (props) => {
   const connectionButton = "tw-flex tw-flex-row tw-justify-center tw-items-center tw-py-5 tw-font-bold tw-w-56 tw-rounded-md tw-cursor-pointer tw-bg-white tw-text-slate-800 tw-border tw-border-slate-300 hover:tw-bg-slate-100 tw-tracking-[1px] tw-shadow-md tw-select-none";
   const onClick = (connectionType: ConnectionType) => {
-    props.setState({ ...props.state, connectionType: connectionType, step: props.state.step + 1, prevStep: props.state.step });
+    props.setState({ ...props.state, connectionType: connectionType, step: props.state.step + 1, skippedSourceSetup: false });
   };
   const setSource = (source: Source) => {
     props.setState({ ...props.state, source: source });
@@ -51,7 +44,7 @@ export const WarehouseSelector: React.FC<WarehouseSelectorProps> = (props) => {
       <div className="tw-text-base tw-font-medium tw-flex tw-flex-row tw-items-center tw-justify-center">
         Choose an existing source
         <Tooltip place="top" label="If you've already setup a source, you can sync additional tables from it.">
-          <InfoIcon className="tw-ml-2 tw-h-3 tw-fill-slate-400" />
+          <InfoIcon className="tw-ml-1.5 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
       <div className="tw-flex tw-flex-row tw-items-center tw-justify-center tw-w-full tw-pb-16">

@@ -2,13 +2,14 @@ import classNames from 'classnames';
 import React, { useState } from 'react';
 import { Loading } from 'src/components/loading/Loading';
 import { createNewSource, INITIAL_SOURCE_STATE, NewSourceConfiguration, NewSourceState } from 'src/connect/Connection';
+import { FinalizeSync } from 'src/connect/Finalize';
 import { ObjectSetup } from 'src/connect/Object';
 import { WarehouseSelector } from 'src/connect/Warehouse';
 import { ConnectionType, Object, Source } from 'src/rpc/api';
 
 export type SetupSyncState = {
   step: number;
-  prevStep: number;
+  skippedSourceSetup: boolean;
   object: Object | undefined;
   namespace: string | undefined;
   tableName: string | undefined;
@@ -19,7 +20,7 @@ export type SetupSyncState = {
 
 const INITIAL_SETUP_STATE: SetupSyncState = {
   step: 0,
-  prevStep: 0,
+  skippedSourceSetup: false,
   object: undefined,
   namespace: undefined,
   tableName: undefined,
@@ -35,8 +36,13 @@ export const App: React.FC = () => {
     // TODO: close the window
   };
   const back = () => {
+    let prevStep = state.step - 1;
+    if (state.skippedSourceSetup && state.step === 2) {
+      prevStep--;
+    }
+
     if (state.step > 0) {
-      setState({ ...state, step: state.prevStep, prevStep: state.prevStep - 1 });
+      setState({ ...state, step: prevStep });
     } else {
       close();
     }
@@ -74,7 +80,7 @@ const AppContent: React.FC<AppContentProps> = props => {
       content = <ObjectSetup linkToken={props.linkToken} state={props.state} setState={props.setState} />;
       break;
     default:
-      content = <div />;
+      content = <FinalizeSync linkToken={props.linkToken} state={props.state} setState={props.setState} />;
       break;
   }
 
@@ -107,7 +113,7 @@ const StepBreadcrumb: React.FC<{ content: string, step: number; active: boolean;
   return (
     <div className='tw-flex tw-flex-row tw-justify-center tw-items-center tw-select-none'>
       <div className={classNames('tw-bg-slate-200 tw-rounded-md tw-h-[18px] tw-w-[18px] tw-flex tw-justify-center tw-items-center tw-text-[10px]', active && 'tw-bg-blue-100 tw-text-blue-700')}>{step}</div>
-      <span className={classNames('tw-pl-2', active && 'tw-text-blue-700')}>{content}</span>
+      <span className={classNames('tw-font-medium tw-pl-2', active && 'tw-text-blue-700')}>{content}</span>
     </div>
   );
 };
@@ -126,14 +132,14 @@ export const Footer: React.FC<FooterProps> = props => {
     setLoading(true);
     switch (props.state.step) {
       case 0:
-        props.setState({ ...props.state, step: props.state.step + 2, prevStep: props.state.step });
+        props.setState({ ...props.state, step: props.state.step + 2, skippedSourceSetup: true });
         break;
       case 1:
         await createNewSource(props.linkToken, props.state, props.setState);
         break;
       case 2:
         // TODO: validate
-        props.setState({ ...props.state, step: props.state.step + 1, prevStep: props.state.step });
+        props.setState({ ...props.state, step: props.state.step + 1 });
         break;
       case 3:
         break;
@@ -147,4 +153,10 @@ export const Footer: React.FC<FooterProps> = props => {
       <button onClick={onClick} className='tw-border tw-text-white tw-font-medium tw-bg-slate-700 tw-rounded-md tw-w-28 tw-h-10 tw-ml-auto tw-mr-20'>{loading ? <Loading light /> : "Continue"}</button>
     </div>
   );
+};
+
+export type SetupSyncProps = {
+  linkToken: string;
+  state: SetupSyncState;
+  setState: (state: SetupSyncState) => void;
 };

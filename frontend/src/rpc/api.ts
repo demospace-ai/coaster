@@ -40,6 +40,13 @@ export const GetObjects: IEndpoint<undefined, GetObjectsResponse> = {
     path: '/objects',
 };
 
+export const GetObjectSchema: IEndpoint<{ objectID: number; }, GetSchemaResponse> = {
+    name: 'Object Schema Fetched',
+    method: 'GET',
+    path: '/object/schema',
+    queryParams: ['objectID'],
+};
+
 export const GetSyncs: IEndpoint<undefined, GetSyncsResponse> = {
     name: 'Syncs Fetched',
     method: 'GET',

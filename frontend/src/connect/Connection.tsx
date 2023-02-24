@@ -2,20 +2,15 @@ import classNames from "classnames";
 import React, { FormEvent, useState } from "react";
 import { Button } from "src/components/button/Button";
 import { InfoIcon } from "src/components/icons/Icons";
+import sync from "src/components/images/sync.svg";
 import { getConnectionTypeImg } from "src/components/images/warehouses";
 import { ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { Tooltip } from "src/components/tooltip/Tooltip";
-import { SetupSyncState } from "src/connect/App";
+import { SetupSyncProps, SetupSyncState } from "src/connect/App";
 import { sendRequest } from "src/rpc/ajax";
 import { BigQueryConfig, ConnectionType, getConnectionType, GetSources, LinkCreateSource, LinkCreateSourceRequest, LinkGetSources, MongoDbConfig, RedshiftConfig, SnowflakeConfig, TestDataConnection, TestDataConnectionRequest } from "src/rpc/api";
 import { mutate } from "swr";
-
-type NewConnectionConfigurationProps = {
-  linkToken: string;
-  state: SetupSyncState;
-  setState: (state: SetupSyncState) => void;
-};
 
 export type NewSourceState = {
   success: boolean | null;
@@ -57,7 +52,7 @@ export const INITIAL_SOURCE_STATE: NewSourceState = {
   },
 };
 
-export const NewSourceConfiguration: React.FC<NewConnectionConfigurationProps> = (props) => {
+export const NewSourceConfiguration: React.FC<SetupSyncProps> = (props) => {
   const state = props.state.newSourceState;
   const setState = (newSourceState: NewSourceState) => props.setState({ ...props.state, newSourceState: newSourceState });
   const submit = async (e: FormEvent) => {
@@ -69,6 +64,13 @@ export const NewSourceConfiguration: React.FC<NewConnectionConfigurationProps> =
   if (!connectionType) {
     // TODO: handle error, this should never happen
     return <></>;
+  }
+
+  if (props.state.newSourceState.success) {
+    return <div className="tw-flex tw-flex-col tw-justify-top">
+      <span className="tw-text-center tw-text-2xl tw-font-bold tw-mb-10">Source all setup!</span>
+      <img src={sync} alt="sync success illustration" className="tw-h-[300px]" />
+    </div>;
   }
 
   let inputs: React.ReactElement;
@@ -145,7 +147,7 @@ export const createNewSource = async (
   if (state.newSourceState.success) {
     // TODO: clear success if one of the inputs change and just update the already created source
     // Already created the source, just continue again
-    setState({ ...state, step: state.step + 1, prevStep: state.step });
+    setState({ ...state, step: state.step + 1 });
     return;
   }
 
@@ -180,7 +182,6 @@ export const createNewSource = async (
       ...state,
       source: response.source,
       step: state.step + 1,
-      prevStep: state.step,
       newSourceState: { ...state.newSourceState, success: true },
     });
   } catch (e) {

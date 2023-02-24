@@ -1,5 +1,5 @@
 import { sendLinkTokenRequest, sendRequest } from "src/rpc/ajax";
-import { GetAllUsers, GetAllUsersResponse, GetApiKey, GetColumnValues, GetColumnValuesRequest, GetColumnValuesResponse, GetDestinations, GetDestinationsResponse, GetNamespaces, GetNamespacesResponse, GetObjects, GetObjectsResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetSourcesResponse, GetSyncs, GetSyncsResponse, GetTables, GetTablesResponse, LinkGetNamespaces, LinkGetSources, LinkGetTables } from "src/rpc/api";
+import { GetAllUsers, GetAllUsersResponse, GetApiKey, GetColumnValues, GetColumnValuesRequest, GetColumnValuesResponse, GetDestinations, GetDestinationsResponse, GetNamespaces, GetNamespacesResponse, GetObjects, GetObjectSchema, GetObjectsResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetSourcesResponse, GetSyncs, GetSyncsResponse, GetTables, GetTablesResponse, LinkGetNamespaces, LinkGetSources, LinkGetTables } from "src/rpc/api";
 import useSWR, { Fetcher } from "swr";
 
 export function useApiKey() {
@@ -38,6 +38,20 @@ export function useObjects(linkToken?: string) {
   const fetcher: Fetcher<GetObjectsResponse, {}> = fetchFn;
   const { data, mutate, error } = useSWR({ GetObjects }, fetcher);
   return { objects: data?.objects, mutate, error };
+}
+
+export function useObjectSchema(objectID: number | undefined, linkToken?: string) {
+  let fetchFn;
+  if (linkToken) {
+    fetchFn = () => sendLinkTokenRequest(GetObjectSchema, linkToken);
+  } else {
+    fetchFn = () => sendRequest(GetObjectSchema);
+  }
+
+  const shouldFetch = objectID;
+  const fetcher: Fetcher<GetSchemaResponse, {}> = fetchFn;
+  const { data, mutate, error } = useSWR(shouldFetch ? { GetObjectSchema, objectID } : null, fetcher);
+  return { schema: data?.schema, mutate, error };
 }
 
 export function useNamespaces(connectionID: number | undefined) {
