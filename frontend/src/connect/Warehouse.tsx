@@ -20,7 +20,7 @@ export const WarehouseSelector: React.FC<SetupSyncProps> = (props) => {
 
   return (
     <div className="tw-w-full tw-px-20">
-      <div className="tw-text-center tw-mb-2 tw-text-2xl tw-font-bold">Select your data warehouse</div>
+      <div className="tw-text-center tw-mb-2 tw-text-2xl tw-font-bold">Add a new data source</div>
       <div className="tw-text-center tw-mb-10 tw-text-slate-600">Choose the data warehouse, database, or data lake to connect.</div>
       <div className="tw-flex tw-flex-row tw-gap-5 tw-flex-wrap tw-justify-center">
         <button className={connectionButton} onClick={() => onClick(ConnectionType.Snowflake)}>
