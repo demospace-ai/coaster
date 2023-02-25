@@ -11,7 +11,6 @@ import (
 	"go.fabra.io/server/common/query"
 	"go.fabra.io/server/common/repositories/connections"
 	"go.fabra.io/server/common/repositories/sources"
-	"go.fabra.io/server/common/views"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -48,25 +47,17 @@ func (s ApiService) LinkGetPreview(auth auth.Authentication, w http.ResponseWrit
 		return nil
 	}
 
-	schema, err := s.queryService.GetTableSchema(context.TODO(), connection, getPreviewRequest.Namespace, getPreviewRequest.TableName)
-	if err != nil {
-		return nil
-	}
-
 	query, err := getPreviewQuery(connection.ConnectionType, getPreviewRequest.Namespace, getPreviewRequest.TableName)
 	if err != nil {
 		return nil
 	}
 
-	data, err := s.queryService.RunQuery(context.TODO(), connection, *query)
+	queryResults, err := s.queryService.RunQuery(context.TODO(), connection, *query)
 	if err != nil {
 		return nil
 	}
 
-	return json.NewEncoder(w).Encode(views.QueryResult{
-		Schema: schema,
-		Data:   data,
-	})
+	return json.NewEncoder(w).Encode(queryResults)
 }
 
 func getPreviewQuery(connectionType models.ConnectionType, namespace string, tableName string) (*string, error) {

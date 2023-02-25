@@ -71,7 +71,7 @@ func (qs MockQueryService) GetColumnValues(ctx context.Context, connection *mode
 	return nil, nil
 }
 
-func (qs MockQueryService) RunQuery(ctx context.Context, connection *models.Connection, queryString string) ([]query.Row, error) {
+func (qs MockQueryService) RunQuery(ctx context.Context, connection *models.Connection, queryString string) (*query.QueryResults, error) {
 	return nil, nil
 }
 

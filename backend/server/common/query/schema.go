@@ -17,3 +17,8 @@ var ErrDone = errors.New("no more items in fabra iterator")
 type RowIterator interface {
 	Next() (Row, error)
 }
+
+type QueryResults struct {
+	Data   []Row  `json:"data"`
+	Schema Schema `json:"schema"`
+}

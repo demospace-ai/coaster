@@ -17,6 +17,70 @@ type ValidatedInputProps = {
   label?: string;
 };
 
+
+export const Input: React.FC<ValidatedInputProps> = props => {
+  const [focused, setFocused] = useState(false);
+  let classes = ['tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border hover:tw-border-slate-400 focus:tw-border-slate-700 tw-outline-none', props.className];
+
+  const onKeydown = (event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    event.stopPropagation();
+    if (event.key === 'Escape') {
+      event.currentTarget.blur();
+    }
+  };
+
+  const showLabel = props.label !== undefined && (focused || (props.value !== undefined && props.value.length > 0));
+
+  return (
+    <div className={classNames("tw-relative", props.label && "tw-mt-4")}>
+      <Transition
+        show={showLabel}
+        enter="tw-transition tw-ease tw-duration-200 tw-transform"
+        enterFrom="tw-translate-y-4 tw-opacity-10"
+        enterTo="tw-translate-y-0"
+        leave="tw-transition tw-ease tw-duration-200 tw-transform"
+        leaveFrom="tw-translate-y-0"
+        leaveTo="tw-translate-y-4 tw-opacity-10"
+      >
+        <label
+          htmlFor="name"
+          className="tw-absolute -tw-top-2 tw-left-2 -tw-mt-px tw-inline-block tw-bg-white tw-px-1 tw-text-xs tw-font-medium tw-text-gray-900"
+        >
+          {props.label}
+        </label>
+      </Transition>
+      {props.textarea ?
+        <textarea
+          id={props.id}
+          name={props.id}
+          autoComplete={props.id}
+          placeholder={focused ? undefined : props.placeholder}
+          className={classNames(classes)}
+          onKeyDown={onKeydown}
+          onFocus={() => { setFocused(true); }}
+          onChange={e => props.setValue(e.target.value)}
+          onBlur={() => { setFocused(false); }}
+          value={props.value ? props.value : ""}
+        />
+        :
+        <input
+          type={props.type ? props.type : 'text'}
+          id={props.id}
+          name={props.id}
+          autoComplete={props.id}
+          placeholder={focused ? undefined : props.placeholder}
+          className={classNames(classes)}
+          onKeyDown={onKeydown}
+          onFocus={() => { setFocused(true); }}
+          onChange={e => props.setValue(e.target.value)}
+          onBlur={() => { setFocused(false); }}
+          value={props.value ? props.value : ""}
+        />
+      }
+    </div>
+  );
+};
+
 export const ValidatedInput: React.FC<ValidatedInputProps> = props => {
   const [isValid, setIsValid] = useState(true);
   const [focused, setFocused] = useState(false);

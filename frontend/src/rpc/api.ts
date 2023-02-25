@@ -74,7 +74,7 @@ export const GetSchema: IEndpoint<GetSchemaRequest, GetSchemaResponse> = {
     queryParams: ['connectionID', 'namespace', 'tableName', 'customJoin'],
 };
 
-export const LinkGetPreview: IEndpoint<LinkGetPreviewRequest, LinkGetPreviewResponse> = {
+export const LinkGetPreview: IEndpoint<LinkGetPreviewRequest, QueryResults> = {
     name: 'Get Preview',
     method: 'POST',
     path: '/link/preview',
@@ -378,7 +378,7 @@ export interface LinkGetSchemaRequest {
     customJoin?: string,
 }
 
-export interface LinkGetPreviewResponse {
+export interface QueryResults {
     schema: Schema;
     data: ResultRow[];
 }

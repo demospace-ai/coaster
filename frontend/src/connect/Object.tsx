@@ -64,8 +64,8 @@ export const ObjectSetup: React.FC<SetupSyncProps> = (props) => {
         <SourceNamespaceSelector namespace={props.state.namespace} setNamespace={setNamespace} linkToken={props.linkToken} source={props.state.source} dropdownHeight="tw-max-h-40" />
         <SourceTableSelector tableName={props.state.tableName} setTableName={setTableName} linkToken={props.linkToken} source={props.state.source} namespace={props.state.namespace} dropdownHeight="tw-max-h-40" />
         <div className="tw-flex tw-flex-row tw-mt-4 tw-items-center">
-          <Button className="tw-h-10" onClick={runQuery}>{previewLoading ? <Loading light /> : "Preview"}</Button>
-          <Checkbox.Root checked={limitPreview} onCheckedChange={() => setLimitPreview(!limitPreview)} className={classNames("tw-mx-2 tw-h-5 tw-w-5 tw-bg-white tw-border-[1.2px] tw-border-slate-800 tw-rounded", limitPreview && "tw-bg-slate-100")}>
+          <Button className="tw-h-10 tw-w-32" onClick={runQuery}>{previewLoading ? <Loading light /> : "Preview"}</Button>
+          <Checkbox.Root checked={limitPreview} onCheckedChange={() => setLimitPreview(!limitPreview)} className={classNames("tw-ml-4 tw-mr-2 tw-h-5 tw-w-5 tw-bg-white tw-border-[1.2px] tw-border-slate-800 tw-rounded", limitPreview && "tw-bg-slate-100")}>
             <Checkbox.Indicator>
               <CheckIcon className="tw-stroke-[2]" />
             </Checkbox.Indicator>
@@ -78,7 +78,7 @@ export const ObjectSetup: React.FC<SetupSyncProps> = (props) => {
         {!previewData && !previewSchema && <div className="tw-pb-52"></div>}
       </div>
       {previewData && previewSchema &&
-        <div className="tw-mt-10 tw-h-[800px] tw-max-h-[400px] tw-w-full tw-rounded-md tw-border tw-border-gray-200">
+        <div className="tw-mt-10 tw-h-[400px] tw-max-h-[400px] tw-w-full tw-rounded-md tw-border tw-border-gray-200">
           <MemoizedResultsTable schema={previewSchema} results={previewData} />
           <div className="tw-pb-24"></div>
         </div>

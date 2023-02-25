@@ -25,7 +25,7 @@ const QueryResultsTable: React.FC<QueryResultsProps> = props => {
                     resultRow.map((resultValue, valueIndex) => {
                       return (
                         <td key={valueIndex} className={classNames("tw-pl-3 tw-pr-5 tw-py-2 tw-text-left tw-border-gray-300 tw-border-solid tw-border-r last:tw-border-r-0 last:tw-w-full focus:tw-bg-blue-300")}>
-                          <div className="tw-h-5 tw-whitespace-nowrap">{resultValue}</div>
+                          <div className="tw-h-5 tw-whitespace-nowrap">{JSON.stringify(resultValue)}</div>
                         </td>
                       );
                     })

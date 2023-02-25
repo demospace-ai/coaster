@@ -4,7 +4,7 @@ import { Button } from "src/components/button/Button";
 import { InfoIcon } from "src/components/icons/Icons";
 import sync from "src/components/images/sync.svg";
 import { getConnectionTypeImg } from "src/components/images/warehouses";
-import { ValidatedInput } from "src/components/input/Input";
+import { Input, ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { SetupSyncProps, SetupSyncState } from "src/connect/App";
@@ -321,7 +321,7 @@ const MongoDbInputs: React.FC<ConnectionConfigurationProps> = props => {
       <ValidatedInput id='username' value={state.mongodbConfig.username} setValue={(value) => { props.setState({ ...state, mongodbConfig: { ...state.mongodbConfig, username: value } }); }} placeholder='Username' label="Username" />
       <ValidatedInput id='password' type="password" value={state.mongodbConfig.password} setValue={(value) => { props.setState({ ...state, mongodbConfig: { ...state.mongodbConfig, password: value } }); }} placeholder='Password' label="Password" />
       <ValidatedInput id='host' value={state.mongodbConfig.host} setValue={(value) => { props.setState({ ...state, mongodbConfig: { ...state.mongodbConfig, host: value } }); }} placeholder='Host' label="Host" />
-      <ValidatedInput id='connectionOptions' value={state.mongodbConfig.connection_options} setValue={(value) => { props.setState({ ...state, mongodbConfig: { ...state.mongodbConfig, connection_options: value } }); }} placeholder='Connection Options' label="Connection Options" />
+      <Input id='connectionOptions' value={state.mongodbConfig.connection_options} setValue={(value) => { props.setState({ ...state, mongodbConfig: { ...state.mongodbConfig, connection_options: value } }); }} placeholder='Connection Options (optional)' label="Connection Options (optional)" />
     </>
   );
 };

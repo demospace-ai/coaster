@@ -74,13 +74,13 @@ func (ac BigQueryApiClient) GetTables(ctx context.Context, namespace string) ([]
 func (ac BigQueryApiClient) GetTableSchema(ctx context.Context, namespace string, tableName string) (Schema, error) {
 	queryString := "SELECT * FROM " + namespace + ".INFORMATION_SCHEMA.COLUMNS WHERE table_name = '" + tableName + "'"
 
-	rows, err := ac.RunQuery(ctx, queryString)
+	queryResults, err := ac.RunQuery(ctx, queryString)
 	if err != nil {
 		return nil, err
 	}
 
 	schema := Schema{}
-	for _, row := range rows {
+	for _, row := range queryResults.Data {
 		if row[0] == nil {
 			continue
 		}
@@ -94,13 +94,13 @@ func (ac BigQueryApiClient) GetTableSchema(ctx context.Context, namespace string
 func (ac BigQueryApiClient) GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]Value, error) {
 	queryString := "SELECT DISTINCT " + columnName + " FROM " + namespace + "." + tableName + " LIMIT 50"
 
-	rows, err := ac.RunQuery(ctx, queryString)
+	queryResults, err := ac.RunQuery(ctx, queryString)
 	if err != nil {
 		return nil, err
 	}
 
 	values := []Value{}
-	for _, row := range rows {
+	for _, row := range queryResults.Data {
 		if row[0] == nil {
 			continue
 		}
@@ -136,7 +136,7 @@ func (ac BigQueryApiClient) GetNamespaces(ctx context.Context) ([]string, error)
 	return results, nil
 }
 
-func (ac BigQueryApiClient) RunQuery(ctx context.Context, queryString string, args ...any) ([]Row, error) {
+func (ac BigQueryApiClient) RunQuery(ctx context.Context, queryString string, args ...any) (*QueryResults, error) {
 	client, err := ac.openConnection(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
@@ -185,7 +185,10 @@ func (ac BigQueryApiClient) RunQuery(ctx context.Context, queryString string, ar
 		results = append(results, convertBigQueryRow(row))
 	}
 
-	return results, nil
+	return &QueryResults{
+		Schema: convertBigQuerySchema(it.Schema),
+		Data:   results,
+	}, nil
 }
 
 func (ac BigQueryApiClient) GetQueryIterator(ctx context.Context, queryString string) (RowIterator, error) {
@@ -229,4 +232,19 @@ func convertBigQueryRow(bigQueryRow []bigquery.Value) Row {
 	}
 
 	return row
+}
+
+func convertBigQuerySchema(bigQuerySchema bigquery.Schema) Schema {
+	schema := Schema{}
+
+	for _, bigQuerySchemaField := range bigQuerySchema {
+		columnSchema := ColumnSchema{
+			Name: bigQuerySchemaField.Name,
+			Type: string(bigQuerySchemaField.Type),
+		}
+
+		schema = append(schema, columnSchema)
+	}
+
+	return schema
 }

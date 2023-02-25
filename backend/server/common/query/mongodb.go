@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"reflect"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -18,8 +19,9 @@ type MongoDbApiClient struct {
 }
 
 type MongoDbIterator struct {
-	mongoDbRows  []bson.D
+	mongoDbRows  bson.A
 	currentIndex int
+	schema       Schema
 }
 
 type MongoQuery struct {
@@ -29,7 +31,7 @@ type MongoQuery struct {
 
 func (it *MongoDbIterator) Next() (Row, error) {
 	if it.currentIndex < len(it.mongoDbRows) {
-		row := convertMongoDbRow(it.mongoDbRows[it.currentIndex])
+		row := convertMongoDbRow(it.mongoDbRows[it.currentIndex].(bson.M), it.schema)
 		it.currentIndex = it.currentIndex + 1
 		return row, nil
 	}
@@ -108,7 +110,7 @@ func (sc MongoDbApiClient) GetNamespaces(ctx context.Context) ([]string, error) 
 	return databaseNames, nil
 }
 
-func (sc MongoDbApiClient) RunQuery(ctx context.Context, queryString string, args ...any) ([]Row, error) {
+func (sc MongoDbApiClient) RunQuery(ctx context.Context, queryString string, args ...any) (*QueryResults, error) {
 	client, err := sc.openConnection(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
@@ -129,7 +131,13 @@ func (sc MongoDbApiClient) RunQuery(ctx context.Context, queryString string, arg
 		mongoQuery.Query,
 	).Decode(&result)
 
-	return convertMongoDbRows(result["cursor"].(bson.M)["firstBatch"].([]bson.D)), nil
+	rows := result["cursor"].(bson.M)["firstBatch"].(bson.A)
+	schema := getMongoSchema(rows[0].(bson.M))
+
+	return &QueryResults{
+		Schema: schema,
+		Data:   convertMongoDbRows(rows, schema),
+	}, nil
 }
 
 func (sc MongoDbApiClient) GetQueryIterator(ctx context.Context, queryString string) (RowIterator, error) {
@@ -153,24 +161,30 @@ func (sc MongoDbApiClient) GetQueryIterator(ctx context.Context, queryString str
 		mongoQuery.Query,
 	).Decode(&result)
 
+	rows := result["cursor"].(bson.M)["firstBatch"].(bson.A)
+	schema := getMongoSchema(rows[0].(bson.M))
+
 	return &MongoDbIterator{
+		schema:       schema,
 		currentIndex: 0,
-		mongoDbRows:  result["cursor"].(bson.M)["firstBatch"].([]bson.D),
+		mongoDbRows:  rows,
 	}, nil
 }
 
-func convertMongoDbRows(mongoDbRows []bson.D) []Row {
+func convertMongoDbRows(mongoDbRows bson.A, schema Schema) []Row {
 	var rows []Row
 	for _, mongoDbRow := range mongoDbRows {
-		rows = append(rows, convertMongoDbRow(mongoDbRow))
+		rows = append(rows, convertMongoDbRow(mongoDbRow.(bson.M), schema))
 	}
 
 	return rows
 }
 
-func convertMongoDbRow(mongoDbRow bson.D) Row {
+func convertMongoDbRow(mongoDbRow bson.M, schema Schema) Row {
 	var row Row
-	for _, mongoDbValue := range mongoDbRow.Map() {
+	// make sure every result is in the same order by looping through schema
+	for _, columnName := range schema {
+		mongoDbValue := mongoDbRow[columnName.Name]
 		row = append(row, Value(mongoDbValue))
 	}
 
@@ -261,4 +275,29 @@ func getFieldTypes(collection *mongo.Collection, fields []string) (map[string]st
 	}
 
 	return fieldTypes, nil
+}
+
+func getMongoSchema(firstRow bson.M) Schema {
+	schema := Schema{}
+	for key, value := range firstRow {
+		fieldType := reflect.TypeOf(value).String()
+		fmt.Print(fieldType)
+		switch fieldType {
+		case "primitive.A":
+			fieldType = "array"
+		case "primitive.M":
+			fieldType = "json"
+		case "primitive.ObjectID":
+			fieldType = "objectID"
+		}
+
+		columnSchema := ColumnSchema{
+			Name: key,
+			Type: fieldType,
+		}
+
+		schema = append(schema, columnSchema)
+	}
+
+	return schema
 }
