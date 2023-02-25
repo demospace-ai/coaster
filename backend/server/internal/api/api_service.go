@@ -189,6 +189,12 @@ func (s ApiService) LinkAuthenticatedRoutes() []router.LinkAuthenticatedRoute {
 			HandlerFunc: s.LinkCreateSync,
 		},
 		{
+			Name:        "Get preview",
+			Method:      router.POST,
+			Pattern:     "/api/link/preview",
+			HandlerFunc: s.LinkGetPreview,
+		},
+		{
 			Name:        "Test data connection",
 			Method:      router.POST,
 			Pattern:     "/api/connection/test",

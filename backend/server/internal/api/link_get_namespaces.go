@@ -24,7 +24,7 @@ func (s ApiService) LinkGetNamespaces(auth auth.Authentication, w http.ResponseW
 
 	strSourceId := r.URL.Query().Get("sourceID")
 	if len(strSourceId) == 0 {
-		return fmt.Errorf("missing source ID from GetSourceNamespaces request URL: %s", r.URL.RequestURI())
+		return fmt.Errorf("missing source ID from LinkGetNamespaces request URL: %s", r.URL.RequestURI())
 	}
 
 	sourceId, err := strconv.ParseInt(strSourceId, 10, 64)
@@ -33,6 +33,7 @@ func (s ApiService) LinkGetNamespaces(auth auth.Authentication, w http.ResponseW
 	}
 
 	// TODO: write test to make sure only authorized users can use the data connection
+	// Needed to ensure end customer ID encoded by the link token owns the source/connection
 	source, err := sources.LoadSourceByID(s.db, auth.Organization.ID, auth.LinkToken.EndCustomerID, sourceId)
 	if err != nil {
 		return err

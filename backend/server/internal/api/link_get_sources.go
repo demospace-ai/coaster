@@ -24,6 +24,7 @@ func (s ApiService) LinkGetSources(auth auth.Authentication, w http.ResponseWrit
 	}
 
 	// TODO: write test to make sure only authorized users can use the data connection
+	// Needed to ensure end customer ID encoded by the link token owns the source/connection
 	sources, err := sources.LoadAllSources(s.db, auth.Organization.ID, auth.LinkToken.EndCustomerID)
 	if err != nil {
 		return err

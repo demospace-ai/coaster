@@ -74,6 +74,12 @@ export const GetSchema: IEndpoint<GetSchemaRequest, GetSchemaResponse> = {
     queryParams: ['connectionID', 'namespace', 'tableName', 'customJoin'],
 };
 
+export const LinkGetPreview: IEndpoint<LinkGetPreviewRequest, LinkGetPreviewResponse> = {
+    name: 'Get Preview',
+    method: 'POST',
+    path: '/link/preview',
+};
+
 export const LinkGetSources: IEndpoint<undefined, GetSourcesResponse> = {
     name: 'Sources Fetched',
     method: 'GET',
@@ -269,12 +275,6 @@ export interface JSONObject {
 export interface JSONArray extends Array<JSONValue> { };
 
 export interface ResultRow extends Array<string | number> { }
-export interface QueryResult {
-    success: boolean,
-    error_message: string,
-    schema: Schema,
-    data: ResultRow[],
-}
 
 export interface ColumnSchema {
     name: string;
@@ -283,17 +283,10 @@ export interface ColumnSchema {
 
 export interface Schema extends Array<ColumnSchema> { }
 
-export function toCsvData(queryResult: QueryResult | undefined): (string | number)[][] {
-    if (queryResult) {
-        const header = queryResult.schema.map(columnSchema => columnSchema.name);
-        return [header, ...queryResult.data];
-    }
-
-    return [];
-}
-
-export interface RunQueryRequest {
-    analysis_id: number;
+export interface LinkGetPreviewRequest {
+    source_id: number;
+    namespace: string;
+    table_name: string;
 }
 
 export interface GetColumnValuesRequest {
@@ -383,6 +376,11 @@ export interface LinkGetSchemaRequest {
     namespace?: string,
     tableName?: string,
     customJoin?: string,
+}
+
+export interface LinkGetPreviewResponse {
+    schema: Schema;
+    data: ResultRow[];
 }
 
 export interface GetSchemaResponse {
