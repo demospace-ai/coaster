@@ -4,6 +4,7 @@ import classNames from "classnames";
 import React, { useState } from "react";
 import { Button } from "src/components/button/Button";
 import { InfoIcon } from "src/components/icons/Icons";
+import query from "src/components/images/query.svg";
 import { Loading } from "src/components/loading/Loading";
 import { MemoizedResultsTable } from "src/components/queryResults/QueryResults";
 import { ObjectSelector, SourceNamespaceSelector, SourceTableSelector } from "src/components/selector/Selector";
@@ -53,14 +54,14 @@ export const ObjectSetup: React.FC<SetupSyncProps> = (props) => {
   };
 
   return (
-    <div className="tw-w-full tw-px-20 tw-flex tw-flex-col tw-items-center">
-      <div className="tw-text-center tw-mb-8 tw-text-2xl tw-font-bold">Define the data model to sync</div>
+    <div className="tw-w-full tw-px-28 tw-flex tw-flex-col">
+      <div className="tw-mb-5 tw-text-2xl tw-font-semibold tw-text-slate-900">Define the data model to sync</div>
       <div className="tw-w-[50%] tw-min-w-[400px] tw-h-full">
-        <div className="tw-text-base tw-font-semibold tw-mb-1">Select object to create</div>
-        <div className="tw-text-slate-600">This is the object that will be created from the data you define in this sync configuration.</div>
+        <div className="tw-text-base tw-font-medium tw-mb-1 tw-text-slate-800">Select object to create</div>
+        <div className="tw-text-slate-600 tw-text-sm">This is the object that will be created from the data you define in this sync configuration.</div>
         <ObjectSelector object={props.state.object} setObject={setObject} linkToken={props.linkToken} />
-        <div className="tw-text-base tw-font-semibold tw-mt-8 tw-mb-1">Select a table to sync from</div>
-        <div className="tw-text-slate-600">This is where the data will be pulled from in your own data warehouse.</div>
+        <div className="tw-text-base tw-font-medium tw-mt-8 tw-mb-1 tw-text-slate-800">Select a table to sync from</div>
+        <div className="tw-text-slate-600 tw-text-sm">This is where the data will be pulled from in your own data warehouse.</div>
         <SourceNamespaceSelector namespace={props.state.namespace} setNamespace={setNamespace} linkToken={props.linkToken} source={props.state.source} dropdownHeight="tw-max-h-40" />
         <SourceTableSelector tableName={props.state.tableName} setTableName={setTableName} linkToken={props.linkToken} source={props.state.source} namespace={props.state.namespace} dropdownHeight="tw-max-h-40" />
         <div className="tw-flex tw-flex-row tw-mt-4 tw-items-center">
@@ -75,14 +76,23 @@ export const ObjectSetup: React.FC<SetupSyncProps> = (props) => {
             <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
           </Tooltip>
         </div>
-        {!previewData && !previewSchema && <div className="tw-pb-52"></div>}
       </div>
-      {previewData && previewSchema &&
-        <div className="tw-mt-10 tw-h-[400px] tw-max-h-[400px] tw-w-full tw-rounded-md tw-border tw-border-gray-200">
+      <div className="tw-mt-10 tw-h-full tw-max-h-[400px] tw-w-full tw-rounded-md tw-border tw-border-gray-200">
+        {previewData && previewSchema ?
           <MemoizedResultsTable schema={previewSchema} results={previewData} />
-          <div className="tw-pb-24"></div>
-        </div>
-      }
+          :
+          <div className="tw-h-full tw-w-full tw-rounded-md tw-bg-slate-50 tw-justify-center tw-items-center tw-text-center tw-flex tw-flex-col">
+            <img src={query} alt="query results placeholder" className="tw-h-20 tw-mb-3"></img>
+            <div className="tw-text-xl tw-font-semibold tw-mb-1 tw-text-slate-600">
+              Preview your data
+            </div>
+            <div className="tw-text-slate-500">
+              A preview of the resulting rows will appear here!
+            </div>
+          </div>
+        }
+        <div className="tw-pb-24"></div>
+      </div>
     </div >
   );
 };

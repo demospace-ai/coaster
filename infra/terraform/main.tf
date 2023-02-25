@@ -502,7 +502,7 @@ resource "google_compute_router" "fabra-ip-router" {
 }
 
 resource "google_compute_address" "egress-ip-address" {
-  name     = "egress-statis-ip"
+  name     = "egress-static-ip"
   region   = "us-west1"
 }
 
@@ -512,7 +512,10 @@ resource "google_compute_router_nat" "fabra-nat" {
   region   = "us-west1"
 
   nat_ip_allocate_option = "MANUAL_ONLY"
-  nat_ips                = [google_compute_address.egress-ip-address.self_link]
+  nat_ips                = [
+    google_compute_address.egress-ip-address.self_link,
+  ]
 
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
 }
+

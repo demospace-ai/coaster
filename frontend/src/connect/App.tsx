@@ -1,3 +1,4 @@
+import { CheckIcon } from '@heroicons/react/24/outline';
 import classNames from 'classnames';
 import React, { useState } from 'react';
 import { Loading } from 'src/components/loading/Loading';
@@ -95,10 +96,10 @@ const Header: React.FC<{ close: () => void; state: SetupSyncState; }> = ({ close
   return (
     <div className='tw-flex tw-flex-row tw-items-center tw-w-full tw-h-20 tw-min-h-[80px] tw-border-b tw-border-slate-200'>
       <div className='tw-flex tw-flex-row tw-gap-10 tw-justify-center tw-items-center tw-w-full'>
-        <StepBreadcrumb step={1} content="Select source" active={state.step === 0} />
-        <StepBreadcrumb step={2} content="Connect source" active={state.step === 1} />
-        <StepBreadcrumb step={3} content="Define model" active={state.step === 2} />
-        <StepBreadcrumb step={4} content="Finalize sync" active={state.step === 3} />
+        <StepBreadcrumb step={1} content="Select source" active={state.step === 0} complete={state.step > 0} />
+        <StepBreadcrumb step={2} content="Connect source" active={state.step === 1} complete={state.step > 1} />
+        <StepBreadcrumb step={3} content="Define model" active={state.step === 2} complete={state.step > 2} />
+        <StepBreadcrumb step={4} content="Finalize sync" active={state.step === 3} complete={state.step > 3} />
       </div>
       <button className="tw-absolute tw-flex tw-items-center t tw-right-10 tw-border-none tw-cursor-pointer tw-p-0" onClick={close}>
         <svg className='tw-h-6 tw-fill-slate-500' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
@@ -109,10 +110,10 @@ const Header: React.FC<{ close: () => void; state: SetupSyncState; }> = ({ close
   );
 };
 
-const StepBreadcrumb: React.FC<{ content: string, step: number; active: boolean; }> = ({ step, content, active }) => {
+const StepBreadcrumb: React.FC<{ content: string, step: number; active: boolean; complete: boolean; }> = ({ step, content, active, complete }) => {
   return (
     <div className='tw-flex tw-flex-row tw-justify-center tw-items-center tw-select-none'>
-      <div className={classNames('tw-bg-slate-200 tw-rounded-md tw-h-[18px] tw-w-[18px] tw-flex tw-justify-center tw-items-center tw-text-[10px]', active && 'tw-bg-blue-100 tw-text-blue-700')}>{step}</div>
+      <div className={classNames('tw-bg-slate-200 tw-rounded-md tw-h-[18px] tw-w-[18px] tw-flex tw-justify-center tw-items-center tw-text-[10px]', active && 'tw-bg-blue-100 tw-text-blue-700', complete && 'tw-bg-green-100 tw-text-green-800')}>{complete ? <CheckIcon className='tw-h-3' /> : step}</div>
       <span className={classNames('tw-font-medium tw-pl-2', active && 'tw-text-blue-700')}>{content}</span>
     </div>
   );
@@ -148,9 +149,9 @@ export const Footer: React.FC<FooterProps> = props => {
   };
 
   return (
-    <div className='tw-flex tw-flex-row tw-w-full tw-h-20 tw-min-h-[80px] tw-border-t tw-border-slate-200 tw-mt-auto tw-items-center'>
-      <button className='tw-border tw-border-slate-300 tw-font-medium tw-rounded-md tw-w-20 tw-h-10 tw-ml-20' onClick={props.back}>Back</button>
-      <button onClick={onClick} className='tw-border tw-text-white tw-font-medium tw-bg-slate-700 tw-rounded-md tw-w-28 tw-h-10 tw-ml-auto tw-mr-20'>{loading ? <Loading light /> : "Continue"}</button>
+    <div className='tw-flex tw-flex-row tw-w-full tw-h-20 tw-min-h-[80px] tw-border-t tw-border-slate-200 tw-mt-auto tw-items-center tw-px-28'>
+      <button className='tw-border tw-border-slate-300 tw-font-medium tw-rounded-md tw-w-32 tw-h-10' onClick={props.back}>Back</button>
+      <button onClick={onClick} className='tw-border tw-text-white tw-font-medium tw-bg-slate-700 tw-rounded-md tw-w-32 tw-h-10 tw-ml-auto'>{loading ? <Loading light /> : "Continue"}</button>
     </div>
   );
 };

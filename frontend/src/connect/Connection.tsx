@@ -90,16 +90,35 @@ export const NewSourceConfiguration: React.FC<SetupSyncProps> = (props) => {
   };
 
   return (
-    <div className="tw-w-[500px] tw-flex tw-flex-col">
-      <div className="tw-flex tw-justify-center tw-items-center tw-text-center tw-mb-2 tw-text-2xl tw-font-bold">
+    <div className="tw-px-28 tw-flex tw-flex-col tw-w-full">
+      <div className="tw-flex tw-mb-2 tw-text-2xl tw-font-semibold tw-text-slate-900">
         <img src={getConnectionTypeImg(connectionType)} alt="icon" className="tw-h-8 tw-mr-1.5" />
         Connect to {getConnectionType(connectionType)}
       </div>
-      <div className="tw-text-center tw-mb-2 tw-text-slate-600">Provide the settings and credentials for your data source.</div>
-      <form className="tw-pb-16" onSubmit={submit}>
-        {inputs}
-        <TestConnectionButton state={state} connectionType={connectionType} />
-      </form >
+      <div className="tw-flex tw-flex-row">
+        <form className="tw-pb-16 tw-w-[500px]" onSubmit={submit}>
+          <div className="tw-mb-4 tw-text-slate-600">Provide the settings and credentials for your data source.</div>
+          {inputs}
+          <TestConnectionButton state={state} connectionType={connectionType} />
+        </form>
+        <div className="tw-w-72 tw-ml-auto tw-text-xs tw-leading-5 tw-border-l tw-border-slate-200 tw-h-fit tw-py-2 tw-pl-8">
+          <div className="">
+            <div className="tw-text-[13px] tw-mb-1 tw-font-medium">Read our docs</div>
+            Not sure where to start? Check out <a href="docs.fabra.io" className="tw-text-blue-500">the docs</a> for step-by-step instructions.
+          </div>
+          <div className="tw-my-5 tw-py-5 tw-border-y tw-border-slate-200">
+            <div className="tw-text-[13px] tw-mb-1 tw-font-medium">Allowed IPs</div>
+            If your warehouse is behind a firewall/private network, please add the following static IP addresses:
+            <ul className="tw-mt-1">
+              <li>• 34.145.25.122</li>
+            </ul>
+          </div>
+          <div>
+            <div className="tw-text-[13px] tw-mb-1 tw-font-medium">Contact support</div>
+            We're here to help! <a href="mailto:help@fabra.io" className="tw-text-blue-500">Reach out</a> if you feel stuck or have any questions.
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
@@ -233,7 +252,7 @@ const TestConnectionButton: React.FC<{ state: NewSourceState, connectionType: Co
 
   const testColor = testConnectionSuccess === null ? null : testConnectionSuccess ? "tw-bg-green-700" : "tw-bg-red-700";
   return (
-    <Button className={classNames("tw-mt-8 tw-bg-slate-200 tw-text-slate-900 hover:tw-bg-slate-300 tw-border-slate-200 tw-w-full tw-h-10", testColor)} onClick={testConnection}>{testLoading ? <Loading /> : "Test"}</Button>
+    <Button className={classNames("tw-mt-8 tw-bg-slate-200 tw-text-slate-900 hover:tw-bg-slate-300 tw-border-slate-200 tw-w-48 tw-h-10", testColor)} onClick={testConnection}>{testLoading ? <Loading /> : "Test"}</Button>
   );
 };
 
