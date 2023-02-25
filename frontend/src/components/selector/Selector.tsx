@@ -88,6 +88,7 @@ type SourceSelectorProps = {
   placeholder?: string;
   validated?: boolean;
   linkToken: string;
+  dropdownHeight?: string;
 };
 
 export const SourceSelector: React.FC<SourceSelectorProps> = props => {
@@ -103,7 +104,9 @@ export const SourceSelector: React.FC<SourceSelectorProps> = props => {
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No sources available!"}
     placeholder={props.placeholder ? props.placeholder : "Choose source"}
     label="Source"
-    validated={props.validated} />;
+    validated={props.validated}
+    dropdownHeight={props.dropdownHeight}
+  />;
 };
 
 type SourceNamespaceSelectorProps = {

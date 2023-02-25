@@ -49,7 +49,7 @@ export const WarehouseSelector: React.FC<SetupSyncProps> = (props) => {
       </div>
       <div className="tw-flex tw-flex-row tw-items-center tw-justify-center tw-w-full tw-pb-16">
         <div className="tw-w-96">
-          <SourceSelector source={props.state.source} setSource={setSource} linkToken={props.linkToken} />
+          <SourceSelector source={props.state.source} setSource={setSource} linkToken={props.linkToken} dropdownHeight="tw-max-h-[128px]" />
         </div>
       </div>
     </div>
