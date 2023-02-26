@@ -42,14 +42,14 @@ export const WarehouseSelector: React.FC<SetupSyncProps> = (props) => {
           MongoDB
         </button>
       </div>
-      <div className="tw-text-center tw-font-bold tw-text-lg tw-mt-8 tw-mb-4 tw-text-slate-700">or</div>
+      <div className="tw-text-center tw-font-bold tw-text-lg tw-mt-8 tw-mb-2 tw-text-slate-700">or</div>
       <div className="tw-text-2xl tw-font-semibold tw-text-slate-900 tw-flex tw-flex-row tw-items-center">
         Choose an existing source
         <Tooltip place="right" maxWidth="500px" label="If you've already setup a source, you can sync additional tables from it.">
           <InfoIcon className="tw-ml-1.5 tw-h-3.5 tw-fill-slate-400" />
         </Tooltip>
       </div>
-      <div className="tw-flex tw-flex-row tw-items-center tw-justify-center tw-w-full tw-pb-16">
+      <div className="tw-flex tw-flex-row tw-items-center tw-justify-center tw-w-full tw-pb-4">
         <div className="tw-w-full">
           <SourceTable linkToken={props.linkToken} setExistingSource={setExistingSource} />
         </div>
@@ -61,40 +61,38 @@ export const WarehouseSelector: React.FC<SetupSyncProps> = (props) => {
 const SourceTable: React.FC<{ linkToken: string; setExistingSource: (source: Source) => void; }> = ({ linkToken, setExistingSource }) => {
   const { sources } = useLinkSources(linkToken);
   return (
-    <div className="tw-mt-8 tw-flow-root">
-      <div className="tw--my-2 tw--mx-4 tw-overflow-x-auto sm:tw--mx-6 lg:tw--mx-8">
-        <div className="tw-inline-block tw-min-w-full tw-py-2 tw-align-middle sm:tw-px-6 lg:tw-px-8">
-          <div className="tw-overflow-hidden tw-shadow tw-ring-1 tw-ring-black tw-ring-opacity-5 sm:tw-rounded-lg">
-            <table className="tw-min-w-full tw-divide-y tw-divide-gray-300">
-              <thead className="tw-bg-gray-50">
-                <tr>
-                  <th scope="col" className="tw-py-3.5 tw-pl-4 tw-pr-3 tw-text-left tw-text-sm tw-font-semibold tw-text-gray-900 sm:tw-pl-6">
-                    Name
-                  </th>
-                  <th scope="col" className="tw-px-3 tw-py-3.5 tw-text-left tw-text-sm tw-font-semibold tw-text-gray-900">
-                    Connection Type
-                  </th>
-                  <th scope="col" className="tw-relative tw-py-3.5 tw-pl-3">
-                    <span className="tw-sr-only">Continue</span>
-                  </th>
+    <div className="tw-mt-6 tw-flow-root">
+      <div className="tw-inline-block tw-min-w-full tw-py-2 tw-align-middle">
+        <div className="tw-overflow-auto tw-shadow tw-ring-1 tw-ring-black tw-ring-opacity-5 tw-rounded-md">
+          <table className="tw-min-w-full tw-divide-y tw-divide-gray-300">
+            <thead className="tw-bg-gray-50">
+              <tr>
+                <th scope="col" className="tw-py-3.5 tw-pl-4 tw-pr-3 tw-text-left tw-text-sm tw-font-semibold tw-text-gray-900">
+                  Name
+                </th>
+                <th scope="col" className="tw-px-3 tw-py-3.5 tw-text-left tw-text-sm tw-font-semibold tw-text-gray-900">
+                  Connection Type
+                </th>
+                <th scope="col" className="tw-relative tw-py-3.5 tw-pl-3">
+                  <span className="tw-sr-only">Continue</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody className="tw-divide-y tw-divide-gray-200 tw-bg-white">
+              {sources && sources.map((source) => (
+                <tr key={source.id} className="tw-cursor-pointer hover:tw-bg-slate-100" onClick={() => setExistingSource(source)}>
+                  <td className="tw-whitespace-nowrap tw-py-4 tw-pl-4 tw-pr-3 tw-text-sm tw-font-medium tw-text-gray-900 tw-flex tw-flex-row tw-items-center">
+                    <img className="tw-mr-2 tw-h-5" src={getConnectionTypeImg(source.connection.connection_type)} alt="warehouse icon" />
+                    {source.display_name}
+                  </td>
+                  <td className="tw-whitespace-nowrap tw-px-3 tw-py-4 tw-text-sm tw-text-gray-500">{source.connection.connection_type}</td>
+                  <td className="tw-pr-4" align="right">
+                    <ChevronRightIcon className="tw-h-4 tw-w-4 tw-text-gray-400" aria-hidden="true" />
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="tw-divide-y tw-divide-gray-200 tw-bg-white">
-                {sources && sources.map((source) => (
-                  <tr key={source.id} className="tw-cursor-pointer hover:tw-bg-slate-100" onClick={() => setExistingSource(source)}>
-                    <td className="tw-whitespace-nowrap tw-py-4 tw-pl-4 tw-pr-3 tw-text-sm tw-font-medium tw-text-gray-900 sm:tw-pl-6 tw-flex tw-flex-row tw-items-center">
-                      <img className="tw-mr-2 tw-h-5" src={getConnectionTypeImg(source.connection.connection_type)} alt="warehouse icon" />
-                      {source.display_name}
-                    </td>
-                    <td className="tw-whitespace-nowrap tw-px-3 tw-py-4 tw-text-sm tw-text-gray-500">{source.connection.connection_type}</td>
-                    <td className="tw-pr-4" align="right">
-                      <ChevronRightIcon className="tw-h-4 tw-w-4 tw-text-gray-400" aria-hidden="true" />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

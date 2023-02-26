@@ -9,11 +9,11 @@ type Sync struct {
 	DestinationID  int64               `json:"destination_id"`
 	SourceID       int64               `json:"source_id"`
 	ObjectID       int64               `json:"object_id"`
-	Namespace      *string             `json:"namespace,omitempty"`
-	TableName      *string             `json:"table_name,omitempty"`
-	CustomJoin     *string             `json:"custom_join,omitempty"`
-	CursorField    *string             `json:"cursor_field,omitempty"`
-	PrimaryKey     *string             `json:"primary_key,omitempty"`
+	Namespace      string              `json:"namespace,omitempty"`
+	TableName      string              `json:"table_name,omitempty"`
+	CustomJoin     string              `json:"custom_join,omitempty"`
+	CursorField    string              `json:"cursor_field,omitempty"`
+	PrimaryKey     string              `json:"primary_key,omitempty"`
 	SyncMode       models.SyncMode     `json:"sync_mode"`
 	Frequency      int64               `json:"frequency"`
 	FieldMappings  []SyncFieldMappings `json:"field_mappings"`
@@ -46,19 +46,19 @@ func ConvertSync(sync *models.Sync, fieldMappings []models.SyncFieldMapping) Syn
 	syncView.FieldMappings = fieldMappingsView
 
 	if sync.Namespace.Valid {
-		syncView.Namespace = &sync.Namespace.String
+		syncView.Namespace = sync.Namespace.String
 	}
 	if sync.TableName.Valid {
-		syncView.TableName = &sync.TableName.String
+		syncView.TableName = sync.TableName.String
 	}
 	if sync.CustomJoin.Valid {
-		syncView.CustomJoin = &sync.CustomJoin.String
+		syncView.CustomJoin = sync.CustomJoin.String
 	}
 	if sync.CursorField.Valid {
-		syncView.CursorField = &sync.CursorField.String
+		syncView.CursorField = sync.CursorField.String
 	}
 	if sync.PrimaryKey.Valid {
-		syncView.PrimaryKey = &sync.PrimaryKey.String
+		syncView.PrimaryKey = sync.PrimaryKey.String
 	}
 
 	return syncView

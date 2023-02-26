@@ -1,22 +1,10 @@
 import { Combobox, Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import classNames from "classnames";
-import { Fragment, HTMLInputTypeAttribute, useRef, useState } from "react";
+import { Fragment, HTMLInputTypeAttribute, InputHTMLAttributes, useRef, useState } from "react";
 import { Loading } from "src/components/loading/Loading";
 
 const UNSET: any = { "undefined": true };
-
-type ValidatedInputProps = {
-  id: string;
-  placeholder?: string;
-  value: string | undefined;
-  setValue: (value: string) => void;
-  className?: string;
-  textarea?: boolean;
-  type?: HTMLInputTypeAttribute;
-  label?: string;
-};
-
 
 export const Input: React.FC<ValidatedInputProps> = props => {
   const [focused, setFocused] = useState(false);
@@ -29,7 +17,7 @@ export const Input: React.FC<ValidatedInputProps> = props => {
     }
   };
 
-  const showLabel = props.label !== undefined && (focused || (props.value !== undefined && props.value.length > 0));
+  const showLabel = props.label !== undefined && (focused || (props.value !== undefined && (props.value !== "string" || props.value.length > 0)));
 
   return (
     <div className={classNames("tw-relative", props.label && "tw-mt-4")}>
@@ -81,10 +69,20 @@ export const Input: React.FC<ValidatedInputProps> = props => {
   );
 };
 
+interface ValidatedInputProps extends InputHTMLAttributes<HTMLInputElement> {
+  placeholder?: string;
+  setValue: (value: any) => void;
+  className?: string;
+  textarea?: boolean;
+  type?: HTMLInputTypeAttribute;
+  label?: string;
+};
+
 export const ValidatedInput: React.FC<ValidatedInputProps> = props => {
+  const { id, value, placeholder, setValue, className, textarea, type, label, ...other } = props;
   const [isValid, setIsValid] = useState(true);
   const [focused, setFocused] = useState(false);
-  let classes = ['tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border hover:tw-border-slate-400 focus:tw-border-slate-700 tw-outline-none', props.className];
+  let classes = ['tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border hover:tw-border-slate-400 focus:tw-border-slate-700 tw-outline-none', className];
   if (!isValid) {
     classes.push('tw-border-red-600');
   }
@@ -96,16 +94,20 @@ export const ValidatedInput: React.FC<ValidatedInputProps> = props => {
     }
   };
 
-  const validateNotEmpty = (value: string | undefined): boolean => {
+  const validateNotEmpty = (value: string | number | readonly string[] | undefined): boolean => {
+    if (typeof value === "number") {
+      return true;
+    }
+
     const valid = value !== undefined && value.length > 0;
     setIsValid(valid);
     return valid;
   };
 
-  const showLabel = props.label !== undefined && (focused || (props.value !== undefined && props.value.length > 0));
+  const showLabel = label !== undefined && (focused || (value !== undefined && (value !== "string" || value.length > 0)));
 
   return (
-    <div className={classNames("tw-relative", props.label && "tw-mt-4")}>
+    <div className={classNames("tw-relative", label && "tw-mt-4")}>
       <Transition
         show={showLabel}
         enter="tw-transition tw-ease tw-duration-200 tw-transform"
@@ -119,35 +121,34 @@ export const ValidatedInput: React.FC<ValidatedInputProps> = props => {
           htmlFor="name"
           className="tw-absolute -tw-top-2 tw-left-2 -tw-mt-px tw-inline-block tw-bg-white tw-px-1 tw-text-xs tw-font-medium tw-text-gray-900"
         >
-          {props.label}
+          {label}
         </label>
       </Transition>
-      {props.textarea ?
+      {textarea ?
         <textarea
-          id={props.id}
-          name={props.id}
-          autoComplete={props.id}
-          placeholder={focused ? undefined : props.placeholder}
+          id={id}
+          name={id}
+          autoComplete={id}
+          placeholder={focused ? undefined : placeholder}
           className={classNames(classes)}
           onKeyDown={onKeydown}
           onFocus={() => { setIsValid(true); setFocused(true); }}
-          onChange={e => props.setValue(e.target.value)}
-          onBlur={() => { validateNotEmpty(props.value); setFocused(false); }}
-          value={props.value ? props.value : ""}
+          onChange={e => setValue(e.target.value)}
+          onBlur={() => { validateNotEmpty(value); setFocused(false); }}
+          value={value ? value : ""}
         />
         :
         <input
-          type={props.type ? props.type : 'text'}
-          id={props.id}
-          name={props.id}
-          autoComplete={props.id}
-          placeholder={focused ? undefined : props.placeholder}
+          type={type ? type : 'text'}
+          name={id}
+          autoComplete={id}
+          placeholder={focused ? undefined : placeholder}
           className={classNames(classes)}
           onKeyDown={onKeydown}
           onFocus={() => { setIsValid(true); setFocused(true); }}
-          onChange={e => props.setValue(e.target.value)}
-          onBlur={() => { validateNotEmpty(props.value); setFocused(false); }}
-          value={props.value ? props.value : ""}
+          onChange={e => setValue(e.target.value)}
+          onBlur={() => { validateNotEmpty(value); setFocused(false); }}
+          {...other}
         />
       }
     </div>

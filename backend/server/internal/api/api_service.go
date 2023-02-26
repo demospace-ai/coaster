@@ -153,6 +153,12 @@ func (s ApiService) LinkAuthenticatedRoutes() []router.LinkAuthenticatedRoute {
 			HandlerFunc: s.GetObjects,
 		},
 		{
+			Name:        "Get object",
+			Method:      router.GET,
+			Pattern:     "/api/object",
+			HandlerFunc: s.GetObject,
+		},
+		{
 			Name:        "Get all sources",
 			Method:      router.GET,
 			Pattern:     "/api/link/sources",

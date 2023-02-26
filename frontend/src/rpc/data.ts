@@ -1,5 +1,5 @@
 import { sendLinkTokenRequest, sendRequest } from "src/rpc/ajax";
-import { GetAllUsers, GetAllUsersResponse, GetApiKey, GetColumnValues, GetColumnValuesRequest, GetColumnValuesResponse, GetDestinations, GetDestinationsResponse, GetNamespaces, GetNamespacesResponse, GetObjects, GetObjectSchema, GetObjectsResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetSourcesResponse, GetSyncs, GetSyncsResponse, GetTables, GetTablesResponse, LinkGetNamespaces, LinkGetSources, LinkGetTables } from "src/rpc/api";
+import { GetAllUsers, GetAllUsersResponse, GetApiKey, GetColumnValues, GetColumnValuesRequest, GetColumnValuesResponse, GetDestinations, GetDestinationsResponse, GetNamespaces, GetNamespacesResponse, GetObject, GetObjectResponse, GetObjects, GetObjectsResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetSourcesResponse, GetSyncs, GetSyncsResponse, GetTables, GetTablesResponse, LinkGetNamespaces, LinkGetSources, LinkGetTables } from "src/rpc/api";
 import useSWR, { Fetcher } from "swr";
 
 export function useApiKey() {
@@ -40,18 +40,18 @@ export function useObjects(linkToken?: string) {
   return { objects: data?.objects, mutate, error };
 }
 
-export function useObjectSchema(objectID: number | undefined, linkToken?: string) {
+export function useObject(objectID: number | undefined, linkToken?: string) {
   let fetchFn;
   if (linkToken) {
-    fetchFn = () => sendLinkTokenRequest(GetObjectSchema, linkToken);
+    fetchFn = (payload: { objectID: number; }) => sendLinkTokenRequest(GetObject, linkToken, payload);
   } else {
-    fetchFn = () => sendRequest(GetObjectSchema);
+    fetchFn = (payload: { objectID: number; }) => sendRequest(GetObject, payload);
   }
 
   const shouldFetch = objectID;
-  const fetcher: Fetcher<GetSchemaResponse, {}> = fetchFn;
-  const { data, mutate, error } = useSWR(shouldFetch ? { GetObjectSchema, objectID } : null, fetcher);
-  return { schema: data?.schema, mutate, error };
+  const fetcher: Fetcher<GetObjectResponse, { objectID: number; }> = fetchFn;
+  const { data, mutate, error } = useSWR(shouldFetch ? { GetObject, objectID } : null, fetcher);
+  return { object: data?.object, mutate, error };
 }
 
 export function useNamespaces(connectionID: number | undefined) {

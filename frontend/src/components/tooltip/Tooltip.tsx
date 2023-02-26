@@ -10,11 +10,12 @@ export interface TooltipProps extends TippyProps {
 };
 
 export const Tooltip: React.FC<TooltipProps> = props => {
-  const place = props.place ? props.place : "bottom";
+  const { place, label, ...other } = props;
+  const placement = props.place ? props.place : "bottom";
 
   return (
     <>
-      <Tippy content={props.label} placement={place} delay={0} duration={100} {...props}>
+      <Tippy content={props.label} placement={placement} delay={0} duration={100} {...other}>
         <div>
           {props.children}
         </div>

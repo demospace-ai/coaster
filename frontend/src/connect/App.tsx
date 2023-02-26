@@ -53,7 +53,7 @@ export const App: React.FC = () => {
   // TODO: pull all child state out to a reducer or redux store here so state isn't lost on navigation
   return (
     <div className='tw-fixed tw-bg-[rgb(0,0,0,0.2)] tw-w-full tw-h-full'>
-      <div className='tw-fixed tw-bg-white tw-flex tw-flex-col tw-w-[70%] tw-h-[70%] tw-top-[48%] tw-left-1/2 -tw-translate-y-1/2 -tw-translate-x-1/2 tw-rounded-lg tw-shadow-modal tw-items-center'>
+      <div id="fabra-connect" className='tw-fixed tw-bg-white tw-flex tw-flex-col tw-w-[70%] tw-h-[75%] tw-top-[50%] tw-left-1/2 -tw-translate-y-1/2 -tw-translate-x-1/2 tw-rounded-lg tw-shadow-modal tw-items-center'>
         <Header close={close} state={state} />
         <AppContent linkToken={linkToken} state={state} setState={setState} />
         <Footer back={back} linkToken={linkToken} state={state} setState={setState} />

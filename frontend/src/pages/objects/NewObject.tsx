@@ -1,27 +1,39 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BackButton, Button } from "src/components/button/Button";
-import { ValidatedComboInput, ValidatedInput } from "src/components/input/Input";
+import { Checkbox } from "src/components/checkbox/Checkbox";
+import { Input, ValidatedComboInput, ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { DestinationSelector, NamespaceSelector, TableSelector } from "src/components/selector/Selector";
 import { sendRequest } from "src/rpc/ajax";
-import { ColumnSchema, CreateObject, CreateObjectRequest, Destination, GetObjects } from "src/rpc/api";
+import { ColumnSchema, CreateObject, CreateObjectRequest, Destination, GetObjects, ObjectField } from "src/rpc/api";
 import { useSchema } from "src/rpc/data";
 import { mutate } from "swr";
 
+enum Step {
+  Initial,
+  FieldMapping,
+}
+
 type NewObjectState = {
+  step: Step;
   displayName: string | undefined;
   destination: Destination | undefined;
   namespace: string | undefined;
   tableName: string | undefined;
-  customerIdColumn: ColumnSchema | undefined;
+  endCustomerIdColumn: ColumnSchema | undefined;
+  fieldsInitialized: boolean;
+  objectFields: ObjectField[];
 };
 
-const INITIAL_DATASET_STATE: NewObjectState = {
+const INITIAL_OBJECT_STATE: NewObjectState = {
+  step: Step.Initial,
   displayName: undefined,
   destination: undefined,
   namespace: undefined,
   tableName: undefined,
-  customerIdColumn: undefined,
+  endCustomerIdColumn: undefined,
+  fieldsInitialized: false,
+  objectFields: [],
 };
 
 const validateAll = (state: NewObjectState): boolean => {
@@ -30,34 +42,153 @@ const validateAll = (state: NewObjectState): boolean => {
     && state.destination !== undefined
     && state.namespace !== undefined && state.namespace.length > 0
     && state.tableName !== undefined && state.tableName.length > 0
-    && state.customerIdColumn !== undefined;
+    && state.endCustomerIdColumn !== undefined;
 };
 
 export const NewObject: React.FC<{ onComplete: () => void; }> = props => {
-  const [state, setState] = useState<NewObjectState>(INITIAL_DATASET_STATE);
+  const [state, setState] = useState<NewObjectState>(INITIAL_OBJECT_STATE);
+
+  let content: React.ReactElement;
+  let back: () => void;
+  switch (state.step) {
+    case Step.Initial:
+      content = <NewObjectForm state={state} setState={setState} />;
+      // TODO: prompt if they want to exit here
+      back = props.onComplete;
+      break;
+    case Step.FieldMapping:
+      content = <ObjectFields state={state} setState={setState} onComplete={props.onComplete} />;
+      back = () => setState({ ...state, step: Step.Initial });
+      break;
+  }
 
   return (
-    <>
-      <BackButton className="tw-mt-3" onClick={props.onComplete} />
-      <div className='tw-flex tw-flex-col tw-w-[900px] tw-py-12 tw-px-10 tw-mx-auto tw-mb-20 tw-mt-8 tw-bg-white tw-rounded-lg tw-shadow-md tw-items-center'>
-        <NewObjectForm state={state} setState={setState} onComplete={props.onComplete} />
+    <div className="tw-h-full tw-pb-20 tw-pt-3">
+      <BackButton onClick={back} />
+      <div className='tw-flex tw-flex-col tw-w-[900px] tw-max-h-full tw-mt-8 tw-py-12 tw-px-10 tw-mx-auto tw-bg-white tw-rounded-lg tw-shadow-md tw-items-center tw-overflow-auto'>
+        {content}
       </div>
-    </>
+    </div>
   );
 };
 
 type NewObjectFormProps = {
   state: NewObjectState;
   setState: (state: NewObjectState) => void;
-  onComplete: () => void;
 };
 
 export const NewObjectForm: React.FC<NewObjectFormProps> = props => {
   const state = props.state;
   const setState = props.setState;
-  const [loading, setLoading] = useState<boolean>(false);
-  const [createObjectSuccess, setCreateObjectSuccess] = useState<boolean | null>(null);
   const { schema } = useSchema(state.destination?.connection.id, state.namespace, state.tableName);
+  const advance = () => {
+    if (validateAll(state)) {
+      setState({ ...state, step: Step.FieldMapping });
+    }
+  };
+
+  return (
+    <div className="tw-flex tw-flex-col tw-w-[400px]">
+      <div className="tw-w-full tw-text-center tw-mb-2 tw-font-bold tw-text-lg">New Object</div>
+      <div className="tw-text-center tw-mb-3">Enter your object configuration.</div>
+      <ValidatedInput
+        id='displayName'
+        value={state.displayName}
+        setValue={(value) => { setState({ ...state, displayName: value }); }}
+        placeholder='Display Name'
+        label="Display Name" />
+      <DestinationSelector
+        className='tw-mt-5'
+        validated={true}
+        destination={state.destination}
+        setDestination={(value: Destination) => {
+          if (!state.destination || value.id !== state.destination.id) {
+            setState({ ...state, destination: value, namespace: undefined, tableName: undefined, endCustomerIdColumn: undefined, });
+          }
+        }} />
+      <NamespaceSelector
+        className='tw-mt-5'
+        validated={true}
+        connection={state.destination?.connection}
+        namespace={state.namespace}
+        setNamespace={(value: string) => {
+          if (value !== state.namespace) {
+            setState({ ...state, namespace: value, tableName: undefined, endCustomerIdColumn: undefined, });
+          }
+        }}
+        noOptionsString="No Namespaces Available! (Choose a data source)"
+      />
+      <TableSelector
+        className="tw-mt-5"
+        connection={state.destination?.connection}
+        namespace={state.namespace}
+        tableName={state.tableName}
+        setTableName={(value: string) => {
+          if (value !== state.tableName) {
+            setState({ ...state, tableName: value, endCustomerIdColumn: undefined, fieldsInitialized: false });
+          }
+        }}
+        noOptionsString="No Tables Available! (Choose a namespace)"
+        validated={true}
+        allowCustom={true}
+      />
+      <ValidatedComboInput
+        className="tw-mt-5"
+        options={schema ? schema : []}
+        selected={state.endCustomerIdColumn}
+        setSelected={(value: ColumnSchema) => { setState({ ...state, endCustomerIdColumn: value }); }}
+        getElementForDisplay={(value: ColumnSchema) => value.name}
+        placeholder='End Customer ID Column'
+        label='End Customer ID Column'
+        noOptionsString="No Columns Available! (Choose a table)"
+        loading={!schema}
+        validated={true}
+      />
+      <Button onClick={advance} className='tw-mt-8 tw-w-full tw-h-10' >Continue</Button>
+    </div>
+  );
+};
+
+type ObjectFieldsProps = {
+  state: NewObjectState;
+  setState: React.Dispatch<React.SetStateAction<NewObjectState>>;
+  onComplete: () => void;
+};
+
+const ObjectFields: React.FC<ObjectFieldsProps> = props => {
+  const { state, setState } = props;
+  const [loading, setLoading] = useState<boolean>(false);
+  const { schema } = useSchema(state.destination?.connection.id, state.namespace, state.tableName);
+  const [createObjectSuccess, setCreateObjectSuccess] = useState<boolean | null>(null);
+  useEffect(() => {
+    const objectFields = schema ? schema.map(column => {
+      return {
+        name: column.name,
+        type: column.type,
+        omit: false,
+      };
+    }) : [];
+    setState(s => {
+      return {
+        ...s,
+        objectFields: objectFields,
+        fieldsInitialized: true,
+      };
+    });
+  }, [schema, setState]);
+
+  const updateObjectField = (newObject: ObjectField, index: number) => {
+    setState({
+      ...state,
+      objectFields: state.objectFields.map((original, i) => {
+        if (i === index) {
+          return newObject;
+        } else {
+          return original;
+        }
+      })
+    });
+  };
 
   const createNewObject = async () => {
     setLoading(true);
@@ -68,14 +199,13 @@ export const NewObjectForm: React.FC<NewObjectFormProps> = props => {
     }
 
     const payload: CreateObjectRequest = {
-      'display_name': state.displayName!,
-      'destination_id': state.destination!.id,
-      'namespace': state.namespace!,
-      'table_name': state.tableName!,
-      'customer_id_column': state.customerIdColumn!.name,
-      'object_fields': [],
+      display_name: state.displayName!,
+      destination_id: state.destination!.id,
+      namespace: state.namespace!,
+      table_name: state.tableName!,
+      end_customer_id_column: state.endCustomerIdColumn!.name,
+      object_fields: state.objectFields,
     };
-
 
     try {
       await sendRequest(CreateObject, payload);
@@ -97,64 +227,30 @@ export const NewObjectForm: React.FC<NewObjectFormProps> = props => {
     );
   }
 
+  if (!state.fieldsInitialized) {
+    return <Loading />;
+  }
+
   return (
-    <div className="tw-flex tw-flex-col tw-w-[400px]">
-      <div className="tw-w-full tw-text-center tw-mb-2 tw-font-bold tw-text-lg">New Object</div>
-      <div className="tw-text-center tw-mb-3">Enter your object configuration:</div>
-      <ValidatedInput
-        id='displayName'
-        value={state.displayName}
-        setValue={(value) => { setState({ ...state, displayName: value }); }}
-        placeholder='Display Name'
-        label="Display Name" />
-      <DestinationSelector
-        className='tw-mt-5'
-        validated={true}
-        destination={state.destination}
-        setDestination={(value: Destination) => {
-          if (!state.destination || value.id !== state.destination.id) {
-            setState({ ...state, destination: value, namespace: undefined, tableName: undefined, customerIdColumn: undefined, });
-          }
-        }} />
-      <NamespaceSelector
-        className='tw-mt-5'
-        validated={true}
-        connection={state.destination?.connection}
-        namespace={state.namespace}
-        setNamespace={(value: string) => {
-          if (value !== state.namespace) {
-            setState({ ...state, namespace: value, tableName: undefined, customerIdColumn: undefined, });
-          }
-        }}
-        noOptionsString="No Namespaces Available! (Choose a data source)"
-      />
-      <TableSelector
-        className="tw-mt-5"
-        connection={state.destination?.connection}
-        namespace={state.namespace}
-        tableName={state.tableName}
-        setTableName={(value: string) => {
-          if (value !== state.tableName) {
-            setState({ ...state, tableName: value, customerIdColumn: undefined, });
-          }
-        }}
-        noOptionsString="No Tables Available! (Choose a namespace)"
-        validated={true}
-        allowCustom={true}
-      />
-      <ValidatedComboInput
-        className="tw-mt-5"
-        options={schema ? schema : []}
-        selected={state.customerIdColumn}
-        setSelected={(value: ColumnSchema) => { setState({ ...state, customerIdColumn: value }); }}
-        getElementForDisplay={(value: ColumnSchema) => value.name}
-        placeholder='End Customer ID Column'
-        label='End Customer ID Column'
-        noOptionsString="No Columns Available! (Return to previous step)"
-        loading={!schema}
-        validated={true}
-      />
-      <Button onClick={() => createNewObject()} className='tw-mt-8 tw-w-full tw-h-10'>{loading ? <Loading /> : "Save"}</Button>
+    <div className="tw-h-full tw-w-full tw-text-center">
+      <div className="tw-w-full tw-text-center tw-mb-2 tw-font-bold tw-text-lg">Object Fields</div>
+      <div className="tw-text-center tw-mb-3">Provide customer-facing names and descriptions for each field.</div>
+      <div className="tw-w-full tw-px-24">
+        {state.objectFields.map((objectField, i) => {
+          return (
+            <div key={objectField.name} className="tw-mt-5 tw-mb-7 tw-text-left">
+              <span className="tw-text-base tw-font-semibold">{objectField.name}</span>
+              <div className="tw-flex tw-items-center tw-mt-2 tw-pb-1.5">
+                <span className="">Omit?</span>
+                <Checkbox className="tw-ml-2 tw-h-4 tw-w-4" checked={objectField.omit} onCheckedChange={() => updateObjectField({ ...objectField, omit: !objectField.omit }, i)} />
+              </div>
+              <Input className="tw-mb-2" value={objectField.display_name} setValue={value => updateObjectField({ ...objectField, display_name: value }, i)} placeholder="Display Name" label="Display Name" />
+              <Input className="tw-mb-2" value={objectField.description} setValue={value => updateObjectField({ ...objectField, description: value }, i)} placeholder="Description" label="Description" />
+            </div>
+          );
+        })}
+      </div>
+      <Button onClick={() => createNewObject()} className='tw-mt-8 tw-w-[400px] tw-h-10'>{loading ? <Loading /> : "Save"}</Button>
     </div>
   );
-};
+};;;

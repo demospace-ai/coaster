@@ -40,10 +40,10 @@ export const GetObjects: IEndpoint<undefined, GetObjectsResponse> = {
     path: '/objects',
 };
 
-export const GetObjectSchema: IEndpoint<{ objectID: number; }, GetSchemaResponse> = {
-    name: 'Object Schema Fetched',
+export const GetObject: IEndpoint<{ objectID: number; }, GetObjectResponse> = {
+    name: 'Object Fetched',
     method: 'GET',
-    path: '/object/schema',
+    path: '/object',
     queryParams: ['objectID'],
 };
 
@@ -211,13 +211,16 @@ export interface CreateObjectRequest {
     destination_id: number;
     namespace: string;
     table_name: string;
-    customer_id_column: string;
+    end_customer_id_column: string;
     object_fields: ObjectField[];
 }
 
 export interface ObjectField {
     name: string;
     type: string;
+    display_name?: string;
+    description?: string;
+    omit: boolean;
 }
 
 export interface BigQueryConfig {
@@ -340,6 +343,10 @@ export interface GetSourcesResponse {
 
 export interface GetObjectsResponse {
     objects: Object[];
+}
+
+export interface GetObjectResponse {
+    object: Object;
 }
 
 export interface Object {

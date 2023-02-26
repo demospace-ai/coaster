@@ -14,12 +14,12 @@ import (
 )
 
 type CreateObjectRequest struct {
-	DisplayName      string              `json:"display_name" validate:"required"`
-	DestinationID    int64               `json:"destination_id" validate:"required"`
-	Namespace        string              `json:"namespace,omitempty" validate:"required"`
-	TableName        string              `json:"table_name,omitempty" validate:"required"`
-	CustomerIdColumn string              `json:"customer_id_column" validate:"required"`
-	ObjectFields     []input.ObjectField `json:"object_fields"`
+	DisplayName         string              `json:"display_name" validate:"required"`
+	DestinationID       int64               `json:"destination_id" validate:"required"`
+	Namespace           string              `json:"namespace,omitempty" validate:"required"`
+	TableName           string              `json:"table_name,omitempty" validate:"required"`
+	EndCustomerIdColumn string              `json:"end_customer_id_column" validate:"required"`
+	ObjectFields        []input.ObjectField `json:"object_fields"`
 }
 
 type CreateObjectResponse struct {
@@ -45,25 +45,25 @@ func (s ApiService) CreateObject(auth auth.Authentication, w http.ResponseWriter
 	}
 
 	// TODO: create model and fields in a transaction
-	model, err := objects.CreateObject(
+	object, err := objects.CreateObject(
 		s.db,
 		auth.Organization.ID,
 		createObjectRequest.DisplayName,
 		createObjectRequest.DestinationID,
 		createObjectRequest.Namespace,
 		createObjectRequest.TableName,
-		createObjectRequest.CustomerIdColumn,
+		createObjectRequest.EndCustomerIdColumn,
 	)
 	if err != nil {
 		return err
 	}
 
-	modelFields, err := objects.CreateObjectFields(s.db, auth.Organization.ID, model.ID, createObjectRequest.ObjectFields)
+	objectFields, err := objects.CreateObjectFields(s.db, auth.Organization.ID, object.ID, createObjectRequest.ObjectFields)
 	if err != nil {
 		return err
 	}
 
 	return json.NewEncoder(w).Encode(CreateObjectResponse{
-		views.ConvertObject(*model, modelFields),
+		views.ConvertObject(*object, objectFields),
 	})
 }

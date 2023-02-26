@@ -1,8 +1,6 @@
-import { CheckIcon } from "@heroicons/react/24/outline";
-import * as Checkbox from "@radix-ui/react-checkbox";
-import classNames from "classnames";
 import React, { useState } from "react";
 import { Button } from "src/components/button/Button";
+import { Checkbox } from "src/components/checkbox/Checkbox";
 import { InfoIcon } from "src/components/icons/Icons";
 import query from "src/components/images/query.svg";
 import { Loading } from "src/components/loading/Loading";
@@ -66,11 +64,7 @@ export const ObjectSetup: React.FC<SetupSyncProps> = (props) => {
         <SourceTableSelector tableName={props.state.tableName} setTableName={setTableName} linkToken={props.linkToken} source={props.state.source} namespace={props.state.namespace} dropdownHeight="tw-max-h-40" />
         <div className="tw-flex tw-flex-row tw-mt-4 tw-items-center">
           <Button className="tw-h-10 tw-w-32" onClick={runQuery}>{previewLoading ? <Loading light /> : "Preview"}</Button>
-          <Checkbox.Root checked={limitPreview} onCheckedChange={() => setLimitPreview(!limitPreview)} className={classNames("tw-ml-4 tw-mr-2 tw-h-5 tw-w-5 tw-bg-white tw-border-[1.2px] tw-border-slate-800 tw-rounded", limitPreview && "tw-bg-slate-100")}>
-            <Checkbox.Indicator>
-              <CheckIcon className="tw-stroke-[2]" />
-            </Checkbox.Indicator>
-          </Checkbox.Root>
+          <Checkbox checked={limitPreview} onCheckedChange={() => setLimitPreview(!limitPreview)} className="tw-ml-4 tw-mr-2 tw-h-5 tw-w-5" />
           <span>Limit preview to 100 records</span>
           <Tooltip place="right" label="Automatically add a LIMIT expression to the query to keep the number of rows fetched to 100.">
             <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />

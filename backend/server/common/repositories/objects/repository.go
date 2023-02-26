@@ -1,6 +1,7 @@
 package objects
 
 import (
+	"go.fabra.io/server/common/database"
 	"go.fabra.io/server/common/input"
 	"go.fabra.io/server/common/models"
 
@@ -14,16 +15,16 @@ func CreateObject(
 	destinationID int64,
 	namespace string,
 	tableName string,
-	customerIdColumn string,
+	endCustomerIdColumn string,
 ) (*models.Object, error) {
 
 	object := models.Object{
-		OrganizationID:   organizationID,
-		DisplayName:      displayName,
-		DestinationID:    destinationID,
-		Namespace:        namespace,
-		TableName:        tableName,
-		CustomerIdColumn: customerIdColumn,
+		OrganizationID:      organizationID,
+		DisplayName:         displayName,
+		DestinationID:       destinationID,
+		Namespace:           namespace,
+		TableName:           tableName,
+		EndCustomerIdColumn: endCustomerIdColumn,
 	}
 
 	result := db.Create(&object)
@@ -78,8 +79,16 @@ func CreateObjectFields(
 	var createdObjectFields []models.ObjectField
 	for _, objectField := range objectFields {
 		objectFieldModel := models.ObjectField{
-			Name: objectField.Name,
-			Type: objectField.Type,
+			ObjectID: objectID,
+			Name:     objectField.Name,
+			Type:     objectField.Type,
+			Omit:     objectField.Omit,
+		}
+		if objectField.DisplayName != nil {
+			objectFieldModel.DisplayName = database.NewNullString(*objectField.DisplayName)
+		}
+		if objectField.Description != nil {
+			objectFieldModel.Description = database.NewNullString(*objectField.Description)
 		}
 
 		result := db.Create(&objectFieldModel)
@@ -90,4 +99,23 @@ func CreateObjectFields(
 	}
 
 	return createdObjectFields, nil
+}
+
+func LoadObjectFieldsByID(
+	db *gorm.DB,
+	objectID int64,
+) ([]models.ObjectField, error) {
+	var objectFields []models.ObjectField
+	result := db.Table("object_fields").
+		Select("object_fields.*").
+		Where("object_fields.object_id = ?", objectID).
+		Where("object_fields.deactivated_at IS NULL").
+		Order("object_fields.created_at ASC").
+		Find(&objectFields)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return objectFields, nil
 }

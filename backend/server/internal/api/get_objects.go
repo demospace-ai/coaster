@@ -14,13 +14,12 @@ type GetObjectsResponse struct {
 }
 
 func (s ApiService) GetObjects(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
-
-	models, err := objects.LoadAllObjects(s.db, auth.Organization.ID)
+	objects, err := objects.LoadAllObjects(s.db, auth.Organization.ID)
 	if err != nil {
 		return err
 	}
 
 	return json.NewEncoder(w).Encode(GetObjectsResponse{
-		models,
+		objects,
 	})
 }
