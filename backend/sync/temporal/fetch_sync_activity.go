@@ -33,17 +33,17 @@ func FetchConfiguration(ctx context.Context, input FetchConfigurationInput) (*Sy
 		return nil, err
 	}
 
-	destination, err := destinations.LoadDestinationByID(input.db, input.organizationID, sync.DestinationID)
+	object, err := objects.LoadObjectByID(input.db, input.organizationID, sync.ObjectID)
+	if err != nil {
+		return nil, err
+	}
+
+	destination, err := destinations.LoadDestinationByID(input.db, input.organizationID, object.DestinationID)
 	if err != nil {
 		return nil, err
 	}
 
 	destinationConnection, err := connections.LoadConnectionByID(input.db, input.organizationID, destination.ConnectionID)
-	if err != nil {
-		return nil, err
-	}
-
-	object, err := objects.LoadObjectByID(input.db, input.organizationID, sync.ObjectID)
 	if err != nil {
 		return nil, err
 	}

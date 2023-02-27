@@ -60,7 +60,7 @@ export const Input: React.FC<ValidatedInputProps> = props => {
           className={mergeClasses(classes)}
           onKeyDown={onKeydown}
           onFocus={() => { setFocused(true); }}
-          onChange={e => props.setValue(e.target.value)}
+          onChange={e => { e.target.type === 'number' ? props.setValue(parseInt(e.target.value)) : props.setValue(e.target.value); }}
           onBlur={() => { setFocused(false); }}
           value={props.value ? props.value : ""}
         />
@@ -146,7 +146,7 @@ export const ValidatedInput: React.FC<ValidatedInputProps> = props => {
           className={mergeClasses(classes)}
           onKeyDown={onKeydown}
           onFocus={() => { setIsValid(true); setFocused(true); }}
-          onChange={e => setValue(e.target.value)}
+          onChange={e => { e.target.type === 'number' ? props.setValue(parseInt(e.target.value)) : props.setValue(e.target.value); }}
           onBlur={() => { validateNotEmpty(value); setFocused(false); }}
           {...other}
         />

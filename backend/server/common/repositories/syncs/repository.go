@@ -71,6 +71,7 @@ func CreateFieldMappings(
 	var createdSyncFieldMappings []models.SyncFieldMapping
 	for _, syncFieldMapping := range syncFieldMappings {
 		syncFieldMappingModel := models.SyncFieldMapping{
+			SyncID:             syncID,
 			SourceFieldName:    syncFieldMapping.SourceFieldName,
 			DestinationFieldId: syncFieldMapping.DestinationFieldId,
 		}
