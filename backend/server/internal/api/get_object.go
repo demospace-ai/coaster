@@ -31,6 +31,7 @@ func (s ApiService) GetObject(auth auth.Authentication, w http.ResponseWriter, r
 		return err
 	}
 
+	// TODO: don't include the omitted fields on link token requests
 	objectFields, err := objects.LoadObjectFieldsByID(s.db, object.ID)
 	if err != nil {
 		return nil

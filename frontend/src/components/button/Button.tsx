@@ -1,9 +1,6 @@
-import { Menu, Transition } from '@headlessui/react';
-import { EllipsisHorizontalIcon } from '@heroicons/react/24/outline';
 import classNames from 'classnames';
-import React, { forwardRef, Fragment, MouseEvent, useState } from 'react';
+import React, { forwardRef } from 'react';
 import { NavLink, NavLinkProps, useNavigate } from 'react-router-dom';
-import { Tooltip } from 'src/components/tooltip/Tooltip';
 
 type ButtonProps = {
   onClick: () => void;
@@ -110,55 +107,5 @@ export const NavButton: React.FC<NavLinkProps> = props => {
 export const DivButton: React.FC<ButtonProps> = props => {
   return (
     <div className={props.className} tabIndex={0} onClick={props.onClick} onKeyDown={(event: React.KeyboardEvent<HTMLDivElement>) => { if (event.key === "Enter") props.onClick(); }}>{props.children}</div>
-  );
-};
-
-export const MoreOptionsButton: React.FC<{ id: string; className?: string; showConfigureModal: () => void; showDeleteModal: () => void; }> = props => {
-  const [tooltipDisabled, setTooltipDisabled] = useState<boolean>(false);
-  const menuItem = 'tw-flex tw-items-center tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded';
-  return (
-    <Menu as="div" className="tw-relative tw-flex tw-justify-center tw-mx-1 tw-w-8 tw-h-8">
-      <Tooltip label="More options" disabled={tooltipDisabled}>
-        <Menu.Button onClick={(e: MouseEvent) => e.stopPropagation()} className='tw-z-0 tw-w-8 tw-h-8 tw-rounded-md tw-bg-white tw-text-slate-800 hover:tw-bg-slate-200'>
-          <EllipsisHorizontalIcon className='tw-h-6 tw-inline' strokeWidth="2" />
-        </Menu.Button>
-      </Tooltip>
-      <Transition
-        as={Fragment}
-        enter="tw-transition tw-ease-out tw-duration-100"
-        enterFrom="tw-transform tw-opacity-0 tw-scale-95"
-        enterTo="tw-transform tw-opacity-100 tw-scale-100"
-        leave="tw-transition tw-ease-in tw-duration-75"
-        leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
-        leaveTo="tw-transform tw-opacity-0 tw-scale-95"
-        beforeEnter={() => setTooltipDisabled(true)}
-        beforeLeave={() => setTooltipDisabled(false)}
-      >
-        <Menu.Items className="tw-z-10 tw-absolute tw-origin-top-right tw-right-0 tw-top-10 tw-w-fit tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none" onClick={(e: MouseEvent) => e.stopPropagation()}>
-          <div className="tw-m-1">
-            <Menu.Item>
-              {({ active }) => (
-                <div onClick={(e: MouseEvent) => { e.stopPropagation(); props.showConfigureModal(); }} className={classNames(
-                  active ? 'tw-bg-slate-200 tw-text-slate-900' : 'tw-text-slate-700',
-                  menuItem
-                )}>
-                  Configure
-                </div>
-              )}
-            </Menu.Item>
-            <Menu.Item>
-              {({ active }) => (
-                <div onClick={(e: MouseEvent) => { e.stopPropagation(); props.showDeleteModal(); }} className={classNames(
-                  active ? 'tw-bg-slate-200 tw-text-slate-900' : 'tw-text-slate-700',
-                  menuItem
-                )}>
-                  Delete
-                </div>
-              )}
-            </Menu.Item>
-          </div>
-        </Menu.Items>
-      </Transition>
-    </Menu>
   );
 };

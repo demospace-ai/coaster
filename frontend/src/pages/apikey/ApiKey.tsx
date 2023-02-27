@@ -23,7 +23,7 @@ export const ApiKey: React.FC = () => {
           (<div className="tw-flex tw-items-center">
             <EyeSlashIcon className="tw-h-4 tw-ml-1 tw-mr-2 tw-cursor-pointer" onClick={() => setVisible(false)} />
             {apiKey}
-            <Tooltip label={copyText} place="top" hideOnClick={false}>
+            <Tooltip label={copyText} placement="top" hideOnClick={false}>
               <Square2StackIcon className="tw-h-4 tw-ml-auto tw-mr-1 tw-cursor-pointer tw-outline-none" onClick={copy} />
             </Tooltip>
           </div>)
@@ -31,7 +31,7 @@ export const ApiKey: React.FC = () => {
           (<div className="tw-flex tw-items-center">
             <EyeIcon className="tw-h-4 tw-cursor-pointer tw-ml-1 tw-mr-2" onClick={() => setVisible(true)} />
             •••••••••••••••••••••••••••••••••••••••••••••••••••
-            <Tooltip label={copyText} place="top" hideOnClick={false}>
+            <Tooltip label={copyText} placement="top" hideOnClick={false}>
               <Square2StackIcon className="tw-h-4 tw-ml-auto tw-mr-1 tw-cursor-pointer tw-outline-none" onClick={copy} />
             </Tooltip>
           </div>)

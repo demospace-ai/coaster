@@ -281,7 +281,6 @@ func getMongoSchema(firstRow bson.M) Schema {
 	schema := Schema{}
 	for key, value := range firstRow {
 		fieldType := reflect.TypeOf(value).String()
-		fmt.Print(fieldType)
 		switch fieldType {
 		case "primitive.A":
 			fieldType = "array"

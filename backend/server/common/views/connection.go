@@ -33,6 +33,7 @@ type Object struct {
 }
 
 type ObjectField struct {
+	ID          int64  `json:"id"`
 	Name        string `json:"name"`
 	Type        string `json:"type"`
 	DisplayName string `json:"display_name,omitempty"`
@@ -100,6 +101,7 @@ func ConvertObject(object models.Object, objectFields []models.ObjectField) Obje
 	viewObjectFields := []ObjectField{}
 	for _, objectField := range objectFields {
 		viewObjectField := ObjectField{
+			ID:   objectField.ID,
 			Name: objectField.Name,
 			Type: objectField.Type,
 			Omit: objectField.Omit,

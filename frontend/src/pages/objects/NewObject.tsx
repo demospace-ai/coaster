@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { BackButton, Button } from "src/components/button/Button";
 import { Checkbox } from "src/components/checkbox/Checkbox";
-import { Input, ValidatedComboInput, ValidatedInput } from "src/components/input/Input";
+import { Input, ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
-import { DestinationSelector, NamespaceSelector, TableSelector } from "src/components/selector/Selector";
+import { ColumnSelector, DestinationSelector, NamespaceSelector, TableSelector } from "src/components/selector/Selector";
 import { sendRequest } from "src/rpc/ajax";
-import { ColumnSchema, CreateObject, CreateObjectRequest, Destination, GetObjects, ObjectField } from "src/rpc/api";
+import { ColumnSchema, CreateObject, CreateObjectRequest, Destination, GetObjects, ObjectFieldInput } from "src/rpc/api";
 import { useSchema } from "src/rpc/data";
 import { mutate } from "swr";
 
@@ -21,8 +21,7 @@ type NewObjectState = {
   namespace: string | undefined;
   tableName: string | undefined;
   endCustomerIdColumn: ColumnSchema | undefined;
-  fieldsInitialized: boolean;
-  objectFields: ObjectField[];
+  objectFields: ObjectFieldInput[] | undefined;
 };
 
 const INITIAL_OBJECT_STATE: NewObjectState = {
@@ -32,8 +31,7 @@ const INITIAL_OBJECT_STATE: NewObjectState = {
   namespace: undefined,
   tableName: undefined,
   endCustomerIdColumn: undefined,
-  fieldsInitialized: false,
-  objectFields: [],
+  objectFields: undefined,
 };
 
 const validateAll = (state: NewObjectState): boolean => {
@@ -103,7 +101,7 @@ export const NewObjectForm: React.FC<NewObjectFormProps> = props => {
         destination={state.destination}
         setDestination={(value: Destination) => {
           if (!state.destination || value.id !== state.destination.id) {
-            setState({ ...state, destination: value, namespace: undefined, tableName: undefined, endCustomerIdColumn: undefined, });
+            setState({ ...state, destination: value, namespace: undefined, tableName: undefined, endCustomerIdColumn: undefined, objectFields: undefined });
           }
         }} />
       <NamespaceSelector
@@ -113,7 +111,7 @@ export const NewObjectForm: React.FC<NewObjectFormProps> = props => {
         namespace={state.namespace}
         setNamespace={(value: string) => {
           if (value !== state.namespace) {
-            setState({ ...state, namespace: value, tableName: undefined, endCustomerIdColumn: undefined, });
+            setState({ ...state, namespace: value, tableName: undefined, endCustomerIdColumn: undefined, objectFields: undefined });
           }
         }}
         noOptionsString="No Namespaces Available! (Choose a data source)"
@@ -125,24 +123,24 @@ export const NewObjectForm: React.FC<NewObjectFormProps> = props => {
         tableName={state.tableName}
         setTableName={(value: string) => {
           if (value !== state.tableName) {
-            setState({ ...state, tableName: value, endCustomerIdColumn: undefined, fieldsInitialized: false });
+            setState({ ...state, tableName: value, endCustomerIdColumn: undefined, objectFields: undefined });
           }
         }}
         noOptionsString="No Tables Available! (Choose a namespace)"
         validated={true}
         allowCustom={true}
       />
-      <ValidatedComboInput
+      <ColumnSelector
         className="tw-mt-5"
-        options={schema ? schema : []}
-        selected={state.endCustomerIdColumn}
-        setSelected={(value: ColumnSchema) => { setState({ ...state, endCustomerIdColumn: value }); }}
-        getElementForDisplay={(value: ColumnSchema) => value.name}
+        column={state.endCustomerIdColumn}
+        setColumn={(value: ColumnSchema) => { setState({ ...state, endCustomerIdColumn: value }); }}
         placeholder='End Customer ID Column'
         label='End Customer ID Column'
         noOptionsString="No Columns Available! (Choose a table)"
-        loading={!schema}
         validated={true}
+        connection={state.destination?.connection}
+        namespace={state.namespace}
+        tableName={state.tableName}
       />
       <Button onClick={advance} className='tw-mt-8 tw-w-full tw-h-10' >Continue</Button>
     </div>
@@ -172,12 +170,16 @@ const ObjectFields: React.FC<ObjectFieldsProps> = props => {
       return {
         ...s,
         objectFields: objectFields,
-        fieldsInitialized: true,
       };
     });
   }, [schema, setState]);
 
-  const updateObjectField = (newObject: ObjectField, index: number) => {
+  const updateObjectField = (newObject: ObjectFieldInput, index: number) => {
+    if (!state.objectFields) {
+      // TODO: should not happen
+      return;
+    }
+
     setState({
       ...state,
       objectFields: state.objectFields.map((original, i) => {
@@ -204,7 +206,7 @@ const ObjectFields: React.FC<ObjectFieldsProps> = props => {
       namespace: state.namespace!,
       table_name: state.tableName!,
       end_customer_id_column: state.endCustomerIdColumn!.name,
-      object_fields: state.objectFields,
+      object_fields: state.objectFields!,
     };
 
     try {
@@ -227,7 +229,7 @@ const ObjectFields: React.FC<ObjectFieldsProps> = props => {
     );
   }
 
-  if (!state.fieldsInitialized) {
+  if (!state.objectFields) {
     return <Loading />;
   }
 

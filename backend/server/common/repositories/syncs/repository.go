@@ -67,11 +67,12 @@ func CreateFieldMappings(
 	syncID int64,
 	syncFieldMappings []input.SyncFieldMapping,
 ) ([]models.SyncFieldMapping, error) {
+	// TODO: validate that the mapped object fields belong to the right object
 	var createdSyncFieldMappings []models.SyncFieldMapping
 	for _, syncFieldMapping := range syncFieldMappings {
 		syncFieldMappingModel := models.SyncFieldMapping{
-			SourceFieldName:      syncFieldMapping.SourceFieldName,
-			DestinationFieldName: syncFieldMapping.DestinationFieldName,
+			SourceFieldName:    syncFieldMapping.SourceFieldName,
+			DestinationFieldId: syncFieldMapping.DestinationFieldId,
 		}
 
 		result := db.Create(&syncFieldMappingModel)

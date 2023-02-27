@@ -7,12 +7,12 @@ import { Loading } from "src/components/loading/Loading";
 import { MemoizedResultsTable } from "src/components/queryResults/QueryResults";
 import { ObjectSelector, SourceNamespaceSelector, SourceTableSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
-import { SetupSyncProps } from "src/connect/App";
+import { SetupSyncProps } from "src/connect/state";
 import { sendLinkTokenRequest } from "src/rpc/ajax";
 import { LinkGetPreview, LinkGetPreviewRequest, Object, ResultRow, Schema } from "src/rpc/api";
 
 export const ObjectSetup: React.FC<SetupSyncProps> = (props) => {
-  const setObject = (object: Object) => props.setState({ ...props.state, object: object });
+  const setObject = (object: Object) => props.setState({ ...props.state, object: object, fieldMappings: undefined });
   const setNamespace = (namespace: string) => props.setState({ ...props.state, namespace: namespace });
   const setTableName = (tableName: string) => props.setState({ ...props.state, tableName: tableName });
   const [limitPreview, setLimitPreview] = useState<boolean>(true);
@@ -66,7 +66,7 @@ export const ObjectSetup: React.FC<SetupSyncProps> = (props) => {
           <Button className="tw-h-10 tw-w-32" onClick={runQuery}>{previewLoading ? <Loading light /> : "Preview"}</Button>
           <Checkbox checked={limitPreview} onCheckedChange={() => setLimitPreview(!limitPreview)} className="tw-ml-4 tw-mr-2 tw-h-5 tw-w-5" />
           <span>Limit preview to 100 records</span>
-          <Tooltip place="right" label="Automatically add a LIMIT expression to the query to keep the number of rows fetched to 100.">
+          <Tooltip placement="right" label="Automatically add a LIMIT expression to the query to keep the number of rows fetched to 100.">
             <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
           </Tooltip>
         </div>

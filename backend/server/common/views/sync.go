@@ -20,8 +20,8 @@ type Sync struct {
 }
 
 type SyncFieldMappings struct {
-	SourceFieldName      string `json:"source_field_name"`
-	DestinationFieldName string `json:"destination_field_name"`
+	SourceFieldName    string `json:"source_field_name"`
+	DestinationFieldId int64  `json:"destination_field_id"`
 }
 
 func ConvertSync(sync *models.Sync, fieldMappings []models.SyncFieldMapping) Sync {
@@ -38,8 +38,8 @@ func ConvertSync(sync *models.Sync, fieldMappings []models.SyncFieldMapping) Syn
 	var fieldMappingsView []SyncFieldMappings
 	for _, fieldMapping := range fieldMappings {
 		fieldMappingsView = append(fieldMappingsView, SyncFieldMappings{
-			SourceFieldName:      fieldMapping.SourceFieldName,
-			DestinationFieldName: fieldMapping.DestinationFieldName,
+			SourceFieldName:    fieldMapping.SourceFieldName,
+			DestinationFieldId: fieldMapping.DestinationFieldId,
 		})
 	}
 

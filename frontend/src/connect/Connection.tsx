@@ -7,50 +7,9 @@ import { getConnectionTypeImg } from "src/components/images/warehouses";
 import { Input, ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { Tooltip } from "src/components/tooltip/Tooltip";
-import { SetupSyncProps, SetupSyncState } from "src/connect/App";
+import { createNewSource, NewSourceState, SetupSyncProps, validateConnectionSetup } from "src/connect/state";
 import { sendRequest } from "src/rpc/ajax";
-import { BigQueryConfig, ConnectionType, getConnectionType, GetSources, LinkCreateSource, LinkCreateSourceRequest, LinkGetSources, MongoDbConfig, RedshiftConfig, SnowflakeConfig, TestDataConnection, TestDataConnectionRequest } from "src/rpc/api";
-import { mutate } from "swr";
-
-export type NewSourceState = {
-  success: boolean | null;
-  displayName: string;
-  bigqueryConfig: BigQueryConfig;
-  snowflakeConfig: SnowflakeConfig;
-  redshiftConfig: RedshiftConfig;
-  mongodbConfig: MongoDbConfig;
-};
-
-// Values must be empty strings otherwise the input will be uncontrolled
-export const INITIAL_SOURCE_STATE: NewSourceState = {
-  success: null,
-  displayName: "",
-  bigqueryConfig: {
-    credentials: "",
-    location: "",
-  },
-  snowflakeConfig: {
-    username: "",
-    password: "",
-    database_name: "",
-    warehouse_name: "",
-    role: "",
-    host: "",
-  },
-  redshiftConfig: {
-    username: "",
-    password: "",
-    database_name: "",
-    port: "",
-    host: "",
-  },
-  mongodbConfig: {
-    username: "",
-    password: "",
-    host: "",
-    connection_options: "",
-  },
-};
+import { ConnectionType, getConnectionType, TestDataConnection, TestDataConnectionRequest } from "src/rpc/api";
 
 export const NewSourceConfiguration: React.FC<SetupSyncProps> = (props) => {
   const state = props.state.newSourceState;
@@ -96,7 +55,7 @@ export const NewSourceConfiguration: React.FC<SetupSyncProps> = (props) => {
         Connect to {getConnectionType(connectionType)}
       </div>
       <div className="tw-flex tw-flex-row">
-        <form className="tw-pb-16 tw-w-[500px]" onSubmit={submit}>
+        <form className="tw-pb-16 tw-w-[500px] tw-mr-10" onSubmit={submit}>
           <div className="tw-mb-4 tw-text-slate-600">Provide the settings and credentials for your data source.</div>
           {inputs}
           <TestConnectionButton state={state} connectionType={connectionType} />
@@ -123,91 +82,6 @@ export const NewSourceConfiguration: React.FC<SetupSyncProps> = (props) => {
   );
 };
 
-const validateAll = (connectionType: ConnectionType | undefined, state: NewSourceState): boolean => {
-  if (!connectionType) {
-    return false;
-  }
-
-  switch (connectionType) {
-    case ConnectionType.Snowflake:
-      return state.displayName.length > 0
-        && state.snowflakeConfig.username.length > 0
-        && state.snowflakeConfig.password.length > 0
-        && state.snowflakeConfig.database_name.length > 0
-        && state.snowflakeConfig.warehouse_name.length > 0
-        && state.snowflakeConfig.role.length > 0
-        && state.snowflakeConfig.host.length > 0;
-    case ConnectionType.BigQuery:
-      return state.displayName.length > 0 && state.bigqueryConfig.credentials.length > 0;
-    case ConnectionType.Redshift:
-      return state.displayName.length > 0
-        && state.redshiftConfig.username.length > 0
-        && state.redshiftConfig.password.length > 0
-        && state.redshiftConfig.database_name.length > 0
-        && state.redshiftConfig.host.length > 0;
-    case ConnectionType.MongoDb:
-      return state.displayName.length > 0
-        && state.mongodbConfig.username.length > 0
-        && state.mongodbConfig.password.length > 0
-        && state.mongodbConfig.host.length > 0; // connection options is optional
-  }
-};
-
-export const createNewSource = async (
-  linkToken: string,
-  state: SetupSyncState,
-  setState: (state: SetupSyncState) => void,
-) => {
-  if (!validateAll(state.connectionType, state.newSourceState)) {
-    // show alert and make all input boxes red
-    return;
-  }
-
-  if (state.newSourceState.success) {
-    // TODO: clear success if one of the inputs change and just update the already created source
-    // Already created the source, just continue again
-    setState({ ...state, step: state.step + 1 });
-    return;
-  }
-
-  const payload: LinkCreateSourceRequest = {
-    'display_name': state.newSourceState.displayName,
-    'connection_type': state.connectionType!,
-  };
-
-  switch (state.connectionType) {
-    case ConnectionType.BigQuery:
-      payload.bigquery_config = state.newSourceState.bigqueryConfig;
-      break;
-    case ConnectionType.Snowflake:
-      payload.snowflake_config = state.newSourceState.snowflakeConfig;
-      break;
-    case ConnectionType.Redshift:
-      payload.redshift_config = state.newSourceState.redshiftConfig;
-      break;
-    case ConnectionType.MongoDb:
-      payload.mongodb_config = state.newSourceState.mongodbConfig;
-      break;
-    default:
-    // TODO: throw an error here
-  }
-
-  try {
-    const response = await sendRequest(LinkCreateSource, payload, [["X-LINK-TOKEN", linkToken]]);
-    // Tell SWRs to refetch sources
-    mutate({ GetSources });
-    mutate({ LinkGetSources }); // Tell SWRs to refetch sources
-    setState({
-      ...state,
-      source: response.source,
-      step: state.step + 1,
-      newSourceState: { ...state.newSourceState, success: true },
-    });
-  } catch (e) {
-    setState({ ...state, newSourceState: { ...state.newSourceState, success: false } });
-  }
-};
-
 const TestConnectionButton: React.FC<{ state: NewSourceState, connectionType: ConnectionType; }> = props => {
   const [testLoading, setTestLoading] = useState(false);
   const [testConnectionSuccess, setTestConnectionSuccess] = useState<boolean | null>(null);
@@ -215,7 +89,7 @@ const TestConnectionButton: React.FC<{ state: NewSourceState, connectionType: Co
 
   const testConnection = async () => {
     setTestLoading(true);
-    if (!validateAll(props.connectionType, state)) {
+    if (!validateConnectionSetup(props.connectionType, state)) {
       setTestLoading(false);
       setTestConnectionSuccess(false);
       return;
@@ -252,7 +126,7 @@ const TestConnectionButton: React.FC<{ state: NewSourceState, connectionType: Co
 
   const testColor = testConnectionSuccess === null ? null : testConnectionSuccess ? "tw-bg-green-700" : "tw-bg-red-700";
   return (
-    <Button className={classNames("tw-mt-8 tw-bg-slate-200 tw-text-slate-900 hover:tw-bg-slate-300 tw-border-slate-200 tw-w-48 tw-h-10", testColor)} onClick={testConnection}>{testLoading ? <Loading /> : "Test"}</Button>
+    <Button className={classNames("tw-mt-8 tw-bg-slate-200 hover:tw-bg-slate-300 tw-border-slate-200 tw-w-48 tw-h-10", testColor)} onClick={testConnection}>{testLoading ? <Loading /> : "Test"}</Button>
   );
 };
 
@@ -267,49 +141,49 @@ const SnowflakeInputs: React.FC<ConnectionConfigurationProps> = props => {
     <>
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-2 tw-mb-1">
         <span>Display Name</span>
-        <Tooltip place="right" label="Pick a name to help you identify this source in the future.">
+        <Tooltip placement="right" label="Pick a name to help you identify this source in the future.">
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
       <ValidatedInput id='displayName' value={state.displayName} setValue={(value) => { props.setState({ ...state, displayName: value }); }} placeholder='Display Name' />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Username</span>
-        <Tooltip place="right" label="You can choose your personal username or create a dedicated user for syncing.">
+        <Tooltip placement="right" label="You can choose your personal username or create a dedicated user for syncing.">
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
       <ValidatedInput id='username' value={state.snowflakeConfig.username} setValue={(value) => { props.setState({ ...state, snowflakeConfig: { ...state.snowflakeConfig, username: value } }); }} placeholder='Username' />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Password</span>
-        <Tooltip place="right" label="Password for the user specified above.">
+        <Tooltip placement="right" label="Password for the user specified above.">
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
       <ValidatedInput id='password' type="password" value={state.snowflakeConfig.password} setValue={(value) => { props.setState({ ...state, snowflakeConfig: { ...state.snowflakeConfig, password: value } }); }} placeholder='Password' />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Database Name</span>
-        <Tooltip place="right" label="The Snowflake database to sync from.">
+        <Tooltip placement="right" label="The Snowflake database to sync from.">
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
       <ValidatedInput id='databaseName' value={state.snowflakeConfig.database_name} setValue={(value) => { props.setState({ ...state, snowflakeConfig: { ...state.snowflakeConfig, database_name: value } }); }} placeholder='Database Name' />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Warehouse Name</span>
-        <Tooltip place="right" label="The warehouse that will be used to run syncs in Snowflake.">
+        <Tooltip placement="right" label="The warehouse that will be used to run syncs in Snowflake.">
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
       <ValidatedInput id='warehouseName' value={state.snowflakeConfig.warehouse_name} setValue={(value) => { props.setState({ ...state, snowflakeConfig: { ...state.snowflakeConfig, warehouse_name: value } }); }} placeholder='Warehouse Name' />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Role</span>
-        <Tooltip place="right" label="The role that will be used to run syncs.">
+        <Tooltip placement="right" label="The role that will be used to run syncs.">
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
       <ValidatedInput id='role' value={state.snowflakeConfig.role} setValue={(value) => { props.setState({ ...state, snowflakeConfig: { ...state.snowflakeConfig, role: value } }); }} placeholder='Role' />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Host</span>
-        <Tooltip place="right" label={<div className="tw-m-2"><span>This is your Snowflake URL. Format may differ based on Snowflake account age. For details, </span><a className="tw-text-blue-400" href="https://docs.snowflake.com/en/user-guide/admin-account-identifier.html">visit the Snowflake docs.</a><div className="tw-mt-2"><span>Example:</span><div className="tw-mt-2 tw-w-full tw-bg-slate-900 tw-rounded-md tw-p-2">abc123.us-east1.gcp.snowflakecomputing.com</div></div></div>} interactive maxWidth={500}>
+        <Tooltip placement="right" label={<div className="tw-m-2"><span>This is your Snowflake URL. Format may differ based on Snowflake account age. For details, </span><a className="tw-text-blue-400" href="https://docs.snowflake.com/en/user-guide/admin-account-identifier.html">visit the Snowflake docs.</a><div className="tw-mt-2"><span>Example:</span><div className="tw-mt-2 tw-w-full tw-bg-slate-900 tw-rounded-md tw-p-2">abc123.us-east1.gcp.snowflakecomputing.com</div></div></div>} interactive maxWidth={500}>
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div >
@@ -351,21 +225,21 @@ const BigQueryInputs: React.FC<ConnectionConfigurationProps> = props => {
     <>
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-2 tw-mb-1">
         <span>Display Name</span>
-        <Tooltip place="right" label="Pick a name to help you identify this source in the future.">
+        <Tooltip placement="right" label="Pick a name to help you identify this source in the future.">
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
       <ValidatedInput id='displayName' value={state.displayName} setValue={(value) => { props.setState({ ...state, displayName: value }); }} placeholder='Display Name' />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Location</span>
-        <Tooltip place="right" label="The geographic location of your BigQuery dataset(s).">
+        <Tooltip placement="right" label="The geographic location of your BigQuery dataset(s).">
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
       <ValidatedInput id='location' value={state.bigqueryConfig.location} setValue={(value) => { props.setState({ ...state, bigqueryConfig: { ...state.bigqueryConfig, location: value } }); }} placeholder='Location' />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Credentials</span>
-        <Tooltip place="right" label="This can be obtained in the Google Cloud web console by navigating to the IAM page and clicking on Service Accounts in the left sidebar. Then, find your service account in the list, go to its Keys tab, and click Add Key. Finally, click on Create new key and choose JSON." interactive maxWidth={500}>
+        <Tooltip placement="right" label="This can be obtained in the Google Cloud web console by navigating to the IAM page and clicking on Service Accounts in the left sidebar. Then, find your service account in the list, go to its Keys tab, and click Add Key. Finally, click on Create new key and choose JSON." interactive maxWidth={500}>
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>

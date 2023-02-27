@@ -1,54 +1,50 @@
 import { CheckIcon } from '@heroicons/react/24/outline';
 import classNames from 'classnames';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Loading } from 'src/components/loading/Loading';
-import { createNewSource, INITIAL_SOURCE_STATE, NewSourceConfiguration, NewSourceState } from 'src/connect/Connection';
+import { NewSourceConfiguration } from 'src/connect/Connection';
 import { FinalizeSync } from 'src/connect/Finalize';
 import { ObjectSetup } from 'src/connect/Object';
+import { createNewSource, INITIAL_SETUP_STATE, SetupSyncState, SyncSetupStep, validateObjectSetup } from 'src/connect/state';
 import { WarehouseSelector } from 'src/connect/Warehouse';
-import { ConnectionType, Object, Source } from 'src/rpc/api';
-
-export type SetupSyncState = {
-  step: number;
-  skippedSourceSetup: boolean;
-  object: Object | undefined;
-  namespace: string | undefined;
-  tableName: string | undefined;
-  connectionType: ConnectionType | undefined;
-  source: Source | undefined;
-  newSourceState: NewSourceState;
-};
-
-const INITIAL_SETUP_STATE: SetupSyncState = {
-  step: 0,
-  skippedSourceSetup: false,
-  object: undefined,
-  namespace: undefined,
-  tableName: undefined,
-  connectionType: undefined,
-  source: undefined,
-  newSourceState: INITIAL_SOURCE_STATE,
-};
+import { useObject } from 'src/rpc/data';
 
 export const App: React.FC = () => {
+  const linkToken = "myjYFNQuUmFTfvLF2F/Ddv/sA+n37xgnCHpeeN/nrw4="; // TODO: get real link token from parent window
   // TODO: figure out how to prevent Redux from being used in this app
   const [state, setState] = useState<SetupSyncState>(INITIAL_SETUP_STATE);
+  const { object } = useObject(state.object?.id, linkToken);
+  // Setup the initial values for the field mappings
+  useEffect(() => {
+    const fieldMappings = object ? object.object_fields.filter(objectField => !objectField.omit).map(objectField => {
+      return {
+        source_column: undefined,
+        destination_field_id: objectField.id,
+      };
+    }) : [];
+    setState(s => {
+      return {
+        ...s,
+        fieldMappings: fieldMappings,
+      };
+    });
+  }, [object]);
+
   const close = () => {
     // TODO: close the window
   };
   const back = () => {
     let prevStep = state.step - 1;
-    if (state.skippedSourceSetup && state.step === 2) {
+    if (state.skippedSourceSetup && state.step === SyncSetupStep.Object) {
       prevStep--;
     }
 
-    if (state.step > 0) {
+    if (state.step > SyncSetupStep.Warehouse) {
       setState({ ...state, step: prevStep });
     } else {
       close();
     }
   };
-  const linkToken = "myjYFNQuUmFTfvLF2F/Ddv/sA+n37xgnCHpeeN/nrw4="; // TODO: get real link token from parent window
 
   // TODO: pull all child state out to a reducer or redux store here so state isn't lost on navigation
   return (
@@ -71,17 +67,20 @@ type AppContentProps = {
 const AppContent: React.FC<AppContentProps> = props => {
   let content: React.ReactNode;
   switch (props.state.step) {
-    case 0:
+    case SyncSetupStep.Warehouse:
       content = <WarehouseSelector linkToken={props.linkToken} state={props.state} setState={props.setState} />;
       break;
-    case 1:
+    case SyncSetupStep.Connection:
       content = <NewSourceConfiguration linkToken={props.linkToken} state={props.state} setState={props.setState} />;
       break;
-    case 2:
+    case SyncSetupStep.Object:
       content = <ObjectSetup linkToken={props.linkToken} state={props.state} setState={props.setState} />;
       break;
-    default:
+    case SyncSetupStep.Finalize:
       content = <FinalizeSync linkToken={props.linkToken} state={props.state} setState={props.setState} />;
+      break;
+    default:
+      // TODO: should never happen
       break;
   }
 
@@ -96,10 +95,10 @@ const Header: React.FC<{ close: () => void; state: SetupSyncState; }> = ({ close
   return (
     <div className='tw-flex tw-flex-row tw-items-center tw-w-full tw-h-20 tw-min-h-[80px] tw-border-b tw-border-slate-200'>
       <div className='tw-flex tw-flex-row tw-gap-10 tw-justify-center tw-items-center tw-w-full'>
-        <StepBreadcrumb step={1} content="Select source" active={state.step === 0} complete={state.step > 0} />
-        <StepBreadcrumb step={2} content="Connect source" active={state.step === 1} complete={state.step > 1} />
-        <StepBreadcrumb step={3} content="Define model" active={state.step === 2} complete={state.step > 2} />
-        <StepBreadcrumb step={4} content="Finalize sync" active={state.step === 3} complete={state.step > 3} />
+        <StepBreadcrumb step={1} content="Select source" active={state.step === SyncSetupStep.Warehouse} complete={state.step > SyncSetupStep.Warehouse} />
+        <StepBreadcrumb step={2} content="Connect source" active={state.step === SyncSetupStep.Connection} complete={state.step > SyncSetupStep.Connection} />
+        <StepBreadcrumb step={3} content="Define model" active={state.step === SyncSetupStep.Object} complete={state.step > SyncSetupStep.Object} />
+        <StepBreadcrumb step={4} content="Finalize sync" active={state.step === SyncSetupStep.Finalize} complete={state.step > SyncSetupStep.Finalize} />
       </div>
       <button className="tw-absolute tw-flex tw-items-center t tw-right-10 tw-border-none tw-cursor-pointer tw-p-0" onClick={close}>
         <svg className='tw-h-6 tw-fill-slate-500' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
@@ -119,7 +118,6 @@ const StepBreadcrumb: React.FC<{ content: string, step: number; active: boolean;
   );
 };
 
-
 type FooterProps = {
   back: () => void;
   linkToken: string;
@@ -129,35 +127,36 @@ type FooterProps = {
 
 export const Footer: React.FC<FooterProps> = props => {
   const [loading, setLoading] = useState<boolean>(false);
-  const onClick = async () => {
-    setLoading(true);
-    switch (props.state.step) {
-      case 0:
-        props.setState({ ...props.state, step: props.state.step + 2, skippedSourceSetup: true });
-        break;
-      case 1:
+  let onClick = () => { };
+  let continueText: string = "Continue";
+  switch (props.state.step) {
+    case SyncSetupStep.Warehouse:
+      break;
+    case SyncSetupStep.Connection:
+      onClick = async () => {
+        setLoading(true);
         await createNewSource(props.linkToken, props.state, props.setState);
-        break;
-      case 2:
-        // TODO: validate
-        props.setState({ ...props.state, step: props.state.step + 1 });
-        break;
-      case 3:
-        break;
-    }
-    setLoading(false);
-  };
+        setLoading(false);
+      };
+      break;
+    case SyncSetupStep.Object:
+      onClick = () => {
+        if (validateObjectSetup(props.state)) {
+          props.setState({ ...props.state, step: props.state.step + 1 });
+        }
+      };
+      break;
+    case SyncSetupStep.Finalize:
+      continueText = "Create Sync";
+      break;
+  }
+  const continueButton: React.ReactElement = <button onClick={onClick} className='tw-border tw-text-white tw-font-medium tw-bg-slate-700 tw-rounded-md tw-w-32 tw-h-10 tw-ml-auto tw-select-none'>{loading ? <Loading light /> : continueText}</button>;
+  const showContinue = props.state.step !== SyncSetupStep.Warehouse;
 
   return (
     <div className='tw-flex tw-flex-row tw-w-full tw-h-20 tw-min-h-[80px] tw-border-t tw-border-slate-200 tw-mt-auto tw-items-center tw-px-28'>
-      <button className='tw-border tw-border-slate-300 tw-font-medium tw-rounded-md tw-w-32 tw-h-10' onClick={props.back}>Back</button>
-      <button onClick={onClick} className='tw-border tw-text-white tw-font-medium tw-bg-slate-700 tw-rounded-md tw-w-32 tw-h-10 tw-ml-auto'>{loading ? <Loading light /> : "Continue"}</button>
+      <button className='tw-border tw-border-slate-300 tw-font-medium tw-rounded-md tw-w-32 tw-h-10 tw-select-none' onClick={props.back}>Back</button>
+      {showContinue && continueButton}
     </div>
   );
-};
-
-export type SetupSyncProps = {
-  linkToken: string;
-  state: SetupSyncState;
-  setState: (state: SetupSyncState) => void;
 };

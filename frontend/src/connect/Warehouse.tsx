@@ -7,17 +7,17 @@ import redshift from "src/components/images/redshift.svg";
 import snowflake from "src/components/images/snowflake.svg";
 import { getConnectionTypeImg } from "src/components/images/warehouses";
 import { Tooltip } from "src/components/tooltip/Tooltip";
-import { SetupSyncProps } from "src/connect/App";
+import { SetupSyncProps, SyncSetupStep } from "src/connect/state";
 import { ConnectionType, Source } from "src/rpc/api";
 import { useLinkSources } from "src/rpc/data";
 
 export const WarehouseSelector: React.FC<SetupSyncProps> = (props) => {
-  const connectionButton = "tw-flex tw-flex-row tw-justify-center tw-items-center tw-py-5 tw-font-bold tw-w-56 tw-rounded-md tw-cursor-pointer tw-bg-white tw-text-slate-800 tw-border tw-border-slate-300 hover:tw-bg-slate-100 tw-tracking-[1px] tw-shadow-md tw-select-none";
+  const connectionButton = "tw-flex tw-flex-row tw-justify-center tw-items-center tw-py-5 tw-font-bold tw-w-56 tw-rounded-md tw-cursor-pointer tw-bg-white tw-text-slate-800 tw-border tw-border-slate-300 hover:tw-bg-slate-100 tw-tracking-[1px] tw-shadow tw-select-none";
   const onClick = (connectionType: ConnectionType) => {
-    props.setState({ ...props.state, connectionType: connectionType, step: props.state.step + 1, skippedSourceSetup: false });
+    props.setState({ ...props.state, connectionType: connectionType, step: SyncSetupStep.Connection, skippedSourceSetup: false });
   };
   const setExistingSource = (source: Source) => {
-    props.setState({ ...props.state, source: source, step: props.state.step + 2, skippedSourceSetup: true });
+    props.setState({ ...props.state, source: source, step: SyncSetupStep.Object, skippedSourceSetup: true });
   };
 
   return (
@@ -45,7 +45,7 @@ export const WarehouseSelector: React.FC<SetupSyncProps> = (props) => {
       <div className="tw-text-center tw-font-bold tw-text-lg tw-mt-8 tw-mb-2 tw-text-slate-700">or</div>
       <div className="tw-text-2xl tw-font-semibold tw-text-slate-900 tw-flex tw-flex-row tw-items-center">
         Choose an existing source
-        <Tooltip place="right" maxWidth="500px" label="If you've already setup a source, you can sync additional tables from it.">
+        <Tooltip placement="right" maxWidth="500px" label="If you've already setup a source, you can sync additional tables from it.">
           <InfoIcon className="tw-ml-1.5 tw-h-3.5 tw-fill-slate-400" />
         </Tooltip>
       </div>
@@ -61,16 +61,16 @@ export const WarehouseSelector: React.FC<SetupSyncProps> = (props) => {
 const SourceTable: React.FC<{ linkToken: string; setExistingSource: (source: Source) => void; }> = ({ linkToken, setExistingSource }) => {
   const { sources } = useLinkSources(linkToken);
   return (
-    <div className="tw-mt-6 tw-flow-root">
+    <div className="tw-mt-5 tw-flow-root tw-select-none">
       <div className="tw-inline-block tw-min-w-full tw-py-2 tw-align-middle">
         <div className="tw-overflow-auto tw-shadow tw-ring-1 tw-ring-black tw-ring-opacity-5 tw-rounded-md">
-          <table className="tw-min-w-full tw-divide-y tw-divide-gray-300">
-            <thead className="tw-bg-gray-50">
+          <table className="tw-min-w-full tw-divide-y tw-divide-slate-200">
+            <thead className="tw-bg-slate-100">
               <tr>
-                <th scope="col" className="tw-py-3.5 tw-pl-4 tw-pr-3 tw-text-left tw-text-sm tw-font-semibold tw-text-gray-900">
+                <th scope="col" className="tw-py-3.5 tw-pl-4 tw-pr-3 tw-text-left tw-text-sm tw-font-semibold tw-text-slate-900">
                   Name
                 </th>
-                <th scope="col" className="tw-px-3 tw-py-3.5 tw-text-left tw-text-sm tw-font-semibold tw-text-gray-900">
+                <th scope="col" className="tw-px-3 tw-py-3.5 tw-text-left tw-text-sm tw-font-semibold tw-text-slate-900">
                   Connection Type
                 </th>
                 <th scope="col" className="tw-relative tw-py-3.5 tw-pl-3">
@@ -78,16 +78,16 @@ const SourceTable: React.FC<{ linkToken: string; setExistingSource: (source: Sou
                 </th>
               </tr>
             </thead>
-            <tbody className="tw-divide-y tw-divide-gray-200 tw-bg-white">
+            <tbody className="tw-divide-y tw-divide-slate-200 tw-bg-white">
               {sources && sources.map((source) => (
-                <tr key={source.id} className="tw-cursor-pointer hover:tw-bg-slate-100" onClick={() => setExistingSource(source)}>
-                  <td className="tw-whitespace-nowrap tw-py-4 tw-pl-4 tw-pr-3 tw-text-sm tw-font-medium tw-text-gray-900 tw-flex tw-flex-row tw-items-center">
+                <tr key={source.id} className="tw-cursor-pointer hover:tw-bg-slate-50" onClick={() => setExistingSource(source)}>
+                  <td className="tw-whitespace-nowrap tw-py-4 tw-pl-4 tw-pr-3 tw-text-sm tw-font-medium tw-text-slate-900 tw-flex tw-flex-row tw-items-center">
                     <img className="tw-mr-2 tw-h-5" src={getConnectionTypeImg(source.connection.connection_type)} alt="warehouse icon" />
                     {source.display_name}
                   </td>
-                  <td className="tw-whitespace-nowrap tw-px-3 tw-py-4 tw-text-sm tw-text-gray-500">{source.connection.connection_type}</td>
+                  <td className="tw-whitespace-nowrap tw-px-3 tw-py-4 tw-text-sm tw-text-slate-500">{source.connection.connection_type}</td>
                   <td className="tw-pr-4" align="right">
-                    <ChevronRightIcon className="tw-h-4 tw-w-4 tw-text-gray-400" aria-hidden="true" />
+                    <ChevronRightIcon className="tw-h-4 tw-w-4 tw-text-slate-400" aria-hidden="true" />
                   </td>
                 </tr>
               ))}

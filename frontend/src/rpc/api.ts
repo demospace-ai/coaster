@@ -212,15 +212,29 @@ export interface CreateObjectRequest {
     namespace: string;
     table_name: string;
     end_customer_id_column: string;
-    object_fields: ObjectField[];
+    object_fields: ObjectFieldInput[];
 }
 
 export interface ObjectField {
+    id: number;
     name: string;
     type: string;
     display_name?: string;
     description?: string;
     omit: boolean;
+}
+
+export interface ObjectFieldInput {
+    name: string;
+    type: string;
+    display_name?: string;
+    description?: string;
+    omit: boolean;
+}
+
+export interface FieldMappingInput {
+    source_column: ColumnSchema | undefined;
+    destination_field_id: number;
 }
 
 export interface BigQueryConfig {
