@@ -1,5 +1,6 @@
 import React from "react";
 import { InfoIcon, LongRightArrow } from "src/components/icons/Icons";
+import rocket from "src/components/images/rocket.svg";
 import { ValidatedDropdownInput, ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { LinkColumnSelector } from "src/components/selector/Selector";
@@ -31,6 +32,16 @@ export const FinalizeSync: React.FC<SetupSyncProps> = (props) => {
       })
     });
   };
+
+  if (props.state.syncCreated) {
+    return (
+      <div className="tw-flex tw-flex-col tw-items-center tw-mt-6">
+        <span className=" tw-text-2xl tw-font-semibold tw-text-slate-800">Sync Created!</span>
+        <span className="tw-mb-6 tw-mt-2 tw-text-base tw-text-slate-500">Your data should start syncing over shortly.</span>
+        <img className="tw-h-56" src={rocket} alt="rocket success" />
+      </div>
+    );
+  }
 
   return (
     <div className="tw-w-full tw-px-28 tw-flex tw-flex-col">

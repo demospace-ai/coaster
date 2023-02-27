@@ -6,7 +6,7 @@ import { NewSourceConfiguration } from 'src/connect/Connection';
 import { FinalizeSync } from 'src/connect/Finalize';
 import { ObjectSetup } from 'src/connect/Object';
 import { Sources } from 'src/connect/Sources';
-import { createNewSource, INITIAL_SETUP_STATE, SetupSyncState, SyncSetupStep, validateObjectSetup } from 'src/connect/state';
+import { createNewSource, createNewSync, INITIAL_SETUP_STATE, SetupSyncState, SyncSetupStep, validateObjectSetup } from 'src/connect/state';
 import { WarehouseSelector } from 'src/connect/Warehouse';
 import { useObject } from 'src/rpc/data';
 
@@ -50,7 +50,7 @@ export const App: React.FC = () => {
       <div id="fabra-connect" className='tw-fixed tw-bg-white tw-flex tw-flex-col tw-w-[70%] tw-h-[75%] tw-top-[50%] tw-left-1/2 -tw-translate-y-1/2 -tw-translate-x-1/2 tw-rounded-lg tw-shadow-modal tw-items-center'>
         <Header close={close} state={state} />
         <AppContent linkToken={linkToken} state={state} setState={setState} />
-        <Footer back={back} linkToken={linkToken} state={state} setState={setState} />
+        <Footer back={back} linkToken={linkToken} state={state} setState={setState} close={close} />
       </div>
     </div>
   );
@@ -130,6 +130,7 @@ type FooterProps = {
   linkToken: string;
   state: SetupSyncState;
   setState: (state: SetupSyncState) => void;
+  close: () => void;
 };
 
 export const Footer: React.FC<FooterProps> = props => {
@@ -156,7 +157,17 @@ export const Footer: React.FC<FooterProps> = props => {
       };
       break;
     case SyncSetupStep.Finalize:
-      continueText = "Create Sync";
+      if (props.state.syncCreated) {
+        continueText = "Done";
+        onClick = props.close;
+      } else {
+        continueText = "Create Sync";
+        onClick = async () => {
+          setLoading(true);
+          await createNewSync(props.linkToken, props.state, props.setState);
+          setLoading(false);
+        };
+      }
       break;
   }
   const continueButton: React.ReactElement = <button onClick={onClick} className='tw-border tw-text-white tw-font-medium tw-bg-slate-700 tw-rounded-md tw-w-32 tw-h-10 tw-ml-auto tw-select-none'>{loading ? <Loading light /> : continueText}</button>;
