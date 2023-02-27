@@ -8,13 +8,30 @@ import { ObjectSetup } from 'src/connect/Object';
 import { Sources } from 'src/connect/Sources';
 import { createNewSource, createNewSync, INITIAL_SETUP_STATE, SetupSyncState, SyncSetupStep, validateObjectSetup } from 'src/connect/state';
 import { WarehouseSelector } from 'src/connect/Warehouse';
+import { FabraMessage, MessageType } from 'src/message/message';
 import { useObject } from 'src/rpc/data';
 
+let needsInit = true;
+
 export const App: React.FC = () => {
-  const linkToken = "myjYFNQuUmFTfvLF2F/Ddv/sA+n37xgnCHpeeN/nrw4="; // TODO: get real link token from parent window
   // TODO: figure out how to prevent Redux from being used in this app
   const [state, setState] = useState<SetupSyncState>(INITIAL_SETUP_STATE);
+  const [linkToken, setLinkToken] = useState<string | undefined>(undefined);
   const { object } = useObject(state.object?.id, linkToken);
+  useEffect(() => {
+    // Recommended way to run one-time initialization: https://beta.reactjs.org/learn/you-might-not-need-an-effect#initializing-the-application
+    if (needsInit) {
+      window.addEventListener("message", (message: MessageEvent<FabraMessage>) => {
+        switch (message.data.messageType) {
+          case MessageType.LinkToken:
+            setLinkToken(message.data.linkToken);
+        }
+      });
+
+      window.parent.postMessage({ messageType: MessageType.IFrameReady });
+      needsInit = false;
+    }
+  }, []);
 
   // Setup the initial values for the field mappings
   useEffect(() => {
@@ -33,7 +50,7 @@ export const App: React.FC = () => {
   }, [object]);
 
   const close = () => {
-    // TODO: close the window
+    window.parent.postMessage({ messageType: MessageType.Close });
   };
   const back = () => {
     let prevStep = state.step - 1;
@@ -43,6 +60,10 @@ export const App: React.FC = () => {
 
     setState({ ...state, step: prevStep });
   };
+
+  if (!linkToken) {
+    return (<Loading />);
+  }
 
   // TODO: pull all child state out to a reducer or redux store here so state isn't lost on navigation
   return (
