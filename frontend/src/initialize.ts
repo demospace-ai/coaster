@@ -1,5 +1,4 @@
 import { FabraMessage, MessageType } from "src/message/message";
-import { isProd } from "src/utils/env";
 
 declare global {
     interface Window { fabra: any; }
@@ -11,8 +10,7 @@ const initialize = () => {
     window.addEventListener("message", handleMessage);
 
     const frame = document.createElement("iframe");
-    const source = isProd() ? "https://connect.fabra.io/connect.html" : "http://localhost:3000/connect.html";
-    frame.setAttribute("src", source);
+    frame.setAttribute("src", "https://connect.fabra.io/connect.html");
     frame.style.position = "absolute";
     frame.style.width = "100%";
     frame.style.height = "100%";
