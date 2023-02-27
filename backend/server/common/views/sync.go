@@ -6,7 +6,6 @@ type Sync struct {
 	ID             int64               `json:"id"`
 	OrganizationID int64               `json:"organization_id"`
 	DisplayName    string              `json:"display_name"`
-	DestinationID  int64               `json:"destination_id"`
 	SourceID       int64               `json:"source_id"`
 	ObjectID       int64               `json:"object_id"`
 	Namespace      string              `json:"namespace,omitempty"`
@@ -26,13 +25,12 @@ type SyncFieldMappings struct {
 
 func ConvertSync(sync *models.Sync, fieldMappings []models.SyncFieldMapping) Sync {
 	syncView := Sync{
-		ID:            sync.ID,
-		DisplayName:   sync.DisplayName,
-		DestinationID: sync.DestinationID,
-		SourceID:      sync.SourceID,
-		ObjectID:      sync.ObjectID,
-		SyncMode:      sync.SyncMode,
-		Frequency:     sync.Frequency,
+		ID:          sync.ID,
+		DisplayName: sync.DisplayName,
+		SourceID:    sync.SourceID,
+		ObjectID:    sync.ObjectID,
+		SyncMode:    sync.SyncMode,
+		Frequency:   sync.Frequency,
 	}
 
 	var fieldMappingsView []SyncFieldMappings

@@ -17,7 +17,6 @@ import (
 type CreateSyncRequest struct {
 	DisplayName    string                   `json:"display_name"`
 	EndCustomerId  int64                    `json:"end_customer_id"`
-	DestinationID  int64                    `json:"destination_id"`
 	SourceID       int64                    `json:"source_id"`
 	ObjectID       int64                    `json:"object_id"`
 	Namespace      *string                  `json:"namespace,omitempty"`
@@ -66,7 +65,6 @@ func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, 
 		auth.Organization.ID,
 		createSyncRequest.DisplayName,
 		createSyncRequest.EndCustomerId,
-		createSyncRequest.DestinationID,
 		createSyncRequest.SourceID,
 		createSyncRequest.ObjectID,
 		createSyncRequest.Namespace,
@@ -76,6 +74,7 @@ func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, 
 		createSyncRequest.PrimaryKey,
 		createSyncRequest.SyncMode,
 		createSyncRequest.Frequency,
+		createSyncRequest.FrequencyUnits,
 	)
 	if err != nil {
 		return err

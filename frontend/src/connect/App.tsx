@@ -1,6 +1,6 @@
 import { CheckIcon } from '@heroicons/react/24/outline';
 import classNames from 'classnames';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Loading } from 'src/components/loading/Loading';
 import { NewSourceConfiguration } from 'src/connect/Connection';
 import { FinalizeSync } from 'src/connect/Finalize';
@@ -15,6 +15,7 @@ export const App: React.FC = () => {
   // TODO: figure out how to prevent Redux from being used in this app
   const [state, setState] = useState<SetupSyncState>(INITIAL_SETUP_STATE);
   const { object } = useObject(state.object?.id, linkToken);
+
   // Setup the initial values for the field mappings
   useEffect(() => {
     const fieldMappings = object ? object.object_fields.filter(objectField => !objectField.omit).map(objectField => {
@@ -62,6 +63,12 @@ type AppContentProps = {
 };
 
 const AppContent: React.FC<AppContentProps> = props => {
+  const ref = useRef<HTMLDivElement>(null);
+  // Scroll to the top on step change
+  React.useEffect(() => {
+    ref.current?.scrollTo(0, 0);
+  }, [props.state.step]);
+
   let content: React.ReactNode;
   switch (props.state.step) {
     case SyncSetupStep.Initial:
@@ -85,7 +92,7 @@ const AppContent: React.FC<AppContentProps> = props => {
   }
 
   return (
-    <div className='tw-overflow-auto tw-w-full tw-h-full tw-flex tw-justify-center tw-pt-10 tw-bg-transparent'>
+    <div ref={ref} className='tw-overflow-auto tw-w-full tw-h-full tw-flex tw-justify-center tw-pt-10 tw-bg-transparent'>
       {content}
     </div>
   );

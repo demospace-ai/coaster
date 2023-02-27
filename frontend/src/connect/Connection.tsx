@@ -25,7 +25,7 @@ export const NewSourceConfiguration: React.FC<SetupSyncProps> = (props) => {
     return <></>;
   }
 
-  if (props.state.newSourceState.success) {
+  if (props.state.newSourceState.sourceCreated) {
     return <div className="tw-flex tw-flex-col tw-justify-top">
       <span className="tw-text-center tw-text-2xl tw-font-bold tw-mb-10">Source all setup!</span>
       <img src={sync} alt="sync success illustration" className="tw-h-[300px]" />

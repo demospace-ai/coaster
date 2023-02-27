@@ -13,7 +13,6 @@ func CreateSync(
 	organizationID int64,
 	displayName string,
 	endCustomerID int64,
-	destinationID int64,
 	sourceID int64,
 	objectID int64,
 	namespace *string,
@@ -23,17 +22,18 @@ func CreateSync(
 	primaryKey *string,
 	syncMode models.SyncMode,
 	frequency int64,
+	frequencyUnits models.FrequencyUnits,
 ) (*models.Sync, error) {
 
 	sync := models.Sync{
 		OrganizationID: organizationID,
 		DisplayName:    displayName,
 		EndCustomerId:  endCustomerID,
-		DestinationID:  destinationID,
 		SourceID:       sourceID,
 		ObjectID:       objectID,
 		SyncMode:       syncMode,
 		Frequency:      frequency,
+		FrequencyUnits: frequencyUnits,
 	}
 
 	if tableName != nil && namespace != nil {

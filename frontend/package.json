@@ -26,6 +26,7 @@
     "react-router-dom": "^6.3.0",
     "rudder-sdk-js": "^2.12.1",
     "swr": "^2.0.4",
+    "tailwind-merge": "^1.10.0",
     "typescript": "^4.6.4"
   },
   "scripts": {

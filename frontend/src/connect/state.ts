@@ -1,5 +1,5 @@
-import { sendRequest } from "src/rpc/ajax";
-import { BigQueryConfig, ConnectionType, FieldMappingInput, GetSources, LinkCreateSource, LinkCreateSourceRequest, LinkGetSources, MongoDbConfig, Object, RedshiftConfig, SnowflakeConfig, Source } from "src/rpc/api";
+import { sendLinkTokenRequest } from "src/rpc/ajax";
+import { BigQueryConfig, ColumnSchema, ConnectionType, FieldMappingInput, FrequencyUnits, GetSources, LinkCreateSource, LinkCreateSourceRequest, LinkCreateSync, LinkCreateSyncRequest, LinkGetSources, LinkGetSyncs, MongoDbConfig, Object, RedshiftConfig, SnowflakeConfig, Source, SyncMode } from "src/rpc/api";
 import { mutate } from "swr";
 
 export type SetupSyncProps = {
@@ -17,7 +17,8 @@ export enum SyncSetupStep {
 }
 
 export type NewSourceState = {
-  success: boolean | null;
+  sourceCreated: boolean;
+  error: string | undefined;
   displayName: string;
   bigqueryConfig: BigQueryConfig;
   snowflakeConfig: SnowflakeConfig;
@@ -27,7 +28,8 @@ export type NewSourceState = {
 
 // Values must be empty strings otherwise the input will be uncontrolled
 const INITIAL_SOURCE_STATE: NewSourceState = {
-  success: null,
+  sourceCreated: false,
+  error: undefined,
   displayName: "",
   bigqueryConfig: {
     credentials: "",
@@ -56,27 +58,46 @@ const INITIAL_SOURCE_STATE: NewSourceState = {
   },
 };
 
+export interface FieldMappingState {
+  source_column: ColumnSchema | undefined;
+  destination_field_id: number;
+}
+
 export type SetupSyncState = {
   step: SyncSetupStep;
+  syncCreated: boolean;
+  error: string | undefined;
   skippedSourceSetup: boolean;
   object: Object | undefined;
   namespace: string | undefined;
   tableName: string | undefined;
+  customJoin: string | undefined;
+  syncMode: SyncMode | undefined;
   connectionType: ConnectionType | undefined;
   source: Source | undefined;
   newSourceState: NewSourceState;
-  fieldMappings: FieldMappingInput[] | undefined;
+  displayName: string | undefined,
+  frequency: number | undefined,
+  frequencyUnits: FrequencyUnits | undefined,
+  fieldMappings: FieldMappingState[] | undefined;
 };
 
 export const INITIAL_SETUP_STATE: SetupSyncState = {
   step: SyncSetupStep.Initial,
+  syncCreated: false,
+  error: undefined,
   skippedSourceSetup: false,
   object: undefined,
   namespace: undefined,
   tableName: undefined,
+  customJoin: undefined,
+  syncMode: SyncMode.FullOverwrite, // TODO
   connectionType: undefined,
   source: undefined,
   newSourceState: INITIAL_SOURCE_STATE,
+  displayName: undefined,
+  frequency: undefined,
+  frequencyUnits: undefined,
   fieldMappings: undefined,
 };
 
@@ -120,7 +141,7 @@ export const createNewSource = async (
     return;
   }
 
-  if (state.newSourceState.success) {
+  if (state.newSourceState.sourceCreated) {
     // TODO: clear success if one of the inputs change and just update the already created source
     // Already created the source, just continue again
     setState({ ...state, step: SyncSetupStep.Object });
@@ -128,8 +149,8 @@ export const createNewSource = async (
   }
 
   const payload: LinkCreateSourceRequest = {
-    'display_name': state.newSourceState.displayName,
-    'connection_type': state.connectionType!,
+    display_name: state.newSourceState.displayName,
+    connection_type: state.connectionType!,
   };
 
   switch (state.connectionType) {
@@ -150,7 +171,7 @@ export const createNewSource = async (
   }
 
   try {
-    const response = await sendRequest(LinkCreateSource, payload, [["X-LINK-TOKEN", linkToken]]);
+    const response = await sendLinkTokenRequest(LinkCreateSource, linkToken, payload);
     // Tell SWRs to refetch sources
     mutate({ GetSources });
     mutate({ LinkGetSources }); // Tell SWRs to refetch sources
@@ -158,13 +179,68 @@ export const createNewSource = async (
       ...state,
       source: response.source,
       step: SyncSetupStep.Object,
-      newSourceState: { ...state.newSourceState, success: true },
+      newSourceState: { ...state.newSourceState, sourceCreated: true },
     });
   } catch (e) {
-    setState({ ...state, newSourceState: { ...state.newSourceState, success: false } });
+    setState({ ...state, newSourceState: { ...state.newSourceState, error: String(e) } });
   }
 };
 
 export const validateObjectSetup = (state: SetupSyncState): boolean => {
   return (state.object !== undefined && state.namespace !== undefined && state.tableName !== undefined);
+};
+
+export const validateSyncSetup = (state: SetupSyncState): boolean => {
+  return state.displayName !== undefined && state.displayName.length > 0
+    && state.source !== undefined
+    && state.object !== undefined
+    && ((state.namespace !== undefined && state.namespace !== undefined) || state.customJoin !== undefined)
+    && state.syncMode !== undefined
+    && state.frequency !== undefined
+    && state.frequencyUnits !== undefined
+    && state.fieldMappings !== undefined;
+};
+
+
+export const createNewSync = async (
+  linkToken: string,
+  state: SetupSyncState,
+  setState: (state: SetupSyncState) => void,
+) => {
+  if (!validateSyncSetup(state)) {
+    // show alert and make all input boxes red
+    return;
+  }
+
+  const fieldMappings: FieldMappingInput[] = state.fieldMappings!.map(fieldMapping => {
+    return (
+      {
+        source_field_name: fieldMapping.source_column!.name,
+        destination_field_id: fieldMapping.destination_field_id,
+      }
+    );
+  });
+  const payload: LinkCreateSyncRequest = {
+    display_name: state.newSourceState.displayName,
+    source_id: state.source!.id,
+    object_id: state.object!.id,
+    namespace: state.namespace,
+    table_name: state.tableName,
+    sync_mode: state.syncMode!,
+    frequency: state.frequency!,
+    frequency_units: state.frequencyUnits!,
+    field_mappings: fieldMappings
+  };
+
+  try {
+    await sendLinkTokenRequest(LinkCreateSync, linkToken, payload);
+    // Tell SWRs to refetch sources
+    mutate({ LinkGetSyncs });
+    setState({
+      ...state,
+      syncCreated: true,
+    });
+  } catch (e) {
+    setState({ ...state, error: String(e) });
+  }
 };

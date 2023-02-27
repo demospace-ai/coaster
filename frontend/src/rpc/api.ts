@@ -162,17 +162,25 @@ export const LinkCreateSource: IEndpoint<LinkCreateSourceRequest, CreateSourceRe
     track: true,
 };
 
+export const LinkCreateSync: IEndpoint<LinkCreateSyncRequest, CreateSyncResponse> = {
+    name: 'Sync Created',
+    method: 'POST',
+    path: '/link/sync',
+    track: true,
+};
+
+// TODO
+export const LinkGetSyncs: IEndpoint<undefined, GetSyncsResponse> = {
+    name: 'Syncs Fetched',
+    method: 'GET',
+    path: '/link/syncs',
+    track: true,
+};
+
 export const CreateObject: IEndpoint<CreateObjectRequest, undefined> = {
     name: 'Object Created',
     method: 'POST',
     path: '/object',
-    track: true,
-};
-
-export const CreateSync: IEndpoint<CreateSyncRequest, CreateSyncResponse> = {
-    name: 'Sync Created',
-    method: 'POST',
-    path: '/sync',
     track: true,
 };
 
@@ -233,7 +241,7 @@ export interface ObjectFieldInput {
 }
 
 export interface FieldMappingInput {
-    source_column: ColumnSchema | undefined;
+    source_field_name: string;
     destination_field_id: number;
 }
 
@@ -266,16 +274,27 @@ export interface MongoDbConfig {
     connection_options: string;
 }
 
-export interface CreateSyncRequest {
+export interface LinkCreateSyncRequest {
     display_name: string;
-    connection_id: number;
-    namespace: string;
-    table_name: string;
+    source_id: number;
+    object_id: number;
+    namespace?: string;
+    table_name?: string;
     custom_join?: string;
+    cursor_field?: string;
+    primary_key?: string;
+    sync_mode: SyncMode;
+    frequency: number;
+    frequency_units: FrequencyUnits;
+    field_mappings: FieldMappingInput[];
 }
 
 export interface CreateSyncResponse {
     sync: Sync;
+}
+
+export interface GetSyncsResponse {
+    syncs: Sync[];
 }
 
 export type JSONValue =
@@ -459,7 +478,6 @@ export enum ConnectionType {
 export interface Sync {
     id: number;
     display_name: string;
-    destination: Destination;
     source: Source;
     object_id: number;
     namespace: string | undefined;
