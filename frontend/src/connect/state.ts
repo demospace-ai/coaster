@@ -9,7 +9,8 @@ export type SetupSyncProps = {
 };
 
 export enum SyncSetupStep {
-  Warehouse = 1,
+  Initial = 1,
+  Warehouse,
   Connection,
   Object,
   Finalize,
@@ -68,7 +69,7 @@ export type SetupSyncState = {
 };
 
 export const INITIAL_SETUP_STATE: SetupSyncState = {
-  step: SyncSetupStep.Warehouse,
+  step: SyncSetupStep.Initial,
   skippedSourceSetup: false,
   object: undefined,
   namespace: undefined,

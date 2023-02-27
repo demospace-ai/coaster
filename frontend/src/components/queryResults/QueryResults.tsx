@@ -11,7 +11,7 @@ const QueryResultsTable: React.FC<QueryResultsProps> = props => {
   // TODO: implement pagination to not render too many results
   return (
     <div className="tw-rounded-md tw-overflow-auto tw-max-h-full tw-flow-root" style={{ contain: "paint" }}>
-      <table className="tw-text-xs">
+      <table>
         <ResultsSchema schema={props.schema} />
         <tbody className="tw-py-2">
           {

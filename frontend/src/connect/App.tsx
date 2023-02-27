@@ -5,6 +5,7 @@ import { Loading } from 'src/components/loading/Loading';
 import { NewSourceConfiguration } from 'src/connect/Connection';
 import { FinalizeSync } from 'src/connect/Finalize';
 import { ObjectSetup } from 'src/connect/Object';
+import { Sources } from 'src/connect/Sources';
 import { createNewSource, INITIAL_SETUP_STATE, SetupSyncState, SyncSetupStep, validateObjectSetup } from 'src/connect/state';
 import { WarehouseSelector } from 'src/connect/Warehouse';
 import { useObject } from 'src/rpc/data';
@@ -36,14 +37,10 @@ export const App: React.FC = () => {
   const back = () => {
     let prevStep = state.step - 1;
     if (state.skippedSourceSetup && state.step === SyncSetupStep.Object) {
-      prevStep--;
+      prevStep = SyncSetupStep.Initial;
     }
 
-    if (state.step > SyncSetupStep.Warehouse) {
-      setState({ ...state, step: prevStep });
-    } else {
-      close();
-    }
+    setState({ ...state, step: prevStep });
   };
 
   // TODO: pull all child state out to a reducer or redux store here so state isn't lost on navigation
@@ -67,6 +64,9 @@ type AppContentProps = {
 const AppContent: React.FC<AppContentProps> = props => {
   let content: React.ReactNode;
   switch (props.state.step) {
+    case SyncSetupStep.Initial:
+      content = <Sources linkToken={props.linkToken} state={props.state} setState={props.setState} />;
+      break;
     case SyncSetupStep.Warehouse:
       content = <WarehouseSelector linkToken={props.linkToken} state={props.state} setState={props.setState} />;
       break;
@@ -95,7 +95,7 @@ const Header: React.FC<{ close: () => void; state: SetupSyncState; }> = ({ close
   return (
     <div className='tw-flex tw-flex-row tw-items-center tw-w-full tw-h-20 tw-min-h-[80px] tw-border-b tw-border-slate-200'>
       <div className='tw-flex tw-flex-row tw-gap-10 tw-justify-center tw-items-center tw-w-full'>
-        <StepBreadcrumb step={1} content="Select source" active={state.step === SyncSetupStep.Warehouse} complete={state.step > SyncSetupStep.Warehouse} />
+        <StepBreadcrumb step={1} content="Select source" active={state.step <= SyncSetupStep.Warehouse} complete={state.step > SyncSetupStep.Warehouse} />
         <StepBreadcrumb step={2} content="Connect source" active={state.step === SyncSetupStep.Connection} complete={state.step > SyncSetupStep.Connection} />
         <StepBreadcrumb step={3} content="Define model" active={state.step === SyncSetupStep.Object} complete={state.step > SyncSetupStep.Object} />
         <StepBreadcrumb step={4} content="Finalize sync" active={state.step === SyncSetupStep.Finalize} complete={state.step > SyncSetupStep.Finalize} />
@@ -130,6 +130,8 @@ export const Footer: React.FC<FooterProps> = props => {
   let onClick = () => { };
   let continueText: string = "Continue";
   switch (props.state.step) {
+    case SyncSetupStep.Initial:
+      break;
     case SyncSetupStep.Warehouse:
       break;
     case SyncSetupStep.Connection:
@@ -151,11 +153,11 @@ export const Footer: React.FC<FooterProps> = props => {
       break;
   }
   const continueButton: React.ReactElement = <button onClick={onClick} className='tw-border tw-text-white tw-font-medium tw-bg-slate-700 tw-rounded-md tw-w-32 tw-h-10 tw-ml-auto tw-select-none'>{loading ? <Loading light /> : continueText}</button>;
-  const showContinue = props.state.step !== SyncSetupStep.Warehouse;
+  const showContinue = props.state.step > SyncSetupStep.Warehouse;
 
   return (
     <div className='tw-flex tw-flex-row tw-w-full tw-h-20 tw-min-h-[80px] tw-border-t tw-border-slate-200 tw-mt-auto tw-items-center tw-px-28'>
-      <button className='tw-border tw-border-slate-300 tw-font-medium tw-rounded-md tw-w-32 tw-h-10 tw-select-none' onClick={props.back}>Back</button>
+      {props.state.step > SyncSetupStep.Initial && <button className='tw-border tw-border-slate-300 tw-font-medium tw-rounded-md tw-w-32 tw-h-10 tw-select-none' onClick={props.back}>Back</button>}
       {showContinue && continueButton}
     </div>
   );
