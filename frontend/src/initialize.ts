@@ -20,6 +20,7 @@ const initialize = () => {
     frame.style.zIndex = "999";
     frame.style.background = "transparent";
     frame.style.display = "none";
+    frame.style.colorScheme = "normal";
     document.body.appendChild(frame);
 
     return frame;
