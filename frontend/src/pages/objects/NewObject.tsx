@@ -78,7 +78,6 @@ type NewObjectFormProps = {
 export const NewObjectForm: React.FC<NewObjectFormProps> = props => {
   const state = props.state;
   const setState = props.setState;
-  const { schema } = useSchema(state.destination?.connection.id, state.namespace, state.tableName);
   const advance = () => {
     if (validateAll(state)) {
       setState({ ...state, step: Step.FieldMapping });
@@ -96,7 +95,7 @@ export const NewObjectForm: React.FC<NewObjectFormProps> = props => {
         placeholder='Display Name'
         label="Display Name" />
       <DestinationSelector
-        className='tw-mt-5'
+        className='tw-mt-5 tw-w-[400px]'
         validated={true}
         destination={state.destination}
         setDestination={(value: Destination) => {
@@ -105,7 +104,7 @@ export const NewObjectForm: React.FC<NewObjectFormProps> = props => {
           }
         }} />
       <NamespaceSelector
-        className='tw-mt-5'
+        className='tw-mt-5 tw-w-[400px]'
         validated={true}
         connection={state.destination?.connection}
         namespace={state.namespace}
@@ -117,7 +116,7 @@ export const NewObjectForm: React.FC<NewObjectFormProps> = props => {
         noOptionsString="No Namespaces Available! (Choose a data source)"
       />
       <TableSelector
-        className="tw-mt-5"
+        className="tw-mt-5 tw-w-[400px]"
         connection={state.destination?.connection}
         namespace={state.namespace}
         tableName={state.tableName}
@@ -131,7 +130,7 @@ export const NewObjectForm: React.FC<NewObjectFormProps> = props => {
         allowCustom={true}
       />
       <ColumnSelector
-        className="tw-mt-5"
+        className="tw-mt-5 tw-w-[400px]"
         column={state.endCustomerIdColumn}
         setColumn={(value: ColumnSchema) => { setState({ ...state, endCustomerIdColumn: value }); }}
         placeholder='End Customer ID Column'
