@@ -18,7 +18,7 @@ const initialize = () => {
     frame.style.top = "0";
     frame.style.left = "0";
     frame.style.zIndex = "999";
-    frame.style.backgroundColor = "transparent";
+    frame.style.background = "transparent";
     frame.style.display = "none";
     document.body.appendChild(frame);
 
