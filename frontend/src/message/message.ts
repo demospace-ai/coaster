@@ -1,8 +1,8 @@
 
 export enum MessageType {
-  IFrameReady,
-  LinkToken,
-  Close,
+  IFrameReady = "fabra-iframe-ready",
+  LinkToken = "fabra-link-token",
+  Close = "fabra-window-close",
 }
 
 export type FabraMessage = {
