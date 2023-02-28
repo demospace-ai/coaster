@@ -49,7 +49,7 @@ export const App: React.FC = () => {
   }, [object]);
 
   const close = () => {
-    window.parent.postMessage({ messageType: MessageType.Close });
+    window.parent.postMessage({ messageType: MessageType.Close }, '*');
   };
   const back = () => {
     let prevStep = state.step - 1;
