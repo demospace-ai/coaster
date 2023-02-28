@@ -33,7 +33,7 @@ const handleMessage = (n: MessageEvent<FabraMessage>) => {
 
 const open = (linkToken: string) => {
     if (iframeReady) {
-        frame.contentWindow!.postMessage({ messageType: MessageType.LinkToken, linkToken: linkToken });
+        frame.contentWindow!.postMessage({ messageType: MessageType.LinkToken, linkToken: linkToken }, "https://connect.fabra.io");
         frame.style.visibility = "visible";
     } else {
         window.setTimeout(open, 100);

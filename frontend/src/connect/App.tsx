@@ -20,7 +20,6 @@ export const App: React.FC = () => {
   const { object } = useObject(state.object?.id, linkToken);
   useEffect(() => {
     // Recommended way to run one-time initialization: https://beta.reactjs.org/learn/you-might-not-need-an-effect#initializing-the-application
-    console.log("start");
     if (needsInit) {
       window.addEventListener("message", (message: MessageEvent<FabraMessage>) => {
         switch (message.data.messageType) {
@@ -28,9 +27,7 @@ export const App: React.FC = () => {
             setLinkToken(message.data.linkToken);
         }
       });
-      console.log("window.parent");
-      console.log(window.parent);
-      window.parent.postMessage({ messageType: MessageType.IFrameReady });
+      window.parent.postMessage({ messageType: MessageType.IFrameReady }, '*');
       needsInit = false;
     }
   }, []);
