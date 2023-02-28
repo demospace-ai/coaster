@@ -76,7 +76,7 @@ const SourceTable: React.FC<SetupSyncProps> = ({ linkToken, state, setState }) =
                       <div className="tw-flex tw-flex-col tw-ml-8">
                         <span className="tw-text-lg tw-font-semibold tw-text-slate-500">Add a source</span>
                         <span className="tw-text-slate-500">Start syncing your data by adding a source.</span>
-                        <Button className="tw-bg-blue-600 hover:tw-bg-blue-800 tw-w-32 tw-mt-4" onClick={() => setState({ ...state, step: SyncSetupStep.Warehouse })}>Add a Source</Button>
+                        <Button className="tw-bg-blue-600 hover:tw-bg-blue-800 tw-w-32 tw-px-0 tw-mt-4" onClick={() => setState({ ...state, step: SyncSetupStep.Warehouse })}>Add a Source</Button>
                       </div>
                     </td>
                   </tr>
