@@ -19,7 +19,7 @@ const initialize = () => {
     frame.style.left = "0";
     frame.style.zIndex = "999";
     frame.style.backgroundColor = "transparent";
-    frame.style.visibility = "hidden";
+    frame.style.display = "none";
     document.body.appendChild(frame);
 
     return frame;
@@ -38,14 +38,14 @@ const handleMessage = (n: MessageEvent<FabraMessage>) => {
 const open = (linkToken: string) => {
     if (iframeReady) {
         frame.contentWindow!.postMessage({ messageType: MessageType.LinkToken, linkToken: linkToken }, "https://connect.fabra.io");
-        frame.style.visibility = "visible";
+        frame.style.display = "block";
     } else {
         window.setTimeout(open, 100);
     }
 };
 
 const close = () => {
-    frame.style.visibility = "hidden";
+    frame.style.display = "none";
 };
 
 const frame = initialize();
