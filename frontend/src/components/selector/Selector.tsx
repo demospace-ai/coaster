@@ -61,7 +61,6 @@ type TableSelectorProps = {
   noOptionsString?: string;
   placeholder?: string;
   validated?: boolean;
-  allowCustom?: boolean;
 };
 
 export const TableSelector: React.FC<TableSelectorProps> = props => {
@@ -77,7 +76,7 @@ export const TableSelector: React.FC<TableSelectorProps> = props => {
     placeholder={props.placeholder ? props.placeholder : "Choose table"}
     label="Table"
     validated={props.validated}
-    allowCustom={props.allowCustom} />;
+  />;
 };
 
 type SourceSelectorProps = {
@@ -147,7 +146,6 @@ type SourceTableSelectorProps = {
   noOptionsString?: string;
   placeholder?: string;
   validated?: boolean;
-  allowCustom?: boolean;
   linkToken: string;
   dropdownHeight?: string;
 };
@@ -165,7 +163,6 @@ export const SourceTableSelector: React.FC<SourceTableSelectorProps> = props => 
     placeholder={props.placeholder ? props.placeholder : "Choose table"}
     label="Table"
     validated={props.validated}
-    allowCustom={props.allowCustom}
     dropdownHeight={props.dropdownHeight}
   />;
 };

@@ -1,6 +1,8 @@
 import { Combobox, Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
-import { Fragment, HTMLInputTypeAttribute, InputHTMLAttributes, useRef, useState } from "react";
+import { Fragment, HTMLInputTypeAttribute, InputHTMLAttributes, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { Modifier, usePopper } from "react-popper";
 import { Loading } from "src/components/loading/Loading";
 import { mergeClasses } from "src/utils/twmerge";
 
@@ -175,6 +177,12 @@ type ValidatedDropdownInputProps = {
 export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = props => {
   const [isValid, setIsValid] = useState(true);
   const [focused, setFocused] = useState(false);
+  const [referenceElement, setReferenceElement] = useState<HTMLButtonElement | null>(null);
+  const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(null);
+  const { styles, attributes } = usePopper(referenceElement, popperElement, {
+    strategy: 'fixed',
+    modifiers: [sameWidth],
+  });
 
   const validateNotUndefined = (value: number | undefined): boolean => {
     const valid = value !== undefined;
@@ -209,6 +217,7 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = pro
           </label>
         </Transition>
         <Listbox.Button
+          ref={setReferenceElement}
           className={mergeClasses("tw-flex tw-justify-center tw-items-center tw-w-96 tw-mt-5 tw-rounded-md tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 hover:tw-border-slate-400 aria-expanded:tw-border-slate-700", props.className, props.validated && !isValid && 'tw-border-red-600')}
         >
           <div className={mergeClasses("tw-inline-block tw-w-[calc(100%-20px)] tw-truncate tw-overflow-none", !props.selected && "tw-text-slate-400")}>
@@ -222,23 +231,23 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = pro
               />
             </span>}
         </Listbox.Button>
-        <Transition
-          as={Fragment}
-          enter="tw-transition tw-ease-out tw-duration-100"
-          enterFrom="tw-transform tw-opacity-0 tw-scale-95"
-          enterTo="tw-transform tw-opacity-100 tw-scale-100"
-          leave="tw-transition tw-ease-in tw-duration-100"
-          leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
-          leaveTo="tw-transform tw-opacity-0 tw-scale-95"
-          beforeEnter={() => setFocused(true)}
-          afterLeave={() => { validateNotUndefined(props.selected); setFocused(false); }}
-        >
-          <div className="tw-relative tw-z-10">
+        <div className="tw-relative tw-z-10" ref={setPopperElement} style={styles.popper} {...attributes.popper}>
+          <Transition
+            as={Fragment}
+            enter="tw-transition tw-ease-out tw-duration-100"
+            enterFrom="tw-transform tw-opacity-0 tw-scale-95"
+            enterTo="tw-transform tw-opacity-100 tw-scale-100"
+            leave="tw-transition tw-ease-in tw-duration-100"
+            leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
+            leaveTo="tw-transform tw-opacity-0 tw-scale-95"
+            beforeEnter={() => setFocused(true)}
+            afterLeave={() => { validateNotUndefined(props.selected); setFocused(false); }}
+          >
             <Listbox.Options className={mergeClasses("tw-absolute tw-z-20 tw-mt-1 tw-max-h-60 tw-min-w-full tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm", props.dropdownHeight)}>
               <DropdownOptions loading={props.loading} options={props.options} noOptionsString={props.noOptionsString} getElementForDisplay={getElementForDropdown} />
             </Listbox.Options>
-          </div>
-        </Transition>
+          </Transition>
+        </div>
       </div>
     </Listbox>
   );
@@ -314,6 +323,12 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
   const [query, setQuery] = useState('');
   const [focused, setFocused] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
+  const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(null);
+  const { styles, attributes } = usePopper(referenceElement, popperElement, {
+    strategy: 'fixed',
+    modifiers: [sameWidth],
+  });
 
   const getFilteredOptions = () => {
     if (query === '') {
@@ -365,7 +380,7 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
             {props.label}
           </label>
         </Transition>
-        <div className={mergeClasses("tw-flex tw-w-96 tw-mt-5 tw-rounded-md tw-bg-white tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 hover:tw-border-slate-400 focus-within:!tw-border-slate-700", props.className, props.validated && !isValid && 'tw-border-red-600')}>
+        <div ref={setReferenceElement} className={mergeClasses("tw-flex tw-w-96 tw-mt-5 tw-rounded-md tw-bg-white tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 hover:tw-border-slate-400 focus-within:!tw-border-slate-700", props.className, props.validated && !isValid && 'tw-border-red-600')}>
           <Combobox.Input
             className={"tw-inline tw-bg-transparent tw-w-[calc(100%-20px)] tw-border-none tw-text-sm tw-leading-5 tw-text-slate-900 tw-outline-none tw-text-ellipsis tw-cursor-pointer focus:tw-cursor-text"}
             displayValue={selected => selected !== UNSET ? getElementForDisplay(selected) : ""}
@@ -383,23 +398,23 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
             </span>
           </Combobox.Button>
         </div>
-        <Transition
-          as={Fragment}
-          enter="tw-transition tw-ease-out tw-duration-100"
-          enterFrom="tw-transform tw-opacity-0 tw-scale-95"
-          enterTo="tw-transform tw-opacity-100 tw-scale-100"
-          leave="tw-transition tw-ease-in tw-duration-100"
-          leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
-          leaveTo="tw-transform tw-opacity-0 tw-scale-95"
-          beforeEnter={() => setFocused(true)}
-          afterLeave={() => { validateNotUndefined(props.selected); setQuery(''); setFocused(false); }}
-        >
-          <div className="tw-relative tw-z-10">
+        <div className="tw-relative tw-z-10" ref={setPopperElement} style={styles.popper} {...attributes.popper}>
+          <Transition
+            as={Fragment}
+            enter="tw-transition tw-ease-out tw-duration-100"
+            enterFrom="tw-transform tw-opacity-0 tw-scale-95"
+            enterTo="tw-transform tw-opacity-100 tw-scale-100"
+            leave="tw-transition tw-ease-in tw-duration-100"
+            leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
+            leaveTo="tw-transform tw-opacity-0 tw-scale-95"
+            beforeEnter={() => setFocused(true)}
+            afterLeave={() => { validateNotUndefined(props.selected); setQuery(''); setFocused(false); }}
+          >
             <Combobox.Options className={mergeClasses("tw-absolute tw-z-20 tw-mt-1 tw-min-w-full tw-max-h-60 tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm", props.dropdownHeight)}>
               <ComboOptions loading={props.loading} options={filteredOptions} noOptionsString={props.noOptionsString} getElementForDisplay={getElementForDisplay} query={query} allowCustom={props.allowCustom} />
             </Combobox.Options>
-          </div>
-        </Transition>
+          </Transition>
+        </div>
       </div>
     </Combobox >
   );
@@ -475,3 +490,27 @@ const ComboOptions: React.FC<ComboOptionsProps> = props => {
     );
   }
 };
+
+const sameWidth: Modifier<"sameWidth"> = {
+  name: "sameWidth",
+  enabled: true,
+  phase: "beforeWrite",
+  requires: ["computeStyles"],
+  fn: ({ state }) => {
+    state.styles.popper.width = `${state.rects.reference.width}px`;
+  },
+  effect: ({ state }) => {
+    state.elements.popper.style.width = `${state.elements.reference.getBoundingClientRect().width}px`;
+  }
+};
+
+
+function Portal(props: { children: React.ReactNode; }) {
+  let { children } = props;
+  let [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) return null;
+  return createPortal(children, document.body);
+}

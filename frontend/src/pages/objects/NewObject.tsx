@@ -127,7 +127,6 @@ export const NewObjectForm: React.FC<NewObjectFormProps> = props => {
         }}
         noOptionsString="No Tables Available! (Choose a namespace)"
         validated={true}
-        allowCustom={true}
       />
       <ColumnSelector
         className="tw-mt-5 tw-w-[400px]"
