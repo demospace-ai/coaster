@@ -11,7 +11,6 @@ const initialize = () => {
 
     const frame = document.createElement("iframe");
     frame.setAttribute("src", "https://connect.fabra.io/connect.html");
-    frame.setAttribute("allowTransparency", "true");
     frame.style.position = "absolute";
     frame.style.width = "100%";
     frame.style.height = "100%";
