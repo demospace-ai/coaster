@@ -375,6 +375,19 @@ resource "google_storage_bucket" "fabra_frontend_bucket" {
     main_page_suffix = "index.html"
     not_found_page   = "index.html"
   }
+
+  cors {
+    max_age_seconds = 3600
+    method          = [
+        "GET",
+    ]
+    origin          = [
+      "*",
+    ]
+    response_header = [
+      "Content-Type",
+    ]
+  }
 }
 
 resource "google_storage_bucket_iam_member" "public_frontend_read_access" {
@@ -418,6 +431,19 @@ resource "google_storage_bucket" "fabra_connect_bucket" {
   website {
     main_page_suffix = "connect.html"
     not_found_page   = "connect.html"
+  }
+
+  cors {
+    max_age_seconds = 3600
+    method          = [
+        "GET",
+    ]
+    origin          = [
+      "*",
+    ]
+    response_header = [
+      "Content-Type",
+    ]
   }
 }
 
@@ -511,6 +537,7 @@ resource "google_compute_router_nat" "fabra-nat" {
   router   = google_compute_router.fabra-ip-router.name
   region   = "us-west1"
 
+  min_ports_per_vm       = 64
   nat_ip_allocate_option = "MANUAL_ONLY"
   nat_ips                = [
     google_compute_address.egress-ip-address.self_link,
