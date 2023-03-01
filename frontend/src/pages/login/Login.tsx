@@ -198,14 +198,14 @@ const OrganizationInput: React.FC<OrganizationInputProps> = props => {
       {suggestedOrganizations.map((suggestion, index) => (
         <li key={index} className="tw-border tw-border-black tw-rounded-md tw-list-none tw-p-8 tw-text-left tw-flex tw-flex-row">
           <Button className="tw-inline-block tw-mr-8 tw-h-10 tw-w-1/2" onClick={() => joinOrganization(suggestion.id)}>Join</Button>
-          <div className="tw-inline-block tw-h-10 tw-w-1/2 tw-text-center">
-            <div className="tw-overflow-hidden tw-text-ellipsis">{suggestion.name}</div>
+          <div className="tw-flex tw-flex-col tw-h-10 tw-w-1/2 tw-text-center tw-justify-center">
+            <div className="tw-overflow-hidden tw-text-ellipsis tw-font-bold tw-text-lg">{suggestion.name}</div>
             {/* TODO: add team size */}
           </div>
         </li>
       ))}
       <div className='tw-my-5 tw-mx-0'>or</div>
-      <Button className="tw-w-full" onClick={() => setOverrideCreate(true)} secondary={true}>Create new organization</Button>
+      <Button className="tw-w-full" onClick={() => setOverrideCreate(true)} >Create new organization</Button>
     </div>
   );
 };

@@ -5,18 +5,16 @@ import { NavLink, NavLinkProps, useNavigate } from 'react-router-dom';
 type ButtonProps = {
   onClick: () => void;
   className?: string;
-  secondary?: boolean;
   children: React.ReactNode;
 };
 
 export const Button: React.FC<ButtonProps> = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
-  const { onClick, className, children, secondary, ...remaining } = props;
+  const { onClick, className, children, ...remaining } = props;
 
   const buttonStyle = classNames(
     props.className,
     'tw-text-white tw-bg-slate-600 hover:tw-bg-slate-800',
     'tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition tw-select-none',
-    props.secondary && 'tw-bg-white tw-text-slate-800 tw-font-normal',
   );
   return (
     <button
