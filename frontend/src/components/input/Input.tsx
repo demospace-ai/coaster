@@ -1,7 +1,6 @@
 import { Combobox, Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
-import { Fragment, HTMLInputTypeAttribute, InputHTMLAttributes, useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import { Fragment, HTMLInputTypeAttribute, InputHTMLAttributes, useRef, useState } from "react";
 import { Modifier, usePopper } from "react-popper";
 import { Loading } from "src/components/loading/Loading";
 import { mergeClasses } from "src/utils/twmerge";
@@ -503,14 +502,3 @@ const sameWidth: Modifier<"sameWidth"> = {
     state.elements.popper.style.width = `${state.elements.reference.getBoundingClientRect().width}px`;
   }
 };
-
-
-function Portal(props: { children: React.ReactNode; }) {
-  let { children } = props;
-  let [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
-
-  if (!mounted) return null;
-  return createPortal(children, document.body);
-}
