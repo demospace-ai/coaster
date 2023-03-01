@@ -272,7 +272,7 @@ resource "google_compute_global_forwarding_rule" "https" {
 }
 
 locals {
-    managed_domains = tolist(["app.fabra.io", "connect.fabra.io"])
+    managed_domains = tolist(["app.fabra.io", "connect.fabra.io", "api.fabra.io"])
 }
 
 resource "random_id" "cert-name" {
@@ -287,6 +287,10 @@ resource "random_id" "cert-name" {
 resource "google_compute_managed_ssl_certificate" "cert" {
     name                      = random_id.cert-name.hex
     type                      = "MANAGED"
+
+    lifecycle {
+        create_before_destroy = true
+    }
 
     managed {
         domains = local.managed_domains
@@ -309,17 +313,22 @@ resource "google_compute_url_map" "default" {
         ]
         path_matcher = "fabra-connect-path-matcher"
     }
-    
+
+    host_rule {
+        hosts = [
+            "api.fabra.io",
+        ]
+        path_matcher = "fabra-api-path-matcher"
+    }
+
     path_matcher {
         name            = "fabra-lb-path-matcher"
         default_service = google_compute_backend_bucket.frontend_backend.id
-
-        path_rule {
-            paths   = [
-              "/api/*",
-            ]
-            service = google_compute_backend_service.default.id
-        }
+    }
+    
+    path_matcher {
+        name            = "fabra-api-path-matcher"
+        default_service = google_compute_backend_service.default.id
     }
 
     path_matcher {
