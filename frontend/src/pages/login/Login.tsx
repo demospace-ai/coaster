@@ -58,7 +58,7 @@ export const Login: React.FC = () => {
   return (
     <div className="tw-flex tw-flex-row tw-h-full tw-bg-slate-100">
       <div className="tw-mt-48 tw-mb-auto tw-mx-auto tw-w-[400px] tw-py-20 tw-px-8 tw-rounded-lg tw-shadow-md tw-bg-white">
-        <div className="tw-font-[Montserrat] tw-text-3xl tw-font-bold tw-mb-5 tw-text-center">fabra</div>
+        <div className="tw-font-[Montserrat] tw-select-none tw-text-3xl tw-font-bold tw-mb-5 tw-text-center">fabra</div>
         <div className="tw-w-[350px] tw-text-center tw-my-2">
           {loginContent}
         </div>
@@ -205,7 +205,7 @@ const OrganizationInput: React.FC<OrganizationInputProps> = props => {
         </li>
       ))}
       <div className='tw-my-5 tw-mx-0'>or</div>
-      <Button className="tw-w-full" onClick={() => setOverrideCreate(true)} >Create new organization</Button>
+      <Button className="tw-w-full tw-h-10" onClick={() => setOverrideCreate(true)} >Create new organization</Button>
     </div>
   );
 };
