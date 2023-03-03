@@ -3,27 +3,27 @@ package views
 import "go.fabra.io/server/common/models"
 
 type Sync struct {
-	ID             int64               `json:"id"`
-	OrganizationID int64               `json:"organization_id"`
-	DisplayName    string              `json:"display_name"`
-	SourceID       int64               `json:"source_id"`
-	ObjectID       int64               `json:"object_id"`
-	Namespace      string              `json:"namespace,omitempty"`
-	TableName      string              `json:"table_name,omitempty"`
-	CustomJoin     string              `json:"custom_join,omitempty"`
-	CursorField    string              `json:"cursor_field,omitempty"`
-	PrimaryKey     string              `json:"primary_key,omitempty"`
-	SyncMode       models.SyncMode     `json:"sync_mode"`
-	Frequency      int64               `json:"frequency"`
-	FieldMappings  []SyncFieldMappings `json:"field_mappings"`
+	ID             int64           `json:"id"`
+	OrganizationID int64           `json:"organization_id"`
+	DisplayName    string          `json:"display_name"`
+	SourceID       int64           `json:"source_id"`
+	ObjectID       int64           `json:"object_id"`
+	Namespace      string          `json:"namespace,omitempty"`
+	TableName      string          `json:"table_name,omitempty"`
+	CustomJoin     string          `json:"custom_join,omitempty"`
+	CursorField    string          `json:"cursor_field,omitempty"`
+	PrimaryKey     string          `json:"primary_key,omitempty"`
+	SyncMode       models.SyncMode `json:"sync_mode"`
+	Frequency      int64           `json:"frequency"`
+	FieldMappings  []FieldMappings `json:"field_mappings"`
 }
 
-type SyncFieldMappings struct {
+type FieldMappings struct {
 	SourceFieldName    string `json:"source_field_name"`
 	DestinationFieldId int64  `json:"destination_field_id"`
 }
 
-func ConvertSync(sync *models.Sync, fieldMappings []models.SyncFieldMapping) Sync {
+func ConvertSync(sync *models.Sync, fieldMappings []models.FieldMapping) Sync {
 	syncView := Sync{
 		ID:          sync.ID,
 		DisplayName: sync.DisplayName,
@@ -33,9 +33,9 @@ func ConvertSync(sync *models.Sync, fieldMappings []models.SyncFieldMapping) Syn
 		Frequency:   sync.Frequency,
 	}
 
-	var fieldMappingsView []SyncFieldMappings
+	var fieldMappingsView []FieldMappings
 	for _, fieldMapping := range fieldMappings {
-		fieldMappingsView = append(fieldMappingsView, SyncFieldMappings{
+		fieldMappingsView = append(fieldMappingsView, FieldMappings{
 			SourceFieldName:    fieldMapping.SourceFieldName,
 			DestinationFieldId: fieldMapping.DestinationFieldId,
 		})

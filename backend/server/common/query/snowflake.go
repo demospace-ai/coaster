@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/snowflakedb/gosnowflake"
+	"go.fabra.io/server/common/data"
 )
 
 type SnowflakeApiClient struct {
@@ -22,13 +23,14 @@ type SnowflakeApiClient struct {
 
 type SnowflakeIterator struct {
 	queryResult sql.Rows
+	schema      data.Schema
 }
 
 type snowflakeSchema struct {
 	Type string `json:"type"`
 }
 
-func (it SnowflakeIterator) Next() (Row, error) {
+func (it SnowflakeIterator) Next() (data.Row, error) {
 	if it.queryResult.Next() {
 		var row []interface{}
 		err := it.queryResult.Scan(&row)
@@ -38,7 +40,12 @@ func (it SnowflakeIterator) Next() (Row, error) {
 		return convertSnowflakeRow(row), nil
 	}
 
-	return nil, ErrDone
+	return nil, data.ErrDone
+}
+
+// TODO: this must be in order
+func (it SnowflakeIterator) Schema() data.Schema {
+	return it.schema
 }
 
 func (sc SnowflakeApiClient) openConnection(ctx context.Context) (*sql.DB, error) {
@@ -101,7 +108,7 @@ func (sc SnowflakeApiClient) GetTables(ctx context.Context, namespace string) ([
 	return tableNames, nil
 }
 
-func (sc SnowflakeApiClient) GetTableSchema(ctx context.Context, namespace string, tableName string) (Schema, error) {
+func (sc SnowflakeApiClient) GetTableSchema(ctx context.Context, namespace string, tableName string) (data.Schema, error) {
 	queryString := "SHOW COLUMNS IN " + namespace + "." + tableName
 
 	queryResult, err := sc.RunQuery(ctx, queryString)
@@ -109,23 +116,26 @@ func (sc SnowflakeApiClient) GetTableSchema(ctx context.Context, namespace strin
 		return nil, err
 	}
 
-	schema := Schema{}
+	schema := data.Schema{}
 	for _, row := range queryResult.Data {
 		if row[0] == nil {
 			continue
 		}
 
-		dataType, err := getSnowflakeColumnType(row[3])
+		var snowflakeSchema snowflakeSchema
+		err := json.Unmarshal([]byte(row[3].(string)), &snowflakeSchema)
 		if err != nil {
 			return nil, err
 		}
-		schema = append(schema, ColumnSchema{Name: row[2].(string), Type: dataType})
+
+		dataType := getSnowflakeColumnType(snowflakeSchema.Type)
+		schema = append(schema, data.ColumnSchema{Name: row[2].(string), Type: dataType})
 	}
 
 	return schema, nil
 }
 
-func (sc SnowflakeApiClient) GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]Value, error) {
+func (sc SnowflakeApiClient) GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]data.Value, error) {
 	queryString := "SELECT DISTINCT " + columnName + " FROM " + namespace + "." + tableName + " LIMIT 50"
 
 	queryResult, err := sc.RunQuery(ctx, queryString)
@@ -133,7 +143,7 @@ func (sc SnowflakeApiClient) GetColumnValues(ctx context.Context, namespace stri
 		return nil, err
 	}
 
-	values := []Value{}
+	values := []data.Value{}
 	for _, row := range queryResult.Data {
 		if row[0] == nil {
 			continue
@@ -171,7 +181,7 @@ func (sc SnowflakeApiClient) GetNamespaces(ctx context.Context) ([]string, error
 	return namespaces, nil
 }
 
-func (sc SnowflakeApiClient) RunQuery(ctx context.Context, queryString string, args ...any) (*QueryResults, error) {
+func (sc SnowflakeApiClient) RunQuery(ctx context.Context, queryString string, args ...any) (*data.QueryResults, error) {
 	client, err := sc.openConnection(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
@@ -190,7 +200,7 @@ func (sc SnowflakeApiClient) RunQuery(ctx context.Context, queryString string, a
 	}
 	numColumns := len(columns)
 
-	var rows []Row
+	var rows []data.Row
 	values := make([]interface{}, numColumns)
 	valuePtrs := make([]interface{}, numColumns)
 	for queryResult.Next() {
@@ -205,13 +215,13 @@ func (sc SnowflakeApiClient) RunQuery(ctx context.Context, queryString string, a
 		rows = append(rows, convertSnowflakeRow(values))
 	}
 
-	return &QueryResults{
+	return &data.QueryResults{
 		Schema: convertSnowflakeSchema(columns),
 		Data:   rows,
 	}, nil
 }
 
-func (sc SnowflakeApiClient) GetQueryIterator(ctx context.Context, queryString string) (RowIterator, error) {
+func (sc SnowflakeApiClient) GetQueryIterator(ctx context.Context, queryString string) (data.RowIterator, error) {
 	client, err := sc.openConnection(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
@@ -223,35 +233,48 @@ func (sc SnowflakeApiClient) GetQueryIterator(ctx context.Context, queryString s
 		return nil, err
 	}
 
-	return SnowflakeIterator{queryResult: *queryResult}, nil
+	columns, err := queryResult.ColumnTypes()
+	if err != nil {
+		return nil, err
+	}
+
+	return SnowflakeIterator{queryResult: *queryResult, schema: convertSnowflakeSchema(columns)}, nil
 }
 
-func convertSnowflakeRow(snowflakeRow []interface{}) Row {
-	var row Row
+func convertSnowflakeRow(snowflakeRow []interface{}) data.Row {
+	var row data.Row
 	for _, value := range snowflakeRow {
-		row = append(row, Value(value))
+		row = append(row, data.Value(value))
 	}
 
 	return row
 }
 
-func getSnowflakeColumnType(rawValue interface{}) (string, error) {
-	var snowflakeSchema snowflakeSchema
-	err := json.Unmarshal([]byte(rawValue.(string)), &snowflakeSchema)
-	if err != nil {
-		return "", err
+func getSnowflakeColumnType(snowflakeType string) data.ColumnType {
+	switch snowflakeType {
+	case "BIT", "BOOLEAN":
+		return data.ColumnTypeBoolean
+	case "INTEGER", "BIGINT", "SMALLINT", "TINYINT":
+		return data.ColumnTypeInteger
+	case "REAL", "DOUBLE", "DECIMAL", "NUMERIC", "FLOAT", "FIXED":
+		return data.ColumnTypeNumber
+	case "TIMESTAMP_TZ":
+		return data.ColumnTypeTimestampTz
+	case "TIMESTAMP", "TIMESTAMP_NTZ":
+		return data.ColumnTypeTimestampNtz
+	default:
+		// Everything can always be treated as a string
+		return data.ColumnTypeString
 	}
-
-	return snowflakeSchema.Type, nil
 }
 
-func convertSnowflakeSchema(columns []*sql.ColumnType) Schema {
-	schema := Schema{}
+func convertSnowflakeSchema(columns []*sql.ColumnType) data.Schema {
+	schema := data.Schema{}
 
 	for _, column := range columns {
-		columnSchema := ColumnSchema{
+		columnSchema := data.ColumnSchema{
 			Name: column.Name(),
-			Type: column.DatabaseTypeName(),
+			Type: getSnowflakeColumnType(column.DatabaseTypeName()),
 		}
 
 		schema = append(schema, columnSchema)

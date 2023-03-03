@@ -8,14 +8,14 @@ import (
 	"strconv"
 
 	"go.fabra.io/server/common/auth"
+	"go.fabra.io/server/common/data"
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/models"
-	"go.fabra.io/server/common/query"
 	"go.fabra.io/server/common/repositories/connections"
 )
 
 type GetSchemaResponse struct {
-	Schema query.Schema `json:"schema"`
+	Schema data.Schema `json:"schema"`
 }
 
 func (s ApiService) GetSchema(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
@@ -47,7 +47,7 @@ func (s ApiService) GetSchema(auth auth.Authentication, w http.ResponseWriter, r
 		return err
 	}
 
-	var schema query.Schema
+	var schema data.Schema
 	if len(customJoin) > 0 {
 		schema, err = s.getSchemaForCustomJoin(*connection, customJoin)
 		if err != nil {
@@ -65,7 +65,7 @@ func (s ApiService) GetSchema(auth auth.Authentication, w http.ResponseWriter, r
 	})
 }
 
-func (s ApiService) getSchemaForCustomJoin(connection models.Connection, customJoin string) (query.Schema, error) {
+func (s ApiService) getSchemaForCustomJoin(connection models.Connection, customJoin string) (data.Schema, error) {
 	switch connection.ConnectionType {
 	case models.ConnectionTypeBigQuery:
 		fallthrough

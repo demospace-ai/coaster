@@ -13,7 +13,7 @@ import { LinkGetPreview, LinkGetPreviewRequest, Object, ResultRow, Schema } from
 
 export const ObjectSetup: React.FC<SetupSyncProps> = (props) => {
   const setObject = (object: Object) => props.setState({ ...props.state, object: object, fieldMappings: undefined });
-  const setNamespace = (namespace: string) => props.setState({ ...props.state, namespace: namespace });
+  const setNamespace = (namespace: string) => props.setState({ ...props.state, namespace: namespace, tableName: undefined });
   const setTableName = (tableName: string) => props.setState({ ...props.state, tableName: tableName });
   const [limitPreview, setLimitPreview] = useState<boolean>(true);
   const [previewLoading, setPreviewLoading] = useState<boolean>(false);

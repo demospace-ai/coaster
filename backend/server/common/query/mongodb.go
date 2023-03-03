@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"go.fabra.io/server/common/data"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -21,7 +22,7 @@ type MongoDbApiClient struct {
 type MongoDbIterator struct {
 	mongoDbRows  bson.A
 	currentIndex int
-	schema       Schema
+	schema       data.Schema
 }
 
 type MongoQuery struct {
@@ -29,14 +30,19 @@ type MongoQuery struct {
 	Query    bson.D `json:"query"`
 }
 
-func (it *MongoDbIterator) Next() (Row, error) {
+// must be pointer receiver to increment field
+func (it *MongoDbIterator) Next() (data.Row, error) {
 	if it.currentIndex < len(it.mongoDbRows) {
 		row := convertMongoDbRow(it.mongoDbRows[it.currentIndex].(bson.M), it.schema)
-		it.currentIndex = it.currentIndex + 1
+		it.currentIndex++
 		return row, nil
 	}
 
-	return nil, ErrDone
+	return nil, data.ErrDone
+}
+
+func (it *MongoDbIterator) Schema() data.Schema {
+	return it.schema
 }
 
 func (sc MongoDbApiClient) openConnection(ctx context.Context) (*mongo.Client, error) {
@@ -66,7 +72,7 @@ func (sc MongoDbApiClient) GetTables(ctx context.Context, namespace string) ([]s
 	return db.ListCollectionNames(ctx, bson.D{})
 }
 
-func (sc MongoDbApiClient) GetTableSchema(ctx context.Context, namespace string, tableName string) (Schema, error) {
+func (sc MongoDbApiClient) GetTableSchema(ctx context.Context, namespace string, tableName string) (data.Schema, error) {
 	client, err := sc.openConnection(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
@@ -89,7 +95,7 @@ func (sc MongoDbApiClient) GetTableSchema(ctx context.Context, namespace string,
 	return convertMongoDbSchema(fieldTypes), nil
 }
 
-func (sc MongoDbApiClient) GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]Value, error) {
+func (sc MongoDbApiClient) GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]data.Value, error) {
 	// TODO
 	return nil, nil
 }
@@ -110,7 +116,7 @@ func (sc MongoDbApiClient) GetNamespaces(ctx context.Context) ([]string, error) 
 	return databaseNames, nil
 }
 
-func (sc MongoDbApiClient) RunQuery(ctx context.Context, queryString string, args ...any) (*QueryResults, error) {
+func (sc MongoDbApiClient) RunQuery(ctx context.Context, queryString string, args ...any) (*data.QueryResults, error) {
 	client, err := sc.openConnection(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
@@ -132,15 +138,15 @@ func (sc MongoDbApiClient) RunQuery(ctx context.Context, queryString string, arg
 	).Decode(&result)
 
 	rows := result["cursor"].(bson.M)["firstBatch"].(bson.A)
-	schema := getMongoSchema(rows[0].(bson.M))
+	schema := getMongoSchemaFromRow(rows[0].(bson.M))
 
-	return &QueryResults{
+	return &data.QueryResults{
 		Schema: schema,
 		Data:   convertMongoDbRows(rows, schema),
 	}, nil
 }
 
-func (sc MongoDbApiClient) GetQueryIterator(ctx context.Context, queryString string) (RowIterator, error) {
+func (sc MongoDbApiClient) GetQueryIterator(ctx context.Context, queryString string) (data.RowIterator, error) {
 	client, err := sc.openConnection(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
@@ -162,7 +168,7 @@ func (sc MongoDbApiClient) GetQueryIterator(ctx context.Context, queryString str
 	).Decode(&result)
 
 	rows := result["cursor"].(bson.M)["firstBatch"].(bson.A)
-	schema := getMongoSchema(rows[0].(bson.M))
+	schema := getMongoSchemaFromRow(rows[0].(bson.M))
 
 	return &MongoDbIterator{
 		schema:       schema,
@@ -171,8 +177,8 @@ func (sc MongoDbApiClient) GetQueryIterator(ctx context.Context, queryString str
 	}, nil
 }
 
-func convertMongoDbRows(mongoDbRows bson.A, schema Schema) []Row {
-	var rows []Row
+func convertMongoDbRows(mongoDbRows bson.A, schema data.Schema) []data.Row {
+	var rows []data.Row
 	for _, mongoDbRow := range mongoDbRows {
 		rows = append(rows, convertMongoDbRow(mongoDbRow.(bson.M), schema))
 	}
@@ -180,23 +186,23 @@ func convertMongoDbRows(mongoDbRows bson.A, schema Schema) []Row {
 	return rows
 }
 
-func convertMongoDbRow(mongoDbRow bson.M, schema Schema) Row {
-	var row Row
+func convertMongoDbRow(mongoDbRow bson.M, schema data.Schema) data.Row {
+	var row data.Row
 	// make sure every result is in the same order by looping through schema
 	for _, columnName := range schema {
 		mongoDbValue := mongoDbRow[columnName.Name]
-		row = append(row, Value(mongoDbValue))
+		row = append(row, data.Value(mongoDbValue))
 	}
 
 	return row
 }
 
-func convertMongoDbSchema(fieldTypes map[string]string) Schema {
-	var schema Schema
+func convertMongoDbSchema(fieldTypes map[string]string) data.Schema {
+	var schema data.Schema
 	for fieldName, fieldType := range fieldTypes {
-		schema = append(schema, ColumnSchema{
+		schema = append(schema, data.ColumnSchema{
 			Name: fieldName,
-			Type: fieldType,
+			Type: getMongoDbColumnType(fieldType),
 		})
 	}
 
@@ -277,26 +283,53 @@ func getFieldTypes(collection *mongo.Collection, fields []string) (map[string]st
 	return fieldTypes, nil
 }
 
-func getMongoSchema(firstRow bson.M) Schema {
-	schema := Schema{}
+func getMongoSchemaFromRow(firstRow bson.M) data.Schema {
+	schema := data.Schema{}
 	for key, value := range firstRow {
-		fieldType := reflect.TypeOf(value).String()
-		switch fieldType {
+		mongoDbType := reflect.TypeOf(value).String()
+		switch mongoDbType {
+		case "primitive.DateTime":
+			mongoDbType = "datetime"
+		case "primitive.Timestamp":
+			mongoDbType = "timestamp"
 		case "primitive.A":
-			fieldType = "array"
+			mongoDbType = "array"
 		case "primitive.M":
-			fieldType = "json"
-		case "primitive.ObjectID":
-			fieldType = "objectID"
+			mongoDbType = "object"
+		case "primitive.Decimal128":
+			mongoDbType = "decimal"
 		}
 
-		columnSchema := ColumnSchema{
+		columnSchema := data.ColumnSchema{
 			Name: key,
-			Type: fieldType,
+			Type: getMongoDbColumnType(mongoDbType),
 		}
 
 		schema = append(schema, columnSchema)
 	}
 
 	return schema
+}
+
+func getMongoDbColumnType(mongoDbType string) data.ColumnType {
+	switch mongoDbType {
+	case "int", "int32", "long":
+		return data.ColumnTypeInteger
+	case "date":
+		return data.ColumnTypeDate
+	case "datetime":
+		return data.ColumnTypeDateTime
+	case "decimal", "double", "float64":
+		return data.ColumnTypeNumber
+	case "timestamp":
+		return data.ColumnTypeTimestampNtz
+	case "array":
+		return data.ColumnTypeArray
+	case "object":
+		return data.ColumnTypeJson
+	case "bool":
+		return data.ColumnTypeBoolean
+	default:
+		return data.ColumnTypeString
+	}
 }

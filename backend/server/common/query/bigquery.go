@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"cloud.google.com/go/bigquery"
+	"go.fabra.io/server/common/data"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 )
@@ -19,11 +20,11 @@ type BigQueryIterator struct {
 	Iterator *bigquery.RowIterator
 }
 
-func (it BigQueryIterator) Next() (Row, error) {
+func (it BigQueryIterator) Next() (data.Row, error) {
 	var row []bigquery.Value
 	err := it.Iterator.Next(&row)
 	if err == iterator.Done {
-		return nil, ErrDone
+		return nil, data.ErrDone
 	}
 
 	if err != nil {
@@ -31,6 +32,11 @@ func (it BigQueryIterator) Next() (Row, error) {
 	}
 
 	return convertBigQueryRow(row), nil
+}
+
+// TODO: this must be in order
+func (it BigQueryIterator) Schema() data.Schema {
+	return convertBigQuerySchema(it.Iterator.Schema)
 }
 
 func (ac BigQueryApiClient) openConnection(ctx context.Context) (*bigquery.Client, error) {
@@ -71,7 +77,7 @@ func (ac BigQueryApiClient) GetTables(ctx context.Context, namespace string) ([]
 	return results, nil
 }
 
-func (ac BigQueryApiClient) GetTableSchema(ctx context.Context, namespace string, tableName string) (Schema, error) {
+func (ac BigQueryApiClient) GetTableSchema(ctx context.Context, namespace string, tableName string) (data.Schema, error) {
 	queryString := "SELECT * FROM " + namespace + ".INFORMATION_SCHEMA.COLUMNS WHERE table_name = '" + tableName + "'"
 
 	queryResults, err := ac.RunQuery(ctx, queryString)
@@ -79,19 +85,19 @@ func (ac BigQueryApiClient) GetTableSchema(ctx context.Context, namespace string
 		return nil, err
 	}
 
-	schema := Schema{}
+	schema := data.Schema{}
 	for _, row := range queryResults.Data {
 		if row[0] == nil {
 			continue
 		}
 
-		schema = append(schema, ColumnSchema{Name: row[3].(string), Type: row[6].(string)})
+		schema = append(schema, data.ColumnSchema{Name: row[3].(string), Type: getBigQueryColumnType(row[6].(string))})
 	}
 
 	return schema, nil
 }
 
-func (ac BigQueryApiClient) GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]Value, error) {
+func (ac BigQueryApiClient) GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]data.Value, error) {
 	queryString := "SELECT DISTINCT " + columnName + " FROM " + namespace + "." + tableName + " LIMIT 50"
 
 	queryResults, err := ac.RunQuery(ctx, queryString)
@@ -99,7 +105,7 @@ func (ac BigQueryApiClient) GetColumnValues(ctx context.Context, namespace strin
 		return nil, err
 	}
 
-	values := []Value{}
+	values := []data.Value{}
 	for _, row := range queryResults.Data {
 		if row[0] == nil {
 			continue
@@ -136,7 +142,7 @@ func (ac BigQueryApiClient) GetNamespaces(ctx context.Context) ([]string, error)
 	return results, nil
 }
 
-func (ac BigQueryApiClient) RunQuery(ctx context.Context, queryString string, args ...any) (*QueryResults, error) {
+func (ac BigQueryApiClient) RunQuery(ctx context.Context, queryString string, args ...any) (*data.QueryResults, error) {
 	client, err := ac.openConnection(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
@@ -167,7 +173,7 @@ func (ac BigQueryApiClient) RunQuery(ctx context.Context, queryString string, ar
 		return nil, err
 	}
 
-	var results []Row
+	var results []data.Row
 	it, err := job.Read(ctx)
 	if err != nil {
 		return nil, err
@@ -185,13 +191,13 @@ func (ac BigQueryApiClient) RunQuery(ctx context.Context, queryString string, ar
 		results = append(results, convertBigQueryRow(row))
 	}
 
-	return &QueryResults{
+	return &data.QueryResults{
 		Schema: convertBigQuerySchema(it.Schema),
 		Data:   results,
 	}, nil
 }
 
-func (ac BigQueryApiClient) GetQueryIterator(ctx context.Context, queryString string) (RowIterator, error) {
+func (ac BigQueryApiClient) GetQueryIterator(ctx context.Context, queryString string) (data.RowIterator, error) {
 	client, err := ac.openConnection(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
@@ -225,22 +231,45 @@ func (ac BigQueryApiClient) GetQueryIterator(ctx context.Context, queryString st
 	}, nil
 }
 
-func convertBigQueryRow(bigQueryRow []bigquery.Value) Row {
-	var row Row
+func convertBigQueryRow(bigQueryRow []bigquery.Value) data.Row {
+	var row data.Row
 	for _, value := range bigQueryRow {
-		row = append(row, Value(value))
+		row = append(row, data.Value(value))
 	}
 
 	return row
 }
 
-func convertBigQuerySchema(bigQuerySchema bigquery.Schema) Schema {
-	schema := Schema{}
+func getBigQueryColumnType(bigQueryType string) data.ColumnType {
+	switch bigQueryType {
+	case "INTEGER", "INT64":
+		return data.ColumnTypeInteger
+	case "FLOAT", "NUMERIC", "BIGNUMERIC":
+		return data.ColumnTypeNumber
+	case "BOOLEAN":
+		return data.ColumnTypeBoolean
+	case "TIMESTAMP":
+		return data.ColumnTypeTimestampTz
+	case "JSON":
+		return data.ColumnTypeJson
+	case "DATE":
+		return data.ColumnTypeDate
+	case "TIME":
+		return data.ColumnTypeTime
+	case "DATETIME":
+		return data.ColumnTypeDateTime
+	default:
+		return data.ColumnTypeString
+	}
+}
+
+func convertBigQuerySchema(bigQuerySchema bigquery.Schema) data.Schema {
+	schema := data.Schema{}
 
 	for _, bigQuerySchemaField := range bigQuerySchema {
-		columnSchema := ColumnSchema{
+		columnSchema := data.ColumnSchema{
 			Name: bigQuerySchemaField.Name,
-			Type: string(bigQuerySchemaField.Type),
+			Type: getBigQueryColumnType(string(bigQuerySchemaField.Type)),
 		}
 
 		schema = append(schema, columnSchema)

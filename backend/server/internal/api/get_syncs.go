@@ -23,7 +23,7 @@ func (s ApiService) GetSyncs(auth auth.Authentication, w http.ResponseWriter, r 
 	syncViews := []views.Sync{}
 	for _, sync := range syncs {
 		// TODO: load sync field mappings
-		syncViews = append(syncViews, views.ConvertSync(&sync, []models.SyncFieldMapping{}))
+		syncViews = append(syncViews, views.ConvertSync(&sync, []models.FieldMapping{}))
 	}
 
 	return json.NewEncoder(w).Encode(GetSyncsResponse{

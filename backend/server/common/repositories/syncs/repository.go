@@ -65,41 +65,41 @@ func CreateFieldMappings(
 	db *gorm.DB,
 	organizationID int64,
 	syncID int64,
-	syncFieldMappings []input.SyncFieldMapping,
-) ([]models.SyncFieldMapping, error) {
+	fieldMappings []input.FieldMapping,
+) ([]models.FieldMapping, error) {
 	// TODO: validate that the mapped object fields belong to the right object
-	var createdSyncFieldMappings []models.SyncFieldMapping
-	for _, syncFieldMapping := range syncFieldMappings {
-		syncFieldMappingModel := models.SyncFieldMapping{
+	var createdFieldMappings []models.FieldMapping
+	for _, fieldMapping := range fieldMappings {
+		fieldMappingModel := models.FieldMapping{
 			SyncID:             syncID,
-			SourceFieldName:    syncFieldMapping.SourceFieldName,
-			DestinationFieldId: syncFieldMapping.DestinationFieldId,
+			SourceFieldName:    fieldMapping.SourceFieldName,
+			DestinationFieldId: fieldMapping.DestinationFieldId,
 		}
 
-		result := db.Create(&syncFieldMappingModel)
+		result := db.Create(&fieldMappingModel)
 		if result.Error != nil {
 			return nil, result.Error
 		}
-		createdSyncFieldMappings = append(createdSyncFieldMappings, syncFieldMappingModel)
+		createdFieldMappings = append(createdFieldMappings, fieldMappingModel)
 	}
 
-	return createdSyncFieldMappings, nil
+	return createdFieldMappings, nil
 }
 
 func LoadSyncByID(db *gorm.DB, organizationID int64, syncID int64) (*models.Sync, error) {
-	var eventSet models.Sync
+	var sync models.Sync
 	result := db.Table("syncs").
 		Select("syncs.*").
 		Where("syncs.id = ?", syncID).
 		Where("syncs.organization_id = ?", organizationID).
 		Where("syncs.deactivated_at IS NULL").
-		Take(&eventSet)
+		Take(&sync)
 
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
-	return &eventSet, nil
+	return &sync, nil
 }
 
 func LoadAllSyncs(
@@ -119,4 +119,25 @@ func LoadAllSyncs(
 	}
 
 	return sync, nil
+}
+
+func LoadFieldMappingsForSync(
+	db *gorm.DB,
+	organizationID int64,
+	syncID int64,
+) ([]models.FieldMapping, error) {
+	// TODO: validate that the mapped object fields belong to the right object
+	var fieldMappings []models.FieldMapping
+	result := db.Table("field_mappings").
+		Select("field_mappings.*").
+		Where("field_mappings.sync_id = ?", syncID).
+		Where("field_mappings.organization_id = ?", organizationID).
+		Where("field_mappings.deactivated_at IS NULL").
+		Find(&fieldMappings)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return fieldMappings, nil
 }

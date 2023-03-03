@@ -1,6 +1,7 @@
 package views
 
 import (
+	"go.fabra.io/server/common/data"
 	"go.fabra.io/server/common/models"
 )
 
@@ -33,12 +34,12 @@ type Object struct {
 }
 
 type ObjectField struct {
-	ID          int64  `json:"id"`
-	Name        string `json:"name"`
-	Type        string `json:"type"`
-	DisplayName string `json:"display_name,omitempty"`
-	Description string `json:"description,omitempty"`
-	Omit        bool   `json:"omit"`
+	ID          int64           `json:"id"`
+	Name        string          `json:"name"`
+	Type        data.ColumnType `json:"type"`
+	DisplayName string          `json:"display_name,omitempty"`
+	Description string          `json:"description,omitempty"`
+	Omit        bool            `json:"omit"`
 }
 
 func ConvertDestination(destination models.Destination, connection models.Connection) Destination {

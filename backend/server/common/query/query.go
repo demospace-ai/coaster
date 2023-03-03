@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"go.fabra.io/server/common/crypto"
+	"go.fabra.io/server/common/data"
 	"go.fabra.io/server/common/models"
 
 	"gorm.io/gorm"
@@ -12,10 +13,10 @@ import (
 type QueryService interface {
 	GetNamespaces(ctx context.Context, connection *models.Connection) ([]string, error)
 	GetTables(ctx context.Context, connection *models.Connection, namespace string) ([]string, error)
-	GetTableSchema(ctx context.Context, connection *models.Connection, namespace string, tableName string) ([]ColumnSchema, error)
-	GetColumnValues(ctx context.Context, connection *models.Connection, namespace string, tableName string, columnName string) ([]Value, error)
-	RunQuery(ctx context.Context, connection *models.Connection, queryString string) (*QueryResults, error)
-	GetQueryIterator(ctx context.Context, connection *models.Connection, queryString string) (RowIterator, error)
+	GetTableSchema(ctx context.Context, connection *models.Connection, namespace string, tableName string) ([]data.ColumnSchema, error)
+	GetColumnValues(ctx context.Context, connection *models.Connection, namespace string, tableName string, columnName string) ([]data.Value, error)
+	RunQuery(ctx context.Context, connection *models.Connection, queryString string) (*data.QueryResults, error)
+	GetQueryIterator(ctx context.Context, connection *models.Connection, queryString string) (data.RowIterator, error)
 }
 
 type QueryServiceImpl struct {
@@ -30,7 +31,7 @@ func NewQueryService(db *gorm.DB, cryptoService crypto.CryptoService) QueryServi
 	}
 }
 
-func (qs QueryServiceImpl) RunQuery(ctx context.Context, connection *models.Connection, queryString string) (*QueryResults, error) {
+func (qs QueryServiceImpl) RunQuery(ctx context.Context, connection *models.Connection, queryString string) (*data.QueryResults, error) {
 	client, err := qs.newAPIClient(ctx, connection)
 	if err != nil {
 		return nil, err
@@ -39,7 +40,7 @@ func (qs QueryServiceImpl) RunQuery(ctx context.Context, connection *models.Conn
 	return client.RunQuery(ctx, queryString)
 }
 
-func (qs QueryServiceImpl) GetQueryIterator(ctx context.Context, connection *models.Connection, queryString string) (RowIterator, error) {
+func (qs QueryServiceImpl) GetQueryIterator(ctx context.Context, connection *models.Connection, queryString string) (data.RowIterator, error) {
 	client, err := qs.newAPIClient(ctx, connection)
 	if err != nil {
 		return nil, err
@@ -66,7 +67,7 @@ func (qs QueryServiceImpl) GetTables(ctx context.Context, connection *models.Con
 	return client.GetTables(ctx, namespace)
 }
 
-func (qs QueryServiceImpl) GetTableSchema(ctx context.Context, connection *models.Connection, namespace string, tableName string) ([]ColumnSchema, error) {
+func (qs QueryServiceImpl) GetTableSchema(ctx context.Context, connection *models.Connection, namespace string, tableName string) ([]data.ColumnSchema, error) {
 	client, err := qs.newAPIClient(ctx, connection)
 	if err != nil {
 		return nil, err
@@ -75,7 +76,7 @@ func (qs QueryServiceImpl) GetTableSchema(ctx context.Context, connection *model
 	return client.GetTableSchema(ctx, namespace, tableName)
 }
 
-func (qs QueryServiceImpl) GetColumnValues(ctx context.Context, connection *models.Connection, namespace string, tableName string, columnName string) ([]Value, error) {
+func (qs QueryServiceImpl) GetColumnValues(ctx context.Context, connection *models.Connection, namespace string, tableName string, columnName string) ([]data.Value, error) {
 	client, err := qs.newAPIClient(ctx, connection)
 	if err != nil {
 		return nil, err

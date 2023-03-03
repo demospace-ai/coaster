@@ -15,19 +15,19 @@ import (
 )
 
 type CreateSyncRequest struct {
-	DisplayName    string                   `json:"display_name"`
-	EndCustomerId  int64                    `json:"end_customer_id"`
-	SourceID       int64                    `json:"source_id"`
-	ObjectID       int64                    `json:"object_id"`
-	Namespace      *string                  `json:"namespace,omitempty"`
-	TableName      *string                  `json:"table_name,omitempty"`
-	CustomJoin     *string                  `json:"custom_join,omitempty"`
-	CursorField    *string                  `json:"cursor_field,omitempty"`
-	PrimaryKey     *string                  `json:"primary_key,omitempty"`
-	SyncMode       models.SyncMode          `json:"sync_mode"`
-	Frequency      int64                    `json:"frequency"`
-	FrequencyUnits models.FrequencyUnits    `json:"frequency_units"`
-	FieldMappings  []input.SyncFieldMapping `json:"field_mappings"`
+	DisplayName    string                `json:"display_name"`
+	EndCustomerId  int64                 `json:"end_customer_id"`
+	SourceID       int64                 `json:"source_id"`
+	ObjectID       int64                 `json:"object_id"`
+	Namespace      *string               `json:"namespace,omitempty"`
+	TableName      *string               `json:"table_name,omitempty"`
+	CustomJoin     *string               `json:"custom_join,omitempty"`
+	CursorField    *string               `json:"cursor_field,omitempty"`
+	PrimaryKey     *string               `json:"primary_key,omitempty"`
+	SyncMode       models.SyncMode       `json:"sync_mode"`
+	Frequency      int64                 `json:"frequency"`
+	FrequencyUnits models.FrequencyUnits `json:"frequency_units"`
+	FieldMappings  []input.FieldMapping  `json:"field_mappings"`
 }
 
 type CreateSyncResponse struct {

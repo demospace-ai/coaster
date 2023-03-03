@@ -180,6 +180,8 @@ export const createNewSource = async (
       source: response.source,
       step: SyncSetupStep.Object,
       newSourceState: { ...state.newSourceState, sourceCreated: true },
+      namespace: undefined, // set namespace and table name to undefined since we're using a new source
+      tableName: undefined,
     });
   } catch (e) {
     setState({ ...state, newSourceState: { ...state.newSourceState, error: String(e) } });

@@ -2,12 +2,9 @@ package config
 
 import (
 	"context"
-	"fmt"
-
-	secretmanager "cloud.google.com/go/secretmanager/apiv1"
-	"cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"
 
 	"github.com/spf13/viper"
+	"go.fabra.io/server/common/secret"
 )
 
 // TODO: move this configuration to YAML or something
@@ -34,7 +31,7 @@ func GetDbPassword() string {
 }
 
 func addSecretToConfig(secretConfig secretConfigType) error {
-	secret, err := fetchSecret(secretConfig.secretKey)
+	secret, err := secret.FetchSecret(context.TODO(), secretConfig.secretKey)
 	if err != nil {
 		return err
 	}
@@ -42,24 +39,4 @@ func addSecretToConfig(secretConfig secretConfigType) error {
 	viper.Set(secretConfig.configKey, secret)
 
 	return nil
-}
-
-func fetchSecret(name string) (*string, error) {
-	ctx := context.Background()
-	client, err := secretmanager.NewClient(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create secretmanager client: %v", err)
-	}
-
-	req := &secretmanagerpb.AccessSecretVersionRequest{
-		Name: name,
-	}
-
-	result, err := client.AccessSecretVersion(ctx, req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to access secret version: %v", err)
-	}
-
-	secret := string(result.Payload.Data)
-	return &secret, nil
 }

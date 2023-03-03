@@ -35,7 +35,7 @@ export const Sources: React.FC<SetupSyncProps> = (props) => {
 const SourceTable: React.FC<SetupSyncProps> = ({ linkToken, state, setState }) => {
   const { sources } = useLinkSources(linkToken);
   const setExistingSource = (source: Source) => {
-    setState({ ...state, source: source, step: SyncSetupStep.Object, skippedSourceSetup: true });
+    setState({ ...state, source: source, step: SyncSetupStep.Object, skippedSourceSetup: true, namespace: undefined, tableName: undefined });
   };
   return (
     <div className="tw-mt-5 tw-flow-root tw-select-none">

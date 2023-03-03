@@ -1,5 +1,7 @@
 package input
 
+import "go.fabra.io/server/common/data"
+
 type SnowflakeConfig struct {
 	Username      string `json:"username,omitempty"`
 	Password      string `json:"password,omitempty"`
@@ -30,9 +32,9 @@ type BigQueryConfig struct {
 }
 
 type ObjectField struct {
-	Name        string  `json:"name"`
-	Type        string  `json:"type"`
-	DisplayName *string `json:"display_name,omitempty"`
-	Description *string `json:"description,omitempty"`
-	Omit        bool    `json:"omit"`
+	Name        string          `json:"name"`
+	Type        data.ColumnType `json:"type"`
+	DisplayName *string         `json:"display_name,omitempty"`
+	Description *string         `json:"description,omitempty"`
+	Omit        bool            `json:"omit"`
 }

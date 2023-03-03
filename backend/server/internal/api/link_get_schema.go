@@ -8,8 +8,8 @@ import (
 	"strconv"
 
 	"go.fabra.io/server/common/auth"
+	"go.fabra.io/server/common/data"
 	"go.fabra.io/server/common/errors"
-	"go.fabra.io/server/common/query"
 	"go.fabra.io/server/common/repositories/connections"
 	"go.fabra.io/server/common/repositories/sources"
 )
@@ -52,7 +52,7 @@ func (s ApiService) LinkGetSchema(auth auth.Authentication, w http.ResponseWrite
 		return err
 	}
 
-	var schema query.Schema
+	var schema data.Schema
 	if len(customJoin) > 0 {
 		schema, err = s.getSchemaForCustomJoin(*connection, customJoin)
 		if err != nil {

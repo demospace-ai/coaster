@@ -3,12 +3,11 @@ package temporal
 import (
 	"time"
 
-	"go.fabra.io/server/common/crypto"
-	"go.fabra.io/server/common/database"
-	"go.fabra.io/server/common/query"
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/workflow"
 )
+
+const SyncTaskQueue = "SYNC_TASK_QUEUE"
 
 type SyncInput struct {
 	OrganizationID int64
@@ -16,12 +15,14 @@ type SyncInput struct {
 }
 
 func SyncWorkflow(ctx workflow.Context, input SyncInput) error {
+	logger := workflow.GetLogger(ctx)
+
 	// RetryPolicy specifies how to automatically handle retries if an Activity fails.
 	retrypolicy := &temporal.RetryPolicy{
 		InitialInterval:    time.Second,
 		BackoffCoefficient: 2.0,
 		MaximumInterval:    time.Minute,
-		MaximumAttempts:    500,
+		MaximumAttempts:    1,
 	}
 	options := workflow.ActivityOptions{
 		// Timeout options specify when to automatically timeout Activity functions.
@@ -32,32 +33,12 @@ func SyncWorkflow(ctx workflow.Context, input SyncInput) error {
 	}
 
 	ctx = workflow.WithActivityOptions(ctx, options)
-
-	db, err := database.InitDatabase()
+	replicateInput := ReplicateInput(input)
+	err := workflow.ExecuteActivity(ctx, Replicate, replicateInput).Get(ctx, nil)
 	if err != nil {
 		return err
 	}
 
-	queryService := query.NewQueryService(db, crypto.NewCryptoService())
-
-	fetchConfigurationInput := FetchConfigurationInput{
-		db:             db,
-		organizationID: input.OrganizationID,
-		syncID:         input.SyncID,
-	}
-	var sync SyncDetails
-	err = workflow.ExecuteActivity(ctx, FetchConfiguration, fetchConfigurationInput).Get(ctx, &sync)
-	if err != nil {
-		return err
-	}
-
-	replicateInput := ReplicateInput{
-		sync:         sync,
-		queryService: queryService,
-	}
-	err = workflow.ExecuteActivity(ctx, Replicate, replicateInput).Get(ctx, nil)
-	if err != nil {
-		return err
-	}
+	logger.Info("Workflow success")
 	return nil
 }
