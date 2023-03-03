@@ -172,6 +172,7 @@ func getInsertStringForModel(object *models.Object, destination *models.Destinat
 	return ""
 }
 
+// TODO: this is only for bigquery, snowflake needs to do parse_json
 func createRowFormat(sourceSchema data.Schema, destinationSchema data.Schema, objectFields []models.ObjectField, fieldMappings []models.FieldMapping) (string, error) {
 	orderedObjectFields, err := createOrderedObjectFields(destinationSchema, objectFields)
 	if err != nil {
@@ -188,7 +189,7 @@ func createRowFormat(sourceSchema data.Schema, destinationSchema data.Schema, ob
 		sourceNameToPosition[sourceColumn.Name] = i
 	}
 
-	rowFormat := ""
+	rowFormat := "("
 	for _, objectField := range orderedObjectFields {
 		pos, err := getSourceColumnPosition(objectField, sourceNameToPosition, destIdToSourceName)
 		if err != nil {
@@ -196,10 +197,16 @@ func createRowFormat(sourceSchema data.Schema, destinationSchema data.Schema, ob
 		}
 
 		// TODO: assert source type matches/is compatible with dest type
-		if objectField.Type == data.ColumnTypeString {
-			rowFormat += fmt.Sprintf("\"%%[%d]s\" ", pos) // this adds a string of the format: "%[2]s"
+		switch objectField.Type {
+		case data.ColumnTypeString:
+			rowFormat += fmt.Sprintf("'%%[%d]v' ", pos) // this adds a string of the format: '%[2]v'
+		case data.ColumnTypeJson:
+			rowFormat += fmt.Sprintf("JSON '%%[%d]v' ", pos) // this adds a string of the format: JSON '%[2]v'
+		default:
+			rowFormat += fmt.Sprintf("%%[%d]v ", pos) // this adds a string of the format: %[2]v
 		}
 	}
+	rowFormat += ")"
 
 	return rowFormat, nil
 }
