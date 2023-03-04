@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"go.fabra.io/server/common/auth"
+	"go.fabra.io/server/common/data"
 	"go.fabra.io/server/common/models"
-	"go.fabra.io/server/common/views"
 
 	"gorm.io/gorm"
 )
@@ -63,18 +63,18 @@ func (qs MockQueryService) GetTables(ctx context.Context, connection *models.Con
 	return nil, nil
 }
 
-func (qs MockQueryService) GetTableSchema(ctx context.Context, connection *models.Connection, namespace string, tableName string) ([]views.ColumnSchema, error) {
+func (qs MockQueryService) GetTableSchema(ctx context.Context, connection *models.Connection, namespace string, tableName string) ([]data.ColumnSchema, error) {
 	return nil, nil
 }
 
-func (qs MockQueryService) GetColumnValues(ctx context.Context, connection *models.Connection, namespace string, tableName string, columnName string) ([]views.Value, error) {
+func (qs MockQueryService) GetColumnValues(ctx context.Context, connection *models.Connection, namespace string, tableName string, columnName string) ([]data.Value, error) {
 	return nil, nil
 }
 
-func (qs MockQueryService) RunQuery(ctx context.Context, connection *models.Connection, queryString string) (*views.QueryResults, error) {
+func (qs MockQueryService) RunQuery(ctx context.Context, connection *models.Connection, queryString string) (*data.QueryResults, error) {
 	return nil, nil
 }
 
-func (qs MockQueryService) GetQueryIterator(ctx context.Context, connection *models.Connection, queryString string) (views.RowIterator, error) {
+func (qs MockQueryService) GetQueryIterator(ctx context.Context, connection *models.Connection, queryString string) (data.RowIterator, error) {
 	return nil, nil
 }

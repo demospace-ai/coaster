@@ -131,7 +131,6 @@ func LoadFieldMappingsForSync(
 	result := db.Table("field_mappings").
 		Select("field_mappings.*").
 		Where("field_mappings.sync_id = ?", syncID).
-		Where("field_mappings.organization_id = ?", organizationID).
 		Where("field_mappings.deactivated_at IS NULL").
 		Find(&fieldMappings)
 
