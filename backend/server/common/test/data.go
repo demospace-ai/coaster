@@ -92,13 +92,29 @@ func CreateApiKey(db *gorm.DB, organizationID int64) string {
 	return rawKey
 }
 
-func CreateLinkToken(db *gorm.DB, organizationID int64, endCustomerId int64) string {
+func CreateActiveLinkToken(db *gorm.DB, organizationID int64, endCustomerId int64) string {
 	rawToken := "linkToken"
 	hashedToken := crypto.HashString(rawToken)
 	linkToken := models.LinkToken{
 		EndCustomerID:  endCustomerId,
 		OrganizationID: organizationID,
 		HashedToken:    hashedToken,
+		Expiration:     time.Now().Add(time.Duration(1) * time.Hour),
+	}
+
+	db.Create(&linkToken)
+
+	return rawToken
+}
+
+func CreateExpiredLinkToken(db *gorm.DB, organizationID int64, endCustomerId int64) string {
+	rawToken := "linkToken"
+	hashedToken := crypto.HashString(rawToken)
+	linkToken := models.LinkToken{
+		EndCustomerID:  endCustomerId,
+		OrganizationID: organizationID,
+		HashedToken:    hashedToken,
+		Expiration:     time.Now().Add(-(time.Duration(1) * time.Hour)),
 	}
 
 	db.Create(&linkToken)

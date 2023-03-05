@@ -65,7 +65,8 @@ var _ = Describe("Router", func() {
 		activeSessionCookie  *http.Cookie
 		expiredSessionCookie *http.Cookie
 		apiKey               string
-		linkToken            string
+		activeLinkToken      string
+		expiredLinkToken     string
 	)
 
 	BeforeEach(func() {
@@ -85,7 +86,8 @@ var _ = Describe("Router", func() {
 			Value: expiredSessionToken,
 		}
 		apiKey = test.CreateApiKey(db, org.ID)
-		linkToken = test.CreateLinkToken(db, org.ID, 123)
+		activeLinkToken = test.CreateActiveLinkToken(db, org.ID, 123)
+		expiredLinkToken = test.CreateExpiredLinkToken(db, org.ID, 123)
 	})
 
 	It("returns 401 when no session token provided for authenticated route", func() {
@@ -135,11 +137,23 @@ var _ = Describe("Router", func() {
 		Expect(result.StatusCode).To(Equal(http.StatusOK))
 	})
 
-	It("returns 401 when active link token provided for authenticated route", func() {
+	It("returns 401 when active link token provided for not-link token authenticated route", func() {
 		rr := httptest.NewRecorder()
 		req, err := http.NewRequest("GET", "/authenticated", nil)
 		Expect(err).To(BeNil())
-		req.Header.Add("X-LINK-TOKEN", linkToken)
+		req.Header.Add("X-LINK-TOKEN", activeLinkToken)
+
+		r.ServeHTTP(rr, req)
+
+		result := rr.Result()
+		Expect(result.StatusCode).To(Equal(http.StatusUnauthorized))
+	})
+
+	It("returns 401 when expired link token provided for link authenticated route", func() {
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequest("GET", "/authenticated", nil)
+		Expect(err).To(BeNil())
+		req.Header.Add("X-LINK-TOKEN", expiredLinkToken)
 
 		r.ServeHTTP(rr, req)
 
@@ -151,7 +165,7 @@ var _ = Describe("Router", func() {
 		rr := httptest.NewRecorder()
 		req, err := http.NewRequest("GET", "/linkauthenticated", nil)
 		Expect(err).To(BeNil())
-		req.Header.Add("X-LINK-TOKEN", linkToken)
+		req.Header.Add("X-LINK-TOKEN", activeLinkToken)
 
 		r.ServeHTTP(rr, req)
 
