@@ -29,7 +29,7 @@ func (s ApiService) LinkGetNamespaces(auth auth.Authentication, w http.ResponseW
 
 	sourceId, err := strconv.ParseInt(strSourceId, 10, 64)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	// TODO: write test to make sure only authorized users can use the data connection

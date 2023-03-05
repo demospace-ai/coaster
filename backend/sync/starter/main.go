@@ -22,7 +22,7 @@ func main() {
 
 	// s := c.ScheduleClient()
 	// id := uuid.New()
-	// var input []interface{}
+	// var input []any
 	// input = append(input, temporal.SyncInput{
 	// 	SyncID: 9, OrganizationID: 1,
 	// })
@@ -44,5 +44,5 @@ func main() {
 
 	c.ExecuteWorkflow(context.TODO(), client.StartWorkflowOptions{
 		TaskQueue: temporal.SyncTaskQueue,
-	}, temporal.SyncWorkflow, temporal.SyncInput{SyncID: 9, OrganizationID: 1})
+	}, temporal.SyncWorkflow, temporal.SyncInput{SyncID: 10, OrganizationID: 1})
 }

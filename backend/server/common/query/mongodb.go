@@ -26,14 +26,16 @@ type MongoDbIterator struct {
 }
 
 type MongoQuery struct {
-	Database string `json:"database"`
-	Query    bson.D `json:"query"`
+	Database   string              `json:"database"`
+	Collection string              `json:"collection"`
+	Filter     bson.D              `json:"filter"`
+	Options    options.FindOptions `json:"options"`
 }
 
 // must be pointer receiver to increment field
 func (it *MongoDbIterator) Next() (data.Row, error) {
 	if it.currentIndex < len(it.mongoDbRows) {
-		row := convertMongoDbRow(it.mongoDbRows[it.currentIndex].(bson.M), it.schema)
+		row := convertMongoDbRow(it.mongoDbRows[it.currentIndex].(bson.D), it.schema)
 		it.currentIndex++
 		return row, nil
 	}
@@ -95,7 +97,7 @@ func (sc MongoDbApiClient) GetTableSchema(ctx context.Context, namespace string,
 	return convertMongoDbSchema(fieldTypes), nil
 }
 
-func (sc MongoDbApiClient) GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]data.Value, error) {
+func (sc MongoDbApiClient) GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]any, error) {
 	// TODO
 	return nil, nil
 }
@@ -129,16 +131,28 @@ func (sc MongoDbApiClient) RunQuery(ctx context.Context, queryString string, arg
 		return nil, err
 	}
 
+	schema, err := sc.GetTableSchema(ctx, mongoQuery.Database, mongoQuery.Collection)
+	if err != nil {
+		return nil, err
+	}
+
 	db := client.Database(mongoQuery.Database)
-
-	var result bson.M
-	db.RunCommand(
+	collection := db.Collection(mongoQuery.Collection)
+	cursor, err := collection.Find(
 		ctx,
-		mongoQuery.Query,
-	).Decode(&result)
+		mongoQuery.Filter,
+		&mongoQuery.Options,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
 
-	rows := result["cursor"].(bson.M)["firstBatch"].(bson.A)
-	schema := getMongoSchemaFromRow(rows[0].(bson.M))
+	var rows bson.A
+	err = cursor.All(ctx, &rows)
+	if err != nil {
+		return nil, err
+	}
 
 	return &data.QueryResults{
 		Schema: schema,
@@ -159,16 +173,28 @@ func (sc MongoDbApiClient) GetQueryIterator(ctx context.Context, queryString str
 		return nil, err
 	}
 
+	schema, err := sc.GetTableSchema(ctx, mongoQuery.Database, mongoQuery.Collection)
+	if err != nil {
+		return nil, err
+	}
+
 	db := client.Database(mongoQuery.Database)
-
-	var result bson.M
-	db.RunCommand(
+	collection := db.Collection(mongoQuery.Collection)
+	cursor, err := collection.Find(
 		ctx,
-		mongoQuery.Query,
-	).Decode(&result)
+		mongoQuery.Filter,
+		&mongoQuery.Options,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
 
-	rows := result["cursor"].(bson.M)["firstBatch"].(bson.A)
-	schema := getMongoSchemaFromRow(rows[0].(bson.M))
+	var rows bson.A
+	err = cursor.All(ctx, &rows)
+	if err != nil {
+		return nil, err
+	}
 
 	return &MongoDbIterator{
 		schema:       schema,
@@ -180,18 +206,22 @@ func (sc MongoDbApiClient) GetQueryIterator(ctx context.Context, queryString str
 func convertMongoDbRows(mongoDbRows bson.A, schema data.Schema) []data.Row {
 	var rows []data.Row
 	for _, mongoDbRow := range mongoDbRows {
-		rows = append(rows, convertMongoDbRow(mongoDbRow.(bson.M), schema))
+		rows = append(rows, convertMongoDbRow(mongoDbRow.(bson.D), schema))
 	}
 
 	return rows
 }
 
-func convertMongoDbRow(mongoDbRow bson.M, schema data.Schema) data.Row {
+func convertMongoDbRow(mongoDbRow bson.D, schema data.Schema) data.Row {
+	valueMap := make(map[string]any)
+	for _, keyPair := range mongoDbRow {
+		valueMap[keyPair.Key] = keyPair.Value
+	}
+
 	var row data.Row
 	// make sure every result is in the same order by looping through schema
 	for _, columnName := range schema {
-		mongoDbValue := mongoDbRow[columnName.Name]
-		row = append(row, data.Value(mongoDbValue))
+		row = append(row, valueMap[columnName.Name])
 	}
 
 	return row
@@ -210,8 +240,9 @@ func convertMongoDbSchema(fieldTypes map[string]string) data.Schema {
 }
 
 func getFields(collection *mongo.Collection) ([]string, error) {
+	ctx := context.TODO()
 	cursor, err := collection.Aggregate(
-		context.TODO(),
+		ctx,
 		mongo.Pipeline{
 			bson.D{{Key: "$limit", Value: 10000}},
 			bson.D{{Key: "$project", Value: bson.D{
@@ -232,8 +263,10 @@ func getFields(collection *mongo.Collection) ([]string, error) {
 		return nil, err
 	}
 
+	defer cursor.Close(ctx)
+
 	var results []bson.M
-	if err = cursor.All(context.TODO(), &results); err != nil {
+	if err = cursor.All(ctx, &results); err != nil {
 		return nil, err
 	}
 
@@ -246,10 +279,11 @@ func getFields(collection *mongo.Collection) ([]string, error) {
 }
 
 func getFieldTypes(collection *mongo.Collection, fields []string) (map[string]string, error) {
+	ctx := context.TODO()
 	fieldTypes := make(map[string]string)
 	for _, field := range fields {
 		cursor, err := collection.Aggregate(
-			context.TODO(),
+			ctx,
 			mongo.Pipeline{
 				bson.D{{Key: "$limit", Value: 10000}},
 				bson.D{{Key: "$project", Value: bson.D{
@@ -272,18 +306,41 @@ func getFieldTypes(collection *mongo.Collection, fields []string) (map[string]st
 			return nil, err
 		}
 
-		var results []bson.M
-		if err = cursor.All(context.TODO(), &results); err != nil {
+		defer cursor.Close(ctx)
+
+		var typesForField []string
+		for cursor.Next(ctx) {
+			var result bson.M
+			err = cursor.Decode(&result)
+			if err != nil {
+				return nil, err
+			}
+
+			// Even if most of the fields are missing/null, we use the most common non-null type if one exists
+			fieldType := result["_id"].(bson.M)["fieldType"]
+			if fieldType == "missing" || fieldType == "null" {
+				continue
+			}
+
+			typesForField = append(typesForField, fieldType.(string))
+		}
+
+		// If there are truly no types, then the field type is null
+		if len(typesForField) == 0 {
+			typesForField = append(typesForField, "null")
+		}
+
+		if err = cursor.Err(); err != nil {
 			return nil, err
 		}
 
-		fieldTypes[field] = results[0]["_id"].(bson.M)["fieldType"].(string)
+		fieldTypes[field] = typesForField[0]
 	}
 
 	return fieldTypes, nil
 }
 
-func getMongoSchemaFromRow(firstRow bson.M) data.Schema {
+func getMongoSchemaFromFirstRow(firstRow bson.M) data.Schema {
 	schema := data.Schema{}
 	for key, value := range firstRow {
 		mongoDbType := reflect.TypeOf(value).String()

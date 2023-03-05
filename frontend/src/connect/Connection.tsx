@@ -1,4 +1,3 @@
-import classNames from "classnames";
 import React, { FormEvent, useState } from "react";
 import { Button } from "src/components/button/Button";
 import { InfoIcon } from "src/components/icons/Icons";
@@ -10,6 +9,7 @@ import { Tooltip } from "src/components/tooltip/Tooltip";
 import { createNewSource, NewSourceState, SetupSyncProps, validateConnectionSetup } from "src/connect/state";
 import { sendRequest } from "src/rpc/ajax";
 import { ConnectionType, getConnectionType, TestDataConnection, TestDataConnectionRequest } from "src/rpc/api";
+import { mergeClasses } from "src/utils/twmerge";
 
 export const NewSourceConfiguration: React.FC<SetupSyncProps> = (props) => {
   const state = props.state.newSourceState;
@@ -126,7 +126,7 @@ const TestConnectionButton: React.FC<{ state: NewSourceState, connectionType: Co
 
   const testColor = testConnectionSuccess === null ? null : testConnectionSuccess ? "tw-bg-green-700" : "tw-bg-red-700";
   return (
-    <Button className={classNames("tw-mt-8 tw-bg-slate-200 hover:tw-bg-slate-300 tw-border-slate-200 tw-w-48 tw-h-10", testColor)} onClick={testConnection}>{testLoading ? <Loading /> : "Test"}</Button>
+    <Button className={mergeClasses("tw-mt-8 tw-bg-slate-200 hover:tw-bg-slate-300 tw-border-slate-200 tw-w-48 tw-h-10", testColor)} onClick={testConnection}>{testLoading ? <Loading /> : "Test"}</Button>
   );
 };
 

@@ -73,6 +73,7 @@ func CreateFieldMappings(
 		fieldMappingModel := models.FieldMapping{
 			SyncID:             syncID,
 			SourceFieldName:    fieldMapping.SourceFieldName,
+			SourceFieldType:    fieldMapping.SourceFieldType,
 			DestinationFieldId: fieldMapping.DestinationFieldId,
 		}
 
@@ -123,7 +124,6 @@ func LoadAllSyncs(
 
 func LoadFieldMappingsForSync(
 	db *gorm.DB,
-	organizationID int64,
 	syncID int64,
 ) ([]models.FieldMapping, error) {
 	// TODO: validate that the mapped object fields belong to the right object

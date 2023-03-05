@@ -31,7 +31,8 @@ type CreateSyncRequest struct {
 }
 
 type CreateSyncResponse struct {
-	Sync views.Sync `json:"sync"`
+	Sync          views.Sync           `json:"sync"`
+	FieldMappings []views.FieldMapping `json:"field_mappings`
 }
 
 func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
@@ -88,6 +89,7 @@ func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, 
 	}
 
 	return json.NewEncoder(w).Encode(CreateSyncResponse{
-		Sync: views.ConvertSync(sync, fieldMappings),
+		Sync:          views.ConvertSync(sync),
+		FieldMappings: views.ConvertFieldMappings(fieldMappings),
 	})
 }

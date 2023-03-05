@@ -13,7 +13,7 @@ type apiClient interface {
 	GetTables(ctx context.Context, namespace string) ([]string, error)
 	GetTableSchema(ctx context.Context, namespace string, tableName string) (data.Schema, error)
 	GetNamespaces(ctx context.Context) ([]string, error)
-	GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]data.Value, error)
+	GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]any, error)
 	RunQuery(ctx context.Context, queryString string, args ...any) (*data.QueryResults, error)
 	GetQueryIterator(ctx context.Context, queryString string) (data.RowIterator, error)
 }

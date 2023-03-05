@@ -31,7 +31,7 @@ func (s ApiService) GetSchema(auth auth.Authentication, w http.ResponseWriter, r
 
 	connectionID, err := strconv.ParseInt(strConnectionID, 10, 64)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	namespace := r.URL.Query().Get("namespace")

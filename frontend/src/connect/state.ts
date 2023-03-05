@@ -223,7 +223,7 @@ export const createNewSync = async (
     );
   });
   const payload: LinkCreateSyncRequest = {
-    display_name: state.newSourceState.displayName,
+    display_name: state.displayName!,
     source_id: state.source!.id,
     object_id: state.object!.id,
     namespace: state.namespace,

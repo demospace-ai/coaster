@@ -97,7 +97,7 @@ func (ac BigQueryApiClient) GetTableSchema(ctx context.Context, namespace string
 	return schema, nil
 }
 
-func (ac BigQueryApiClient) GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]data.Value, error) {
+func (ac BigQueryApiClient) GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]any, error) {
 	queryString := "SELECT DISTINCT " + columnName + " FROM " + namespace + "." + tableName + " LIMIT 50"
 
 	queryResults, err := ac.RunQuery(ctx, queryString)
@@ -105,7 +105,7 @@ func (ac BigQueryApiClient) GetColumnValues(ctx context.Context, namespace strin
 		return nil, err
 	}
 
-	values := []data.Value{}
+	values := []any{}
 	for _, row := range queryResults.Data {
 		if row[0] == nil {
 			continue
@@ -234,7 +234,7 @@ func (ac BigQueryApiClient) GetQueryIterator(ctx context.Context, queryString st
 func convertBigQueryRow(bigQueryRow []bigquery.Value) data.Row {
 	var row data.Row
 	for _, value := range bigQueryRow {
-		row = append(row, data.Value(value))
+		row = append(row, any(value))
 	}
 
 	return row

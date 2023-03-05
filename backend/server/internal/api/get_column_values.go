@@ -8,12 +8,11 @@ import (
 	"strconv"
 
 	"go.fabra.io/server/common/auth"
-	"go.fabra.io/server/common/data"
 	"go.fabra.io/server/common/repositories/connections"
 )
 
 type GetColumnValuesResponse struct {
-	ColumnValues []data.Value `json:"column_values"`
+	ColumnValues []any `json:"column_values"`
 }
 
 func (s ApiService) GetColumnValues(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
@@ -24,7 +23,7 @@ func (s ApiService) GetColumnValues(auth auth.Authentication, w http.ResponseWri
 
 	connectionID, err := strconv.ParseInt(strConnectionID, 10, 64)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	namespace := r.URL.Query().Get("namespace")

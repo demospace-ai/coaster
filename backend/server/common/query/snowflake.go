@@ -32,7 +32,7 @@ type snowflakeSchema struct {
 
 func (it SnowflakeIterator) Next() (data.Row, error) {
 	if it.queryResult.Next() {
-		var row []interface{}
+		var row []any
 		err := it.queryResult.Scan(&row)
 		if err != nil {
 			return nil, err
@@ -91,8 +91,8 @@ func (sc SnowflakeApiClient) GetTables(ctx context.Context, namespace string) ([
 
 	// just scan into a string list, everything can be a string
 	var tableNames []string
-	values := make([]interface{}, numColumns)
-	valuePtrs := make([]interface{}, numColumns)
+	values := make([]any, numColumns)
+	valuePtrs := make([]any, numColumns)
 	for queryResult.Next() {
 		for i := 0; i < numColumns; i++ {
 			valuePtrs[i] = &values[i]
@@ -135,7 +135,7 @@ func (sc SnowflakeApiClient) GetTableSchema(ctx context.Context, namespace strin
 	return schema, nil
 }
 
-func (sc SnowflakeApiClient) GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]data.Value, error) {
+func (sc SnowflakeApiClient) GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]any, error) {
 	queryString := "SELECT DISTINCT " + columnName + " FROM " + namespace + "." + tableName + " LIMIT 50"
 
 	queryResult, err := sc.RunQuery(ctx, queryString)
@@ -143,7 +143,7 @@ func (sc SnowflakeApiClient) GetColumnValues(ctx context.Context, namespace stri
 		return nil, err
 	}
 
-	values := []data.Value{}
+	values := []any{}
 	for _, row := range queryResult.Data {
 		if row[0] == nil {
 			continue
@@ -201,8 +201,8 @@ func (sc SnowflakeApiClient) RunQuery(ctx context.Context, queryString string, a
 	numColumns := len(columns)
 
 	var rows []data.Row
-	values := make([]interface{}, numColumns)
-	valuePtrs := make([]interface{}, numColumns)
+	values := make([]any, numColumns)
+	valuePtrs := make([]any, numColumns)
 	for queryResult.Next() {
 		for i := 0; i < numColumns; i++ {
 			valuePtrs[i] = &values[i]
@@ -241,10 +241,10 @@ func (sc SnowflakeApiClient) GetQueryIterator(ctx context.Context, queryString s
 	return SnowflakeIterator{queryResult: *queryResult, schema: convertSnowflakeSchema(columns)}, nil
 }
 
-func convertSnowflakeRow(snowflakeRow []interface{}) data.Row {
+func convertSnowflakeRow(snowflakeRow []any) data.Row {
 	var row data.Row
 	for _, value := range snowflakeRow {
-		row = append(row, data.Value(value))
+		row = append(row, any(value))
 	}
 
 	return row

@@ -2,7 +2,9 @@ package temporal
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"strings"
 
 	"go.fabra.io/server/common/crypto"
 	"go.fabra.io/server/common/data"
@@ -62,7 +64,7 @@ func Replicate(ctx context.Context, input ReplicateInput) error {
 		return err
 	}
 
-	fieldMappings, err := syncs.LoadFieldMappingsForSync(db, input.OrganizationID, input.SyncID)
+	fieldMappings, err := syncs.LoadFieldMappingsForSync(db, input.SyncID)
 	if err != nil {
 		return err
 	}
@@ -72,26 +74,22 @@ func Replicate(ctx context.Context, input ReplicateInput) error {
 		return err
 	}
 
-	queryString := getQueryStringForSource(sourceConnection, sync)
+	readQuery := getReadQuery(sourceConnection, sync, fieldMappings)
 
-	it, err := queryService.GetQueryIterator(ctx, sourceConnection, queryString)
+	it, err := queryService.GetQueryIterator(ctx, sourceConnection, readQuery)
 	if err != nil {
 		return err
 	}
 
-	sourceSchema := it.Schema()
-	destinationSchema, err := queryService.GetTableSchema(ctx, destinationConnection, object.Namespace, object.TableName)
-	if err != nil {
-		return err
-	}
-
-	rowFormat, err := createRowFormat(sourceSchema, destinationSchema, objectFields, fieldMappings)
+	columnString := createColumnString(objectFields, object.EndCustomerIdColumn)
+	rowFormat, err := createRowFormat(objectFields, fieldMappings)
 	if err != nil {
 		return err
 	}
 
 	// TODO: batch insert 10,000 rows at a time
 	// write to temporary table in destination
+	rowStrings := []string{}
 	for {
 		row, err := it.Next()
 		if err == data.ErrDone {
@@ -101,16 +99,24 @@ func Replicate(ctx context.Context, input ReplicateInput) error {
 		if err != nil {
 			return err
 		}
-		// TODO
-		value := fmt.Sprintf(rowFormat, row)
-		logger.Info("original row", row)
-		logger.Info("converted row", value)
 
+		l := []any(row)
+		l = append(l, sync.EndCustomerId) // add the end customer ID as well
+
+		rowString := fmt.Sprintf(rowFormat, l...)
+		rowStrings = append(rowStrings, rowString)
 	}
 
+	insertQuery := getInsertQuery(object, columnString, strings.Join(rowStrings, ", "))
+
+	_, err = queryService.RunQuery(ctx, destinationConnection, insertQuery)
+	if err != nil {
+		return err
+	}
+
+	// TODO
 	// copy from temporary table into dest table
 	// delete all old data, then insert new data
-
 	// delete temporary table
 
 	logger.Info("replicate activity done")
@@ -119,8 +125,8 @@ func Replicate(ctx context.Context, input ReplicateInput) error {
 }
 
 // TODO: only read 10,000 rows at once or something
-func getQueryStringForSource(sourceConnection *models.Connection, sync *models.Sync) string {
-	if sourceConnection == nil {
+func getReadQuery(sourceConnection *models.Connection, sync *models.Sync, fieldMappings []models.FieldMapping) string {
+	if sourceConnection == nil || sync == nil || fieldMappings == nil {
 		return "" // TODO: throw error
 	}
 
@@ -128,125 +134,96 @@ func getQueryStringForSource(sourceConnection *models.Connection, sync *models.S
 		return sync.CustomJoin.String
 	}
 
-	switch sourceConnection.ConnectionType {
-	case (models.ConnectionTypeBigQuery):
-		fallthrough
-	case (models.ConnectionTypeSnowflake):
-		return "SELECT * FROM " + sync.Namespace.String + "." + sync.TableName.String + ";"
-	}
-
-	return ""
+	selectString := getSelectString(fieldMappings)
+	return fmt.Sprintf("SELECT %s FROM %s.%s;", selectString, sync.Namespace.String, sync.TableName.String)
 }
 
-func getTempInsertStringForModel(object *models.Object, destination *models.DestinationConnection) string {
-	if object == nil || destination == nil {
+func getSelectString(fieldMappings []models.FieldMapping) string {
+	columns := []string{}
+	for _, fieldMapping := range fieldMappings {
+		switch fieldMapping.SourceFieldType {
+		case data.ColumnTypeTimestampNtz, data.ColumnTypeTimestampTz:
+			// Golang formats timestamps differently, so just read them as a string
+			columns = append(columns, fmt.Sprintf("STRING(%s)", fieldMapping.SourceFieldName))
+		default:
+			columns = append(columns, fieldMapping.SourceFieldName)
+		}
+	}
+
+	return strings.Join(columns, ", ")
+}
+
+func getInsertQuery(object *models.Object, columnString string, valuesString string) string {
+	if object == nil {
 		return "" // TODO: throw error
 	}
 
-	switch destination.ConnectionType {
-	case (models.ConnectionTypeBigQuery):
-		fallthrough
-	case (models.ConnectionTypeSnowflake):
-		return "INSERT INTO " + getTempTableName(object.Namespace, object.TableName) + " SELECT * FROM VALUES\n"
-	}
-
-	return ""
+	return fmt.Sprintf("INSERT %s.%s %s VALUES %s;", object.Namespace, object.TableName, columnString, valuesString)
 }
 
-func getTempTableName(namespace string, tableName string) string {
-	return namespace + ".tmp_" + tableName
-}
-
-func getInsertStringForModel(object *models.Object, destination *models.DestinationConnection) string {
-	if object == nil || destination == nil {
-		return "" // TODO: throw error
+func createColumnString(objectFields []models.ObjectField, endCustomerIdColumn string) string {
+	columns := []string{}
+	for _, objectField := range objectFields {
+		if objectField.Omit {
+			continue
+		}
+		columns = append(columns, objectField.Name)
 	}
+	columns = append(columns, endCustomerIdColumn)
 
-	switch destination.ConnectionType {
-	case (models.ConnectionTypeBigQuery):
-		fallthrough
-	case (models.ConnectionTypeSnowflake):
-		return "INSERT INTO " + object.Namespace + "." + object.TableName + " SELECT * FROM VALUES\n"
-	}
-
-	return ""
+	return fmt.Sprintf("(%s)", strings.Join(columns, ", "))
 }
 
 // TODO: this is only for bigquery, snowflake needs to do parse_json
-func createRowFormat(sourceSchema data.Schema, destinationSchema data.Schema, objectFields []models.ObjectField, fieldMappings []models.FieldMapping) (string, error) {
-	orderedObjectFields, err := createOrderedObjectFields(destinationSchema, objectFields)
-	if err != nil {
-		return "", err
+func createRowFormat(objectFields []models.ObjectField, fieldMappings []models.FieldMapping) (string, error) {
+	destIdToSourcePosition := make(map[int64]int)
+	for i, fieldMapping := range fieldMappings {
+		destIdToSourcePosition[fieldMapping.DestinationFieldId] = i
 	}
 
-	destIdToSourceName := make(map[int64]string)
-	for _, fieldMapping := range fieldMappings {
-		destIdToSourceName[fieldMapping.DestinationFieldId] = fieldMapping.SourceFieldName
-	}
+	tokens := []string{}
+	for _, objectField := range objectFields {
+		if objectField.Omit {
+			continue
+		}
 
-	sourceNameToPosition := make(map[string]int)
-	for i, sourceColumn := range sourceSchema {
-		sourceNameToPosition[sourceColumn.Name] = i
-	}
-
-	rowFormat := "("
-	for _, objectField := range orderedObjectFields {
-		pos, err := getSourceColumnPosition(objectField, sourceNameToPosition, destIdToSourceName)
+		pos, err := getSourceColumnPosition(objectField, destIdToSourcePosition)
 		if err != nil {
 			return "", err
 		}
 
+		fmtPos := pos + 1 // format strings index the args from 1 not 0
+
 		// TODO: assert source type matches/is compatible with dest type
 		switch objectField.Type {
-		case data.ColumnTypeString:
-			rowFormat += fmt.Sprintf("'%%[%d]v' ", pos) // this adds a string of the format: '%[2]v'
+		case data.ColumnTypeInteger, data.ColumnTypeNumber:
+			tokens = append(tokens, fmt.Sprintf("%%[%d]v", fmtPos)) // this adds a string of the format: %[2]v,
 		case data.ColumnTypeJson:
-			rowFormat += fmt.Sprintf("JSON '%%[%d]v' ", pos) // this adds a string of the format: JSON '%[2]v'
+			tokens = append(tokens, fmt.Sprintf("JSON '%%[%d]v'", fmtPos)) // this adds a string of the format: JSON '%[2]v',
+		case data.ColumnTypeTimestampTz, data.ColumnTypeTimestampNtz:
+			tokens = append(tokens, fmt.Sprintf("TIMESTAMP('%%[%d]v')", fmtPos)) // this adds a string of the format: JSON '%[2]v',
+		case data.ColumnTypeDate:
+			tokens = append(tokens, fmt.Sprintf("DATE(TIMESTAMP('%%[%d]v'))", fmtPos)) // this adds a string of the format: JSON '%[2]v',
+		case data.ColumnTypeTime:
+			tokens = append(tokens, fmt.Sprintf("TIME(TIMESTAMP('%%[%d]v'))", fmtPos)) // this adds a string of the format: JSON '%[2]v',
 		default:
-			rowFormat += fmt.Sprintf("%%[%d]v ", pos) // this adds a string of the format: %[2]v
+			tokens = append(tokens, fmt.Sprintf("'%%[%d]v'", fmtPos)) // this adds a string of the format: '%[2]v',
 		}
 	}
-	rowFormat += ")"
 
+	// add one extra token for the end customer ID
+	tokens = append(tokens, fmt.Sprintf("%%[%d]v", len(fieldMappings)+1))
+
+	rowFormat := fmt.Sprintf("(%s)", strings.Join(tokens, ", "))
 	return rowFormat, nil
 }
 
-func getSourceColumnPosition(orderedObjectField models.ObjectField, sourceNameToPosition map[string]int, destIdToSourceName map[int64]string) (int, error) {
-	sourceName, ok := destIdToSourceName[orderedObjectField.ID]
+func getSourceColumnPosition(orderedObjectField models.ObjectField, destIdToSourcePosition map[int64]int) (int, error) {
+	sourcePosition, ok := destIdToSourcePosition[orderedObjectField.ID]
 	if !ok {
-		return -1, fmt.Errorf("could not find object field %d in field mappings: %v", orderedObjectField.ID, destIdToSourceName)
+		prettyMap, _ := json.Marshal(destIdToSourcePosition)
+		return -1, fmt.Errorf("could not find object field %d in field mappings: %+v", orderedObjectField.ID, prettyMap)
 	}
 
-	sourcePos, ok := sourceNameToPosition[sourceName]
-	if !ok {
-		return -1, fmt.Errorf("could not find source name %s in source schema: %v", sourceName, sourceNameToPosition)
-	}
-
-	return sourcePos, nil
-}
-
-func createOrderedObjectFields(destinationSchema data.Schema, objectFields []models.ObjectField) ([]models.ObjectField, error) {
-	var orderedObjectFields []models.ObjectField
-	for _, column := range destinationSchema {
-		objectField, err := getObjectField(column.Name, objectFields)
-		if err != nil {
-			return nil, err
-		}
-
-		if !objectField.Omit {
-			orderedObjectFields = append(orderedObjectFields, *objectField)
-		}
-	}
-
-	return orderedObjectFields, nil
-}
-
-func getObjectField(columnName string, objectFields []models.ObjectField) (*models.ObjectField, error) {
-	for _, objectField := range objectFields {
-		if objectField.Name == columnName {
-			return &objectField, nil
-		}
-	}
-
-	return nil, fmt.Errorf("did not find column name %s in object fields: %+v", columnName, objectFields)
+	return sourcePosition, nil
 }

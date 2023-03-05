@@ -1,6 +1,9 @@
 package views
 
-import "go.fabra.io/server/common/models"
+import (
+	"go.fabra.io/server/common/data"
+	"go.fabra.io/server/common/models"
+)
 
 type Sync struct {
 	ID             int64           `json:"id"`
@@ -15,15 +18,15 @@ type Sync struct {
 	PrimaryKey     string          `json:"primary_key,omitempty"`
 	SyncMode       models.SyncMode `json:"sync_mode"`
 	Frequency      int64           `json:"frequency"`
-	FieldMappings  []FieldMappings `json:"field_mappings"`
 }
 
-type FieldMappings struct {
-	SourceFieldName    string `json:"source_field_name"`
-	DestinationFieldId int64  `json:"destination_field_id"`
+type FieldMapping struct {
+	SourceFieldName    string          `json:"source_field_name"`
+	SourceFieldType    data.ColumnType `json:"source_field_type"`
+	DestinationFieldId int64           `json:"destination_field_id"`
 }
 
-func ConvertSync(sync *models.Sync, fieldMappings []models.FieldMapping) Sync {
+func ConvertSync(sync *models.Sync) Sync {
 	syncView := Sync{
 		ID:          sync.ID,
 		DisplayName: sync.DisplayName,
@@ -32,16 +35,6 @@ func ConvertSync(sync *models.Sync, fieldMappings []models.FieldMapping) Sync {
 		SyncMode:    sync.SyncMode,
 		Frequency:   sync.Frequency,
 	}
-
-	var fieldMappingsView []FieldMappings
-	for _, fieldMapping := range fieldMappings {
-		fieldMappingsView = append(fieldMappingsView, FieldMappings{
-			SourceFieldName:    fieldMapping.SourceFieldName,
-			DestinationFieldId: fieldMapping.DestinationFieldId,
-		})
-	}
-
-	syncView.FieldMappings = fieldMappingsView
 
 	if sync.Namespace.Valid {
 		syncView.Namespace = sync.Namespace.String
@@ -60,4 +53,17 @@ func ConvertSync(sync *models.Sync, fieldMappings []models.FieldMapping) Sync {
 	}
 
 	return syncView
+}
+
+func ConvertFieldMappings(fieldMappings []models.FieldMapping) []FieldMapping {
+	var fieldMappingsView []FieldMapping
+	for _, fieldMapping := range fieldMappings {
+		fieldMappingsView = append(fieldMappingsView, FieldMapping{
+			SourceFieldName:    fieldMapping.SourceFieldName,
+			SourceFieldType:    fieldMapping.SourceFieldType,
+			DestinationFieldId: fieldMapping.DestinationFieldId,
+		})
+	}
+
+	return fieldMappingsView
 }

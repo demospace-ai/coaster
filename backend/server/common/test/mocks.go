@@ -67,7 +67,7 @@ func (qs MockQueryService) GetTableSchema(ctx context.Context, connection *model
 	return nil, nil
 }
 
-func (qs MockQueryService) GetColumnValues(ctx context.Context, connection *models.Connection, namespace string, tableName string, columnName string) ([]data.Value, error) {
+func (qs MockQueryService) GetColumnValues(ctx context.Context, connection *models.Connection, namespace string, tableName string, columnName string) ([]any, error) {
 	return nil, nil
 }
 

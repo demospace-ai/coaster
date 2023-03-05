@@ -88,6 +88,7 @@ func (s ApiService) LinkCreateSync(auth auth.Authentication, w http.ResponseWrit
 	}
 
 	return json.NewEncoder(w).Encode(CreateSyncResponse{
-		Sync: views.ConvertSync(sync, fieldMappings),
+		Sync:          views.ConvertSync(sync),
+		FieldMappings: views.ConvertFieldMappings(fieldMappings),
 	})
 }

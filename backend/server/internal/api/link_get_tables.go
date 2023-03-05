@@ -29,7 +29,7 @@ func (s ApiService) LinkGetTables(auth auth.Authentication, w http.ResponseWrite
 
 	sourceId, err := strconv.ParseInt(strSourceId, 10, 64)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	namespace := r.URL.Query().Get("namespace")

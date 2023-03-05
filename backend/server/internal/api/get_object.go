@@ -23,7 +23,7 @@ func (s ApiService) GetObject(auth auth.Authentication, w http.ResponseWriter, r
 
 	objectId, err := strconv.ParseInt(strObjectId, 10, 64)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	object, err := objects.LoadObjectByID(s.db, auth.Organization.ID, objectId)
@@ -34,7 +34,7 @@ func (s ApiService) GetObject(auth auth.Authentication, w http.ResponseWriter, r
 	// TODO: don't include the omitted fields on link token requests
 	objectFields, err := objects.LoadObjectFieldsByID(s.db, object.ID)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	return json.NewEncoder(w).Encode(GetObjectResponse{

@@ -14,7 +14,7 @@ type QueryService interface {
 	GetNamespaces(ctx context.Context, connection *models.Connection) ([]string, error)
 	GetTables(ctx context.Context, connection *models.Connection, namespace string) ([]string, error)
 	GetTableSchema(ctx context.Context, connection *models.Connection, namespace string, tableName string) ([]data.ColumnSchema, error)
-	GetColumnValues(ctx context.Context, connection *models.Connection, namespace string, tableName string, columnName string) ([]data.Value, error)
+	GetColumnValues(ctx context.Context, connection *models.Connection, namespace string, tableName string, columnName string) ([]any, error)
 	RunQuery(ctx context.Context, connection *models.Connection, queryString string) (*data.QueryResults, error)
 	GetQueryIterator(ctx context.Context, connection *models.Connection, queryString string) (data.RowIterator, error)
 }
@@ -76,7 +76,7 @@ func (qs QueryServiceImpl) GetTableSchema(ctx context.Context, connection *model
 	return client.GetTableSchema(ctx, namespace, tableName)
 }
 
-func (qs QueryServiceImpl) GetColumnValues(ctx context.Context, connection *models.Connection, namespace string, tableName string, columnName string) ([]data.Value, error) {
+func (qs QueryServiceImpl) GetColumnValues(ctx context.Context, connection *models.Connection, namespace string, tableName string, columnName string) ([]any, error) {
 	client, err := qs.newAPIClient(ctx, connection)
 	if err != nil {
 		return nil, err

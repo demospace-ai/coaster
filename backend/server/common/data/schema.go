@@ -25,8 +25,7 @@ type ColumnSchema struct {
 	Type ColumnType `json:"type"`
 }
 
-type Row []Value
-type Value interface{}
+type Row []any
 
 var ErrDone = errors.New("no more items in fabra iterator")
 

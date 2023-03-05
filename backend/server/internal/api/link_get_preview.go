@@ -12,6 +12,7 @@ import (
 	"go.fabra.io/server/common/repositories/connections"
 	"go.fabra.io/server/common/repositories/sources"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type LinkGetPreviewRequest struct {
@@ -44,17 +45,17 @@ func (s ApiService) LinkGetPreview(auth auth.Authentication, w http.ResponseWrit
 
 	connection, err := connections.LoadConnectionByID(s.db, auth.Organization.ID, source.ConnectionID)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	query, err := getPreviewQuery(connection.ConnectionType, getPreviewRequest.Namespace, getPreviewRequest.TableName)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	queryResults, err := s.queryService.RunQuery(context.TODO(), connection, *query)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	return json.NewEncoder(w).Encode(queryResults)
@@ -64,8 +65,10 @@ func getPreviewQuery(connectionType models.ConnectionType, namespace string, tab
 	switch connectionType {
 	case models.ConnectionTypeMongoDb:
 		mongoQuery := query.MongoQuery{
-			Database: namespace,
-			Query:    bson.D{{Key: "find", Value: tableName}},
+			Database:   namespace,
+			Collection: tableName,
+			Filter:     bson.D{},
+			Options:    *options.Find().SetLimit(100),
 		}
 
 		mongoQueryBytes, err := json.Marshal(mongoQuery)

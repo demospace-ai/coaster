@@ -5,8 +5,7 @@ import (
 	"net/http"
 
 	"go.fabra.io/server/common/auth"
-	"go.fabra.io/server/common/models"
-	"go.fabra.io/server/common/repositories/syncs"
+	sync_repository "go.fabra.io/server/common/repositories/syncs"
 	"go.fabra.io/server/common/views"
 )
 
@@ -15,15 +14,14 @@ type GetSyncsResponse struct {
 }
 
 func (s ApiService) GetSyncs(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
-	syncs, err := syncs.LoadAllSyncs(s.db, auth.Organization.ID)
+	syncs, err := sync_repository.LoadAllSyncs(s.db, auth.Organization.ID)
 	if err != nil {
 		return err
 	}
 
 	syncViews := []views.Sync{}
 	for _, sync := range syncs {
-		// TODO: load sync field mappings
-		syncViews = append(syncViews, views.ConvertSync(&sync, []models.FieldMapping{}))
+		syncViews = append(syncViews, views.ConvertSync(&sync))
 	}
 
 	return json.NewEncoder(w).Encode(GetSyncsResponse{
