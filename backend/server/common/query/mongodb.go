@@ -131,10 +131,16 @@ func (sc MongoDbApiClient) RunQuery(ctx context.Context, queryString string, arg
 		return nil, err
 	}
 
-	schema, err := sc.GetTableSchema(ctx, mongoQuery.Database, mongoQuery.Collection)
-	if err != nil {
-		return nil, err
-	}
+	schemaC := make(chan data.Schema)
+	errC := make(chan error)
+	go func() {
+		schema, err := sc.GetTableSchema(ctx, mongoQuery.Database, mongoQuery.Collection)
+		schemaC <- schema
+		errC <- err
+
+		close(schemaC)
+		close(errC)
+	}()
 
 	db := client.Database(mongoQuery.Database)
 	collection := db.Collection(mongoQuery.Collection)
@@ -150,6 +156,12 @@ func (sc MongoDbApiClient) RunQuery(ctx context.Context, queryString string, arg
 
 	var rows bson.A
 	err = cursor.All(ctx, &rows)
+	if err != nil {
+		return nil, err
+	}
+
+	schema := <-schemaC
+	err = <-errC
 	if err != nil {
 		return nil, err
 	}
@@ -173,10 +185,16 @@ func (sc MongoDbApiClient) GetQueryIterator(ctx context.Context, queryString str
 		return nil, err
 	}
 
-	schema, err := sc.GetTableSchema(ctx, mongoQuery.Database, mongoQuery.Collection)
-	if err != nil {
-		return nil, err
-	}
+	schemaC := make(chan data.Schema)
+	errC := make(chan error)
+	go func() {
+		schema, err := sc.GetTableSchema(ctx, mongoQuery.Database, mongoQuery.Collection)
+		schemaC <- schema
+		errC <- err
+
+		close(schemaC)
+		close(errC)
+	}()
 
 	db := client.Database(mongoQuery.Database)
 	collection := db.Collection(mongoQuery.Collection)
@@ -192,6 +210,12 @@ func (sc MongoDbApiClient) GetQueryIterator(ctx context.Context, queryString str
 
 	var rows bson.A
 	err = cursor.All(ctx, &rows)
+	if err != nil {
+		return nil, err
+	}
+
+	schema := <-schemaC
+	err = <-errC
 	if err != nil {
 		return nil, err
 	}

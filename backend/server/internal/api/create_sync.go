@@ -32,7 +32,7 @@ type CreateSyncRequest struct {
 
 type CreateSyncResponse struct {
 	Sync          views.Sync           `json:"sync"`
-	FieldMappings []views.FieldMapping `json:"field_mappings`
+	FieldMappings []views.FieldMapping `json:"field_mappings"`
 }
 
 func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
