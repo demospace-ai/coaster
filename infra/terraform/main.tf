@@ -12,7 +12,7 @@ terraform {
 }
 
 provider "google-beta" {
-  project     = "fabra-344902"
+  project = "fabra-344902"
 }
 
 provider "google" {
@@ -27,6 +27,13 @@ resource "google_compute_network" "vpc" {
   name                    = "fabra-vpc"
   routing_mode            = "GLOBAL"
   auto_create_subnetworks = true
+}
+
+resource "google_compute_subnetwork" "subnet" {
+  name          = "fabra-vpc"
+  region        = "us-west1"
+  network       = google_compute_network.vpc.id
+  ip_cidr_range = "10.138.0.0/20"
 }
 
 # Setup IP block for VPC
@@ -56,11 +63,13 @@ resource "google_sql_database_instance" "main_instance" {
   region           = "us-west1"
   database_version = "POSTGRES_11"
   settings {
-    tier = "db-f1-micro"
+    availability_type = "REGIONAL"
+    tier = "db-custom-1-3840"
 
     ip_configuration {
-      ipv4_enabled    = false
+      ipv4_enabled    = true
       private_network = google_compute_network.vpc.self_link
+      enable_private_path_for_google_cloud_services = true
     }
   }
 
@@ -553,5 +562,17 @@ resource "google_compute_router_nat" "fabra-nat" {
   ]
 
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+}
+
+resource "google_container_cluster" "fabra-worker-cluster" {
+  name     = "fabra-worker-gke-cluster"
+  location = "us-west1"
+
+  network    = google_compute_network.vpc.name
+  subnetwork = google_compute_subnetwork.subnet.name
+
+  ip_allocation_policy {}
+
+  enable_autopilot = true
 }
 
