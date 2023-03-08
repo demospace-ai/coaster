@@ -576,3 +576,20 @@ resource "google_container_cluster" "fabra-worker-cluster" {
   enable_autopilot = true
 }
 
+resource "google_cloudbuild_trigger" "worker-build-trigger" {
+  name = "worker-trigger"
+
+  included_files = ["backend/sync/**"]
+
+  github {
+    name  = "fabra"
+    owner = "fabra-io"
+
+    push {
+      branch       = "main"
+      invert_regex = false
+    }
+  }
+
+  filename = "infra/cloudbuild/worker.yaml"
+}

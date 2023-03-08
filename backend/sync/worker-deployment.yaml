@@ -1,0 +1,43 @@
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "fabra-sync"
+  namespace: "default"
+  labels:
+    app: "fabra-sync"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: "fabra-sync"
+  template:
+    metadata:
+      labels:
+        app: "fabra-sync"
+    spec:
+      containers:
+      - name: "fabra-sync"
+        image: "gcr.io/fabra-344902/sync@latest"
+---
+apiVersion: "autoscaling/v2"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  name: "fabra-sync-hpa-aykx"
+  namespace: "default"
+  labels:
+    app: "fabra-sync"
+spec:
+  scaleTargetRef:
+    kind: "Deployment"
+    name: "fabra-sync"
+    apiVersion: "apps/v1"
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: "Resource"
+    resource:
+      name: "cpu"
+      target:
+        type: "Utilization"
+        averageUtilization: 80
