@@ -19,6 +19,14 @@ spec:
       containers:
       - name: "fabra-sync"
         image: "gcr.io/fabra-344902/sync:latest"
+        resources:
+          requests:
+            cpu: "2000m"
+            memory: "2Gi"
+        env:
+        - name: IS_PROD
+          value: "true"
+
 ---
 apiVersion: "autoscaling/v2"
 kind: "HorizontalPodAutoscaler"
@@ -41,3 +49,11 @@ spec:
       target:
         type: "Utilization"
         averageUtilization: 80
+---
+apiVersion: "v1"
+kind: "ServiceAccount"
+metadata:
+  annotations:
+    iam.gke.io/gcp-service-account: "932264813910-compute@developer.gserviceaccount.com"
+  name: "default"
+  namespace: "default"

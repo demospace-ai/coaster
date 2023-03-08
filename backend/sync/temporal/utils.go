@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	"log"
-	"os"
 
 	"go.fabra.io/server/common/application"
 	"go.fabra.io/server/common/secret"
@@ -13,7 +12,7 @@ import (
 
 func getTemporalHostPort() string {
 	if application.IsProd() {
-		return os.Getenv("TEMPORAL_CLUSTER_HOST_PORT")
+		return "fabra.rhbmi.tmprl.cloud:7233"
 	} else {
 		return "localhost:7233"
 	}
@@ -21,7 +20,7 @@ func getTemporalHostPort() string {
 
 func getTemporalNamespace() string {
 	if application.IsProd() {
-		return os.Getenv("TEMPORAL_NAMESPACE")
+		return "fabra.rhbmi"
 	} else {
 		return "default"
 	}

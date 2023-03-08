@@ -593,3 +593,15 @@ resource "google_cloudbuild_trigger" "worker-build-trigger" {
 
   filename = "infra/cloudbuild/worker.yaml"
 }
+
+data "google_compute_default_service_account" "default" {
+}
+
+resource "google_service_account_iam_binding" "fabra-worker-gke-binding" {
+  service_account_id = data.google_compute_default_service_account.default.id
+  role               = "roles/iam.workloadIdentityUser"
+
+  members = [
+    "serviceAccount:fabra-344902.svc.id.goog[default/default]",
+  ]
+}
