@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: "fabra-sync"
-        image: "gcr.io/fabra-344902/sync@latest"
+        image: "gcr.io/fabra-344902/sync:latest"
 ---
 apiVersion: "autoscaling/v2"
 kind: "HorizontalPodAutoscaler"
