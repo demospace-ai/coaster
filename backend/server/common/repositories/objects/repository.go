@@ -83,6 +83,7 @@ func CreateObjectFields(
 			Name:     objectField.Name,
 			Type:     objectField.Type,
 			Omit:     objectField.Omit,
+			Optional: objectField.Optional,
 		}
 		if objectField.DisplayName != nil {
 			objectFieldModel.DisplayName = database.NewNullString(*objectField.DisplayName)

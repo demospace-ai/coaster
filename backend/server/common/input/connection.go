@@ -34,7 +34,8 @@ type BigQueryConfig struct {
 type ObjectField struct {
 	Name        string          `json:"name"`
 	Type        data.ColumnType `json:"type"`
+	Omit        bool            `json:"omit"`
+	Optional    bool            `json:"optional"`
 	DisplayName *string         `json:"display_name,omitempty"`
 	Description *string         `json:"description,omitempty"`
-	Omit        bool            `json:"omit"`
 }

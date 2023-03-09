@@ -162,6 +162,7 @@ const ObjectFields: React.FC<ObjectFieldsProps> = props => {
         name: column.name,
         type: column.type,
         omit: false,
+        optional: false,
       };
     }) : [];
     setState(s => {
@@ -243,6 +244,8 @@ const ObjectFields: React.FC<ObjectFieldsProps> = props => {
               <div className="tw-flex tw-items-center tw-mt-2 tw-pb-1.5">
                 <span className="">Omit?</span>
                 <Checkbox className="tw-ml-2 tw-h-4 tw-w-4" checked={objectField.omit} onCheckedChange={() => updateObjectField({ ...objectField, omit: !objectField.omit }, i)} />
+                <span className="tw-ml-4">Optional?</span>
+                <Checkbox className="tw-ml-2 tw-h-4 tw-w-4" checked={objectField.optional} onCheckedChange={() => updateObjectField({ ...objectField, optional: !objectField.optional }, i)} />
               </div>
               <Input className="tw-mb-2" value={objectField.display_name} setValue={value => updateObjectField({ ...objectField, display_name: value }, i)} placeholder="Display Name" label="Display Name" />
               <Input className="tw-mb-2" value={objectField.description} setValue={value => updateObjectField({ ...objectField, description: value }, i)} placeholder="Description" label="Description" />

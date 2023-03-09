@@ -227,17 +227,19 @@ export interface ObjectField {
     id: number;
     name: string;
     type: string;
+    omit: boolean;
+    optional: boolean;
     display_name?: string;
     description?: string;
-    omit: boolean;
 }
 
 export interface ObjectFieldInput {
     name: string;
     type: string;
+    omit: boolean;
+    optional: boolean;
     display_name?: string;
     description?: string;
-    omit: boolean;
 }
 
 export interface FieldMappingInput {
