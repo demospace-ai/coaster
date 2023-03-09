@@ -1,7 +1,9 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"go.fabra.io/server/common/auth"
@@ -10,9 +12,14 @@ import (
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/repositories/syncs"
 	"go.fabra.io/server/common/views"
+	"go.fabra.io/sync/temporal"
+	"go.temporal.io/sdk/client"
 
 	"github.com/go-playground/validator/v10"
 )
+
+const CLIENT_PEM_KEY = "projects/932264813910/secrets/temporal-client-pem/versions/latest"
+const CLIENT_KEY_KEY = "projects/932264813910/secrets/temporal-client-key/versions/latest"
 
 type CreateSyncRequest struct {
 	DisplayName    string                `json:"display_name"`
@@ -87,6 +94,21 @@ func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, 
 	if err != nil {
 		return err
 	}
+
+	// TODO: do this on a schedule
+	c, err := temporal.CreateClient(CLIENT_PEM_KEY, CLIENT_KEY_KEY)
+	if err != nil {
+		log.Fatalln("unable to create Temporal client", err)
+	}
+	defer c.Close()
+
+	ctx := context.TODO()
+	c.ExecuteWorkflow(
+		ctx,
+		client.StartWorkflowOptions{TaskQueue: temporal.SyncTaskQueue},
+		temporal.SyncWorkflow,
+		temporal.SyncInput{SyncID: sync.ID, OrganizationID: auth.Organization.ID},
+	)
 
 	return json.NewEncoder(w).Encode(CreateSyncResponse{
 		Sync:          views.ConvertSync(sync),
