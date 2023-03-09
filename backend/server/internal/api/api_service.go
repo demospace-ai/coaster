@@ -101,7 +101,7 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 		},
 		{
 			Name:        "Create sync",
-			Method:      router.POST,g
+			Method:      router.POST,
 			Pattern:     "/sync",
 			HandlerFunc: s.CreateSync,
 		},
