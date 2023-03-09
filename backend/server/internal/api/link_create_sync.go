@@ -1,7 +1,9 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"go.fabra.io/server/common/auth"
@@ -10,6 +12,8 @@ import (
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/repositories/syncs"
 	"go.fabra.io/server/common/views"
+	"go.fabra.io/sync/temporal"
+	"go.temporal.io/sdk/client"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -82,6 +86,27 @@ func (s ApiService) LinkCreateSync(auth auth.Authentication, w http.ResponseWrit
 	// TODO: validate types are mapped correctly
 	fieldMappings, err := syncs.CreateFieldMappings(
 		s.db, auth.Organization.ID, sync.ID, createSyncRequest.FieldMappings,
+	)
+	if err != nil {
+		return err
+	}
+
+	// TODO: do this on a schedule
+	c, err := temporal.CreateClient(CLIENT_PEM_KEY, CLIENT_KEY_KEY)
+	if err != nil {
+		log.Fatalln("unable to create Temporal client", err)
+	}
+	defer c.Close()
+
+	ctx := context.TODO()
+	_, err = c.ExecuteWorkflow(
+		ctx,
+		client.StartWorkflowOptions{
+			TaskQueue:    temporal.SyncTaskQueue,
+			CronSchedule: "0 0 * * *",
+		},
+		temporal.SyncWorkflow,
+		temporal.SyncInput{SyncID: sync.ID, OrganizationID: auth.Organization.ID},
 	)
 	if err != nil {
 		return err
