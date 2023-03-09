@@ -82,7 +82,7 @@ func Replicate(ctx context.Context, input ReplicateInput) error {
 	}
 
 	columnString := createColumnString(objectFields, object.EndCustomerIdColumn)
-	rowFormat, err := createRowFormat(objectFields, fieldMappings)
+	rowFormatTokens, err := createRowFormatTokens(objectFields, fieldMappings)
 	if err != nil {
 		return err
 	}
@@ -103,7 +103,16 @@ func Replicate(ctx context.Context, input ReplicateInput) error {
 		l := []any(row)
 		l = append(l, sync.EndCustomerId) // add the end customer ID as well
 
-		rowString := fmt.Sprintf(rowFormat, l...)
+		rowString := ""
+		for i, val := range l {
+			if val != nil {
+				rowString += fmt.Sprintf(rowFormatTokens[i], val)
+			} else {
+				// TODO: handle if destination column is not nullable
+				rowString += "NULL"
+			}
+		}
+
 		rowStrings = append(rowStrings, rowString)
 	}
 
@@ -175,7 +184,7 @@ func createColumnString(objectFields []models.ObjectField, endCustomerIdColumn s
 }
 
 // TODO: this is only for bigquery, snowflake needs to do parse_json
-func createRowFormat(objectFields []models.ObjectField, fieldMappings []models.FieldMapping) (string, error) {
+func createRowFormatTokens(objectFields []models.ObjectField, fieldMappings []models.FieldMapping) ([]string, error) {
 	destIdToSourcePosition := make(map[int64]int)
 	for i, fieldMapping := range fieldMappings {
 		destIdToSourcePosition[fieldMapping.DestinationFieldId] = i
@@ -189,7 +198,7 @@ func createRowFormat(objectFields []models.ObjectField, fieldMappings []models.F
 
 		pos, err := getSourceColumnPosition(objectField, destIdToSourcePosition)
 		if err != nil {
-			return "", err
+			return nil, err
 		}
 
 		fmtPos := pos + 1 // format strings index the args from 1 not 0
@@ -214,8 +223,7 @@ func createRowFormat(objectFields []models.ObjectField, fieldMappings []models.F
 	// add one extra token for the end customer ID
 	tokens = append(tokens, fmt.Sprintf("%%[%d]v", len(fieldMappings)+1))
 
-	rowFormat := fmt.Sprintf("(%s)", strings.Join(tokens, ", "))
-	return rowFormat, nil
+	return tokens, nil
 }
 
 func getSourceColumnPosition(orderedObjectField models.ObjectField, destIdToSourcePosition map[int64]int) (int, error) {

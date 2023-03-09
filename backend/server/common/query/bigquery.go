@@ -160,7 +160,6 @@ func (ac BigQueryApiClient) RunQuery(ctx context.Context, queryString string, ar
 	// Run the query and print results when the query job is completed.
 	job, err := q.Run(ctx)
 	if err != nil {
-		fmt.Printf("query: %s", queryString)
 		return nil, err
 	}
 
@@ -168,11 +167,9 @@ func (ac BigQueryApiClient) RunQuery(ctx context.Context, queryString string, ar
 	// TODO: make special error type for this
 	status, err := job.Wait(ctx)
 	if err != nil {
-		fmt.Printf("qu3ery: %s", queryString)
 		return nil, err
 	}
 	if err := status.Err(); err != nil {
-		fmt.Printf("quer2y: %s", queryString)
 		return nil, err
 	}
 
