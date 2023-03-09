@@ -44,5 +44,5 @@ func main() {
 
 	c.ExecuteWorkflow(context.TODO(), client.StartWorkflowOptions{
 		TaskQueue: temporal.SyncTaskQueue,
-	}, temporal.SyncWorkflow, temporal.SyncInput{SyncID: 10, OrganizationID: 1})
+	}, temporal.SyncWorkflow, temporal.SyncInput{SyncID: 1, OrganizationID: 2})
 }

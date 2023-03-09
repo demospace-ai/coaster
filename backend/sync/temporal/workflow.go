@@ -26,7 +26,7 @@ func SyncWorkflow(ctx workflow.Context, input SyncInput) error {
 	}
 	options := workflow.ActivityOptions{
 		// Timeout options specify when to automatically timeout Activity functions.
-		StartToCloseTimeout: time.Minute,
+		StartToCloseTimeout: time.Hour * 2,
 		// Optionally provide a customized RetryPolicy.
 		// Temporal retries failures by default, this is just an example.
 		RetryPolicy: retrypolicy,
