@@ -105,7 +105,10 @@ func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, 
 	ctx := context.TODO()
 	c.ExecuteWorkflow(
 		ctx,
-		client.StartWorkflowOptions{TaskQueue: temporal.SyncTaskQueue},
+		client.StartWorkflowOptions{
+			TaskQueue:    temporal.SyncTaskQueue,
+			CronSchedule: "0 0 * * *",
+		},
 		temporal.SyncWorkflow,
 		temporal.SyncInput{SyncID: sync.ID, OrganizationID: auth.Organization.ID},
 	)
