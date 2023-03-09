@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"go.fabra.io/server/common/auth"
-	"go.fabra.io/server/common/config"
 	"go.fabra.io/server/common/crypto"
 	"go.fabra.io/server/common/database"
 	"go.fabra.io/server/common/query"
@@ -15,12 +14,6 @@ import (
 )
 
 func main() {
-	err := config.InitConfig()
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
-
 	db, err := database.InitDatabase()
 	if err != nil {
 		log.Fatal(err)

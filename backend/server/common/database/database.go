@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -9,12 +10,14 @@ import (
 	"time"
 
 	"go.fabra.io/server/common/application"
-	"go.fabra.io/server/common/config"
+	"go.fabra.io/server/common/secret"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
+
+const DB_PASSWORD_KEY = "projects/932264813910/secrets/fabra-db-password/versions/latest"
 
 type NullString struct{ sql.NullString }
 
@@ -75,14 +78,18 @@ func initDatabaseDev() (*gorm.DB, error) {
 
 func initDatabaseProd() (*gorm.DB, error) {
 	var (
-		dbUser    = mustGetenv("DB_USER")
-		dbPwd     = config.GetDbPassword()
-		dbTCPHost = mustGetenv("DB_HOST")
-		dbPort    = mustGetenv("DB_PORT")
-		dbName    = mustGetenv("DB_NAME")
+		dbUser = mustGetenv("DB_USER")
+		dbHost = mustGetenv("DB_HOST")
+		dbPort = mustGetenv("DB_PORT")
+		dbName = mustGetenv("DB_NAME")
 	)
 
-	dbURI := fmt.Sprintf("host=%s user=%s password=%s port=%s database=%s", dbTCPHost, dbUser, dbPwd, dbPort, dbName)
+	dbPwd, err := secret.FetchSecret(context.TODO(), DB_PASSWORD_KEY)
+	if err != nil {
+		return nil, err
+	}
+
+	dbURI := fmt.Sprintf("host=%s user=%s password=%s port=%s database=%s", dbHost, dbUser, *dbPwd, dbPort, dbName)
 
 	db, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
