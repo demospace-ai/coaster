@@ -24,6 +24,11 @@ type ReplicateInput struct {
 	SyncID         int64
 }
 
+type FormatToken struct {
+	Format string
+	Index  int
+}
+
 func Replicate(ctx context.Context, input ReplicateInput) error {
 	logger := activity.GetLogger(ctx)
 
@@ -103,16 +108,20 @@ func Replicate(ctx context.Context, input ReplicateInput) error {
 		l := []any(row)
 		l = append(l, sync.EndCustomerId) // add the end customer ID as well
 
-		rowString := ""
-		for i, val := range l {
+		fmt.Printf("%v", l)
+
+		var rowTokens []string
+		for _, formatToken := range rowFormatTokens {
+			val := l[formatToken.Index]
 			if val != nil {
-				rowString += fmt.Sprintf(rowFormatTokens[i], val)
+				rowTokens = append(rowTokens, fmt.Sprintf(formatToken.Format, val))
 			} else {
 				// TODO: handle if destination column is not nullable
-				rowString += "NULL"
+				rowTokens = append(rowTokens, "NULL")
 			}
 		}
 
+		rowString := fmt.Sprintf("(%s)", strings.Join(rowTokens, ", "))
 		rowStrings = append(rowStrings, rowString)
 	}
 
@@ -184,13 +193,13 @@ func createColumnString(objectFields []models.ObjectField, endCustomerIdColumn s
 }
 
 // TODO: this is only for bigquery, snowflake needs to do parse_json
-func createRowFormatTokens(objectFields []models.ObjectField, fieldMappings []models.FieldMapping) ([]string, error) {
+func createRowFormatTokens(objectFields []models.ObjectField, fieldMappings []models.FieldMapping) ([]FormatToken, error) {
 	destIdToSourcePosition := make(map[int64]int)
 	for i, fieldMapping := range fieldMappings {
 		destIdToSourcePosition[fieldMapping.DestinationFieldId] = i
 	}
 
-	tokens := []string{}
+	var tokens []FormatToken
 	for _, objectField := range objectFields {
 		if objectField.Omit {
 			continue
@@ -201,27 +210,25 @@ func createRowFormatTokens(objectFields []models.ObjectField, fieldMappings []mo
 			return nil, err
 		}
 
-		fmtPos := pos + 1 // format strings index the args from 1 not 0
-
 		// TODO: assert source type matches/is compatible with dest type
 		switch objectField.Type {
 		case data.ColumnTypeInteger, data.ColumnTypeNumber:
-			tokens = append(tokens, fmt.Sprintf("%%[%d]v", fmtPos)) // this adds a string of the format: %[2]v,
+			tokens = append(tokens, FormatToken{Format: "%v", Index: pos}) // this adds a string of the format: %v,
 		case data.ColumnTypeJson:
-			tokens = append(tokens, fmt.Sprintf("JSON '%%[%d]v'", fmtPos)) // this adds a string of the format: JSON '%[2]v',
+			tokens = append(tokens, FormatToken{Format: "JSON '%v'", Index: pos}) // this adds a string of the format: JSON '%v',
 		case data.ColumnTypeTimestampTz, data.ColumnTypeTimestampNtz:
-			tokens = append(tokens, fmt.Sprintf("TIMESTAMP('%%[%d]v')", fmtPos)) // this adds a string of the format: JSON '%[2]v',
+			tokens = append(tokens, FormatToken{Format: "TIMESTAMP('%v')", Index: pos}) // this adds a string of the format: TIMESTAMP('%v')',
 		case data.ColumnTypeDate:
-			tokens = append(tokens, fmt.Sprintf("DATE(TIMESTAMP('%%[%d]v'))", fmtPos)) // this adds a string of the format: JSON '%[2]v',
+			tokens = append(tokens, FormatToken{Format: "DATE(TIMESTAMP('%v'))", Index: pos}) // this adds a string of the format: DATE(TIMESTAMP('%v'))',
 		case data.ColumnTypeTime:
-			tokens = append(tokens, fmt.Sprintf("TIME(TIMESTAMP('%%[%d]v'))", fmtPos)) // this adds a string of the format: JSON '%[2]v',
+			tokens = append(tokens, FormatToken{Format: "TIME(TIMESTAMP('%v'))", Index: pos}) // this adds a string of the format: TIME(TIMESTAMP('%v')),
 		default:
-			tokens = append(tokens, fmt.Sprintf("'%%[%d]v'", fmtPos)) // this adds a string of the format: '%[2]v',
+			tokens = append(tokens, FormatToken{Format: "'%v'", Index: pos}) // this adds a string of the format: '%v',
 		}
 	}
 
 	// add one extra token for the end customer ID
-	tokens = append(tokens, fmt.Sprintf("%%[%d]v", len(fieldMappings)+1))
+	tokens = append(tokens, FormatToken{Format: "%v", Index: len(fieldMappings)})
 
 	return tokens, nil
 }
