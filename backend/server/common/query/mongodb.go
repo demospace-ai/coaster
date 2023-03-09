@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"reflect"
 
 	"go.fabra.io/server/common/data"
 	"go.mongodb.org/mongo-driver/bson"
@@ -362,34 +361,6 @@ func getFieldTypes(collection *mongo.Collection, fields []string) (map[string]st
 	}
 
 	return fieldTypes, nil
-}
-
-func getMongoSchemaFromFirstRow(firstRow bson.M) data.Schema {
-	schema := data.Schema{}
-	for key, value := range firstRow {
-		mongoDbType := reflect.TypeOf(value).String()
-		switch mongoDbType {
-		case "primitive.DateTime":
-			mongoDbType = "datetime"
-		case "primitive.Timestamp":
-			mongoDbType = "timestamp"
-		case "primitive.A":
-			mongoDbType = "array"
-		case "primitive.M":
-			mongoDbType = "object"
-		case "primitive.Decimal128":
-			mongoDbType = "decimal"
-		}
-
-		columnSchema := data.ColumnSchema{
-			Name: key,
-			Type: getMongoDbColumnType(mongoDbType),
-		}
-
-		schema = append(schema, columnSchema)
-	}
-
-	return schema
 }
 
 func getMongoDbColumnType(mongoDbType string) data.ColumnType {
