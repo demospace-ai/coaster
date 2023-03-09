@@ -12,9 +12,12 @@ steps:
   name: 'gcr.io/cloud-builders/docker'
   args:
   - build
-  - '-t gcr.io/fabra-344902/fabra:$COMMIT_SHA'
-  - '-t gcr.io/fabra-344902/fabra:latest'
-  - '-f backend/server/Dockerfile'
+  - '-t'
+  - 'gcr.io/fabra-344902/fabra:$COMMIT_SHA'
+  - '-t'
+  - 'gcr.io/fabra-344902/fabra:latest'
+  - '-f'
+  - 'backend/server/Dockerfile'
   - 'backend/'
   waitFor: ['test-backend']
 
