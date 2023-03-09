@@ -48,8 +48,7 @@ func (s ApiService) RunSync(auth auth.Authentication, w http.ResponseWriter, r *
 	_, err = c.ExecuteWorkflow(
 		ctx,
 		client.StartWorkflowOptions{
-			TaskQueue:    temporal.SyncTaskQueue,
-			CronSchedule: "0 0 * * *",
+			TaskQueue: temporal.SyncTaskQueue,
 		},
 		temporal.SyncWorkflow,
 		temporal.SyncInput{SyncID: sync.ID, OrganizationID: auth.Organization.ID},
