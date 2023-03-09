@@ -84,9 +84,11 @@ func (s ApiService) Login(w http.ResponseWriter, r *http.Request) error {
 		}
 	} else {
 		var userEmailDomain = strings.Split(user.Email, "@")[1]
-		suggestedOrganizations, err = organizations.LoadOrganizationsByEmailDomain(s.db, userEmailDomain)
-		if err != nil {
-			return err
+		if userEmailDomain != "gmail.com" && userEmailDomain != "outlook.com" && userEmailDomain != "icloud.com" && userEmailDomain != "yahoo.com" && userEmailDomain != "aol.com" && userEmailDomain != "hotmail.com" {
+			suggestedOrganizations, err = organizations.LoadOrganizationsByEmailDomain(s.db, userEmailDomain)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
