@@ -89,10 +89,6 @@ func initDatabaseProd() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	fmt.Println("password fetched")
-	fmt.Println(dbPort)
-	fmt.Println(len(*dbPwd) > 1)
-
 	dbURI := fmt.Sprintf("host=%s user=%s password=%s port=%s database=%s", dbHost, dbUser, *dbPwd, dbPort, dbName)
 
 	db, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{
