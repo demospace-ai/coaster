@@ -101,9 +101,15 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 		},
 		{
 			Name:        "Create sync",
-			Method:      router.POST,
+			Method:      router.POST,g
 			Pattern:     "/sync",
 			HandlerFunc: s.CreateSync,
+		},
+		{
+			Name:        "Run sync",
+			Method:      router.POST,
+			Pattern:     "/sync/{syncID}",
+			HandlerFunc: s.RunSync,
 		},
 		{
 			Name:        "Create link token",
