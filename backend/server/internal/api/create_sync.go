@@ -103,7 +103,7 @@ func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, 
 	defer c.Close()
 
 	ctx := context.TODO()
-	c.ExecuteWorkflow(
+	_, err = c.ExecuteWorkflow(
 		ctx,
 		client.StartWorkflowOptions{
 			TaskQueue:    temporal.SyncTaskQueue,
@@ -112,6 +112,9 @@ func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, 
 		temporal.SyncWorkflow,
 		temporal.SyncInput{SyncID: sync.ID, OrganizationID: auth.Organization.ID},
 	)
+	if err != nil {
+		return err
+	}
 
 	return json.NewEncoder(w).Encode(CreateSyncResponse{
 		Sync:          views.ConvertSync(sync),
