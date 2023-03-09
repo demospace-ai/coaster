@@ -26,7 +26,14 @@ spec:
         env:
         - name: IS_PROD
           value: "true"
-
+        - name: DB_USER
+          value: "db_user"
+        - name: DB_NAME
+          value: "fabra-db"
+        - name: DB_HOST
+          value: "10.111.1.3"
+        - name: DB_PORT
+          value: "5432"
 ---
 apiVersion: "autoscaling/v2"
 kind: "HorizontalPodAutoscaler"

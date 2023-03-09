@@ -97,7 +97,7 @@ func initDatabaseProd() (*gorm.DB, error) {
 func mustGetenv(k string) string {
 	v := os.Getenv(k)
 	if v == "" {
-		log.Fatalf("Warning: %s environment variable not set.\n", k)
+		log.Fatalf("Error: %s environment variable not set.\n", k)
 	}
 	return v
 }
