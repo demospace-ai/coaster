@@ -1,6 +1,7 @@
 package destinations
 
 import (
+	"go.fabra.io/server/common/database"
 	"go.fabra.io/server/common/models"
 
 	"gorm.io/gorm"
@@ -11,12 +12,17 @@ func CreateDestination(
 	organizationID int64,
 	displayName string,
 	connectionID int64,
+	stagingBucket *string,
 ) (*models.Destination, error) {
 
 	destination := models.Destination{
 		OrganizationID: organizationID,
 		DisplayName:    displayName,
 		ConnectionID:   connectionID,
+	}
+
+	if stagingBucket != nil {
+		destination.StagingBucket = database.NewNullString(*stagingBucket)
 	}
 
 	result := db.Create(&destination)

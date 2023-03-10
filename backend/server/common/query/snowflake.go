@@ -243,6 +243,7 @@ func (sc SnowflakeApiClient) GetQueryIterator(ctx context.Context, queryString s
 
 func convertSnowflakeRow(snowflakeRow []any) data.Row {
 	var row data.Row
+	// TODO: convert the values to the expected Fabra Golang types
 	for _, value := range snowflakeRow {
 		row = append(row, any(value))
 	}

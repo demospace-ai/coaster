@@ -46,13 +46,13 @@ func (it *MongoDbIterator) Schema() data.Schema {
 	return it.schema
 }
 
-func (sc MongoDbApiClient) openConnection(ctx context.Context) (*mongo.Client, error) {
+func (mc MongoDbApiClient) openConnection(ctx context.Context) (*mongo.Client, error) {
 	connectionString := fmt.Sprintf(
 		"mongodb+srv://%s:%s@%s/?%s",
-		sc.Username,
-		sc.Password,
-		sc.Host,
-		sc.ConnectionOptions,
+		mc.Username,
+		mc.Password,
+		mc.Host,
+		mc.ConnectionOptions,
 	)
 	serverAPIOptions := options.ServerAPI(options.ServerAPIVersion1)
 	clientOptions := options.Client().
@@ -61,8 +61,8 @@ func (sc MongoDbApiClient) openConnection(ctx context.Context) (*mongo.Client, e
 	return mongo.Connect(ctx, clientOptions)
 }
 
-func (sc MongoDbApiClient) GetTables(ctx context.Context, namespace string) ([]string, error) {
-	client, err := sc.openConnection(ctx)
+func (mc MongoDbApiClient) GetTables(ctx context.Context, namespace string) ([]string, error) {
+	client, err := mc.openConnection(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
 	}
@@ -73,8 +73,8 @@ func (sc MongoDbApiClient) GetTables(ctx context.Context, namespace string) ([]s
 	return db.ListCollectionNames(ctx, bson.D{})
 }
 
-func (sc MongoDbApiClient) GetTableSchema(ctx context.Context, namespace string, tableName string) (data.Schema, error) {
-	client, err := sc.openConnection(ctx)
+func (mc MongoDbApiClient) GetTableSchema(ctx context.Context, namespace string, tableName string) (data.Schema, error) {
+	client, err := mc.openConnection(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
 	}
@@ -96,13 +96,13 @@ func (sc MongoDbApiClient) GetTableSchema(ctx context.Context, namespace string,
 	return convertMongoDbSchema(fieldTypes), nil
 }
 
-func (sc MongoDbApiClient) GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]any, error) {
+func (mc MongoDbApiClient) GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]any, error) {
 	// TODO
 	return nil, nil
 }
 
-func (sc MongoDbApiClient) GetNamespaces(ctx context.Context) ([]string, error) {
-	client, err := sc.openConnection(ctx)
+func (mc MongoDbApiClient) GetNamespaces(ctx context.Context) ([]string, error) {
+	client, err := mc.openConnection(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
 	}
@@ -117,8 +117,8 @@ func (sc MongoDbApiClient) GetNamespaces(ctx context.Context) ([]string, error) 
 	return databaseNames, nil
 }
 
-func (sc MongoDbApiClient) RunQuery(ctx context.Context, queryString string, args ...any) (*data.QueryResults, error) {
-	client, err := sc.openConnection(ctx)
+func (mc MongoDbApiClient) RunQuery(ctx context.Context, queryString string, args ...any) (*data.QueryResults, error) {
+	client, err := mc.openConnection(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
 	}
@@ -133,7 +133,7 @@ func (sc MongoDbApiClient) RunQuery(ctx context.Context, queryString string, arg
 	schemaC := make(chan data.Schema)
 	errC := make(chan error)
 	go func() {
-		schema, err := sc.GetTableSchema(ctx, mongoQuery.Database, mongoQuery.Collection)
+		schema, err := mc.GetTableSchema(ctx, mongoQuery.Database, mongoQuery.Collection)
 		schemaC <- schema
 		errC <- err
 
@@ -171,8 +171,8 @@ func (sc MongoDbApiClient) RunQuery(ctx context.Context, queryString string, arg
 	}, nil
 }
 
-func (sc MongoDbApiClient) GetQueryIterator(ctx context.Context, queryString string) (data.RowIterator, error) {
-	client, err := sc.openConnection(ctx)
+func (mc MongoDbApiClient) GetQueryIterator(ctx context.Context, queryString string) (data.RowIterator, error) {
+	client, err := mc.openConnection(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
 	}
@@ -187,7 +187,7 @@ func (sc MongoDbApiClient) GetQueryIterator(ctx context.Context, queryString str
 	schemaC := make(chan data.Schema)
 	errC := make(chan error)
 	go func() {
-		schema, err := sc.GetTableSchema(ctx, mongoQuery.Database, mongoQuery.Collection)
+		schema, err := mc.GetTableSchema(ctx, mongoQuery.Database, mongoQuery.Collection)
 		schemaC <- schema
 		errC <- err
 
@@ -236,6 +236,7 @@ func convertMongoDbRows(mongoDbRows bson.A, schema data.Schema) []data.Row {
 }
 
 func convertMongoDbRow(mongoDbRow bson.D, schema data.Schema) data.Row {
+	// TODO: convert the values to the expected Fabra Golang types
 	valueMap := make(map[string]any)
 	for _, keyPair := range mongoDbRow {
 		valueMap[keyPair.Key] = keyPair.Value
@@ -378,7 +379,7 @@ func getMongoDbColumnType(mongoDbType string) data.ColumnType {
 	case "array":
 		return data.ColumnTypeArray
 	case "object":
-		return data.ColumnTypeJson
+		return data.ColumnTypeObject
 	case "bool":
 		return data.ColumnTypeBoolean
 	default:

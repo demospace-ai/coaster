@@ -6,9 +6,10 @@ import (
 )
 
 type Destination struct {
-	ID          int64      `json:"id"`
-	DisplayName string     `json:"display_name"`
-	Connection  Connection `json:"connection"`
+	ID            int64      `json:"id"`
+	DisplayName   string     `json:"display_name"`
+	Connection    Connection `json:"connection"`
+	StagingBucket string     `json:"staging_bucket,omitempty"`
 }
 
 type Source struct {
@@ -43,7 +44,7 @@ type ObjectField struct {
 }
 
 func ConvertDestination(destination models.Destination, connection models.Connection) Destination {
-	return Destination{
+	destinationView := Destination{
 		ID:          destination.ID,
 		DisplayName: destination.DisplayName,
 		Connection: Connection{
@@ -51,6 +52,12 @@ func ConvertDestination(destination models.Destination, connection models.Connec
 			ConnectionType: connection.ConnectionType,
 		},
 	}
+
+	if destination.StagingBucket.Valid {
+		destinationView.StagingBucket = destination.StagingBucket.String
+	}
+
+	return destinationView
 }
 
 func ConvertDestinationConnections(destinationConnections []models.DestinationConnection) []Destination {

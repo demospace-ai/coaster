@@ -17,6 +17,7 @@ import (
 type CreateDestinationRequest struct {
 	DisplayName     string                 `json:"display_name"`
 	ConnectionType  models.ConnectionType  `json:"connection_type"`
+	StagingBucket   *string                `json:"staging_bucket"`
 	BigQueryConfig  *input.BigQueryConfig  `json:"bigquery_config,omitempty"`
 	SnowflakeConfig *input.SnowflakeConfig `json:"snowflake_config,omitempty"`
 	RedshiftConfig  *input.RedshiftConfig  `json:"redshift_config,omitempty"`
@@ -92,6 +93,7 @@ func (s ApiService) CreateDestination(auth auth.Authentication, w http.ResponseW
 		auth.Organization.ID,
 		createDestinationRequest.DisplayName,
 		connection.ID,
+		createDestinationRequest.StagingBucket,
 	)
 	if err != nil {
 		return err

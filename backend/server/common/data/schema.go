@@ -1,6 +1,10 @@
 package data
 
-import "errors"
+import (
+	"errors"
+
+	"cloud.google.com/go/bigquery"
+)
 
 type Schema []ColumnSchema
 
@@ -10,15 +14,39 @@ const (
 	ColumnTypeString       ColumnType = "STRING"
 	ColumnTypeInteger      ColumnType = "INTEGER"
 	ColumnTypeNumber       ColumnType = "NUMBER"
-	ColumnTypeJson         ColumnType = "JSON"
 	ColumnTypeTimestampTz  ColumnType = "TIMESTAMP_TZ"
 	ColumnTypeTimestampNtz ColumnType = "TIMESTAMP_NTZ"
+	ColumnTypeTimeTz       ColumnType = "TIME_TZ"
+	ColumnTypeTimeNtz      ColumnType = "TIME_NTZ"
 	ColumnTypeDate         ColumnType = "DATE"
-	ColumnTypeTime         ColumnType = "TIME"
 	ColumnTypeDateTime     ColumnType = "DATETIME"
 	ColumnTypeBoolean      ColumnType = "BOOLEAN"
 	ColumnTypeArray        ColumnType = "ARRAY"
+	ColumnTypeObject       ColumnType = "OBJECT"
 )
+
+func (ct ColumnType) ToBigQueryType() bigquery.FieldType {
+	switch ct {
+	case ColumnTypeInteger:
+		return bigquery.IntegerFieldType
+	case ColumnTypeNumber:
+		return bigquery.NumericFieldType
+	case ColumnTypeBoolean:
+		return bigquery.BooleanFieldType
+	case ColumnTypeTimestampTz, ColumnTypeTimestampNtz:
+		return bigquery.TimestampFieldType
+	case ColumnTypeObject:
+		return bigquery.JSONFieldType
+	case ColumnTypeDate:
+		return bigquery.DateFieldType
+	case ColumnTypeTimeTz, ColumnTypeTimeNtz:
+		return bigquery.TimeFieldType
+	case ColumnTypeDateTime:
+		return bigquery.DateTimeFieldType
+	default:
+		return bigquery.StringFieldType
+	}
+}
 
 type ColumnSchema struct {
 	Name string     `json:"name"`

@@ -7,6 +7,7 @@ import (
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/data"
 	"go.fabra.io/server/common/models"
+	"go.fabra.io/server/common/query"
 
 	"gorm.io/gorm"
 )
@@ -76,5 +77,9 @@ func (qs MockQueryService) RunQuery(ctx context.Context, connection *models.Conn
 }
 
 func (qs MockQueryService) GetQueryIterator(ctx context.Context, connection *models.Connection, queryString string) (data.RowIterator, error) {
+	return nil, nil
+}
+
+func (qs MockQueryService) GetClient(ctx context.Context, connection *models.Connection) (query.ConnectorClient, error) {
 	return nil, nil
 }

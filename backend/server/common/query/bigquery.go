@@ -3,8 +3,11 @@ package query
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"cloud.google.com/go/bigquery"
+	"cloud.google.com/go/civil"
+	"cloud.google.com/go/storage"
 	"go.fabra.io/server/common/data"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
@@ -31,7 +34,7 @@ func (it BigQueryIterator) Next() (data.Row, error) {
 		return nil, err
 	}
 
-	return convertBigQueryRow(row), nil
+	return convertBigQueryRow(row, it.Iterator.Schema), nil
 }
 
 // TODO: this must be in order
@@ -188,7 +191,7 @@ func (ac BigQueryApiClient) RunQuery(ctx context.Context, queryString string, ar
 		if err != nil {
 			return nil, err
 		}
-		results = append(results, convertBigQueryRow(row))
+		results = append(results, convertBigQueryRow(row, it.Schema))
 	}
 
 	return &data.QueryResults{
@@ -231,10 +234,91 @@ func (ac BigQueryApiClient) GetQueryIterator(ctx context.Context, queryString st
 	}, nil
 }
 
-func convertBigQueryRow(bigQueryRow []bigquery.Value) data.Row {
+func (ac BigQueryApiClient) StageData(ctx context.Context, csvData string, stagingOptions StagingOptions) error {
+	var credentialOption option.ClientOption
+	if ac.Credentials != nil {
+		credentialOption = option.WithCredentialsJSON([]byte(*ac.Credentials))
+	}
+
+	gcsClient, err := storage.NewClient(ctx, credentialOption)
+	if err != nil {
+		return err
+	}
+	defer gcsClient.Close()
+
+	w := gcsClient.Bucket(stagingOptions.Bucket).Object(stagingOptions.File).NewWriter(ctx)
+	if _, err := fmt.Fprint(w, csvData); err != nil {
+		return err
+	}
+
+	if err := w.Close(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (ac BigQueryApiClient) LoadFromStaging(ctx context.Context, namespace string, tableName string, loadOptions LoadOptions) error {
+	client, err := ac.openConnection(ctx)
+	if err != nil {
+		return fmt.Errorf("bigquery.NewClient: %v", err)
+	}
+	defer client.Close()
+
+	gcsRef := bigquery.NewGCSReference(loadOptions.GcsReference)
+	gcsRef.SourceFormat = bigquery.CSV
+	gcsRef.Schema = loadOptions.BigQuerySchema
+
+	loader := client.Dataset(namespace).Table(tableName).LoaderFrom(gcsRef)
+	loader.WriteDisposition = loadOptions.WriteMode
+
+	job, err := loader.Run(ctx)
+	if err != nil {
+		return err
+	}
+	status, err := job.Wait(ctx)
+	if err != nil {
+		return err
+	}
+
+	if status.Err() != nil {
+		return fmt.Errorf("job completed with error: %v", status.Err())
+	}
+	return nil
+}
+
+func (ac BigQueryApiClient) CleanUpStagingData(ctx context.Context, stagingOptions StagingOptions) error {
+	var credentialOption option.ClientOption
+	if ac.Credentials != nil {
+		credentialOption = option.WithCredentialsJSON([]byte(*ac.Credentials))
+	}
+
+	gcsClient, err := storage.NewClient(ctx, credentialOption)
+	if err != nil {
+		return err
+	}
+	defer gcsClient.Close()
+
+	object := gcsClient.Bucket(stagingOptions.Bucket).Object(stagingOptions.File)
+	return object.Delete(ctx)
+}
+
+func convertBigQueryRow(bigQueryRow []bigquery.Value, schema bigquery.Schema) data.Row {
 	var row data.Row
-	for _, value := range bigQueryRow {
-		row = append(row, any(value))
+	for i, value := range bigQueryRow {
+		columnType := schema[i].Type
+		switch columnType {
+		case bigquery.TimestampFieldType:
+			row = append(row, value.(time.Time).Format(FABRA_TIMESTAMP_FORMAT))
+		case bigquery.DateFieldType:
+			row = append(row, value.(civil.Date).String())
+		case bigquery.TimeFieldType:
+			row = append(row, value.(civil.Time).String())
+		case bigquery.DateTimeFieldType:
+			row = append(row, value.(civil.DateTime).String())
+		default:
+			row = append(row, any(value))
+		}
 	}
 
 	return row
@@ -251,11 +335,11 @@ func getBigQueryColumnType(bigQueryType string) data.ColumnType {
 	case "TIMESTAMP":
 		return data.ColumnTypeTimestampTz
 	case "JSON":
-		return data.ColumnTypeJson
+		return data.ColumnTypeObject
 	case "DATE":
 		return data.ColumnTypeDate
 	case "TIME":
-		return data.ColumnTypeTime
+		return data.ColumnTypeTimeNtz
 	case "DATETIME":
 		return data.ColumnTypeDateTime
 	default:

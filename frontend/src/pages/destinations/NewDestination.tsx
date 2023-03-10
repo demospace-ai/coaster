@@ -45,6 +45,7 @@ type NewConnectionConfigurationProps = {
 
 type NewDestinationState = {
   displayName: string;
+  staging_bucket: string;
   bigqueryConfig: BigQueryConfig;
   snowflakeConfig: SnowflakeConfig;
   redshiftConfig: RedshiftConfig;
@@ -54,6 +55,7 @@ type NewDestinationState = {
 // Values must be empty strings otherwise the input will be uncontrolled
 const INITIAL_DESTINATION_STATE: NewDestinationState = {
   displayName: "",
+  staging_bucket: "",
   bigqueryConfig: {
     credentials: "",
     location: "",
@@ -92,7 +94,10 @@ const validateAll = (connectionType: ConnectionType, state: NewDestinationState)
         && state.snowflakeConfig.role.length > 0
         && state.snowflakeConfig.host.length > 0;
     case ConnectionType.BigQuery:
-      return state.displayName.length > 0 && state.bigqueryConfig.credentials.length > 0;
+      return state.displayName.length > 0
+        && state.staging_bucket.length > 0
+        && state.bigqueryConfig.location.length > 0
+        && state.bigqueryConfig.credentials.length > 0;
     case ConnectionType.Redshift:
       return state.displayName.length > 0
         && state.redshiftConfig.username.length > 0
@@ -297,6 +302,7 @@ const BigQueryInputs: React.FC<ConnectionConfigurationProps> = props => {
     <>
       <ValidatedInput id='displayName' value={state.displayName} setValue={(value) => { props.setState({ ...state, displayName: value }); }} placeholder='Display Name' label="Display Name" />
       <ValidatedInput id='location' value={state.bigqueryConfig.location} setValue={(value) => { props.setState({ ...state, bigqueryConfig: { ...state.bigqueryConfig, location: value } }); }} placeholder='Location' label="Location" />
+      <ValidatedInput id='staging-bucket' value={state.staging_bucket} setValue={(value) => { props.setState({ ...state, staging_bucket: value }); }} placeholder='Staging Bucket' label="Staging Bucket" />
       <ValidatedInput
         className="tw-h-24 tw-min-h-[40px] tw-max-h-80"
         id='credentials'
