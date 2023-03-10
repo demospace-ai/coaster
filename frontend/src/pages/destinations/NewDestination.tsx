@@ -391,7 +391,7 @@ const ConnectionTypeSelector: React.FC<ConnectionTypeSelectorProps> = props => {
   const connectionButton = "tw-flex tw-flex-row tw-justify-center tw-items-center tw-py-5 tw-font-bold tw-w-56 tw-rounded-md tw-cursor-pointer tw-bg-white tw-text-slate-800 tw-border tw-border-slate-300 hover:tw-bg-slate-100 tw-tracking-[1px] tw-shadow-md tw-select-none";
   return (
     <>
-      <div className="tw-text-center tw-mb-10">Choose your data warehouse:</div>
+      <div className="tw-text-center tw-mb-8">Choose one of our supported destinations for syncs:</div>
       <div className="tw-flex tw-flex-row tw-gap-5 tw-flex-wrap tw-justify-center">
         <button className={connectionButton} onClick={() => props.setConnectionType(ConnectionType.Snowflake)}>
           <img src={snowflake} alt="data source logo" className="tw-h-6 tw-mr-1.5" />
