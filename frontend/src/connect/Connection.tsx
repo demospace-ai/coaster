@@ -254,4 +254,4 @@ const BigQueryInputs: React.FC<ConnectionConfigurationProps> = props => {
       />
     </>
   );
-};;
+};
