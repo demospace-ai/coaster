@@ -13,7 +13,7 @@ export const Button: React.FC<ButtonProps> = forwardRef<HTMLButtonElement, Butto
 
   const buttonStyle = classNames(
     props.className,
-    'tw-text-white tw-bg-slate-600 hover:tw-bg-slate-800',
+    'tw-text-primary-text tw-bg-primary hover:tw-bg-primary-hover',
     'tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition tw-select-none',
   );
   return (
@@ -40,7 +40,7 @@ export const LinkButton: React.FC<LinkButtonProps> = forwardRef<HTMLAnchorElemen
 
   const buttonStyle = classNames(
     props.className,
-    'tw-text-white tw-bg-slate-600 hover:tw-bg-slate-800',
+    'tw-text-primary-text tw-bg-primary hover:tw-bg-primary-hover',
     'tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition tw-select-none',
   );
   return (
@@ -62,7 +62,7 @@ type FormButtonProps = {
 
 export const FormButton: React.FC<FormButtonProps> = props => {
   const buttonStyle = classNames(
-    'tw-text-white tw-bg-slate-600 hover:tw-bg-slate-800',
+    'tw-text-primary-text tw-bg-primary hover:tw-bg-primary-hover',
     'tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition tw-select-none',
     props.className
   );
@@ -95,7 +95,7 @@ export const BackButton: React.FC<Partial<ButtonProps>> = props => {
 export const NavButton: React.FC<NavLinkProps> = props => {
   return (
     <NavLink
-      className={classNames('tw-bg-slate-600 tw-text-white tw-rounded-md tw-block tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-font-bold tw-text-center tw-transition-colors hover:tw-bg-slate-800 tw-border tw-border-solid tw-border-slate-800', props.className as string)}
+      className={classNames('tw-bg-primary tw-text-white tw-rounded-md tw-block tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-font-bold tw-text-center tw-transition-colors hover:tw-bg-primary-hover tw-border tw-border-solid tw-border-primary-hover', props.className as string)}
       to={props.to}>
       {props.children}
     </NavLink>

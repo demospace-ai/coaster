@@ -6,6 +6,11 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        primary: {
+					DEFAULT: "var(--color-primary)",
+					hover: "var(--color-primary-hover)",
+					text: "var(--color-primary-text)",
+				},
         'gray-10': '#fcfdff',
         'gray-350': '#b9bdc3',
       },

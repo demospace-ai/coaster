@@ -85,7 +85,7 @@ export const ValidatedInput: React.FC<InputProps> = props => {
   const { id, value, placeholder, setValue, className, textarea, type, label, ...other } = props;
   const [isValid, setIsValid] = useState(true);
   const [focused, setFocused] = useState(false);
-  let classes = ['tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border hover:tw-border-slate-400 focus:tw-border-slate-700 tw-outline-none', className];
+  let classes = ['tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border hover:tw-border-primary-hover focus:tw-border-primary tw-outline-none', className];
   if (!isValid) {
     classes.push('tw-border-red-600');
   }
@@ -122,7 +122,7 @@ export const ValidatedInput: React.FC<InputProps> = props => {
       >
         <label
           htmlFor="name"
-          className="tw-absolute -tw-top-2 tw-left-2 -tw-mt-px tw-inline-block tw-bg-white tw-px-1 tw-text-xs tw-font-medium tw-text-gray-900"
+          className="tw-absolute -tw-top-2 tw-left-2 -tw-mt-px tw-inline-block tw-bg-white tw-px-1 tw-text-xs tw-font-medium tw-text-primary"
         >
           {label}
         </label>
@@ -212,14 +212,14 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = pro
         >
           <label
             htmlFor="name"
-            className="tw-absolute tw-top-3 tw-left-2 -tw-mt-px tw-inline-block tw-bg-white tw-px-1 tw-text-xs tw-font-medium tw-text-gray-900"
+            className="tw-absolute tw-top-3 tw-left-2 -tw-mt-px tw-inline-block tw-bg-white tw-px-1 tw-text-xs tw-font-medium tw-text-primary"
           >
             {props.label}
           </label>
         </Transition>
         <Listbox.Button
           ref={setReferenceElement}
-          className={mergeClasses("tw-flex tw-justify-center tw-items-center tw-w-96 tw-mt-5 tw-rounded-md tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 hover:tw-border-slate-400 aria-expanded:tw-border-slate-700", props.className, props.validated && !isValid && 'tw-border-red-600')}
+          className={mergeClasses("tw-flex tw-justify-center tw-items-center tw-w-96 tw-mt-5 tw-rounded-md tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 hover:tw-border-primary-hover aria-expanded:tw-border-primary", props.className, props.validated && !isValid && 'tw-border-red-600')}
         >
           <div className={mergeClasses("tw-inline-block tw-w-[calc(100%-20px)] tw-truncate tw-overflow-none", !props.selected && "tw-text-slate-400")}>
             {value !== UNSET ? getElementForDisplay(props.selected) : props.placeholder}
@@ -376,12 +376,12 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
         >
           <label
             htmlFor="name"
-            className="tw-absolute tw-top-3 tw-left-2 -tw-mt-px tw-inline-block tw-bg-white tw-px-1 tw-text-xs tw-font-medium tw-text-gray-900"
+            className="tw-absolute tw-top-3 tw-left-2 -tw-mt-px tw-inline-block tw-bg-white tw-px-1 tw-text-xs tw-font-medium tw-text-primary"
           >
             {props.label}
           </label>
         </Transition>
-        <div ref={setReferenceElement} className={mergeClasses("tw-flex tw-w-96 tw-mt-5 tw-rounded-md tw-bg-white tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 hover:tw-border-slate-400 focus-within:!tw-border-slate-700", props.className, props.validated && !isValid && 'tw-border-red-600')}>
+        <div ref={setReferenceElement} className={mergeClasses("tw-flex tw-w-96 tw-mt-5 tw-rounded-md tw-bg-white tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 hover:tw-border-primary-hover focus-within:!tw-border-primary tw-transition tw-duration-100", props.className, props.validated && !isValid && 'tw-border-red-600')}>
           <Combobox.Input
             className={"tw-inline tw-bg-transparent tw-w-[calc(100%-20px)] tw-border-none tw-text-sm tw-leading-5 tw-text-slate-900 tw-outline-none tw-text-ellipsis tw-cursor-pointer focus:tw-cursor-text"}
             displayValue={selected => selected !== UNSET ? getElementForDisplay(selected) : ""}
