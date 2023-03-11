@@ -38,6 +38,6 @@ func (s ApiService) GetObject(auth auth.Authentication, w http.ResponseWriter, r
 	}
 
 	return json.NewEncoder(w).Encode(GetObjectResponse{
-		views.ConvertObject(*object, objectFields),
+		views.ConvertObject(object, objectFields),
 	})
 }

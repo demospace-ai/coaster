@@ -64,6 +64,6 @@ func (s ApiService) CreateObject(auth auth.Authentication, w http.ResponseWriter
 	}
 
 	return json.NewEncoder(w).Encode(CreateObjectResponse{
-		views.ConvertObject(*object, objectFields),
+		views.ConvertObject(object, objectFields),
 	})
 }

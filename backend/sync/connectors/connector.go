@@ -4,19 +4,22 @@ import (
 	"context"
 
 	"go.fabra.io/server/common/data"
-	"go.fabra.io/server/common/models"
+	"go.fabra.io/server/common/views"
 )
 
+type DestinationOptions struct {
+	StagingBucket string
+}
+
 type Connector interface {
-	Read(ctx context.Context, sourceConnection *models.Connection, sync *models.Sync, fieldMappings []models.FieldMapping) ([]data.Row, error)
+	Read(ctx context.Context, sourceConnection views.FullConnection, sync views.Sync, fieldMappings []views.FieldMapping) ([]data.Row, error)
 	Write(
 		ctx context.Context,
-		destinationConnection *models.Connection,
-		destination *models.DestinationConnection,
-		object *models.Object,
-		sync *models.Sync,
-		objectFields []models.ObjectField,
-		fieldMappings []models.FieldMapping,
+		destinationConnection views.FullConnection,
+		destinationOptions DestinationOptions,
+		object views.Object,
+		sync views.Sync,
+		fieldMappings []views.FieldMapping,
 		rows []data.Row,
 	) error
 }

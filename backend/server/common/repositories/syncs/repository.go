@@ -28,7 +28,7 @@ func CreateSync(
 	sync := models.Sync{
 		OrganizationID: organizationID,
 		DisplayName:    displayName,
-		EndCustomerId:  endCustomerID,
+		EndCustomerID:  endCustomerID,
 		SourceID:       sourceID,
 		ObjectID:       objectID,
 		SyncMode:       syncMode,

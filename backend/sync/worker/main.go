@@ -19,6 +19,7 @@ func main() {
 
 	// This worker hosts both Workflow and Activity functions
 	w := worker.New(c, temporal.SyncTaskQueue, worker.Options{})
+	w.RegisterActivity(temporal.FetchConfig)
 	w.RegisterActivity(temporal.Replicate)
 	w.RegisterWorkflow(temporal.SyncWorkflow)
 

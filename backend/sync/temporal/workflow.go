@@ -33,8 +33,16 @@ func SyncWorkflow(ctx workflow.Context, input SyncInput) error {
 	}
 
 	ctx = workflow.WithActivityOptions(ctx, options)
-	replicateInput := ReplicateInput(input)
-	err := workflow.ExecuteActivity(ctx, Replicate, replicateInput).Get(ctx, nil)
+
+	var syncConfig SyncConfig
+	fetchInput := FetchConfigInput(input)
+	err := workflow.ExecuteActivity(ctx, FetchConfig, fetchInput).Get(ctx, &syncConfig)
+	if err != nil {
+		return err
+	}
+
+	replicateInput := ReplicateInput(syncConfig)
+	err = workflow.ExecuteActivity(ctx, Replicate, replicateInput).Get(ctx, nil)
 	if err != nil {
 		return err
 	}

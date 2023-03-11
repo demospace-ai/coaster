@@ -8,6 +8,7 @@ import (
 type Sync struct {
 	ID             int64           `json:"id"`
 	OrganizationID int64           `json:"organization_id"`
+	EndCustomerID  int64           `json:"end_customer_id"`
 	DisplayName    string          `json:"display_name"`
 	SourceID       int64           `json:"source_id"`
 	ObjectID       int64           `json:"object_id"`
@@ -28,12 +29,14 @@ type FieldMapping struct {
 
 func ConvertSync(sync *models.Sync) Sync {
 	syncView := Sync{
-		ID:          sync.ID,
-		DisplayName: sync.DisplayName,
-		SourceID:    sync.SourceID,
-		ObjectID:    sync.ObjectID,
-		SyncMode:    sync.SyncMode,
-		Frequency:   sync.Frequency,
+		ID:             sync.ID,
+		OrganizationID: sync.OrganizationID,
+		EndCustomerID:  sync.EndCustomerID,
+		DisplayName:    sync.DisplayName,
+		SourceID:       sync.SourceID,
+		ObjectID:       sync.ObjectID,
+		SyncMode:       sync.SyncMode,
+		Frequency:      sync.Frequency,
 	}
 
 	if sync.Namespace.Valid {

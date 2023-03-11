@@ -2,6 +2,7 @@ package views
 
 import (
 	"go.fabra.io/server/common/data"
+	"go.fabra.io/server/common/database"
 	"go.fabra.io/server/common/models"
 )
 
@@ -22,6 +23,23 @@ type Source struct {
 type Connection struct {
 	ID             int64                 `json:"id"`
 	ConnectionType models.ConnectionType `json:"connection_type"`
+}
+
+// Don't return this to the client except in special situations
+type FullConnection struct {
+	ID                int64                 `json:"id"`
+	OrganizationID    int64                 `json:"organization_id"`
+	ConnectionType    models.ConnectionType `json:"connection_type"`
+	Credentials       string                `json:"credentials"`
+	Username          string                `json:"username"`
+	Password          string                `json:"password"`
+	Location          string                `json:"location"`
+	WarehouseName     string                `json:"warehouse_name"`
+	DatabaseName      string                `json:"database_name"`
+	Role              string                `json:"role"`
+	Host              string                `json:"host"`
+	Port              string                `json:"port"`
+	ConnectionOptions string                `json:"connection_options"`
 }
 
 type Object struct {
@@ -105,7 +123,7 @@ func ConvertSourceConnections(sourceConnections []models.SourceConnection) []Sou
 	return sources
 }
 
-func ConvertObject(object models.Object, objectFields []models.ObjectField) Object {
+func ConvertObject(object *models.Object, objectFields []models.ObjectField) Object {
 	viewObjectFields := []ObjectField{}
 	for _, objectField := range objectFields {
 		viewObjectField := ObjectField{
@@ -131,5 +149,62 @@ func ConvertObject(object models.Object, objectFields []models.ObjectField) Obje
 		TableName:           object.TableName,
 		EndCustomerIdColumn: object.EndCustomerIdColumn,
 		ObjectFields:        viewObjectFields,
+	}
+}
+
+func ConvertFullConnection(connection *models.Connection) FullConnection {
+	fullConnection := FullConnection{
+		ID:             connection.ID,
+		ConnectionType: connection.ConnectionType,
+	}
+
+	if connection.Credentials.Valid {
+		fullConnection.Credentials = connection.Credentials.String
+	}
+	if connection.Username.Valid {
+		fullConnection.Username = connection.Username.String
+	}
+	if connection.Password.Valid {
+		fullConnection.Password = connection.Password.String
+	}
+	if connection.Location.Valid {
+		fullConnection.Location = connection.Location.String
+	}
+	if connection.WarehouseName.Valid {
+		fullConnection.WarehouseName = connection.WarehouseName.String
+	}
+	if connection.DatabaseName.Valid {
+		fullConnection.DatabaseName = connection.DatabaseName.String
+	}
+	if connection.Role.Valid {
+		fullConnection.Role = connection.Role.String
+	}
+	if connection.Host.Valid {
+		fullConnection.Host = connection.Host.String
+	}
+	if connection.Port.Valid {
+		fullConnection.Port = connection.Port.String
+	}
+	if connection.ConnectionOptions.Valid {
+		fullConnection.ConnectionOptions = connection.ConnectionOptions.String
+	}
+
+	return fullConnection
+}
+
+func ConvertConnectionView(fullConnection FullConnection) *models.Connection {
+	return &models.Connection{
+		OrganizationID:    fullConnection.OrganizationID,
+		ConnectionType:    fullConnection.ConnectionType,
+		Credentials:       database.NewNullString(fullConnection.Credentials),
+		Username:          database.NewNullString(fullConnection.Username),
+		Password:          database.NewNullString(fullConnection.Password),
+		Location:          database.NewNullString(fullConnection.Location),
+		DatabaseName:      database.NewNullString(fullConnection.DatabaseName),
+		WarehouseName:     database.NewNullString(fullConnection.WarehouseName),
+		Role:              database.NewNullString(fullConnection.Role),
+		Host:              database.NewNullString(fullConnection.Host),
+		Port:              database.NewNullString(fullConnection.Port),
+		ConnectionOptions: database.NewNullString(fullConnection.ConnectionOptions),
 	}
 }

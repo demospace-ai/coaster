@@ -10,6 +10,7 @@ import (
 	"go.fabra.io/server/common/data"
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/query"
+	"go.fabra.io/server/common/views"
 )
 
 type BigQueryImpl struct {
@@ -22,14 +23,16 @@ func NewBigQueryConnector(queryService query.QueryService) Connector {
 	}
 }
 
-func (bqs BigQueryImpl) Read(ctx context.Context, sourceConnection *models.Connection, sync *models.Sync, fieldMappings []models.FieldMapping) ([]data.Row, error) {
-	sc, err := bqs.queryService.GetClient(ctx, sourceConnection)
+func (bqs BigQueryImpl) Read(ctx context.Context, sourceConnection views.FullConnection, sync views.Sync, fieldMappings []views.FieldMapping) ([]data.Row, error) {
+	connectionModel := views.ConvertConnectionView(sourceConnection)
+
+	sc, err := bqs.queryService.GetClient(ctx, connectionModel)
 	if err != nil {
 		return nil, err
 	}
 	sourceClient := sc.(query.BigQueryApiClient)
 
-	readQuery := getReadQuery(sourceConnection, sync, fieldMappings)
+	readQuery := getReadQuery(connectionModel, sync, fieldMappings)
 
 	results, err := sourceClient.RunQuery(ctx, readQuery)
 	if err != nil {
@@ -40,20 +43,16 @@ func (bqs BigQueryImpl) Read(ctx context.Context, sourceConnection *models.Conne
 }
 
 // TODO: only read 10,000 rows at once or something
-func getReadQuery(sourceConnection *models.Connection, sync *models.Sync, fieldMappings []models.FieldMapping) string {
-	if sourceConnection == nil || sync == nil || fieldMappings == nil {
-		return "" // TODO: throw error
-	}
-
-	if sync.CustomJoin.Valid {
-		return sync.CustomJoin.String
+func getReadQuery(sourceConnection *models.Connection, sync views.Sync, fieldMappings []views.FieldMapping) string {
+	if len(sync.CustomJoin) > 0 {
+		return sync.CustomJoin
 	}
 
 	selectString := getSelectString(fieldMappings)
-	return fmt.Sprintf("SELECT %s FROM %s.%s;", selectString, sync.Namespace.String, sync.TableName.String)
+	return fmt.Sprintf("SELECT %s FROM %s.%s;", selectString, sync.Namespace, sync.TableName)
 }
 
-func getSelectString(fieldMappings []models.FieldMapping) string {
+func getSelectString(fieldMappings []views.FieldMapping) string {
 	columns := []string{}
 	for _, fieldMapping := range fieldMappings {
 		columns = append(columns, fieldMapping.SourceFieldName)
@@ -64,15 +63,16 @@ func getSelectString(fieldMappings []models.FieldMapping) string {
 
 func (bqs BigQueryImpl) Write(
 	ctx context.Context,
-	destinationConnection *models.Connection,
-	destination *models.DestinationConnection,
-	object *models.Object,
-	sync *models.Sync,
-	objectFields []models.ObjectField,
-	fieldMappings []models.FieldMapping,
+	destinationConnection views.FullConnection,
+	destinationOptions DestinationOptions,
+	object views.Object,
+	sync views.Sync,
+	fieldMappings []views.FieldMapping,
 	rows []data.Row,
 ) error {
-	dc, err := bqs.queryService.GetClient(ctx, destinationConnection)
+	connectionModel := views.ConvertConnectionView(destinationConnection)
+
+	dc, err := bqs.queryService.GetClient(ctx, connectionModel)
 	if err != nil {
 		return err
 	}
@@ -80,7 +80,7 @@ func (bqs BigQueryImpl) Write(
 
 	// TODO: batch insert 10,000 rows at a time
 	// write to temporary table in destination
-	orderedObjectFields := createOrderedObjectFields(objectFields, fieldMappings)
+	orderedObjectFields := createOrderedObjectFields(object.ObjectFields, fieldMappings)
 	rowStrings := []string{}
 	for _, row := range rows {
 		var rowTokens []string
@@ -105,15 +105,15 @@ func (bqs BigQueryImpl) Write(
 			}
 		}
 
-		rowTokens = append(rowTokens, fmt.Sprintf("%d", sync.EndCustomerId))
+		rowTokens = append(rowTokens, fmt.Sprintf("%d", sync.EndCustomerID))
 		rowString := strings.Join(rowTokens, ",")
 		rowStrings = append(rowStrings, rowString)
 	}
 
 	file := uuid.New().String()
-	gcsReference := fmt.Sprintf("gs://%s/%s", destination.StagingBucket.String, file)
+	gcsReference := fmt.Sprintf("gs://%s/%s", destinationOptions.StagingBucket, file)
 
-	stagingOptions := query.StagingOptions{Bucket: destination.StagingBucket.String, File: file}
+	stagingOptions := query.StagingOptions{Bucket: destinationOptions.StagingBucket, File: file}
 	err = destClient.StageData(ctx, strings.Join(rowStrings, "\n"), stagingOptions)
 	if err != nil {
 		return err
@@ -134,26 +134,27 @@ func (bqs BigQueryImpl) Write(
 
 func toBigQueryWriteMode(syncMode models.SyncMode) bigquery.TableWriteDisposition {
 	switch syncMode {
-	case models.SyncModeFullAppend:
-		return bigquery.WriteAppend
 	case models.SyncModeFullOverwrite:
 		return bigquery.WriteTruncate
+	case models.SyncModeFullAppend:
+		return bigquery.WriteAppend
 	case models.SyncModeIncrementalAppend:
 		return bigquery.WriteAppend
 	case models.SyncModeIncrementalUpdate:
-		return bigquery.WriteAppend
+		// incremental update loads updated/new rows into a temp table, before merging with the destination
+		return bigquery.WriteTruncate
 	default:
 		return bigquery.WriteAppend
 	}
 }
 
-func createOrderedObjectFields(objectFields []models.ObjectField, fieldMappings []models.FieldMapping) []models.ObjectField {
-	objectFieldIdToObjectField := make(map[int64]models.ObjectField)
+func createOrderedObjectFields(objectFields []views.ObjectField, fieldMappings []views.FieldMapping) []views.ObjectField {
+	objectFieldIdToObjectField := make(map[int64]views.ObjectField)
 	for _, objectField := range objectFields {
 		objectFieldIdToObjectField[objectField.ID] = objectField
 	}
 
-	var orderedObjectFields []models.ObjectField
+	var orderedObjectFields []views.ObjectField
 	for _, fieldMapping := range fieldMappings {
 		orderedObjectFields = append(orderedObjectFields, objectFieldIdToObjectField[fieldMapping.DestinationFieldId])
 	}
@@ -161,7 +162,7 @@ func createOrderedObjectFields(objectFields []models.ObjectField, fieldMappings 
 	return orderedObjectFields
 }
 
-func createCsvSchema(endCustomerIdColumn string, orderedObjectFields []models.ObjectField) bigquery.Schema {
+func createCsvSchema(endCustomerIdColumn string, orderedObjectFields []views.ObjectField) bigquery.Schema {
 	var csvSchema bigquery.Schema
 	for _, objectField := range orderedObjectFields {
 		field := bigquery.FieldSchema{
