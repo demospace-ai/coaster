@@ -4,30 +4,50 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+	/* These are the defaults */
+	--color-primary: #475569;
+	--color-primary-hover: #1e293b;
+	--color-primary-text: #ffffff;
+}
+
 html {
-  height: 100%;
+	height: 100%;
 }
 
 body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  font-family: "Inter", sans-serif;
-  font-size: 14px;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background: white;
-  color: #0d1117;
-  overscroll-behavior: none;
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	font-family: "Inter", sans-serif;
+	font-size: 14px;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	background: white;
+	color: #0d1117;
+	overscroll-behavior: none;
 }
 
 input,
 textarea,
 button {
-  font-family: inherit;
-  font-size: inherit;
+	font-family: inherit;
+	font-size: inherit;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+	font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+		monospace;
+}
+
+.rotate-animation {
+	transform-box: fill-box;
+	transform-origin: 50% 50%;
+	animation: spin 15s linear infinite;
+}
+
+@keyframes spin {
+	100% {
+		transform: rotateZ(360deg);
+	}
 }
