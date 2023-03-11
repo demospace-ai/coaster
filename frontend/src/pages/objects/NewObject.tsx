@@ -4,9 +4,11 @@ import { Checkbox } from "src/components/checkbox/Checkbox";
 import { Input, ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { ColumnSelector, DestinationSelector, NamespaceSelector, TableSelector } from "src/components/selector/Selector";
+import { Tooltip } from "src/components/tooltip/Tooltip";
 import { sendRequest } from "src/rpc/ajax";
 import { ColumnSchema, CreateObject, CreateObjectRequest, Destination, GetObjects, ObjectFieldInput } from "src/rpc/api";
 import { useSchema } from "src/rpc/data";
+import { mergeClasses } from "src/utils/twmerge";
 import { mutate } from "swr";
 
 enum Step {
@@ -156,12 +158,15 @@ const ObjectFields: React.FC<ObjectFieldsProps> = props => {
   const [loading, setLoading] = useState<boolean>(false);
   const { schema } = useSchema(state.destination?.connection.id, state.namespace, state.tableName);
   const [createObjectSuccess, setCreateObjectSuccess] = useState<boolean | null>(null);
+  const endCustomerIdColumn = state.endCustomerIdColumn?.name;
   useEffect(() => {
     const objectFields = schema ? schema.map(column => {
+      // automatically omit end customer ID column
+      const omit = column.name === endCustomerIdColumn;
       return {
         name: column.name,
         type: column.type,
-        omit: false,
+        omit: omit,
         optional: false,
       };
     }) : [];
@@ -171,7 +176,7 @@ const ObjectFields: React.FC<ObjectFieldsProps> = props => {
         objectFields: objectFields,
       };
     });
-  }, [schema, setState]);
+  }, [schema, endCustomerIdColumn, setState]);
 
   const updateObjectField = (newObject: ObjectFieldInput, index: number) => {
     if (!state.objectFields) {
@@ -238,18 +243,21 @@ const ObjectFields: React.FC<ObjectFieldsProps> = props => {
       <div className="tw-text-center tw-mb-3">Provide customer-facing names and descriptions for each field.</div>
       <div className="tw-w-full tw-px-24">
         {state.objectFields.map((objectField, i) => {
+          const isEndCustomerIdColumn = objectField.name === endCustomerIdColumn;
           return (
-            <div key={objectField.name} className="tw-mt-5 tw-mb-7 tw-text-left">
-              <span className="tw-text-base tw-font-semibold">{objectField.name}</span>
-              <div className="tw-flex tw-items-center tw-mt-2 tw-pb-1.5">
-                <span className="">Omit?</span>
-                <Checkbox className="tw-ml-2 tw-h-4 tw-w-4" checked={objectField.omit} onCheckedChange={() => updateObjectField({ ...objectField, omit: !objectField.omit }, i)} />
-                <span className="tw-ml-4">Optional?</span>
-                <Checkbox className="tw-ml-2 tw-h-4 tw-w-4" checked={objectField.optional} onCheckedChange={() => updateObjectField({ ...objectField, optional: !objectField.optional }, i)} />
+            <Tooltip label="End Customer ID column should not be visible to your end customer, it will be automatically set by Fabra." disabled={!isEndCustomerIdColumn}>
+              <div key={objectField.name} className={mergeClasses("tw-mt-5 tw-mb-7 tw-text-left")}>
+                <span className="tw-text-base tw-font-semibold">{objectField.name}</span>
+                <div className="tw-flex tw-items-center tw-mt-2 tw-pb-1.5">
+                  <span className="">Omit?</span>
+                  <Checkbox disabled={isEndCustomerIdColumn} className="tw-ml-2 tw-h-4 tw-w-4 tw-" checked={objectField.omit} onCheckedChange={() => updateObjectField({ ...objectField, omit: !objectField.omit }, i)} />
+                  <span className="tw-ml-4">Optional?</span>
+                  <Checkbox disabled={isEndCustomerIdColumn} className="tw-ml-2 tw-h-4 tw-w-4" checked={objectField.optional} onCheckedChange={() => updateObjectField({ ...objectField, optional: !objectField.optional }, i)} />
+                </div>
+                <Input disabled={isEndCustomerIdColumn} className="tw-mb-2" value={objectField.display_name} setValue={value => updateObjectField({ ...objectField, display_name: value }, i)} placeholder="Display Name" label="Display Name" />
+                <Input disabled={isEndCustomerIdColumn} className="tw-mb-2" value={objectField.description} setValue={value => updateObjectField({ ...objectField, description: value }, i)} placeholder="Description" label="Description" />
               </div>
-              <Input className="tw-mb-2" value={objectField.display_name} setValue={value => updateObjectField({ ...objectField, display_name: value }, i)} placeholder="Display Name" label="Display Name" />
-              <Input className="tw-mb-2" value={objectField.description} setValue={value => updateObjectField({ ...objectField, description: value }, i)} placeholder="Description" label="Description" />
-            </div>
+            </Tooltip>
           );
         })}
       </div>

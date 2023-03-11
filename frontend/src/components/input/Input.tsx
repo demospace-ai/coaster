@@ -7,9 +7,10 @@ import { mergeClasses } from "src/utils/twmerge";
 
 const UNSET: any = { "undefined": true };
 
-export const Input: React.FC<ValidatedInputProps> = props => {
+export const Input: React.FC<InputProps> = props => {
+  const { id, value, placeholder, setValue, className, textarea, type, label, ...other } = props;
   const [focused, setFocused] = useState(false);
-  let classes = ['tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border hover:tw-border-slate-400 focus:tw-border-slate-700 tw-outline-none', props.className];
+  let classes = ['tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border focus:tw-border-slate-700 tw-outline-none', !props.disabled && "hover:tw-border-slate-400", props.className];
 
   const onKeydown = (event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     event.stopPropagation();
@@ -64,13 +65,14 @@ export const Input: React.FC<ValidatedInputProps> = props => {
           onChange={e => { e.target.type === 'number' ? props.setValue(parseInt(e.target.value)) : props.setValue(e.target.value); }}
           onBlur={() => { setFocused(false); }}
           value={props.value ? props.value : ""}
+          {...other}
         />
       }
     </div>
   );
 };
 
-interface ValidatedInputProps extends InputHTMLAttributes<HTMLInputElement> {
+interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   placeholder?: string;
   setValue: (value: any) => void;
   className?: string;
@@ -79,7 +81,7 @@ interface ValidatedInputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
 };
 
-export const ValidatedInput: React.FC<ValidatedInputProps> = props => {
+export const ValidatedInput: React.FC<InputProps> = props => {
   const { id, value, placeholder, setValue, className, textarea, type, label, ...other } = props;
   const [isValid, setIsValid] = useState(true);
   const [focused, setFocused] = useState(false);
