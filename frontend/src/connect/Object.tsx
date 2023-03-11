@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button } from "src/components/button/Button";
 import { Checkbox } from "src/components/checkbox/Checkbox";
 import { InfoIcon } from "src/components/icons/Icons";
-import { ReactComponent as PreviewAnimation } from "src/components/images/preview_animation.svg";
+import { ReactComponent as PreviewAnimation } from "src/components/images/dataConnectAnimation.svg";
 import { Loading } from "src/components/loading/Loading";
 import { MemoizedResultsTable } from "src/components/queryResults/QueryResults";
 import { ObjectSelector, SourceNamespaceSelector, SourceTableSelector } from "src/components/selector/Selector";
