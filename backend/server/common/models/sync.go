@@ -14,10 +14,10 @@ const (
 type FrequencyUnits string
 
 const (
-	FrequencyUnitsMinutes SyncMode = "minutes"
-	FrequencyUnitsHours   SyncMode = "hours"
-	FrequencyUnitsDays    SyncMode = "days"
-	FrequencyUnitsWeeks   SyncMode = "weeks"
+	FrequencyUnitsMinutes FrequencyUnits = "minutes"
+	FrequencyUnitsHours   FrequencyUnits = "hours"
+	FrequencyUnitsDays    FrequencyUnits = "days"
+	FrequencyUnitsWeeks   FrequencyUnits = "weeks"
 )
 
 type Sync struct {

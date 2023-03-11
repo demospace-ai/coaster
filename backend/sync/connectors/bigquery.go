@@ -23,10 +23,10 @@ func NewBigQueryConnector(queryService query.QueryService) Connector {
 	}
 }
 
-func (bqs BigQueryImpl) Read(ctx context.Context, sourceConnection views.FullConnection, sync views.Sync, fieldMappings []views.FieldMapping) ([]data.Row, error) {
+func (bq BigQueryImpl) Read(ctx context.Context, sourceConnection views.FullConnection, sync views.Sync, fieldMappings []views.FieldMapping) ([]data.Row, error) {
 	connectionModel := views.ConvertConnectionView(sourceConnection)
 
-	sc, err := bqs.queryService.GetClient(ctx, connectionModel)
+	sc, err := bq.queryService.GetClient(ctx, connectionModel)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func getSelectString(fieldMappings []views.FieldMapping) string {
 	return strings.Join(columns, ",")
 }
 
-func (bqs BigQueryImpl) Write(
+func (bq BigQueryImpl) Write(
 	ctx context.Context,
 	destinationConnection views.FullConnection,
 	destinationOptions DestinationOptions,
@@ -72,7 +72,7 @@ func (bqs BigQueryImpl) Write(
 ) error {
 	connectionModel := views.ConvertConnectionView(destinationConnection)
 
-	dc, err := bqs.queryService.GetClient(ctx, connectionModel)
+	dc, err := bq.queryService.GetClient(ctx, connectionModel)
 	if err != nil {
 		return err
 	}

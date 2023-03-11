@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -91,7 +92,9 @@ func (s ApiService) LinkCreateSync(auth auth.Authentication, w http.ResponseWrit
 		return err
 	}
 
-	// TODO: do this on a schedule
+	// TODO: use schedules instead of crons
+	cronSchedule := createCronSchedule(createSyncRequest.Frequency, createSyncRequest.FrequencyUnits)
+
 	c, err := temporal.CreateClient(CLIENT_PEM_KEY, CLIENT_KEY_KEY)
 	if err != nil {
 		log.Fatalln("unable to create Temporal client", err)
@@ -99,11 +102,11 @@ func (s ApiService) LinkCreateSync(auth auth.Authentication, w http.ResponseWrit
 	defer c.Close()
 
 	ctx := context.TODO()
-	_, err = c.ExecuteWorkflow(
+	workflow, err := c.ExecuteWorkflow(
 		ctx,
 		client.StartWorkflowOptions{
 			TaskQueue:    temporal.SyncTaskQueue,
-			CronSchedule: "0 0 * * *",
+			CronSchedule: cronSchedule,
 		},
 		temporal.SyncWorkflow,
 		temporal.SyncInput{SyncID: sync.ID, OrganizationID: auth.Organization.ID},
@@ -112,8 +115,27 @@ func (s ApiService) LinkCreateSync(auth auth.Authentication, w http.ResponseWrit
 		return err
 	}
 
+	// tell the workflow to run immediately
+	c.SignalWorkflow(ctx, workflow.GetID(), workflow.GetRunID(), "start", nil)
+
 	return json.NewEncoder(w).Encode(CreateSyncResponse{
 		Sync:          views.ConvertSync(sync),
 		FieldMappings: views.ConvertFieldMappings(fieldMappings),
 	})
+}
+
+func createCronSchedule(frequency int64, frequencyUnits models.FrequencyUnits) string {
+	// this uses the robfig format: https://docs.temporal.io/workflows#robfig-predefined-schedules-and-intervals
+	switch frequencyUnits {
+	case models.FrequencyUnitsMinutes:
+		return fmt.Sprintf("@every %dm", frequency)
+	case models.FrequencyUnitsHours:
+		return fmt.Sprintf("@every %dh", frequency)
+	case models.FrequencyUnitsDays:
+		return fmt.Sprintf("@every %dh", frequency*24)
+	case models.FrequencyUnitsWeeks:
+		return fmt.Sprintf("@every %dh", frequency*24*7)
+	default:
+		return "0 0 0 0 2000" // choose a day in the past so it never executes
+	}
 }
