@@ -4,6 +4,13 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+	/* These are the default Fabra colors */
+	--color-primary: #475569;
+	--color-primary-hover: #1e293b;
+	--color-primary-text: #ffffff;
+}
+
 html {
   height: 100%;
 }
@@ -30,4 +37,16 @@ button {
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+.rotate-animation {
+	transform-box: fill-box;
+	transform-origin: 50% 50%;
+	animation: spin 15s linear infinite;
+}
+
+@keyframes spin {
+	100% {
+		transform: rotateZ(360deg);
+	}
 }

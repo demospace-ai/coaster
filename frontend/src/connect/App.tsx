@@ -1,6 +1,7 @@
 import { CheckIcon } from '@heroicons/react/24/outline';
 import classNames from 'classnames';
 import React, { useEffect, useRef, useState } from 'react';
+import { Button } from 'src/components/button/Button';
 import { Loading } from 'src/components/loading/Loading';
 import { NewSourceConfiguration } from 'src/connect/Connection';
 import { FinalizeSync } from 'src/connect/Finalize';
@@ -47,6 +48,16 @@ export const App: React.FC = () => {
       };
     });
   }, [object]);
+
+  useEffect(() => {
+		const root = document.querySelector<HTMLElement>(":root");
+
+		if (root) {
+			root.style.setProperty("--color-primary", "#ea580c");
+			root.style.setProperty("--color-primary-hover", "#fb923c");
+			root.style.setProperty("--color-primary-text", "#FFFFFF");
+		}
+	}, []);
 
   const close = () => {
     window.parent.postMessage({ messageType: MessageType.Close }, '*');
@@ -139,8 +150,16 @@ const Header: React.FC<{ close: () => void; state: SetupSyncState; }> = ({ close
 const StepBreadcrumb: React.FC<{ content: string, step: number; active: boolean; complete: boolean; }> = ({ step, content, active, complete }) => {
   return (
     <div className='tw-flex tw-flex-row tw-justify-center tw-items-center tw-select-none'>
-      <div className={classNames('tw-bg-slate-200 tw-rounded-md tw-h-[18px] tw-w-[18px] tw-flex tw-justify-center tw-items-center tw-text-[10px]', active && 'tw-bg-blue-100 tw-text-blue-700', complete && 'tw-bg-green-100 tw-text-green-800')}>{complete ? <CheckIcon className='tw-h-3' /> : step}</div>
-      <span className={classNames('tw-font-medium tw-pl-2', active && 'tw-text-blue-700')}>{content}</span>
+      <div 
+        className={classNames(
+          'tw-bg-slate-200 tw-rounded-md tw-h-[18px] tw-w-[18px] tw-flex tw-justify-center tw-items-center tw-text-[10px]', 
+          !active && !complete && 'tw-bg-slate-200 tw-text-slate-900',
+          active && 'tw-bg-primary tw-text-primary-text', 
+          complete && 'tw-bg-green-100 tw-text-green-800'
+        )}>
+          {complete ? <CheckIcon className='tw-h-3' /> : step}
+      </div>
+      <span className={classNames('tw-font-medium tw-pl-2', active && 'tw-text-primary')}>{content}</span>
     </div>
   );
 };
@@ -190,13 +209,19 @@ export const Footer: React.FC<FooterProps> = props => {
       }
       break;
   }
-  const continueButton: React.ReactElement = <button onClick={onClick} className='tw-border tw-text-white tw-font-medium tw-bg-slate-700 tw-rounded-md tw-w-32 tw-h-10 tw-ml-auto tw-select-none'>{loading ? <Loading light /> : continueText}</button>;
   const showContinue = props.state.step > SyncSetupStep.Warehouse;
 
   return (
     <div className='tw-flex tw-flex-row tw-w-full tw-h-20 tw-min-h-[80px] tw-border-t tw-border-slate-200 tw-mt-auto tw-items-center tw-px-28'>
       {props.state.step > SyncSetupStep.Initial && <button className='tw-border tw-border-slate-300 tw-font-medium tw-rounded-md tw-w-32 tw-h-10 tw-select-none' onClick={props.back}>Back</button>}
-      {showContinue && continueButton}
+			{showContinue && (
+				<Button
+					onClick={onClick}
+					className="tw-border tw-w-36 tw-h-10 tw-ml-auto tw-select-none "
+				>
+					{loading ? <Loading light /> : continueText}
+				</Button>
+			)}
     </div>
   );
 };

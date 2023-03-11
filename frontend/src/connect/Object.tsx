@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button } from "src/components/button/Button";
 import { Checkbox } from "src/components/checkbox/Checkbox";
 import { InfoIcon } from "src/components/icons/Icons";
-import query from "src/components/images/query.svg";
+import { ReactComponent as PreviewAnimation } from "src/components/images/preview_animation.svg";
 import { Loading } from "src/components/loading/Loading";
 import { MemoizedResultsTable } from "src/components/queryResults/QueryResults";
 import { ObjectSelector, SourceNamespaceSelector, SourceTableSelector } from "src/components/selector/Selector";
@@ -76,7 +76,7 @@ export const ObjectSetup: React.FC<SetupSyncProps> = (props) => {
           <MemoizedResultsTable schema={previewSchema} results={previewData} />
           :
           <div className="tw-h-full tw-w-full tw-rounded-md tw-bg-slate-50 tw-justify-center tw-items-center tw-text-center tw-flex tw-flex-col">
-            <img src={query} alt="query results placeholder" className="tw-h-20 tw-mb-3"></img>
+            <PreviewAnimation className="tw-h-28 tw-mb-3" />
             <div className="tw-text-xl tw-font-semibold tw-mb-1 tw-text-slate-600">
               Preview your data
             </div>
