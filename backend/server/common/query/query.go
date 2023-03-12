@@ -95,6 +95,19 @@ func (qs QueryServiceImpl) GetClient(ctx context.Context, connection *models.Con
 			Role:          connection.Role.String,
 			Host:          connection.Host.String,
 		}, nil
+	case models.ConnectionTypeRedshift:
+		redshiftPassword, err := qs.cryptoService.DecryptConnectionCredentials(connection.Password.String)
+		if err != nil {
+			return nil, err
+		}
+
+		// TODO: validate all connection params
+		return RedshiftApiClient{
+			Username:     connection.Username.String,
+			Password:     *redshiftPassword,
+			DatabaseName: connection.DatabaseName.String,
+			Host:         connection.Host.String,
+		}, nil
 	case models.ConnectionTypeMongoDb:
 		mongodbPassword, err := qs.cryptoService.DecryptConnectionCredentials(connection.Password.String)
 		if err != nil {

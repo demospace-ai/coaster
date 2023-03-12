@@ -93,8 +93,7 @@ func CreateRedshiftConnection(
 		Username:       database.NewNullString(redshiftConfig.Username),
 		Password:       database.NewNullString(encryptedPassword),
 		DatabaseName:   database.NewNullString(redshiftConfig.DatabaseName),
-		Port:           database.NewNullString(redshiftConfig.Port),
-		Host:           database.NewNullString(redshiftConfig.Host),
+		Host:           database.NewNullString(redshiftConfig.Endpoint), // we just use the host field to store the whole endpoint (including port)
 	}
 
 	result := db.Create(&connection)

@@ -5,10 +5,11 @@ import "go.fabra.io/server/common/database"
 type ConnectionType string
 
 const (
-	ConnectionTypeSnowflake ConnectionType = "snowflake"
+	ConnectionTypeSynapse   ConnectionType = "synapse"
 	ConnectionTypeBigQuery  ConnectionType = "bigquery"
-	ConnectionTypeRedshift  ConnectionType = "redshift"
 	ConnectionTypeMongoDb   ConnectionType = "mongodb"
+	ConnectionTypeRedshift  ConnectionType = "redshift"
+	ConnectionTypeSnowflake ConnectionType = "snowflake"
 )
 
 type BigQueryCredentials struct {

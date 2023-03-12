@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"go.fabra.io/server/common/auth"
@@ -54,6 +55,8 @@ func (s ApiService) TestDataConnection(auth auth.Authentication, w http.Response
 		return testSnowflakeConnection(*testDataConnectionRequest.SnowflakeConfig)
 	case models.ConnectionTypeMongoDb:
 		return testMongoDbConnection(*testDataConnectionRequest.MongoDbConfig)
+	case models.ConnectionTypeRedshift:
+		return testRedshiftConnection(*testDataConnectionRequest.RedshiftConfig)
 	}
 
 	return nil
@@ -103,6 +106,47 @@ func testSnowflakeConnection(snowflakeConfig input.SnowflakeConfig) error {
 	}
 
 	db, err := sql.Open("snowflake", dsn)
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	rows, err := db.Query("SELECT 1")
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	var v int
+	for rows.Next() {
+		err := rows.Scan(&v)
+		if err != nil {
+			return err
+		}
+		if v != 1 {
+			return err
+		}
+	}
+	if rows.Err() != nil {
+		return err
+	}
+
+	return nil
+}
+
+func testRedshiftConnection(redshiftConfig input.RedshiftConfig) error {
+	dsn := url.URL{
+		Scheme: "postgres",
+		User:   url.UserPassword(redshiftConfig.Username, redshiftConfig.Password),
+		Host:   redshiftConfig.Endpoint,
+		Path:   redshiftConfig.DatabaseName,
+	}
+
+	params := url.Values{}
+	params.Add("sslmode", "require")
+	dsn.RawQuery = params.Encode()
+
+	db, err := sql.Open("postgres", dsn.String())
 	if err != nil {
 		return err
 	}

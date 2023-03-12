@@ -74,8 +74,7 @@ const INITIAL_DESTINATION_STATE: NewDestinationState = {
     username: "",
     password: "",
     database_name: "",
-    port: "",
-    host: "",
+    endpoint: "",
   },
   mongodbConfig: {
     username: "",
@@ -105,7 +104,7 @@ const validateAll = (connectionType: ConnectionType, state: NewDestinationState)
         && state.redshiftConfig.username.length > 0
         && state.redshiftConfig.password.length > 0
         && state.redshiftConfig.database_name.length > 0
-        && state.redshiftConfig.host.length > 0;
+        && state.redshiftConfig.endpoint.length > 0;
     case ConnectionType.MongoDb:
       return state.displayName.length > 0
         && state.mongodbConfig.username.length > 0
@@ -317,12 +316,48 @@ const RedshiftInputs: React.FC<ConnectionConfigurationProps> = props => {
   const state = props.state;
   return (
     <>
-      <ValidatedInput id='displayName' value={state.displayName} setValue={(value) => { props.setState({ ...state, displayName: value }); }} placeholder='Display Name' label="Display Name" />
-      <ValidatedInput id='username' value={state.redshiftConfig.username} setValue={(value) => { props.setState({ ...state, redshiftConfig: { ...state.redshiftConfig, username: value } }); }} placeholder='Username' label="Username" />
-      <ValidatedInput id='password' type="password" value={state.redshiftConfig.password} setValue={(value) => { props.setState({ ...state, redshiftConfig: { ...state.redshiftConfig, password: value } }); }} placeholder='Password' label="Password" />
-      <ValidatedInput id='databaseName' value={state.redshiftConfig.database_name} setValue={(value) => { props.setState({ ...state, redshiftConfig: { ...state.redshiftConfig, database_name: value } }); }} placeholder='Database Name' label="Database Name" />
-      <ValidatedInput id='host' value={state.redshiftConfig.host} setValue={(value) => { props.setState({ ...state, redshiftConfig: { ...state.redshiftConfig, host: value } }); }} placeholder='Host' label="Host" />
-      <ValidatedInput id='port' value={state.redshiftConfig.port} setValue={(value) => { props.setState({ ...state, redshiftConfig: { ...state.redshiftConfig, port: value } }); }} placeholder='Port' label="Port" />
+      <div className="tw-flex tw-flex-row tw-items-center tw-mt-2 tw-mb-1">
+        <span>Display Name</span>
+        <Tooltip placement="right" label="Pick a name to help you identify this source in the future.">
+          <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+        </Tooltip>
+      </div>
+      <ValidatedInput id='displayName' value={state.displayName} setValue={(value) => { props.setState({ ...state, displayName: value }); }} placeholder='Display Name' />
+      <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
+        <span>Username</span>
+        <Tooltip placement="right" label="You can choose your personal username or create a dedicated user for syncing.">
+          <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+        </Tooltip>
+      </div>
+      <ValidatedInput id='username' value={state.redshiftConfig.username} setValue={(value) => { props.setState({ ...state, redshiftConfig: { ...state.redshiftConfig, username: value } }); }} placeholder='Username' />
+      <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
+        <span>Password</span>
+        <Tooltip placement="right" label="Password for the user specified above.">
+          <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+        </Tooltip>
+      </div>
+      <ValidatedInput id='password' type="password" value={state.redshiftConfig.password} setValue={(value) => { props.setState({ ...state, redshiftConfig: { ...state.redshiftConfig, password: value } }); }} placeholder='Password' />
+      <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
+        <span>Database Name</span>
+        <Tooltip placement="right" label="The Redshift database to sync from.">
+          <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+        </Tooltip>
+      </div>
+      <ValidatedInput id='databaseName' value={state.redshiftConfig.database_name} setValue={(value) => { props.setState({ ...state, redshiftConfig: { ...state.redshiftConfig, database_name: value } }); }} placeholder='Database Name' />
+      <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
+        <span>Endpoint</span>
+        <Tooltip placement="right" label={
+          <div className="tw-m-2">
+            <div>This is the URL for your Redshift data warehouse. For Redshift clusters, it can be found on the specific cluster page under "General Information" and should look like:</div>
+            <div className="tw-mt-2 tw-w-full tw-bg-slate-900 tw-rounded-md tw-p-2">your-cluster.abc123.us-west-2.redshift.amazonaws.com</div>
+            <div className="tw-mt-3">For Serverless Redshift, <a className="tw-text-blue-400" href="https://docs.aws.amazon.com/redshift/latest/mgmt/serverless-connecting.html">visit the Redshift docs.</a> The following is the expected format for Serverless Redshift:</div>
+            <div className="tw-mt-2 tw-w-full tw-bg-slate-900 tw-rounded-md tw-p-2"><span className="tw-italic">workgroup-name</span>.<span className="tw-italic">account-number</span>.<span className="tw-italic">aws-region</span>.redshift-serverless.amazonaws.com</div>
+          </div>}
+          interactive maxWidth={640}>
+          <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+        </Tooltip>
+      </div >
+      <ValidatedInput id='endpoint' value={state.redshiftConfig.endpoint} setValue={(value) => { props.setState({ ...state, redshiftConfig: { ...state.redshiftConfig, endpoint: value } }); }} placeholder='Endpoint' />
     </>
   );
 };

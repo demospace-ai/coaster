@@ -47,8 +47,7 @@ const INITIAL_SOURCE_STATE: NewSourceState = {
     username: "",
     password: "",
     database_name: "",
-    port: "",
-    host: "",
+    endpoint: "",
   },
   mongodbConfig: {
     username: "",
@@ -122,7 +121,7 @@ export const validateConnectionSetup = (connectionType: ConnectionType | undefin
         && state.redshiftConfig.username.length > 0
         && state.redshiftConfig.password.length > 0
         && state.redshiftConfig.database_name.length > 0
-        && state.redshiftConfig.host.length > 0;
+        && state.redshiftConfig.endpoint.length > 0;
     case ConnectionType.MongoDb:
       return state.displayName.length > 0
         && state.mongodbConfig.username.length > 0

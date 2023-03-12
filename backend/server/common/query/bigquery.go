@@ -101,7 +101,7 @@ func (ac BigQueryApiClient) GetTableSchema(ctx context.Context, namespace string
 }
 
 func (ac BigQueryApiClient) GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]any, error) {
-	queryString := "SELECT DISTINCT " + columnName + " FROM " + namespace + "." + tableName + " LIMIT 50"
+	queryString := fmt.Sprintf("SELECT DISTINCT %s FROM %s.%s LIMIT 100", columnName, namespace, tableName)
 
 	queryResults, err := ac.RunQuery(ctx, queryString)
 	if err != nil {

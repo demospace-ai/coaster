@@ -54,7 +54,7 @@ func (s ApiService) GetSchema(auth auth.Authentication, w http.ResponseWriter, r
 			return err
 		}
 	} else {
-		schema, err = s.queryService.GetTableSchema(context.Background(), connection, namespace, tableName)
+		schema, err = s.queryService.GetTableSchema(context.TODO(), connection, namespace, tableName)
 		if err != nil {
 			return err
 		}

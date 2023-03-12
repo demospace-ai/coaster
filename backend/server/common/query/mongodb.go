@@ -64,7 +64,7 @@ func (mc MongoDbApiClient) openConnection(ctx context.Context) (*mongo.Client, e
 func (mc MongoDbApiClient) GetTables(ctx context.Context, namespace string) ([]string, error) {
 	client, err := mc.openConnection(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
+		return nil, fmt.Errorf("mongodb.NewClient: %v", err)
 	}
 
 	defer client.Disconnect(ctx)
@@ -76,7 +76,7 @@ func (mc MongoDbApiClient) GetTables(ctx context.Context, namespace string) ([]s
 func (mc MongoDbApiClient) GetTableSchema(ctx context.Context, namespace string, tableName string) (data.Schema, error) {
 	client, err := mc.openConnection(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
+		return nil, fmt.Errorf("mongodb.NewClient: %v", err)
 	}
 
 	defer client.Disconnect(ctx)
@@ -104,7 +104,7 @@ func (mc MongoDbApiClient) GetColumnValues(ctx context.Context, namespace string
 func (mc MongoDbApiClient) GetNamespaces(ctx context.Context) ([]string, error) {
 	client, err := mc.openConnection(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
+		return nil, fmt.Errorf("mongodb.NewClient: %v", err)
 	}
 
 	defer client.Disconnect(ctx)
@@ -120,7 +120,7 @@ func (mc MongoDbApiClient) GetNamespaces(ctx context.Context) ([]string, error) 
 func (mc MongoDbApiClient) RunQuery(ctx context.Context, queryString string, args ...any) (*data.QueryResults, error) {
 	client, err := mc.openConnection(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
+		return nil, fmt.Errorf("mongodb.NewClient: %v", err)
 	}
 	defer client.Disconnect(ctx)
 
@@ -174,7 +174,7 @@ func (mc MongoDbApiClient) RunQuery(ctx context.Context, queryString string, arg
 func (mc MongoDbApiClient) GetQueryIterator(ctx context.Context, queryString string) (data.RowIterator, error) {
 	client, err := mc.openConnection(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
+		return nil, fmt.Errorf("mongodb.NewClient: %v", err)
 	}
 	defer client.Disconnect(ctx)
 

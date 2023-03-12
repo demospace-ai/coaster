@@ -32,7 +32,7 @@ func (bq BigQueryImpl) Read(ctx context.Context, sourceConnection views.FullConn
 	}
 	sourceClient := sc.(query.BigQueryApiClient)
 
-	readQuery := getReadQuery(connectionModel, sync, fieldMappings)
+	readQuery := bq.getReadQuery(connectionModel, sync, fieldMappings)
 
 	results, err := sourceClient.RunQuery(ctx, readQuery)
 	if err != nil {
@@ -43,16 +43,16 @@ func (bq BigQueryImpl) Read(ctx context.Context, sourceConnection views.FullConn
 }
 
 // TODO: only read 10,000 rows at once or something
-func getReadQuery(sourceConnection *models.Connection, sync views.Sync, fieldMappings []views.FieldMapping) string {
+func (bq BigQueryImpl) getReadQuery(sourceConnection *models.Connection, sync views.Sync, fieldMappings []views.FieldMapping) string {
 	if len(sync.CustomJoin) > 0 {
 		return sync.CustomJoin
 	}
 
-	selectString := getSelectString(fieldMappings)
+	selectString := bq.getSelectString(fieldMappings)
 	return fmt.Sprintf("SELECT %s FROM %s.%s;", selectString, sync.Namespace, sync.TableName)
 }
 
-func getSelectString(fieldMappings []views.FieldMapping) string {
+func (bq BigQueryImpl) getSelectString(fieldMappings []views.FieldMapping) string {
 	columns := []string{}
 	for _, fieldMapping := range fieldMappings {
 		columns = append(columns, fieldMapping.SourceFieldName)
@@ -80,7 +80,7 @@ func (bq BigQueryImpl) Write(
 
 	// TODO: batch insert 10,000 rows at a time
 	// write to temporary table in destination
-	orderedObjectFields := createOrderedObjectFields(object.ObjectFields, fieldMappings)
+	orderedObjectFields := bq.createOrderedObjectFields(object.ObjectFields, fieldMappings)
 	rowStrings := []string{}
 	for _, row := range rows {
 		var rowTokens []string
@@ -119,11 +119,11 @@ func (bq BigQueryImpl) Write(
 		return err
 	}
 
-	csvSchema := createCsvSchema(object.EndCustomerIdColumn, orderedObjectFields)
+	csvSchema := bq.createCsvSchema(object.EndCustomerIdColumn, orderedObjectFields)
 	err = destClient.LoadFromStaging(ctx, object.Namespace, object.TableName, query.LoadOptions{
 		GcsReference:   gcsReference,
 		BigQuerySchema: csvSchema,
-		WriteMode:      toBigQueryWriteMode(sync.SyncMode),
+		WriteMode:      bq.toBigQueryWriteMode(sync.SyncMode),
 	})
 	if err != nil {
 		return err
@@ -132,7 +132,7 @@ func (bq BigQueryImpl) Write(
 	return destClient.CleanUpStagingData(ctx, stagingOptions)
 }
 
-func toBigQueryWriteMode(syncMode models.SyncMode) bigquery.TableWriteDisposition {
+func (bq BigQueryImpl) toBigQueryWriteMode(syncMode models.SyncMode) bigquery.TableWriteDisposition {
 	switch syncMode {
 	case models.SyncModeFullOverwrite:
 		return bigquery.WriteTruncate
@@ -148,7 +148,7 @@ func toBigQueryWriteMode(syncMode models.SyncMode) bigquery.TableWriteDispositio
 	}
 }
 
-func createOrderedObjectFields(objectFields []views.ObjectField, fieldMappings []views.FieldMapping) []views.ObjectField {
+func (bq BigQueryImpl) createOrderedObjectFields(objectFields []views.ObjectField, fieldMappings []views.FieldMapping) []views.ObjectField {
 	objectFieldIdToObjectField := make(map[int64]views.ObjectField)
 	for _, objectField := range objectFields {
 		objectFieldIdToObjectField[objectField.ID] = objectField
@@ -162,7 +162,7 @@ func createOrderedObjectFields(objectFields []views.ObjectField, fieldMappings [
 	return orderedObjectFields
 }
 
-func createCsvSchema(endCustomerIdColumn string, orderedObjectFields []views.ObjectField) bigquery.Schema {
+func (bq BigQueryImpl) createCsvSchema(endCustomerIdColumn string, orderedObjectFields []views.ObjectField) bigquery.Schema {
 	var csvSchema bigquery.Schema
 	for _, objectField := range orderedObjectFields {
 		field := bigquery.FieldSchema{

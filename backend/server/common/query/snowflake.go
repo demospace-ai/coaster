@@ -72,7 +72,7 @@ func (sc SnowflakeApiClient) openConnection(ctx context.Context) (*sql.DB, error
 func (sc SnowflakeApiClient) GetTables(ctx context.Context, namespace string) ([]string, error) {
 	client, err := sc.openConnection(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
+		return nil, fmt.Errorf("snowflake.NewClient: %v", err)
 	}
 
 	defer client.Close()
@@ -136,7 +136,7 @@ func (sc SnowflakeApiClient) GetTableSchema(ctx context.Context, namespace strin
 }
 
 func (sc SnowflakeApiClient) GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]any, error) {
-	queryString := "SELECT DISTINCT " + columnName + " FROM " + namespace + "." + tableName + " LIMIT 50"
+	queryString := fmt.Sprintf("SELECT DISTINCT %s FROM %s.%s LIMIT 100", columnName, namespace, tableName)
 
 	queryResult, err := sc.RunQuery(ctx, queryString)
 	if err != nil {
@@ -156,13 +156,6 @@ func (sc SnowflakeApiClient) GetColumnValues(ctx context.Context, namespace stri
 }
 
 func (sc SnowflakeApiClient) GetNamespaces(ctx context.Context) ([]string, error) {
-	client, err := sc.openConnection(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
-	}
-
-	defer client.Close()
-
 	queryString := "SHOW TERSE SCHEMAS"
 	queryResult, err := sc.RunQuery(ctx, queryString)
 	if err != nil {
@@ -184,7 +177,7 @@ func (sc SnowflakeApiClient) GetNamespaces(ctx context.Context) ([]string, error
 func (sc SnowflakeApiClient) RunQuery(ctx context.Context, queryString string, args ...any) (*data.QueryResults, error) {
 	client, err := sc.openConnection(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
+		return nil, fmt.Errorf("snowflake.NewClient: %v", err)
 	}
 	defer client.Close()
 
@@ -224,7 +217,7 @@ func (sc SnowflakeApiClient) RunQuery(ctx context.Context, queryString string, a
 func (sc SnowflakeApiClient) GetQueryIterator(ctx context.Context, queryString string) (data.RowIterator, error) {
 	client, err := sc.openConnection(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
+		return nil, fmt.Errorf("snowflake.NewClient: %v", err)
 	}
 	defer client.Close()
 

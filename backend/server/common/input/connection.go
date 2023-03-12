@@ -15,8 +15,7 @@ type RedshiftConfig struct {
 	Username     string `json:"username,omitempty"`
 	Password     string `json:"password,omitempty"`
 	DatabaseName string `json:"database_name,omitempty"`
-	Port         string `json:"port,omitempty"`
-	Host         string `json:"host,omitempty"`
+	Endpoint     string `json:"endpoint,omitempty"`
 }
 
 type MongoDbConfig struct {

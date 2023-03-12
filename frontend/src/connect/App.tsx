@@ -49,16 +49,6 @@ export const App: React.FC = () => {
     });
   }, [object]);
 
-  useEffect(() => {
-    const root = document.querySelector<HTMLElement>(":root");
-
-    if (root) {
-      root.style.setProperty("--color-primary", "#ea580c");
-      root.style.setProperty("--color-primary-hover", "#fb923c");
-      root.style.setProperty("--color-primary-text", "#FFFFFF");
-    }
-  }, []);
-
   const close = () => {
     window.parent.postMessage({ messageType: MessageType.Close }, '*');
   };

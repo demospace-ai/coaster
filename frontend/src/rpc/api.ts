@@ -190,6 +190,7 @@ export interface TestDataConnectionRequest {
     bigquery_config?: BigQueryConfig;
     snowflake_config?: SnowflakeConfig;
     mongodb_config?: MongoDbConfig;
+    redshift_config?: RedshiftConfig;
 }
 
 export interface CreateDestinationRequest {
@@ -265,8 +266,7 @@ export interface RedshiftConfig {
     username: string;
     password: string;
     database_name: string;
-    port: string;
-    host: string;
+    endpoint: string;
 }
 
 export interface MongoDbConfig {
