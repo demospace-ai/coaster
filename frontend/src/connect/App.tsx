@@ -11,6 +11,7 @@ import { createNewSource, createNewSync, INITIAL_SETUP_STATE, SetupSyncState, Sy
 import { WarehouseSelector } from 'src/connect/Warehouse';
 import { FabraMessage, MessageType } from 'src/message/message';
 import { useObject } from 'src/rpc/data';
+import { CustomTheme } from 'src/utils/theme';
 
 let needsInit = true;
 
@@ -19,13 +20,30 @@ export const App: React.FC = () => {
   const [state, setState] = useState<SetupSyncState>(INITIAL_SETUP_STATE);
   const [linkToken, setLinkToken] = useState<string | undefined>(undefined);
   const { object } = useObject(state.object?.id, linkToken);
+
+  const handleInitTheme = (theme: CustomTheme) => {
+    const root = document.querySelector<HTMLElement>(":root");
+            
+    if (root) {
+      if ( theme.colors?.primary){
+        root.style.setProperty("--color-primary", theme.colors.primary.base);
+        root.style.setProperty("--color-primary-hover", theme.colors.primary.hover);
+        root.style.setProperty("--color-primary-text", theme.colors.primary.text);
+      }
+    }
+  }
+
+
   useEffect(() => {
     // Recommended way to run one-time initialization: https://beta.reactjs.org/learn/you-might-not-need-an-effect#initializing-the-application
     if (needsInit) {
       window.addEventListener("message", (message: MessageEvent<FabraMessage>) => {
         switch (message.data.messageType) {
-          case MessageType.LinkToken:
+          case MessageType.Initialize:
             setLinkToken(message.data.linkToken);
+            if ( message.data.theme ){
+              handleInitTheme(message.data.theme);
+            }
         }
       });
       window.parent.postMessage({ messageType: MessageType.IFrameReady }, '*');
