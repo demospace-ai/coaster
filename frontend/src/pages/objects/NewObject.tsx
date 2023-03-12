@@ -63,12 +63,12 @@ export const NewObject: React.FC<{ onComplete: () => void; }> = props => {
   }
 
   return (
-    <div className="tw-h-full tw-pb-20 tw-pt-3">
+    <>
       <BackButton onClick={back} />
-      <div className='tw-flex tw-flex-col tw-w-[900px] tw-max-h-full tw-mt-8 tw-py-12 tw-px-10 tw-mx-auto tw-bg-white tw-rounded-lg tw-shadow-md tw-items-center tw-overflow-auto'>
+      <div className='tw-flex tw-flex-col tw-w-[900px] tw-mt-8 tw-mb-24 tw-py-12 tw-px-10 tw-mx-auto tw-bg-white tw-rounded-lg tw-shadow-md tw-items-center'>
         {content}
       </div>
-    </div>
+    </>
   );
 };
 
@@ -245,7 +245,7 @@ const ObjectFields: React.FC<ObjectFieldsProps> = props => {
         {state.objectFields.map((objectField, i) => {
           const isEndCustomerIdColumn = objectField.name === endCustomerIdColumn;
           return (
-            <Tooltip label="End Customer ID column should not be visible to your end customer, it will be automatically set by Fabra." disabled={!isEndCustomerIdColumn}>
+            <Tooltip label="The End Customer ID column should not be visible to your end customer, it will be automatically set by Fabra during syncs." disabled={!isEndCustomerIdColumn}>
               <div key={objectField.name} className={mergeClasses("tw-mt-5 tw-mb-7 tw-text-left")}>
                 <span className="tw-text-base tw-font-semibold">{objectField.name}</span>
                 <div className="tw-flex tw-items-center tw-mt-2 tw-pb-1.5">

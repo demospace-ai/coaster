@@ -27,7 +27,7 @@ export const NewDestination: React.FC<{ onComplete: () => void; }> = props => {
   return (
     <>
       <BackButton className="tw-mt-3" onClick={onBack} />
-      <div className='tw-flex tw-flex-col tw-w-[900px] tw-py-12 tw-px-10 tw-mx-auto tw-mb-20 tw-mt-8 tw-bg-white tw-rounded-lg tw-shadow-md tw-items-center'>
+      <div className='tw-flex tw-flex-col tw-w-[900px] tw-mt-8 tw-mb-24 tw-py-12 tw-px-10 tw-mx-auto tw-bg-white tw-rounded-lg tw-shadow-md tw-items-center'>
         <div className="tw-w-full tw-text-center tw-mb-5 tw-font-bold tw-text-lg">New Destination</div>
         {connectionType ?
           <NewDestinationConfiguration connectionType={connectionType} setConnectionType={setConnectionType} onComplete={props.onComplete} />
