@@ -13,9 +13,6 @@ if (isProd()) {
   H.init('7e3vw5g1');
 }
 
-// do the thing
-window.parent.postMessage({});
-
 const container = document.getElementById('root');
 const root = createRoot(container!);
 
