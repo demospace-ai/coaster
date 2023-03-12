@@ -2,8 +2,6 @@ package api
 
 import (
 	"context"
-	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -23,7 +21,7 @@ func (s ApiService) RunSync(auth auth.Authentication, w http.ResponseWriter, r *
 	vars := mux.Vars(r)
 	strSyncId, ok := vars["syncID"]
 	if !ok {
-		return fmt.Errorf("missing sync ID from RunSync request URL: %s", r.URL.RequestURI())
+		return errors.Newf("missing sync ID from RunSync request URL: %s", r.URL.RequestURI())
 	}
 
 	syncId, err := strconv.ParseInt(strSyncId, 10, 64)
@@ -40,7 +38,7 @@ func (s ApiService) RunSync(auth auth.Authentication, w http.ResponseWriter, r *
 	// TODO: do this on a schedule
 	c, err := temporal.CreateClient(CLIENT_PEM_KEY, CLIENT_KEY_KEY)
 	if err != nil {
-		log.Fatalln("unable to create Temporal client", err)
+		return err
 	}
 	defer c.Close()
 

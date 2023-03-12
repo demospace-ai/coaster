@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -25,7 +24,7 @@ func (s ApiService) LinkGetSchema(auth auth.Authentication, w http.ResponseWrite
 
 	strSourceId := r.URL.Query().Get("sourceID")
 	if len(strSourceId) == 0 {
-		return fmt.Errorf("missing source ID from LinkGetSchema request URL: %s", r.URL.RequestURI())
+		return errors.Newf("missing source ID from LinkGetSchema request URL: %s", r.URL.RequestURI())
 	}
 
 	sourceId, err := strconv.ParseInt(strSourceId, 10, 64)
@@ -37,7 +36,7 @@ func (s ApiService) LinkGetSchema(auth auth.Authentication, w http.ResponseWrite
 	tableName := r.URL.Query().Get("tableName")
 	customJoin := r.URL.Query().Get("customJoin")
 	if (len(namespace) == 0 || len(tableName) == 0) && len(customJoin) == 0 {
-		return fmt.Errorf("must provide both namespace and table name or custom join in GetSchema request: %s", r.URL.RequestURI())
+		return errors.Newf("must provide both namespace and table name or custom join in GetSchema request: %s", r.URL.RequestURI())
 	}
 
 	// TODO: write test to make sure only authorized users can use the data connection

@@ -2,11 +2,11 @@ package api
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"strings"
 
 	"go.fabra.io/server/common/auth"
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/repositories/organizations"
 	"go.fabra.io/server/common/repositories/users"

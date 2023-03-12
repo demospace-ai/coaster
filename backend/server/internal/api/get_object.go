@@ -2,11 +2,11 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
 	"go.fabra.io/server/common/auth"
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/repositories/objects"
 	"go.fabra.io/server/common/views"
 )
@@ -18,7 +18,7 @@ type GetObjectResponse struct {
 func (s ApiService) GetObject(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	strObjectId := r.URL.Query().Get("objectID")
 	if len(strObjectId) == 0 {
-		return fmt.Errorf("missing object ID from GetObjectSchema request URL: %s", r.URL.RequestURI())
+		return errors.Newf("missing object ID from GetObjectSchema request URL: %s", r.URL.RequestURI())
 	}
 
 	objectId, err := strconv.ParseInt(strObjectId, 10, 64)

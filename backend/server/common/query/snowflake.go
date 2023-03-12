@@ -5,11 +5,11 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/snowflakedb/gosnowflake"
 	"go.fabra.io/server/common/data"
+	"go.fabra.io/server/common/errors"
 )
 
 type SnowflakeApiClient struct {
@@ -72,14 +72,15 @@ func (sc SnowflakeApiClient) openConnection(ctx context.Context) (*sql.DB, error
 func (sc SnowflakeApiClient) GetTables(ctx context.Context, namespace string) ([]string, error) {
 	client, err := sc.openConnection(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("snowflake.NewClient: %v", err)
+		return nil, errors.Wrap(err, "opening connection for get table")
 	}
 
 	defer client.Close()
 
-	queryResult, err := client.Query("SHOW TERSE TABLES IN " + namespace)
+	queryString := fmt.Sprintf("SHOW TERSE TABLES IN %s", namespace)
+	queryResult, err := client.Query(queryString)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "running query %s", queryString)
 	}
 	defer queryResult.Close()
 
@@ -99,7 +100,7 @@ func (sc SnowflakeApiClient) GetTables(ctx context.Context, namespace string) ([
 		}
 		err := queryResult.Scan(valuePtrs...)
 		if err != nil {
-			log.Fatalf("Failed to scan. err: %v", err)
+			return nil, err
 		}
 
 		tableNames = append(tableNames, values[1].(string))
@@ -113,7 +114,7 @@ func (sc SnowflakeApiClient) GetTableSchema(ctx context.Context, namespace strin
 
 	queryResult, err := sc.RunQuery(ctx, queryString)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "getting schema for %s.%s", namespace, tableName)
 	}
 
 	schema := data.Schema{}
@@ -177,7 +178,7 @@ func (sc SnowflakeApiClient) GetNamespaces(ctx context.Context) ([]string, error
 func (sc SnowflakeApiClient) RunQuery(ctx context.Context, queryString string, args ...any) (*data.QueryResults, error) {
 	client, err := sc.openConnection(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("snowflake.NewClient: %v", err)
+		return nil, err
 	}
 	defer client.Close()
 
@@ -202,7 +203,7 @@ func (sc SnowflakeApiClient) RunQuery(ctx context.Context, queryString string, a
 		}
 		err := queryResult.Scan(valuePtrs...)
 		if err != nil {
-			log.Fatalf("Failed to scan. err: %v", err)
+			return nil, err
 		}
 
 		rows = append(rows, convertSnowflakeRow(values))
@@ -217,7 +218,7 @@ func (sc SnowflakeApiClient) RunQuery(ctx context.Context, queryString string, a
 func (sc SnowflakeApiClient) GetQueryIterator(ctx context.Context, queryString string) (data.RowIterator, error) {
 	client, err := sc.openConnection(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("snowflake.NewClient: %v", err)
+		return nil, err
 	}
 	defer client.Close()
 

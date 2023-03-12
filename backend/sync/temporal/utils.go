@@ -3,7 +3,6 @@ package temporal
 import (
 	"context"
 	"crypto/tls"
-	"log"
 
 	"go.fabra.io/server/common/application"
 	"go.fabra.io/server/common/secret"
@@ -29,17 +28,17 @@ func getTemporalNamespace() string {
 func CreateClient(certPem string, certKey string) (client.Client, error) {
 	clientPem, err := secret.FetchSecret(context.TODO(), certPem)
 	if err != nil {
-		log.Fatalf("Error: %+v", err)
+		return nil, err
 	}
 
 	clientKey, err := secret.FetchSecret(context.TODO(), certKey)
 	if err != nil {
-		log.Fatalf("Error: %+v", err)
+		return nil, err
 	}
 
 	cert, err := tls.X509KeyPair([]byte(*clientPem), []byte(*clientKey))
 	if err != nil {
-		log.Fatalf("Failed loading client cert and key: %+v", err)
+		return nil, err
 	}
 
 	// Create the client object just once per process

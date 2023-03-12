@@ -74,7 +74,7 @@ func testBigQueryConnection(bigqueryConfig input.BigQueryConfig) error {
 	ctx := context.Background()
 	client, err := bigquery.NewClient(ctx, bigQueryCredentials.ProjectID, credentialOption)
 	if err != nil {
-		return fmt.Errorf("bigquery.NewClient: %v", err)
+		return err
 	}
 	defer client.Close()
 

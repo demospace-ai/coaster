@@ -9,6 +9,7 @@ import (
 	"cloud.google.com/go/civil"
 	"cloud.google.com/go/storage"
 	"go.fabra.io/server/common/data"
+	"go.fabra.io/server/common/errors"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 )
@@ -44,7 +45,7 @@ func (it BigQueryIterator) Schema() data.Schema {
 
 func (ac BigQueryApiClient) openConnection(ctx context.Context) (*bigquery.Client, error) {
 	if ac.ProjectID == nil {
-		return nil, fmt.Errorf("missing project ID")
+		return nil, errors.Newf("missing project ID")
 	}
 
 	var credentialOption option.ClientOption
@@ -58,7 +59,7 @@ func (ac BigQueryApiClient) openConnection(ctx context.Context) (*bigquery.Clien
 func (ac BigQueryApiClient) GetTables(ctx context.Context, namespace string) ([]string, error) {
 	client, err := ac.openConnection(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
+		return nil, err
 	}
 
 	defer client.Close()
@@ -71,7 +72,7 @@ func (ac BigQueryApiClient) GetTables(ctx context.Context, namespace string) ([]
 			break
 		}
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrapf(err, "getting tables for namespace %s", namespace)
 		}
 
 		results = append(results, table.TableID)
@@ -123,7 +124,7 @@ func (ac BigQueryApiClient) GetColumnValues(ctx context.Context, namespace strin
 func (ac BigQueryApiClient) GetNamespaces(ctx context.Context) ([]string, error) {
 	client, err := ac.openConnection(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
+		return nil, err
 	}
 
 	defer client.Close()
@@ -148,7 +149,7 @@ func (ac BigQueryApiClient) GetNamespaces(ctx context.Context) ([]string, error)
 func (ac BigQueryApiClient) RunQuery(ctx context.Context, queryString string, args ...any) (*data.QueryResults, error) {
 	client, err := ac.openConnection(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
+		return nil, err
 	}
 	defer client.Close()
 
@@ -203,7 +204,7 @@ func (ac BigQueryApiClient) RunQuery(ctx context.Context, queryString string, ar
 func (ac BigQueryApiClient) GetQueryIterator(ctx context.Context, queryString string) (data.RowIterator, error) {
 	client, err := ac.openConnection(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("bigquery.NewClient: %v", err)
+		return nil, err
 	}
 	defer client.Close()
 
@@ -261,7 +262,7 @@ func (ac BigQueryApiClient) StageData(ctx context.Context, csvData string, stagi
 func (ac BigQueryApiClient) LoadFromStaging(ctx context.Context, namespace string, tableName string, loadOptions LoadOptions) error {
 	client, err := ac.openConnection(ctx)
 	if err != nil {
-		return fmt.Errorf("bigquery.NewClient: %v", err)
+		return err
 	}
 	defer client.Close()
 
@@ -282,7 +283,7 @@ func (ac BigQueryApiClient) LoadFromStaging(ctx context.Context, namespace strin
 	}
 
 	if status.Err() != nil {
-		return fmt.Errorf("job completed with error: %v", status.Err())
+		return errors.Newf("job completed with error: %v", status.Err())
 	}
 	return nil
 }

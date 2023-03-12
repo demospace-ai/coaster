@@ -20,7 +20,6 @@ import (
 )
 
 func SetupDatabase() (*gorm.DB, func()) {
-
 	pool, err := dockertest.NewPool("")
 	if err != nil {
 		log.Fatalf("Could not connect to docker: %s", err)

@@ -3,11 +3,11 @@ package query
 import (
 	"context"
 	"encoding/json"
-	"errors"
 
 	"cloud.google.com/go/bigquery"
 	"go.fabra.io/server/common/crypto"
 	"go.fabra.io/server/common/data"
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/models"
 
 	"gorm.io/gorm"
@@ -122,7 +122,7 @@ func (qs QueryServiceImpl) GetClient(ctx context.Context, connection *models.Con
 			ConnectionOptions: connection.ConnectionOptions.String,
 		}, nil
 	default:
-		return nil, errors.New("unrecognized warehouse type")
+		return nil, errors.Newf("unrecognized warehouse type %v", connection.ConnectionType)
 	}
 }
 

@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 
 	"go.fabra.io/server/common/auth"
@@ -97,7 +96,7 @@ func (s ApiService) LinkCreateSync(auth auth.Authentication, w http.ResponseWrit
 
 	c, err := temporal.CreateClient(CLIENT_PEM_KEY, CLIENT_KEY_KEY)
 	if err != nil {
-		log.Fatalln("unable to create Temporal client", err)
+		return err
 	}
 	defer c.Close()
 

@@ -40,7 +40,10 @@ func (r Router) RunService(service ApiService) {
 	// We factor out registering the routes so we can use that for testing without
 	// actually running the server on a live port
 	r.RegisterRoutes(service)
-	log.Fatal(http.ListenAndServe(":8080", r.router))
+	err := http.ListenAndServe(":8080", r.router)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 // Exported for testing

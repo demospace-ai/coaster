@@ -26,7 +26,7 @@ func (s ApiService) GetSchema(auth auth.Authentication, w http.ResponseWriter, r
 
 	strConnectionID := r.URL.Query().Get("connectionID")
 	if len(strConnectionID) == 0 {
-		return fmt.Errorf("missing connection ID from GetSchema request URL: %s", r.URL.RequestURI())
+		return errors.Newf("missing connection ID from GetSchema request URL: %s", r.URL.RequestURI())
 	}
 
 	connectionID, err := strconv.ParseInt(strConnectionID, 10, 64)
@@ -38,7 +38,7 @@ func (s ApiService) GetSchema(auth auth.Authentication, w http.ResponseWriter, r
 	tableName := r.URL.Query().Get("tableName")
 	customJoin := r.URL.Query().Get("customJoin")
 	if (len(namespace) == 0 || len(tableName) == 0) && len(customJoin) == 0 {
-		return fmt.Errorf("must provide both namespace and table name or custom join in GetSchema request: %s", r.URL.RequestURI())
+		return errors.Newf("must provide both namespace and table name or custom join in GetSchema request: %s", r.URL.RequestURI())
 	}
 
 	// TODO: write test to make sure only authorized users can use the data connection

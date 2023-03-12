@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"log"
 	"net/url"
 
 	_ "github.com/lib/pq"
@@ -60,7 +59,7 @@ func (rc RedshiftApiClient) openConnection(ctx context.Context) (*sql.DB, error)
 func (rc RedshiftApiClient) GetTables(ctx context.Context, namespace string) ([]string, error) {
 	client, err := rc.openConnection(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("redshift.NewClient: %v", err)
+		return nil, err
 	}
 
 	defer client.Close()
@@ -88,7 +87,7 @@ func (rc RedshiftApiClient) GetTables(ctx context.Context, namespace string) ([]
 		}
 		err := queryResult.Scan(valuePtrs...)
 		if err != nil {
-			log.Fatalf("Failed to scan. err: %v", err)
+			return nil, err
 		}
 
 		tableNames = append(tableNames, convertRedshiftValue(values[0]).(string))
@@ -102,7 +101,7 @@ func (rc RedshiftApiClient) GetTableSchema(ctx context.Context, namespace string
 
 	queryResult, err := rc.RunQuery(ctx, queryString)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "getting schema for %s.%s", namespace, tableName)
 	}
 
 	schema := data.Schema{}
@@ -148,7 +147,7 @@ func (rc RedshiftApiClient) GetNamespaces(ctx context.Context) ([]string, error)
 func (rc RedshiftApiClient) RunQuery(ctx context.Context, queryString string, args ...any) (*data.QueryResults, error) {
 	client, err := rc.openConnection(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("redshift.NewClient: %v", err)
+		return nil, err
 	}
 	defer client.Close()
 
@@ -173,7 +172,7 @@ func (rc RedshiftApiClient) RunQuery(ctx context.Context, queryString string, ar
 		}
 		err := queryResult.Scan(valuePtrs...)
 		if err != nil {
-			log.Fatalf("Failed to scan. err: %v", err)
+			return nil, err
 		}
 
 		rows = append(rows, convertRedshiftRow(values))
@@ -188,7 +187,7 @@ func (rc RedshiftApiClient) RunQuery(ctx context.Context, queryString string, ar
 func (rc RedshiftApiClient) GetQueryIterator(ctx context.Context, queryString string) (data.RowIterator, error) {
 	client, err := rc.openConnection(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("redshift.NewClient: %v", err)
+		return nil, err
 	}
 	defer client.Close()
 

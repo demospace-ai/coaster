@@ -42,7 +42,13 @@ func main() {
 	// 	},
 	// })
 
-	c.ExecuteWorkflow(context.TODO(), client.StartWorkflowOptions{
+	// c.ExecuteWorkflow(context.TODO(), client.StartWorkflowOptions{
+	// 	TaskQueue: temporal.SyncTaskQueue,
+	// }, temporal.SyncWorkflow, temporal.SyncInput{SyncID: 1, OrganizationID: 2})
+	_, err = c.SignalWithStartWorkflow(context.TODO(), "6d15a0a5-6df8-45ac-881e-ec8828d45d7c", "start", nil, client.StartWorkflowOptions{
 		TaskQueue: temporal.SyncTaskQueue,
-	}, temporal.SyncWorkflow, temporal.SyncInput{SyncID: 1, OrganizationID: 2})
+	}, temporal.SyncWorkflow, temporal.SyncInput{SyncID: 11, OrganizationID: 1})
+	if err != nil {
+		log.Fatal(err)
+	}
 }

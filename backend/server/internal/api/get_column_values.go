@@ -3,11 +3,11 @@ package api
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
 	"go.fabra.io/server/common/auth"
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/repositories/connections"
 )
 
@@ -18,7 +18,7 @@ type GetColumnValuesResponse struct {
 func (s ApiService) GetColumnValues(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	strConnectionID := r.URL.Query().Get("connectionID")
 	if len(strConnectionID) == 0 {
-		return fmt.Errorf("missing connection ID from GetPropertyValues request URL: %s", r.URL.RequestURI())
+		return errors.Newf("missing connection ID from GetPropertyValues request URL: %s", r.URL.RequestURI())
 	}
 
 	connectionID, err := strconv.ParseInt(strConnectionID, 10, 64)
@@ -28,17 +28,17 @@ func (s ApiService) GetColumnValues(auth auth.Authentication, w http.ResponseWri
 
 	namespace := r.URL.Query().Get("namespace")
 	if len(namespace) == 0 {
-		return fmt.Errorf("missing namespace from GetColumnValues request URL: %s", r.URL.RequestURI())
+		return errors.Newf("missing namespace from GetColumnValues request URL: %s", r.URL.RequestURI())
 	}
 
 	tableName := r.URL.Query().Get("tableName")
 	if len(tableName) == 0 {
-		return fmt.Errorf("missing table name from GetColumnValues request URL: %s", r.URL.RequestURI())
+		return errors.Newf("missing table name from GetColumnValues request URL: %s", r.URL.RequestURI())
 	}
 
 	columnName := r.URL.Query().Get("columnName")
 	if len(columnName) == 0 {
-		return fmt.Errorf("missing column name from GetColumnValues request URL: %s", r.URL.RequestURI())
+		return errors.Newf("missing column name from GetColumnValues request URL: %s", r.URL.RequestURI())
 	}
 
 	// TODO: write test to make sure only authorized users can use the data connection

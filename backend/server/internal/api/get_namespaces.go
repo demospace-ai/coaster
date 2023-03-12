@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -24,7 +23,7 @@ func (s ApiService) GetNamespaces(auth auth.Authentication, w http.ResponseWrite
 
 	strConnectionID := r.URL.Query().Get("connectionID")
 	if len(strConnectionID) == 0 {
-		return fmt.Errorf("missing connection ID from GetNamespaces request URL: %s", r.URL.RequestURI())
+		return errors.Newf("missing connection ID from GetNamespaces request URL: %s", r.URL.RequestURI())
 	}
 
 	connectionID, err := strconv.ParseInt(strConnectionID, 10, 64)

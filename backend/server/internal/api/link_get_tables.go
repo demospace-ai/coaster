@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -24,7 +23,7 @@ func (s ApiService) LinkGetTables(auth auth.Authentication, w http.ResponseWrite
 
 	strSourceId := r.URL.Query().Get("sourceID")
 	if len(strSourceId) == 0 {
-		return fmt.Errorf("missing source ID from LinkGetTables request URL: %s", r.URL.RequestURI())
+		return errors.Newf("missing source ID from LinkGetTables request URL: %s", r.URL.RequestURI())
 	}
 
 	sourceId, err := strconv.ParseInt(strSourceId, 10, 64)
@@ -34,7 +33,7 @@ func (s ApiService) LinkGetTables(auth auth.Authentication, w http.ResponseWrite
 
 	namespace := r.URL.Query().Get("namespace")
 	if len(namespace) == 0 {
-		return fmt.Errorf("missing namespace from LinkGetTables request URL: %s", r.URL.RequestURI())
+		return errors.Newf("missing namespace from LinkGetTables request URL: %s", r.URL.RequestURI())
 	}
 
 	// TODO: write test to make sure only authorized users can use the data connection

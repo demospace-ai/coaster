@@ -1,11 +1,9 @@
 package users
 
 import (
-	"errors"
-
+	"github.com/pkg/errors"
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/repositories/external_profiles"
-
 	"gorm.io/gorm"
 )
 

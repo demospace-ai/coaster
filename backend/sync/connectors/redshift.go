@@ -2,11 +2,11 @@ package connectors
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
 
 	"go.fabra.io/server/common/data"
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/query"
 	"go.fabra.io/server/common/views"

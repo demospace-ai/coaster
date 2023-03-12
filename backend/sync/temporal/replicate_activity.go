@@ -34,6 +34,8 @@ func Replicate(ctx context.Context, input ReplicateInput) error {
 		sourceConnector = connectors.NewBigQueryConnector(queryService)
 	case models.ConnectionTypeSnowflake:
 		sourceConnector = connectors.NewBigQueryConnector(queryService)
+	case models.ConnectionTypeRedshift:
+		sourceConnector = connectors.NewRedshiftConnector(queryService)
 	default:
 		return errors.Newf("source not implemented for %s", input.SourceConnection.ConnectionType)
 	}
@@ -44,11 +46,11 @@ func Replicate(ctx context.Context, input ReplicateInput) error {
 	}
 
 	var destConnector connectors.Connector
-	switch input.SourceConnection.ConnectionType {
+	switch input.DestinationConnection.ConnectionType {
 	case models.ConnectionTypeBigQuery:
 		destConnector = connectors.NewBigQueryConnector(queryService)
 	default:
-		return errors.Newf("source not implemented for %s", input.SourceConnection.ConnectionType)
+		return errors.Newf("destination not implemented for %s", input.SourceConnection.ConnectionType)
 	}
 
 	return destConnector.Write(ctx, input.DestinationConnection, input.DestinationOptions, input.Object, input.Sync, input.FieldMappings, rows)

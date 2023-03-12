@@ -5,11 +5,11 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
-	"fmt"
 	"hash/crc32"
 
 	kms "cloud.google.com/go/kms/apiv1"
 	"cloud.google.com/go/kms/apiv1/kmspb"
+	"go.fabra.io/server/common/errors"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
@@ -39,7 +39,7 @@ func encrypt(keyName string, plaintextString string) (*string, error) {
 	ctx := context.Background()
 	client, err := kms.NewKeyManagementClient(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create kms client: %v", err)
+		return nil, errors.Wrap(err, "failed to create kms client")
 	}
 	defer client.Close()
 
@@ -59,14 +59,14 @@ func encrypt(keyName string, plaintextString string) (*string, error) {
 
 	result, err := client.Encrypt(ctx, req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to encrypt: %v", err)
+		return nil, errors.Wrap(err, "failed to encrypt")
 	}
 
 	if !result.VerifiedPlaintextCrc32C {
-		return nil, fmt.Errorf("encrypt: request corrupted in-transit")
+		return nil, errors.Newf("encrypt: request corrupted in-transit")
 	}
 	if int64(crc32c(result.Ciphertext)) != result.CiphertextCrc32C.Value {
-		return nil, fmt.Errorf("encrypt: response corrupted in-transit")
+		return nil, errors.Newf("encrypt: response corrupted in-transit")
 	}
 
 	ciphertext := hex.EncodeToString(result.Ciphertext)
@@ -82,7 +82,7 @@ func decrypt(keyName string, ciphertextString string) (*string, error) {
 	ctx := context.Background()
 	client, err := kms.NewKeyManagementClient(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create kms client: %v", err)
+		return nil, errors.Wrap(err, "failed to create kms client")
 	}
 	defer client.Close()
 
@@ -100,11 +100,11 @@ func decrypt(keyName string, ciphertextString string) (*string, error) {
 
 	result, err := client.Decrypt(ctx, req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to decrypt ciphertext: %v", err)
+		return nil, errors.Wrap(err, "failed to decrypt ciphertext")
 	}
 
 	if int64(crc32c(result.Plaintext)) != result.PlaintextCrc32C.Value {
-		return nil, fmt.Errorf("decrypt: response corrupted in-transit")
+		return nil, errors.Newf("decrypt: response corrupted in-transit")
 	}
 
 	plaintext := string(result.Plaintext)

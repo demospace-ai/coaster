@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"go.fabra.io/server/common/application"
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/secret"
 
 	"gorm.io/driver/postgres"
@@ -70,7 +71,7 @@ func initDatabaseDev() (*gorm.DB, error) {
 		),
 	})
 	if err != nil {
-		return nil, fmt.Errorf("sql.Open: %v", err)
+		return nil, errors.Wrap(err, "sql.Open")
 	}
 
 	return db, nil
@@ -95,7 +96,7 @@ func initDatabaseProd() (*gorm.DB, error) {
 		Logger: logger.Default.LogMode(logger.Silent),
 	})
 	if err != nil {
-		return nil, fmt.Errorf("sql.Open: %v", err)
+		return nil, errors.Wrap(err, "sql.Open")
 	}
 
 	return db, nil

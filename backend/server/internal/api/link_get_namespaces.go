@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -24,7 +23,7 @@ func (s ApiService) LinkGetNamespaces(auth auth.Authentication, w http.ResponseW
 
 	strSourceId := r.URL.Query().Get("sourceID")
 	if len(strSourceId) == 0 {
-		return fmt.Errorf("missing source ID from LinkGetNamespaces request URL: %s", r.URL.RequestURI())
+		return errors.Newf("missing source ID from LinkGetNamespaces request URL: %s", r.URL.RequestURI())
 	}
 
 	sourceId, err := strconv.ParseInt(strSourceId, 10, 64)
