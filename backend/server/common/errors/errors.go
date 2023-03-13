@@ -65,7 +65,7 @@ func Wrap(err error, message string) error {
 }
 
 func Wrapf(err error, format string, args ...any) error {
-	return errors.Wrapf(err, format, args)
+	return errors.Wrapf(err, format, args...)
 }
 
 func New(message string) error {
@@ -73,7 +73,7 @@ func New(message string) error {
 }
 
 func Newf(format string, a ...any) error {
-	return errors.Errorf(format, a)
+	return errors.Errorf(format, a...)
 }
 
 func WithStack(err error) error {
