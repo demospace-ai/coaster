@@ -23,16 +23,18 @@ export const App: React.FC = () => {
 
   const handleInitTheme = (theme: CustomTheme) => {
     const root = document.querySelector<HTMLElement>(":root");
-
     if (root) {
-      if (theme.colors?.primary) {
+      if (theme.colors?.primary?.base) {
         root.style.setProperty("--color-primary", theme.colors.primary.base);
+      }
+      if (theme.colors?.primary?.hover) {
         root.style.setProperty("--color-primary-hover", theme.colors.primary.hover);
+      }
+      if (theme.colors?.primary?.text) {
         root.style.setProperty("--color-primary-text", theme.colors.primary.text);
       }
-    }
+    };
   };
-
 
   useEffect(() => {
     // Recommended way to run one-time initialization: https://beta.reactjs.org/learn/you-might-not-need-an-effect#initializing-the-application

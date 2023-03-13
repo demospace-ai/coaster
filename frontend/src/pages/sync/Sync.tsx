@@ -7,7 +7,7 @@ import { useSyncDetails } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
 
 const tableHeaderStyle = "tw-sticky tw-top-0 tw-z-0 tw-border-b tw-border-slate-300 tw-py-3.5 tw-px-4 sm:tw-pr-6 lg:tw-pr-8 tw-text-left tw-whitespace-nowrap";
-const tableCellStyle = "tw-whitespace-nowrap tw-left tw-px-4 tw-min-w-[200px] tw-overflow-hidden tw-text-ellipsis tw-py-4 tw-text-sm tw-text-slate-800 tw-hidden sm:tw-table-cell";
+const tableCellStyle = "tw-whitespace-nowrap tw-left tw-pl-3 tw-min-w-[200px] tw-overflow-hidden tw-text-ellipsis tw-py-4 tw-text-sm tw-text-slate-800 tw-hidden sm:tw-table-cell";
 
 export const SyncDetails: React.FC = () => {
   const { syncID } = useParams<{ syncID: string; }>();
