@@ -2,16 +2,19 @@ import { CustomTheme } from "src/utils/theme";
 
 export enum MessageType {
   IFrameReady = "fabra-iframe-ready",
-  Initialize = "fabra-initialize",
+  LinkToken = "fabra-link-token",
+  Theme = 'fabra-theme',
   Close = "fabra-window-close",
 }
 
 export type FabraMessage = {
   messageType: MessageType.IFrameReady;
 } | {
-  messageType: MessageType.Initialize
+  messageType: MessageType.LinkToken
   linkToken: string;
-  theme?: CustomTheme
 } | {
   messageType: MessageType.Close
+} | {
+  messageType: MessageType.Theme,
+  theme: CustomTheme;
 };

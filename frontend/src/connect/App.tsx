@@ -39,11 +39,14 @@ export const App: React.FC = () => {
     if (needsInit) {
       window.addEventListener("message", (message: MessageEvent<FabraMessage>) => {
         switch (message.data.messageType) {
-          case MessageType.Initialize:
+          case MessageType.LinkToken:
             setLinkToken(message.data.linkToken);
-            if ( message.data.theme ){
+            break
+          case MessageType.Theme:
+            if ( message.data.theme){
               handleInitTheme(message.data.theme);
             }
+            break
         }
       });
       window.parent.postMessage({ messageType: MessageType.IFrameReady }, '*');

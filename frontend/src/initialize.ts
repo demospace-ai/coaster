@@ -7,8 +7,9 @@ declare global {
 
 let iframe: HTMLIFrameElement | null = null;
 let iframeReady: boolean = false;
+let customTheme: CustomTheme | undefined = undefined;
 
-const initialize = ({ linkToken, theme } : { linkToken: string, theme?: CustomTheme}) => {
+const initialize = ({ theme } : {  theme?: CustomTheme}) => {
     window.addEventListener("message", handleMessage);
 
     const frame = document.createElement("iframe");
@@ -24,8 +25,9 @@ const initialize = ({ linkToken, theme } : { linkToken: string, theme?: CustomTh
     frame.style.colorScheme = "normal";
     document.body.appendChild(frame);
 
-    // NOTE: This passes the necessary initialization data to the iFrame
-    frame.contentWindow!.postMessage({ messageType: MessageType.Initialize, linkToken, theme }, "https://connect.fabra.io");
+    if ( theme ){
+        customTheme = theme
+    }
 
     iframe = frame;
 };
@@ -35,6 +37,10 @@ const handleMessage = (n: MessageEvent<FabraMessage>) => {
         case MessageType.IFrameReady:
             // NOTE: iFrame is letting us know that initialization is complete, and user can call
             // open whenever they want now.
+            if ( iframe && customTheme){
+                const message: FabraMessage = { messageType: MessageType.Theme, theme: customTheme}
+                iframe.contentWindow!.postMessage(message, "https://connect.fabra.io");
+            }
             iframeReady = true;
             break;
         case MessageType.Close:
@@ -42,8 +48,9 @@ const handleMessage = (n: MessageEvent<FabraMessage>) => {
     }
 };
 
-const open = () => {
+const open = (linkToken: string) => {
     if ( iframe && iframeReady ){
+        iframe.contentWindow!.postMessage({ messageType: MessageType.LinkToken, linkToken }, "https://connect.fabra.io");
         iframe.style.display = 'block'
     } else {
         window.setTimeout(open, 100)
