@@ -130,7 +130,7 @@ const TestConnectionButton: React.FC<{ state: NewSourceState, connectionType: Co
 
   const testColor = testConnectionSuccess === null ? null : testConnectionSuccess ? "tw-bg-green-700" : "tw-bg-red-700";
   return (
-    <Button className={mergeClasses("tw-mt-8 tw-bg-slate-200 hover:tw-bg-slate-300 tw-border-slate-200 tw-w-48 tw-h-10", testColor)} onClick={testConnection}>{testLoading ? <Loading /> : "Test"}</Button>
+    <Button className={mergeClasses("tw-mt-8 tw-bg-slate-400 hover:tw-bg-slate-500 tw-border-slate-200 tw-w-48 tw-h-10", testColor)} onClick={testConnection}>{testLoading ? <Loading /> : "Test"}</Button>
   );
 };
 
