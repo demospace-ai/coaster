@@ -1,23 +1,22 @@
 package api
 
 import (
-	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/gorilla/mux"
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/errors"
+	"go.fabra.io/server/common/repositories/sync_runs"
 	"go.fabra.io/server/common/repositories/syncs"
 	"go.fabra.io/server/common/views"
-	"go.fabra.io/sync/temporal"
-	"go.temporal.io/api/workflowservice/v1"
 )
 
 type GetSyncDetailsResponse struct {
-	SyncDetails []views.SyncDetails `json:"sync_details"`
+	Sync        views.Sync      `json:"sync"`
+	NextRunTime string          `json:"next_run_time"`
+	SyncRuns    []views.SyncRun `json:"sync_runs"`
 }
 
 func (s ApiService) GetSyncDetails(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
@@ -42,21 +41,14 @@ func (s ApiService) GetSyncDetails(auth auth.Authentication, w http.ResponseWrit
 		return err
 	}
 
-	c, err := temporal.CreateClient(CLIENT_PEM_KEY, CLIENT_KEY_KEY)
+	syncRuns, err := sync_runs.LoadAllRunsForSync(s.db, auth.Organization.ID, sync.ID)
 	if err != nil {
 		return err
 	}
-	defer c.Close()
 
-	res, err := c.ListWorkflow(context.TODO(), &workflowservice.ListWorkflowExecutionsRequest{
-		Query: fmt.Sprintf("WorkflowId = '%s' order by StartTime desc", sync.WorkflowID),
+	return json.NewEncoder(w).Encode(GetSyncDetailsResponse{
+		Sync:        views.ConvertSync(sync),
+		NextRunTime: "",
+		SyncRuns:    views.ConvertSyncRuns(syncRuns),
 	})
-	if err != nil {
-		return err
-	}
-
-	// TODO
-	res.GoString()
-
-	return json.NewEncoder(w).Encode(GetSyncsResponse{})
 }

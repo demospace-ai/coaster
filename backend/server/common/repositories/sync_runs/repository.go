@@ -46,3 +46,20 @@ func CompleteSyncRun(db *gorm.DB, syncRun *models.SyncRun, status models.SyncRun
 
 	return syncRun, nil
 }
+
+func LoadAllRunsForSync(db *gorm.DB, organizationID int64, syncID int64) ([]models.SyncRun, error) {
+	var syncRuns []models.SyncRun
+	result := db.Table("sync_runs").
+		Select("sync_runs.*").
+		Where("sync_runs.organization_id = ?", organizationID).
+		Where("sync_runs.sync_id = ?", syncID).
+		Where("sync_runs.deactivated_at IS NULL").
+		Order("sync_runs.created_at DESC").
+		Find(&syncRuns)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return syncRuns, nil
+}

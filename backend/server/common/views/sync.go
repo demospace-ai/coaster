@@ -1,6 +1,8 @@
 package views
 
 import (
+	"time"
+
 	"go.fabra.io/server/common/data"
 	"go.fabra.io/server/common/models"
 )
@@ -21,17 +23,11 @@ type Sync struct {
 	Frequency      int64           `json:"frequency"`
 }
 
-type SyncDetails struct {
-	Sync
-	NextRunTime string    `json:"next_run_time"`
-	SyncRuns    []SyncRun `json:"sync_runs"`
-}
-
 type SyncRun struct {
-	Success     bool   `json:"success"`
-	StartedAt   string `json:"started_at"`
-	CompletedAt string `json:"completed_at"`
-	Error       string `json:"error"`
+	Status      models.SyncRunStatus `json:"status"`
+	StartedAt   string               `json:"started_at"`
+	CompletedAt string               `json:"completed_at"`
+	Error       string               `json:"error,omitempty"`
 }
 
 type FieldMapping struct {
@@ -82,4 +78,22 @@ func ConvertFieldMappings(fieldMappings []models.FieldMapping) []FieldMapping {
 	}
 
 	return fieldMappingsView
+}
+
+func ConvertSyncRuns(syncRuns []models.SyncRun) []SyncRun {
+	var syncRunsView []SyncRun
+	for _, syncRun := range syncRuns {
+		syncRunView := SyncRun{
+			Status:      syncRun.Status,
+			StartedAt:   syncRun.StartedAt.Format(time.RFC822),
+			CompletedAt: syncRun.CompletedAt.Format(time.RFC822),
+		}
+		if syncRun.Error.Valid {
+			syncRunView.Error = syncRun.Error.String
+		}
+
+		syncRunsView = append(syncRunsView, syncRunView)
+	}
+
+	return syncRunsView
 }

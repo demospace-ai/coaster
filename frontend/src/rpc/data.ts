@@ -1,5 +1,5 @@
 import { sendLinkTokenRequest, sendRequest } from "src/rpc/ajax";
-import { GetAllUsers, GetAllUsersResponse, GetApiKey, GetColumnValues, GetColumnValuesRequest, GetColumnValuesResponse, GetDestinations, GetDestinationsResponse, GetNamespaces, GetNamespacesResponse, GetObject, GetObjectResponse, GetObjects, GetObjectsResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetSourcesResponse, GetSyncs, GetSyncsResponse, GetTables, GetTablesResponse, LinkGetNamespaces, LinkGetSchema, LinkGetSources, LinkGetTables } from "src/rpc/api";
+import { GetAllUsers, GetAllUsersResponse, GetApiKey, GetColumnValues, GetColumnValuesRequest, GetColumnValuesResponse, GetDestinations, GetDestinationsResponse, GetNamespaces, GetNamespacesResponse, GetObject, GetObjectResponse, GetObjects, GetObjectsResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetSourcesResponse, GetSyncDetails, GetSyncDetailsResponse, GetSyncs, GetSyncsResponse, GetTables, GetTablesResponse, LinkGetNamespaces, LinkGetSchema, LinkGetSources, LinkGetSyncDetails, LinkGetSyncs, LinkGetTables } from "src/rpc/api";
 import useSWR, { Fetcher } from "swr";
 
 export function useApiKey() {
@@ -68,6 +68,19 @@ export function useTables(connectionID: number | undefined, namespace: string | 
   return { tables: data?.tables, mutate, error, loading: isLoading || isValidating };
 }
 
+export function useSyncs() {
+  const fetcher: Fetcher<GetSyncsResponse, {}> = () => sendRequest(GetSyncs);
+  const { data, mutate, error, isLoading, isValidating } = useSWR({ GetSyncs }, fetcher);
+  return { syncs: data?.syncs, mutate, error, loading: isLoading || isValidating };
+}
+
+export function useSyncDetails(syncID: number | undefined) {
+  const shouldFetch = syncID;
+  const fetcher: Fetcher<GetSyncDetailsResponse, { syncID: number; }> = (payload: { syncID: number; }) => sendRequest(GetSyncDetails, payload);
+  const { data, mutate, error, isLoading, isValidating } = useSWR(shouldFetch ? { GetSyncDetails, syncID } : null, fetcher);
+  return { syncDetails: data, mutate, error, loading: isLoading || isValidating };
+}
+
 export function useLinkNamespaces(sourceID: number | undefined, linkToken: string) {
   const fetcher: Fetcher<GetNamespacesResponse, { sourceID: number; }> = (payload: { sourceID: number; }) => sendLinkTokenRequest(LinkGetNamespaces, linkToken, payload);
   const shouldFetch = sourceID;
@@ -95,10 +108,17 @@ export function useLinkSources(linkToken: string) {
   return { sources: data?.sources, mutate, error, loading: isLoading || isValidating };
 }
 
-export function useSyncs() {
-  const fetcher: Fetcher<GetSyncsResponse, {}> = () => sendRequest(GetSyncs);
+export function useLinkSyncs(linkToken: string) {
+  const fetcher: Fetcher<GetSyncsResponse, {}> = () => sendLinkTokenRequest(LinkGetSyncs, linkToken);
   const { data, mutate, error, isLoading, isValidating } = useSWR({ GetSyncs }, fetcher);
   return { syncs: data?.syncs, mutate, error, loading: isLoading || isValidating };
+}
+
+export function useLinkSyncDetails(syncID: number | undefined, linkToken: string) {
+  const shouldFetch = syncID;
+  const fetcher: Fetcher<GetSyncDetailsResponse, { syncID: number; }> = (payload: { syncID: number; }) => sendLinkTokenRequest(LinkGetSyncDetails, linkToken, payload);
+  const { data, mutate, error, isLoading, isValidating } = useSWR(shouldFetch ? { GetSyncDetails, syncID } : null, fetcher);
+  return { syncDetails: data, mutate, error, loading: isLoading || isValidating };
 }
 
 export function useColumnValues(connectionID: number | undefined, namespace: string | undefined, tableName: string | undefined, columnName: string | undefined) {

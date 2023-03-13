@@ -114,7 +114,7 @@ func LoadAllSyncs(
 		Select("syncs.*").
 		Where("syncs.organization_id = ?", organizationID).
 		Where("syncs.deactivated_at IS NULL").
-		Order("syncs.created_at ASC").
+		Order("syncs.created_at DESC").
 		Find(&sync)
 
 	if result.Error != nil {

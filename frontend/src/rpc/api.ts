@@ -53,6 +53,13 @@ export const GetSyncs: IEndpoint<undefined, GetSyncsResponse> = {
     path: '/syncs',
 };
 
+export const GetSyncDetails: IEndpoint<{ syncID: number; }, GetSyncDetailsResponse> = {
+    name: 'Sync Details Fetched',
+    method: 'GET',
+    path: '/sync/:syncID',
+    track: true,
+};
+
 export const GetNamespaces: IEndpoint<{ connectionID: number; }, GetNamespacesResponse> = {
     name: 'Namespaces Fetched',
     method: 'GET',
@@ -169,11 +176,17 @@ export const LinkCreateSync: IEndpoint<LinkCreateSyncRequest, CreateSyncResponse
     track: true,
 };
 
-// TODO
 export const LinkGetSyncs: IEndpoint<undefined, GetSyncsResponse> = {
     name: 'Syncs Fetched',
     method: 'GET',
     path: '/link/syncs',
+    track: true,
+};
+
+export const LinkGetSyncDetails: IEndpoint<{ syncID: number; }, GetSyncDetailsResponse> = {
+    name: 'Sync Details Fetched',
+    method: 'GET',
+    path: '/link/sync/:syncID',
     track: true,
 };
 
@@ -299,6 +312,12 @@ export interface GetSyncsResponse {
     syncs: Sync[];
 }
 
+export interface GetSyncDetailsResponse {
+    sync: Sync;
+    next_run_time: string;
+    sync_runs: SyncRun[];
+}
+
 export type JSONValue =
     | string
     | number
@@ -394,10 +413,6 @@ export interface Object {
     object_fields: ObjectField[];
 }
 
-export interface GetSyncsResponse {
-    syncs: Sync[];
-}
-
 export interface GetNamespacesResponse {
     namespaces: string[];
 }
@@ -480,6 +495,7 @@ export enum ConnectionType {
 export interface Sync {
     id: number;
     display_name: string;
+    end_customer_id: number;
     source: Source;
     object_id: number;
     namespace: string | undefined;
@@ -490,6 +506,21 @@ export interface Sync {
     sync_mode: SyncMode;
     frequency: number;
     frequency_units: FrequencyUnits;
+}
+
+export interface SyncRun {
+    id: number;
+    sync_id: number;
+    status: SyncRunStatus;
+    error: string | undefined;
+    started_at: string;
+    completed_at: string;
+}
+
+export enum SyncRunStatus {
+    Running = "running",
+    Failed = "failed",
+    Completed = "completed",
 }
 
 export enum SyncMode {

@@ -10,6 +10,7 @@ import { Home } from 'src/pages/home/Home';
 import { Login } from 'src/pages/login/Login';
 import { NotFound } from 'src/pages/notfound/NotFound';
 import { Objects } from 'src/pages/objects/Objects';
+import { SyncDetails } from 'src/pages/sync/Sync';
 import { Syncs } from 'src/pages/syncs/Syncs';
 import { Team } from 'src/pages/team/Team';
 import { useSelector } from 'src/root/model';
@@ -45,6 +46,7 @@ export const App: React.FC = () => {
           <Route path='/destinations' element={<RequireAuth element={<Destinations />} />} />
           <Route path='/objects' element={<RequireAuth element={<Objects />} />} />
           <Route path='/syncs' element={<RequireAuth element={<Syncs />} />} />
+          <Route path='/sync/:syncID' element={<RequireAuth element={<SyncDetails />} />} />
           <Route path='*' element={<NotFound />} />
         </Route>
       </Routes>

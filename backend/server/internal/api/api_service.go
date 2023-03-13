@@ -70,7 +70,7 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.GetSchema,
 		},
 		{
-			Name:        "Get all sync configurations",
+			Name:        "Get all syncs",
 			Method:      router.GET,
 			Pattern:     "/syncs",
 			HandlerFunc: s.GetSyncs,
@@ -116,6 +116,12 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			Method:      router.DELETE,
 			Pattern:     "/sync/{syncID}",
 			HandlerFunc: s.CancelSync,
+		},
+		{
+			Name:        "Get sync details",
+			Method:      router.GET,
+			Pattern:     "/sync/{syncID}",
+			HandlerFunc: s.GetSyncDetails,
 		},
 		{
 			Name:        "Create link token",
