@@ -213,6 +213,24 @@ func (s ApiService) LinkAuthenticatedRoutes() []router.LinkAuthenticatedRoute {
 			HandlerFunc: s.LinkCreateSync,
 		},
 		{
+			Name:        "Cancel sync",
+			Method:      router.DELETE,
+			Pattern:     "/link/sync/{syncID}",
+			HandlerFunc: s.LinkCancelSync,
+		},
+		{
+			Name:        "Get sync details",
+			Method:      router.GET,
+			Pattern:     "/link/sync/{syncID}",
+			HandlerFunc: s.LinkGetSyncDetails,
+		},
+		{
+			Name:        "Get all syncs",
+			Method:      router.GET,
+			Pattern:     "/link/syncs",
+			HandlerFunc: s.LinkGetSyncs,
+		},
+		{
 			Name:        "Get preview",
 			Method:      router.POST,
 			Pattern:     "/link/preview",
