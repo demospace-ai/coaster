@@ -23,15 +23,15 @@ export const App: React.FC = () => {
 
   const handleInitTheme = (theme: CustomTheme) => {
     const root = document.querySelector<HTMLElement>(":root");
-            
+
     if (root) {
-      if ( theme.colors?.primary){
+      if (theme.colors?.primary) {
         root.style.setProperty("--color-primary", theme.colors.primary.base);
         root.style.setProperty("--color-primary-hover", theme.colors.primary.hover);
         root.style.setProperty("--color-primary-text", theme.colors.primary.text);
       }
     }
-  }
+  };
 
 
   useEffect(() => {
@@ -41,12 +41,12 @@ export const App: React.FC = () => {
         switch (message.data.messageType) {
           case MessageType.LinkToken:
             setLinkToken(message.data.linkToken);
-            break
+            break;
           case MessageType.Theme:
-            if ( message.data.theme){
+            if (message.data.theme) {
               handleInitTheme(message.data.theme);
             }
-            break
+            break;
         }
       });
       window.parent.postMessage({ messageType: MessageType.IFrameReady }, '*');

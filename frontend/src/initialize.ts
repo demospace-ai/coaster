@@ -7,9 +7,8 @@ declare global {
 
 let iframe: HTMLIFrameElement | null = null;
 let iframeReady: boolean = false;
-let customTheme: CustomTheme | undefined = undefined;
 
-const initialize = ({ theme } : {  theme?: CustomTheme}) => {
+const initialize = ({ theme }: { theme?: CustomTheme; }) => {
     window.addEventListener("message", handleMessage);
 
     const frame = document.createElement("iframe");
@@ -25,8 +24,8 @@ const initialize = ({ theme } : {  theme?: CustomTheme}) => {
     frame.style.colorScheme = "normal";
     document.body.appendChild(frame);
 
-    if ( theme ){
-        customTheme = theme
+    if (theme) {
+        window.fabra.customTheme = theme;
     }
 
     iframe = frame;
@@ -35,10 +34,9 @@ const initialize = ({ theme } : {  theme?: CustomTheme}) => {
 const handleMessage = (n: MessageEvent<FabraMessage>) => {
     switch (n.data.messageType) {
         case MessageType.IFrameReady:
-            // NOTE: iFrame is letting us know that initialization is complete, and user can call
-            // open whenever they want now.
-            if ( iframe && customTheme){
-                const message: FabraMessage = { messageType: MessageType.Theme, theme: customTheme}
+            // NOTE: iFrame is letting us know that initialization is complete, and user can call open.
+            if (iframe && window.fabra.customTheme) {
+                const message: FabraMessage = { messageType: MessageType.Theme, theme: window.fabra.customTheme };
                 iframe.contentWindow!.postMessage(message, "https://connect.fabra.io");
             }
             iframeReady = true;
@@ -49,21 +47,21 @@ const handleMessage = (n: MessageEvent<FabraMessage>) => {
 };
 
 const open = (linkToken: string) => {
-    if ( iframe && iframeReady ){
+    if (iframe && iframeReady) {
         iframe.contentWindow!.postMessage({ messageType: MessageType.LinkToken, linkToken }, "https://connect.fabra.io");
-        iframe.style.display = 'block'
+        iframe.style.display = 'block';
     } else {
-        window.setTimeout(open, 100)
+        window.setTimeout(open, 100);
     }
 };
 
 const close = () => {
-    if ( iframe ){
-        iframe.style.display = 'none'
+    if (iframe) {
+        iframe.style.display = 'none';
     }
 };
 
-
+// Special object to hold state and functions
 window.fabra = {
     open: open,
     close: close,
