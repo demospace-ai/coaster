@@ -14,12 +14,12 @@ import (
 )
 
 type CreateObjectRequest struct {
-	DisplayName         string              `json:"display_name" validate:"required"`
-	DestinationID       int64               `json:"destination_id" validate:"required"`
-	Namespace           string              `json:"namespace,omitempty" validate:"required"`
-	TableName           string              `json:"table_name,omitempty" validate:"required"`
-	EndCustomerIdColumn string              `json:"end_customer_id_column" validate:"required"`
-	ObjectFields        []input.ObjectField `json:"object_fields"`
+	DisplayName        string              `json:"display_name" validate:"required"`
+	DestinationID      int64               `json:"destination_id" validate:"required"`
+	Namespace          string              `json:"namespace,omitempty" validate:"required"`
+	TableName          string              `json:"table_name,omitempty" validate:"required"`
+	EndCustomerIdField string              `json:"end_customer_id_field" validate:"required"`
+	ObjectFields       []input.ObjectField `json:"object_fields"`
 }
 
 type CreateObjectResponse struct {
@@ -52,7 +52,7 @@ func (s ApiService) CreateObject(auth auth.Authentication, w http.ResponseWriter
 		createObjectRequest.DestinationID,
 		createObjectRequest.Namespace,
 		createObjectRequest.TableName,
-		createObjectRequest.EndCustomerIdColumn,
+		createObjectRequest.EndCustomerIdField,
 	)
 	if err != nil {
 		return err

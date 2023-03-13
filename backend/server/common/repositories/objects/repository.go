@@ -19,12 +19,12 @@ func CreateObject(
 ) (*models.Object, error) {
 
 	object := models.Object{
-		OrganizationID:      organizationID,
-		DisplayName:         displayName,
-		DestinationID:       destinationID,
-		Namespace:           namespace,
-		TableName:           tableName,
-		EndCustomerIdColumn: endCustomerIdColumn,
+		OrganizationID:     organizationID,
+		DisplayName:        displayName,
+		DestinationID:      destinationID,
+		Namespace:          namespace,
+		TableName:          tableName,
+		EndCustomerIdField: endCustomerIdColumn,
 	}
 
 	result := db.Create(&object)

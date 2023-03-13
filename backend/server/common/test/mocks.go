@@ -64,11 +64,11 @@ func (qs MockQueryService) GetTables(ctx context.Context, connection *models.Con
 	return nil, nil
 }
 
-func (qs MockQueryService) GetTableSchema(ctx context.Context, connection *models.Connection, namespace string, tableName string) ([]data.ColumnSchema, error) {
+func (qs MockQueryService) GetSchema(ctx context.Context, connection *models.Connection, namespace string, tableName string) ([]data.Field, error) {
 	return nil, nil
 }
 
-func (qs MockQueryService) GetColumnValues(ctx context.Context, connection *models.Connection, namespace string, tableName string, columnName string) ([]any, error) {
+func (qs MockQueryService) GetFieldValues(ctx context.Context, connection *models.Connection, namespace string, tableName string, fieldName string) ([]any, error) {
 	return nil, nil
 }
 

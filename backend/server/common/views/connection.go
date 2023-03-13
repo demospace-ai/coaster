@@ -43,23 +43,23 @@ type FullConnection struct {
 }
 
 type Object struct {
-	ID                  int64         `json:"id"`
-	DisplayName         string        `json:"display_name"`
-	DestinationID       int64         `json:"destination_id"`
-	Namespace           string        `json:"namespace"`
-	TableName           string        `json:"table_name"`
-	EndCustomerIdColumn string        `json:"end_customer_id_column"`
-	ObjectFields        []ObjectField `json:"object_fields"`
+	ID                 int64         `json:"id"`
+	DisplayName        string        `json:"display_name"`
+	DestinationID      int64         `json:"destination_id"`
+	Namespace          string        `json:"namespace"`
+	TableName          string        `json:"table_name"`
+	EndCustomerIdField string        `json:"end_customer_id_field"`
+	ObjectFields       []ObjectField `json:"object_fields"`
 }
 
 type ObjectField struct {
-	ID          int64           `json:"id"`
-	Name        string          `json:"name"`
-	Type        data.ColumnType `json:"type"`
-	DisplayName string          `json:"display_name,omitempty"`
-	Description string          `json:"description,omitempty"`
-	Omit        bool            `json:"omit"`
-	Optional    bool            `json:"optional"`
+	ID          int64          `json:"id"`
+	Name        string         `json:"name"`
+	Type        data.FieldType `json:"type"`
+	DisplayName string         `json:"display_name,omitempty"`
+	Description string         `json:"description,omitempty"`
+	Omit        bool           `json:"omit"`
+	Optional    bool           `json:"optional"`
 }
 
 func ConvertDestination(destination models.Destination, connection models.Connection) Destination {
@@ -144,13 +144,13 @@ func ConvertObject(object *models.Object, objectFields []models.ObjectField) Obj
 	}
 
 	return Object{
-		ID:                  object.ID,
-		DisplayName:         object.DisplayName,
-		DestinationID:       object.DestinationID,
-		Namespace:           object.Namespace,
-		TableName:           object.TableName,
-		EndCustomerIdColumn: object.EndCustomerIdColumn,
-		ObjectFields:        viewObjectFields,
+		ID:                 object.ID,
+		DisplayName:        object.DisplayName,
+		DestinationID:      object.DestinationID,
+		Namespace:          object.Namespace,
+		TableName:          object.TableName,
+		EndCustomerIdField: object.EndCustomerIdField,
+		ObjectFields:       viewObjectFields,
 	}
 }
 

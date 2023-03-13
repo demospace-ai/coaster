@@ -37,7 +37,7 @@ export const App: React.FC = () => {
   useEffect(() => {
     const fieldMappings = object ? object.object_fields.filter(objectField => !objectField.omit).map(objectField => {
       return {
-        source_column: undefined,
+        source_field: undefined,
         destination_field_id: objectField.id,
       };
     }) : [];

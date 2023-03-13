@@ -73,7 +73,7 @@ func (mc MongoDbApiClient) GetTables(ctx context.Context, namespace string) ([]s
 	return db.ListCollectionNames(ctx, bson.D{})
 }
 
-func (mc MongoDbApiClient) GetTableSchema(ctx context.Context, namespace string, tableName string) (data.Schema, error) {
+func (mc MongoDbApiClient) GetSchema(ctx context.Context, namespace string, tableName string) (data.Schema, error) {
 	client, err := mc.openConnection(ctx)
 	if err != nil {
 		return nil, err
@@ -96,7 +96,7 @@ func (mc MongoDbApiClient) GetTableSchema(ctx context.Context, namespace string,
 	return convertMongoDbSchema(fieldTypes), nil
 }
 
-func (mc MongoDbApiClient) GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]any, error) {
+func (mc MongoDbApiClient) GetFieldValues(ctx context.Context, namespace string, tableName string, fieldName string) ([]any, error) {
 	// TODO
 	return nil, nil
 }
@@ -133,7 +133,7 @@ func (mc MongoDbApiClient) RunQuery(ctx context.Context, queryString string, arg
 	schemaC := make(chan data.Schema)
 	errC := make(chan error)
 	go func() {
-		schema, err := mc.GetTableSchema(ctx, mongoQuery.Database, mongoQuery.Collection)
+		schema, err := mc.GetSchema(ctx, mongoQuery.Database, mongoQuery.Collection)
 		schemaC <- schema
 		errC <- err
 
@@ -187,7 +187,7 @@ func (mc MongoDbApiClient) GetQueryIterator(ctx context.Context, queryString str
 	schemaC := make(chan data.Schema)
 	errC := make(chan error)
 	go func() {
-		schema, err := mc.GetTableSchema(ctx, mongoQuery.Database, mongoQuery.Collection)
+		schema, err := mc.GetSchema(ctx, mongoQuery.Database, mongoQuery.Collection)
 		schemaC <- schema
 		errC <- err
 
@@ -244,8 +244,8 @@ func convertMongoDbRow(mongoDbRow bson.D, schema data.Schema) data.Row {
 
 	var row data.Row
 	// make sure every result is in the same order by looping through schema
-	for _, columnName := range schema {
-		row = append(row, valueMap[columnName.Name])
+	for _, field := range schema {
+		row = append(row, valueMap[field.Name])
 	}
 
 	return row
@@ -254,9 +254,9 @@ func convertMongoDbRow(mongoDbRow bson.D, schema data.Schema) data.Row {
 func convertMongoDbSchema(fieldTypes map[string]string) data.Schema {
 	var schema data.Schema
 	for fieldName, fieldType := range fieldTypes {
-		schema = append(schema, data.ColumnSchema{
+		schema = append(schema, data.Field{
 			Name: fieldName,
-			Type: getMongoDbColumnType(fieldType),
+			Type: getMongoDbFieldType(fieldType),
 		})
 	}
 
@@ -364,25 +364,25 @@ func getFieldTypes(collection *mongo.Collection, fields []string) (map[string]st
 	return fieldTypes, nil
 }
 
-func getMongoDbColumnType(mongoDbType string) data.ColumnType {
+func getMongoDbFieldType(mongoDbType string) data.FieldType {
 	switch mongoDbType {
 	case "int", "int32", "long":
-		return data.ColumnTypeInteger
+		return data.FieldTypeInteger
 	case "date":
-		return data.ColumnTypeDate
+		return data.FieldTypeDate
 	case "datetime":
-		return data.ColumnTypeDateTime
+		return data.FieldTypeDateTime
 	case "decimal", "double", "float64":
-		return data.ColumnTypeNumber
+		return data.FieldTypeNumber
 	case "timestamp":
-		return data.ColumnTypeTimestampNtz
+		return data.FieldTypeTimestampNtz
 	case "array":
-		return data.ColumnTypeArray
+		return data.FieldTypeArray
 	case "object":
-		return data.ColumnTypeObject
+		return data.FieldTypeJson
 	case "bool":
-		return data.ColumnTypeBoolean
+		return data.FieldTypeBoolean
 	default:
-		return data.ColumnTypeString
+		return data.FieldTypeString
 	}
 }

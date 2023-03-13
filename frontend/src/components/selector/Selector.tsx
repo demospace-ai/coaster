@@ -1,6 +1,6 @@
 import { ValidatedComboInput, ValidatedDropdownInput } from "src/components/input/Input";
-import { ColumnSchema, Connection, Destination, Object, Source } from "src/rpc/api";
-import { useColumnValues, useDestinations, useLinkNamespaces, useLinkSchema, useLinkSources, useLinkTables, useNamespaces, useObjects, useSchema, useTables } from "src/rpc/data";
+import { Connection, Destination, Field, Object, Source } from "src/rpc/api";
+import { useDestinations, useFieldValues, useLinkNamespaces, useLinkSchema, useLinkSources, useLinkTables, useNamespaces, useObjects, useSchema, useTables } from "src/rpc/data";
 
 type DestinationSelectorProps = {
   destination: Destination | undefined;
@@ -195,12 +195,12 @@ export const ObjectSelector: React.FC<ObjectSelectorProps> = props => {
   />;
 };
 
-type LinkColumnSelectorProps = {
+type LinkFieldSelectorProps = {
   source: Source | undefined;
   namespace: string | undefined;
   tableName: string | undefined;
-  column: ColumnSchema | undefined;
-  setColumn: (column: ColumnSchema) => void;
+  field: Field | undefined;
+  setField: (field: Field) => void;
   className?: string;
   noOptionsString?: string;
   label?: string;
@@ -209,29 +209,29 @@ type LinkColumnSelectorProps = {
   linkToken: string;
 };
 
-export const LinkColumnSelector: React.FC<LinkColumnSelectorProps> = props => {
+export const LinkFieldSelector: React.FC<LinkFieldSelectorProps> = props => {
   const { schema, loading } = useLinkSchema(props.source?.id, props.namespace, props.tableName, props.linkToken);
 
   return <ValidatedComboInput
     className={props.className}
     options={schema}
-    selected={props.column}
-    setSelected={props.setColumn}
-    getElementForDisplay={(value: ColumnSchema) => value.name}
-    noOptionsString={props.noOptionsString ? props.noOptionsString : "No column available!"}
-    placeholder={props.placeholder ? props.placeholder : "Choose column"}
+    selected={props.field}
+    setSelected={props.setField}
+    getElementForDisplay={(value: Field) => value.name}
+    noOptionsString={props.noOptionsString ? props.noOptionsString : "No field available!"}
+    placeholder={props.placeholder ? props.placeholder : "Choose field"}
     label={props.label}
     loading={loading}
     validated={props.validated}
   />;
 };
 
-type ColumnSelectorProps = {
+type FieldSelectorProps = {
   connection: Connection | undefined;
   namespace: string | undefined;
   tableName: string | undefined;
-  column: ColumnSchema | undefined;
-  setColumn: (column: ColumnSchema) => void;
+  field: Field | undefined;
+  setField: (field: Field) => void;
   className?: string;
   noOptionsString?: string;
   label?: string;
@@ -239,48 +239,48 @@ type ColumnSelectorProps = {
   validated?: boolean;
 };
 
-export const ColumnSelector: React.FC<ColumnSelectorProps> = props => {
+export const FieldSelector: React.FC<FieldSelectorProps> = props => {
   const { schema, loading } = useSchema(props.connection?.id, props.namespace, props.tableName);
 
   return <ValidatedComboInput
     className={props.className}
     options={schema}
-    selected={props.column}
-    setSelected={props.setColumn}
-    getElementForDisplay={(value: ColumnSchema) => value.name}
-    noOptionsString={props.noOptionsString ? props.noOptionsString : "No column available!"}
-    placeholder={props.placeholder ? props.placeholder : "Choose column"}
-    label={props.label ? props.label : "Column"}
+    selected={props.field}
+    setSelected={props.setField}
+    getElementForDisplay={(value: Field) => value.name}
+    noOptionsString={props.noOptionsString ? props.noOptionsString : "No field available!"}
+    placeholder={props.placeholder ? props.placeholder : "Choose field"}
+    label={props.label ? props.label : "Field"}
     loading={loading}
     validated={props.validated}
   />;
 };
 
-type ColumnValueSelectorProps = {
+type FieldValueSelectorProps = {
   connection: Connection | undefined;
   namespace: string | undefined;
   tableName: string | undefined;
-  column: ColumnSchema | undefined;
-  columnValue: string | number | null | undefined,
-  setColumnValue: (columnName: string) => void;
+  field: Field | undefined;
+  fieldValue: string | number | null | undefined,
+  setFieldValue: (fieldName: string) => void;
   className?: string;
   noOptionsString?: string;
   placeholder?: string;
   validated?: boolean;
 };
 
-export const ColumnValueSelector: React.FC<ColumnValueSelectorProps> = props => {
-  const { columnValues, loading } = useColumnValues(props.connection?.id, props.namespace, props.tableName, props.column?.name);
+export const FieldValueSelector: React.FC<FieldValueSelectorProps> = props => {
+  const { fieldValues, loading } = useFieldValues(props.connection?.id, props.namespace, props.tableName, props.field?.name);
 
   return <ValidatedComboInput
     className={props.className}
-    selected={props.columnValue}
-    setSelected={props.setColumnValue}
-    options={columnValues}
+    selected={props.fieldValue}
+    setSelected={props.setFieldValue}
+    options={fieldValues}
     getElementForDisplay={(propertyValue: string) => propertyValue ? propertyValue : "<empty>"}
     loading={loading}
-    noOptionsString={props.noOptionsString ? props.noOptionsString : "No column values available!"}
-    placeholder={props.placeholder ? props.placeholder : "Choose column value"}
+    noOptionsString={props.noOptionsString ? props.noOptionsString : "No field values available!"}
+    placeholder={props.placeholder ? props.placeholder : "Choose field value"}
     validated={props.validated}
     allowCustom={true} />;
 };

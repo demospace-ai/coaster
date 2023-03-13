@@ -29,8 +29,8 @@ type LoadOptions struct {
 type QueryService interface {
 	GetNamespaces(ctx context.Context, connection *models.Connection) ([]string, error)
 	GetTables(ctx context.Context, connection *models.Connection, namespace string) ([]string, error)
-	GetTableSchema(ctx context.Context, connection *models.Connection, namespace string, tableName string) ([]data.ColumnSchema, error)
-	GetColumnValues(ctx context.Context, connection *models.Connection, namespace string, tableName string, columnName string) ([]any, error)
+	GetSchema(ctx context.Context, connection *models.Connection, namespace string, tableName string) ([]data.Field, error)
+	GetFieldValues(ctx context.Context, connection *models.Connection, namespace string, tableName string, fieldName string) ([]any, error)
 	RunQuery(ctx context.Context, connection *models.Connection, queryString string) (*data.QueryResults, error)
 	GetQueryIterator(ctx context.Context, connection *models.Connection, queryString string) (data.RowIterator, error)
 	GetClient(ctx context.Context, connection *models.Connection) (ConnectorClient, error)
@@ -50,9 +50,9 @@ func NewQueryService(db *gorm.DB, cryptoService crypto.CryptoService) QueryServi
 
 type ConnectorClient interface {
 	GetTables(ctx context.Context, namespace string) ([]string, error)
-	GetTableSchema(ctx context.Context, namespace string, tableName string) (data.Schema, error)
+	GetSchema(ctx context.Context, namespace string, tableName string) (data.Schema, error)
 	GetNamespaces(ctx context.Context) ([]string, error)
-	GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]any, error)
+	GetFieldValues(ctx context.Context, namespace string, tableName string, fieldName string) ([]any, error)
 	RunQuery(ctx context.Context, queryString string, args ...any) (*data.QueryResults, error)
 	GetQueryIterator(ctx context.Context, queryString string) (data.RowIterator, error)
 }
@@ -162,20 +162,20 @@ func (qs QueryServiceImpl) GetTables(ctx context.Context, connection *models.Con
 	return client.GetTables(ctx, namespace)
 }
 
-func (qs QueryServiceImpl) GetTableSchema(ctx context.Context, connection *models.Connection, namespace string, tableName string) ([]data.ColumnSchema, error) {
+func (qs QueryServiceImpl) GetSchema(ctx context.Context, connection *models.Connection, namespace string, tableName string) ([]data.Field, error) {
 	client, err := qs.GetClient(ctx, connection)
 	if err != nil {
 		return nil, err
 	}
 
-	return client.GetTableSchema(ctx, namespace, tableName)
+	return client.GetSchema(ctx, namespace, tableName)
 }
 
-func (qs QueryServiceImpl) GetColumnValues(ctx context.Context, connection *models.Connection, namespace string, tableName string, columnName string) ([]any, error) {
+func (qs QueryServiceImpl) GetFieldValues(ctx context.Context, connection *models.Connection, namespace string, tableName string, fieldName string) ([]any, error) {
 	client, err := qs.GetClient(ctx, connection)
 	if err != nil {
 		return nil, err
 	}
 
-	return client.GetColumnValues(ctx, namespace, tableName, columnName)
+	return client.GetFieldValues(ctx, namespace, tableName, fieldName)
 }

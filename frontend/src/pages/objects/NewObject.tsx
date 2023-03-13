@@ -3,10 +3,10 @@ import { BackButton, Button } from "src/components/button/Button";
 import { Checkbox } from "src/components/checkbox/Checkbox";
 import { Input, ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
-import { ColumnSelector, DestinationSelector, NamespaceSelector, TableSelector } from "src/components/selector/Selector";
+import { DestinationSelector, FieldSelector, NamespaceSelector, TableSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { sendRequest } from "src/rpc/ajax";
-import { ColumnSchema, CreateObject, CreateObjectRequest, Destination, GetObjects, ObjectFieldInput } from "src/rpc/api";
+import { CreateObject, CreateObjectRequest, Destination, Field, GetObjects, ObjectFieldInput } from "src/rpc/api";
 import { useSchema } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
 import { mutate } from "swr";
@@ -22,7 +22,7 @@ type NewObjectState = {
   destination: Destination | undefined;
   namespace: string | undefined;
   tableName: string | undefined;
-  endCustomerIdColumn: ColumnSchema | undefined;
+  endCustomerIdField: Field | undefined;
   objectFields: ObjectFieldInput[] | undefined;
 };
 
@@ -32,7 +32,7 @@ const INITIAL_OBJECT_STATE: NewObjectState = {
   destination: undefined,
   namespace: undefined,
   tableName: undefined,
-  endCustomerIdColumn: undefined,
+  endCustomerIdField: undefined,
   objectFields: undefined,
 };
 
@@ -42,7 +42,7 @@ const validateAll = (state: NewObjectState): boolean => {
     && state.destination !== undefined
     && state.namespace !== undefined && state.namespace.length > 0
     && state.tableName !== undefined && state.tableName.length > 0
-    && state.endCustomerIdColumn !== undefined;
+    && state.endCustomerIdField !== undefined;
 };
 
 export const NewObject: React.FC<{ onComplete: () => void; }> = props => {
@@ -102,7 +102,7 @@ export const NewObjectForm: React.FC<NewObjectFormProps> = props => {
         destination={state.destination}
         setDestination={(value: Destination) => {
           if (!state.destination || value.id !== state.destination.id) {
-            setState({ ...state, destination: value, namespace: undefined, tableName: undefined, endCustomerIdColumn: undefined, objectFields: undefined });
+            setState({ ...state, destination: value, namespace: undefined, tableName: undefined, endCustomerIdField: undefined, objectFields: undefined });
           }
         }} />
       <NamespaceSelector
@@ -112,7 +112,7 @@ export const NewObjectForm: React.FC<NewObjectFormProps> = props => {
         namespace={state.namespace}
         setNamespace={(value: string) => {
           if (value !== state.namespace) {
-            setState({ ...state, namespace: value, tableName: undefined, endCustomerIdColumn: undefined, objectFields: undefined });
+            setState({ ...state, namespace: value, tableName: undefined, endCustomerIdField: undefined, objectFields: undefined });
           }
         }}
         noOptionsString="No Namespaces Available! (Choose a data source)"
@@ -124,19 +124,19 @@ export const NewObjectForm: React.FC<NewObjectFormProps> = props => {
         tableName={state.tableName}
         setTableName={(value: string) => {
           if (value !== state.tableName) {
-            setState({ ...state, tableName: value, endCustomerIdColumn: undefined, objectFields: undefined });
+            setState({ ...state, tableName: value, endCustomerIdField: undefined, objectFields: undefined });
           }
         }}
         noOptionsString="No Tables Available! (Choose a namespace)"
         validated={true}
       />
-      <ColumnSelector
+      <FieldSelector
         className="tw-mt-5 tw-w-[400px]"
-        column={state.endCustomerIdColumn}
-        setColumn={(value: ColumnSchema) => { setState({ ...state, endCustomerIdColumn: value }); }}
-        placeholder='End Customer ID Column'
-        label='End Customer ID Column'
-        noOptionsString="No Columns Available! (Choose a table)"
+        field={state.endCustomerIdField}
+        setField={(value: Field) => { setState({ ...state, endCustomerIdField: value }); }}
+        placeholder='End Customer ID Field'
+        label='End Customer ID Field'
+        noOptionsString="No Fields Available! (Choose a table)"
         validated={true}
         connection={state.destination?.connection}
         namespace={state.namespace}
@@ -158,14 +158,14 @@ const ObjectFields: React.FC<ObjectFieldsProps> = props => {
   const [loading, setLoading] = useState<boolean>(false);
   const { schema } = useSchema(state.destination?.connection.id, state.namespace, state.tableName);
   const [createObjectSuccess, setCreateObjectSuccess] = useState<boolean | null>(null);
-  const endCustomerIdColumn = state.endCustomerIdColumn?.name;
+  const endCustomerIdField = state.endCustomerIdField?.name;
   useEffect(() => {
-    const objectFields = schema ? schema.map(column => {
-      // automatically omit end customer ID column
-      const omit = column.name === endCustomerIdColumn;
+    const objectFields = schema ? schema.map(field => {
+      // automatically omit end customer ID field
+      const omit = field.name === endCustomerIdField;
       return {
-        name: column.name,
-        type: column.type,
+        name: field.name,
+        type: field.type,
         omit: omit,
         optional: false,
       };
@@ -176,7 +176,7 @@ const ObjectFields: React.FC<ObjectFieldsProps> = props => {
         objectFields: objectFields,
       };
     });
-  }, [schema, endCustomerIdColumn, setState]);
+  }, [schema, endCustomerIdField, setState]);
 
   const updateObjectField = (newObject: ObjectFieldInput, index: number) => {
     if (!state.objectFields) {
@@ -209,7 +209,7 @@ const ObjectFields: React.FC<ObjectFieldsProps> = props => {
       destination_id: state.destination!.id,
       namespace: state.namespace!,
       table_name: state.tableName!,
-      end_customer_id_column: state.endCustomerIdColumn!.name,
+      end_customer_id_field: state.endCustomerIdField!.name,
       object_fields: state.objectFields!,
     };
 
@@ -243,19 +243,19 @@ const ObjectFields: React.FC<ObjectFieldsProps> = props => {
       <div className="tw-text-center tw-mb-3">Provide customer-facing names and descriptions for each field.</div>
       <div className="tw-w-full tw-px-24">
         {state.objectFields.map((objectField, i) => {
-          const isEndCustomerIdColumn = objectField.name === endCustomerIdColumn;
+          const isEndCustomerIdField = objectField.name === endCustomerIdField;
           return (
-            <Tooltip label="The End Customer ID column should not be visible to your end customer, it will be automatically set by Fabra during syncs." disabled={!isEndCustomerIdColumn}>
+            <Tooltip label="The End Customer ID field should not be visible to your end customer, it will be automatically set by Fabra during syncs." disabled={!isEndCustomerIdField}>
               <div key={objectField.name} className={mergeClasses("tw-mt-5 tw-mb-7 tw-text-left")}>
                 <span className="tw-text-base tw-font-semibold">{objectField.name}</span>
                 <div className="tw-flex tw-items-center tw-mt-2 tw-pb-1.5">
                   <span className="">Omit?</span>
-                  <Checkbox disabled={isEndCustomerIdColumn} className="tw-ml-2 tw-h-4 tw-w-4 tw-" checked={objectField.omit} onCheckedChange={() => updateObjectField({ ...objectField, omit: !objectField.omit }, i)} />
+                  <Checkbox disabled={isEndCustomerIdField} className="tw-ml-2 tw-h-4 tw-w-4 tw-" checked={objectField.omit} onCheckedChange={() => updateObjectField({ ...objectField, omit: !objectField.omit }, i)} />
                   <span className="tw-ml-4">Optional?</span>
-                  <Checkbox disabled={isEndCustomerIdColumn} className="tw-ml-2 tw-h-4 tw-w-4" checked={objectField.optional} onCheckedChange={() => updateObjectField({ ...objectField, optional: !objectField.optional }, i)} />
+                  <Checkbox disabled={isEndCustomerIdField} className="tw-ml-2 tw-h-4 tw-w-4" checked={objectField.optional} onCheckedChange={() => updateObjectField({ ...objectField, optional: !objectField.optional }, i)} />
                 </div>
-                <Input disabled={isEndCustomerIdColumn} className="tw-mb-2" value={objectField.display_name} setValue={value => updateObjectField({ ...objectField, display_name: value }, i)} placeholder="Display Name" label="Display Name" />
-                <Input disabled={isEndCustomerIdColumn} className="tw-mb-2" value={objectField.description} setValue={value => updateObjectField({ ...objectField, description: value }, i)} placeholder="Description" label="Description" />
+                <Input disabled={isEndCustomerIdField} className="tw-mb-2" value={objectField.display_name} setValue={value => updateObjectField({ ...objectField, display_name: value }, i)} placeholder="Display Name" label="Display Name" />
+                <Input disabled={isEndCustomerIdField} className="tw-mb-2" value={objectField.description} setValue={value => updateObjectField({ ...objectField, description: value }, i)} placeholder="Description" label="Description" />
               </div>
             </Tooltip>
           );

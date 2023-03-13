@@ -147,11 +147,11 @@ export const TestDataConnection: IEndpoint<TestDataConnectionRequest, undefined>
     path: '/connection/test',
 };
 
-export const GetColumnValues: IEndpoint<GetColumnValuesRequest, GetColumnValuesResponse> = {
-    name: 'Column Values Fetched',
+export const GetFieldValues: IEndpoint<GetFieldValuesRequest, GetFieldValuesResponse> = {
+    name: 'Field Values Fetched',
     method: 'GET',
-    path: '/connection/column_values',
-    queryParams: ['connectionID', 'namespace', 'tableName', 'columnName'],
+    path: '/connection/field_values',
+    queryParams: ['connectionID', 'namespace', 'tableName', 'fieldName'],
     track: true,
 };
 
@@ -233,14 +233,14 @@ export interface CreateObjectRequest {
     destination_id: number;
     namespace: string;
     table_name: string;
-    end_customer_id_column: string;
+    end_customer_id_field: string;
     object_fields: ObjectFieldInput[];
 }
 
 export interface ObjectField {
     id: number;
     name: string;
-    type: string;
+    type: FieldType;
     omit: boolean;
     optional: boolean;
     display_name?: string;
@@ -249,7 +249,7 @@ export interface ObjectField {
 
 export interface ObjectFieldInput {
     name: string;
-    type: string;
+    type: FieldType;
     omit: boolean;
     optional: boolean;
     display_name?: string;
@@ -258,7 +258,16 @@ export interface ObjectFieldInput {
 
 export interface FieldMappingInput {
     source_field_name: string;
+    source_field_type: FieldType;
     destination_field_id: number;
+}
+
+export enum FieldType {
+    String = "STRING",
+    Integer = "INTEGER",
+    Timestamp = "TIMESTAMP",
+    Json = "JSON",
+    TimestampTz = "TIMESTAMP_TZ"
 }
 
 export interface BigQueryConfig {
@@ -333,12 +342,12 @@ export interface JSONArray extends Array<JSONValue> { };
 
 export interface ResultRow extends Array<string | number> { }
 
-export interface ColumnSchema {
+export interface Field {
     name: string;
-    type: string;
+    type: FieldType;
 }
 
-export interface Schema extends Array<ColumnSchema> { }
+export interface Schema extends Array<Field> { }
 
 export interface LinkGetPreviewRequest {
     source_id: number;
@@ -346,15 +355,15 @@ export interface LinkGetPreviewRequest {
     table_name: string;
 }
 
-export interface GetColumnValuesRequest {
+export interface GetFieldValuesRequest {
     connectionID: number;
     namespace: string;
     tableName: string;
-    columnName: string;
+    fieldName: string;
 }
 
-export interface GetColumnValuesResponse {
-    column_values: string[];
+export interface GetFieldValuesResponse {
+    field_values: string[];
 }
 
 export interface SetOrganizationRequest {
@@ -459,12 +468,6 @@ export interface CheckSessionResponse {
     user: User;
     organization?: Organization,
     suggested_organizations?: Organization[];
-}
-
-export enum ColumnType {
-    String = "STRING",
-    Integer = "INTEGER",
-    Timestamp = "TIMESTAMP"
 }
 
 export interface Destination {

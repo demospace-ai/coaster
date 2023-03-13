@@ -52,12 +52,12 @@ func (rs RedshiftImpl) getReadQuery(sourceConnection *models.Connection, sync vi
 }
 
 func (rs RedshiftImpl) getSelectString(fieldMappings []views.FieldMapping) string {
-	columns := []string{}
+	fields := []string{}
 	for _, fieldMapping := range fieldMappings {
-		columns = append(columns, fieldMapping.SourceFieldName)
+		fields = append(fields, fieldMapping.SourceFieldName)
 	}
 
-	return strings.Join(columns, ",")
+	return strings.Join(fields, ",")
 }
 
 func (rs RedshiftImpl) Write(

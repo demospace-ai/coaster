@@ -130,10 +130,10 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.CreateLinkToken,
 		},
 		{
-			Name:        "Get values for a specified column",
+			Name:        "Get values for a specified field",
 			Method:      router.GET,
-			Pattern:     "/connection/column_values",
-			HandlerFunc: s.GetColumnValues,
+			Pattern:     "/connection/field_values",
+			HandlerFunc: s.GetFieldValues,
 		},
 		{
 			Name:        "Set organization for user",
@@ -161,6 +161,7 @@ func (s ApiService) UnauthenticatedRoutes() []router.UnauthenticatedRoute {
 	}
 }
 
+// TODO: find a better way of doing this
 // Only a subset of the APIs should be accessible with Link Token Authentication
 func (s ApiService) LinkAuthenticatedRoutes() []router.LinkAuthenticatedRoute {
 	return []router.LinkAuthenticatedRoute{

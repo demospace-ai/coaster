@@ -6,6 +6,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { Loading } from 'src/components/loading/Loading';
 import { useLogout } from 'src/pages/login/actions';
 import { useSelector } from 'src/root/model';
+import { useSyncDetails } from 'src/rpc/data';
 import { toTitleCase } from 'src/utils/string';
 
 export const Header: React.FC = () => {
@@ -39,9 +40,20 @@ const Breadcrumbs: React.FC<{ pathname: string; }> = props => {
   switch (pathTokens[1]) {
     case "apikey":
       return <PageBreadcrumbs title={"API Keys"} pathname={props.pathname} />;
+    case 'sync':
+      return <SyncBreadcrumbs id={pathTokens[2]} pathname={props.pathname} />;
     default:
       return <PageBreadcrumbs title={toTitleCase(pathTokens[1])} pathname={props.pathname} />;
   }
+};
+
+const SyncBreadcrumbs: React.FC<{ id: string, pathname: string; }> = props => {
+  const { syncDetails } = useSyncDetails(Number(props.id)); // This is deduped by SWR so don't worry about the extra fetch
+  const title = syncDetails?.sync.display_name;
+  const crumbs: Breadcrumb[] = [{ title: 'Syncs', path: '/syncs' }, { title, path: props.pathname }];
+  document.title = title + " | Fabra";
+
+  return <BreadcrumbsLayout crumbs={crumbs} />;
 };
 
 const PageBreadcrumbs: React.FC<{ title?: string, pathname: string; }> = props => {

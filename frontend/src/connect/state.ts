@@ -1,5 +1,5 @@
 import { sendLinkTokenRequest } from "src/rpc/ajax";
-import { BigQueryConfig, ColumnSchema, ConnectionType, FieldMappingInput, FrequencyUnits, GetSources, LinkCreateSource, LinkCreateSourceRequest, LinkCreateSync, LinkCreateSyncRequest, LinkGetSources, LinkGetSyncs, MongoDbConfig, Object, RedshiftConfig, SnowflakeConfig, Source, SyncMode } from "src/rpc/api";
+import { BigQueryConfig, ConnectionType, Field, FieldMappingInput, FrequencyUnits, GetSources, LinkCreateSource, LinkCreateSourceRequest, LinkCreateSync, LinkCreateSyncRequest, LinkGetSources, LinkGetSyncs, MongoDbConfig, Object, RedshiftConfig, SnowflakeConfig, Source, SyncMode } from "src/rpc/api";
 import { mutate } from "swr";
 
 export type SetupSyncProps = {
@@ -58,7 +58,7 @@ const INITIAL_SOURCE_STATE: NewSourceState = {
 };
 
 export interface FieldMappingState {
-  source_column: ColumnSchema | undefined;
+  source_field: Field | undefined;
   destination_field_id: number;
 }
 
@@ -216,8 +216,8 @@ export const createNewSync = async (
   const fieldMappings: FieldMappingInput[] = state.fieldMappings!.map(fieldMapping => {
     return (
       {
-        source_field_name: fieldMapping.source_column!.name,
-        source_field_type: fieldMapping.source_column!.type,
+        source_field_name: fieldMapping.source_field!.name,
+        source_field_type: fieldMapping.source_field!.type,
         destination_field_id: fieldMapping.destination_field_id,
       }
     );

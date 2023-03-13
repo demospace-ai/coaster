@@ -6,51 +6,51 @@ import (
 	"cloud.google.com/go/bigquery"
 )
 
-type Schema []ColumnSchema
+type Schema []Field
 
-type ColumnType string
+type FieldType string
 
 const (
-	ColumnTypeString       ColumnType = "STRING"
-	ColumnTypeInteger      ColumnType = "INTEGER"
-	ColumnTypeNumber       ColumnType = "NUMBER"
-	ColumnTypeTimestampTz  ColumnType = "TIMESTAMP_TZ"
-	ColumnTypeTimestampNtz ColumnType = "TIMESTAMP_NTZ"
-	ColumnTypeTimeTz       ColumnType = "TIME_TZ"
-	ColumnTypeTimeNtz      ColumnType = "TIME_NTZ"
-	ColumnTypeDate         ColumnType = "DATE"
-	ColumnTypeDateTime     ColumnType = "DATETIME"
-	ColumnTypeBoolean      ColumnType = "BOOLEAN"
-	ColumnTypeArray        ColumnType = "ARRAY"
-	ColumnTypeObject       ColumnType = "OBJECT"
+	FieldTypeString       FieldType = "STRING"
+	FieldTypeInteger      FieldType = "INTEGER"
+	FieldTypeNumber       FieldType = "NUMBER"
+	FieldTypeTimestampTz  FieldType = "TIMESTAMP_TZ"
+	FieldTypeTimestampNtz FieldType = "TIMESTAMP_NTZ"
+	FieldTypeTimeTz       FieldType = "TIME_TZ"
+	FieldTypeTimeNtz      FieldType = "TIME_NTZ"
+	FieldTypeDate         FieldType = "DATE"
+	FieldTypeDateTime     FieldType = "DATETIME"
+	FieldTypeBoolean      FieldType = "BOOLEAN"
+	FieldTypeArray        FieldType = "ARRAY"
+	FieldTypeJson         FieldType = "JSON"
 )
 
-func (ct ColumnType) ToBigQueryType() bigquery.FieldType {
+func (ct FieldType) ToBigQueryType() bigquery.FieldType {
 	switch ct {
-	case ColumnTypeInteger:
+	case FieldTypeInteger:
 		return bigquery.IntegerFieldType
-	case ColumnTypeNumber:
+	case FieldTypeNumber:
 		return bigquery.NumericFieldType
-	case ColumnTypeBoolean:
+	case FieldTypeBoolean:
 		return bigquery.BooleanFieldType
-	case ColumnTypeTimestampTz, ColumnTypeTimestampNtz:
+	case FieldTypeTimestampTz, FieldTypeTimestampNtz:
 		return bigquery.TimestampFieldType
-	case ColumnTypeObject:
+	case FieldTypeJson:
 		return bigquery.JSONFieldType
-	case ColumnTypeDate:
+	case FieldTypeDate:
 		return bigquery.DateFieldType
-	case ColumnTypeTimeTz, ColumnTypeTimeNtz:
+	case FieldTypeTimeTz, FieldTypeTimeNtz:
 		return bigquery.TimeFieldType
-	case ColumnTypeDateTime:
+	case FieldTypeDateTime:
 		return bigquery.DateTimeFieldType
 	default:
 		return bigquery.StringFieldType
 	}
 }
 
-type ColumnSchema struct {
-	Name string     `json:"name"`
-	Type ColumnType `json:"type"`
+type Field struct {
+	Name string    `json:"name"`
+	Type FieldType `json:"type"`
 }
 
 type Row []any

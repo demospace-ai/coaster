@@ -8,7 +8,7 @@ import (
 type ObjectField struct {
 	ObjectID    int64               `json:"object_id"`
 	Name        string              `json:"name"`
-	Type        data.ColumnType     `json:"type"`
+	Type        data.FieldType      `json:"type"`
 	Omit        bool                `json:"omit"`
 	Optional    bool                `json:"optional"`
 	DisplayName database.NullString `json:"display_name"`

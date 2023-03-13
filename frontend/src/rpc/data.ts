@@ -1,5 +1,5 @@
 import { sendLinkTokenRequest, sendRequest } from "src/rpc/ajax";
-import { GetAllUsers, GetAllUsersResponse, GetApiKey, GetColumnValues, GetColumnValuesRequest, GetColumnValuesResponse, GetDestinations, GetDestinationsResponse, GetNamespaces, GetNamespacesResponse, GetObject, GetObjectResponse, GetObjects, GetObjectsResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetSourcesResponse, GetSyncDetails, GetSyncDetailsResponse, GetSyncs, GetSyncsResponse, GetTables, GetTablesResponse, LinkGetNamespaces, LinkGetSchema, LinkGetSources, LinkGetSyncDetails, LinkGetSyncs, LinkGetTables } from "src/rpc/api";
+import { GetAllUsers, GetAllUsersResponse, GetApiKey, GetDestinations, GetDestinationsResponse, GetFieldValues, GetFieldValuesRequest, GetFieldValuesResponse, GetNamespaces, GetNamespacesResponse, GetObject, GetObjectResponse, GetObjects, GetObjectsResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetSourcesResponse, GetSyncDetails, GetSyncDetailsResponse, GetSyncs, GetSyncsResponse, GetTables, GetTablesResponse, LinkGetNamespaces, LinkGetSchema, LinkGetSources, LinkGetSyncDetails, LinkGetSyncs, LinkGetTables } from "src/rpc/api";
 import useSWR, { Fetcher } from "swr";
 
 export function useApiKey() {
@@ -121,9 +121,9 @@ export function useLinkSyncDetails(syncID: number | undefined, linkToken: string
   return { syncDetails: data, mutate, error, loading: isLoading || isValidating };
 }
 
-export function useColumnValues(connectionID: number | undefined, namespace: string | undefined, tableName: string | undefined, columnName: string | undefined) {
-  const fetcher: Fetcher<GetColumnValuesResponse, GetColumnValuesRequest> = (payload: GetColumnValuesRequest) => sendRequest(GetColumnValues, payload);
-  const shouldFetch = connectionID && namespace && tableName && columnName;
-  const { data, mutate, error, isLoading, isValidating } = useSWR(shouldFetch ? { GetColumnValues, connectionID, namespace, tableName, columnName } : null, fetcher);
-  return { columnValues: data?.column_values, mutate, error, loading: isLoading || isValidating };
+export function useFieldValues(connectionID: number | undefined, namespace: string | undefined, tableName: string | undefined, fieldName: string | undefined) {
+  const fetcher: Fetcher<GetFieldValuesResponse, GetFieldValuesRequest> = (payload: GetFieldValuesRequest) => sendRequest(GetFieldValues, payload);
+  const shouldFetch = connectionID && namespace && tableName && fieldName;
+  const { data, mutate, error, isLoading, isValidating } = useSWR(shouldFetch ? { GetFieldValues: GetFieldValues, connectionID, namespace, tableName, fieldName } : null, fetcher);
+  return { fieldValues: data?.field_values, mutate, error, loading: isLoading || isValidating };
 }

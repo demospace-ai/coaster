@@ -46,10 +46,10 @@ const ResultsSchema: React.FC<{ schema: Schema; }> = ({ schema }) => {
       <tr>
         <th key={-1} scope="col" className="tw-pl-3 tw-pr-5 tw-py-2 tw-bg-gray-100"></th>
         {
-          schema.map((columnSchema, index) => {
+          schema.map((fieldSchema, index) => {
             return (
               <th key={index} scope="col" className="tw-pl-3 tw-pr-5 tw-py-3 tw-text-left tw-bg-gray-100 ">
-                <div className="tw-whitespace-nowrap">{columnSchema.name}</div>
+                <div className="tw-whitespace-nowrap">{fieldSchema.name}</div>
               </th>
             );
           })

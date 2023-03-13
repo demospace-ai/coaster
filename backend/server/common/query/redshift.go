@@ -92,14 +92,14 @@ func (rc RedshiftApiClient) GetTables(ctx context.Context, namespace string) ([]
 			return nil, err
 		}
 
-		// Can hardcode ColumnTypeString here because we know what the return value of this query will be
-		tableNames = append(tableNames, convertRedshiftValue(values[0], data.ColumnTypeString).(string))
+		// Can hardcode FieldTypeString here because we know what the return value of this query will be
+		tableNames = append(tableNames, convertRedshiftValue(values[0], data.FieldTypeString).(string))
 	}
 
 	return tableNames, nil
 }
 
-func (rc RedshiftApiClient) GetTableSchema(ctx context.Context, namespace string, tableName string) (data.Schema, error) {
+func (rc RedshiftApiClient) GetSchema(ctx context.Context, namespace string, tableName string) (data.Schema, error) {
 	queryString := fmt.Sprintf("SELECT * FROM pg_table_def WHERE schemaname = '%s' AND tablename = '%s'", namespace, tableName)
 
 	queryResult, err := rc.RunQuery(ctx, queryString)
@@ -109,15 +109,15 @@ func (rc RedshiftApiClient) GetTableSchema(ctx context.Context, namespace string
 
 	schema := data.Schema{}
 	for _, row := range queryResult.Data {
-		dataType := getRedshiftColumnType(row[3].(string))
-		schema = append(schema, data.ColumnSchema{Name: row[2].(string), Type: dataType})
+		dataType := getRedshiftFieldType(row[3].(string))
+		schema = append(schema, data.Field{Name: row[2].(string), Type: dataType})
 	}
 
 	return schema, nil
 }
 
-func (rc RedshiftApiClient) GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]any, error) {
-	queryString := fmt.Sprintf("SELECT DISTINCT %s FROM %s.%s LIMIT 100", columnName, namespace, tableName)
+func (rc RedshiftApiClient) GetFieldValues(ctx context.Context, namespace string, tableName string, fieldName string) ([]any, error) {
+	queryString := fmt.Sprintf("SELECT DISTINCT %s FROM %s.%s LIMIT 100", fieldName, namespace, tableName)
 
 	queryResult, err := rc.RunQuery(ctx, queryString)
 	if err != nil {
@@ -208,25 +208,26 @@ func (rc RedshiftApiClient) GetQueryIterator(ctx context.Context, queryString st
 	return RedshiftIterator{queryResult: *queryResult, schema: convertRedshiftSchema(columns)}, nil
 }
 
-func getRedshiftColumnType(redshiftType string) data.ColumnType {
+func getRedshiftFieldType(redshiftType string) data.FieldType {
 	switch redshiftType {
 	case "BOOL", "BOOLEAN":
-		return data.ColumnTypeBoolean
+		return data.FieldTypeBoolean
 	case "INT", "INT2", "INT4", "INT8", "BIGINT":
-		return data.ColumnTypeInteger
+		return data.FieldTypeInteger
 	case "FLOAT", "FLOAT4", "FLOAT8", "NUMERIC", "DOUBLE":
-		return data.ColumnTypeNumber
+		return data.FieldTypeNumber
 	case "DATE":
-		return data.ColumnTypeDate
+		return data.FieldTypeDate
 	case "TIMESTAMPTZ", "TIMESTAMP WITH TIME ZONE":
-		return data.ColumnTypeTimestampTz
+		return data.FieldTypeTimestampTz
 	case "TIMESTAMP", "TIMESTAMP WITHOUT TIME ZONE":
-		return data.ColumnTypeTimestampNtz
-	case "": // special case for objects with Redshift
-		return data.ColumnTypeObject
+		return data.FieldTypeTimestampNtz
+	case "":
+		// Objects from Redshift will have an empty type
+		return data.FieldTypeJson
 	default:
 		// Everything can always be treated as a string
-		return data.ColumnTypeString
+		return data.FieldTypeString
 	}
 }
 
@@ -239,14 +240,14 @@ func convertRedshiftRow(redshiftRow []any, schema data.Schema) data.Row {
 	return row
 }
 
-func convertRedshiftValue(redshiftValue any, columnType data.ColumnType) any {
+func convertRedshiftValue(redshiftValue any, fieldType data.FieldType) any {
 	// TODO: convert the values to the expected Fabra Golang types
-	switch columnType {
-	case data.ColumnTypeTimestampTz:
+	switch fieldType {
+	case data.FieldTypeTimestampTz:
 		return redshiftValue.(time.Time).Format(FABRA_TIMESTAMP_TZ_FORMAT)
-	case data.ColumnTypeTimestampNtz:
+	case data.FieldTypeTimestampNtz:
 		return civil.DateTimeOf(redshiftValue.(time.Time)).String()
-	case data.ColumnTypeString:
+	case data.FieldTypeString:
 		// Redshift strings are returned as uint8 slices
 		return string([]byte(redshiftValue.(string)))
 	default:
@@ -258,12 +259,12 @@ func convertRedshiftSchema(columns []*sql.ColumnType) data.Schema {
 	schema := data.Schema{}
 
 	for _, column := range columns {
-		columnSchema := data.ColumnSchema{
+		field := data.Field{
 			Name: column.Name(),
-			Type: getRedshiftColumnType(column.DatabaseTypeName()),
+			Type: getRedshiftFieldType(column.DatabaseTypeName()),
 		}
 
-		schema = append(schema, columnSchema)
+		schema = append(schema, field)
 	}
 
 	return schema

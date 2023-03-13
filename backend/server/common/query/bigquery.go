@@ -81,7 +81,7 @@ func (ac BigQueryApiClient) GetTables(ctx context.Context, namespace string) ([]
 	return results, nil
 }
 
-func (ac BigQueryApiClient) GetTableSchema(ctx context.Context, namespace string, tableName string) (data.Schema, error) {
+func (ac BigQueryApiClient) GetSchema(ctx context.Context, namespace string, tableName string) (data.Schema, error) {
 	queryString := "SELECT * FROM " + namespace + ".INFORMATION_SCHEMA.COLUMNS WHERE table_name = '" + tableName + "'"
 
 	queryResults, err := ac.RunQuery(ctx, queryString)
@@ -95,14 +95,14 @@ func (ac BigQueryApiClient) GetTableSchema(ctx context.Context, namespace string
 			continue
 		}
 
-		schema = append(schema, data.ColumnSchema{Name: row[3].(string), Type: getBigQueryColumnType(row[6].(string))})
+		schema = append(schema, data.Field{Name: row[3].(string), Type: getBigQueryFieldType(row[6].(string))})
 	}
 
 	return schema, nil
 }
 
-func (ac BigQueryApiClient) GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]any, error) {
-	queryString := fmt.Sprintf("SELECT DISTINCT %s FROM %s.%s LIMIT 100", columnName, namespace, tableName)
+func (ac BigQueryApiClient) GetFieldValues(ctx context.Context, namespace string, tableName string, fieldName string) ([]any, error) {
+	queryString := fmt.Sprintf("SELECT DISTINCT %s FROM %s.%s LIMIT 100", fieldName, namespace, tableName)
 
 	queryResults, err := ac.RunQuery(ctx, queryString)
 	if err != nil {
@@ -307,8 +307,8 @@ func (ac BigQueryApiClient) CleanUpStagingData(ctx context.Context, stagingOptio
 func convertBigQueryRow(bigQueryRow []bigquery.Value, schema bigquery.Schema) data.Row {
 	var row data.Row
 	for i, value := range bigQueryRow {
-		columnType := schema[i].Type
-		switch columnType {
+		fieldType := schema[i].Type
+		switch fieldType {
 		case bigquery.TimestampFieldType:
 			row = append(row, value.(time.Time).Format(FABRA_TIMESTAMP_TZ_FORMAT))
 		case bigquery.DateFieldType:
@@ -325,26 +325,26 @@ func convertBigQueryRow(bigQueryRow []bigquery.Value, schema bigquery.Schema) da
 	return row
 }
 
-func getBigQueryColumnType(bigQueryType string) data.ColumnType {
+func getBigQueryFieldType(bigQueryType string) data.FieldType {
 	switch bigQueryType {
 	case "INTEGER", "INT64":
-		return data.ColumnTypeInteger
+		return data.FieldTypeInteger
 	case "FLOAT", "NUMERIC", "BIGNUMERIC":
-		return data.ColumnTypeNumber
+		return data.FieldTypeNumber
 	case "BOOLEAN":
-		return data.ColumnTypeBoolean
+		return data.FieldTypeBoolean
 	case "TIMESTAMP":
-		return data.ColumnTypeTimestampTz
+		return data.FieldTypeTimestampTz
 	case "JSON":
-		return data.ColumnTypeObject
+		return data.FieldTypeJson
 	case "DATE":
-		return data.ColumnTypeDate
+		return data.FieldTypeDate
 	case "TIME":
-		return data.ColumnTypeTimeNtz
+		return data.FieldTypeTimeNtz
 	case "DATETIME":
-		return data.ColumnTypeDateTime
+		return data.FieldTypeDateTime
 	default:
-		return data.ColumnTypeString
+		return data.FieldTypeString
 	}
 }
 
@@ -352,12 +352,12 @@ func convertBigQuerySchema(bigQuerySchema bigquery.Schema) data.Schema {
 	schema := data.Schema{}
 
 	for _, bigQuerySchemaField := range bigQuerySchema {
-		columnSchema := data.ColumnSchema{
+		field := data.Field{
 			Name: bigQuerySchemaField.Name,
-			Type: getBigQueryColumnType(string(bigQuerySchemaField.Type)),
+			Type: getBigQueryFieldType(string(bigQuerySchemaField.Type)),
 		}
 
-		schema = append(schema, columnSchema)
+		schema = append(schema, field)
 	}
 
 	return schema

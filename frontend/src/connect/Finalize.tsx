@@ -3,10 +3,10 @@ import { InfoIcon, LongRightArrow } from "src/components/icons/Icons";
 import rocket from "src/components/images/rocket.svg";
 import { ValidatedDropdownInput, ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
-import { LinkColumnSelector } from "src/components/selector/Selector";
+import { LinkFieldSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { FieldMappingState, SetupSyncProps } from "src/connect/state";
-import { ColumnSchema, FrequencyUnits, ObjectField } from "src/rpc/api";
+import { Field, FrequencyUnits, ObjectField } from "src/rpc/api";
 import { useObject } from "src/rpc/data";
 
 export const FinalizeSync: React.FC<SetupSyncProps> = (props) => {
@@ -63,12 +63,12 @@ export const FinalizeSync: React.FC<SetupSyncProps> = (props) => {
             !objectField.omit &&
             <div key={objectField.name} className="tw-flex tw-flex-row tw-items-center tw-mb-5" >
               <div>
-                <LinkColumnSelector
+                <LinkFieldSelector
                   className="tw-mt-0 tw-w-80"
-                  column={fieldMapping?.source_column}
-                  setColumn={(value: ColumnSchema) => { updateFieldMapping({ ...fieldMapping, source_column: value }, fieldMappingIdx!); }}
-                  placeholder='Choose a column'
-                  noOptionsString="No Columns Available!"
+                  field={fieldMapping?.source_field}
+                  setField={(value: Field) => { updateFieldMapping({ ...fieldMapping, source_field: value }, fieldMappingIdx!); }}
+                  placeholder='Choose a field'
+                  noOptionsString="No Fields Available!"
                   validated={true}
                   source={props.state.source}
                   namespace={props.state.namespace}

@@ -54,12 +54,12 @@ func (bq BigQueryImpl) getReadQuery(sourceConnection *models.Connection, sync vi
 }
 
 func (bq BigQueryImpl) getSelectString(fieldMappings []views.FieldMapping) string {
-	columns := []string{}
+	fields := []string{}
 	for _, fieldMapping := range fieldMappings {
-		columns = append(columns, fieldMapping.SourceFieldName)
+		fields = append(fields, fieldMapping.SourceFieldName)
 	}
 
-	return strings.Join(columns, ",")
+	return strings.Join(fields, ",")
 }
 
 func (bq BigQueryImpl) Write(
@@ -88,16 +88,17 @@ func (bq BigQueryImpl) Write(
 		for i, value := range row {
 			sourceType := fieldMappings[i].SourceFieldType
 			if value == nil {
-				rowTokens = append(rowTokens, "") // empty string for null values will be interpreted correctly
+				// empty string for null values will be interpreted as null when loading from csv
+				rowTokens = append(rowTokens, "")
 			} else {
 				switch sourceType {
-				case data.ColumnTypeObject:
+				case data.FieldTypeJson:
 					// JSON-like values need to be escaped according to BigQuery expectations. Even if the destination
 					// type is not JSON, it is necessary to escape to avoid issues
 					// https://cloud.google.com/bigquery/docs/reference/standard-sql/json-data#load_from_csv_files
 					escapedValue := fmt.Sprintf("\"%s\"", strings.ReplaceAll(fmt.Sprintf("%v", value), "\"", "\"\""))
 					rowTokens = append(rowTokens, escapedValue)
-				case data.ColumnTypeString:
+				case data.FieldTypeString:
 					// escape the string so commas don't break the CSV schema
 					rowTokens = append(rowTokens, fmt.Sprintf("\"%v\"", value))
 				default:
@@ -122,7 +123,7 @@ func (bq BigQueryImpl) Write(
 	// always clean up the data in the storage bucket
 	defer destClient.CleanUpStagingData(ctx, stagingOptions)
 
-	csvSchema := bq.createCsvSchema(object.EndCustomerIdColumn, orderedObjectFields)
+	csvSchema := bq.createCsvSchema(object.EndCustomerIdField, orderedObjectFields)
 	err = destClient.LoadFromStaging(ctx, object.Namespace, object.TableName, query.LoadOptions{
 		GcsReference:   gcsReference,
 		BigQuerySchema: csvSchema,

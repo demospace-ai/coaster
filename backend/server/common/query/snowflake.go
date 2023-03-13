@@ -109,7 +109,7 @@ func (sc SnowflakeApiClient) GetTables(ctx context.Context, namespace string) ([
 	return tableNames, nil
 }
 
-func (sc SnowflakeApiClient) GetTableSchema(ctx context.Context, namespace string, tableName string) (data.Schema, error) {
+func (sc SnowflakeApiClient) GetSchema(ctx context.Context, namespace string, tableName string) (data.Schema, error) {
 	queryString := fmt.Sprintf("SHOW COLUMNS IN %s.%s", namespace, tableName)
 
 	queryResult, err := sc.RunQuery(ctx, queryString)
@@ -129,15 +129,15 @@ func (sc SnowflakeApiClient) GetTableSchema(ctx context.Context, namespace strin
 			return nil, err
 		}
 
-		dataType := getSnowflakeColumnType(snowflakeSchema.Type)
-		schema = append(schema, data.ColumnSchema{Name: row[2].(string), Type: dataType})
+		dataType := getSnowflakeFieldType(snowflakeSchema.Type)
+		schema = append(schema, data.Field{Name: row[2].(string), Type: dataType})
 	}
 
 	return schema, nil
 }
 
-func (sc SnowflakeApiClient) GetColumnValues(ctx context.Context, namespace string, tableName string, columnName string) ([]any, error) {
-	queryString := fmt.Sprintf("SELECT DISTINCT %s FROM %s.%s LIMIT 100", columnName, namespace, tableName)
+func (sc SnowflakeApiClient) GetFieldValues(ctx context.Context, namespace string, tableName string, fieldName string) ([]any, error) {
+	queryString := fmt.Sprintf("SELECT DISTINCT %s FROM %s.%s LIMIT 100", fieldName, namespace, tableName)
 
 	queryResult, err := sc.RunQuery(ctx, queryString)
 	if err != nil {
@@ -249,21 +249,21 @@ func convertSnowflakeValue(snowflakeValue any) any {
 	return snowflakeValue
 }
 
-func getSnowflakeColumnType(snowflakeType string) data.ColumnType {
+func getSnowflakeFieldType(snowflakeType string) data.FieldType {
 	switch snowflakeType {
 	case "BIT", "BOOLEAN":
-		return data.ColumnTypeBoolean
+		return data.FieldTypeBoolean
 	case "INTEGER", "BIGINT", "SMALLINT", "TINYINT":
-		return data.ColumnTypeInteger
+		return data.FieldTypeInteger
 	case "REAL", "DOUBLE", "DECIMAL", "NUMERIC", "FLOAT", "FIXED":
-		return data.ColumnTypeNumber
+		return data.FieldTypeNumber
 	case "TIMESTAMP_TZ":
-		return data.ColumnTypeTimestampTz
+		return data.FieldTypeTimestampTz
 	case "TIMESTAMP", "TIMESTAMP_NTZ":
-		return data.ColumnTypeTimestampNtz
+		return data.FieldTypeTimestampNtz
 	default:
 		// Everything can always be treated as a string
-		return data.ColumnTypeString
+		return data.FieldTypeString
 	}
 }
 
@@ -271,12 +271,12 @@ func convertSnowflakeSchema(columns []*sql.ColumnType) data.Schema {
 	schema := data.Schema{}
 
 	for _, column := range columns {
-		columnSchema := data.ColumnSchema{
+		field := data.Field{
 			Name: column.Name(),
-			Type: getSnowflakeColumnType(column.DatabaseTypeName()),
+			Type: getSnowflakeFieldType(column.DatabaseTypeName()),
 		}
 
-		schema = append(schema, columnSchema)
+		schema = append(schema, field)
 	}
 
 	return schema

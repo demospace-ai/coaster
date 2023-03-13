@@ -52,12 +52,12 @@ func (sf SnowflakeImpl) getReadQuery(sourceConnection *models.Connection, sync v
 }
 
 func (sf SnowflakeImpl) getSelectString(fieldMappings []views.FieldMapping) string {
-	columns := []string{}
+	fields := []string{}
 	for _, fieldMapping := range fieldMappings {
-		columns = append(columns, fieldMapping.SourceFieldName)
+		fields = append(fields, fieldMapping.SourceFieldName)
 	}
 
-	return strings.Join(columns, ",")
+	return strings.Join(fields, ",")
 }
 
 func (sf SnowflakeImpl) Write(

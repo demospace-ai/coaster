@@ -11,11 +11,11 @@ import (
 	"go.fabra.io/server/common/repositories/connections"
 )
 
-type GetColumnValuesResponse struct {
-	ColumnValues []any `json:"column_values"`
+type GetFieldValuesResponse struct {
+	FieldValues []any `json:"field_values"`
 }
 
-func (s ApiService) GetColumnValues(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) GetFieldValues(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	strConnectionID := r.URL.Query().Get("connectionID")
 	if len(strConnectionID) == 0 {
 		return errors.Newf("missing connection ID from GetPropertyValues request URL: %s", r.URL.RequestURI())
@@ -28,17 +28,17 @@ func (s ApiService) GetColumnValues(auth auth.Authentication, w http.ResponseWri
 
 	namespace := r.URL.Query().Get("namespace")
 	if len(namespace) == 0 {
-		return errors.Newf("missing namespace from GetColumnValues request URL: %s", r.URL.RequestURI())
+		return errors.Newf("missing namespace from GetFieldValues request URL: %s", r.URL.RequestURI())
 	}
 
 	tableName := r.URL.Query().Get("tableName")
 	if len(tableName) == 0 {
-		return errors.Newf("missing table name from GetColumnValues request URL: %s", r.URL.RequestURI())
+		return errors.Newf("missing table name from GetFieldValues request URL: %s", r.URL.RequestURI())
 	}
 
-	columnName := r.URL.Query().Get("columnName")
-	if len(columnName) == 0 {
-		return errors.Newf("missing column name from GetColumnValues request URL: %s", r.URL.RequestURI())
+	fieldName := r.URL.Query().Get("fieldName")
+	if len(fieldName) == 0 {
+		return errors.Newf("missing field name from GetFieldValues request URL: %s", r.URL.RequestURI())
 	}
 
 	// TODO: write test to make sure only authorized users can use the data connection
@@ -47,14 +47,13 @@ func (s ApiService) GetColumnValues(auth auth.Authentication, w http.ResponseWri
 		return err
 	}
 
-	// TODO: support getting property values for custom property group
 	ctx := context.Background()
-	columnValues, err := s.queryService.GetColumnValues(ctx, connection, namespace, tableName, columnName)
+	fieldValues, err := s.queryService.GetFieldValues(ctx, connection, namespace, tableName, fieldName)
 	if err != nil {
 		return err
 	}
 
-	return json.NewEncoder(w).Encode(GetColumnValuesResponse{
-		ColumnValues: columnValues,
+	return json.NewEncoder(w).Encode(GetFieldValuesResponse{
+		FieldValues: fieldValues,
 	})
 }
