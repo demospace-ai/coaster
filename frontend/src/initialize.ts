@@ -12,7 +12,7 @@ interface FabraConnectOptions {
 let iframe: HTMLIFrameElement | null = null;
 let iframeReady: boolean = false;
 
-const initialize = (options: FabraConnectOptions) => {
+const initialize = (options?: FabraConnectOptions) => {
     window.addEventListener("message", handleMessage);
 
     const frame = document.createElement("iframe");
@@ -28,7 +28,7 @@ const initialize = (options: FabraConnectOptions) => {
     frame.style.colorScheme = "normal";
     document.body.appendChild(frame);
 
-    if (options.customTheme) {
+    if (options?.customTheme) {
         window.fabra.customTheme = options.customTheme;
     }
 
