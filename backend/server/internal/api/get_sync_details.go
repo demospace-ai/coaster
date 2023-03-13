@@ -2,6 +2,8 @@ package api
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -9,11 +11,16 @@ import (
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/repositories/syncs"
+	"go.fabra.io/server/common/views"
 	"go.fabra.io/sync/temporal"
-	"go.temporal.io/sdk/client"
+	"go.temporal.io/api/workflowservice/v1"
 )
 
-func (s ApiService) RunSync(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+type GetSyncDetailsResponse struct {
+	SyncDetails []views.SyncDetails `json:"sync_details"`
+}
+
+func (s ApiService) GetSyncDetails(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
 		return errors.NewBadRequest("must setup organization first")
 	}
@@ -21,7 +28,7 @@ func (s ApiService) RunSync(auth auth.Authentication, w http.ResponseWriter, r *
 	vars := mux.Vars(r)
 	strSyncId, ok := vars["syncID"]
 	if !ok {
-		return errors.Newf("missing sync ID from RunSync request URL: %s", r.URL.RequestURI())
+		return errors.Newf("missing sync ID from GetSyncDetails request URL: %s", r.URL.RequestURI())
 	}
 
 	syncId, err := strconv.ParseInt(strSyncId, 10, 64)
@@ -41,22 +48,15 @@ func (s ApiService) RunSync(auth auth.Authentication, w http.ResponseWriter, r *
 	}
 	defer c.Close()
 
-	ctx := context.TODO()
-	_, err = c.SignalWithStartWorkflow(
-		ctx,
-		sync.WorkflowID,
-		"start",
-		nil,
-		client.StartWorkflowOptions{
-			ID:        sync.WorkflowID,
-			TaskQueue: temporal.SyncTaskQueue,
-		},
-		temporal.SyncWorkflow,
-		temporal.SyncInput{SyncID: sync.ID, OrganizationID: auth.Organization.ID},
-	)
+	res, err := c.ListWorkflow(context.TODO(), &workflowservice.ListWorkflowExecutionsRequest{
+		Query: fmt.Sprintf("WorkflowId = '%s' order by StartTime desc", sync.WorkflowID),
+	})
 	if err != nil {
 		return err
 	}
 
-	return nil
+	// TODO
+	res.GoString()
+
+	return json.NewEncoder(w).Encode(GetSyncsResponse{})
 }

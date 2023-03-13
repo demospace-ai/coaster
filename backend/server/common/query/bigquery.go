@@ -310,7 +310,7 @@ func convertBigQueryRow(bigQueryRow []bigquery.Value, schema bigquery.Schema) da
 		columnType := schema[i].Type
 		switch columnType {
 		case bigquery.TimestampFieldType:
-			row = append(row, value.(time.Time).Format(FABRA_TIMESTAMP_FORMAT))
+			row = append(row, value.(time.Time).Format(FABRA_TIMESTAMP_TZ_FORMAT))
 		case bigquery.DateFieldType:
 			row = append(row, value.(civil.Date).String())
 		case bigquery.TimeFieldType:

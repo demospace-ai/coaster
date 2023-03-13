@@ -110,7 +110,7 @@ func (sc SnowflakeApiClient) GetTables(ctx context.Context, namespace string) ([
 }
 
 func (sc SnowflakeApiClient) GetTableSchema(ctx context.Context, namespace string, tableName string) (data.Schema, error) {
-	queryString := "SHOW COLUMNS IN " + namespace + "." + tableName
+	queryString := fmt.Sprintf("SHOW COLUMNS IN %s.%s", namespace, tableName)
 
 	queryResult, err := sc.RunQuery(ctx, queryString)
 	if err != nil {
@@ -237,12 +237,16 @@ func (sc SnowflakeApiClient) GetQueryIterator(ctx context.Context, queryString s
 
 func convertSnowflakeRow(snowflakeRow []any) data.Row {
 	var row data.Row
-	// TODO: convert the values to the expected Fabra Golang types
 	for _, value := range snowflakeRow {
-		row = append(row, any(value))
+		row = append(row, convertSnowflakeValue(value))
 	}
 
 	return row
+}
+
+func convertSnowflakeValue(snowflakeValue any) any {
+	// TODO: convert the values to the expected Fabra Golang types
+	return snowflakeValue
 }
 
 func getSnowflakeColumnType(snowflakeType string) data.ColumnType {

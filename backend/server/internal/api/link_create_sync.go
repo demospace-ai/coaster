@@ -115,7 +115,21 @@ func (s ApiService) LinkCreateSync(auth auth.Authentication, w http.ResponseWrit
 	}
 
 	// tell the workflow to run immediately
-	c.SignalWorkflow(ctx, workflow.GetID(), workflow.GetRunID(), "start", nil)
+	_, err = c.SignalWithStartWorkflow(
+		ctx,
+		workflow.GetID(),
+		"start",
+		nil,
+		client.StartWorkflowOptions{
+			ID:        sync.WorkflowID,
+			TaskQueue: temporal.SyncTaskQueue,
+		},
+		temporal.SyncWorkflow,
+		temporal.SyncInput{SyncID: sync.ID, OrganizationID: auth.Organization.ID},
+	)
+	if err != nil {
+		return err
+	}
 
 	return json.NewEncoder(w).Encode(CreateSyncResponse{
 		Sync:          views.ConvertSync(sync),

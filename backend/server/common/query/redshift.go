@@ -5,7 +5,9 @@ import (
 	"database/sql"
 	"fmt"
 	"net/url"
+	"time"
 
+	"cloud.google.com/go/civil"
 	_ "github.com/lib/pq"
 	"go.fabra.io/server/common/data"
 	"go.fabra.io/server/common/errors"
@@ -30,7 +32,7 @@ func (it RedshiftIterator) Next() (data.Row, error) {
 		if err != nil {
 			return nil, err
 		}
-		return convertRedshiftRow(row), nil
+		return convertRedshiftRow(row, it.schema), nil
 	}
 
 	return nil, data.ErrDone
@@ -90,7 +92,8 @@ func (rc RedshiftApiClient) GetTables(ctx context.Context, namespace string) ([]
 			return nil, err
 		}
 
-		tableNames = append(tableNames, convertRedshiftValue(values[0]).(string))
+		// Can hardcode ColumnTypeString here because we know what the return value of this query will be
+		tableNames = append(tableNames, convertRedshiftValue(values[0], data.ColumnTypeString).(string))
 	}
 
 	return tableNames, nil
@@ -106,8 +109,8 @@ func (rc RedshiftApiClient) GetTableSchema(ctx context.Context, namespace string
 
 	schema := data.Schema{}
 	for _, row := range queryResult.Data {
-		dataType := getRedshiftColumnType(convertRedshiftValue(row[3]).(string))
-		schema = append(schema, data.ColumnSchema{Name: convertRedshiftValue(row[2]).(string), Type: dataType})
+		dataType := getRedshiftColumnType(row[3].(string))
+		schema = append(schema, data.ColumnSchema{Name: row[2].(string), Type: dataType})
 	}
 
 	return schema, nil
@@ -123,7 +126,7 @@ func (rc RedshiftApiClient) GetColumnValues(ctx context.Context, namespace strin
 
 	values := []any{}
 	for _, row := range queryResult.Data {
-		values = append(values, convertRedshiftValue(row[0]))
+		values = append(values, row[0])
 	}
 
 	return values, nil
@@ -138,7 +141,7 @@ func (rc RedshiftApiClient) GetNamespaces(ctx context.Context) ([]string, error)
 
 	var namespaces []string
 	for _, row := range queryResult.Data {
-		namespaces = append(namespaces, convertRedshiftValue(row[0]).(string))
+		namespaces = append(namespaces, row[0].(string))
 	}
 
 	return namespaces, nil
@@ -162,6 +165,7 @@ func (rc RedshiftApiClient) RunQuery(ctx context.Context, queryString string, ar
 		return nil, err
 	}
 	numColumns := len(columns)
+	schema := convertRedshiftSchema(columns)
 
 	var rows []data.Row
 	values := make([]any, numColumns)
@@ -175,11 +179,11 @@ func (rc RedshiftApiClient) RunQuery(ctx context.Context, queryString string, ar
 			return nil, err
 		}
 
-		rows = append(rows, convertRedshiftRow(values))
+		rows = append(rows, convertRedshiftRow(values, schema))
 	}
 
 	return &data.QueryResults{
-		Schema: convertRedshiftSchema(columns),
+		Schema: schema,
 		Data:   rows,
 	}, nil
 }
@@ -226,23 +230,27 @@ func getRedshiftColumnType(redshiftType string) data.ColumnType {
 	}
 }
 
-func convertRedshiftRow(redshiftRow []any) data.Row {
+func convertRedshiftRow(redshiftRow []any, schema data.Schema) data.Row {
 	var row data.Row
-	// TODO: convert the values to the expected Fabra Golang types
-	for _, value := range redshiftRow {
-		v := convertRedshiftValue(value)
-		row = append(row, v)
+	for i, value := range redshiftRow {
+		row = append(row, convertRedshiftValue(value, schema[i].Type))
 	}
 
 	return row
 }
 
-func convertRedshiftValue(redshiftValue any) any {
-	switch v := redshiftValue.(type) {
-	case []uint8:
-		return string([]byte(v))
+func convertRedshiftValue(redshiftValue any, columnType data.ColumnType) any {
+	// TODO: convert the values to the expected Fabra Golang types
+	switch columnType {
+	case data.ColumnTypeTimestampTz:
+		return redshiftValue.(time.Time).Format(FABRA_TIMESTAMP_TZ_FORMAT)
+	case data.ColumnTypeTimestampNtz:
+		return civil.DateTimeOf(redshiftValue.(time.Time)).String()
+	case data.ColumnTypeString:
+		// Redshift strings are returned as uint8 slices
+		return string([]byte(redshiftValue.(string)))
 	default:
-		return any(v)
+		return redshiftValue
 	}
 }
 

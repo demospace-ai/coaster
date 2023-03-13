@@ -21,6 +21,19 @@ type Sync struct {
 	Frequency      int64           `json:"frequency"`
 }
 
+type SyncDetails struct {
+	Sync
+	NextRunTime string    `json:"next_run_time"`
+	SyncRuns    []SyncRun `json:"sync_runs"`
+}
+
+type SyncRun struct {
+	Success     bool   `json:"success"`
+	StartedAt   string `json:"started_at"`
+	CompletedAt string `json:"completed_at"`
+	Error       string `json:"error"`
+}
+
 type FieldMapping struct {
 	SourceFieldName    string          `json:"source_field_name"`
 	SourceFieldType    data.ColumnType `json:"source_field_type"`

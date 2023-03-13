@@ -7,34 +7,56 @@ import (
 	"gorm.io/gorm"
 )
 
-type HttpError struct {
-	Code              int
-	ClientVisibleData string
+type CustomerVisibleError struct {
+	message string
 }
 
-func (e HttpError) Error() string {
-	return e.ClientVisibleData
+func (e CustomerVisibleError) Error() string {
+	return e.message
+}
+
+type HttpError struct {
+	code int
+	CustomerVisibleError
+}
+
+func (e HttpError) Code() int {
+	return e.code
 }
 
 var NotFound = HttpError{
-	Code:              http.StatusNotFound,
-	ClientVisibleData: http.StatusText(http.StatusNotFound),
+	code: http.StatusNotFound,
+	CustomerVisibleError: CustomerVisibleError{
+		message: http.StatusText(http.StatusNotFound),
+	},
 }
 
 var BadRequest = HttpError{
-	Code:              http.StatusBadRequest,
-	ClientVisibleData: http.StatusText(http.StatusBadRequest),
+	code: http.StatusBadRequest,
+	CustomerVisibleError: CustomerVisibleError{
+		message: http.StatusText(http.StatusBadRequest),
+	},
 }
 
 var Unauthorized = HttpError{
-	Code:              http.StatusUnauthorized,
-	ClientVisibleData: http.StatusText(http.StatusUnauthorized),
+	code: http.StatusUnauthorized,
+	CustomerVisibleError: CustomerVisibleError{
+		message: http.StatusText(http.StatusUnauthorized),
+	},
+}
+
+func NewCustomerVisibleError(err error) CustomerVisibleError {
+	return CustomerVisibleError{
+		message: err.Error(),
+	}
 }
 
 func NewBadRequest(clientVisibleData string) error {
 	return HttpError{
-		Code:              http.StatusBadRequest,
-		ClientVisibleData: clientVisibleData,
+		code: http.StatusBadRequest,
+		CustomerVisibleError: CustomerVisibleError{
+			message: clientVisibleData,
+		},
 	}
 }
 
@@ -64,4 +86,8 @@ func IsRecordNotFound(err error) bool {
 
 func IsCookieNotFound(err error) bool {
 	return errors.Is(err, http.ErrNoCookie)
+}
+
+func As(err error, target interface{}) bool {
+	return errors.As(err, target)
 }

@@ -1,6 +1,7 @@
 package syncs
 
 import (
+	"github.com/google/uuid"
 	"go.fabra.io/server/common/database"
 	"go.fabra.io/server/common/input"
 	"go.fabra.io/server/common/models"
@@ -28,6 +29,7 @@ func CreateSync(
 	sync := models.Sync{
 		OrganizationID: organizationID,
 		DisplayName:    displayName,
+		WorkflowID:     uuid.NewString(),
 		EndCustomerID:  endCustomerID,
 		SourceID:       sourceID,
 		ObjectID:       objectID,

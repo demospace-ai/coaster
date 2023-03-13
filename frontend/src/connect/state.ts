@@ -217,6 +217,7 @@ export const createNewSync = async (
     return (
       {
         source_field_name: fieldMapping.source_column!.name,
+        source_field_type: fieldMapping.source_column!.type,
         destination_field_id: fieldMapping.destination_field_id,
       }
     );

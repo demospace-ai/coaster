@@ -8,6 +8,7 @@ import (
 	"cloud.google.com/go/bigquery"
 	"github.com/google/uuid"
 	"go.fabra.io/server/common/data"
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/query"
 	"go.fabra.io/server/common/views"
@@ -36,7 +37,7 @@ func (bq BigQueryImpl) Read(ctx context.Context, sourceConnection views.FullConn
 
 	results, err := sourceClient.RunQuery(ctx, readQuery)
 	if err != nil {
-		return nil, err
+		return nil, errors.NewCustomerVisibleError(err)
 	}
 
 	return results.Data, nil
@@ -116,8 +117,10 @@ func (bq BigQueryImpl) Write(
 	stagingOptions := query.StagingOptions{Bucket: destinationOptions.StagingBucket, File: file}
 	err = destClient.StageData(ctx, strings.Join(rowStrings, "\n"), stagingOptions)
 	if err != nil {
-		return err
+		return errors.NewCustomerVisibleError(err)
 	}
+	// always clean up the data in the storage bucket
+	defer destClient.CleanUpStagingData(ctx, stagingOptions)
 
 	csvSchema := bq.createCsvSchema(object.EndCustomerIdColumn, orderedObjectFields)
 	err = destClient.LoadFromStaging(ctx, object.Namespace, object.TableName, query.LoadOptions{
@@ -126,10 +129,10 @@ func (bq BigQueryImpl) Write(
 		WriteMode:      bq.toBigQueryWriteMode(sync.SyncMode),
 	})
 	if err != nil {
-		return err
+		return errors.NewCustomerVisibleError(err)
 	}
 
-	return destClient.CleanUpStagingData(ctx, stagingOptions)
+	return nil
 }
 
 func (bq BigQueryImpl) toBigQueryWriteMode(syncMode models.SyncMode) bigquery.TableWriteDisposition {
@@ -166,15 +169,17 @@ func (bq BigQueryImpl) createCsvSchema(endCustomerIdColumn string, orderedObject
 	var csvSchema bigquery.Schema
 	for _, objectField := range orderedObjectFields {
 		field := bigquery.FieldSchema{
-			Name: objectField.Name,
-			Type: objectField.Type.ToBigQueryType(),
+			Name:     objectField.Name,
+			Type:     objectField.Type.ToBigQueryType(),
+			Required: !objectField.Optional,
 		}
 		csvSchema = append(csvSchema, &field)
 	}
 
 	endCustomerIdField := bigquery.FieldSchema{
-		Name: endCustomerIdColumn,
-		Type: bigquery.IntegerFieldType,
+		Name:     endCustomerIdColumn,
+		Type:     bigquery.IntegerFieldType,
+		Required: true,
 	}
 	csvSchema = append(csvSchema, &endCustomerIdField)
 

@@ -59,6 +59,7 @@ type ObjectField struct {
 	DisplayName string          `json:"display_name,omitempty"`
 	Description string          `json:"description,omitempty"`
 	Omit        bool            `json:"omit"`
+	Optional    bool            `json:"optional"`
 }
 
 func ConvertDestination(destination models.Destination, connection models.Connection) Destination {
@@ -127,10 +128,11 @@ func ConvertObject(object *models.Object, objectFields []models.ObjectField) Obj
 	viewObjectFields := []ObjectField{}
 	for _, objectField := range objectFields {
 		viewObjectField := ObjectField{
-			ID:   objectField.ID,
-			Name: objectField.Name,
-			Type: objectField.Type,
-			Omit: objectField.Omit,
+			ID:       objectField.ID,
+			Name:     objectField.Name,
+			Type:     objectField.Type,
+			Omit:     objectField.Omit,
+			Optional: objectField.Optional,
 		}
 		if objectField.DisplayName.Valid {
 			viewObjectField.DisplayName = objectField.DisplayName.String

@@ -23,6 +23,7 @@ const (
 type Sync struct {
 	OrganizationID int64
 	DisplayName    string              `json:"display_name"`
+	WorkflowID     string              `json:"workflow_id"`
 	EndCustomerID  int64               `json:"end_customer_id"`
 	SourceID       int64               `json:"source_id"`
 	ObjectID       int64               `json:"object_id"`

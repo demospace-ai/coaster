@@ -10,10 +10,9 @@ import (
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/repositories/syncs"
 	"go.fabra.io/sync/temporal"
-	"go.temporal.io/sdk/client"
 )
 
-func (s ApiService) RunSync(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) CancelSync(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
 		return errors.NewBadRequest("must setup organization first")
 	}
@@ -42,17 +41,10 @@ func (s ApiService) RunSync(auth auth.Authentication, w http.ResponseWriter, r *
 	defer c.Close()
 
 	ctx := context.TODO()
-	_, err = c.SignalWithStartWorkflow(
+	err = c.CancelWorkflow(
 		ctx,
 		sync.WorkflowID,
-		"start",
-		nil,
-		client.StartWorkflowOptions{
-			ID:        sync.WorkflowID,
-			TaskQueue: temporal.SyncTaskQueue,
-		},
-		temporal.SyncWorkflow,
-		temporal.SyncInput{SyncID: sync.ID, OrganizationID: auth.Organization.ID},
+		"",
 	)
 	if err != nil {
 		return err

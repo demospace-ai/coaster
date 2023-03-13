@@ -1,5 +1,5 @@
 build:
 	go build -o bin/worker worker/main.go
 
-build-starter:
+bs:
 	go build -o bin/starter starter/main.go

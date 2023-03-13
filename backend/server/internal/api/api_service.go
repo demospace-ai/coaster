@@ -112,6 +112,12 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.RunSync,
 		},
 		{
+			Name:        "Cancel sync",
+			Method:      router.DELETE,
+			Pattern:     "/sync/{syncID}",
+			HandlerFunc: s.CancelSync,
+		},
+		{
 			Name:        "Create link token",
 			Method:      router.POST,
 			Pattern:     "/link_token",
