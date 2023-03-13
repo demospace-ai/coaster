@@ -5,10 +5,14 @@ declare global {
     interface Window { fabra: any; }
 }
 
+interface FabraConnectOptions {
+    customTheme?: CustomTheme;
+}
+
 let iframe: HTMLIFrameElement | null = null;
 let iframeReady: boolean = false;
 
-const initialize = ({ theme }: { theme?: CustomTheme; }) => {
+const initialize = (options: FabraConnectOptions) => {
     window.addEventListener("message", handleMessage);
 
     const frame = document.createElement("iframe");
@@ -24,8 +28,8 @@ const initialize = ({ theme }: { theme?: CustomTheme; }) => {
     frame.style.colorScheme = "normal";
     document.body.appendChild(frame);
 
-    if (theme) {
-        window.fabra.customTheme = theme;
+    if (options.customTheme) {
+        window.fabra.customTheme = options.customTheme;
     }
 
     iframe = frame;

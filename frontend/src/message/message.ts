@@ -10,10 +10,10 @@ export enum MessageType {
 export type FabraMessage = {
   messageType: MessageType.IFrameReady;
 } | {
-  messageType: MessageType.LinkToken
+  messageType: MessageType.LinkToken;
   linkToken: string;
 } | {
-  messageType: MessageType.Close
+  messageType: MessageType.Close;
 } | {
   messageType: MessageType.Theme,
   theme: CustomTheme;
