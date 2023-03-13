@@ -1,4 +1,4 @@
-import { ArrowPathIcon, ArrowTopRightOnSquareIcon, BellIcon, CircleStackIcon, CubeIcon, DocumentTextIcon, HomeIcon, KeyIcon, MapIcon, UserPlusIcon } from '@heroicons/react/24/outline';
+import { ArrowPathIcon, ArrowTopRightOnSquareIcon, BellIcon, CircleStackIcon, CubeIcon, HomeIcon, KeyIcon, MapIcon, UserPlusIcon } from '@heroicons/react/24/outline';
 import classNames from "classnames";
 import { NavLink } from "react-router-dom";
 import { QuestionCircleIcon } from "src/components/icons/Icons";
@@ -42,14 +42,6 @@ export const NavigationBar: React.FC = () => {
             <ArrowPathIcon className="tw-h-4" strokeWidth="2" />
             <div className={route}>Syncs</div>
           </NavLink>
-        </div>
-        <div className={routeContainer}>
-          <Tooltip label="Coming soon!">
-            <div className={navLink}>
-              <DocumentTextIcon className="tw-h-4" strokeWidth="2" />
-              <div className={route}>Logs</div>
-            </div>
-          </Tooltip>
         </div>
         <div className={routeContainer}>
           <Tooltip label="Coming soon!">

@@ -12,6 +12,7 @@ const tableCellStyle = "tw-whitespace-nowrap tw-left tw-px-4 tw-min-w-[200px] tw
 export const SyncDetails: React.FC = () => {
   const { syncID } = useParams<{ syncID: string; }>();
   const { syncDetails } = useSyncDetails(Number(syncID));
+  const syncRuns = syncDetails?.sync_runs ? syncDetails.sync_runs : [];
 
   return (
     <div className='tw-pt-5 tw-pb-24 tw-px-10 tw-h-full tw-w-full tw-overflow-scroll'>
@@ -35,7 +36,7 @@ export const SyncDetails: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {syncDetails?.sync_runs.length > 0 ? syncDetails?.sync_runs!.map((syncRun, index) => (
+              {syncRuns.length > 0 ? syncRuns.map((syncRun, index) => (
                 <tr key={index} className="tw-border-b tw-border-solid tw-border-slate-200 last:tw-border-0 tw-cursor-pointer hover:tw-bg-slate-50" onClick={() => { }}>
                   <td className={mergeClasses(tableCellStyle, "tw-min-w-[120px]")}>
                     {syncRun.status}
