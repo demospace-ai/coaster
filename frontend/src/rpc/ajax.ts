@@ -1,9 +1,9 @@
 import { compile } from 'path-to-regexp';
 import { rudderanalytics } from 'src/app/rudder';
 import { IEndpoint } from 'src/rpc/api';
+import { isProd } from 'src/utils/env';
 
-const IS_PROD = process.env.NODE_ENV === 'production';
-const ROOT_DOMAIN = IS_PROD ? 'https://api.fabra.io' : 'http://localhost:8080';
+const ROOT_DOMAIN = isProd() ? 'https://api.fabra.io' : 'http://localhost:8080';
 
 export async function sendLinkTokenRequest<RequestType extends Record<string, any>, ResponseType>(
     endpoint: IEndpoint<RequestType, ResponseType>,

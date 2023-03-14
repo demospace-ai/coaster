@@ -1,5 +1,8 @@
 import { FabraMessage, MessageType } from "src/message/message";
+import { isProd } from "src/utils/env";
 import { CustomTheme } from "./utils/theme";
+
+const CONNECT_ROOT = isProd() ? "https://connect.fabra.io" : "http://localhost:3000";
 
 declare global {
     interface Window { fabra: any; }
@@ -16,7 +19,7 @@ const initialize = (options?: FabraConnectOptions) => {
     window.addEventListener("message", handleMessage);
 
     const frame = document.createElement("iframe");
-    frame.setAttribute("src", "https://connect.fabra.io/connect.html");
+    frame.setAttribute("src", CONNECT_ROOT + "/connect.html");
     frame.style.position = "absolute";
     frame.style.width = "100%";
     frame.style.height = "100%";
@@ -41,7 +44,7 @@ const handleMessage = (n: MessageEvent<FabraMessage>) => {
             // NOTE: iFrame is letting us know that initialization is complete, and user can call open.
             if (iframe && window.fabra.customTheme) {
                 const message: FabraMessage = { messageType: MessageType.Theme, theme: window.fabra.customTheme };
-                iframe.contentWindow!.postMessage(message, "https://connect.fabra.io");
+                iframe.contentWindow!.postMessage(message, CONNECT_ROOT);
             }
             iframeReady = true;
             break;
@@ -52,10 +55,10 @@ const handleMessage = (n: MessageEvent<FabraMessage>) => {
 
 const open = (linkToken: string) => {
     if (iframe && iframeReady) {
-        iframe.contentWindow!.postMessage({ messageType: MessageType.LinkToken, linkToken }, "https://connect.fabra.io");
+        iframe.contentWindow!.postMessage({ messageType: MessageType.LinkToken, linkToken }, CONNECT_ROOT);
         iframe.style.display = 'block';
     } else {
-        window.setTimeout(open, 100);
+        window.setTimeout(() => open(linkToken), 100);
     }
 };
 
