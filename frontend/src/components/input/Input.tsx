@@ -195,8 +195,8 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = pro
   const getElementForDropdown = props.getElementForDropdown ? props.getElementForDropdown : getElementForDisplay;
   const showLabel = props.label !== undefined && (focused || (props.selected !== undefined));
 
-  // TODO: Hack because Headless UI does not handle undefined correctly
-  const value = props.selected === undefined ? UNSET : props.selected;
+  // An undefined value will cause the input to be uncontrolled, so change to null
+  const value = props.selected === undefined ? null : props.selected;
 
   return (
     <Listbox as="div" className="tw-flex tw-w-fit" by={props.by} value={value} onChange={value => { props.setSelected(value); setIsValid(true); }}>
@@ -222,7 +222,7 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = pro
           className={mergeClasses("tw-flex tw-justify-center tw-items-center tw-w-96 tw-mt-5 tw-rounded-md tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 hover:tw-border-primary-hover aria-expanded:tw-border-primary", props.className, props.validated && !isValid && 'tw-border-red-600')}
         >
           <div className={mergeClasses("tw-inline-block tw-w-[calc(100%-20px)] tw-truncate tw-overflow-none", !props.selected && "tw-text-slate-400")}>
-            {value !== UNSET ? getElementForDisplay(props.selected) : props.placeholder}
+            {value ? getElementForDisplay(props.selected) : props.placeholder}
           </div>
           {!props.noCaret &&
             <span className="tw-pointer-events-none pr-2">
@@ -317,6 +317,7 @@ type ValidatedComboInputProps = {
   allowCustom?: boolean;
   label?: string;
   dropdownHeight?: string;
+  nullable?: boolean;
 };
 
 export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => {
@@ -359,8 +360,8 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
     return valid;
   };
 
-  // TODO: Hack because Headless UI does not handle undefined correctly
-  const value = props.selected === undefined ? UNSET : props.selected;
+  // An undefined value will cause the input to be uncontrolled, so change to null
+  const value = props.selected === undefined ? null : props.selected;
 
   return (
     <Combobox as="div" className="tw-flex tw-w-fit" by={props.by} value={value} onChange={(value: number) => { props.setSelected(value); setIsValid(true); }}>
@@ -384,7 +385,7 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
         <div ref={setReferenceElement} className={mergeClasses("tw-flex tw-w-96 tw-mt-5 tw-rounded-md tw-bg-white tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 hover:tw-border-primary-hover focus-within:!tw-border-primary tw-transition tw-duration-100", props.className, props.validated && !isValid && 'tw-border-red-600')}>
           <Combobox.Input
             className={"tw-inline tw-bg-transparent tw-w-[calc(100%-20px)] tw-border-none tw-text-sm tw-leading-5 tw-text-slate-900 tw-outline-none tw-text-ellipsis tw-cursor-pointer focus:tw-cursor-text"}
-            displayValue={selected => selected !== UNSET ? getElementForDisplay(selected) : ""}
+            displayValue={selected => selected ? getElementForDisplay(selected) : ""}
             onChange={event => setQuery(event.target.value)}
             placeholder={props.placeholder}
             onClick={() => buttonRef.current?.click()}
