@@ -11,6 +11,7 @@ import { createNewSource, createNewSync, INITIAL_SETUP_STATE, SetupSyncState, Sy
 import { WarehouseSelector } from 'src/connect/Warehouse';
 import { FabraMessage, MessageType } from 'src/message/message';
 import { useObject } from 'src/rpc/data';
+import { isProd } from 'src/utils/env';
 import { CustomTheme } from 'src/utils/theme';
 
 let needsInit = true;
@@ -35,6 +36,12 @@ export const App: React.FC = () => {
       }
     };
   };
+
+  useEffect(() => {
+    if (!isProd()) {
+      setLinkToken(import.meta.env.VITE_LINK_TOKEN);
+    }
+  }, []);
 
   useEffect(() => {
     // Recommended way to run one-time initialization: https://beta.reactjs.org/learn/you-might-not-need-an-effect#initializing-the-application
