@@ -49,6 +49,45 @@ func LoadSourceByID(db *gorm.DB, organizationID int64, endCustomerID int64, sour
 	return &source, nil
 }
 
+func LoadSourcesByIDs(db *gorm.DB, organizationID int64, sourceIDs []int64) ([]models.SourceConnection, error) {
+	var sources []models.SourceConnection
+	result := db.Table("sources").
+		Select("sources.*, connections.connection_type").
+		Joins("JOIN connections ON sources.connection_id = connections.id").
+		Where("sources.id IN ?", sourceIDs).
+		Where("sources.organization_id = ?", organizationID).
+		Where("sources.deactivated_at IS NULL").
+		Order("sources.created_at ASC").
+		Where("connections.deactivated_at IS NULL").
+		Find(&sources)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return sources, nil
+}
+
+func LoadSourcesByIDsForCustomer(db *gorm.DB, organizationID int64, endCustomerID int64, sourceIDs []int64) ([]models.SourceConnection, error) {
+	var sources []models.SourceConnection
+	result := db.Table("sources").
+		Select("sources.*, connections.connection_type").
+		Joins("JOIN connections ON sources.connection_id = connections.id").
+		Where("sources.id IN ?", sourceIDs).
+		Where("sources.organization_id = ?", organizationID).
+		Where("sources.end_customer_id = ?", endCustomerID).
+		Where("sources.deactivated_at IS NULL").
+		Order("sources.created_at ASC").
+		Where("connections.deactivated_at IS NULL").
+		Find(&sources)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return sources, nil
+}
+
 func LoadAllSources(
 	db *gorm.DB,
 	organizationID int64,

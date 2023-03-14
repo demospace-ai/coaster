@@ -71,7 +71,7 @@ export function useTables(connectionID: number | undefined, namespace: string | 
 export function useSyncs() {
   const fetcher: Fetcher<GetSyncsResponse, {}> = () => sendRequest(GetSyncs);
   const { data, mutate, error, isLoading, isValidating } = useSWR({ GetSyncs }, fetcher);
-  return { syncs: data?.syncs, mutate, error, loading: isLoading || isValidating };
+  return { syncs: data?.syncs, objects: data?.objects, sources: data?.sources, mutate, error, loading: isLoading || isValidating };
 }
 
 export function useSyncDetails(syncID: number | undefined) {
@@ -111,7 +111,7 @@ export function useLinkSources(linkToken: string) {
 export function useLinkSyncs(linkToken: string) {
   const fetcher: Fetcher<GetSyncsResponse, {}> = () => sendLinkTokenRequest(LinkGetSyncs, linkToken);
   const { data, mutate, error, isLoading, isValidating } = useSWR({ GetSyncs }, fetcher);
-  return { syncs: data?.syncs, mutate, error, loading: isLoading || isValidating };
+  return { syncs: data?.syncs, objects: data?.objects, sources: data?.sources, mutate, error, loading: isLoading || isValidating };
 }
 
 export function useLinkSyncDetails(syncID: number | undefined, linkToken: string) {

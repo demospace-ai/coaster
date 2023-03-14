@@ -282,10 +282,7 @@ func (ac BigQueryApiClient) LoadFromStaging(ctx context.Context, namespace strin
 		return err
 	}
 
-	if status.Err() != nil {
-		return errors.Newf("job completed with error: %v", status.Err())
-	}
-	return nil
+	return status.Err()
 }
 
 func (ac BigQueryApiClient) CleanUpStagingData(ctx context.Context, stagingOptions StagingOptions) error {

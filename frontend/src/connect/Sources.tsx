@@ -1,5 +1,5 @@
 import { ChevronRightIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "src/components/button/Button";
 import { AddDatabase, InfoIcon } from "src/components/icons/Icons";
 import { getConnectionTypeImg } from "src/components/images/warehouses";
@@ -9,7 +9,23 @@ import { SetupSyncProps, SyncSetupStep } from "src/connect/state";
 import { Source } from "src/rpc/api";
 import { useLinkSources } from "src/rpc/data";
 
-export const Sources: React.FC<SetupSyncProps> = (props) => {
+export const Sources: React.FC<SetupSyncProps> = ({ linkToken, state, setState }) => {
+  const { sources } = useLinkSources(linkToken);
+  const [loading, setLoading] = useState<boolean>(true);
+  useEffect(() => {
+    if (sources !== undefined) {
+      if (sources.length > 0) {
+        setLoading(false);
+      } else {
+        setState({ ...state, step: SyncSetupStep.ChooseSourceType, skippedSourceSelection: true });
+      }
+    }
+  }, [state, setState, sources]);
+
+  if (loading) {
+    return <Loading />;
+  }
+
   return (
     <div className="tw-w-full tw-px-28">
       <div className="tw-flex tw-flex-row tw-items-center">
@@ -17,7 +33,7 @@ export const Sources: React.FC<SetupSyncProps> = (props) => {
         <Tooltip placement="right" maxWidth="500px" label="These are the data sources you've setup previously.">
           <InfoIcon className="tw-ml-1.5 tw-h-3.5 tw-fill-slate-400" />
         </Tooltip>
-        <Button className="tw-ml-auto tw-flex tw-flex-row tw-items-center tw-h-8 tw-bg-blue-600 hover:tw-bg-blue-800" onClick={() => props.setState({ ...props.state, step: SyncSetupStep.Warehouse })}>
+        <Button className="tw-ml-auto tw-flex tw-flex-row tw-items-center tw-h-8 tw-bg-blue-600 hover:tw-bg-blue-800" onClick={() => setState({ ...state, step: SyncSetupStep.ChooseSourceType })}>
           <PlusCircleIcon className="tw-h-5 tw-mr-2 tw-stroke-2" />
           <span className="tw-mr-1">New Source</span>
         </Button>
@@ -25,7 +41,7 @@ export const Sources: React.FC<SetupSyncProps> = (props) => {
       <div className="tw-text-left tw-mt-2 tw-text-slate-600">Setup additional syncs from your existing sources, or add a new source.</div>
       <div className="tw-flex tw-flex-row tw-items-center tw-justify-center tw-w-full tw-pb-4">
         <div className="tw-w-full">
-          <SourceTable linkToken={props.linkToken} state={props.state} setState={props.setState} />
+          <SourceTable linkToken={linkToken} state={state} setState={setState} />
         </div>
       </div>
     </div >
@@ -35,7 +51,7 @@ export const Sources: React.FC<SetupSyncProps> = (props) => {
 const SourceTable: React.FC<SetupSyncProps> = ({ linkToken, state, setState }) => {
   const { sources } = useLinkSources(linkToken);
   const setExistingSource = (source: Source) => {
-    setState({ ...state, source: source, step: SyncSetupStep.Object, skippedSourceSetup: true, namespace: undefined, tableName: undefined });
+    setState({ ...state, source: source, step: SyncSetupStep.ChooseData, skippedSourceSetup: true, namespace: undefined, tableName: undefined });
   };
   return (
     <div className="tw-mt-5 tw-flow-root tw-select-none">
@@ -76,7 +92,7 @@ const SourceTable: React.FC<SetupSyncProps> = ({ linkToken, state, setState }) =
                       <div className="tw-flex tw-flex-col tw-ml-8">
                         <span className="tw-text-lg tw-font-semibold tw-text-slate-500">Add a source</span>
                         <span className="tw-text-slate-500">Start syncing your data by adding a source.</span>
-                        <Button className="tw-bg-blue-600 hover:tw-bg-blue-800 tw-w-32 tw-px-0 tw-mt-4" onClick={() => setState({ ...state, step: SyncSetupStep.Warehouse })}>Add a Source</Button>
+                        <Button className="tw-bg-blue-600 hover:tw-bg-blue-800 tw-w-32 tw-px-0 tw-mt-4" onClick={() => setState({ ...state, step: SyncSetupStep.ChooseSourceType })}>Add a Source</Button>
                       </div>
                     </td>
                   </tr>
@@ -84,7 +100,7 @@ const SourceTable: React.FC<SetupSyncProps> = ({ linkToken, state, setState }) =
               </tbody>
             </table>
             :
-            <Loading></Loading>
+            <Loading />
           }
         </div>
       </div>

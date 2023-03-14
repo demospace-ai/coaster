@@ -9,7 +9,7 @@ import { ConnectionType } from "src/rpc/api";
 export const WarehouseSelector: React.FC<SetupSyncProps> = (props) => {
   const connectionButton = "tw-flex tw-flex-row tw-justify-center tw-items-center tw-py-5 tw-font-bold tw-w-56 tw-rounded-md tw-cursor-pointer tw-bg-white tw-text-slate-800 tw-border tw-border-slate-300 hover:tw-bg-slate-100 tw-tracking-[1px] tw-shadow tw-select-none";
   const onClick = (connectionType: ConnectionType) => {
-    props.setState({ ...props.state, connectionType: connectionType, step: SyncSetupStep.Connection, skippedSourceSetup: false });
+    props.setState({ ...props.state, connectionType: connectionType, step: SyncSetupStep.ConnectionDetails, skippedSourceSetup: false });
   };
 
   return (

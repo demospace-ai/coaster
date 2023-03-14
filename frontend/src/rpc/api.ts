@@ -319,6 +319,8 @@ export interface CreateSyncResponse {
 
 export interface GetSyncsResponse {
     syncs: Sync[];
+    sources: Source[];
+    objects: Object[];
 }
 
 export interface GetSyncDetailsResponse {
@@ -499,7 +501,7 @@ export interface Sync {
     id: number;
     display_name: string;
     end_customer_id: number;
-    source: Source;
+    source_id: number;
     object_id: number;
     namespace: string | undefined;
     table_name: string | undefined;

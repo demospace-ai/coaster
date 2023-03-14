@@ -47,9 +47,9 @@ export const SyncDetails: React.FC = () => {
                   <td className={tableCellStyle}>
                     {syncRun.completed_at}
                   </td>
-                  <td className={mergeClasses(tableCellStyle, "tw-max-w-[450px]")}>
+                  <td className={tableCellStyle}>
                     <Tooltip label={<div className="tw-m-2 tw-cursor-text">{syncRun.error}</div>} maxWidth={600} interactive>
-                      <div>
+                      <div className="tw-overflow-hidden tw-text-ellipsis tw-max-w-[450px]">
                         {syncRun.error}
                       </div>
                     </Tooltip>

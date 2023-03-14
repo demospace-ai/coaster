@@ -51,6 +51,23 @@ func LoadObjectByID(db *gorm.DB, organizationID int64, objectID int64) (*models.
 	return &object, nil
 }
 
+func LoadObjectsByIDs(db *gorm.DB, organizationID int64, objectIDs []int64) ([]models.Object, error) {
+	var objects []models.Object
+	result := db.Table("objects").
+		Select("objects.*").
+		Where("objects.id IN ?", objectIDs).
+		Where("objects.organization_id = ?", organizationID).
+		Where("objects.deactivated_at IS NULL").
+		Order("objects.created_at ASC").
+		Find(&objects)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return objects, nil
+}
+
 func LoadAllObjects(
 	db *gorm.DB,
 	organizationID int64,

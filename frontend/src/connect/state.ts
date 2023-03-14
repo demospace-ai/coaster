@@ -9,10 +9,10 @@ export type SetupSyncProps = {
 };
 
 export enum SyncSetupStep {
-  Initial = 1,
-  Warehouse,
-  Connection,
-  Object,
+  ExistingSources = 1,
+  ChooseSourceType,
+  ConnectionDetails,
+  ChooseData,
   Finalize,
 }
 
@@ -67,6 +67,7 @@ export type SetupSyncState = {
   syncCreated: boolean;
   error: string | undefined;
   skippedSourceSetup: boolean;
+  skippedSourceSelection: boolean;
   object: Object | undefined;
   namespace: string | undefined;
   tableName: string | undefined;
@@ -82,10 +83,11 @@ export type SetupSyncState = {
 };
 
 export const INITIAL_SETUP_STATE: SetupSyncState = {
-  step: SyncSetupStep.Initial,
+  step: SyncSetupStep.ExistingSources,
   syncCreated: false,
   error: undefined,
   skippedSourceSetup: false,
+  skippedSourceSelection: false,
   object: undefined,
   namespace: undefined,
   tableName: undefined,
@@ -143,7 +145,7 @@ export const createNewSource = async (
   if (state.newSourceState.sourceCreated) {
     // TODO: clear success if one of the inputs change and just update the already created source
     // Already created the source, just continue again
-    setState({ ...state, step: SyncSetupStep.Object });
+    setState({ ...state, step: SyncSetupStep.ChooseData });
     return;
   }
 
@@ -177,7 +179,7 @@ export const createNewSource = async (
     setState({
       ...state,
       source: response.source,
-      step: SyncSetupStep.Object,
+      step: SyncSetupStep.ChooseData,
       newSourceState: { ...state.newSourceState, sourceCreated: true },
       namespace: undefined, // set namespace and table name to undefined since we're using a new source
       tableName: undefined,
