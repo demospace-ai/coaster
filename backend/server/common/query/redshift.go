@@ -248,7 +248,10 @@ func convertRedshiftValue(redshiftValue any, fieldType data.FieldType) any {
 	case data.FieldTypeTimestampNtz:
 		return civil.DateTimeOf(redshiftValue.(time.Time)).String()
 	case data.FieldTypeString:
-		// Redshift strings are returned as uint8 slices
+		// Redshift strings are sometimes returned as uint8 slices
+		if v, ok := redshiftValue.([]uint8); ok {
+			return string([]byte(v))
+		}
 		return string([]byte(redshiftValue.(string)))
 	default:
 		return redshiftValue

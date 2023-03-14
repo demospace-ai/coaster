@@ -27,7 +27,7 @@ export const Sources: React.FC<SetupSyncProps> = ({ linkToken, state, setState }
   }
 
   return (
-    <div className="tw-w-full tw-px-28">
+    <div className="tw-w-full tw-px-20">
       <div className="tw-flex tw-flex-row tw-items-center">
         <span className="tw-text-2xl tw-font-semibold tw-text-slate-900">Your sources</span>
         <Tooltip placement="right" maxWidth="500px" label="These are the data sources you've setup previously.">

@@ -44,7 +44,7 @@ export const FinalizeSync: React.FC<SetupSyncProps> = (props) => {
   }
 
   return (
-    <div className="tw-w-full tw-px-28 tw-flex tw-flex-col">
+    <div className="tw-w-full tw-pl-20 tw-pr-[72px] tw-flex tw-flex-col">
       <div className="tw-text-left tw-mb-5 tw-text-2xl tw-font-bold tw-text-slate-900">Finalize your sync configuration</div>
       <div className="tw-w-[100%] tw-min-w-[400px] tw-h-full">
         <div className="tw-text-base tw-font-medium tw-mb-1 tw-text-slate-800">Display Name</div>
@@ -61,22 +61,20 @@ export const FinalizeSync: React.FC<SetupSyncProps> = (props) => {
           const fieldMapping = props.state.fieldMappings![fieldMappingIdx!];
           return (
             !objectField.omit &&
-            <div key={objectField.name} className="tw-flex tw-flex-row tw-items-center tw-mb-5" >
-              <div>
-                <LinkFieldSelector
-                  className="tw-mt-0 tw-w-80"
-                  field={fieldMapping?.source_field}
-                  setField={(value: Field) => { updateFieldMapping({ ...fieldMapping, source_field: value }, fieldMappingIdx!); }}
-                  placeholder='Choose a field'
-                  noOptionsString="No Fields Available!"
-                  validated={true}
-                  source={props.state.source}
-                  namespace={props.state.namespace}
-                  tableName={props.state.tableName}
-                  linkToken={props.linkToken}
-                />
-              </div>
-              <LongRightArrow className="tw-fill-slate-600 tw-h-3 tw-ml-auto" />
+            <div key={objectField.name} className="tw-flex tw-flex-row tw-items-center tw-justify-between tw-mb-5" >
+              <LinkFieldSelector
+                className="tw-mt-0 tw-w-96 tw-flex"
+                field={fieldMapping?.source_field}
+                setField={(value: Field) => { updateFieldMapping({ ...fieldMapping, source_field: value }, fieldMappingIdx!); }}
+                placeholder='Choose a field'
+                noOptionsString="No Fields Available!"
+                validated={true}
+                source={props.state.source}
+                namespace={props.state.namespace}
+                tableName={props.state.tableName}
+                linkToken={props.linkToken}
+              />
+              <LongRightArrow className="tw-fill-slate-600 tw-h-3" />
               <MappedField objectField={objectField} />
             </div>
           );
@@ -93,7 +91,7 @@ export const FinalizeSync: React.FC<SetupSyncProps> = (props) => {
 
 const MappedField: React.FC<{ objectField: ObjectField; }> = ({ objectField }) => {
   return (
-    <div className='tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-fle tw-w-80 tw-box-border tw-bg-slate-100 tw-outline-none tw-ml-auto tw-flex tw-flex-row tw-items-center tw-text-slate-500 tw-select-none'>
+    <div className='tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-p-3 tw-w-80 tw-box-border tw-bg-slate-100 tw-outline-none tw-flex tw-flex-row tw-items-center tw-text-slate-500 tw-select-none'>
       <div>{objectField.display_name}</div>
       {
         objectField.description &&

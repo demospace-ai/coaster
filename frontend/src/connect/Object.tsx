@@ -52,9 +52,9 @@ export const ObjectSetup: React.FC<SetupSyncProps> = (props) => {
   };
 
   return (
-    <div className="tw-w-full tw-px-28 tw-flex tw-flex-col">
+    <div className="tw-w-full tw-pl-20 tw-pr-[72px] tw-flex tw-flex-col">
       <div className="tw-mb-5 tw-text-2xl tw-font-semibold tw-text-slate-900">Define the data model to sync</div>
-      <div className="tw-w-[50%] tw-min-w-[400px] tw-h-full">
+      <div className="tw-w-[50%] tw-min-w-[400px]">
         <div className="tw-text-base tw-font-medium tw-mb-1 tw-text-slate-800">Select object to create</div>
         <div className="tw-text-slate-600 tw-text-sm">This is the object that will be created from the data you define in this sync configuration.</div>
         <ObjectSelector object={props.state.object} setObject={setObject} linkToken={props.linkToken} />
@@ -76,7 +76,7 @@ export const ObjectSetup: React.FC<SetupSyncProps> = (props) => {
           <MemoizedResultsTable schema={previewSchema} results={previewData} />
           :
           <div className="tw-h-full tw-w-full tw-rounded-md tw-bg-slate-50 tw-justify-center tw-items-center tw-text-center tw-flex tw-flex-col">
-            <DataPreview className="tw-h-28 tw-mb-3" animate={previewLoading} />
+            <DataPreview className="tw-h-20 tw-mb-3" animate={previewLoading} />
             <div className="tw-text-xl tw-font-semibold tw-mb-1 tw-text-slate-600">
               Preview your data
             </div>

@@ -25,7 +25,7 @@ export const SyncDetails: React.FC = () => {
       <div className='tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-lg tw-overflow-auto tw-overscroll-contain tw-shadow-md tw-w-full' >
         {syncDetails
           ?
-          <table className="tw-min-w-full tw-border-spacing-0">
+          <table className="tw-min-w-full tw-border-spacing-0 tw-divide-y tw-divide-slate-200">
             <thead className="tw-bg-slate-600 tw-text-white">
               <tr>
                 <th scope="col" className={tableHeaderStyle}>Status</th>
@@ -35,9 +35,9 @@ export const SyncDetails: React.FC = () => {
                 <th scope="col" className={classNames(tableHeaderStyle, 'tw-w-5')}></th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="tw-divide-y tw-divide-slate-200 tw-bg-white">
               {syncRuns.length > 0 ? syncRuns.map((syncRun, index) => (
-                <tr key={index} className="tw-border-b tw-border-solid tw-border-slate-200 last:tw-border-0 tw-cursor-pointer hover:tw-bg-slate-50" onClick={() => { }}>
+                <tr key={index} className="tw-cursor-pointer hover:tw-bg-slate-50" onClick={() => { }}>
                   <td className={mergeClasses(tableCellStyle, "tw-min-w-[120px]")}>
                     {syncRun.status}
                   </td>

@@ -49,7 +49,7 @@ export const NewSourceConfiguration: React.FC<SetupSyncProps> = (props) => {
   };
 
   return (
-    <div className="tw-px-28 tw-flex tw-flex-col tw-w-full">
+    <div className="tw-pl-20 tw-pr-[72px] tw-flex tw-flex-col tw-w-full">
       <div className="tw-flex tw-mb-2 tw-text-2xl tw-font-semibold tw-text-slate-900">
         <img src={getConnectionTypeImg(connectionType)} alt="icon" className="tw-h-8 tw-mr-1.5" />
         Connect to {getConnectionType(connectionType)}
@@ -60,7 +60,7 @@ export const NewSourceConfiguration: React.FC<SetupSyncProps> = (props) => {
           {inputs}
           <TestConnectionButton state={state} connectionType={connectionType} />
         </form>
-        <div className="tw-w-72 tw-ml-auto tw-text-xs tw-leading-5 tw-border-l tw-border-slate-200 tw-h-fit tw-py-2 tw-pl-8">
+        <div className="tw-w-80 tw-ml-auto tw-text-xs tw-leading-5 tw-border-l tw-border-slate-200 tw-h-fit tw-py-2 tw-pl-8 tw-mr-10">
           <div className="">
             <div className="tw-text-[13px] tw-mb-1 tw-font-medium">Read our docs</div>
             Not sure where to start? Check out <a href="docs.fabra.io" className="tw-text-blue-500">the docs</a> for step-by-step instructions.

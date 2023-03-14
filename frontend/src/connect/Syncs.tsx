@@ -36,13 +36,13 @@ const SyncList: React.FC<{ linkToken: string; }> = ({ linkToken }) => {
   const sourceIdMap = new Map(sources?.map(source => [source.id, source]));
 
   return (
-    <div className="tw-mt-2 tw-px-28">
+    <div className="tw-mt-2 tw-px-20">
       <div className="tw-flex tw-w-full tw-mt-2">
         <div className="tw-flex-col">
           <div className="tw-flex tw-justify-start tw-font-bold tw-text-2xl">Your syncs</div>
           <div className="tw-mt-2 tw-text-slate-600">Setup a sync to connect your data and map it to fields in the application.</div>
         </div>
-        <Button className="tw-ml-auto tw-h-10" onClick={() => navigate("/newsync")}>New Sync</Button>
+        <Button className="tw-ml-auto tw-h-9" onClick={() => navigate("/newsync")}>New Sync</Button>
       </div>
       <div className="tw-mt-10 tw-overflow-auto tw-shadow tw-ring-1 tw-ring-black tw-ring-opacity-5 tw-rounded-md">
         {syncs ?
