@@ -10,7 +10,7 @@ import { isProd } from 'src/utils/env';
 
 // Initialize Highlight tracking for production
 if (isProd()) {
-  H.init('7e3vw5g1');
+  H.init('6gllomg9');
 }
 
 const container = document.getElementById('root');
