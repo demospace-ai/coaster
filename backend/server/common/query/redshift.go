@@ -241,6 +241,11 @@ func convertRedshiftRow(redshiftRow []any, schema data.Schema) data.Row {
 }
 
 func convertRedshiftValue(redshiftValue any, fieldType data.FieldType) any {
+	// Don't try to convert value that is nil
+	if redshiftValue == nil {
+		return nil
+	}
+
 	// TODO: convert the values to the expected Fabra Golang types
 	switch fieldType {
 	case data.FieldTypeTimestampTz:

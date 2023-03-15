@@ -3,7 +3,7 @@ import React, { FormEvent, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, FormButton } from 'src/components/button/Button';
 import mail from 'src/components/images/mail.svg';
-import { Loading } from 'src/components/loading/Loading';
+import { LogoLoading } from 'src/components/loading/LogoLoading';
 import {
   GoogleLoginResponse, useHandleGoogleResponse, useSetOrganization
 } from 'src/pages/login/actions';
@@ -40,7 +40,7 @@ export const Login: React.FC = () => {
 
   if (loading) {
     return (
-      <Loading />
+      <LogoLoading />
     );
   }
 

@@ -1,4 +1,4 @@
-import './../index.css';
+import 'src/index.css';
 
 import { ErrorBoundary } from '@highlight-run/react';
 import { H } from 'highlight.run';

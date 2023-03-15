@@ -4,7 +4,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { BackButton } from "src/components/button/Button";
 import { Loading } from "src/components/loading/Loading";
 import { Tooltip } from "src/components/tooltip/Tooltip";
+import { SyncRunStatus } from "src/rpc/api";
 import { useLinkSyncDetails } from "src/rpc/data";
+import { toTitleCase } from "src/utils/string";
 import { mergeClasses } from "src/utils/twmerge";
 
 export const SyncRuns: React.FC<{ linkToken: string; close: () => void; }> = ({ linkToken, close }) => {
@@ -17,7 +19,7 @@ export const SyncRuns: React.FC<{ linkToken: string; close: () => void; }> = ({ 
 };
 
 const tableHeaderStyle = "tw-sticky tw-top-0 tw-z-0 tw-py-3.5 tw-px-4 sm:tw-pr-6 lg:tw-pr-8 tw-text-left tw-whitespace-nowrap";
-const tableCellStyle = "tw-whitespace-nowrap tw-left tw-pl-3 tw-min-w-[200px] tw-overflow-hidden tw-py-4 tw-text-sm tw-text-slate-800 tw-hidden sm:tw-table-cell";
+const tableCellStyle = "tw-whitespace-nowrap tw-left tw-pl-3 tw-min-w-[180px] tw-overflow-hidden tw-py-4 tw-text-sm tw-text-slate-800 tw-hidden sm:tw-table-cell";
 
 const SyncRunsList: React.FC<{ linkToken: string; }> = ({ linkToken }) => {
   const { syncID } = useParams<{ syncID: string; }>();
@@ -49,8 +51,10 @@ const SyncRunsList: React.FC<{ linkToken: string; }> = ({ linkToken }) => {
               <tbody className="tw-divide-y tw-divide-slate-200 tw-bg-white">
                 {syncRuns.length > 0 ? syncRuns.map((syncRun, index) => (
                   <tr key={index} className="tw-cursor-pointer hover:tw-bg-slate-50" onClick={() => { }}>
-                    <td className={mergeClasses(tableCellStyle, "tw-min-w-[120px]")}>
-                      {syncRun.status}
+                    <td className={mergeClasses(tableCellStyle, "tw-min-w-[140px]")}>
+                      <div className={mergeClasses("tw-py-1 tw-px-2 tw-rounded tw-text-center tw-w-[100px] tw-border tw-font-medium", getStatusStyle(syncRun.status))}>
+                        {toTitleCase(syncRun.status)}
+                      </div>
                     </td>
                     <td className={tableCellStyle}>
                       {syncRun.started_at}
@@ -59,7 +63,7 @@ const SyncRunsList: React.FC<{ linkToken: string; }> = ({ linkToken }) => {
                       {syncRun.completed_at}
                     </td>
                     <td className={tableCellStyle}>
-                      <Tooltip label={<div className="tw-m-2 tw-cursor-text">{syncRun.error}</div>} maxWidth={600} interactive>
+                      <Tooltip label={<div className="tw-m-2 tw-cursor-text tw-font-mono">{syncRun.error}</div>} maxWidth={600} interactive>
                         <div className="tw-overflow-hidden tw-text-ellipsis tw-max-w-[450px]">
                           {syncRun.error}
                         </div>
@@ -93,4 +97,17 @@ const Header: React.FC<{ close: () => void; }> = ({ close }) => {
       </button>
     </div >
   );
+};
+
+const getStatusStyle = (status: SyncRunStatus): string => {
+  switch (status) {
+    case SyncRunStatus.Running:
+      return "tw-bg-sky-100 tw-border-sky-600 tw-text-sky-600";
+    case SyncRunStatus.Completed:
+      return "tw-bg-green-100 tw-border-green-600 tw-text-green-600";
+    case SyncRunStatus.Failed:
+      return "tw-bg-red-100 tw-border-red-500 tw-text-red-500";
+    default:
+      return "tw-bg-gray-100 tw-border-gray-500 tw-text-gray-500";
+  }
 };
