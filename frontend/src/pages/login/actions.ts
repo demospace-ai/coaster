@@ -1,3 +1,4 @@
+import { H } from 'highlight.run';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { rudderanalytics } from 'src/app/rudder';
@@ -67,6 +68,9 @@ export function useOnLoginSuccess() {
 
   return useCallback(async (user: User, organization: Organization | undefined) => {
     rudderanalytics.identify(user.id.toString());
+    H.identify(user.email, {
+      id: user.id.toString(),
+    });
 
     // If there's no organization, go to the login page so the user can set it
     if (!organization) {
