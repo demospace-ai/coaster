@@ -144,6 +144,7 @@ resource "google_cloud_run_service" "fabra" {
 
   template {
     spec {
+      service_account_name = google_service_account.fabra-backend.email
       containers {
         image = "gcr.io/fabra-344902/fabra"
         env {
@@ -416,7 +417,7 @@ resource "google_storage_bucket_iam_member" "public_frontend_read_access" {
 
 resource "google_compute_backend_bucket" "frontend_backend" {
   name        = "frontend-backend-bucket"
-  description = "Static react web app"
+  description = "Static react web app for Fabra"
   bucket_name = google_storage_bucket.fabra_frontend_bucket.name
   enable_cdn  = true
 }
@@ -594,11 +595,18 @@ resource "google_cloudbuild_trigger" "worker-build-trigger" {
   filename = "infra/cloudbuild/worker.yaml"
 }
 
-data "google_compute_default_service_account" "default" {
+resource "google_service_account" "fabra-backend" {
+  account_id = "fabra-backend"
+  display_name = "Fabra Backend Service"
+}
+
+resource "google_service_account" "fabra-sync" {
+  account_id = "fabra-sync"
+  display_name = "Fabra Sync Service"
 }
 
 resource "google_service_account_iam_binding" "fabra-worker-gke-binding" {
-  service_account_id = data.google_compute_default_service_account.default.id
+  service_account_id = google_service_account.fabra-sync.id
   role               = "roles/iam.workloadIdentityUser"
 
   members = [
