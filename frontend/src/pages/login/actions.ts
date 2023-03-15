@@ -29,6 +29,9 @@ export function useHandleGoogleResponse(): GoogleLoginHandler {
 
       onLoginSuccess(loginResponse.user, loginResponse.organization);
     } catch (e) {
+      dispatch({
+        type: 'login.unauthorized',
+      });
     }
   }, [dispatch, onLoginSuccess]);
 }

@@ -2,6 +2,7 @@ import classNames from 'classnames';
 import React, { FormEvent, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, FormButton } from 'src/components/button/Button';
+import mail from 'src/components/images/mail.svg';
 import { Loading } from 'src/components/loading/Loading';
 import {
   GoogleLoginResponse, useHandleGoogleResponse, useSetOrganization
@@ -22,6 +23,7 @@ export const Login: React.FC = () => {
   const handleGoogleResponse = useHandleGoogleResponse();
   const isAuthenticated = useSelector(state => state.login.authenticated);
   const organization = useSelector(state => state.login.organization);
+  const unauthorized = useSelector(state => state.login.unauthorized);
   const navigate = useNavigate();
 
   // Use effect to navigate after render if authenticated
@@ -59,8 +61,16 @@ export const Login: React.FC = () => {
     <div className="tw-flex tw-flex-row tw-h-full tw-bg-slate-100">
       <div className="tw-mt-48 tw-mb-auto tw-mx-auto tw-w-[400px] tw-py-20 tw-px-8 tw-rounded-lg tw-shadow-md tw-bg-white">
         <div className="tw-font-[Montserrat] tw-select-none tw-text-3xl tw-font-bold tw-mb-5 tw-text-center">fabra</div>
-        <div className="tw-w-[350px] tw-text-center tw-my-2">
-          {loginContent}
+        <div className="tw-text-center tw-my-2">
+          {unauthorized ?
+            <div className="tw-flex tw-flex-col tw-justify-center">
+              <div>
+                You don't have access to Fabra yet. Contact us at <a className="tw-text-blue-500" href="mailto:founders@fabra.io">founders@fabra.io</a> to get an account provisioned!
+              </div>
+              <img src={mail} alt="mail" className='tw-h-36 tw-mt-5' />
+            </div>
+            :
+            <>{loginContent}</>}
         </div>
       </div>
     </div>
@@ -74,7 +84,7 @@ type StartContentProps = {
 const StartContent: React.FC<StartContentProps> = props => {
   // Hack to adjust Google login button width for mobile since CSS is not supported
   const { width } = useWindowDimensions();
-  const googleButtonWidth = width > 600 ? 350 : 300;
+  const googleButtonWidth = width > 600 ? 320 : 300;
 
   return (
     <>
@@ -120,7 +130,7 @@ const GoogleLogin: React.FC<GoogleLoginProps> = props => {
     }
   }, [props.onGoogleSignIn, props.width]);
 
-  return <div ref={buttonRef}></div>;
+  return <div className='tw-flex tw-justify-center' ref={buttonRef}></div>;
 };
 
 type OrganizationInputProps = {

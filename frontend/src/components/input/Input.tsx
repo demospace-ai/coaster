@@ -5,8 +5,6 @@ import { Modifier, usePopper } from "react-popper";
 import { Loading } from "src/components/loading/Loading";
 import { mergeClasses } from "src/utils/twmerge";
 
-const UNSET: any = { "undefined": true };
-
 export const Input: React.FC<InputProps> = props => {
   const { id, value, placeholder, setValue, className, textarea, type, label, ...other } = props;
   const [focused, setFocused] = useState(false);

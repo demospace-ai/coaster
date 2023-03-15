@@ -11,6 +11,7 @@ export interface LoginState {
   user?: User;
   organization?: Organization;
   suggestedOrganizations?: Organization[];
+  unauthorized?: boolean; // means that the user's domain is not allowed yet
   email?: string;
 }
 
@@ -31,6 +32,9 @@ export type LoginAction =
   | {
     type: 'login.organizationSet',
     organization: Organization,
+  }
+  | {
+    type: 'login.unauthorized';
   };
 
 export function loginReducer(state: LoginState = INITIAL_LOGIN_STATE, action: LoginAction): LoginState {
@@ -56,6 +60,11 @@ export function loginReducer(state: LoginState = INITIAL_LOGIN_STATE, action: Lo
       return {
         ...state,
         organization: action.organization,
+      };
+    case 'login.unauthorized':
+      return {
+        ...state,
+        unauthorized: true,
       };
     default:
       return state;
