@@ -84,7 +84,14 @@ func (s ApiService) Login(w http.ResponseWriter, r *http.Request) error {
 		}
 	} else {
 		var userEmailDomain = strings.Split(user.Email, "@")[1]
+		// Don't suggest organizations via domain for common domain names
 		if userEmailDomain != "gmail.com" && userEmailDomain != "outlook.com" && userEmailDomain != "icloud.com" && userEmailDomain != "yahoo.com" && userEmailDomain != "aol.com" && userEmailDomain != "hotmail.com" {
+
+			// TODO: hack to associate watershed.com emails with watershedclimate.com (since that's how it was created)
+			if userEmailDomain == "watershed.com" {
+				userEmailDomain = "watershedclimate.com"
+			}
+
 			suggestedOrganizations, err = organizations.LoadOrganizationsByEmailDomain(s.db, userEmailDomain)
 			if err != nil {
 				return err
@@ -123,6 +130,20 @@ func googleLogin(ctx context.Context, db *gorm.DB, idToken string) (*models.User
 	externalUserInfo, err := validateAndParseIdToken(ctx, idToken)
 	if err != nil {
 		return nil, nil, err
+	}
+
+	// "Do things that don't scale"
+	allowedDomains := map[string]bool{
+		"fabra.io":             true,
+		"plotline.so":          true,
+		"watershed.com":        true,
+		"watershedclimate.com": true,
+		"relate.so":            true,
+	}
+	var userEmailDomain = strings.Split(externalUserInfo.Email, "@")[1]
+	_, ok := allowedDomains[userEmailDomain]
+	if !ok {
+		return nil, nil, errors.Unauthorized
 	}
 
 	user, err := users.GetOrCreateForExternalInfo(db, externalUserInfo)
