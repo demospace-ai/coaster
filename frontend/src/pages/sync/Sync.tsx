@@ -5,7 +5,6 @@ import { Loading } from "src/components/loading/Loading";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { SyncRunStatus } from "src/rpc/api";
 import { useSyncDetails } from "src/rpc/data";
-import { toTitleCase } from "src/utils/string";
 import { mergeClasses } from "src/utils/twmerge";
 
 const tableHeaderStyle = "tw-sticky tw-top-0 tw-z-0 tw-border-b tw-border-slate-300 tw-py-3.5 tw-px-4 sm:tw-pr-6 lg:tw-pr-8 tw-text-left tw-whitespace-nowrap";
@@ -41,11 +40,11 @@ export const SyncDetails: React.FC = () => {
               {syncRuns.length > 0 ? syncRuns.map((syncRun, index) => (
                 <tr key={index} className="tw-cursor-pointer hover:tw-bg-slate-50" onClick={() => { }}>
                   <td className={mergeClasses(tableCellStyle, "tw-min-w-[120px]")}>
-                    <div className={mergeClasses("tw-py-1 tw-px-2 tw-rounded tw-text-center tw-w-[90px] tw-border tw-font-medium", getStatusStyle(syncRun.status))}>
-                      {toTitleCase(syncRun.status)}
+                    <div className={mergeClasses("tw-py-1 tw-px-2 tw-rounded tw-text-center tw-w-[100px] tw-border tw-text-xs tw-font-medium", getStatusStyle(syncRun.status))}>
+                      {syncRun.status.toUpperCase()}
                     </div>
                   </td>
-                  <td className={tableCellStyle}>
+                  <td className={tableCellStyle}>g
                     {syncRun.started_at}
                   </td>
                   <td className={tableCellStyle}>

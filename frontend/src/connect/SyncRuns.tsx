@@ -6,7 +6,6 @@ import { Loading } from "src/components/loading/Loading";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { SyncRunStatus } from "src/rpc/api";
 import { useLinkSyncDetails } from "src/rpc/data";
-import { toTitleCase } from "src/utils/string";
 import { mergeClasses } from "src/utils/twmerge";
 
 export const SyncRuns: React.FC<{ linkToken: string; close: () => void; }> = ({ linkToken, close }) => {
@@ -52,8 +51,8 @@ const SyncRunsList: React.FC<{ linkToken: string; }> = ({ linkToken }) => {
                 {syncRuns.length > 0 ? syncRuns.map((syncRun, index) => (
                   <tr key={index} className="tw-cursor-pointer hover:tw-bg-slate-50" onClick={() => { }}>
                     <td className={mergeClasses(tableCellStyle, "tw-min-w-[140px]")}>
-                      <div className={mergeClasses("tw-py-1 tw-px-2 tw-rounded tw-text-center tw-w-[100px] tw-border tw-font-medium", getStatusStyle(syncRun.status))}>
-                        {toTitleCase(syncRun.status)}
+                      <div className={mergeClasses("tw-py-1 tw-px-2 tw-rounded tw-text-center tw-w-[100px] tw-border tw-text-xs tw-font-medium", getStatusStyle(syncRun.status))}>
+                        {syncRun.status.toUpperCase()}
                       </div>
                     </td>
                     <td className={tableCellStyle}>

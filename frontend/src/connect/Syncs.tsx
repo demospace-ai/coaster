@@ -40,7 +40,7 @@ const SyncList: React.FC<{ linkToken: string; }> = ({ linkToken }) => {
       <div className="tw-flex tw-w-full tw-mt-2">
         <div className="tw-flex-col">
           <div className="tw-flex tw-justify-start tw-font-bold tw-text-2xl">Your syncs</div>
-          <div className="tw-mt-2 tw-text-slate-600">Setup a sync to connect your data and map it to fields in the application.</div>
+          <div className="tw-mt-2 tw-text-slate-600">Setup a sync to connect your data source and map it to fields in the application.</div>
         </div>
         <Button className="tw-ml-auto tw-h-9" onClick={() => navigate("/newsync")}>New Sync</Button>
       </div>
