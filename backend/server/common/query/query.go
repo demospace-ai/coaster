@@ -108,6 +108,19 @@ func (qs QueryServiceImpl) GetClient(ctx context.Context, connection *models.Con
 			DatabaseName: connection.DatabaseName.String,
 			Host:         connection.Host.String,
 		}, nil
+	case models.ConnectionTypeSynapse:
+		synapsePassword, err := qs.cryptoService.DecryptConnectionCredentials(connection.Password.String)
+		if err != nil {
+			return nil, err
+		}
+
+		// TODO: validate all connection params
+		return SynapseApiClient{
+			Username:     connection.Username.String,
+			Password:     *synapsePassword,
+			DatabaseName: connection.DatabaseName.String,
+			Host:         connection.Host.String,
+		}, nil
 	case models.ConnectionTypeMongoDb:
 		mongodbPassword, err := qs.cryptoService.DecryptConnectionCredentials(connection.Password.String)
 		if err != nil {

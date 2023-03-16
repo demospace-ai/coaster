@@ -44,16 +44,15 @@ func (it RedshiftIterator) Schema() data.Schema {
 }
 
 func (rc RedshiftApiClient) openConnection(ctx context.Context) (*sql.DB, error) {
-	dsn := url.URL{
-		Scheme: "postgres",
-		User:   url.UserPassword(rc.Username, rc.Password),
-		Host:   rc.Host,
-		Path:   rc.DatabaseName,
-	}
-
 	params := url.Values{}
 	params.Add("sslmode", "require")
-	dsn.RawQuery = params.Encode()
+	dsn := url.URL{
+		Scheme:   "postgres",
+		User:     url.UserPassword(rc.Username, rc.Password),
+		Host:     rc.Host,
+		Path:     rc.DatabaseName,
+		RawQuery: params.Encode(),
+	}
 
 	return sql.Open("postgres", dsn.String())
 }
