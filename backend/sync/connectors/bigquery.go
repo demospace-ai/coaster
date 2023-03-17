@@ -123,11 +123,12 @@ func (bq BigQueryImpl) Write(
 	// always clean up the data in the storage bucket
 	defer destClient.CleanUpStagingData(ctx, stagingOptions)
 
+	writeMode := bq.toBigQueryWriteMode(sync.SyncMode)
 	csvSchema := bq.createCsvSchema(object.EndCustomerIdField, orderedObjectFields)
 	err = destClient.LoadFromStaging(ctx, object.Namespace, object.TableName, query.LoadOptions{
 		GcsReference:   gcsReference,
 		BigQuerySchema: csvSchema,
-		WriteMode:      bq.toBigQueryWriteMode(sync.SyncMode),
+		WriteMode:      writeMode,
 	})
 	if err != nil {
 		return errors.NewCustomerVisibleError(err)

@@ -9,6 +9,7 @@ import (
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/input"
 	"go.fabra.io/server/common/models"
+	"go.fabra.io/server/common/repositories/objects"
 	"go.fabra.io/server/common/repositories/syncs"
 	"go.fabra.io/server/common/views"
 	"go.fabra.io/sync/temporal"
@@ -21,19 +22,19 @@ const CLIENT_PEM_KEY = "projects/932264813910/secrets/temporal-client-pem/versio
 const CLIENT_KEY_KEY = "projects/932264813910/secrets/temporal-client-key/versions/latest"
 
 type CreateSyncRequest struct {
-	DisplayName    string                `json:"display_name"`
-	EndCustomerId  int64                 `json:"end_customer_id"`
-	SourceID       int64                 `json:"source_id"`
-	ObjectID       int64                 `json:"object_id"`
-	Namespace      *string               `json:"namespace,omitempty"`
-	TableName      *string               `json:"table_name,omitempty"`
-	CustomJoin     *string               `json:"custom_join,omitempty"`
-	CursorField    *string               `json:"cursor_field,omitempty"`
-	PrimaryKey     *string               `json:"primary_key,omitempty"`
-	SyncMode       models.SyncMode       `json:"sync_mode"`
-	Frequency      int64                 `json:"frequency"`
-	FrequencyUnits models.FrequencyUnits `json:"frequency_units"`
-	FieldMappings  []input.FieldMapping  `json:"field_mappings"`
+	DisplayName    string                 `json:"display_name"`
+	EndCustomerId  int64                  `json:"end_customer_id"`
+	SourceID       int64                  `json:"source_id"`
+	ObjectID       int64                  `json:"object_id"`
+	Namespace      *string                `json:"namespace,omitempty"`
+	TableName      *string                `json:"table_name,omitempty"`
+	CustomJoin     *string                `json:"custom_join,omitempty"`
+	CursorField    *string                `json:"cursor_field,omitempty"`
+	PrimaryKey     *string                `json:"primary_key,omitempty"`
+	SyncMode       *models.SyncMode       `json:"sync_mode,omitempty"`
+	Frequency      *int64                 `json:"frequency,omitempty"`
+	FrequencyUnits *models.FrequencyUnits `json:"frequency_units,omitempty"`
+	FieldMappings  []input.FieldMapping   `json:"field_mappings"`
 }
 
 type CreateSyncResponse struct {
@@ -65,7 +66,44 @@ func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, 
 		return errors.NewBadRequest("must have table_name and namespace or custom_join")
 	}
 
-	// TODO: create sync schedule in Temporal
+	// this also serves to check that this organization owns the object
+	object, err := objects.LoadObjectByID(s.db, auth.Organization.ID, createSyncRequest.ObjectID)
+	if err != nil {
+		return err
+	}
+
+	// default values for the sync come from the object
+	var cursorField, primaryKey *string
+	if object.CursorField.Valid {
+		cursorField = &object.CursorField.String
+	}
+	if object.PrimaryKey.Valid {
+		primaryKey = &object.PrimaryKey.String
+	}
+	var syncMode models.SyncMode = object.SyncMode
+	var frequency int64 = object.Frequency
+	var frequencyUnits models.FrequencyUnits = object.FrequencyUnits
+
+	// TODO: validate that the organization allows customizing sync settings
+	if true {
+		if createSyncRequest.CursorField != nil {
+			cursorField = createSyncRequest.CursorField
+		}
+		if createSyncRequest.PrimaryKey != nil {
+			primaryKey = createSyncRequest.PrimaryKey
+		}
+		if createSyncRequest.SyncMode != nil {
+			syncMode = *createSyncRequest.SyncMode
+		}
+		if createSyncRequest.Frequency != nil {
+			frequency = *createSyncRequest.Frequency
+		}
+		if createSyncRequest.FrequencyUnits != nil {
+			frequencyUnits = *createSyncRequest.FrequencyUnits
+		}
+	}
+
+	// TODO: create via schedule in Temporal once GA
 	// TODO: create field mappings in DB using transaction
 	sync, err := syncs.CreateSync(
 		s.db,
@@ -77,11 +115,11 @@ func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, 
 		createSyncRequest.Namespace,
 		createSyncRequest.TableName,
 		createSyncRequest.CustomJoin,
-		createSyncRequest.CursorField,
-		createSyncRequest.PrimaryKey,
-		createSyncRequest.SyncMode,
-		createSyncRequest.Frequency,
-		createSyncRequest.FrequencyUnits,
+		cursorField,
+		primaryKey,
+		syncMode,
+		frequency,
+		frequencyUnits,
 	)
 	if err != nil {
 		return err
@@ -95,7 +133,7 @@ func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, 
 	}
 
 	// TODO: use schedules instead of crons
-	cronSchedule := createCronSchedule(createSyncRequest.Frequency, createSyncRequest.FrequencyUnits)
+	cronSchedule := createCronSchedule(frequency, frequencyUnits)
 
 	c, err := temporal.CreateClient(CLIENT_PEM_KEY, CLIENT_KEY_KEY)
 	if err != nil {

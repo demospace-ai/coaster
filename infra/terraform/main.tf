@@ -577,6 +577,7 @@ resource "google_container_cluster" "fabra-worker-cluster" {
   enable_autopilot = true
 }
 
+# TODO: figure out how to only trigger this when dependencies change
 resource "google_cloudbuild_trigger" "worker-build-trigger" {
   name = "worker-trigger"
 

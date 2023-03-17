@@ -24,6 +24,9 @@ module.exports = {
         'centered': 'rgba(99, 99, 99, 0.2) 0 0 10px',
         'centered-sm': 'rgba(99, 99, 99, 0.1) 0 0 4px',
       },
+      width: {
+        '100': '400px',
+      },
       keyframes: {
         'shimmer': {
           '100%': { '-webkit-mask-position': 'left' }

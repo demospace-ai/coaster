@@ -8,19 +8,20 @@ import (
 )
 
 type Sync struct {
-	ID             int64           `json:"id"`
-	OrganizationID int64           `json:"organization_id"`
-	EndCustomerID  int64           `json:"end_customer_id"`
-	DisplayName    string          `json:"display_name"`
-	SourceID       int64           `json:"source_id"`
-	ObjectID       int64           `json:"object_id"`
-	Namespace      string          `json:"namespace,omitempty"`
-	TableName      string          `json:"table_name,omitempty"`
-	CustomJoin     string          `json:"custom_join,omitempty"`
-	CursorField    string          `json:"cursor_field,omitempty"`
-	PrimaryKey     string          `json:"primary_key,omitempty"`
-	SyncMode       models.SyncMode `json:"sync_mode"`
-	Frequency      int64           `json:"frequency"`
+	ID             int64                 `json:"id"`
+	OrganizationID int64                 `json:"organization_id"`
+	EndCustomerID  int64                 `json:"end_customer_id"`
+	DisplayName    string                `json:"display_name"`
+	SourceID       int64                 `json:"source_id"`
+	ObjectID       int64                 `json:"object_id"`
+	Namespace      string                `json:"namespace,omitempty"`
+	TableName      string                `json:"table_name,omitempty"`
+	CustomJoin     string                `json:"custom_join,omitempty"`
+	CursorField    string                `json:"cursor_field,omitempty"`
+	PrimaryKey     string                `json:"primary_key,omitempty"`
+	SyncMode       models.SyncMode       `json:"sync_mode"`
+	Frequency      int64                 `json:"frequency"`
+	FrequencyUnits models.FrequencyUnits `json:"frequency_units"`
 }
 
 type SyncRun struct {

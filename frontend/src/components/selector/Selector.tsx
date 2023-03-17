@@ -9,10 +9,13 @@ type DestinationSelectorProps = {
   noOptionsString?: string;
   placeholder?: string;
   validated?: boolean;
+  label?: string;
+  showLabel?: boolean;
 };
 
 export const DestinationSelector: React.FC<DestinationSelectorProps> = props => {
   const { destinations, loading } = useDestinations();
+  const label = props.label ? props.label : "Destination";
 
   return <ValidatedDropdownInput
     className={props.className}
@@ -23,7 +26,7 @@ export const DestinationSelector: React.FC<DestinationSelectorProps> = props => 
     loading={loading}
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No destinations available!"}
     placeholder={props.placeholder ? props.placeholder : "Choose destination"}
-    label="Destination"
+    label={props.showLabel ? label : undefined}
     validated={props.validated} />;
 };
 
@@ -35,10 +38,13 @@ type NamespaceSelectorProps = {
   noOptionsString?: string;
   placeholder?: string;
   validated?: boolean;
+  label?: string;
+  showLabel?: boolean;
 };
 
 export const NamespaceSelector: React.FC<NamespaceSelectorProps> = props => {
   const { namespaces, loading } = useNamespaces(props.connection?.id);
+  const label = props.label ? props.label : "Namespace";
 
   return <ValidatedComboInput
     className={props.className}
@@ -48,7 +54,7 @@ export const NamespaceSelector: React.FC<NamespaceSelectorProps> = props => {
     loading={loading}
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No namespaces available!"}
     placeholder={props.placeholder ? props.placeholder : "Choose namespace"}
-    label="Namespace"
+    label={props.showLabel ? label : undefined}
     validated={props.validated} />;
 };
 
@@ -61,10 +67,13 @@ type TableSelectorProps = {
   noOptionsString?: string;
   placeholder?: string;
   validated?: boolean;
+  label?: string;
+  showLabel?: boolean;
 };
 
 export const TableSelector: React.FC<TableSelectorProps> = props => {
   const { tables, loading } = useTables(props.connection?.id, props.namespace);
+  const label = props.label ? props.label : "Table";
 
   return <ValidatedComboInput
     className={props.className}
@@ -74,7 +83,7 @@ export const TableSelector: React.FC<TableSelectorProps> = props => {
     loading={loading}
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No tables available!"}
     placeholder={props.placeholder ? props.placeholder : "Choose table"}
-    label="Table"
+    label={props.showLabel ? label : undefined}
     validated={props.validated}
   />;
 };
@@ -227,30 +236,34 @@ export const LinkFieldSelector: React.FC<LinkFieldSelectorProps> = props => {
 };
 
 type FieldSelectorProps = {
-  connection: Connection | undefined;
-  namespace: string | undefined;
-  tableName: string | undefined;
+  connection?: Connection;
+  namespace?: string;
+  tableName?: string;
   field: Field | undefined;
   setField: (field: Field) => void;
+  predefinedFields?: Field[];
   className?: string;
   noOptionsString?: string;
   label?: string;
+  showLabel?: boolean;
   placeholder?: string;
   validated?: boolean;
 };
 
 export const FieldSelector: React.FC<FieldSelectorProps> = props => {
   const { schema, loading } = useSchema(props.connection?.id, props.namespace, props.tableName);
+  const fields = props.predefinedFields ? props.predefinedFields : schema;
+  const label = props.label ? props.label : "Field";
 
   return <ValidatedComboInput
     className={props.className}
-    options={schema}
+    options={fields}
     selected={props.field}
     setSelected={props.setField}
     getElementForDisplay={(value: Field) => value.name}
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No field available!"}
     placeholder={props.placeholder ? props.placeholder : "Choose field"}
-    label={props.label ? props.label : "Field"}
+    label={props.showLabel ? label : undefined}
     loading={loading}
     validated={props.validated}
   />;

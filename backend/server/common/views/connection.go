@@ -43,13 +43,19 @@ type FullConnection struct {
 }
 
 type Object struct {
-	ID                 int64         `json:"id"`
-	DisplayName        string        `json:"display_name"`
-	DestinationID      int64         `json:"destination_id"`
-	Namespace          string        `json:"namespace"`
-	TableName          string        `json:"table_name"`
-	EndCustomerIdField string        `json:"end_customer_id_field"`
-	ObjectFields       []ObjectField `json:"object_fields"`
+	ID                 int64                 `json:"id"`
+	DisplayName        string                `json:"display_name"`
+	DestinationID      int64                 `json:"destination_id"`
+	TargetType         models.TargetType     `json:"target_type"`
+	Namespace          string                `json:"namespace,omitempty"`
+	TableName          string                `json:"table_name,omitempty"`
+	SyncMode           models.SyncMode       `json:"sync_mode"`
+	CursorField        string                `json:"cursor_field,omitempty"`
+	PrimaryKey         string                `json:"primary_key,omitempty"`
+	EndCustomerIdField string                `json:"end_customer_id_field"`
+	Frequency          int64                 `json:"frequency"`
+	FrequencyUnits     models.FrequencyUnits `json:"frequency_units"`
+	ObjectFields       []ObjectField         `json:"object_fields"`
 }
 
 type ObjectField struct {
@@ -143,15 +149,35 @@ func ConvertObject(object *models.Object, objectFields []models.ObjectField) Obj
 		viewObjectFields = append(viewObjectFields, viewObjectField)
 	}
 
-	return Object{
+	viewObject := Object{
 		ID:                 object.ID,
 		DisplayName:        object.DisplayName,
 		DestinationID:      object.DestinationID,
-		Namespace:          object.Namespace,
-		TableName:          object.TableName,
+		TargetType:         object.TargetType,
+		SyncMode:           object.SyncMode,
 		EndCustomerIdField: object.EndCustomerIdField,
+		Frequency:          object.Frequency,
+		FrequencyUnits:     object.FrequencyUnits,
 		ObjectFields:       viewObjectFields,
 	}
+
+	if object.Namespace.Valid {
+		viewObject.Namespace = object.Namespace.String
+	}
+
+	if object.TableName.Valid {
+		viewObject.TableName = object.TableName.String
+	}
+
+	if object.CursorField.Valid {
+		viewObject.CursorField = object.CursorField.String
+	}
+
+	if object.PrimaryKey.Valid {
+		viewObject.PrimaryKey = object.PrimaryKey.String
+	}
+
+	return viewObject
 }
 
 func ConvertFullConnection(connection *models.Connection) FullConnection {

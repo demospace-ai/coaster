@@ -85,14 +85,14 @@ export const FinalizeSync: React.FC<SetupSyncProps> = (props) => {
         <ValidatedDropdownInput className="tw-w-96" options={Object.values(FrequencyUnits)} selected={props.state.frequencyUnits} setSelected={value => props.setState({ ...props.state, frequencyUnits: value })} loading={false} placeholder="Frequency Units" noOptionsString="nil" label="Frequency Unit" getElementForDisplay={(value) => value.charAt(0).toUpperCase() + value.slice(1)} />
         <div className="tw-pb-52"></div>
       </div>
-    </div>
+    </div >
   );
 };
 
 const MappedField: React.FC<{ objectField: ObjectField; }> = ({ objectField }) => {
   return (
     <div className='tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-p-3 tw-w-80 tw-box-border tw-bg-slate-100 tw-outline-none tw-flex tw-flex-row tw-items-center tw-text-slate-500 tw-select-none'>
-      <div>{objectField.display_name}</div>
+      <div>{objectField.display_name ? objectField.display_name : objectField.name}</div>
       {
         objectField.description &&
         <Tooltip placement="top-end" label={objectField.description}>

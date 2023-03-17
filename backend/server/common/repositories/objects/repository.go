@@ -13,18 +13,42 @@ func CreateObject(
 	organizationID int64,
 	displayName string,
 	destinationID int64,
-	namespace string,
-	tableName string,
+	targetType models.TargetType,
+	namespace *string,
+	tableName *string,
+	syncMode models.SyncMode,
+	cursorField *string,
+	primaryKey *string,
 	endCustomerIdColumn string,
+	frequency int64,
+	frequencyUnits models.FrequencyUnits,
 ) (*models.Object, error) {
 
 	object := models.Object{
 		OrganizationID:     organizationID,
 		DisplayName:        displayName,
 		DestinationID:      destinationID,
-		Namespace:          namespace,
-		TableName:          tableName,
+		TargetType:         targetType,
+		SyncMode:           syncMode,
 		EndCustomerIdField: endCustomerIdColumn,
+		Frequency:          frequency,
+		FrequencyUnits:     frequencyUnits,
+	}
+
+	if namespace != nil {
+		object.Namespace = database.NewNullString(*namespace)
+	}
+
+	if tableName != nil {
+		object.TableName = database.NewNullString(*tableName)
+	}
+
+	if cursorField != nil {
+		object.CursorField = database.NewNullString(*cursorField)
+	}
+
+	if primaryKey != nil {
+		object.PrimaryKey = database.NewNullString(*primaryKey)
 	}
 
 	result := db.Create(&object)
