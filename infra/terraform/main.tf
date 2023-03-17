@@ -233,6 +233,7 @@ resource "google_cloudbuild_trigger" "database-migration-trigger" {
 }
 
 resource "google_compute_backend_service" "default" {
+    security_policy = "https://www.googleapis.com/compute/v1/projects/fabra-344902/global/securityPolicies/fabra-cloud-armor"
     affinity_cookie_ttl_sec         = 0
     connection_draining_timeout_sec = 300
     enable_cdn                      = false
@@ -575,6 +576,12 @@ resource "google_container_cluster" "fabra-worker-cluster" {
   ip_allocation_policy {}
 
   enable_autopilot = true
+
+  cluster_autoscaling {
+    auto_provisioning_defaults {
+      service_account = google_service_account.fabra-sync.email
+    }
+  }
 }
 
 # TODO: figure out how to only trigger this when dependencies change
