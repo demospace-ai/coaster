@@ -72,6 +72,7 @@ func SyncWorkflow(ctx workflow.Context, input SyncInput) error {
 		return err
 	}
 
+	var cursorPosition CursorPosition
 	replicateInput := ReplicateInput(syncConfig)
 	err = workflow.ExecuteActivity(replicateCtx, Replicate, replicateInput).Get(replicateCtx, nil)
 	if err != nil {

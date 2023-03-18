@@ -22,10 +22,10 @@ steps:
   name: "gcr.io/cloud-builders/gke-deploy"
   args: 
   - 'run'
-  - '--filename=backend/sync/worker-deployment.yaml'
+  - '--filename=backend/sync/gke-deployment.yaml'
   - '--image=gcr.io/fabra-344902/sync:$SHORT_SHA'
   - '--location=us-west1'
-  - '--cluster=fabra-worker-gke-cluster'
+  - '--cluster=fabra-sync-gke-cluster'
   waitFor: ['push-sync']
 
 images: ['gcr.io/fabra-344902/sync:$SHORT_SHA']
