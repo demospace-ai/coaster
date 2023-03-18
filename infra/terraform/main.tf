@@ -566,8 +566,8 @@ resource "google_compute_router_nat" "fabra-nat" {
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
 }
 
-resource "google_container_cluster" "fabra-worker-cluster" {
-  name     = "fabra-worker-gke-cluster"
+resource "google_container_cluster" "fabra-sync-cluster" {
+  name     = "fabra-sync-gke-cluster"
   location = "us-west1"
 
   network    = google_compute_network.vpc.name
