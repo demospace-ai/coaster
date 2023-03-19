@@ -22,6 +22,7 @@ func main() {
 	w.RegisterActivity(temporal.RecordStatus)
 	w.RegisterActivity(temporal.FetchConfig)
 	w.RegisterActivity(temporal.Replicate)
+	w.RegisterActivity(temporal.UpdateCursor)
 	w.RegisterWorkflow(temporal.SyncWorkflow)
 
 	// Start listening to the Task Queue

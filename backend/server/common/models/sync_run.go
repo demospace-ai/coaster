@@ -19,6 +19,7 @@ type SyncRun struct {
 	SyncID         int64               `json:"sync_id"`
 	Status         SyncRunStatus       `json:"status"`
 	Error          database.NullString `json:"error"`
+	RowsWritten    int                 `json:"rows_written"`
 	StartedAt      time.Time           `json:"started_at"`
 	CompletedAt    time.Time           `json:"completed_at"`
 

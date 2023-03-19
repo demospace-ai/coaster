@@ -8,27 +8,29 @@ import (
 )
 
 type Sync struct {
-	ID             int64                 `json:"id"`
-	OrganizationID int64                 `json:"organization_id"`
-	EndCustomerID  int64                 `json:"end_customer_id"`
-	DisplayName    string                `json:"display_name"`
-	SourceID       int64                 `json:"source_id"`
-	ObjectID       int64                 `json:"object_id"`
-	Namespace      string                `json:"namespace,omitempty"`
-	TableName      string                `json:"table_name,omitempty"`
-	CustomJoin     string                `json:"custom_join,omitempty"`
-	CursorField    string                `json:"cursor_field,omitempty"`
-	PrimaryKey     string                `json:"primary_key,omitempty"`
-	SyncMode       models.SyncMode       `json:"sync_mode"`
-	Frequency      int64                 `json:"frequency"`
-	FrequencyUnits models.FrequencyUnits `json:"frequency_units"`
+	ID                int64                 `json:"id"`
+	OrganizationID    int64                 `json:"organization_id"`
+	EndCustomerID     int64                 `json:"end_customer_id"`
+	DisplayName       string                `json:"display_name"`
+	SourceID          int64                 `json:"source_id"`
+	ObjectID          int64                 `json:"object_id"`
+	Namespace         *string               `json:"namespace,omitempty"`
+	TableName         *string               `json:"table_name,omitempty"`
+	CustomJoin        *string               `json:"custom_join,omitempty"`
+	CursorPosition    *string               `json:"cursor_position,omitempty"`
+	SourceCursorField *string               `json:"source_cursor_field,omitempty"`
+	SourcePrimaryKey  *string               `json:"source_primary_key,omitempty"`
+	SyncMode          models.SyncMode       `json:"sync_mode"`
+	Frequency         int64                 `json:"frequency"`
+	FrequencyUnits    models.FrequencyUnits `json:"frequency_units"`
 }
 
 type SyncRun struct {
 	Status      models.SyncRunStatus `json:"status"`
 	StartedAt   string               `json:"started_at"`
 	CompletedAt string               `json:"completed_at"`
-	Error       string               `json:"error,omitempty"`
+	Error       *string              `json:"error,omitempty"`
+	RowsWritten int                  `json:"rows_written"`
 }
 
 type FieldMapping struct {
@@ -50,19 +52,22 @@ func ConvertSync(sync *models.Sync) Sync {
 	}
 
 	if sync.Namespace.Valid {
-		syncView.Namespace = sync.Namespace.String
+		syncView.Namespace = &sync.Namespace.String
 	}
 	if sync.TableName.Valid {
-		syncView.TableName = sync.TableName.String
+		syncView.TableName = &sync.TableName.String
 	}
 	if sync.CustomJoin.Valid {
-		syncView.CustomJoin = sync.CustomJoin.String
+		syncView.CustomJoin = &sync.CustomJoin.String
 	}
-	if sync.CursorField.Valid {
-		syncView.CursorField = sync.CursorField.String
+	if sync.CursorPosition.Valid {
+		syncView.CursorPosition = &sync.CursorPosition.String
 	}
-	if sync.PrimaryKey.Valid {
-		syncView.PrimaryKey = sync.PrimaryKey.String
+	if sync.SourceCursorField.Valid {
+		syncView.SourceCursorField = &sync.SourceCursorField.String
+	}
+	if sync.SourcePrimaryKey.Valid {
+		syncView.SourcePrimaryKey = &sync.SourcePrimaryKey.String
 	}
 
 	return syncView
@@ -88,9 +93,10 @@ func ConvertSyncRuns(syncRuns []models.SyncRun) []SyncRun {
 			Status:      syncRun.Status,
 			StartedAt:   syncRun.StartedAt.Format(time.RFC822),
 			CompletedAt: syncRun.CompletedAt.Format(time.RFC822),
+			RowsWritten: syncRun.RowsWritten,
 		}
 		if syncRun.Error.Valid {
-			syncRunView.Error = syncRun.Error.String
+			syncRunView.Error = &syncRun.Error.String
 		}
 
 		syncRunsView = append(syncRunsView, syncRunView)

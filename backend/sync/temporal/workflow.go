@@ -47,10 +47,21 @@ var REPLICATE_OPTIONS = workflow.ActivityOptions{
 	},
 }
 
+var CURSOR_OPTIONS = workflow.ActivityOptions{
+	StartToCloseTimeout: time.Minute * 3,
+	RetryPolicy: &temporal.RetryPolicy{
+		InitialInterval:    time.Second,
+		BackoffCoefficient: 2.0,
+		MaximumInterval:    time.Minute,
+		MaximumAttempts:    3,
+	},
+}
+
 func SyncWorkflow(ctx workflow.Context, input SyncInput) error {
 	recordCtx := workflow.WithActivityOptions(ctx, RECORD_OPTIONS)
 	fetchCtx := workflow.WithActivityOptions(ctx, FETCH_OPTIONS)
 	replicateCtx := workflow.WithActivityOptions(ctx, REPLICATE_OPTIONS)
+	cursorCtx := workflow.WithActivityOptions(ctx, CURSOR_OPTIONS)
 
 	var syncRun models.SyncRun
 	err := workflow.ExecuteActivity(recordCtx, RecordStatus, RecordStatusInput{
@@ -72,9 +83,9 @@ func SyncWorkflow(ctx workflow.Context, input SyncInput) error {
 		return err
 	}
 
-	var cursorPosition CursorPosition
+	var replicateOutput ReplicateOutput
 	replicateInput := ReplicateInput(syncConfig)
-	err = workflow.ExecuteActivity(replicateCtx, Replicate, replicateInput).Get(replicateCtx, nil)
+	err = workflow.ExecuteActivity(replicateCtx, Replicate, replicateInput).Get(replicateCtx, &replicateOutput)
 	if err != nil {
 		// Ignore the error returned here. It is logged by Temporal as the activity task
 		// failing, and the reason for the workflow failing is the original error
@@ -82,32 +93,45 @@ func SyncWorkflow(ctx workflow.Context, input SyncInput) error {
 		return err
 	}
 
-	return recordSuccess(recordCtx, syncRun)
+	if syncConfig.Sync.SyncMode.UsesCursor() && replicateOutput.CursorPosition != nil {
+		cursorInput := UpdateCursorInput{
+			Sync:           syncConfig.Sync,
+			CursorPosition: *replicateOutput.CursorPosition,
+		}
+		err = workflow.ExecuteActivity(cursorCtx, UpdateCursor, cursorInput).Get(cursorCtx, nil)
+		if err != nil {
+			// Ignore the error returned here. It is logged by Temporal as the activity task
+			// failing, and the reason for the workflow failing is the original error
+			recordFailure(recordCtx, err, syncRun)
+			return err
+		}
+	}
+
+	return recordSuccess(recordCtx, syncRun, replicateOutput.RowsWritten)
 }
 
 func recordFailure(ctx workflow.Context, err error, syncRun models.SyncRun) error {
 	var applicationErr *temporal.ApplicationError
+	var errString string
 	if errors.As(err, &applicationErr) && applicationErr.Type() == "CustomerVisibleError" {
-		return workflow.ExecuteActivity(ctx, RecordStatus, RecordStatusInput{
-			UpdateType: UpdateTypeComplete,
-			SyncRun:    syncRun,
-			NewStatus:  models.SyncRunStatusFailed,
-			Error:      applicationErr.Message(),
-		}).Get(ctx, nil)
+		errString = applicationErr.Message()
 	} else {
-		return workflow.ExecuteActivity(ctx, RecordStatus, RecordStatusInput{
-			UpdateType: UpdateTypeComplete,
-			SyncRun:    syncRun,
-			NewStatus:  models.SyncRunStatusFailed,
-			Error:      "unexpected error",
-		}).Get(ctx, nil)
+		errString = "unexpected error"
 	}
-}
 
-func recordSuccess(ctx workflow.Context, syncRun models.SyncRun) error {
 	return workflow.ExecuteActivity(ctx, RecordStatus, RecordStatusInput{
 		UpdateType: UpdateTypeComplete,
 		SyncRun:    syncRun,
-		NewStatus:  models.SyncRunStatusCompleted,
+		NewStatus:  models.SyncRunStatusFailed,
+		Error:      &errString,
+	}).Get(ctx, nil)
+}
+
+func recordSuccess(ctx workflow.Context, syncRun models.SyncRun, rowsWritten int) error {
+	return workflow.ExecuteActivity(ctx, RecordStatus, RecordStatusInput{
+		UpdateType:  UpdateTypeComplete,
+		SyncRun:     syncRun,
+		NewStatus:   models.SyncRunStatusCompleted,
+		RowsWritten: rowsWritten,
 	}).Get(ctx, nil)
 }

@@ -15,15 +15,20 @@ const FABRA_STAGING_BUCKET = "fabra-staging"
 
 type ReplicateInput = SyncConfig
 
+type ReplicateOutput struct {
+	RowsWritten    int
+	CursorPosition *string
+}
+
 type FormatToken struct {
 	Format string
 	Index  int
 }
 
-func Replicate(ctx context.Context, input ReplicateInput) error {
+func Replicate(ctx context.Context, input ReplicateInput) (*ReplicateOutput, error) {
 	db, err := database.InitDatabase()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	queryService := query.NewQueryService(db, crypto.NewCryptoService())
@@ -33,16 +38,22 @@ func Replicate(ctx context.Context, input ReplicateInput) error {
 	case models.ConnectionTypeBigQuery:
 		sourceConnector = connectors.NewBigQueryConnector(queryService)
 	case models.ConnectionTypeSnowflake:
-		sourceConnector = connectors.NewBigQueryConnector(queryService)
+		sourceConnector = connectors.NewSnowflakeConnector(queryService)
 	case models.ConnectionTypeRedshift:
 		sourceConnector = connectors.NewRedshiftConnector(queryService)
 	default:
-		return errors.Newf("source not implemented for %s", input.SourceConnection.ConnectionType)
+		return nil, errors.Newf("source not implemented for %s", input.SourceConnection.ConnectionType)
 	}
 
-	rows, err := sourceConnector.Read(ctx, input.SourceConnection, input.Sync, input.FieldMappings)
+	rows, cursorPosition, err := sourceConnector.Read(ctx, input.SourceConnection, input.Sync, input.FieldMappings)
 	if err != nil {
-		return err
+		return nil, err
+	}
+
+	if len(rows) <= 0 {
+		return &ReplicateOutput{
+			RowsWritten: 0,
+		}, nil
 	}
 
 	var destConnector connectors.Connector
@@ -50,8 +61,16 @@ func Replicate(ctx context.Context, input ReplicateInput) error {
 	case models.ConnectionTypeBigQuery:
 		destConnector = connectors.NewBigQueryConnector(queryService)
 	default:
-		return errors.Newf("destination not implemented for %s", input.SourceConnection.ConnectionType)
+		return nil, errors.Newf("destination not implemented for %s", input.SourceConnection.ConnectionType)
 	}
 
-	return destConnector.Write(ctx, input.DestinationConnection, input.DestinationOptions, input.Object, input.Sync, input.FieldMappings, rows)
+	err = destConnector.Write(ctx, input.DestinationConnection, input.DestinationOptions, input.Object, input.Sync, input.FieldMappings, rows)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ReplicateOutput{
+		RowsWritten:    len(rows),
+		CursorPosition: cursorPosition,
+	}, nil
 }

@@ -13,6 +13,10 @@ const (
 	SyncModeIncrementalUpdate SyncMode = "incremental_update"
 )
 
+func (sm SyncMode) UsesCursor() bool {
+	return sm == SyncModeIncrementalAppend || sm == SyncModeIncrementalUpdate
+}
+
 type FrequencyUnits string
 
 const (
@@ -34,12 +38,12 @@ type Sync struct {
 	CustomJoin     database.NullString `json:"custom_join"`
 
 	// These values are used to override the object settings, but default to the same values
-	SyncMode       SyncMode            `json:"sync_mode"`
-	Frequency      int64               `json:"frequency"`
-	FrequencyUnits FrequencyUnits      `json:"frequency_units"`
-	CursorField    database.NullString `json:"cursor_field"`    // used to determine rows to sync based on whether they changed e.g. updated_at
-	PrimaryKey     database.NullString `json:"primary_key"`     // used to map updated rows to the row in the destination (only needed for updates)
-	CursorPosition database.NullString `json:"cursor_position"` // current value of the cursor to determine where to start a sync from
+	SyncMode          SyncMode            `json:"sync_mode"`
+	Frequency         int64               `json:"frequency"`
+	FrequencyUnits    FrequencyUnits      `json:"frequency_units"`
+	SourceCursorField database.NullString `json:"source_cursor_field,omitempty"`
+	SourcePrimaryKey  database.NullString `json:"source_primary_key,omitempty"`
+	CursorPosition    database.NullString `json:"cursor_position"` // current value of the cursor to determine where to start a sync from
 
 	BaseModel
 }

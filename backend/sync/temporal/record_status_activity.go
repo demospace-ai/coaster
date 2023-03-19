@@ -22,7 +22,8 @@ type RecordStatusInput struct {
 	SyncRun        models.SyncRun
 	UpdateType     UpdateType
 	NewStatus      models.SyncRunStatus
-	Error          string
+	RowsWritten    int
+	Error          *string
 }
 
 func RecordStatus(ctx context.Context, input RecordStatusInput) (*models.SyncRun, error) {
@@ -35,7 +36,7 @@ func RecordStatus(ctx context.Context, input RecordStatusInput) (*models.SyncRun
 	case UpdateTypeCreate:
 		return sync_runs.CreateSyncRun(db, input.OrganizationID, input.SyncID)
 	case UpdateTypeComplete:
-		return sync_runs.CompleteSyncRun(db, &input.SyncRun, input.NewStatus, input.Error)
+		return sync_runs.CompleteSyncRun(db, &input.SyncRun, input.NewStatus, input.Error, input.RowsWritten)
 	default:
 		return nil, errors.Newf("unexpected update type: %s", input.UpdateType)
 	}

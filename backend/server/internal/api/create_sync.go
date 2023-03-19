@@ -22,19 +22,19 @@ const CLIENT_PEM_KEY = "projects/932264813910/secrets/temporal-client-pem/versio
 const CLIENT_KEY_KEY = "projects/932264813910/secrets/temporal-client-key/versions/latest"
 
 type CreateSyncRequest struct {
-	DisplayName    string                 `json:"display_name"`
-	EndCustomerId  int64                  `json:"end_customer_id"`
-	SourceID       int64                  `json:"source_id"`
-	ObjectID       int64                  `json:"object_id"`
-	Namespace      *string                `json:"namespace,omitempty"`
-	TableName      *string                `json:"table_name,omitempty"`
-	CustomJoin     *string                `json:"custom_join,omitempty"`
-	CursorField    *string                `json:"cursor_field,omitempty"`
-	PrimaryKey     *string                `json:"primary_key,omitempty"`
-	SyncMode       *models.SyncMode       `json:"sync_mode,omitempty"`
-	Frequency      *int64                 `json:"frequency,omitempty"`
-	FrequencyUnits *models.FrequencyUnits `json:"frequency_units,omitempty"`
-	FieldMappings  []input.FieldMapping   `json:"field_mappings"`
+	DisplayName       string                 `json:"display_name"`
+	EndCustomerId     int64                  `json:"end_customer_id"`
+	SourceID          int64                  `json:"source_id"`
+	ObjectID          int64                  `json:"object_id"`
+	Namespace         *string                `json:"namespace,omitempty"`
+	TableName         *string                `json:"table_name,omitempty"`
+	CustomJoin        *string                `json:"custom_join,omitempty"`
+	SourceCursorField *string                `json:"source_cursor_field,omitempty"`
+	SourcePrimaryKey  *string                `json:"source_primary_key,omitempty"`
+	SyncMode          *models.SyncMode       `json:"sync_mode,omitempty"`
+	Frequency         *int64                 `json:"frequency,omitempty"`
+	FrequencyUnits    *models.FrequencyUnits `json:"frequency_units,omitempty"`
+	FieldMappings     []input.FieldMapping   `json:"field_mappings"`
 }
 
 type CreateSyncResponse struct {
@@ -72,25 +72,25 @@ func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, 
 		return err
 	}
 
+	objectFields, err := objects.LoadObjectFieldsByID(s.db, createSyncRequest.ObjectID)
+	if err != nil {
+		return err
+	}
+
 	// default values for the sync come from the object
-	var cursorField, primaryKey *string
-	if object.CursorField.Valid {
-		cursorField = &object.CursorField.String
-	}
-	if object.PrimaryKey.Valid {
-		primaryKey = &object.PrimaryKey.String
-	}
-	var syncMode models.SyncMode = object.SyncMode
-	var frequency int64 = object.Frequency
-	var frequencyUnits models.FrequencyUnits = object.FrequencyUnits
+	sourceCursorField := getSourceCursorField(object, objectFields, createSyncRequest.FieldMappings)
+	sourcePrimaryKey := getSourcePrimaryKey(object, objectFields, createSyncRequest.FieldMappings)
+	syncMode := object.SyncMode
+	frequency := object.Frequency
+	frequencyUnits := object.FrequencyUnits
 
 	// TODO: validate that the organization allows customizing sync settings
 	if true {
-		if createSyncRequest.CursorField != nil {
-			cursorField = createSyncRequest.CursorField
+		if createSyncRequest.SourceCursorField != nil {
+			sourceCursorField = createSyncRequest.SourceCursorField
 		}
-		if createSyncRequest.PrimaryKey != nil {
-			primaryKey = createSyncRequest.PrimaryKey
+		if createSyncRequest.SourcePrimaryKey != nil {
+			sourcePrimaryKey = createSyncRequest.SourcePrimaryKey
 		}
 		if createSyncRequest.SyncMode != nil {
 			syncMode = *createSyncRequest.SyncMode
@@ -115,8 +115,8 @@ func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, 
 		createSyncRequest.Namespace,
 		createSyncRequest.TableName,
 		createSyncRequest.CustomJoin,
-		cursorField,
-		primaryKey,
+		sourceCursorField,
+		sourcePrimaryKey,
 		syncMode,
 		frequency,
 		frequencyUnits,
@@ -176,4 +176,42 @@ func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, 
 		Sync:          views.ConvertSync(sync),
 		FieldMappings: views.ConvertFieldMappings(fieldMappings),
 	})
+}
+
+func getSourcePrimaryKey(object *models.Object, objectFields []models.ObjectField, fieldMappings []input.FieldMapping) *string {
+	if object.PrimaryKey.Valid {
+		var destinationPrimaryKey models.ObjectField
+		for _, field := range objectFields {
+			if field.Name == object.PrimaryKey.String {
+				destinationPrimaryKey = field
+			}
+		}
+
+		for _, fieldMapping := range fieldMappings {
+			if fieldMapping.DestinationFieldId == destinationPrimaryKey.ID {
+				return &fieldMapping.SourceFieldName
+			}
+		}
+	}
+
+	return nil
+}
+
+func getSourceCursorField(object *models.Object, objectFields []models.ObjectField, fieldMappings []input.FieldMapping) *string {
+	if object.CursorField.Valid {
+		var destinationCursorField models.ObjectField
+		for _, field := range objectFields {
+			if field.Name == object.CursorField.String {
+				destinationCursorField = field
+			}
+		}
+
+		for _, fieldMapping := range fieldMappings {
+			if fieldMapping.DestinationFieldId == destinationCursorField.ID {
+				return &fieldMapping.SourceFieldName
+			}
+		}
+	}
+
+	return nil
 }

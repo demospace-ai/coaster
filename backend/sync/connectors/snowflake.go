@@ -22,33 +22,45 @@ func NewSnowflakeConnector(queryService query.QueryService) Connector {
 	}
 }
 
-func (sf SnowflakeImpl) Read(ctx context.Context, sourceConnection views.FullConnection, sync views.Sync, fieldMappings []views.FieldMapping) ([]data.Row, error) {
+func (sf SnowflakeImpl) Read(ctx context.Context, sourceConnection views.FullConnection, sync views.Sync, fieldMappings []views.FieldMapping) ([]data.Row, *string, error) {
 	connectionModel := views.ConvertConnectionView(sourceConnection)
 
 	sc, err := sf.queryService.GetClient(ctx, connectionModel)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	sourceClient := sc.(query.SnowflakeApiClient)
 
 	readQuery := sf.getReadQuery(connectionModel, sync, fieldMappings)
-
 	results, err := sourceClient.RunQuery(ctx, readQuery)
 	if err != nil {
-		return nil, err
+		return nil, nil, errors.NewCustomerVisibleError(err)
 	}
 
-	return results.Data, nil
+	newCursorPosition := sf.getNewCursorPosition(results, sync)
+	return results.Data, newCursorPosition, nil
 }
 
 // TODO: only read 10,000 rows at once or something
 func (sf SnowflakeImpl) getReadQuery(sourceConnection *models.Connection, sync views.Sync, fieldMappings []views.FieldMapping) string {
-	if len(sync.CustomJoin) > 0 {
-		return sync.CustomJoin
+	var queryString string
+	if sync.CustomJoin != nil {
+		queryString = *sync.CustomJoin
+	} else {
+		selectString := sf.getSelectString(fieldMappings)
+		queryString = fmt.Sprintf("SELECT %s FROM %s.%s", selectString, *sync.Namespace, *sync.TableName)
 	}
 
-	selectString := sf.getSelectString(fieldMappings)
-	return fmt.Sprintf("SELECT %s FROM %s.%s;", selectString, sync.Namespace, sync.TableName)
+	if sync.SyncMode.UsesCursor() {
+		if sync.CursorPosition != nil {
+			// order by cursor field to simplify
+			return fmt.Sprintf("%s WHERE %s > '%s' ORDER BY %s ASC;", queryString, *sync.SourceCursorField, *sync.CursorPosition, *sync.SourceCursorField)
+		} else {
+			return fmt.Sprintf("%s ORDER BY %s ASC;", queryString, *sync.SourceCursorField)
+		}
+	} else {
+		return fmt.Sprintf("%s;", queryString)
+	}
 }
 
 func (sf SnowflakeImpl) getSelectString(fieldMappings []views.FieldMapping) string {
@@ -58,6 +70,28 @@ func (sf SnowflakeImpl) getSelectString(fieldMappings []views.FieldMapping) stri
 	}
 
 	return strings.Join(fields, ",")
+}
+
+func (sf SnowflakeImpl) getNewCursorPosition(results *data.QueryResults, sync views.Sync) *string {
+	if sync.SourceCursorField == nil {
+		return nil
+	}
+
+	if len(results.Data) <= 0 {
+		return nil
+	}
+
+	var cursorFieldPos int
+	for i := range results.Schema {
+		if results.Schema[i].Name == *sync.SourceCursorField {
+			cursorFieldPos = i
+		}
+	}
+
+	// TODO: make sure we don't miss any rows
+	// we sort rows by cursor field so just take the last row
+	newCursorPos := results.Data[len(results.Data)-1][cursorFieldPos].(string)
+	return &newCursorPos
 }
 
 func (sf SnowflakeImpl) Write(

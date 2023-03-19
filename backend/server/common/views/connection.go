@@ -10,7 +10,7 @@ type Destination struct {
 	ID            int64      `json:"id"`
 	DisplayName   string     `json:"display_name"`
 	Connection    Connection `json:"connection"`
-	StagingBucket string     `json:"staging_bucket,omitempty"`
+	StagingBucket *string    `json:"staging_bucket,omitempty"`
 }
 
 type Source struct {
@@ -47,11 +47,11 @@ type Object struct {
 	DisplayName        string                `json:"display_name"`
 	DestinationID      int64                 `json:"destination_id"`
 	TargetType         models.TargetType     `json:"target_type"`
-	Namespace          string                `json:"namespace,omitempty"`
-	TableName          string                `json:"table_name,omitempty"`
+	Namespace          *string               `json:"namespace,omitempty"`
+	TableName          *string               `json:"table_name,omitempty"`
 	SyncMode           models.SyncMode       `json:"sync_mode"`
-	CursorField        string                `json:"cursor_field,omitempty"`
-	PrimaryKey         string                `json:"primary_key,omitempty"`
+	CursorField        *string               `json:"cursor_field,omitempty"`
+	PrimaryKey         *string               `json:"primary_key,omitempty"`
 	EndCustomerIdField string                `json:"end_customer_id_field"`
 	Frequency          int64                 `json:"frequency"`
 	FrequencyUnits     models.FrequencyUnits `json:"frequency_units"`
@@ -62,8 +62,8 @@ type ObjectField struct {
 	ID          int64          `json:"id"`
 	Name        string         `json:"name"`
 	Type        data.FieldType `json:"type"`
-	DisplayName string         `json:"display_name,omitempty"`
-	Description string         `json:"description,omitempty"`
+	DisplayName *string        `json:"display_name,omitempty"`
+	Description *string        `json:"description,omitempty"`
 	Omit        bool           `json:"omit"`
 	Optional    bool           `json:"optional"`
 }
@@ -79,7 +79,7 @@ func ConvertDestination(destination models.Destination, connection models.Connec
 	}
 
 	if destination.StagingBucket.Valid {
-		destinationView.StagingBucket = destination.StagingBucket.String
+		destinationView.StagingBucket = &destination.StagingBucket.String
 	}
 
 	return destinationView
@@ -141,10 +141,10 @@ func ConvertObject(object *models.Object, objectFields []models.ObjectField) Obj
 			Optional: objectField.Optional,
 		}
 		if objectField.DisplayName.Valid {
-			viewObjectField.DisplayName = objectField.DisplayName.String
+			viewObjectField.DisplayName = &objectField.DisplayName.String
 		}
 		if objectField.Description.Valid {
-			viewObjectField.Description = objectField.Description.String
+			viewObjectField.Description = &objectField.Description.String
 		}
 		viewObjectFields = append(viewObjectFields, viewObjectField)
 	}
@@ -162,19 +162,19 @@ func ConvertObject(object *models.Object, objectFields []models.ObjectField) Obj
 	}
 
 	if object.Namespace.Valid {
-		viewObject.Namespace = object.Namespace.String
+		viewObject.Namespace = &object.Namespace.String
 	}
 
 	if object.TableName.Valid {
-		viewObject.TableName = object.TableName.String
+		viewObject.TableName = &object.TableName.String
 	}
 
 	if object.CursorField.Valid {
-		viewObject.CursorField = object.CursorField.String
+		viewObject.CursorField = &object.CursorField.String
 	}
 
 	if object.PrimaryKey.Valid {
-		viewObject.PrimaryKey = object.PrimaryKey.String
+		viewObject.PrimaryKey = &object.PrimaryKey.String
 	}
 
 	return viewObject

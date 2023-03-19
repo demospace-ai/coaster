@@ -43,6 +43,7 @@ const SyncRunsList: React.FC<{ linkToken: string; }> = ({ linkToken }) => {
                   <th scope="col" className={tableHeaderStyle}>Status</th>
                   <th scope="col" className={tableHeaderStyle}>Started At</th>
                   <th scope="col" className={tableHeaderStyle}>Completed At</th>
+                  <th scope="col" className={tableHeaderStyle}>Rows Written</th>
                   <th scope="col" className={tableHeaderStyle}>Error</th>
                   <th scope="col" className={classNames(tableHeaderStyle, 'tw-w-5')}></th>
                 </tr>
@@ -60,6 +61,9 @@ const SyncRunsList: React.FC<{ linkToken: string; }> = ({ linkToken }) => {
                     </td>
                     <td className={tableCellStyle}>
                       {syncRun.completed_at}
+                    </td>
+                    <td className={tableCellStyle}>
+                      {syncRun.rows_written}
                     </td>
                     <td className={tableCellStyle}>
                       <Tooltip label={<div className="tw-m-2 tw-cursor-text tw-font-mono">{syncRun.error}</div>} maxWidth={600} interactive>

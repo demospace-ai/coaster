@@ -19,8 +19,8 @@ func CreateSync(
 	namespace *string,
 	tableName *string,
 	customJoin *string,
-	cursorField *string,
-	primaryKey *string,
+	sourceCursorField *string,
+	sourcePrimaryKey *string,
 	syncMode models.SyncMode,
 	frequency int64,
 	frequencyUnits models.FrequencyUnits,
@@ -47,12 +47,12 @@ func CreateSync(
 		sync.CustomJoin = database.NewNullString(*customJoin)
 	}
 
-	if cursorField != nil {
-		sync.CursorField = database.NewNullString(*cursorField)
+	if sourceCursorField != nil {
+		sync.SourceCursorField = database.NewNullString(*sourceCursorField)
 	}
 
-	if primaryKey != nil {
-		sync.PrimaryKey = database.NewNullString(*primaryKey)
+	if sourcePrimaryKey != nil {
+		sync.SourcePrimaryKey = database.NewNullString(*sourcePrimaryKey)
 	}
 
 	result := db.Create(&sync)
@@ -179,4 +179,21 @@ func LoadFieldMappingsForSync(
 	}
 
 	return fieldMappings, nil
+}
+
+func UpdateCursor(
+	db *gorm.DB,
+	sync *models.Sync,
+	cursorPosition string,
+) (*models.Sync, error) {
+	updates := models.Sync{
+		CursorPosition: database.NewNullString(cursorPosition),
+	}
+
+	result := db.Model(sync).Updates(updates)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return sync, nil
 }

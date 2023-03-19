@@ -272,8 +272,8 @@ export enum FieldType {
   String = "STRING",
   Integer = "INTEGER",
   Timestamp = "TIMESTAMP",
+  TimestampTz = "TIMESTAMP_TZ",
   Json = "JSON",
-  TimestampTz = "TIMESTAMP_TZ"
 }
 
 export interface BigQueryConfig {
@@ -313,8 +313,8 @@ export interface LinkCreateSyncRequest {
   custom_join?: string;
   field_mappings: FieldMappingInput[];
   // remaining fields will inherit from object if empty
-  cursor_field?: string;
-  primary_key?: string;
+  source_cursor_field?: string;
+  source_primary_key?: string;
   sync_mode?: SyncMode;
   frequency?: number;
   frequency_units?: FrequencyUnits;
@@ -514,8 +514,8 @@ export interface Sync {
   table_name: string | undefined;
   custom_join: string | undefined;
   // the following settings will override object settings if set
-  cursor_field: string | undefined;
-  primary_key: string | undefined;
+  source_cursor_field: string | undefined;
+  source_primary_key: string | undefined;
   sync_mode: SyncMode | undefined;
   frequency: number | undefined;
   frequency_units: FrequencyUnits | undefined;
@@ -528,6 +528,7 @@ export interface SyncRun {
   error: string | undefined;
   started_at: string;
   completed_at: string;
+  rows_written: number;
 }
 
 export enum SyncRunStatus {

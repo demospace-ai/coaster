@@ -12,7 +12,7 @@ type DestinationOptions struct {
 }
 
 type Connector interface {
-	Read(ctx context.Context, sourceConnection views.FullConnection, sync views.Sync, fieldMappings []views.FieldMapping) ([]data.Row, error)
+	Read(ctx context.Context, sourceConnection views.FullConnection, sync views.Sync, fieldMappings []views.FieldMapping) ([]data.Row, *string, error)
 	Write(
 		ctx context.Context,
 		destinationConnection views.FullConnection,

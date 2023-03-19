@@ -7,7 +7,7 @@ import { Loading } from "src/components/loading/Loading";
 import { DestinationSelector, FieldSelector, NamespaceSelector, TableSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { sendRequest } from "src/rpc/ajax";
-import { CreateObject, CreateObjectRequest, Destination, Field, FrequencyUnits, GetObjects, needsCursorField, needsPrimaryKey, ObjectFieldInput, SyncMode, TargetType } from "src/rpc/api";
+import { CreateObject, CreateObjectRequest, Destination, Field, FieldType, FrequencyUnits, GetObjects, needsCursorField, needsPrimaryKey, ObjectFieldInput, SyncMode, TargetType } from "src/rpc/api";
 import { useSchema } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
 import { mutate } from "swr";
@@ -77,11 +77,20 @@ const validateAll = (state: NewObjectState): boolean => {
     validateDestination(state)
     && validateFields(state)
     && state.syncMode !== undefined
-    && (!needsCursorField(state.syncMode) || state.cursorField !== undefined)
+    && (!needsCursorField(state.syncMode) || validateCursorField(state))
     && (!needsPrimaryKey(state.syncMode) || state.primaryKey !== undefined)
     && state.endCustomerIdField !== undefined
     && state.frequency !== undefined
     && state.frequencyUnits !== undefined
+  );
+};
+
+const validateCursorField = (state: NewObjectState): boolean => {
+  // TODO: allow using other types
+  return state.cursorField !== undefined && (
+    state.cursorField.type === FieldType.Timestamp
+    || state.cursorField.type === FieldType.TimestampTz
+    || state.cursorField.type === FieldType.Integer
   );
 };
 
@@ -460,7 +469,6 @@ const DestinationTarget: React.FC<ObjectStepProps> = ({ state, setState }) => {
     </div>
   );
 };
-
 
 const SyncModeSelector: React.FC<ObjectStepProps> = ({ state, setState }) => {
   type SyncModeOption = {
