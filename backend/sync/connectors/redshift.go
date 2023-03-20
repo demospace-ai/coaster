@@ -53,6 +53,7 @@ func (rs RedshiftImpl) getReadQuery(sourceConnection *models.Connection, sync vi
 
 	if sync.SyncMode.UsesCursor() {
 		if sync.CursorPosition != nil {
+			// TODO: allow choosing other operators (rows smaller than current cursor)
 			// order by cursor field to simplify
 			return fmt.Sprintf("%s WHERE %s > '%s' ORDER BY %s ASC;", queryString, *sync.SourceCursorField, *sync.CursorPosition, *sync.SourceCursorField)
 		} else {

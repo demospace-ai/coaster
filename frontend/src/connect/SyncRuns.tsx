@@ -18,7 +18,7 @@ export const SyncRuns: React.FC<{ linkToken: string; close: () => void; }> = ({ 
 };
 
 const tableHeaderStyle = "tw-sticky tw-top-0 tw-z-0 tw-py-3.5 tw-px-4 sm:tw-pr-6 lg:tw-pr-8 tw-text-left tw-whitespace-nowrap";
-const tableCellStyle = "tw-whitespace-nowrap tw-left tw-pl-3 tw-min-w-[180px] tw-overflow-hidden tw-py-4 tw-text-sm tw-text-slate-800 tw-hidden sm:tw-table-cell";
+const tableCellStyle = "tw-whitespace-nowrap tw-left tw-overflow-hidden tw-py-4 tw-pl-4 tw-text-sm tw-text-slate-800 tw-hidden sm:tw-table-cell";
 
 const SyncRunsList: React.FC<{ linkToken: string; }> = ({ linkToken }) => {
   const { syncID } = useParams<{ syncID: string; }>();
@@ -42,8 +42,7 @@ const SyncRunsList: React.FC<{ linkToken: string; }> = ({ linkToken }) => {
                 <tr>
                   <th scope="col" className={tableHeaderStyle}>Status</th>
                   <th scope="col" className={tableHeaderStyle}>Started At</th>
-                  <th scope="col" className={tableHeaderStyle}>Completed At</th>
-                  <th scope="col" className={tableHeaderStyle}>Rows Written</th>
+                  <th scope="col" className={tableHeaderStyle}>Rows Synced</th>
                   <th scope="col" className={tableHeaderStyle}>Error</th>
                   <th scope="col" className={classNames(tableHeaderStyle, 'tw-w-5')}></th>
                 </tr>
@@ -51,28 +50,32 @@ const SyncRunsList: React.FC<{ linkToken: string; }> = ({ linkToken }) => {
               <tbody className="tw-divide-y tw-divide-slate-200 tw-bg-white">
                 {syncRuns.length > 0 ? syncRuns.map((syncRun, index) => (
                   <tr key={index} className="tw-cursor-pointer hover:tw-bg-slate-50" onClick={() => { }}>
-                    <td className={mergeClasses(tableCellStyle, "tw-min-w-[140px]")}>
+                    <td className={tableCellStyle}>
                       <div className={mergeClasses("tw-py-1 tw-px-2 tw-rounded tw-text-center tw-w-[100px] tw-border tw-text-xs tw-font-medium", getStatusStyle(syncRun.status))}>
                         {syncRun.status.toUpperCase()}
                       </div>
                     </td>
                     <td className={tableCellStyle}>
-                      {syncRun.started_at}
-                    </td>
-                    <td className={tableCellStyle}>
-                      {syncRun.completed_at}
+                      <div>
+                        <div className="tw-font-medium tw-mb-0.5">
+                          {syncRun.started_at}
+                        </div>
+                        <div className="tw-text-xs tw-text-slate-500">
+                          Duration: {syncRun.duration}
+                        </div>
+                      </div>
                     </td>
                     <td className={tableCellStyle}>
                       {syncRun.rows_written}
                     </td>
                     <td className={tableCellStyle}>
                       <Tooltip label={<div className="tw-m-2 tw-cursor-text tw-font-mono">{syncRun.error}</div>} maxWidth={600} interactive>
-                        <div className="tw-overflow-hidden tw-text-ellipsis tw-max-w-[450px]">
+                        <div className="tw-overflow-hidden tw-text-ellipsis tw-max-w-[240px]">
                           {syncRun.error}
                         </div>
                       </Tooltip>
                     </td>
-                    <td className={mergeClasses(tableCellStyle, "tw-min-w-[50px] tw-w-full tw-pr-5")}>
+                    <td className={mergeClasses(tableCellStyle, "tw-pr-5")}>
                       <ChevronRightIcon className="tw-ml-auto tw-h-4 tw-w-4 tw-text-slate-400" aria-hidden="true" />
                     </td>
                   </tr>

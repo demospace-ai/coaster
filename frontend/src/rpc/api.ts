@@ -528,6 +528,7 @@ export interface SyncRun {
   error: string | undefined;
   started_at: string;
   completed_at: string;
+  duration: string;
   rows_written: number;
 }
 
