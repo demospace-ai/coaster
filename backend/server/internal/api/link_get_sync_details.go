@@ -10,7 +10,7 @@ import (
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/repositories/sync_runs"
 	"go.fabra.io/server/common/repositories/syncs"
-	"go.fabra.io/server/common/timezone"
+	"go.fabra.io/server/common/timeutils"
 	"go.fabra.io/server/common/views"
 )
 
@@ -23,7 +23,7 @@ func (s ApiService) LinkGetSyncDetails(auth auth.Authentication, w http.Response
 		return errors.NewBadRequest("must send link token")
 	}
 
-	timezone := timezone.GetTimezoneHeader(r)
+	timezone := timeutils.GetTimezoneHeader(r)
 
 	vars := mux.Vars(r)
 	strSyncId, ok := vars["syncID"]

@@ -1,6 +1,6 @@
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
-import { getConnectionTypeImg } from "src/components/images/warehouses";
+import { getConnectionTypeImg } from "src/components/images/connections";
 import { Loading } from "src/components/loading/Loading";
 import { useSyncs } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";

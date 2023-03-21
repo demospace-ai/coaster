@@ -10,7 +10,7 @@ import (
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/repositories/sync_runs"
 	"go.fabra.io/server/common/repositories/syncs"
-	"go.fabra.io/server/common/timezone"
+	"go.fabra.io/server/common/timeutils"
 	"go.fabra.io/server/common/views"
 )
 
@@ -25,7 +25,7 @@ func (s ApiService) GetSyncDetails(auth auth.Authentication, w http.ResponseWrit
 		return errors.NewBadRequest("must setup organization first")
 	}
 
-	timezone := timezone.GetTimezoneHeader(r)
+	timezone := timeutils.GetTimezoneHeader(r)
 
 	vars := mux.Vars(r)
 	strSyncId, ok := vars["syncID"]

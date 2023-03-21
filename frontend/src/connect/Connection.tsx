@@ -1,8 +1,8 @@
 import React, { FormEvent, useState } from "react";
 import { Button } from "src/components/button/Button";
 import { InfoIcon } from "src/components/icons/Icons";
+import { getConnectionTypeImg } from "src/components/images/connections";
 import sync from "src/components/images/sync.svg";
-import { getConnectionTypeImg } from "src/components/images/warehouses";
 import { Input, ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { Tooltip } from "src/components/tooltip/Tooltip";
@@ -27,7 +27,7 @@ export const NewSourceConfiguration: React.FC<SetupSyncProps> = (props) => {
 
   if (props.state.newSourceState.sourceCreated) {
     return <div className="tw-flex tw-flex-col tw-justify-top">
-      <span className="tw-text-center tw-text-2xl tw-font-bold tw-mb-10">Source all setup!</span>
+      <span className="tw-text-center tw-text-2xl tw-font-bold tw-mb-10">Source is all setup!</span>
       <img src={sync} alt="sync success illustration" className="tw-h-[300px]" />
     </div>;
   }
@@ -46,6 +46,9 @@ export const NewSourceConfiguration: React.FC<SetupSyncProps> = (props) => {
     case ConnectionType.MongoDb:
       inputs = <MongoDbInputs state={state} setState={setState} />;
       break;
+    case ConnectionType.Webhook:
+      inputs = <>Unexpected</>;
+      break;
   };
 
   return (
@@ -63,7 +66,7 @@ export const NewSourceConfiguration: React.FC<SetupSyncProps> = (props) => {
         <div className="tw-w-80 tw-ml-auto tw-text-xs tw-leading-5 tw-border-l tw-border-slate-200 tw-h-fit tw-py-2 tw-pl-8 tw-mr-10">
           <div className="">
             <div className="tw-text-[13px] tw-mb-1 tw-font-medium">Read our docs</div>
-            Not sure where to start? Check out <a href="docs.fabra.io" className="tw-text-blue-500">the docs</a> for step-by-step instructions.
+            Not sure where to start? Check out <a href="docs.fabra.io" target="_blank" rel="noreferrer" className="tw-text-blue-500">the docs</a> for step-by-step instructions.
           </div>
           <div className="tw-my-5 tw-py-5 tw-border-y tw-border-slate-200">
             <div className="tw-text-[13px] tw-mb-1 tw-font-medium">Allowed IPs</div>
@@ -187,7 +190,7 @@ const SnowflakeInputs: React.FC<ConnectionConfigurationProps> = props => {
       <ValidatedInput id='role' value={state.snowflakeConfig.role} setValue={(value) => { props.setState({ ...state, snowflakeConfig: { ...state.snowflakeConfig, role: value } }); }} placeholder='Role' />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Host</span>
-        <Tooltip placement="right" label={<div className="tw-m-2"><span>This is your Snowflake URL. Format may differ based on Snowflake account age. For details, </span><a className="tw-text-blue-400" href="https://docs.snowflake.com/en/user-guide/admin-account-identifier.html">visit the Snowflake docs.</a><div className="tw-mt-2"><span>Example:</span><div className="tw-mt-2 tw-w-full tw-bg-slate-900 tw-rounded-md tw-p-2">abc123.us-east1.gcp.snowflakecomputing.com</div></div></div>} interactive maxWidth={500}>
+        <Tooltip placement="right" label={<div className="tw-m-2"><span>This is your Snowflake URL. Format may differ based on Snowflake account age. For details, </span><a className="tw-text-blue-400" target="_blank" rel="noreferrer" href="https://docs.snowflake.com/en/user-guide/admin-account-identifier.html">visit the Snowflake docs.</a><div className="tw-mt-2"><span>Example:</span><div className="tw-mt-2 tw-w-full tw-bg-slate-900 tw-rounded-md tw-p-2">abc123.us-east1.gcp.snowflakecomputing.com</div></div></div>} interactive maxWidth={500}>
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div >
@@ -234,7 +237,7 @@ const RedshiftInputs: React.FC<ConnectionConfigurationProps> = props => {
           <div className="tw-m-2">
             <div>This is the URL for your Redshift data warehouse. For Redshift clusters, it can be found on the specific cluster page under "General Information" and should look like:</div>
             <div className="tw-mt-2 tw-w-full tw-bg-slate-900 tw-rounded-md tw-p-2">your-cluster.abc123.us-west-2.redshift.amazonaws.com</div>
-            <div className="tw-mt-3">For Serverless Redshift, <a className="tw-text-blue-400" href="https://docs.aws.amazon.com/redshift/latest/mgmt/serverless-connecting.html">visit the Redshift docs.</a> The following is the expected format for Serverless Redshift:</div>
+            <div className="tw-mt-3">For Serverless Redshift, <a className="tw-text-blue-400" target="_blank" rel="noreferrer" href="https://docs.aws.amazon.com/redshift/latest/mgmt/serverless-connecting.html">visit the Redshift docs.</a> The following is the expected format for Serverless Redshift:</div>
             <div className="tw-mt-2 tw-w-full tw-bg-slate-900 tw-rounded-md tw-p-2"><span className="tw-italic">workgroup-name</span>.<span className="tw-italic">account-number</span>.<span className="tw-italic">aws-region</span>.redshift-serverless.amazonaws.com</div>
           </div>}
           interactive maxWidth={640}>

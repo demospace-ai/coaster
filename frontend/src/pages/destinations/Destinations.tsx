@@ -2,7 +2,7 @@ import { PlusCircleIcon } from "@heroicons/react/20/solid";
 import classNames from "classnames";
 import { ReactElement, useState } from "react";
 import { Button } from "src/components/button/Button";
-import { getConnectionTypeImg } from "src/components/images/warehouses";
+import { getConnectionTypeImg } from "src/components/images/connections";
 import { Loading } from "src/components/loading/Loading";
 import { NewDestination } from "src/pages/destinations/NewDestination";
 import { getConnectionType } from "src/rpc/api";

@@ -1,13 +1,11 @@
 package views
 
 import (
-	"fmt"
-	"strconv"
-	"strings"
 	"time"
 
 	"go.fabra.io/server/common/data"
 	"go.fabra.io/server/common/models"
+	"go.fabra.io/server/common/timeutils"
 )
 
 const CUSTOMER_VISIBLE_TIME_FORMAT = "01/02/06 at 03:04 PM MST"
@@ -95,7 +93,7 @@ func ConvertFieldMappings(fieldMappings []models.FieldMapping) []FieldMapping {
 func ConvertSyncRuns(syncRuns []models.SyncRun, timezone *time.Location) ([]SyncRun, error) {
 	var syncRunsView []SyncRun
 	for _, syncRun := range syncRuns {
-		duration, err := getDurationString(syncRun.CompletedAt.Sub(syncRun.StartedAt))
+		duration, err := timeutils.GetDurationString(syncRun.CompletedAt.Sub(syncRun.StartedAt))
 		if err != nil {
 			return nil, err
 		}
@@ -114,65 +112,4 @@ func ConvertSyncRuns(syncRuns []models.SyncRun, timezone *time.Location) ([]Sync
 	}
 
 	return syncRunsView, nil
-}
-
-func getDurationString(duration time.Duration) (*string, error) {
-	var output []string
-	remaining := duration.Truncate(time.Second).String()
-
-	hSplit := strings.Split(remaining, "h")
-	if len(hSplit) == 1 {
-		remaining = hSplit[0]
-	} else {
-		hours, err := strconv.Atoi(hSplit[0])
-		if err != nil {
-			return nil, err
-		}
-
-		if hours == 1 {
-			output = append(output, fmt.Sprintf("%d hour", hours))
-		} else if hours > 0 {
-			output = append(output, fmt.Sprintf("%d hours", hours))
-		}
-		remaining = hSplit[1]
-	}
-
-	mSplit := strings.Split(remaining, "m")
-	if len(mSplit) == 1 {
-		remaining = mSplit[0]
-	} else {
-		minutes, err := strconv.Atoi(mSplit[0])
-		if err != nil {
-			return nil, err
-		}
-
-		if minutes == 1 {
-			output = append(output, fmt.Sprintf("%d minute", minutes))
-		} else if minutes > 0 {
-			output = append(output, fmt.Sprintf("%d minutes", minutes))
-		}
-		remaining = mSplit[1]
-	}
-
-	sSplit := strings.Split(remaining, "s")
-	if len(sSplit) == 1 {
-	} else {
-		seconds, err := strconv.Atoi(sSplit[0])
-		if err != nil {
-			return nil, err
-		}
-
-		if seconds == 1 {
-			output = append(output, fmt.Sprintf("%d second", seconds))
-		} else if seconds > 0 {
-			output = append(output, fmt.Sprintf("%d seconds", seconds))
-		}
-	}
-
-	outputStr := strings.Join(output, " ")
-	if outputStr == "" {
-		outputStr = "1 second"
-	}
-
-	return &outputStr, nil
 }

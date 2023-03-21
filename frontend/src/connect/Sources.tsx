@@ -2,7 +2,7 @@ import { ChevronRightIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
 import React, { useEffect, useState } from "react";
 import { Button } from "src/components/button/Button";
 import { AddDatabase, InfoIcon } from "src/components/icons/Icons";
-import { getConnectionTypeImg } from "src/components/images/warehouses";
+import { getConnectionTypeImg } from "src/components/images/connections";
 import { Loading } from "src/components/loading/Loading";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { SetupSyncProps, SyncSetupStep } from "src/connect/state";

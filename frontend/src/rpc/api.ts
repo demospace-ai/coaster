@@ -304,6 +304,22 @@ export interface MongoDbConfig {
   connection_options: string;
 }
 
+export interface WebhookConfig {
+  endpoint: string;
+  headers: HeaderInput[];
+}
+
+export interface HeaderInput {
+  name: string | undefined;
+  value: string | undefined;
+  type: HeaderType | undefined;
+}
+
+export enum HeaderType {
+  Constant = "constant",
+  Variable = "variable",
+}
+
 export interface LinkCreateSyncRequest {
   display_name: string;
   source_id: number;
@@ -502,6 +518,7 @@ export enum ConnectionType {
   Snowflake = "snowflake",
   Redshift = "redshift",
   MongoDb = "mongodb",
+  Webhook = "webhook",
 }
 
 export interface Sync {
@@ -591,5 +608,7 @@ export function getConnectionType(connectionType: ConnectionType): string {
       return "Redshift";
     case ConnectionType.MongoDb:
       return "MongoDB";
+    case ConnectionType.Webhook:
+      return "Webhook";
   }
 }

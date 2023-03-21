@@ -2,7 +2,7 @@ import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
 import { Button } from "src/components/button/Button";
 import { AddDatabase } from "src/components/icons/Icons";
-import { getConnectionTypeImg } from "src/components/images/warehouses";
+import { getConnectionTypeImg } from "src/components/images/connections";
 import { Loading } from "src/components/loading/Loading";
 import { useLinkSyncs } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
