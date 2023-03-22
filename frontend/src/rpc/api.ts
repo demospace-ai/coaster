@@ -305,19 +305,13 @@ export interface MongoDbConfig {
 }
 
 export interface WebhookConfig {
-  endpoint: string;
+  url: string;
   headers: HeaderInput[];
 }
 
 export interface HeaderInput {
-  name: string | undefined;
-  value: string | undefined;
-  type: HeaderType | undefined;
-}
-
-export enum HeaderType {
-  Constant = "constant",
-  Variable = "variable",
+  name: string;
+  value: string;
 }
 
 export interface LinkCreateSyncRequest {

@@ -82,7 +82,7 @@ func CreateApiKey(db *gorm.DB, organizationID int64) string {
 	encrypted, _ := cryptoService.EncryptApiKey(rawKey)
 	hashedKey := crypto.HashString(rawKey)
 	apiKey := models.ApiKey{
-		ApiKey:         *encrypted,
+		EncryptedKey:   *encrypted,
 		OrganizationID: organizationID,
 		HashedKey:      hashedKey,
 	}

@@ -514,10 +514,13 @@ resource "google_kms_crypto_key" "data-connection-key" {
   }
 }
 
-resource "google_kms_key_ring_iam_member" "data-connection-key-ring-cloud-run-role" {
+resource "google_kms_key_ring_iam_binding" "data-connection-key-ring-binding" {
   key_ring_id = google_kms_key_ring.data-connection-keyring.id
-  role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
-  member        = "serviceAccount:932264813910-compute@developer.gserviceaccount.com"
+  role = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+  members = [
+    "serviceAccount:fabra-sync@fabra-344902.iam.gserviceaccount.com",
+    "serviceAccount:fabra-backend@fabra-344902.iam.gserviceaccount.com"
+  ]
 }
 
 resource "google_kms_key_ring" "api-key-keyring" {
@@ -535,10 +538,13 @@ resource "google_kms_crypto_key" "api-key-key" {
   }
 }
 
-resource "google_kms_key_ring_iam_member" "api-key-key-ring-cloud-run-role" {
+resource "google_kms_key_ring_iam_binding" "api-key-key-ring-binding" {
   key_ring_id = google_kms_key_ring.api-key-keyring.id
-  role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
-  member        = "serviceAccount:932264813910-compute@developer.gserviceaccount.com"
+  role = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+  members = [
+    "serviceAccount:fabra-sync@fabra-344902.iam.gserviceaccount.com",
+    "serviceAccount:fabra-backend@fabra-344902.iam.gserviceaccount.com"
+  ]
 }
 
 resource "google_compute_router" "fabra-ip-router" {
@@ -619,5 +625,29 @@ resource "google_service_account_iam_binding" "fabra-worker-gke-binding" {
 
   members = [
     "serviceAccount:fabra-344902.svc.id.goog[default/default]",
+  ]
+}
+
+resource "google_kms_key_ring" "webhook-verification-key-keyring" {
+  name     = "webhook-verification-key-keyring"
+  location = "global"
+}
+
+resource "google_kms_crypto_key" "webhook-verification-key-key" {
+  name            = "webhook-verification-key-key"
+  key_ring        = google_kms_key_ring.webhook-verification-key-keyring.id
+  rotation_period = "100000s"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "google_kms_key_ring_iam_binding" "webhook-verification-key-ring-binding" {
+  key_ring_id = google_kms_key_ring.webhook-verification-key-keyring.id
+  role = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+  members = [
+    "serviceAccount:fabra-sync@fabra-344902.iam.gserviceaccount.com",
+    "serviceAccount:fabra-backend@fabra-344902.iam.gserviceaccount.com"
   ]
 }

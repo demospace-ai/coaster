@@ -3,11 +3,11 @@ import React, { FormEvent, useState } from "react";
 import { BackButton, Button, FormButton } from "src/components/button/Button";
 import { InfoIcon } from "src/components/icons/Icons";
 import { getConnectionTypeImg } from "src/components/images/connections";
-import { Input, ValidatedDropdownInput, ValidatedInput } from "src/components/input/Input";
+import { Input, ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { sendRequest } from "src/rpc/ajax";
-import { BigQueryConfig, ConnectionType, CreateDestination, CreateDestinationRequest, getConnectionType, GetDestinations, HeaderType, MongoDbConfig, RedshiftConfig, SnowflakeConfig, TestDataConnection, TestDataConnectionRequest, WebhookConfig } from "src/rpc/api";
+import { BigQueryConfig, ConnectionType, CreateDestination, CreateDestinationRequest, getConnectionType, GetDestinations, HeaderInput, MongoDbConfig, RedshiftConfig, SnowflakeConfig, TestDataConnection, TestDataConnectionRequest, WebhookConfig } from "src/rpc/api";
 import { mergeClasses } from "src/utils/twmerge";
 import { mutate } from "swr";
 
@@ -81,7 +81,7 @@ const INITIAL_DESTINATION_STATE: NewDestinationState = {
     connection_options: "",
   },
   webhookConfig: {
-    endpoint: "",
+    url: "",
     headers: [],
   },
 };
@@ -114,8 +114,13 @@ const validateAll = (connectionType: ConnectionType, state: NewDestinationState)
         && state.mongodbConfig.host.length > 0; // connection options is optional
     case ConnectionType.Webhook:
       return state.displayName.length > 0
-        && state.webhookConfig.endpoint.length > 0;
+        && state.webhookConfig.url.length > 0
+        && validateHeaders(state.webhookConfig.headers);
   }
+};
+
+const validateHeaders = (headers: HeaderInput[]): boolean => {
+  return headers.every(header => header.name.length > 0 && header.value.length > 0);
 };
 
 const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = props => {
@@ -397,11 +402,6 @@ const WebhookInputs: React.FC<ConnectionConfigurationProps> = props => {
     headers[index].value = newValue;
     props.setState({ ...state, webhookConfig: { ...state.webhookConfig, headers: headers } });
   };
-  const setHeaderType = (index: number, newType: HeaderType) => {
-    const headers = [...state.webhookConfig.headers];
-    headers[index].type = newType;
-    props.setState({ ...state, webhookConfig: { ...state.webhookConfig, headers: headers } });
-  };
   const removeHeader = (index: number) => {
     const headers = [...state.webhookConfig.headers];
     headers.splice(index, 1);
@@ -425,7 +425,7 @@ const WebhookInputs: React.FC<ConnectionConfigurationProps> = props => {
       </div>
       <div className="tw-flex tw-items-center tw-w-100 tw-border tw-border-slate-300 hover:tw-border-primary-hover focus:tw-border-primary tw-rounded-md tw-overflow-clip">
         <span className="tw-select-none tw-text-slate-500 tw-px-2 tw-bg-slate-100 tw-h-10 tw-flex tw-items-center">https://</span>
-        <ValidatedInput className="tw-w-100 tw-pl-1 tw-border-0 tw-bg-transparent tw-rounded-none" id='URL' value={state.webhookConfig.endpoint} setValue={(value) => { props.setState({ ...state, webhookConfig: { ...state.webhookConfig, endpoint: value } }); }} placeholder='URL' />
+        <ValidatedInput className="tw-w-100 tw-pl-1 tw-border-0 tw-bg-transparent tw-rounded-none" id='URL' value={state.webhookConfig.url} setValue={(value) => { props.setState({ ...state, webhookConfig: { ...state.webhookConfig, url: value } }); }} placeholder='URL' />
       </div>
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Headers</span>
@@ -441,11 +441,10 @@ const WebhookInputs: React.FC<ConnectionConfigurationProps> = props => {
         <div key={index} className="tw-flex tw-flex-row tw-items-center tw-w-full tw-justify-start tw-gap-5 tw-mb-4">
           <ValidatedInput id='Header Name' value={header.name} setValue={(value) => setHeaderName(index, value)} placeholder='Header Name' className="tw-w-64" />
           <ValidatedInput id='Header Value' value={header.value} setValue={(value) => setHeaderValue(index, value)} placeholder='Header Value' className="tw-w-64" />
-          <ValidatedDropdownInput options={[HeaderType.Constant, HeaderType.Variable]} selected={header.type} setSelected={(value) => setHeaderType(index, value)} placeholder='Header Type' noOptionsString="" loading={false} className="tw-w-40 tw-mt-0" />
           <Button onClick={() => removeHeader(index)}><XMarkIcon className="tw-h-5" /></Button>
         </div>
       ))}
-      <Button className="tw-mt-1" onClick={() => props.setState({ ...state, webhookConfig: { ...state.webhookConfig, headers: [...state.webhookConfig.headers, { name: undefined, value: undefined, type: undefined }] } })}>Add Header</Button>
+      <Button className="tw-mt-1" onClick={() => props.setState({ ...state, webhookConfig: { ...state.webhookConfig, headers: [...state.webhookConfig.headers, { name: "", value: "", }] } })}>Add Header</Button>
     </>
   );
 };

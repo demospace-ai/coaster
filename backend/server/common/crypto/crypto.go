@@ -15,12 +15,15 @@ import (
 
 const CONNECTION_KEY = "projects/fabra-344902/locations/global/keyRings/data-connection-keyring/cryptoKeys/data-connection-key"
 const API_KEY_KEY = "projects/fabra-344902/locations/global/keyRings/api-key-keyring/cryptoKeys/api-key-key"
+const WEBHOOK_PRIVATE_KEY_KEY = "projects/fabra-344902/locations/global/keyRings/webhook-verification-key-keyring/cryptoKeys/webhook-verification-key-key"
 
 type CryptoService interface {
 	DecryptConnectionCredentials(encryptedCredentials string) (*string, error)
 	EncryptConnectionCredentials(credentials string) (*string, error)
 	DecryptApiKey(encryptedApiKey string) (*string, error)
 	EncryptApiKey(apiKey string) (*string, error)
+	DecryptWebhookPrivateKey(encryptedWebhookPrivateKey string) (*string, error)
+	EncryptWebhookPrivateKey(webhookVerificationKey string) (*string, error)
 }
 
 type CryptoServiceImpl struct {
@@ -145,4 +148,22 @@ func (cs CryptoServiceImpl) EncryptApiKey(apiKey string) (*string, error) {
 	}
 
 	return encryptedApiKey, nil
+}
+
+func (cs CryptoServiceImpl) DecryptWebhookPrivateKey(encryptedWebhookPrivateKey string) (*string, error) {
+	webhookPrivateKey, err := decrypt(WEBHOOK_PRIVATE_KEY_KEY, encryptedWebhookPrivateKey)
+	if err != nil {
+		return nil, err
+	}
+
+	return webhookPrivateKey, nil
+}
+
+func (cs CryptoServiceImpl) EncryptWebhookPrivateKey(webhookPrivateKey string) (*string, error) {
+	encryptedWebhookPrivateKey, err := encrypt(WEBHOOK_PRIVATE_KEY_KEY, webhookPrivateKey)
+	if err != nil {
+		return nil, err
+	}
+
+	return encryptedWebhookPrivateKey, nil
 }

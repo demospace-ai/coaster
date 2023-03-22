@@ -12,10 +12,6 @@ import (
 	"go.fabra.io/server/common/repositories/api_keys"
 )
 
-type GetApiKeyResponse struct {
-	ApiKey string `json:"api_key"`
-}
-
 func (s ApiService) GetApiKey(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
 		return errors.NewBadRequest("cannot request users without organization")
@@ -35,7 +31,7 @@ func (s ApiService) GetOrCreateApiKey(organizationID int64) (*string, error) {
 	if err != nil {
 		// no api key found, so just generate one now
 		if errors.IsRecordNotFound(err) {
-			rawApiKey := generateApiKey()
+			rawApiKey := generateKey()
 			encryptedApiKey, err := s.cryptoService.EncryptApiKey(rawApiKey)
 			if err != nil {
 				return nil, err
@@ -52,10 +48,10 @@ func (s ApiService) GetOrCreateApiKey(organizationID int64) (*string, error) {
 		}
 	}
 
-	return s.cryptoService.DecryptApiKey(apiKey.ApiKey)
+	return s.cryptoService.DecryptApiKey(apiKey.EncryptedKey)
 }
 
-func generateApiKey() string {
+func generateKey() string {
 	randomBytes := make([]byte, 32)
 	_, err := rand.Read(randomBytes)
 	if err != nil {

@@ -9,7 +9,7 @@ import (
 func CreateApiKey(db *gorm.DB, organizationID int64, encryptedApiKey string, hashedKey string) (*models.ApiKey, error) {
 	apiKey := models.ApiKey{
 		OrganizationID: organizationID,
-		ApiKey:         encryptedApiKey,
+		EncryptedKey:   encryptedApiKey,
 		HashedKey:      hashedKey,
 	}
 
