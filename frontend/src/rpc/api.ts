@@ -28,6 +28,13 @@ export const GetDestinations: IEndpoint<undefined, GetDestinationsResponse> = {
   path: '/destinations',
 };
 
+
+export const GetDestination: IEndpoint<{ destinationID: number; }, GetDestinationResponse> = {
+  name: 'Destination Fetched',
+  method: 'GET',
+  path: '/destination/:destinationID',
+};
+
 export const GetSources: IEndpoint<undefined, GetSourcesResponse> = {
   name: 'Sources Fetched',
   method: 'GET',
@@ -43,8 +50,7 @@ export const GetObjects: IEndpoint<undefined, GetObjectsResponse> = {
 export const GetObject: IEndpoint<{ objectID: number; }, GetObjectResponse> = {
   name: 'Object Fetched',
   method: 'GET',
-  path: '/object',
-  queryParams: ['objectID'],
+  path: '/object/:objectID',
 };
 
 export const GetSyncs: IEndpoint<undefined, GetSyncsResponse> = {
@@ -53,8 +59,8 @@ export const GetSyncs: IEndpoint<undefined, GetSyncsResponse> = {
   path: '/syncs',
 };
 
-export const GetSyncDetails: IEndpoint<{ syncID: number; }, GetSyncDetailsResponse> = {
-  name: 'Sync Details Fetched',
+export const GetSync: IEndpoint<{ syncID: number; }, GetSyncResponse> = {
+  name: 'Sync Fetched',
   method: 'GET',
   path: '/sync/:syncID',
   track: true,
@@ -183,8 +189,8 @@ export const LinkGetSyncs: IEndpoint<undefined, GetSyncsResponse> = {
   track: true,
 };
 
-export const LinkGetSyncDetails: IEndpoint<{ syncID: number; }, GetSyncDetailsResponse> = {
-  name: 'Sync Details Fetched',
+export const LinkGetSync: IEndpoint<{ syncID: number; }, GetSyncResponse> = {
+  name: 'Sync Fetched',
   method: 'GET',
   path: '/link/sync/:syncID',
   track: true,
@@ -340,7 +346,7 @@ export interface GetSyncsResponse {
   objects: Object[];
 }
 
-export interface GetSyncDetailsResponse {
+export interface GetSyncResponse {
   sync: Sync;
   next_run_time: string;
   sync_runs: SyncRun[];
@@ -417,6 +423,10 @@ export interface GetAllUsersResponse {
 
 export interface GetDestinationsResponse {
   destinations: Destination[];
+}
+
+export interface GetDestinationResponse {
+  destination: Destination;
 }
 
 export interface GetSourcesResponse {

@@ -30,16 +30,14 @@ func CreateSource(
 }
 
 // TODO: test that connection credentials are not exposed
-func LoadSourceByID(db *gorm.DB, organizationID int64, endCustomerID int64, sourceID int64) (*models.SourceConnection, error) {
-	var source models.SourceConnection
+func LoadSourceByID(db *gorm.DB, organizationID int64, endCustomerID int64, sourceID int64) (*models.Source, error) {
+	var source models.Source
 	result := db.Table("sources").
-		Select("sources.*, connections.connection_type").
-		Joins("JOIN connections ON sources.connection_id = connections.id").
+		Select("sources.*").
 		Where("sources.id = ?", sourceID).
 		Where("sources.organization_id = ?", organizationID).
 		Where("sources.end_customer_id = ?", endCustomerID).
 		Where("sources.deactivated_at IS NULL").
-		Where("connections.deactivated_at IS NULL").
 		Take(&source)
 
 	if result.Error != nil {

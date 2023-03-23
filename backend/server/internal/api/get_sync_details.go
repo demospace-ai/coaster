@@ -14,13 +14,13 @@ import (
 	"go.fabra.io/server/common/views"
 )
 
-type GetSyncDetailsResponse struct {
+type GetSyncResponse struct {
 	Sync        views.Sync      `json:"sync"`
 	NextRunTime string          `json:"next_run_time"`
 	SyncRuns    []views.SyncRun `json:"sync_runs"`
 }
 
-func (s ApiService) GetSyncDetails(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) GetSync(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
 		return errors.NewBadRequest("must setup organization first")
 	}
@@ -54,7 +54,7 @@ func (s ApiService) GetSyncDetails(auth auth.Authentication, w http.ResponseWrit
 		return err
 	}
 
-	return json.NewEncoder(w).Encode(GetSyncDetailsResponse{
+	return json.NewEncoder(w).Encode(GetSyncResponse{
 		Sync:        views.ConvertSync(sync),
 		NextRunTime: "",
 		SyncRuns:    syncRunsView,

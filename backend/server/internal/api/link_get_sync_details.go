@@ -14,7 +14,7 @@ import (
 	"go.fabra.io/server/common/views"
 )
 
-func (s ApiService) LinkGetSyncDetails(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) LinkGetSync(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
 		return errors.NewBadRequest("must setup organization first")
 	}
@@ -52,7 +52,7 @@ func (s ApiService) LinkGetSyncDetails(auth auth.Authentication, w http.Response
 		return err
 	}
 
-	return json.NewEncoder(w).Encode(GetSyncDetailsResponse{
+	return json.NewEncoder(w).Encode(GetSyncResponse{
 		Sync:        views.ConvertSync(sync),
 		NextRunTime: "",
 		SyncRuns:    syncRunsView,

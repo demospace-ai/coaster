@@ -1,5 +1,5 @@
 import { sendLinkTokenRequest, sendRequest } from "src/rpc/ajax";
-import { GetAllUsers, GetAllUsersResponse, GetApiKey, GetDestinations, GetDestinationsResponse, GetFieldValues, GetFieldValuesRequest, GetFieldValuesResponse, GetNamespaces, GetNamespacesResponse, GetObject, GetObjectResponse, GetObjects, GetObjectsResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetSourcesResponse, GetSyncDetails, GetSyncDetailsResponse, GetSyncs, GetSyncsResponse, GetTables, GetTablesResponse, LinkGetNamespaces, LinkGetSchema, LinkGetSources, LinkGetSyncDetails, LinkGetSyncs, LinkGetTables } from "src/rpc/api";
+import { GetAllUsers, GetAllUsersResponse, GetApiKey, GetDestination, GetDestinationResponse, GetDestinations, GetDestinationsResponse, GetFieldValues, GetFieldValuesRequest, GetFieldValuesResponse, GetNamespaces, GetNamespacesResponse, GetObject, GetObjectResponse, GetObjects, GetObjectsResponse, GetSchema, GetSchemaRequest, GetSchemaResponse, GetSourcesResponse, GetSync, GetSyncResponse, GetSyncs, GetSyncsResponse, GetTables, GetTablesResponse, LinkGetNamespaces, LinkGetSchema, LinkGetSources, LinkGetSync, LinkGetSyncs, LinkGetTables } from "src/rpc/api";
 import useSWR, { Fetcher } from "swr";
 
 export function useApiKey() {
@@ -25,6 +25,13 @@ export function useDestinations() {
   const fetcher: Fetcher<GetDestinationsResponse, {}> = () => sendRequest(GetDestinations);
   const { data, mutate, error, isLoading, isValidating } = useSWR({ GetDestinations }, fetcher);
   return { destinations: data?.destinations, mutate, error, loading: isLoading || isValidating };
+}
+
+export function useDestination(destinationID: number | undefined) {
+  const shouldFetch = destinationID;
+  const fetcher: Fetcher<GetDestinationResponse, { destinationID: number; }> = (payload: { destinationID: number; }) => sendRequest(GetDestination, payload);
+  const { data, mutate, error, isLoading, isValidating } = useSWR(shouldFetch ? { GetDestination, destinationID } : null, fetcher);
+  return { destination: data?.destination, mutate, error, loading: isLoading || isValidating };
 }
 
 export function useObjects(linkToken?: string) {
@@ -74,11 +81,11 @@ export function useSyncs() {
   return { syncs: data?.syncs, objects: data?.objects, sources: data?.sources, mutate, error, loading: isLoading || isValidating };
 }
 
-export function useSyncDetails(syncID: number | undefined) {
+export function useSync(syncID: number | undefined) {
   const shouldFetch = syncID;
-  const fetcher: Fetcher<GetSyncDetailsResponse, { syncID: number; }> = (payload: { syncID: number; }) => sendRequest(GetSyncDetails, payload);
-  const { data, mutate, error, isLoading, isValidating } = useSWR(shouldFetch ? { GetSyncDetails, syncID } : null, fetcher);
-  return { syncDetails: data, mutate, error, loading: isLoading || isValidating };
+  const fetcher: Fetcher<GetSyncResponse, { syncID: number; }> = (payload: { syncID: number; }) => sendRequest(GetSync, payload);
+  const { data, mutate, error, isLoading, isValidating } = useSWR(shouldFetch ? { GetSync: GetSync, syncID } : null, fetcher);
+  return { sync: data, mutate, error, loading: isLoading || isValidating };
 }
 
 export function useLinkNamespaces(sourceID: number | undefined, linkToken: string) {
@@ -114,11 +121,11 @@ export function useLinkSyncs(linkToken: string) {
   return { syncs: data?.syncs, objects: data?.objects, sources: data?.sources, mutate, error, loading: isLoading || isValidating };
 }
 
-export function useLinkSyncDetails(syncID: number | undefined, linkToken: string) {
+export function useLinkSync(syncID: number | undefined, linkToken: string) {
   const shouldFetch = syncID;
-  const fetcher: Fetcher<GetSyncDetailsResponse, { syncID: number; }> = (payload: { syncID: number; }) => sendLinkTokenRequest(LinkGetSyncDetails, linkToken, payload);
-  const { data, mutate, error, isLoading, isValidating } = useSWR(shouldFetch ? { GetSyncDetails, syncID } : null, fetcher);
-  return { syncDetails: data, mutate, error, loading: isLoading || isValidating };
+  const fetcher: Fetcher<GetSyncResponse, { syncID: number; }> = (payload: { syncID: number; }) => sendLinkTokenRequest(LinkGetSync, linkToken, payload);
+  const { data, mutate, error, isLoading, isValidating } = useSWR(shouldFetch ? { GetSync: GetSync, syncID } : null, fetcher);
+  return { sync: data, mutate, error, loading: isLoading || isValidating };
 }
 
 export function useFieldValues(connectionID: number | undefined, namespace: string | undefined, tableName: string | undefined, fieldName: string | undefined) {

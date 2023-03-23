@@ -5,7 +5,7 @@ import { BackButton } from "src/components/button/Button";
 import { Loading } from "src/components/loading/Loading";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { SyncRunStatus } from "src/rpc/api";
-import { useLinkSyncDetails } from "src/rpc/data";
+import { useLinkSync } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
 
 export const SyncRuns: React.FC<{ linkToken: string; close: () => void; }> = ({ linkToken, close }) => {
@@ -22,20 +22,20 @@ const tableCellStyle = "tw-whitespace-nowrap tw-left tw-overflow-hidden tw-py-4 
 
 const SyncRunsList: React.FC<{ linkToken: string; }> = ({ linkToken }) => {
   const { syncID } = useParams<{ syncID: string; }>();
-  const { syncDetails } = useLinkSyncDetails(Number(syncID), linkToken);
-  const syncRuns = syncDetails?.sync_runs ? syncDetails.sync_runs : [];
+  const { sync } = useLinkSync(Number(syncID), linkToken);
+  const syncRuns = sync?.sync_runs ? sync.sync_runs : [];
 
   return (
     <div className="tw-pb-24 tw-px-20 tw-overflow-auto">
       <div className='tw-mt-2 tw-h-full tw-w-full'>
         <div className="tw-flex tw-w-full tw-mb-8">
           <div className="tw-flex tw-flex-row tw-items-center tw-font-bold tw-text-xl">
-            Sync Runs • {syncDetails?.sync.display_name}
+            Sync Runs • {sync?.sync.display_name}
             <div className="hover:tw-bg-slate-200 tw-p-1 tw-rounded tw-ml-2 tw-cursor-pointer"><PencilIcon className="tw-h-4"></PencilIcon></div>
           </div>
         </div>
         <div className='tw-shadow tw-ring-1 tw-ring-black tw-ring-opacity-5 tw-rounded-md tw-overflow-auto tw-overscroll-contain tw-w-full tw-max-h-[420px]' >
-          {syncDetails
+          {sync
             ?
             <table className="tw-min-w-full tw-border-spacing-0 tw-divide-y tw-divide-slate-200">
               <thead className="tw-sticky tw-top-0 tw-bg-slate-100">

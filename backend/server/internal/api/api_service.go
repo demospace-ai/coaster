@@ -52,6 +52,12 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.GetDestinations,
 		},
 		{
+			Name:        "Get destination",
+			Method:      router.GET,
+			Pattern:     "/destination/{destinationID}",
+			HandlerFunc: s.GetDestination,
+		},
+		{
 			Name:        "Get namespaces",
 			Method:      router.GET,
 			Pattern:     "/connection/namespaces",
@@ -118,10 +124,10 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.CancelSync,
 		},
 		{
-			Name:        "Get sync details",
+			Name:        "Get sync",
 			Method:      router.GET,
 			Pattern:     "/sync/{syncID}",
-			HandlerFunc: s.GetSyncDetails,
+			HandlerFunc: s.GetSync,
 		},
 		{
 			Name:        "Create link token",
@@ -174,7 +180,7 @@ func (s ApiService) LinkAuthenticatedRoutes() []router.LinkAuthenticatedRoute {
 		{
 			Name:        "Get object",
 			Method:      router.GET,
-			Pattern:     "/object",
+			Pattern:     "/object/{objectID}",
 			HandlerFunc: s.GetObject,
 		},
 		{
@@ -220,10 +226,10 @@ func (s ApiService) LinkAuthenticatedRoutes() []router.LinkAuthenticatedRoute {
 			HandlerFunc: s.LinkCancelSync,
 		},
 		{
-			Name:        "Get sync details",
+			Name:        "Get sync",
 			Method:      router.GET,
 			Pattern:     "/link/sync/{syncID}",
-			HandlerFunc: s.LinkGetSyncDetails,
+			HandlerFunc: s.LinkGetSync,
 		},
 		{
 			Name:        "Get all syncs",

@@ -85,17 +85,21 @@ func ConvertDestination(destination models.Destination, connection models.Connec
 	return destinationView
 }
 
+func ConvertDestinationConnection(destinationConnection models.DestinationConnection) Destination {
+	return Destination{
+		ID:          destinationConnection.ID,
+		DisplayName: destinationConnection.DisplayName,
+		Connection: Connection{
+			ID:             destinationConnection.ConnectionID,
+			ConnectionType: destinationConnection.ConnectionType,
+		},
+	}
+}
+
 func ConvertDestinationConnections(destinationConnections []models.DestinationConnection) []Destination {
 	destinations := []Destination{}
 	for _, destinationConnection := range destinationConnections {
-		destinations = append(destinations, Destination{
-			ID:          destinationConnection.ID,
-			DisplayName: destinationConnection.DisplayName,
-			Connection: Connection{
-				ID:             destinationConnection.ConnectionID,
-				ConnectionType: destinationConnection.ConnectionType,
-			},
-		})
+		destinations = append(destinations, ConvertDestinationConnection(destinationConnection))
 	}
 
 	return destinations

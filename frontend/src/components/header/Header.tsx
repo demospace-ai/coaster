@@ -6,7 +6,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { Loading } from 'src/components/loading/Loading';
 import { useLogout } from 'src/pages/login/actions';
 import { useSelector } from 'src/root/model';
-import { useSyncDetails } from 'src/rpc/data';
+import { useSync } from 'src/rpc/data';
 import { toTitleCase } from 'src/utils/string';
 
 export const Header: React.FC = () => {
@@ -48,8 +48,8 @@ const Breadcrumbs: React.FC<{ pathname: string; }> = props => {
 };
 
 const SyncBreadcrumbs: React.FC<{ id: string, pathname: string; }> = props => {
-  const { syncDetails } = useSyncDetails(Number(props.id)); // This is deduped by SWR so don't worry about the extra fetch
-  const title = syncDetails?.sync.display_name;
+  const { sync } = useSync(Number(props.id)); // This is deduped by SWR so don't worry about the extra fetch
+  const title = sync?.sync.display_name;
   const crumbs: Breadcrumb[] = [{ title: 'Syncs', path: '/syncs' }, { title, path: props.pathname }];
   document.title = title + " | Fabra";
 
