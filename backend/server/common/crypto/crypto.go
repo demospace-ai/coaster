@@ -17,14 +17,17 @@ import (
 const CONNECTION_KEY = "projects/fabra-344902/locations/global/keyRings/data-connection-keyring/cryptoKeys/data-connection-key"
 const API_KEY_KEY = "projects/fabra-344902/locations/global/keyRings/api-key-keyring/cryptoKeys/api-key-key"
 const WEBHOOK_SIGNING_KEY_KEY = "projects/fabra-344902/locations/global/keyRings/webhook-verification-key-keyring/cryptoKeys/webhook-verification-key-key"
+const END_CUSTOMER_API_KEY_KEY = "projects/fabra-344902/locations/global/keyRings/end-customer-api-key-keyring/cryptoKeys/end-customer-api-key-key"
 
 type CryptoService interface {
 	DecryptConnectionCredentials(encryptedCredentials string) (*string, error)
 	EncryptConnectionCredentials(credentials string) (*string, error)
 	DecryptApiKey(encryptedApiKey string) (*string, error)
 	EncryptApiKey(apiKey string) (*string, error)
-	DecryptWebhookSigningKey(encryptedWebhookPrivateKey string) (*string, error)
-	EncryptWebhookSigningKey(webhookVerificationKey string) (*string, error)
+	DecryptWebhookSigningKey(encryptedWebhookSigningKey string) (*string, error)
+	EncryptWebhookSigningKey(webhookSigningKey string) (*string, error)
+	DecryptEndCustomerApiKey(encryptedEndCustomerApiKey string) (*string, error)
+	EncryptEndCustomerApiKey(endCustomerApiKey string) (*string, error)
 }
 
 type CryptoServiceImpl struct {
@@ -160,20 +163,38 @@ func (cs CryptoServiceImpl) EncryptApiKey(apiKey string) (*string, error) {
 	return encryptedApiKey, nil
 }
 
-func (cs CryptoServiceImpl) DecryptWebhookSigningKey(encryptedWebhookPrivateKey string) (*string, error) {
-	webhookPrivateKey, err := decrypt(WEBHOOK_SIGNING_KEY_KEY, encryptedWebhookPrivateKey)
+func (cs CryptoServiceImpl) DecryptWebhookSigningKey(encryptedWebhookSigningKey string) (*string, error) {
+	webhookSigningKey, err := decrypt(WEBHOOK_SIGNING_KEY_KEY, encryptedWebhookSigningKey)
 	if err != nil {
 		return nil, err
 	}
 
-	return webhookPrivateKey, nil
+	return webhookSigningKey, nil
 }
 
-func (cs CryptoServiceImpl) EncryptWebhookSigningKey(webhookPrivateKey string) (*string, error) {
-	encryptedWebhookPrivateKey, err := encrypt(WEBHOOK_SIGNING_KEY_KEY, webhookPrivateKey)
+func (cs CryptoServiceImpl) EncryptWebhookSigningKey(webhookSigningKey string) (*string, error) {
+	encryptedWebhookSigningKey, err := encrypt(WEBHOOK_SIGNING_KEY_KEY, webhookSigningKey)
 	if err != nil {
 		return nil, err
 	}
 
-	return encryptedWebhookPrivateKey, nil
+	return encryptedWebhookSigningKey, nil
+}
+
+func (cs CryptoServiceImpl) DecryptEndCustomerApiKey(encryptedEndCustomerApiKey string) (*string, error) {
+	endCustomerApiKey, err := decrypt(END_CUSTOMER_API_KEY_KEY, encryptedEndCustomerApiKey)
+	if err != nil {
+		return nil, err
+	}
+
+	return endCustomerApiKey, nil
+}
+
+func (cs CryptoServiceImpl) EncryptEndCustomerApiKey(endCustomerApi string) (*string, error) {
+	encryptedEndCustomerApiKey, err := encrypt(END_CUSTOMER_API_KEY_KEY, endCustomerApi)
+	if err != nil {
+		return nil, err
+	}
+
+	return encryptedEndCustomerApiKey, nil
 }

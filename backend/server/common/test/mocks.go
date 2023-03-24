@@ -56,6 +56,16 @@ func (cs MockCryptoService) EncryptWebhookSigningKey(_ string) (*string, error) 
 	return &result, nil
 }
 
+func (cs MockCryptoService) DecryptEndCustomerApiKey(encryptedEndCustomerApiKey string) (*string, error) {
+	result := "decrypted"
+	return &result, nil
+}
+
+func (cs MockCryptoService) EncryptEndCustomerApiKey(endCustomerApi string) (*string, error) {
+	result := "encrypted"
+	return &result, nil
+}
+
 type MockQueryService struct {
 	db *gorm.DB
 }

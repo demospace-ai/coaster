@@ -9,11 +9,14 @@ import (
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/crypto"
 	"go.fabra.io/server/common/errors"
+	"go.fabra.io/server/common/input"
 	"go.fabra.io/server/common/repositories/link_tokens"
+	"go.fabra.io/server/common/repositories/webhooks"
 )
 
 type CreateLinkTokenRequest struct {
-	EndCustomerId int64 `json:"end_customer_id" validate:"required"`
+	EndCustomerId int64              `json:"end_customer_id" validate:"required"`
+	WebhookData   *input.WebhookData `json:"webhook_data,omitempty"`
 }
 
 type CreateLinkTokenResponse struct {
@@ -36,6 +39,27 @@ func (s ApiService) CreateLinkToken(auth auth.Authentication, w http.ResponseWri
 	_, err = link_tokens.CreateLinkToken(s.db, auth.Organization.ID, createLinkTokenRequest.EndCustomerId, crypto.HashString(rawLinkToken))
 	if err != nil {
 		return err
+	}
+
+	if createLinkTokenRequest.WebhookData != nil {
+		if createLinkTokenRequest.WebhookData.EndCustomerApiKey != nil {
+			encryptedEndCustomerApiKey, err := s.cryptoService.EncryptEndCustomerApiKey(*createLinkTokenRequest.WebhookData.EndCustomerApiKey)
+			if err != nil {
+				return err
+			}
+
+			// TODO: use transaction
+			// this operation always replaces the existing api key
+			err = webhooks.DeactivateExistingEndCustomerApiKey(s.db, auth.Organization.ID, createLinkTokenRequest.EndCustomerId)
+			if err != nil {
+				return err
+			}
+
+			err = webhooks.CreateEndCustomerApiKey(s.db, auth.Organization.ID, createLinkTokenRequest.EndCustomerId, *encryptedEndCustomerApiKey)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
 	return json.NewEncoder(w).Encode(CreateLinkTokenResponse{
