@@ -18,8 +18,8 @@ type CreateObjectRequest struct {
 	DisplayName        string                `json:"display_name" validate:"required"`
 	DestinationID      int64                 `json:"destination_id" validate:"required"`
 	TargetType         models.TargetType     `json:"target_type" validate:"required"`
-	Namespace          *string               `json:"namespace,omitempty" validate:"required"`
-	TableName          *string               `json:"table_name,omitempty" validate:"required"`
+	Namespace          *string               `json:"namespace,omitempty"`
+	TableName          *string               `json:"table_name,omitempty"`
 	SyncMode           models.SyncMode       `json:"sync_mode" validate:"required"`
 	CursorField        *string               `json:"cursor_field,omitempty"`
 	PrimaryKey         *string               `json:"primary_key,omitempty"`

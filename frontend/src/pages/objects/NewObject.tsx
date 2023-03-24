@@ -92,7 +92,7 @@ const validateAll = (state: NewObjectState): boolean => {
     && state.syncMode !== undefined
     && (!needsCursorField(state.syncMode) || validateCursorField(state))
     && (!needsPrimaryKey(state.syncMode) || state.primaryKey !== undefined)
-    && state.endCustomerIdField !== undefined
+    //&& state.endCustomerIdField !== undefined
     && state.frequency !== undefined
     && state.frequencyUnits !== undefined
   );
@@ -202,7 +202,12 @@ export const DestinationSetup: React.FC<ObjectStepProps> = props => {
         destination={state.destination}
         setDestination={(value: Destination) => {
           if (!state.destination || value.id !== state.destination.id) {
-            setState({ ...state, destination: value, namespace: undefined, tableName: undefined, endCustomerIdField: undefined, objectFields: [] });
+            if (value.connection.connection_type === ConnectionType.Webhook) {
+              // Just hardcode EndCustomerIDField and TargetType for webhooks— they don't matter anyway
+              setState({ ...state, destination: value, namespace: undefined, tableName: undefined, targetType: TargetType.Webhook, endCustomerIdField: { name: "end_customer_id", type: FieldType.Integer }, objectFields: [] });
+            } else {
+              setState({ ...state, destination: value, namespace: undefined, tableName: undefined, endCustomerIdField: undefined, objectFields: [] });
+            }
           }
         }} />
       <DestinationTarget state={state} setState={setState} />
@@ -479,20 +484,24 @@ const Finalize: React.FC<ObjectStepProps & { onComplete: () => void; }> = (props
       }
       {state.syncMode !== undefined &&
         <>
-          <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5 tw-mb-3">
-            <span className="tw-font-medium">End Customer ID</span>
-          </div>
-          <FieldSelector
-            className="tw-mt-0 tw-w-100"
-            field={state.endCustomerIdField}
-            setField={(value: Field) => { setState({ ...state, endCustomerIdField: value }); }}
-            placeholder='End Customer ID Field'
-            noOptionsString="No Fields Available!"
-            validated={true}
-            connection={state.destination?.connection}
-            namespace={state.namespace}
-            tableName={state.tableName}
-          />
+          {state.destination?.connection.connection_type !== ConnectionType.Webhook &&
+            <>
+              <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5 tw-mb-3">
+                <span className="tw-font-medium">End Customer ID</span>
+              </div>
+              <FieldSelector
+                className="tw-mt-0 tw-w-100"
+                field={state.endCustomerIdField}
+                setField={(value: Field) => { setState({ ...state, endCustomerIdField: value }); }}
+                placeholder='End Customer ID Field'
+                noOptionsString="No Fields Available!"
+                validated={true}
+                connection={state.destination?.connection}
+                namespace={state.namespace}
+                tableName={state.tableName}
+              />
+            </>
+          }
           <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5 tw-mb-3">
             <span className="tw-font-medium">Frequency</span>
           </div>

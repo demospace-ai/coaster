@@ -603,6 +603,7 @@ export enum TargetType {
   SingleExisting = "single_existing",
   SingleNew = "single_new",
   TablePerCustomer = "table_per_customer",
+  Webhook = "webhook",
 }
 
 export enum FrequencyUnits {
