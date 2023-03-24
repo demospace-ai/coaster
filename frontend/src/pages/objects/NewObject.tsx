@@ -1,10 +1,11 @@
+import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import { ChangeEvent, useEffect, useState } from "react";
 import { BackButton, Button } from "src/components/button/Button";
 import { Checkbox } from "src/components/checkbox/Checkbox";
 import { InfoIcon } from "src/components/icons/Icons";
 import { Input, ValidatedDropdownInput, ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
-import { DestinationSelector, FieldSelector, NamespaceSelector, TableSelector } from "src/components/selector/Selector";
+import { DestinationSelector, FieldSelector, FieldTypeSelector, NamespaceSelector, TableSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { sendRequest } from "src/rpc/ajax";
 import { ConnectionType, CreateObject, CreateObjectRequest, Destination, Field, FieldType, FrequencyUnits, GetObjects, needsCursorField, needsPrimaryKey, ObjectFieldInput, SyncMode, TargetType } from "src/rpc/api";
@@ -15,6 +16,7 @@ import { mutate } from "swr";
 enum Step {
   Initial,
   FieldMapping,
+  CreateFields,
   Finalize,
 }
 
@@ -56,13 +58,20 @@ type ObjectStepProps = {
 };
 
 const validateDestination = (state: NewObjectState): boolean => {
-  return (
+  if (
     state.displayName !== undefined && state.displayName.length > 0
     && state.destination !== undefined
-    && state.targetType !== undefined
-    && state.namespace !== undefined && state.namespace.length > 0
-    && state.tableName !== undefined && state.tableName.length > 0
-  );
+  ) {
+    if (state.destination.connection.connection_type === ConnectionType.Webhook) {
+      return true;
+    } else {
+      return (state.targetType !== undefined
+        && state.namespace !== undefined && state.namespace.length > 0
+        && state.tableName !== undefined && state.tableName.length > 0);
+    }
+  } else {
+    return false;
+  }
 };
 
 const validateFields = (state: NewObjectState): boolean => {
@@ -88,7 +97,7 @@ const validateAll = (state: NewObjectState): boolean => {
 const validateCursorField = (state: NewObjectState): boolean => {
   // TODO: allow using other types
   return state.cursorField !== undefined && (
-    state.cursorField.type === FieldType.Timestamp
+    state.cursorField.type === FieldType.TimestampNtz
     || state.cursorField.type === FieldType.TimestampTz
     || state.cursorField.type === FieldType.Integer
   );
@@ -106,7 +115,11 @@ export const NewObject: React.FC<{ onComplete: () => void; }> = props => {
       back = props.onComplete;
       break;
     case Step.FieldMapping:
-      content = <ObjectFields state={state} setState={setState} />;
+      content = <ExistingObjectFields state={state} setState={setState} />;
+      back = () => setState({ ...state, step: Step.Initial });
+      break;
+    case Step.CreateFields:
+      content = <NewObjectFields state={state} setState={setState} />;
       back = () => setState({ ...state, step: Step.Initial });
       break;
     case Step.Finalize:
@@ -130,8 +143,12 @@ export const DestinationSetup: React.FC<ObjectStepProps> = props => {
   const setState = props.setState;
   const advance = () => {
     if (validateDestination(state)) {
-      setState({ ...state, step: Step.FieldMapping });
-    }
+      if (state.destination?.connection.connection_type === ConnectionType.Webhook) {
+        setState({ ...state, step: Step.CreateFields });
+      } else {
+        setState({ ...state, step: Step.FieldMapping });
+      }
+    };
   };
 
   return (
@@ -169,18 +186,17 @@ export const DestinationSetup: React.FC<ObjectStepProps> = props => {
   );
 };
 
-const ObjectFields: React.FC<ObjectStepProps> = props => {
+const ExistingObjectFields: React.FC<ObjectStepProps> = props => {
   const { state, setState } = props;
   const { schema } = useSchema(state.destination?.connection.id, state.namespace, state.tableName);
-  const endCustomerIdField = state.endCustomerIdField?.name;
+  // Initialize object fields from schema
   useEffect(() => {
     const objectFields = schema ? schema.map(field => {
       // automatically omit end customer ID field
-      const omit = field.name === endCustomerIdField;
       return {
         name: field.name,
         type: field.type,
-        omit: omit,
+        omit: false,
         optional: false,
       };
     }) : undefined;
@@ -190,7 +206,7 @@ const ObjectFields: React.FC<ObjectStepProps> = props => {
         objectFields: objectFields,
       };
     });
-  }, [schema, endCustomerIdField, setState]);
+  }, [schema, setState]);
 
   const updateObjectField = (newObject: ObjectFieldInput, index: number) => {
     if (!state.objectFields) {
@@ -240,6 +256,122 @@ const ObjectFields: React.FC<ObjectStepProps> = props => {
         }
       </div>
       <Button onClick={advance} className='tw-mt-6 tw-w-100 tw-h-10' >Continue</Button>
+    </div >
+  );
+};
+
+const NewObjectFields: React.FC<ObjectStepProps> = props => {
+  const { state, setState } = props;
+  // Initialize object fields to an empty list
+  useEffect(() => {
+    setState(s => {
+      return {
+        ...s,
+        objectFields: [],
+      };
+    });
+  }, [setState]);
+
+  const updateObjectField = (newObject: ObjectFieldInput, index: number) => {
+    if (!state.objectFields) {
+      // TODO: should not happen
+      return;
+    }
+
+    setState({
+      ...state,
+      objectFields: state.objectFields.map((original, i) => {
+        if (i === index) {
+          return newObject;
+        } else {
+          return original;
+        }
+      })
+    });
+  };
+
+  const addObjectField = () => {
+    if (!state.objectFields) {
+      return;
+    }
+
+    setState({
+      ...state,
+      objectFields: [...state.objectFields, {
+        name: "",
+        type: FieldType.String,
+        omit: false,
+        optional: false,
+      }]
+    });
+  };
+
+  const advance = () => {
+    if (validateFields(state)) {
+      setState({ ...state, step: Step.Finalize });
+    }
+  };
+
+  return (
+    <div className="tw-h-full tw-w-full tw-text-center">
+      <div className="tw-w-full tw-text-center tw-mb-2 tw-font-bold tw-text-lg">Object Fields</div>
+      <div className="tw-text-center tw-mb-3">Provide customer-facing names and descriptions for each field.</div>
+      <div className="tw-w-full tw-px-24">
+        {state.objectFields ?
+          <>
+            {state.objectFields.map((objectField, i) => (
+              <div key={objectField.name} className="tw-mt-5 tw-mb-7 tw-text-left tw-p-4 tw-border tw-rounded-lg">
+                <span className="tw-font-semibold tw-text-lg">Field {i + 1}</span>
+                <div className="tw-flex tw-items-center tw-mt-3">
+                  <span>Optional?</span>
+                  <Checkbox className="tw-ml-2 tw-h-4 tw-w-4" checked={objectField.optional} onCheckedChange={() => updateObjectField({ ...objectField, optional: !objectField.optional }, i)} />
+                </div>
+                <div className="tw-flex tw-w-full tw-items-center tw-mb-2">
+                  <div className="tw-w-full tw-mr-4">
+                    <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
+                      <span>Key</span>
+                      <Tooltip placement="right" label="Choose a valid JSON field key that will be used when sending this data to your webhook.">
+                        <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+                      </Tooltip>
+                    </div>
+                    <Input wrapperClassName="tw-w-full tw-h-full" value={objectField.display_name} setValue={value => updateObjectField({ ...objectField, name: value }, i)} placeholder="Key" />
+                  </div>
+                  <div>
+                    <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
+                      <span>Field Type</span>
+                      <Tooltip placement="right" label="Choose the type for this field.">
+                        <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+                      </Tooltip>
+                    </div>
+                    <FieldTypeSelector className="tw-w-48 tw-m-0" type={objectField.type} setFieldType={value => updateObjectField({ ...objectField, type: value }, i)} />
+                  </div>
+                </div>
+                <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
+                  <span>Display Name</span>
+                  <Tooltip placement="right" label="Set a customer-facing name that your customers will see when setting up a sync.">
+                    <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+                  </Tooltip>
+                </div>
+                <Input className="tw-mb-2" value={objectField.display_name} setValue={value => updateObjectField({ ...objectField, display_name: value }, i)} placeholder="Display Name (optional)" />
+                <div className="tw-flex tw-flex-row tw-items-center tw-mt-2 tw-mb-1">
+                  <span>Description</span>
+                  <Tooltip placement="right" label="Add any extra information that will help your customers understand how to map their data to this object.">
+                    <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+                  </Tooltip>
+                </div>
+                <Input className="tw-mb-2" value={objectField.description} setValue={value => updateObjectField({ ...objectField, description: value }, i)} placeholder="Description (optional)" />
+              </div>
+            ))}
+            <Button className="tw-mt-7 tw-mx-auto tw-flex tw-items-center" onClick={addObjectField}>
+              <PlusCircleIcon className="tw-h-5 tw-mr-1.5 tw-stroke-2" />
+              Add Object Field
+            </Button>
+          </>
+          :
+          <Loading className="tw-mt-5" />
+        }
+      </div>
+      <Button onClick={advance} className='tw-mt-16 tw-w-100 tw-h-10' >Continue</Button>
     </div >
   );
 };

@@ -1,5 +1,5 @@
 import { ValidatedComboInput, ValidatedDropdownInput } from "src/components/input/Input";
-import { Connection, Destination, Field, Object, Source } from "src/rpc/api";
+import { Connection, Destination, Field, FieldType, Object as DataObject, Source } from "src/rpc/api";
 import { useDestinations, useFieldValues, useLinkNamespaces, useLinkSchema, useLinkSources, useLinkTables, useNamespaces, useObjects, useSchema, useTables } from "src/rpc/data";
 
 type DestinationSelectorProps = {
@@ -177,8 +177,8 @@ export const SourceTableSelector: React.FC<SourceTableSelectorProps> = props => 
 };
 
 type ObjectSelectorProps = {
-  object: Object | undefined;
-  setObject: (object: Object) => void;
+  object: DataObject | undefined;
+  setObject: (object: DataObject) => void;
   className?: string;
   noOptionsString?: string;
   label?: string;
@@ -194,7 +194,7 @@ export const ObjectSelector: React.FC<ObjectSelectorProps> = props => {
     className={props.className}
     selected={props.object}
     setSelected={props.setObject}
-    getElementForDisplay={(object: Object) => object.display_name}
+    getElementForDisplay={(object: DataObject) => object.display_name}
     options={objects}
     loading={loading}
     noOptionsString={props.noOptionsString ? props.noOptionsString : "No objects available!"}
@@ -296,6 +296,32 @@ export const FieldValueSelector: React.FC<FieldValueSelectorProps> = props => {
     placeholder={props.placeholder ? props.placeholder : "Choose field value"}
     validated={props.validated}
     allowCustom={true} />;
+};
+
+
+type FieldTypeSelectorProps = {
+  type: FieldType,
+  setFieldType: (type: FieldType) => void;
+  className?: string;
+  noOptionsString?: string;
+  placeholder?: string;
+  validated?: boolean;
+};
+
+export const FieldTypeSelector: React.FC<FieldTypeSelectorProps> = props => {
+  const fieldTypes = Object.values(FieldType);
+
+  return <ValidatedComboInput
+    className={props.className}
+    selected={props.type}
+    setSelected={props.setFieldType}
+    options={fieldTypes}
+    getElementForDisplay={(propertyValue: string) => propertyValue ? propertyValue : "<empty>"}
+    loading={false}
+    noOptionsString={props.noOptionsString ? props.noOptionsString : "No field types available!"}
+    placeholder={props.placeholder ? props.placeholder : "Choose field type"}
+    validated={props.validated}
+  />;
 };
 
 type DateRangeSelectorProps = {

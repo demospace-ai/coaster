@@ -20,7 +20,7 @@ export const Input: React.FC<InputProps> = props => {
   const showLabel = props.label !== undefined && (focused || (props.value !== undefined && (props.value !== "string" || props.value.length > 0)));
 
   return (
-    <div className={mergeClasses("tw-relative", props.label && "tw-mt-4")}>
+    <div className={mergeClasses("tw-relative", props.label && "tw-mt-4", props.wrapperClassName)}>
       <Transition
         show={showLabel}
         enter="tw-transition tw-ease tw-duration-200 tw-transform"
@@ -77,6 +77,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   textarea?: boolean;
   type?: HTMLInputTypeAttribute;
   label?: string;
+  wrapperClassName?: string;
 };
 
 export const ValidatedInput: React.FC<InputProps> = props => {

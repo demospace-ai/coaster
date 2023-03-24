@@ -279,8 +279,15 @@ export interface FieldMappingInput {
 export enum FieldType {
   String = "STRING",
   Integer = "INTEGER",
-  Timestamp = "TIMESTAMP",
+  Number = "NUMBER",
   TimestampTz = "TIMESTAMP_TZ",
+  TimestampNtz = "TIMESTAMP_NTZ",
+  TimeTz = "TIME_TZ",
+  TimeNtz = "TIME_NTZ",
+  Date = "DATE",
+  Datetime = "DATETIME",
+  Boolean = "BOOLEAN",
+  Array = "ARRAY",
   Json = "JSON",
 }
 
