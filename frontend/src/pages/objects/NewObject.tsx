@@ -7,7 +7,7 @@ import { Loading } from "src/components/loading/Loading";
 import { DestinationSelector, FieldSelector, NamespaceSelector, TableSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { sendRequest } from "src/rpc/ajax";
-import { CreateObject, CreateObjectRequest, Destination, Field, FieldType, FrequencyUnits, GetObjects, needsCursorField, needsPrimaryKey, ObjectFieldInput, SyncMode, TargetType } from "src/rpc/api";
+import { ConnectionType, CreateObject, CreateObjectRequest, Destination, Field, FieldType, FrequencyUnits, GetObjects, needsCursorField, needsPrimaryKey, ObjectFieldInput, SyncMode, TargetType } from "src/rpc/api";
 import { useSchema } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
 import { mutate } from "swr";
@@ -401,6 +401,11 @@ const DestinationTarget: React.FC<ObjectStepProps> = ({ state, setState }) => {
     //   description: "Data from each of your customers will be stored in a separate table in your destination. The name of the table will include the customer's ID as a suffix."
     // },
   ];
+
+  if (!state.destination || state.destination.connection.connection_type === ConnectionType.Webhook) {
+    return <></>;
+  }
+
   return (
     <div className="tw-mt-5">
       <label className="tw-font-medium">Target</label>

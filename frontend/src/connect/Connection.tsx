@@ -1,7 +1,7 @@
 import React, { FormEvent, useState } from "react";
 import { Button } from "src/components/button/Button";
 import { InfoIcon } from "src/components/icons/Icons";
-import { ConnectionImage } from "src/components/images/connections";
+import { ConnectionImage } from "src/components/images/Connections";
 import sync from "src/components/images/sync.svg";
 import { Input, ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";

@@ -1,8 +1,5 @@
 import React from "react";
-import bigquery from "src/components/images/bigquery.svg";
-import mongodb from "src/components/images/mongodb.svg";
-import redshift from "src/components/images/redshift.svg";
-import snowflake from "src/components/images/snowflake.svg";
+import { ConnectionImage } from "src/components/images/Connections";
 import { SetupSyncProps, SyncSetupStep } from "src/connect/state";
 import { ConnectionType } from "src/rpc/api";
 
@@ -18,19 +15,19 @@ export const WarehouseSelector: React.FC<SetupSyncProps> = (props) => {
       <div className="tw-text-left tw-mb-10 tw-text-slate-600">Choose the data warehouse, database, or data lake to connect.</div>
       <div className="tw-flex tw-flex-row tw-gap-5 tw-flex-wrap tw-justify-between">
         <button className={connectionButton} onClick={() => onClick(ConnectionType.Snowflake)}>
-          <img src={snowflake} alt="data source logo" className="tw-h-6 tw-mr-1.5" />
+          <ConnectionImage connectionType={ConnectionType.Snowflake} className="tw-h-6 tw-mr-1.5" />
           Snowflake
         </button>
         <button className={connectionButton} onClick={() => onClick(ConnectionType.BigQuery)}>
-          <img src={bigquery} alt="data source logo" className="tw-h-6 tw-mr-1.5" />
+          <ConnectionImage connectionType={ConnectionType.BigQuery} className="tw-h-6 tw-mr-1.5" />
           BigQuery
         </button>
         <button className={connectionButton} onClick={() => onClick(ConnectionType.Redshift)}>
-          <img src={redshift} alt="data source logo" className="tw-h-6 tw-mr-1.5" />
+          <ConnectionImage connectionType={ConnectionType.Redshift} className="tw-h-6 tw-mr-1.5" />
           Redshift
         </button>
         <button className={connectionButton} onClick={() => onClick(ConnectionType.MongoDb)}>
-          <img src={mongodb} alt="data source logo" className="tw-h-6 tw-mr-1.5" />
+          <ConnectionImage connectionType={ConnectionType.MongoDb} className="tw-h-6 tw-mr-1.5" />
           MongoDB
         </button>
       </div>

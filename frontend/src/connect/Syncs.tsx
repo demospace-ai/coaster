@@ -42,7 +42,7 @@ const SyncList: React.FC<{ linkToken: string; }> = ({ linkToken }) => {
           <div className="tw-flex tw-justify-start tw-font-bold tw-text-2xl">Your syncs</div>
           <div className="tw-mt-2 tw-text-slate-600">Setup a sync to connect your data source and map it to fields in the application.</div>
         </div>
-        <Button className="tw-ml-auto tw-h-9" onClick={() => navigate("/newsync")}>New Sync</Button>
+        <Button className="tw-ml-auto tw-h-9 tw-whitespace-nowrap" onClick={() => navigate("/newsync")}>New Sync</Button>
       </div>
       <div className="tw-mt-10 tw-overflow-auto tw-shadow tw-ring-1 tw-ring-black tw-ring-opacity-5 tw-rounded-md">
         {syncs ?
@@ -80,8 +80,8 @@ const SyncList: React.FC<{ linkToken: string; }> = ({ linkToken }) => {
                     <td className={tableCellStyle}>
                       {object?.display_name}
                     </td>
-                    <td className={mergeClasses(tableCellStyle, "tw-flex")}>
-                      <ConnectionImage connectionType={source!.connection.connection_type} />
+                    <td className={mergeClasses(tableCellStyle, "tw-flex tw-items-center")}>
+                      <ConnectionImage connectionType={source!.connection.connection_type} className="tw-h-6 tw-mr-1.5" />
                       {source?.display_name}
                     </td>
                     <td className="tw-pr-4" align="right">

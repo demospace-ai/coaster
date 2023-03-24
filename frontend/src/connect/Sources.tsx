@@ -2,7 +2,7 @@ import { ChevronRightIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
 import React, { useEffect, useState } from "react";
 import { Button } from "src/components/button/Button";
 import { AddDatabase, InfoIcon } from "src/components/icons/Icons";
-import { getConnectionTypeImg } from "src/components/images/connections";
+import { ConnectionImage } from "src/components/images/Connections";
 import { Loading } from "src/components/loading/Loading";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { SetupSyncProps, SyncSetupStep } from "src/connect/state";
@@ -33,7 +33,7 @@ export const Sources: React.FC<SetupSyncProps> = ({ linkToken, state, setState }
         <Tooltip placement="right" maxWidth="500px" label="These are the data sources you've setup previously.">
           <InfoIcon className="tw-ml-1.5 tw-h-3.5 tw-fill-slate-400" />
         </Tooltip>
-        <Button className="tw-ml-auto tw-flex tw-flex-row tw-items-center tw-h-8 tw-bg-blue-600 hover:tw-bg-blue-800" onClick={() => setState({ ...state, step: SyncSetupStep.ChooseSourceType })}>
+        <Button className="tw-ml-auto tw-flex tw-flex-row tw-items-center tw-whitespace-nowrap tw-h-8 tw-bg-blue-600 hover:tw-bg-blue-800" onClick={() => setState({ ...state, step: SyncSetupStep.ChooseSourceType })}>
           <PlusCircleIcon className="tw-h-5 tw-mr-2 tw-stroke-2" />
           <span className="tw-mr-1">New Source</span>
         </Button>
@@ -76,7 +76,7 @@ const SourceTable: React.FC<SetupSyncProps> = ({ linkToken, state, setState }) =
                 {sources.length > 0 ? sources.map((source) => (
                   <tr key={source.id} className="tw-cursor-pointer hover:tw-bg-slate-50" onClick={() => setExistingSource(source)}>
                     <td className="tw-whitespace-nowrap tw-py-4 tw-pl-4 tw-pr-3 tw-text-sm tw-font-medium tw-text-slate-900 tw-flex tw-flex-row tw-items-center">
-                      <img className="tw-mr-2 tw-h-5" src={getConnectionTypeImg(source.connection.connection_type)} alt="warehouse icon" />
+                      <ConnectionImage connectionType={source.connection.connection_type} className="tw-h-6 tw-mr-1.5" />
                       {source.display_name}
                     </td>
                     <td className="tw-whitespace-nowrap tw-px-3 tw-py-4 tw-text-sm tw-text-slate-500">{source.connection.connection_type}</td>
