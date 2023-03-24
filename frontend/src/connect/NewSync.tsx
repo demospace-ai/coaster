@@ -1,6 +1,6 @@
 import { CheckIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "src/components/button/Button";
 import { Loading } from "src/components/loading/Loading";
@@ -14,11 +14,13 @@ import { useObject } from "src/rpc/data";
 
 export const NewSync: React.FC<{ linkToken: string, close: () => void; }> = ({ linkToken, close }) => {
   const [state, setState] = useState<SetupSyncState>(INITIAL_SETUP_STATE);
+  const [prevObject, setPrevObject] = useState<Object | undefined>(undefined);
   const { object } = useObject(state.object?.id, linkToken);
   const navigate = useNavigate();
 
   // Setup the initial values for the field mappings
-  useEffect(() => {
+  if (object && object !== prevObject) {
+    setPrevObject(object);
     const fieldMappings = object ? object.object_fields.filter(objectField => !objectField.omit).map(objectField => {
       return {
         source_field: undefined,
@@ -31,7 +33,7 @@ export const NewSync: React.FC<{ linkToken: string, close: () => void; }> = ({ l
         fieldMappings: fieldMappings,
       };
     });
-  }, [object]);
+  }
 
   const back = () => {
     if (state.step === SyncSetupStep.ExistingSources) {

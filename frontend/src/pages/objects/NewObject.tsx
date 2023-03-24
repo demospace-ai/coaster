@@ -1,5 +1,5 @@
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { BackButton, Button } from "src/components/button/Button";
 import { Checkbox } from "src/components/checkbox/Checkbox";
 import { InfoIcon } from "src/components/icons/Icons";
@@ -8,7 +8,7 @@ import { Loading } from "src/components/loading/Loading";
 import { DestinationSelector, FieldSelector, FieldTypeSelector, NamespaceSelector, TableSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { sendRequest } from "src/rpc/ajax";
-import { ConnectionType, CreateObject, CreateObjectRequest, Destination, Field, FieldType, FrequencyUnits, GetObjects, needsCursorField, needsPrimaryKey, ObjectFieldInput, SyncMode, TargetType } from "src/rpc/api";
+import { ConnectionType, CreateObject, CreateObjectRequest, Destination, Field, FieldType, FrequencyUnits, GetObjects, needsCursorField, needsPrimaryKey, ObjectFieldInput, Schema, SyncMode, TargetType } from "src/rpc/api";
 import { useSchema } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
 import { mutate } from "swr";
@@ -33,7 +33,7 @@ type NewObjectState = {
   endCustomerIdField: Field | undefined;
   frequency: number | undefined;
   frequencyUnits: FrequencyUnits | undefined;
-  objectFields: ObjectFieldInput[] | undefined;
+  objectFields: ObjectFieldInput[];
 };
 
 const INITIAL_OBJECT_STATE: NewObjectState = {
@@ -49,7 +49,7 @@ const INITIAL_OBJECT_STATE: NewObjectState = {
   endCustomerIdField: undefined,
   frequency: undefined,
   frequencyUnits: undefined,
-  objectFields: undefined,
+  objectFields: [],
 };
 
 type ObjectStepProps = {
@@ -78,8 +78,12 @@ const validateFields = (state: NewObjectState): boolean => {
   return (
     validateDestination(state)
     && state.objectFields !== undefined && state.objectFields.length > 0
+    && state.objectFields.every(objectField =>
+      objectField.name && objectField.name.length > 0 && objectField.type && objectField.type.length > 0
+    )
   );
 };
+
 
 const validateAll = (state: NewObjectState): boolean => {
   return (
@@ -105,6 +109,28 @@ const validateCursorField = (state: NewObjectState): boolean => {
 
 export const NewObject: React.FC<{ onComplete: () => void; }> = props => {
   const [state, setState] = useState<NewObjectState>(INITIAL_OBJECT_STATE);
+  const [prevSchema, setPrevSchema] = useState<Schema | undefined>(undefined);
+  const { schema } = useSchema(state.destination?.connection.id, state.namespace, state.tableName);
+
+  // Initialize object fields from schema
+  if (schema && schema !== prevSchema) {
+    setPrevSchema(schema);
+    const objectFields = schema.map(field => {
+      // automatically omit end customer ID field
+      return {
+        name: field.name,
+        type: field.type,
+        omit: false,
+        optional: false,
+      };
+    });
+    setState(s => {
+      return {
+        ...s,
+        objectFields: objectFields,
+      };
+    });
+  }
 
   let content: React.ReactElement;
   let back: () => void;
@@ -162,7 +188,6 @@ export const DestinationSetup: React.FC<ObjectStepProps> = props => {
         </Tooltip>
       </div>
       <ValidatedInput
-        id='displayName'
         className="tw-w-100"
         value={state.displayName}
         setValue={(value) => { setState({ ...state, displayName: value }); }}
@@ -177,7 +202,7 @@ export const DestinationSetup: React.FC<ObjectStepProps> = props => {
         destination={state.destination}
         setDestination={(value: Destination) => {
           if (!state.destination || value.id !== state.destination.id) {
-            setState({ ...state, destination: value, namespace: undefined, tableName: undefined, endCustomerIdField: undefined, objectFields: undefined });
+            setState({ ...state, destination: value, namespace: undefined, tableName: undefined, endCustomerIdField: undefined, objectFields: [] });
           }
         }} />
       <DestinationTarget state={state} setState={setState} />
@@ -188,26 +213,6 @@ export const DestinationSetup: React.FC<ObjectStepProps> = props => {
 
 const ExistingObjectFields: React.FC<ObjectStepProps> = props => {
   const { state, setState } = props;
-  const { schema } = useSchema(state.destination?.connection.id, state.namespace, state.tableName);
-  // Initialize object fields from schema
-  useEffect(() => {
-    const objectFields = schema ? schema.map(field => {
-      // automatically omit end customer ID field
-      return {
-        name: field.name,
-        type: field.type,
-        omit: false,
-        optional: false,
-      };
-    }) : undefined;
-    setState(s => {
-      return {
-        ...s,
-        objectFields: objectFields,
-      };
-    });
-  }, [schema, setState]);
-
   const updateObjectField = (newObject: ObjectFieldInput, index: number) => {
     if (!state.objectFields) {
       // TODO: should not happen
@@ -237,22 +242,22 @@ const ExistingObjectFields: React.FC<ObjectStepProps> = props => {
       <div className="tw-w-full tw-text-center tw-mb-2 tw-font-bold tw-text-lg">Object Fields</div>
       <div className="tw-text-center tw-mb-3">Provide customer-facing names and descriptions for each field.</div>
       <div className="tw-w-full tw-px-24">
-        {state.objectFields ?
+        {state.objectFields.length > 0 ?
           state.objectFields.map((objectField, i) => (
             <div key={objectField.name} className={mergeClasses("tw-mt-5 tw-mb-7 tw-text-left")}>
               <span className="tw-text-base tw-font-semibold">{objectField.name}</span>
               <div className="tw-flex tw-items-center tw-mt-2 tw-pb-1.5">
                 <span className="">Omit?</span>
-                <Checkbox className="tw-ml-2 tw-h-4 tw-w-4 tw-" checked={objectField.omit} onCheckedChange={() => updateObjectField({ ...objectField, omit: !objectField.omit }, i)} />
+                <Checkbox className="tw-ml-2 tw-h-4 tw-w-4 tw-" checked={Boolean(objectField.omit)} onCheckedChange={() => updateObjectField({ ...objectField, omit: !objectField.omit }, i)} />
                 <span className="tw-ml-4">Optional?</span>
-                <Checkbox className="tw-ml-2 tw-h-4 tw-w-4" checked={objectField.optional} onCheckedChange={() => updateObjectField({ ...objectField, optional: !objectField.optional }, i)} />
+                <Checkbox className="tw-ml-2 tw-h-4 tw-w-4" checked={Boolean(objectField.optional)} onCheckedChange={() => updateObjectField({ ...objectField, optional: !objectField.optional }, i)} />
               </div>
               <Input className="tw-mb-2" value={objectField.display_name} setValue={value => updateObjectField({ ...objectField, display_name: value }, i)} placeholder="Display Name (optional)" label="Display Name" />
               <Input className="tw-mb-2" value={objectField.description} setValue={value => updateObjectField({ ...objectField, description: value }, i)} placeholder="Description (optional)" label="Description" />
             </div>
           ))
           :
-          <Loading className="tw-mt-5" />
+          <Loading />
         }
       </div>
       <Button onClick={advance} className='tw-mt-6 tw-w-100 tw-h-10' >Continue</Button>
@@ -262,16 +267,6 @@ const ExistingObjectFields: React.FC<ObjectStepProps> = props => {
 
 const NewObjectFields: React.FC<ObjectStepProps> = props => {
   const { state, setState } = props;
-  // Initialize object fields to an empty list
-  useEffect(() => {
-    setState(s => {
-      return {
-        ...s,
-        objectFields: [],
-      };
-    });
-  }, [setState]);
-
   const updateObjectField = (newObject: ObjectFieldInput, index: number) => {
     if (!state.objectFields) {
       // TODO: should not happen
@@ -298,8 +293,8 @@ const NewObjectFields: React.FC<ObjectStepProps> = props => {
     setState({
       ...state,
       objectFields: [...state.objectFields, {
-        name: "",
-        type: FieldType.String,
+        name: undefined,
+        type: undefined,
         omit: false,
         optional: false,
       }]
@@ -318,23 +313,23 @@ const NewObjectFields: React.FC<ObjectStepProps> = props => {
       <div className="tw-text-center tw-mb-3">Provide customer-facing names and descriptions for each field.</div>
       <div className="tw-w-full tw-px-24">
         {state.objectFields ?
-          <>
+          <div>
             {state.objectFields.map((objectField, i) => (
-              <div key={objectField.name} className="tw-mt-5 tw-mb-7 tw-text-left tw-p-4 tw-border tw-rounded-lg">
+              <div key={i} className="tw-mt-5 tw-mb-7 tw-text-left tw-p-4 tw-border tw-rounded-lg">
                 <span className="tw-font-semibold tw-text-lg">Field {i + 1}</span>
                 <div className="tw-flex tw-items-center tw-mt-3">
                   <span>Optional?</span>
-                  <Checkbox className="tw-ml-2 tw-h-4 tw-w-4" checked={objectField.optional} onCheckedChange={() => updateObjectField({ ...objectField, optional: !objectField.optional }, i)} />
+                  <Checkbox className="tw-ml-2 tw-h-4 tw-w-4" checked={Boolean(objectField.optional)} onCheckedChange={() => updateObjectField({ ...objectField, optional: !objectField.optional }, i)} />
                 </div>
                 <div className="tw-flex tw-w-full tw-items-center tw-mb-2">
                   <div className="tw-w-full tw-mr-4">
                     <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
-                      <span>Key</span>
-                      <Tooltip placement="right" label="Choose a valid JSON field key that will be used when sending this data to your webhook.">
+                      <span>Field Key</span>
+                      <Tooltip placement="right" label="Choose a valid JSON key that will be used when sending this field to your webhook.">
                         <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
                       </Tooltip>
                     </div>
-                    <Input wrapperClassName="tw-w-full tw-h-full" value={objectField.display_name} setValue={value => updateObjectField({ ...objectField, name: value }, i)} placeholder="Key" />
+                    <Input value={objectField.name} setValue={value => updateObjectField({ ...objectField, name: value }, i)} placeholder="Field Key" />
                   </div>
                   <div>
                     <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
@@ -366,7 +361,7 @@ const NewObjectFields: React.FC<ObjectStepProps> = props => {
               <PlusCircleIcon className="tw-h-5 tw-mr-1.5 tw-stroke-2" />
               Add Object Field
             </Button>
-          </>
+          </div>
           :
           <Loading className="tw-mt-5" />
         }
@@ -414,7 +409,11 @@ const Finalize: React.FC<ObjectStepProps & { onComplete: () => void; }> = (props
     setLoading(false);
   };
 
-  const fields = state.objectFields ? state.objectFields.filter(field => !field.omit && !field.optional) : [];
+  const fields: Field[] = state.objectFields ? state.objectFields
+    .filter(field => field.name && field.type && !field.omit && !field.optional)
+    .map(field => {
+      return { name: field.name!, type: field.type! };
+    }) : [];
 
   if (createObjectSuccess) {
     return (
@@ -580,7 +579,7 @@ const DestinationTarget: React.FC<ObjectStepProps> = ({ state, setState }) => {
             namespace={state.namespace}
             setNamespace={(value: string) => {
               if (value !== state.namespace) {
-                setState({ ...state, namespace: value, tableName: undefined, endCustomerIdField: undefined, objectFields: undefined });
+                setState({ ...state, namespace: value, tableName: undefined, endCustomerIdField: undefined, objectFields: [] });
               }
             }}
             noOptionsString="No Namespaces Available! (Choose a data source)"
@@ -595,7 +594,7 @@ const DestinationTarget: React.FC<ObjectStepProps> = ({ state, setState }) => {
             tableName={state.tableName}
             setTableName={(value: string) => {
               if (value !== state.tableName) {
-                setState({ ...state, tableName: value, endCustomerIdField: undefined, objectFields: undefined });
+                setState({ ...state, tableName: value, endCustomerIdField: undefined, objectFields: [] });
               }
             }}
             noOptionsString="No Tables Available! (Choose a namespace)"

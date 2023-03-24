@@ -300,7 +300,7 @@ export const FieldValueSelector: React.FC<FieldValueSelectorProps> = props => {
 
 
 type FieldTypeSelectorProps = {
-  type: FieldType,
+  type: FieldType | undefined,
   setFieldType: (type: FieldType) => void;
   className?: string;
   noOptionsString?: string;

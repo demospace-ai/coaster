@@ -262,10 +262,10 @@ export interface ObjectField {
 }
 
 export interface ObjectFieldInput {
-  name: string;
-  type: FieldType;
-  omit: boolean;
-  optional: boolean;
+  name?: string;
+  type?: FieldType;
+  omit?: boolean;
+  optional?: boolean;
   display_name?: string;
   description?: string;
 }
