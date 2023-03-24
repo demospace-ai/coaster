@@ -51,7 +51,7 @@ const ObjectList: React.FC<{ setStep: (step: Step) => void; }> = ({ setStep }) =
           </div>
         </Button>
       </div>
-      <div className='tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-lg tw-max-h-64 tw-overflow-x-auto tw-overscroll-contain tw-shadow-md' >
+      <div className='tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-lg tw-overflow-x-auto tw-overscroll-contain tw-shadow-md' >
         {objects
           ?
           <table className="tw-min-w-full tw-border-spacing-0">

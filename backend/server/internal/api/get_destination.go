@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/errors"
+	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/repositories/connections"
 	"go.fabra.io/server/common/repositories/destinations"
 	"go.fabra.io/server/common/views"
@@ -39,7 +40,19 @@ func (s ApiService) GetDestination(auth auth.Authentication, w http.ResponseWrit
 		return err
 	}
 
+	var destinationView views.Destination
+	if connection.ConnectionType == models.ConnectionTypeWebhook {
+		webhookSigningKey, err := s.cryptoService.DecryptWebhookSigningKey(connection.Credentials.String)
+		if err != nil {
+			return err
+		}
+
+		destinationView = views.ConvertWebhook(*destination, *connection, webhookSigningKey)
+	} else {
+		destinationView = views.ConvertDestination(*destination, *connection)
+	}
+
 	return json.NewEncoder(w).Encode(GetDestinationResponse{
-		views.ConvertDestination(*destination, *connection),
+		destinationView,
 	})
 }

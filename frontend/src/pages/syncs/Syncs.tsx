@@ -1,6 +1,6 @@
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
-import { getConnectionTypeImg } from "src/components/images/connections";
+import { ConnectionImage } from "src/components/images/Connections";
 import { Loading } from "src/components/loading/Loading";
 import { useSyncs } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
@@ -19,7 +19,7 @@ export const Syncs: React.FC = () => {
       <div className="tw-flex tw-w-full tw-mb-5 tw-mt-2">
         <div className="tw-flex tw-flex-col tw-justify-end tw-font-bold tw-text-lg">Syncs</div>
       </div>
-      <div className='tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-lg tw-max-h-96 tw-overflow-x-auto tw-overscroll-contain tw-shadow-md' >
+      <div className='tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-lg tw-overflow-x-auto tw-overscroll-contain tw-shadow-md' >
         {syncs
           ?
           <table className="tw-min-w-full tw-border-spacing-0">
@@ -47,8 +47,8 @@ export const Syncs: React.FC = () => {
                     <td className={tableCellStyle}>
                       {object?.display_name}
                     </td>
-                    <td className={mergeClasses(tableCellStyle, "tw-flex tw-flex-row")}>
-                      <img className="tw-mr-2 tw-h-5" src={getConnectionTypeImg(source!.connection.connection_type)} alt="warehouse icon" />
+                    <td className={mergeClasses(tableCellStyle, "tw-flex tw-flex-row tw-items-center")}>
+                      <ConnectionImage connectionType={source!.connection.connection_type} className="tw-h-6 tw-mr-1.5" />
                       {source?.display_name}
                     </td>
                     <td className={mergeClasses(tableCellStyle, "tw-w-full tw-pr-5")}>

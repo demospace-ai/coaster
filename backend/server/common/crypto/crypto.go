@@ -2,6 +2,7 @@ package crypto
 
 import (
 	"context"
+	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
@@ -15,15 +16,15 @@ import (
 
 const CONNECTION_KEY = "projects/fabra-344902/locations/global/keyRings/data-connection-keyring/cryptoKeys/data-connection-key"
 const API_KEY_KEY = "projects/fabra-344902/locations/global/keyRings/api-key-keyring/cryptoKeys/api-key-key"
-const WEBHOOK_PRIVATE_KEY_KEY = "projects/fabra-344902/locations/global/keyRings/webhook-verification-key-keyring/cryptoKeys/webhook-verification-key-key"
+const WEBHOOK_SIGNING_KEY_KEY = "projects/fabra-344902/locations/global/keyRings/webhook-verification-key-keyring/cryptoKeys/webhook-verification-key-key"
 
 type CryptoService interface {
 	DecryptConnectionCredentials(encryptedCredentials string) (*string, error)
 	EncryptConnectionCredentials(credentials string) (*string, error)
 	DecryptApiKey(encryptedApiKey string) (*string, error)
 	EncryptApiKey(apiKey string) (*string, error)
-	DecryptWebhookPrivateKey(encryptedWebhookPrivateKey string) (*string, error)
-	EncryptWebhookPrivateKey(webhookVerificationKey string) (*string, error)
+	DecryptWebhookSigningKey(encryptedWebhookPrivateKey string) (*string, error)
+	EncryptWebhookSigningKey(webhookVerificationKey string) (*string, error)
 }
 
 type CryptoServiceImpl struct {
@@ -36,6 +37,15 @@ func NewCryptoService() CryptoService {
 func HashString(input string) string {
 	h := sha256.Sum256([]byte(input))
 	return base64.StdEncoding.EncodeToString(h[:])
+}
+
+func GenerateSigningKey() string {
+	randomBytes := make([]byte, 32)
+	_, err := rand.Read(randomBytes)
+	if err != nil {
+		panic(err)
+	}
+	return base64.StdEncoding.EncodeToString(randomBytes)
 }
 
 func encrypt(keyName string, plaintextString string) (*string, error) {
@@ -150,8 +160,8 @@ func (cs CryptoServiceImpl) EncryptApiKey(apiKey string) (*string, error) {
 	return encryptedApiKey, nil
 }
 
-func (cs CryptoServiceImpl) DecryptWebhookPrivateKey(encryptedWebhookPrivateKey string) (*string, error) {
-	webhookPrivateKey, err := decrypt(WEBHOOK_PRIVATE_KEY_KEY, encryptedWebhookPrivateKey)
+func (cs CryptoServiceImpl) DecryptWebhookSigningKey(encryptedWebhookPrivateKey string) (*string, error) {
+	webhookPrivateKey, err := decrypt(WEBHOOK_SIGNING_KEY_KEY, encryptedWebhookPrivateKey)
 	if err != nil {
 		return nil, err
 	}
@@ -159,8 +169,8 @@ func (cs CryptoServiceImpl) DecryptWebhookPrivateKey(encryptedWebhookPrivateKey 
 	return webhookPrivateKey, nil
 }
 
-func (cs CryptoServiceImpl) EncryptWebhookPrivateKey(webhookPrivateKey string) (*string, error) {
-	encryptedWebhookPrivateKey, err := encrypt(WEBHOOK_PRIVATE_KEY_KEY, webhookPrivateKey)
+func (cs CryptoServiceImpl) EncryptWebhookSigningKey(webhookPrivateKey string) (*string, error) {
+	encryptedWebhookPrivateKey, err := encrypt(WEBHOOK_SIGNING_KEY_KEY, webhookPrivateKey)
 	if err != nil {
 		return nil, err
 	}

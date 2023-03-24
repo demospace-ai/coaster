@@ -4,7 +4,7 @@ import classNames from "classnames";
 import { ReactElement, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "src/components/button/Button";
-import { getConnectionTypeImg } from "src/components/images/connections";
+import { ConnectionImage } from "src/components/images/Connections";
 import { Loading } from "src/components/loading/Loading";
 import { NewDestination } from "src/pages/destinations/NewDestination";
 import { getConnectionType } from "src/rpc/api";
@@ -56,7 +56,7 @@ const DestinationList: React.FC<{ setStep: (step: Step) => void; }> = ({ setStep
           </div>
         </Button>
       </div>
-      <div className='tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-lg tw-max-h-64 tw-overflow-x-auto tw-overscroll-contain tw-shadow-md' >
+      <div className='tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-lg tw-overflow-x-auto tw-overscroll-contain tw-shadow-md' >
         {destinations
           ?
           <table className="tw-min-w-full tw-border-spacing-0">
@@ -75,7 +75,7 @@ const DestinationList: React.FC<{ setStep: (step: Step) => void; }> = ({ setStep
                   </td>
                   <td className={tableCellStyle}>
                     <div className="tw-flex tw-items-center">
-                      <img src={getConnectionTypeImg(destination.connection.connection_type)} alt="data source logo" className="tw-h-6 tw-mr-1" />
+                      <ConnectionImage connectionType={destination.connection.connection_type} className="tw-h-6 tw-mr-1" />
                       {getConnectionType(destination.connection.connection_type)}
                     </div>
                   </td>

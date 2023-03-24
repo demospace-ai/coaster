@@ -2,7 +2,7 @@ import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
 import { Button } from "src/components/button/Button";
 import { AddDatabase } from "src/components/icons/Icons";
-import { getConnectionTypeImg } from "src/components/images/connections";
+import { ConnectionImage } from "src/components/images/Connections";
 import { Loading } from "src/components/loading/Loading";
 import { useLinkSyncs } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
@@ -81,7 +81,7 @@ const SyncList: React.FC<{ linkToken: string; }> = ({ linkToken }) => {
                       {object?.display_name}
                     </td>
                     <td className={mergeClasses(tableCellStyle, "tw-flex")}>
-                      <img className="tw-mr-2 tw-h-5" src={getConnectionTypeImg(source!.connection.connection_type)} alt="warehouse icon" />
+                      <ConnectionImage connectionType={source!.connection.connection_type} />
                       {source?.display_name}
                     </td>
                     <td className="tw-pr-4" align="right">

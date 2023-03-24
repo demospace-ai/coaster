@@ -129,3 +129,24 @@ func CreateMongoDbConnection(
 
 	return &connection, nil
 }
+
+func CreateWebhookConnection(
+	db *gorm.DB,
+	organizationID int64,
+	webhookConfig input.WebhookConfig,
+	encryptedSigningKey string,
+) (*models.Connection, error) {
+	connection := models.Connection{
+		OrganizationID: organizationID,
+		ConnectionType: models.ConnectionTypeWebhook,
+		Host:           database.NewNullString(webhookConfig.URL),   // store URL in the host column
+		Credentials:    database.NewNullString(encryptedSigningKey), // store signing key in the credentials column
+	}
+
+	result := db.Create(&connection)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &connection, nil
+}

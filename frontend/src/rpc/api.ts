@@ -210,6 +210,7 @@ export interface TestDataConnectionRequest {
   snowflake_config?: SnowflakeConfig;
   mongodb_config?: MongoDbConfig;
   redshift_config?: RedshiftConfig;
+  webhook_config?: WebhookConfig;
 }
 
 export interface CreateDestinationRequest {
@@ -219,6 +220,7 @@ export interface CreateDestinationRequest {
   snowflake_config?: SnowflakeConfig;
   redshift_config?: RedshiftConfig;
   mongodb_config?: MongoDbConfig;
+  webhook_config?: WebhookConfig;
 }
 
 export interface LinkCreateSourceRequest {
@@ -503,6 +505,7 @@ export interface Destination {
   id: number;
   display_name: string;
   connection: Connection;
+  webhook_signing_key?: string;
 }
 
 export interface Source {

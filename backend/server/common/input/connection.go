@@ -25,6 +25,16 @@ type MongoDbConfig struct {
 	ConnectionOptions *string `json:"connection_options,omitempty"`
 }
 
+type WebhookConfig struct {
+	URL     string   `json:"url,omitempty"`
+	Headers []Header `json:"headers,omitempty"`
+}
+
+type Header struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
 type BigQueryConfig struct {
 	Credentials string `json:"credentials,omitempty"`
 	Location    string `json:"location,omitempty"`

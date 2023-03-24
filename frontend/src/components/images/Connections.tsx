@@ -5,7 +5,7 @@ import snowflake from "src/components/images/snowflake.svg";
 import webhook from "src/components/images/webhook.svg";
 import { ConnectionType } from "src/rpc/api";
 
-export function getConnectionTypeImg(connectionType: ConnectionType): string {
+function getConnectionTypeImg(connectionType: ConnectionType): string {
   switch (connectionType) {
     case ConnectionType.BigQuery:
       return bigquery;
@@ -19,3 +19,9 @@ export function getConnectionTypeImg(connectionType: ConnectionType): string {
       return webhook;
   }
 }
+
+export const ConnectionImage: React.FC<{ connectionType: ConnectionType; className?: string; }> = ({ connectionType, className }) => {
+  return (
+    <img src={getConnectionTypeImg(connectionType)} alt="data source logo" className={className} />
+  );
+};

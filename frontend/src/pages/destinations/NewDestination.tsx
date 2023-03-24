@@ -1,13 +1,12 @@
-import { XMarkIcon } from "@heroicons/react/24/outline";
 import React, { FormEvent, useState } from "react";
 import { BackButton, Button, FormButton } from "src/components/button/Button";
 import { InfoIcon } from "src/components/icons/Icons";
-import { getConnectionTypeImg } from "src/components/images/connections";
+import { ConnectionImage } from "src/components/images/Connections";
 import { Input, ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { sendRequest } from "src/rpc/ajax";
-import { BigQueryConfig, ConnectionType, CreateDestination, CreateDestinationRequest, getConnectionType, GetDestinations, HeaderInput, MongoDbConfig, RedshiftConfig, SnowflakeConfig, TestDataConnection, TestDataConnectionRequest, WebhookConfig } from "src/rpc/api";
+import { BigQueryConfig, ConnectionType, CreateDestination, CreateDestinationRequest, getConnectionType, GetDestinations, MongoDbConfig, RedshiftConfig, SnowflakeConfig, TestDataConnection, TestDataConnectionRequest, WebhookConfig } from "src/rpc/api";
 import { mergeClasses } from "src/utils/twmerge";
 import { mutate } from "swr";
 
@@ -114,13 +113,8 @@ const validateAll = (connectionType: ConnectionType, state: NewDestinationState)
         && state.mongodbConfig.host.length > 0; // connection options is optional
     case ConnectionType.Webhook:
       return state.displayName.length > 0
-        && state.webhookConfig.url.length > 0
-        && validateHeaders(state.webhookConfig.headers);
+        && state.webhookConfig.url.length > 0;
   }
-};
-
-const validateHeaders = (headers: HeaderInput[]): boolean => {
-  return headers.every(header => header.name.length > 0 && header.value.length > 0);
 };
 
 const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = props => {
@@ -154,8 +148,9 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = p
       case ConnectionType.MongoDb:
         payload.mongodb_config = state.mongodbConfig;
         break;
-      default:
-      // TODO: throw an error here
+      case ConnectionType.Webhook:
+        payload.webhook_config = state.webhookConfig;
+        break;
     }
 
     try {
@@ -200,7 +195,7 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = p
   return (
     <div className="tw-w-full">
       <div className="tw-flex tw-items-center tw-mb-8">
-        <img src={getConnectionTypeImg(props.connectionType)} alt="icon" className="tw-h-6 tw-mr-1.5" />
+        <ConnectionImage connectionType={props.connectionType} className="tw-h-6 tw-mr-1.5" />
         <div className="tw-font-medium">Enter your {getConnectionType(props.connectionType)} configuration:</div>
       </div>
       <form onSubmit={createNewDestination}>
@@ -242,11 +237,15 @@ const TestConnectionButton: React.FC<{ state: NewDestinationState, connectionTyp
       case ConnectionType.Snowflake:
         payload.snowflake_config = state.snowflakeConfig;
         break;
+      case ConnectionType.Redshift:
+        payload.redshift_config = state.redshiftConfig;
+        break;
       case ConnectionType.MongoDb:
         payload.mongodb_config = state.mongodbConfig;
         break;
-      default:
-      // TODO: throw an error here
+      case ConnectionType.Webhook:
+        payload.webhook_config = state.webhookConfig;
+        break;
     }
 
     try {
@@ -392,21 +391,6 @@ const MongoDbInputs: React.FC<ConnectionConfigurationProps> = props => {
 
 const WebhookInputs: React.FC<ConnectionConfigurationProps> = props => {
   const state = props.state;
-  const setHeaderName = (index: number, newName: string) => {
-    const headers = [...state.webhookConfig.headers];
-    headers[index].name = newName;
-    props.setState({ ...state, webhookConfig: { ...state.webhookConfig, headers: headers } });
-  };
-  const setHeaderValue = (index: number, newValue: string) => {
-    const headers = [...state.webhookConfig.headers];
-    headers[index].value = newValue;
-    props.setState({ ...state, webhookConfig: { ...state.webhookConfig, headers: headers } });
-  };
-  const removeHeader = (index: number) => {
-    const headers = [...state.webhookConfig.headers];
-    headers.splice(index, 1);
-    props.setState({ ...state, webhookConfig: { ...state.webhookConfig, headers: headers } });
-  };
 
   return (
     <>
@@ -427,24 +411,6 @@ const WebhookInputs: React.FC<ConnectionConfigurationProps> = props => {
         <span className="tw-select-none tw-text-slate-500 tw-px-2 tw-bg-slate-100 tw-h-10 tw-flex tw-items-center">https://</span>
         <ValidatedInput className="tw-w-100 tw-pl-1 tw-border-0 tw-bg-transparent tw-rounded-none" id='URL' value={state.webhookConfig.url} setValue={(value) => { props.setState({ ...state, webhookConfig: { ...state.webhookConfig, url: value } }); }} placeholder='URL' />
       </div>
-      <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
-        <span>Headers</span>
-        <Tooltip placement="right" maxWidth={400} interactive label={
-          <div>
-            Any headers you want Fabra to send when calling your webhook. For <span className="tw-font-mono tw-bg-slate-900 tw-rounded tw-px-1">Variable</span> webhooks, the header value can be populated from any end customer metadata you send to Fabra. Read more <a className="tw-text-blue-400" target="_blank" rel="noreferrer" href="https://docs.fabra.io/concepts/webhooks#headers">here</a>.
-          </div>
-        }>
-          <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
-        </Tooltip>
-      </div>
-      {state.webhookConfig.headers.map((header, index) => (
-        <div key={index} className="tw-flex tw-flex-row tw-items-center tw-w-full tw-justify-start tw-gap-5 tw-mb-4">
-          <ValidatedInput id='Header Name' value={header.name} setValue={(value) => setHeaderName(index, value)} placeholder='Header Name' className="tw-w-64" />
-          <ValidatedInput id='Header Value' value={header.value} setValue={(value) => setHeaderValue(index, value)} placeholder='Header Value' className="tw-w-64" />
-          <Button onClick={() => removeHeader(index)}><XMarkIcon className="tw-h-5" /></Button>
-        </div>
-      ))}
-      <Button className="tw-mt-1" onClick={() => props.setState({ ...state, webhookConfig: { ...state.webhookConfig, headers: [...state.webhookConfig.headers, { name: "", value: "", }] } })}>Add Header</Button>
     </>
   );
 };
@@ -503,23 +469,23 @@ const ConnectionTypeSelector: React.FC<ConnectionTypeSelectorProps> = props => {
       <div className="tw-text-center tw-mb-8">Choose one of our supported destinations for syncs:</div>
       <div className="tw-flex tw-flex-row tw-gap-5 tw-flex-wrap tw-justify-center">
         <button className={connectionButton} onClick={() => props.setConnectionType(ConnectionType.Snowflake)}>
-          <img src={getConnectionTypeImg(ConnectionType.Snowflake)} alt="data source logo" className="tw-h-6 tw-mr-1.5" />
+          <ConnectionImage connectionType={ConnectionType.Snowflake} className="tw-h-6 tw-mr-1.5" />
           Snowflake
         </button>
         <button className={connectionButton} onClick={() => props.setConnectionType(ConnectionType.BigQuery)}>
-          <img src={getConnectionTypeImg(ConnectionType.BigQuery)} alt="data source logo" className="tw-h-6 tw-mr-1.5" />
+          <ConnectionImage connectionType={ConnectionType.BigQuery} className="tw-h-6 tw-mr-1.5" />
           BigQuery
         </button>
         <button className={connectionButton} onClick={() => props.setConnectionType(ConnectionType.Redshift)}>
-          <img src={getConnectionTypeImg(ConnectionType.Redshift)} alt="data source logo" className="tw-h-6 tw-mr-1.5" />
+          <ConnectionImage connectionType={ConnectionType.Redshift} className="tw-h-6 tw-mr-1.5" />
           Redshift
         </button>
         <button className={connectionButton} onClick={() => props.setConnectionType(ConnectionType.MongoDb)}>
-          <img src={getConnectionTypeImg(ConnectionType.MongoDb)} alt="data source logo" className="tw-h-6 tw-mr-1.5" />
+          <ConnectionImage connectionType={ConnectionType.MongoDb} className="tw-h-6 tw-mr-1.5" />
           MongoDB
         </button>
         <button className={connectionButton} onClick={() => props.setConnectionType(ConnectionType.Webhook)}>
-          <img src={getConnectionTypeImg(ConnectionType.Webhook)} alt="data source logo" className="tw-h-5 tw-mr-1.5" />
+          <ConnectionImage connectionType={ConnectionType.Webhook} className="tw-h-6 tw-mr-1.5" />
           Webhook
         </button>
       </div>

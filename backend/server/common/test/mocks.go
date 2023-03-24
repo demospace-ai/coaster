@@ -46,12 +46,12 @@ func (cs MockCryptoService) EncryptApiKey(_ string) (*string, error) {
 	return &result, nil
 }
 
-func (cs MockCryptoService) DecryptWebhookPrivateKey(_ string) (*string, error) {
+func (cs MockCryptoService) DecryptWebhookSigningKey(_ string) (*string, error) {
 	result := "decrypted"
 	return &result, nil
 }
 
-func (cs MockCryptoService) EncryptWebhookPrivateKey(_ string) (*string, error) {
+func (cs MockCryptoService) EncryptWebhookSigningKey(_ string) (*string, error) {
 	result := "encrypted"
 	return &result, nil
 }

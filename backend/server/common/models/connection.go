@@ -10,6 +10,7 @@ const (
 	ConnectionTypeMongoDb   ConnectionType = "mongodb"
 	ConnectionTypeRedshift  ConnectionType = "redshift"
 	ConnectionTypeSnowflake ConnectionType = "snowflake"
+	ConnectionTypeWebhook   ConnectionType = "webhook"
 )
 
 type BigQueryCredentials struct {

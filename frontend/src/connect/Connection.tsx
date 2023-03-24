@@ -1,7 +1,7 @@
 import React, { FormEvent, useState } from "react";
 import { Button } from "src/components/button/Button";
 import { InfoIcon } from "src/components/icons/Icons";
-import { getConnectionTypeImg } from "src/components/images/connections";
+import { ConnectionImage } from "src/components/images/connections";
 import sync from "src/components/images/sync.svg";
 import { Input, ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
@@ -54,7 +54,7 @@ export const NewSourceConfiguration: React.FC<SetupSyncProps> = (props) => {
   return (
     <div className="tw-pl-20 tw-pr-[72px] tw-flex tw-flex-col tw-w-full">
       <div className="tw-flex tw-mb-2 tw-text-2xl tw-font-semibold tw-text-slate-900">
-        <img src={getConnectionTypeImg(connectionType)} alt="icon" className="tw-h-8 tw-mr-1.5" />
+        <ConnectionImage connectionType={connectionType} className="tw-h-8 tw-mr-1.5" />
         Connect to {getConnectionType(connectionType)}
       </div>
       <div className="tw-flex tw-flex-row">

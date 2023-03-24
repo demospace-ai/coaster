@@ -7,10 +7,11 @@ import (
 )
 
 type Destination struct {
-	ID            int64      `json:"id"`
-	DisplayName   string     `json:"display_name"`
-	Connection    Connection `json:"connection"`
-	StagingBucket *string    `json:"staging_bucket,omitempty"`
+	ID                int64      `json:"id"`
+	DisplayName       string     `json:"display_name"`
+	Connection        Connection `json:"connection"`
+	StagingBucket     *string    `json:"staging_bucket,omitempty"`
+	WebhookSigningKey *string    `json:"webhook_signing_key,omitempty"`
 }
 
 type Source struct {
@@ -76,6 +77,24 @@ func ConvertDestination(destination models.Destination, connection models.Connec
 			ID:             connection.ID,
 			ConnectionType: connection.ConnectionType,
 		},
+	}
+
+	if destination.StagingBucket.Valid {
+		destinationView.StagingBucket = &destination.StagingBucket.String
+	}
+
+	return destinationView
+}
+
+func ConvertWebhook(destination models.Destination, connection models.Connection, webhookSigningKey *string) Destination {
+	destinationView := Destination{
+		ID:          destination.ID,
+		DisplayName: destination.DisplayName,
+		Connection: Connection{
+			ID:             connection.ID,
+			ConnectionType: connection.ConnectionType,
+		},
+		WebhookSigningKey: webhookSigningKey,
 	}
 
 	if destination.StagingBucket.Valid {
