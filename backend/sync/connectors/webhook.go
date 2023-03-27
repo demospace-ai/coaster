@@ -69,9 +69,9 @@ func (wh WebhookImpl) Write(
 	request.Header.Set("Content-Type", "application/json; charset=UTF-8")
 
 	client := &http.Client{}
-	response, error := client.Do(request)
-	if error != nil {
-		panic(error)
+	response, err := client.Do(request)
+	if err != nil {
+		return err
 	}
 	defer response.Body.Close()
 
