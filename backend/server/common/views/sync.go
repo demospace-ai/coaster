@@ -105,7 +105,8 @@ func ConvertSyncRuns(syncRuns []models.SyncRun, timezone *time.Location) ([]Sync
 			RowsWritten: syncRun.RowsWritten,
 		}
 		if syncRun.Error.Valid {
-			syncRunView.Error = &syncRun.Error.String
+			syncError := syncRun.Error.String
+			syncRunView.Error = &syncError
 		}
 
 		syncRunsView = append(syncRunsView, syncRunView)

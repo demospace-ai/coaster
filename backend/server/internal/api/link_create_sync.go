@@ -104,6 +104,7 @@ func (s ApiService) LinkCreateSync(auth auth.Authentication, w http.ResponseWrit
 	workflow, err := c.ExecuteWorkflow(
 		ctx,
 		client.StartWorkflowOptions{
+			ID:           sync.WorkflowID,
 			TaskQueue:    temporal.SyncTaskQueue,
 			CronSchedule: cronSchedule,
 		},

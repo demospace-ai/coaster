@@ -60,6 +60,8 @@ func Replicate(ctx context.Context, input ReplicateInput) (*ReplicateOutput, err
 	switch input.DestinationConnection.ConnectionType {
 	case models.ConnectionTypeBigQuery:
 		destConnector = connectors.NewBigQueryConnector(queryService)
+	case models.ConnectionTypeWebhook:
+		destConnector = connectors.NewWebhookConnector(queryService)
 	default:
 		return nil, errors.Newf("destination not implemented for %s", input.SourceConnection.ConnectionType)
 	}

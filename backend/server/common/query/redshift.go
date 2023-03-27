@@ -3,8 +3,10 @@ package query
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"net/url"
+	"strconv"
 	"time"
 
 	"cloud.google.com/go/civil"
@@ -245,7 +247,6 @@ func convertRedshiftValue(redshiftValue any, fieldType data.FieldType) any {
 		return nil
 	}
 
-	// TODO: convert the values to the expected Fabra Golang types
 	switch fieldType {
 	case data.FieldTypeTimestampTz:
 		return redshiftValue.(time.Time).Format(FABRA_TIMESTAMP_TZ_FORMAT)
@@ -257,6 +258,19 @@ func convertRedshiftValue(redshiftValue any, fieldType data.FieldType) any {
 			return string([]byte(v))
 		}
 		return string([]byte(redshiftValue.(string)))
+	case data.FieldTypeJson:
+		var strValue string
+		if v, ok := redshiftValue.([]uint8); ok {
+			strValue = string([]byte(v))
+		} else {
+			strValue = string([]byte(redshiftValue.(string)))
+		}
+
+		// TODO: handle error
+		unquoted, _ := strconv.Unquote(strValue)
+		jsonValue := map[string]any{}
+		json.Unmarshal([]byte(unquoted), &jsonValue)
+		return jsonValue
 	default:
 		return redshiftValue
 	}

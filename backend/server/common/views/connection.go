@@ -164,10 +164,12 @@ func ConvertObject(object *models.Object, objectFields []models.ObjectField) Obj
 			Optional: objectField.Optional,
 		}
 		if objectField.DisplayName.Valid {
-			viewObjectField.DisplayName = &objectField.DisplayName.String
+			displayName := objectField.DisplayName.String
+			viewObjectField.DisplayName = &displayName
 		}
 		if objectField.Description.Valid {
-			viewObjectField.Description = &objectField.Description.String
+			description := objectField.Description.String
+			viewObjectField.Description = &description
 		}
 		viewObjectFields = append(viewObjectFields, viewObjectField)
 	}

@@ -117,7 +117,6 @@ func (bq BigQueryImpl) Write(
 
 	// TODO: batch insert 10,000 rows at a time
 	// write to temporary table in destination
-	orderedObjectFields := bq.createOrderedObjectFields(object.ObjectFields, fieldMappings)
 	rowStrings := []string{}
 	for _, row := range rows {
 		var rowTokens []string
@@ -160,6 +159,7 @@ func (bq BigQueryImpl) Write(
 	defer destClient.CleanUpStagingData(ctx, stagingOptions)
 
 	writeMode := bq.toBigQueryWriteMode(sync.SyncMode)
+	orderedObjectFields := bq.createOrderedObjectFields(object.ObjectFields, fieldMappings)
 	csvSchema := bq.createCsvSchema(object.EndCustomerIdField, orderedObjectFields)
 	err = destClient.LoadFromStaging(ctx, *object.Namespace, *object.TableName, query.LoadOptions{
 		GcsReference:   gcsReference,

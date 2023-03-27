@@ -37,7 +37,7 @@ func (it SnowflakeIterator) Next() (data.Row, error) {
 		if err != nil {
 			return nil, err
 		}
-		return convertSnowflakeRow(row), nil
+		return convertSnowflakeRow(row, it.schema), nil
 	}
 
 	return nil, data.ErrDone
@@ -193,6 +193,7 @@ func (sc SnowflakeApiClient) RunQuery(ctx context.Context, queryString string, a
 		return nil, err
 	}
 	numColumns := len(columns)
+	schema := convertSnowflakeSchema(columns)
 
 	var rows []data.Row
 	values := make([]any, numColumns)
@@ -206,11 +207,11 @@ func (sc SnowflakeApiClient) RunQuery(ctx context.Context, queryString string, a
 			return nil, err
 		}
 
-		rows = append(rows, convertSnowflakeRow(values))
+		rows = append(rows, convertSnowflakeRow(values, schema))
 	}
 
 	return &data.QueryResults{
-		Schema: convertSnowflakeSchema(columns),
+		Schema: schema,
 		Data:   rows,
 	}, nil
 }
@@ -235,18 +236,29 @@ func (sc SnowflakeApiClient) GetQueryIterator(ctx context.Context, queryString s
 	return SnowflakeIterator{queryResult: *queryResult, schema: convertSnowflakeSchema(columns)}, nil
 }
 
-func convertSnowflakeRow(snowflakeRow []any) data.Row {
+func convertSnowflakeRow(snowflakeRow []any, schema data.Schema) data.Row {
 	var row data.Row
-	for _, value := range snowflakeRow {
-		row = append(row, convertSnowflakeValue(value))
+	for i, value := range snowflakeRow {
+		row = append(row, convertSnowflakeValue(value, schema[i].Type))
 	}
 
 	return row
 }
 
-func convertSnowflakeValue(snowflakeValue any) any {
-	// TODO: convert the values to the expected Fabra Golang types
-	return snowflakeValue
+func convertSnowflakeValue(snowflakeValue any, fieldType data.FieldType) any {
+	if snowflakeValue == nil {
+		return nil
+	}
+
+	// TODO: convert remaining types to the expected Fabra Golang types
+	switch fieldType {
+	case data.FieldTypeJson:
+		jsonValue := map[string]any{}
+		json.Unmarshal([]byte(snowflakeValue.(string)), &jsonValue)
+		return jsonValue
+	default:
+		return snowflakeValue
+	}
 }
 
 func getSnowflakeFieldType(snowflakeType string) data.FieldType {
@@ -261,6 +273,8 @@ func getSnowflakeFieldType(snowflakeType string) data.FieldType {
 		return data.FieldTypeTimestampTz
 	case "TIMESTAMP", "TIMESTAMP_NTZ":
 		return data.FieldTypeTimestampNtz
+	case "VARIANT":
+		return data.FieldTypeJson
 	default:
 		// Everything can always be treated as a string
 		return data.FieldTypeString

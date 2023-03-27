@@ -2,6 +2,7 @@ package query
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -304,22 +305,33 @@ func (ac BigQueryApiClient) CleanUpStagingData(ctx context.Context, stagingOptio
 func convertBigQueryRow(bigQueryRow []bigquery.Value, schema bigquery.Schema) data.Row {
 	var row data.Row
 	for i, value := range bigQueryRow {
-		fieldType := schema[i].Type
-		switch fieldType {
-		case bigquery.TimestampFieldType:
-			row = append(row, value.(time.Time).Format(FABRA_TIMESTAMP_TZ_FORMAT))
-		case bigquery.DateFieldType:
-			row = append(row, value.(civil.Date).String())
-		case bigquery.TimeFieldType:
-			row = append(row, value.(civil.Time).String())
-		case bigquery.DateTimeFieldType:
-			row = append(row, value.(civil.DateTime).String())
-		default:
-			row = append(row, any(value))
-		}
+		row = append(row, convertBigQueryValue(value, schema[i].Type))
 	}
 
 	return row
+}
+
+func convertBigQueryValue(bigqueryValue any, fieldType bigquery.FieldType) any {
+	if bigqueryValue == nil {
+		return nil
+	}
+
+	switch fieldType {
+	case bigquery.TimestampFieldType:
+		return bigqueryValue.(time.Time).Format(FABRA_TIMESTAMP_TZ_FORMAT)
+	case bigquery.DateFieldType:
+		return bigqueryValue.(civil.Date).String()
+	case bigquery.TimeFieldType:
+		return bigqueryValue.(civil.Time).String()
+	case bigquery.DateTimeFieldType:
+		return bigqueryValue.(civil.DateTime).String()
+	case bigquery.JSONFieldType:
+		jsonValue := map[string]any{}
+		json.Unmarshal([]byte(bigqueryValue.(string)), &jsonValue)
+		return jsonValue
+	default:
+		return bigqueryValue
+	}
 }
 
 func getBigQueryFieldType(bigQueryType string) data.FieldType {
