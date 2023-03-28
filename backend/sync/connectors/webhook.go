@@ -3,10 +3,14 @@ package connectors
 import (
 	"bytes"
 	"context"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"net/http"
 	"time"
 
+	"go.fabra.io/server/common/crypto"
 	"go.fabra.io/server/common/data"
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/query"
@@ -15,20 +19,25 @@ import (
 )
 
 const MAX_BATCH_SIZE = 1_000
+const REFILL_RATE = 100
+const MAX_BURST = 100
 
 type WebhookData struct {
-	ObjectName    string           `json:"object_name"`
-	EndCustomerId int64            `json:"end_customer_id"`
-	Data          []map[string]any `json:"data"`
+	ObjectName     string           `json:"object_name"`
+	EndCustomerId  int64            `json:"end_customer_id"`
+	FabraTimestamp int64            `json:"fabra_timestamp"`
+	Data           []map[string]any `json:"data"`
 }
 
 type WebhookImpl struct {
-	queryService query.QueryService
+	queryService  query.QueryService
+	cryptoService crypto.CryptoService
 }
 
-func NewWebhookConnector(queryService query.QueryService) Connector {
+func NewWebhookConnector(queryService query.QueryService, cryptoService crypto.CryptoService) Connector {
 	return WebhookImpl{
-		queryService: queryService,
+		queryService:  queryService,
+		cryptoService: cryptoService,
 	}
 }
 
@@ -47,7 +56,12 @@ func (wh WebhookImpl) Write(
 ) error {
 	currentBatchSize := 0
 	// TODO: allow customizing the rate limit
-	limiter := rate.NewLimiter(rate.Every(1*time.Second/100), 100)
+	limiter := rate.NewLimiter(REFILL_RATE, MAX_BURST)
+
+	decryptedSigningKey, err := wh.cryptoService.DecryptWebhookSigningKey(destinationConnection.Credentials)
+	if err != nil {
+		return err
+	}
 
 	orderedObjectFields := wh.createOrderedObjectFields(object.ObjectFields, fieldMappings)
 	outputDataList := []map[string]any{}
@@ -67,7 +81,7 @@ func (wh WebhookImpl) Write(
 			currentBatchSize = 0
 			// TODO: add retry
 			limiter.Wait(ctx)
-			err := wh.sendData(object.DisplayName, sync.EndCustomerID, outputDataList, destinationConnection.Host)
+			err := wh.sendData(object.DisplayName, sync.EndCustomerID, outputDataList, destinationConnection.Host, *decryptedSigningKey)
 			if err != nil {
 				return err
 			}
@@ -75,7 +89,7 @@ func (wh WebhookImpl) Write(
 	}
 
 	if currentBatchSize > 0 {
-		err := wh.sendData(object.DisplayName, sync.EndCustomerID, outputDataList, destinationConnection.Host)
+		err := wh.sendData(object.DisplayName, sync.EndCustomerID, outputDataList, destinationConnection.Host, *decryptedSigningKey)
 		if err != nil {
 			return err
 		}
@@ -84,11 +98,12 @@ func (wh WebhookImpl) Write(
 	return nil
 }
 
-func (wh WebhookImpl) sendData(objectName string, endCustomerId int64, outputDataList []map[string]any, webhookUrl string) error {
+func (wh WebhookImpl) sendData(objectName string, endCustomerId int64, outputDataList []map[string]any, webhookUrl string, decryptedSigningKey string) error {
 	webhookData := WebhookData{
-		ObjectName:    objectName,
-		EndCustomerId: endCustomerId,
-		Data:          outputDataList,
+		ObjectName:     objectName,
+		EndCustomerId:  endCustomerId,
+		FabraTimestamp: time.Now().Unix(),
+		Data:           outputDataList,
 	}
 	marshalled, err := json.Marshal(webhookData)
 	if err != nil {
@@ -97,6 +112,7 @@ func (wh WebhookImpl) sendData(objectName string, endCustomerId int64, outputDat
 
 	request, _ := http.NewRequest("POST", webhookUrl, bytes.NewBuffer(marshalled))
 	request.Header.Set("Content-Type", "application/json; charset=UTF-8")
+	request.Header.Set("X-FABRA-SIGNATURE", wh.signPayload(decryptedSigningKey, marshalled))
 
 	client := &http.Client{}
 	response, err := client.Do(request)
@@ -106,6 +122,12 @@ func (wh WebhookImpl) sendData(objectName string, endCustomerId int64, outputDat
 	response.Body.Close()
 
 	return nil
+}
+
+func (wh WebhookImpl) signPayload(secret string, data []byte) string {
+	h := hmac.New(sha256.New, []byte(secret))
+	h.Write(data)
+	return hex.EncodeToString(h.Sum(nil))
 }
 
 func (wh WebhookImpl) createOrderedObjectFields(objectFields []views.ObjectField, fieldMappings []views.FieldMapping) []views.ObjectField {

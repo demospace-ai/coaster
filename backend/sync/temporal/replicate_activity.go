@@ -31,7 +31,8 @@ func Replicate(ctx context.Context, input ReplicateInput) (*ReplicateOutput, err
 		return nil, err
 	}
 
-	queryService := query.NewQueryService(db, crypto.NewCryptoService())
+	cryptoService := crypto.NewCryptoService()
+	queryService := query.NewQueryService(db, cryptoService)
 
 	var sourceConnector connectors.Connector
 	switch input.SourceConnection.ConnectionType {
@@ -61,7 +62,7 @@ func Replicate(ctx context.Context, input ReplicateInput) (*ReplicateOutput, err
 	case models.ConnectionTypeBigQuery:
 		destConnector = connectors.NewBigQueryConnector(queryService)
 	case models.ConnectionTypeWebhook:
-		destConnector = connectors.NewWebhookConnector(queryService)
+		destConnector = connectors.NewWebhookConnector(queryService, cryptoService)
 	default:
 		return nil, errors.Newf("destination not implemented for %s", input.SourceConnection.ConnectionType)
 	}
