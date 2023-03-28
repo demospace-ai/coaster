@@ -7,9 +7,12 @@ import (
 
 	"go.fabra.io/server/common/data"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
+const MONGO_TIMESTAMP_TZ_FORMAT = "2006-01-02T15:04:05.000+07:00"
 
 type MongoDbApiClient struct {
 	Username          string
@@ -226,43 +229,6 @@ func (mc MongoDbApiClient) GetQueryIterator(ctx context.Context, queryString str
 	}, nil
 }
 
-func convertMongoDbRows(mongoDbRows bson.A, schema data.Schema) []data.Row {
-	var rows []data.Row
-	for _, mongoDbRow := range mongoDbRows {
-		rows = append(rows, convertMongoDbRow(mongoDbRow.(bson.D), schema))
-	}
-
-	return rows
-}
-
-func convertMongoDbRow(mongoDbRow bson.D, schema data.Schema) data.Row {
-	// TODO: convert the values to the expected Fabra Golang types
-	valueMap := make(map[string]any)
-	for _, keyPair := range mongoDbRow {
-		valueMap[keyPair.Key] = keyPair.Value
-	}
-
-	var row data.Row
-	// make sure every result is in the same order by looping through schema
-	for _, field := range schema {
-		row = append(row, valueMap[field.Name])
-	}
-
-	return row
-}
-
-func convertMongoDbSchema(fieldTypes map[string]string) data.Schema {
-	var schema data.Schema
-	for fieldName, fieldType := range fieldTypes {
-		schema = append(schema, data.Field{
-			Name: fieldName,
-			Type: getMongoDbFieldType(fieldType),
-		})
-	}
-
-	return schema
-}
-
 func getFields(collection *mongo.Collection) ([]string, error) {
 	ctx := context.TODO()
 	cursor, err := collection.Aggregate(
@@ -364,18 +330,72 @@ func getFieldTypes(collection *mongo.Collection, fields []string) (map[string]st
 	return fieldTypes, nil
 }
 
+func convertMongoDbRows(mongoDbRows bson.A, schema data.Schema) []data.Row {
+	var rows []data.Row
+	for _, mongoDbRow := range mongoDbRows {
+		rows = append(rows, convertMongoDbRow(mongoDbRow.(bson.D), schema))
+	}
+
+	return rows
+}
+
+func convertMongoDbRow(mongoDbRow bson.D, schema data.Schema) data.Row {
+	// TODO: convert the values to the expected Fabra Golang types
+	valueMap := make(map[string]any)
+	for _, keyPair := range mongoDbRow {
+		valueMap[keyPair.Key] = keyPair.Value
+	}
+
+	var row data.Row
+	// make sure every result is in the same order by looping through schema
+	for _, field := range schema {
+		value := convertMongoDbValue(valueMap[field.Name], field.Type)
+		row = append(row, value)
+	}
+
+	return row
+}
+
+func convertMongoDbValue(mongoDbValue any, fieldType data.FieldType) any {
+	if mongoDbValue == nil {
+		return nil
+	}
+
+	switch fieldType {
+	case data.FieldTypeDateTimeTz:
+		return mongoDbValue.(primitive.DateTime).Time().UTC().Format(FABRA_TIMESTAMP_TZ_FORMAT)
+	case data.FieldTypeJson:
+		return ToMap(mongoDbValue.(bson.D))
+	case data.FieldTypeArray:
+		return ToArray(mongoDbValue.(bson.A))
+	default:
+		return mongoDbValue
+	}
+}
+
+func convertMongoDbSchema(fieldTypes map[string]string) data.Schema {
+	var schema data.Schema
+	for fieldName, fieldType := range fieldTypes {
+		schema = append(schema, data.Field{
+			Name: fieldName,
+			Type: getMongoDbFieldType(fieldType),
+		})
+	}
+
+	return schema
+}
+
 func getMongoDbFieldType(mongoDbType string) data.FieldType {
 	switch mongoDbType {
 	case "int", "int32", "long":
 		return data.FieldTypeInteger
-	case "date":
-		return data.FieldTypeDate
-	case "datetime":
-		return data.FieldTypeDateTime
+	case "date", "datetime":
+		// MongoDB dates/datetimes are in UTC
+		return data.FieldTypeDateTimeTz
+	case "timestamp":
+		return data.FieldTypeTimestamp
 	case "decimal", "double", "float64":
 		return data.FieldTypeNumber
-	case "timestamp":
-		return data.FieldTypeTimestampNtz
 	case "array":
 		return data.FieldTypeArray
 	case "object":
@@ -385,4 +405,39 @@ func getMongoDbFieldType(mongoDbType string) data.FieldType {
 	default:
 		return data.FieldTypeString
 	}
+}
+
+func ToMap(bsonMap bson.D) map[string]any {
+	output := map[string]any{}
+	for _, pair := range bsonMap {
+		if pair.Value == nil {
+			continue
+		}
+
+		switch value := pair.Value.(type) {
+		case bson.D:
+			output[pair.Key] = ToMap(value)
+		case bson.A:
+			output[pair.Key] = ToArray(value)
+		default:
+			output[pair.Key] = value
+		}
+	}
+	return output
+}
+
+func ToArray(bsonArray bson.A) []any {
+	output := []any{}
+	for _, rawValue := range bsonArray {
+		switch value := rawValue.(type) {
+		case bson.D:
+			output = append(output, ToMap(value))
+		case bson.A:
+			output = append(output, ToArray(value))
+		default:
+			output = append(output, value)
+		}
+	}
+
+	return output
 }

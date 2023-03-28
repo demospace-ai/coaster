@@ -219,9 +219,9 @@ func getRedshiftFieldType(redshiftType string) data.FieldType {
 	case "DATE":
 		return data.FieldTypeDate
 	case "TIMESTAMPTZ", "TIMESTAMP WITH TIME ZONE":
-		return data.FieldTypeTimestampTz
+		return data.FieldTypeDateTimeTz
 	case "TIMESTAMP", "TIMESTAMP WITHOUT TIME ZONE":
-		return data.FieldTypeTimestampNtz
+		return data.FieldTypeDateTimeNtz
 	case "":
 		// Objects from Redshift will have an empty type
 		return data.FieldTypeJson
@@ -247,9 +247,9 @@ func convertRedshiftValue(redshiftValue any, fieldType data.FieldType) any {
 	}
 
 	switch fieldType {
-	case data.FieldTypeTimestampTz:
+	case data.FieldTypeDateTimeTz:
 		return redshiftValue.(time.Time).Format(FABRA_TIMESTAMP_TZ_FORMAT)
-	case data.FieldTypeTimestampNtz:
+	case data.FieldTypeDateTimeNtz:
 		return redshiftValue.(time.Time).Format(FABRA_TIMESTAMP_NTZ_FORMAT)
 	case data.FieldTypeString:
 		// Redshift strings are sometimes returned as uint8 slices

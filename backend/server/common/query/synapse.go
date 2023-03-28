@@ -249,9 +249,9 @@ func getSynapseFieldType(synapseType string) data.FieldType {
 	case "REAL", "DOUBLE", "DECIMAL", "NUMERIC", "FLOAT", "FIXED":
 		return data.FieldTypeNumber
 	case "TIMESTAMP_TZ":
-		return data.FieldTypeTimestampTz
+		return data.FieldTypeDateTimeTz
 	case "TIMESTAMP", "TIMESTAMP_NTZ":
-		return data.FieldTypeTimestampNtz
+		return data.FieldTypeDateTimeNtz
 	default:
 		// Everything can always be treated as a string
 		return data.FieldTypeString

@@ -259,9 +259,9 @@ func convertSnowflakeValue(snowflakeValue any, fieldType data.FieldType) any {
 		jsonValue := map[string]any{}
 		json.Unmarshal([]byte(snowflakeValue.(string)), &jsonValue)
 		return jsonValue
-	case data.FieldTypeTimestampTz:
+	case data.FieldTypeDateTimeTz:
 		return snowflakeValue.(time.Time).Format(FABRA_TIMESTAMP_TZ_FORMAT)
-	case data.FieldTypeTimestampNtz:
+	case data.FieldTypeDateTimeNtz:
 		return snowflakeValue.(time.Time).Format(FABRA_TIMESTAMP_NTZ_FORMAT)
 	default:
 		return snowflakeValue
@@ -277,9 +277,9 @@ func getSnowflakeFieldType(snowflakeType string) data.FieldType {
 	case "REAL", "DOUBLE", "DECIMAL", "NUMERIC", "FLOAT", "FIXED":
 		return data.FieldTypeNumber
 	case "TIMESTAMP_TZ":
-		return data.FieldTypeTimestampTz
-	case "TIMESTAMP", "TIMESTAMP_NTZ":
-		return data.FieldTypeTimestampNtz
+		return data.FieldTypeDateTimeTz
+	case "DATETIME", "TIMESTAMP", "TIMESTAMP_NTZ":
+		return data.FieldTypeDateTimeNtz
 	case "VARIANT":
 		return data.FieldTypeJson
 	default:

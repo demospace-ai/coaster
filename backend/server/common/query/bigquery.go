@@ -343,15 +343,18 @@ func getBigQueryFieldType(bigQueryType string) data.FieldType {
 	case "BOOLEAN":
 		return data.FieldTypeBoolean
 	case "TIMESTAMP":
-		return data.FieldTypeTimestampTz
+		// BigQuery timestamps are actually datetimes with optional timezone information
+		return data.FieldTypeDateTimeTz
 	case "JSON":
 		return data.FieldTypeJson
 	case "DATE":
 		return data.FieldTypeDate
 	case "TIME":
+		// BigQuery times do not contain timezone information
 		return data.FieldTypeTimeNtz
 	case "DATETIME":
-		return data.FieldTypeDateTime
+		// BigQuery datetimes do not contain timezone information
+		return data.FieldTypeDateTimeNtz
 	default:
 		return data.FieldTypeString
 	}

@@ -208,7 +208,7 @@ func (bq BigQueryImpl) createCsvSchema(endCustomerIdColumn string, orderedObject
 	for _, objectField := range orderedObjectFields {
 		field := bigquery.FieldSchema{
 			Name:     objectField.Name,
-			Type:     objectField.Type.ToBigQueryType(),
+			Type:     getBigQueryType(objectField.Type),
 			Required: !objectField.Optional,
 		}
 		csvSchema = append(csvSchema, &field)
@@ -222,4 +222,27 @@ func (bq BigQueryImpl) createCsvSchema(endCustomerIdColumn string, orderedObject
 	csvSchema = append(csvSchema, &endCustomerIdField)
 
 	return csvSchema
+}
+
+func getBigQueryType(fieldType data.FieldType) bigquery.FieldType {
+	switch fieldType {
+	case data.FieldTypeInteger:
+		return bigquery.IntegerFieldType
+	case data.FieldTypeNumber:
+		return bigquery.NumericFieldType
+	case data.FieldTypeBoolean:
+		return bigquery.BooleanFieldType
+	case data.FieldTypeTimestamp:
+		return bigquery.TimestampFieldType
+	case data.FieldTypeDateTimeTz, data.FieldTypeDateTimeNtz:
+		return bigquery.DateTimeFieldType
+	case data.FieldTypeJson:
+		return bigquery.JSONFieldType
+	case data.FieldTypeDate:
+		return bigquery.DateFieldType
+	case data.FieldTypeTimeTz, data.FieldTypeTimeNtz:
+		return bigquery.TimeFieldType
+	default:
+		return bigquery.StringFieldType
+	}
 }
