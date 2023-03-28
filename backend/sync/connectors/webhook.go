@@ -86,13 +86,15 @@ func (wh WebhookImpl) Write(
 		currentBatchSize++
 		// TODO: allow customizing batch size
 		if currentBatchSize == MAX_BATCH_SIZE {
-			currentBatchSize = 0
 			// TODO: add retry
 			limiter.Wait(ctx)
 			err := wh.sendData(object.DisplayName, sync.EndCustomerID, decryptedEndCustomerApiKey, outputDataList, destinationConnection.Host, *decryptedSigningKey)
 			if err != nil {
 				return err
 			}
+
+			currentBatchSize = 0
+			outputDataList = nil
 		}
 	}
 
