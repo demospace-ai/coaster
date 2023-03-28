@@ -32,7 +32,7 @@ type SyncRun struct {
 	Status      models.SyncRunStatus `json:"status"`
 	StartedAt   string               `json:"started_at"`
 	CompletedAt string               `json:"completed_at"`
-	Duration    string               `json:"duration"`
+	Duration    *string              `json:"duration,omitempty"`
 	Error       *string              `json:"error,omitempty"`
 	RowsWritten int                  `json:"rows_written"`
 }
@@ -93,20 +93,22 @@ func ConvertFieldMappings(fieldMappings []models.FieldMapping) []FieldMapping {
 func ConvertSyncRuns(syncRuns []models.SyncRun, timezone *time.Location) ([]SyncRun, error) {
 	var syncRunsView []SyncRun
 	for _, syncRun := range syncRuns {
-		duration, err := timeutils.GetDurationString(syncRun.CompletedAt.Sub(syncRun.StartedAt))
-		if err != nil {
-			return nil, err
-		}
 		syncRunView := SyncRun{
 			Status:      syncRun.Status,
 			StartedAt:   syncRun.StartedAt.In(timezone).Format(CUSTOMER_VISIBLE_TIME_FORMAT),
 			CompletedAt: syncRun.CompletedAt.In(timezone).Format(CUSTOMER_VISIBLE_TIME_FORMAT),
-			Duration:    *duration,
 			RowsWritten: syncRun.RowsWritten,
 		}
 		if syncRun.Error.Valid {
 			syncError := syncRun.Error.String
 			syncRunView.Error = &syncError
+		}
+		if syncRun.Status != models.SyncRunStatusRunning {
+			duration, err := timeutils.GetDurationString(syncRun.CompletedAt.Sub(syncRun.StartedAt))
+			if err != nil {
+				return nil, err
+			}
+			syncRunView.Duration = duration
 		}
 
 		syncRunsView = append(syncRunsView, syncRunView)

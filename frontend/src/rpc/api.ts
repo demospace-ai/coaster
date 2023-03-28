@@ -559,7 +559,7 @@ export interface SyncRun {
   error: string | undefined;
   started_at: string;
   completed_at: string;
-  duration: string;
+  duration: string | undefined;
   rows_written: number;
 }
 

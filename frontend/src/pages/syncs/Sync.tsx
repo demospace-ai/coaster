@@ -48,9 +48,11 @@ export const Sync: React.FC = () => {
                       <div className="tw-font-medium tw-mb-0.5">
                         {syncRun.started_at}
                       </div>
-                      <div className="tw-text-xs tw-text-slate-500">
-                        Duration: {syncRun.duration}
-                      </div>
+                      {syncRun.duration &&
+                        <div className="tw-text-xs tw-text-slate-500">
+                          Duration: {syncRun.duration}
+                        </div>
+                      }
                     </div>
                   </td>
                   <td className={tableCellStyle}>
