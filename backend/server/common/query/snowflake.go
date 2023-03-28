@@ -6,11 +6,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/snowflakedb/gosnowflake"
 	"go.fabra.io/server/common/data"
 	"go.fabra.io/server/common/errors"
 )
+
+const SNOWFLAKE_TZ_FORMAT = "2006-01-02T15:04:05.000-07:00"
 
 type SnowflakeApiClient struct {
 	Username      string
@@ -256,6 +259,10 @@ func convertSnowflakeValue(snowflakeValue any, fieldType data.FieldType) any {
 		jsonValue := map[string]any{}
 		json.Unmarshal([]byte(snowflakeValue.(string)), &jsonValue)
 		return jsonValue
+	case data.FieldTypeTimestampTz:
+		return snowflakeValue.(time.Time).Format(FABRA_TIMESTAMP_TZ_FORMAT)
+	case data.FieldTypeTimestampNtz:
+		return snowflakeValue.(time.Time).Format(FABRA_TIMESTAMP_NTZ_FORMAT)
 	default:
 		return snowflakeValue
 	}

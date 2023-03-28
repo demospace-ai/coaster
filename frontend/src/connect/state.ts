@@ -1,5 +1,5 @@
 import { sendLinkTokenRequest } from "src/rpc/ajax";
-import { BigQueryConfig, ConnectionType, Field, FieldMappingInput, FrequencyUnits, GetSources, LinkCreateSource, LinkCreateSourceRequest, LinkCreateSync, LinkCreateSyncRequest, LinkGetSources, LinkGetSyncs, MongoDbConfig, Object, RedshiftConfig, SnowflakeConfig, Source, SyncMode } from "src/rpc/api";
+import { BigQueryConfig, ConnectionType, Field, FieldMappingInput, FrequencyUnits, GetSources, LinkCreateSource, LinkCreateSourceRequest, LinkCreateSync, LinkCreateSyncRequest, LinkGetSources, LinkGetSyncs, MongoDbConfig, Object, RedshiftConfig, SnowflakeConfig, Source } from "src/rpc/api";
 import { mutate } from "swr";
 
 export type SetupSyncProps = {
@@ -72,7 +72,6 @@ export type SetupSyncState = {
   namespace: string | undefined;
   tableName: string | undefined;
   customJoin: string | undefined;
-  syncMode: SyncMode | undefined;
   connectionType: ConnectionType | undefined;
   source: Source | undefined;
   newSourceState: NewSourceState;
@@ -92,7 +91,6 @@ export const INITIAL_SETUP_STATE: SetupSyncState = {
   namespace: undefined,
   tableName: undefined,
   customJoin: undefined,
-  syncMode: SyncMode.FullOverwrite, // TODO
   connectionType: undefined,
   source: undefined,
   newSourceState: INITIAL_SOURCE_STATE,
@@ -129,6 +127,8 @@ export const validateConnectionSetup = (connectionType: ConnectionType | undefin
         && state.mongodbConfig.username.length > 0
         && state.mongodbConfig.password.length > 0
         && state.mongodbConfig.host.length > 0; // connection options is optional
+    case ConnectionType.Webhook:
+      return false; // cannot create a sync with a webhook source
   }
 };
 
@@ -198,7 +198,6 @@ export const validateSyncSetup = (state: SetupSyncState): boolean => {
     && state.source !== undefined
     && state.object !== undefined
     && ((state.namespace !== undefined && state.namespace !== undefined) || state.customJoin !== undefined)
-    && state.syncMode !== undefined
     && state.frequency !== undefined
     && state.frequencyUnits !== undefined
     && state.fieldMappings !== undefined;
@@ -230,7 +229,6 @@ export const createNewSync = async (
     object_id: state.object!.id,
     namespace: state.namespace,
     table_name: state.tableName,
-    sync_mode: state.syncMode!,
     frequency: state.frequency!,
     frequency_units: state.frequencyUnits!,
     field_mappings: fieldMappings

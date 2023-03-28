@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"time"
 
-	"cloud.google.com/go/civil"
 	_ "github.com/lib/pq"
 	"go.fabra.io/server/common/data"
 	"go.fabra.io/server/common/errors"
@@ -251,7 +250,7 @@ func convertRedshiftValue(redshiftValue any, fieldType data.FieldType) any {
 	case data.FieldTypeTimestampTz:
 		return redshiftValue.(time.Time).Format(FABRA_TIMESTAMP_TZ_FORMAT)
 	case data.FieldTypeTimestampNtz:
-		return civil.DateTimeOf(redshiftValue.(time.Time)).String()
+		return redshiftValue.(time.Time).Format(FABRA_TIMESTAMP_NTZ_FORMAT)
 	case data.FieldTypeString:
 		// Redshift strings are sometimes returned as uint8 slices
 		if v, ok := redshiftValue.([]uint8); ok {
