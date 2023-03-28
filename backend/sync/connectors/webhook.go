@@ -5,12 +5,16 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"go.fabra.io/server/common/data"
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/query"
 	"go.fabra.io/server/common/views"
+	"golang.org/x/time/rate"
 )
+
+const MAX_BATCH_SIZE = 1_000
 
 type WebhookData struct {
 	ObjectName    string           `json:"object_name"`
@@ -41,7 +45,10 @@ func (wh WebhookImpl) Write(
 	fieldMappings []views.FieldMapping,
 	rows []data.Row,
 ) error {
-	// TODO: batch insert 10,000 rows at a time
+	currentBatchSize := 0
+	// TODO: allow customizing the rate limit
+	limiter := rate.NewLimiter(rate.Every(1*time.Second/100), 100)
+
 	orderedObjectFields := wh.createOrderedObjectFields(object.ObjectFields, fieldMappings)
 	outputDataList := []map[string]any{}
 	for _, row := range rows {
@@ -53,11 +60,34 @@ func (wh WebhookImpl) Write(
 			}
 		}
 		outputDataList = append(outputDataList, outputData)
+
+		currentBatchSize++
+		// TODO: allow customizing batch size
+		if currentBatchSize == MAX_BATCH_SIZE {
+			currentBatchSize = 0
+			// TODO: add retry
+			limiter.Wait(ctx)
+			err := wh.sendData(object.DisplayName, sync.EndCustomerID, outputDataList, destinationConnection.Host)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
+	if currentBatchSize > 0 {
+		err := wh.sendData(object.DisplayName, sync.EndCustomerID, outputDataList, destinationConnection.Host)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (wh WebhookImpl) sendData(objectName string, endCustomerId int64, outputDataList []map[string]any, webhookUrl string) error {
 	webhookData := WebhookData{
-		ObjectName:    object.DisplayName,
-		EndCustomerId: sync.EndCustomerID,
+		ObjectName:    objectName,
+		EndCustomerId: endCustomerId,
 		Data:          outputDataList,
 	}
 	marshalled, err := json.Marshal(webhookData)
@@ -65,7 +95,7 @@ func (wh WebhookImpl) Write(
 		return err
 	}
 
-	request, _ := http.NewRequest("POST", destinationConnection.Host, bytes.NewBuffer(marshalled))
+	request, _ := http.NewRequest("POST", webhookUrl, bytes.NewBuffer(marshalled))
 	request.Header.Set("Content-Type", "application/json; charset=UTF-8")
 
 	client := &http.Client{}
@@ -73,7 +103,7 @@ func (wh WebhookImpl) Write(
 	if err != nil {
 		return err
 	}
-	defer response.Body.Close()
+	response.Body.Close()
 
 	return nil
 }
