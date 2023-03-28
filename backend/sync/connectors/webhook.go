@@ -23,21 +23,24 @@ const REFILL_RATE = 100
 const MAX_BURST = 100
 
 type WebhookData struct {
-	ObjectName     string           `json:"object_name"`
-	EndCustomerId  int64            `json:"end_customer_id"`
-	FabraTimestamp int64            `json:"fabra_timestamp"`
-	Data           []map[string]any `json:"data"`
+	ObjectName        string           `json:"object_name"`
+	EndCustomerId     int64            `json:"end_customer_id"`
+	EndCustomerApiKey *string          `json:"end_customer_api_key,omitempty"`
+	FabraTimestamp    int64            `json:"fabra_timestamp"`
+	Data              []map[string]any `json:"data"`
 }
 
 type WebhookImpl struct {
-	queryService  query.QueryService
-	cryptoService crypto.CryptoService
+	queryService               query.QueryService
+	cryptoService              crypto.CryptoService
+	encryptedEndCustomerApiKey *string
 }
 
-func NewWebhookConnector(queryService query.QueryService, cryptoService crypto.CryptoService) Connector {
+func NewWebhookConnector(queryService query.QueryService, cryptoService crypto.CryptoService, encryptedEndCustomerApiKey *string) Connector {
 	return WebhookImpl{
-		queryService:  queryService,
-		cryptoService: cryptoService,
+		queryService:               queryService,
+		cryptoService:              cryptoService,
+		encryptedEndCustomerApiKey: encryptedEndCustomerApiKey, // TODO: does this belong here?
 	}
 }
 
@@ -63,6 +66,11 @@ func (wh WebhookImpl) Write(
 		return err
 	}
 
+	decryptedEndCustomerApiKey, err := wh.cryptoService.DecryptEndCustomerApiKey(*wh.encryptedEndCustomerApiKey)
+	if err != nil {
+		return err
+	}
+
 	orderedObjectFields := wh.createOrderedObjectFields(object.ObjectFields, fieldMappings)
 	outputDataList := []map[string]any{}
 	for _, row := range rows {
@@ -81,7 +89,7 @@ func (wh WebhookImpl) Write(
 			currentBatchSize = 0
 			// TODO: add retry
 			limiter.Wait(ctx)
-			err := wh.sendData(object.DisplayName, sync.EndCustomerID, outputDataList, destinationConnection.Host, *decryptedSigningKey)
+			err := wh.sendData(object.DisplayName, sync.EndCustomerID, decryptedEndCustomerApiKey, outputDataList, destinationConnection.Host, *decryptedSigningKey)
 			if err != nil {
 				return err
 			}
@@ -89,7 +97,7 @@ func (wh WebhookImpl) Write(
 	}
 
 	if currentBatchSize > 0 {
-		err := wh.sendData(object.DisplayName, sync.EndCustomerID, outputDataList, destinationConnection.Host, *decryptedSigningKey)
+		err := wh.sendData(object.DisplayName, sync.EndCustomerID, decryptedEndCustomerApiKey, outputDataList, destinationConnection.Host, *decryptedSigningKey)
 		if err != nil {
 			return err
 		}
@@ -98,12 +106,13 @@ func (wh WebhookImpl) Write(
 	return nil
 }
 
-func (wh WebhookImpl) sendData(objectName string, endCustomerId int64, outputDataList []map[string]any, webhookUrl string, decryptedSigningKey string) error {
+func (wh WebhookImpl) sendData(objectName string, endCustomerId int64, endCustomerApiKey *string, outputDataList []map[string]any, webhookUrl string, decryptedSigningKey string) error {
 	webhookData := WebhookData{
-		ObjectName:     objectName,
-		EndCustomerId:  endCustomerId,
-		FabraTimestamp: time.Now().Unix(),
-		Data:           outputDataList,
+		ObjectName:        objectName,
+		EndCustomerId:     endCustomerId,
+		EndCustomerApiKey: endCustomerApiKey,
+		FabraTimestamp:    time.Now().Unix(),
+		Data:              outputDataList,
 	}
 	marshalled, err := json.Marshal(webhookData)
 	if err != nil {

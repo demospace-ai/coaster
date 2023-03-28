@@ -62,7 +62,8 @@ func Replicate(ctx context.Context, input ReplicateInput) (*ReplicateOutput, err
 	case models.ConnectionTypeBigQuery:
 		destConnector = connectors.NewBigQueryConnector(queryService)
 	case models.ConnectionTypeWebhook:
-		destConnector = connectors.NewWebhookConnector(queryService, cryptoService)
+		// TODO: does end customer api key belong here?
+		destConnector = connectors.NewWebhookConnector(queryService, cryptoService, input.EncryptedEndCustomerApiKey)
 	default:
 		return nil, errors.Newf("destination not implemented for %s", input.SourceConnection.ConnectionType)
 	}
