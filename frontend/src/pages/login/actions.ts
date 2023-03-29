@@ -67,7 +67,11 @@ export function useOnLoginSuccess() {
   const navigate = useNavigate();
 
   return useCallback(async (user: User, organization: Organization | undefined) => {
-    rudderanalytics.identify(user.id.toString());
+    rudderanalytics.identify(user.id.toString(), {
+      "name": `${user.first_name} ${user.last_name}`,
+      "email": user.email
+    });
+
     H.identify(user.email, {
       id: user.id.toString(),
     });

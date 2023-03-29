@@ -7,13 +7,14 @@ import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import { App } from 'src/app/App';
+import { rudderanalytics } from 'src/app/rudder';
 import { createStore } from 'src/root/model';
 import { isProd } from 'src/utils/env';
 
 const store = createStore();
 
-// Initialize Highlight tracking for production
 if (isProd()) {
+  rudderanalytics.load('2DuH7iesuV4TtpwMqRvXqQttOvm', 'https://fabranickbele.dataplane.rudderstack.com');
   H.init('7e3vw5g1');
 }
 
