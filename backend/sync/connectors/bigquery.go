@@ -232,9 +232,9 @@ func getBigQueryType(fieldType data.FieldType) bigquery.FieldType {
 		return bigquery.NumericFieldType
 	case data.FieldTypeBoolean:
 		return bigquery.BooleanFieldType
-	case data.FieldTypeTimestamp:
+	case data.FieldTypeTimestamp, data.FieldTypeDateTimeTz:
 		return bigquery.TimestampFieldType
-	case data.FieldTypeDateTimeTz, data.FieldTypeDateTimeNtz:
+	case data.FieldTypeDateTimeNtz:
 		return bigquery.DateTimeFieldType
 	case data.FieldTypeJson:
 		return bigquery.JSONFieldType
