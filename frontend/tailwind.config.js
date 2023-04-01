@@ -8,7 +8,8 @@ module.exports = {
       animation: {
         'spin-slow': 'spin 15s linear infinite',
         'shimmer': 'shimmer 1.5s linear infinite',
-        'fade-in': 'fade-in 200ms ease-in-out'
+        'fade-in': 'fade-in 200ms ease-in-out',
+        'dot-flashing': 'dot-flashing 1s infinite linear alternate',
       },
       colors: {
         primary: {
@@ -34,6 +35,14 @@ module.exports = {
         'fade-in': {
           '0%': { 'opacity': 0 },
           '100%': { 'opacity': 1 }
+        },
+        'dot-flashing': {
+          '0%': {
+            'opacity': '1'
+          },
+          '30%, 100%': {
+            'opacity': '0.2'
+          }
         }
       }
     }

@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import { mergeClasses } from "src/utils/twmerge";
 
 type LoadingProps = {
@@ -21,3 +22,52 @@ export const Loading: React.FC<LoadingProps> = props => {
     </svg>
   );
 };
+
+export const DotsLoading: React.FC<LoadingProps> = props => {
+  const dotStyle = "tw-w-[5px] tw-h-[5px] tw-bg-slate-500 tw-rounded tw-animate-dot-flashing";
+  return (
+    <div className={mergeClasses("tw-flex tw-gap-0.5", props.className)}>
+      <div className={classNames(dotStyle, "[animation-delay:0s]")}></div>
+      <div className={classNames(dotStyle, "[animation-delay:0.25s]")}></div>
+      <div className={classNames(dotStyle, "[animation-delay:0.5s]")}></div>
+    </div>
+  );
+};
+
+
+// .dot-flashing {
+//   position: relative;
+//   width: 10px;
+//   height: 10px;
+//   border-radius: 5px;
+//   background-color: #9880ff;
+//   color: #9880ff;
+//   animation: dot-flashing 1s infinite linear alternate;
+//   animation-delay: 0.5s;
+// }
+// .dot-flashing::before, .dot-flashing::after {
+//   content: "";
+//   display: inline-block;
+//   position: absolute;
+//   top: 0;
+// }
+// .dot-flashing::before {
+//   left: -15px;
+//   width: 10px;
+//   height: 10px;
+//   border-radius: 5px;
+//   background-color: #9880ff;
+//   color: #9880ff;
+//   animation: dot-flashing 1s infinite alternate;
+//   animation-delay: 0s;
+// }
+// .dot-flashing::after {
+//   left: 15px;
+//   width: 10px;
+//   height: 10px;
+//   border-radius: 5px;
+//   background-color: #9880ff;
+//   color: #9880ff;
+//   animation: dot-flashing 1s infinite alternate;
+//   animation-delay: 1s;
+// }

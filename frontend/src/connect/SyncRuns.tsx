@@ -2,7 +2,7 @@ import { ChevronRightIcon, PencilIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import { useNavigate, useParams } from "react-router-dom";
 import { BackButton } from "src/components/button/Button";
-import { Loading } from "src/components/loading/Loading";
+import { DotsLoading, Loading } from "src/components/loading/Loading";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { SyncRunStatus } from "src/rpc/api";
 import { useLinkSync } from "src/rpc/data";
@@ -51,8 +51,8 @@ const SyncRunsList: React.FC<{ linkToken: string; }> = ({ linkToken }) => {
                 {syncRuns.length > 0 ? syncRuns.map((syncRun, index) => (
                   <tr key={index} className="tw-cursor-pointer hover:tw-bg-slate-50" onClick={() => { }}>
                     <td className={tableCellStyle}>
-                      <div className={mergeClasses("tw-py-1 tw-px-2 tw-rounded tw-text-center tw-w-[100px] tw-border tw-text-xs tw-font-medium", getStatusStyle(syncRun.status))}>
-                        {syncRun.status.toUpperCase()}
+                      <div className={mergeClasses("tw-flex tw-justify-center tw-items-center tw-py-1 tw-px-2 tw-rounded tw-text-center tw-w-[110px] tw-border tw-text-xs tw-font-medium", getStatusStyle(syncRun.status))}>
+                        {syncRun.status.toUpperCase()} {syncRun.status === SyncRunStatus.Running && <DotsLoading className="tw-ml-1.5" />}
                       </div>
                     </td>
                     <td className={tableCellStyle}>
