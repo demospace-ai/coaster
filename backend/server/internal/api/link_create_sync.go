@@ -3,8 +3,8 @@ package api
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
+	"time"
 
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/errors"
@@ -17,6 +17,9 @@ import (
 
 	"github.com/go-playground/validator/v10"
 )
+
+const DAY = time.Hour * 24
+const WEEK = DAY * 7
 
 type CreateSyncLinkRequest struct {
 	DisplayName    string                `json:"display_name"`
@@ -91,9 +94,6 @@ func (s ApiService) LinkCreateSync(auth auth.Authentication, w http.ResponseWrit
 		return err
 	}
 
-	// TODO: use schedules instead of crons
-	cronSchedule := createCronSchedule(createSyncRequest.Frequency, createSyncRequest.FrequencyUnits)
-
 	c, err := temporal.CreateClient(CLIENT_PEM_KEY, CLIENT_KEY_KEY)
 	if err != nil {
 		return err
@@ -101,33 +101,30 @@ func (s ApiService) LinkCreateSync(auth auth.Authentication, w http.ResponseWrit
 	defer c.Close()
 
 	ctx := context.TODO()
-	workflow, err := c.ExecuteWorkflow(
-		ctx,
-		client.StartWorkflowOptions{
-			ID:           sync.WorkflowID,
-			TaskQueue:    temporal.SyncTaskQueue,
-			CronSchedule: cronSchedule,
-		},
-		temporal.SyncWorkflow,
-		temporal.SyncInput{SyncID: sync.ID, OrganizationID: auth.Organization.ID},
-	)
+	scheduleClient := c.ScheduleClient()
+	schedule, err := createSchedule(createSyncRequest.Frequency, createSyncRequest.FrequencyUnits)
 	if err != nil {
 		return err
 	}
 
-	// tell the workflow to run immediately
-	_, err = c.SignalWithStartWorkflow(
-		ctx,
-		workflow.GetID(),
-		"start",
-		nil,
-		client.StartWorkflowOptions{
-			ID:        sync.WorkflowID,
+	_, err = scheduleClient.Create(ctx, client.ScheduleOptions{
+		ID:                 sync.WorkflowID,
+		TriggerImmediately: true,
+		Action: &client.ScheduleWorkflowAction{
 			TaskQueue: temporal.SyncTaskQueue,
+			Workflow:  temporal.SyncWorkflow,
+			Args: []interface{}{temporal.SyncInput{
+				SyncID: sync.ID, OrganizationID: auth.Organization.ID,
+			}},
 		},
-		temporal.SyncWorkflow,
-		temporal.SyncInput{SyncID: sync.ID, OrganizationID: auth.Organization.ID},
-	)
+		Spec: client.ScheduleSpec{
+			Intervals: []client.ScheduleIntervalSpec{
+				{
+					Every: schedule,
+				},
+			},
+		},
+	})
 	if err != nil {
 		return err
 	}
@@ -138,18 +135,19 @@ func (s ApiService) LinkCreateSync(auth auth.Authentication, w http.ResponseWrit
 	})
 }
 
-func createCronSchedule(frequency int64, frequencyUnits models.FrequencyUnits) string {
-	// this uses the robfig format: https://docs.temporal.io/workflows#robfig-predefined-schedules-and-intervals
+func createSchedule(frequency int64, frequencyUnits models.FrequencyUnits) (time.Duration, error) {
+	frequencyDuration := time.Duration(frequency)
 	switch frequencyUnits {
 	case models.FrequencyUnitsMinutes:
-		return fmt.Sprintf("@every %dm", frequency)
+		return frequencyDuration * time.Minute, nil
 	case models.FrequencyUnitsHours:
-		return fmt.Sprintf("@every %dh", frequency)
+		return frequencyDuration * time.Hour, nil
 	case models.FrequencyUnitsDays:
-		return fmt.Sprintf("@every %dh", frequency*24)
+		return frequencyDuration * DAY, nil
 	case models.FrequencyUnitsWeeks:
-		return fmt.Sprintf("@every %dh", frequency*24*7)
+		return frequencyDuration * WEEK, nil
 	default:
-		return "0 0 0 0 2000" // choose a day in the past so it never executes
+		// TODO: this should not happen
+		return WEEK, errors.Newf("unexpected frequency unit: %s", string(frequencyUnits))
 	}
 }

@@ -42,18 +42,9 @@ func (s ApiService) RunSync(auth auth.Authentication, w http.ResponseWriter, r *
 	defer c.Close()
 
 	ctx := context.TODO()
-	_, err = c.SignalWithStartWorkflow(
-		ctx,
-		sync.WorkflowID,
-		"start",
-		nil,
-		client.StartWorkflowOptions{
-			ID:        sync.WorkflowID,
-			TaskQueue: temporal.SyncTaskQueue,
-		},
-		temporal.SyncWorkflow,
-		temporal.SyncInput{SyncID: sync.ID, OrganizationID: auth.Organization.ID},
-	)
+	scheduleClient := c.ScheduleClient()
+	workflow := scheduleClient.GetHandle(ctx, sync.WorkflowID)
+	err = workflow.Trigger(ctx, client.ScheduleTriggerOptions{})
 	if err != nil {
 		return err
 	}

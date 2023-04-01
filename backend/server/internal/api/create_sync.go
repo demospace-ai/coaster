@@ -132,42 +132,36 @@ func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, 
 		return err
 	}
 
-	// TODO: use schedules instead of crons
-	cronSchedule := createCronSchedule(frequency, frequencyUnits)
-
 	c, err := temporal.CreateClient(CLIENT_PEM_KEY, CLIENT_KEY_KEY)
 	if err != nil {
 		return err
 	}
 	defer c.Close()
-
 	ctx := context.TODO()
-	workflow, err := c.ExecuteWorkflow(
-		ctx,
-		client.StartWorkflowOptions{
-			ID:           sync.WorkflowID,
-			TaskQueue:    temporal.SyncTaskQueue,
-			CronSchedule: cronSchedule,
-		},
-		temporal.SyncWorkflow,
-		temporal.SyncInput{SyncID: sync.ID, OrganizationID: auth.Organization.ID},
-	)
+	scheduleClient := c.ScheduleClient()
+	schedule, err := createSchedule(frequency, frequencyUnits)
 	if err != nil {
 		return err
 	}
 
-	// tell the workflow to run immediately
-	_, err = c.SignalWithStartWorkflow(
-		ctx,
-		workflow.GetID(),
-		"start",
-		nil,
-		client.StartWorkflowOptions{
+	_, err = scheduleClient.Create(ctx, client.ScheduleOptions{
+		ID:                 sync.WorkflowID,
+		TriggerImmediately: true,
+		Action: &client.ScheduleWorkflowAction{
 			TaskQueue: temporal.SyncTaskQueue,
+			Workflow:  temporal.SyncWorkflow,
+			Args: []interface{}{temporal.SyncInput{
+				SyncID: sync.ID, OrganizationID: auth.Organization.ID,
+			}},
 		},
-		temporal.SyncWorkflow,
-		temporal.SyncInput{SyncID: sync.ID, OrganizationID: auth.Organization.ID},
-	)
+		Spec: client.ScheduleSpec{
+			Intervals: []client.ScheduleIntervalSpec{
+				{
+					Every: schedule,
+				},
+			},
+		},
+	})
 	if err != nil {
 		return err
 	}
