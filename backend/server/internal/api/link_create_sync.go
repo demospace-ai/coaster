@@ -10,6 +10,7 @@ import (
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/input"
 	"go.fabra.io/server/common/models"
+	"go.fabra.io/server/common/repositories/objects"
 	"go.fabra.io/server/common/repositories/syncs"
 	"go.fabra.io/server/common/views"
 	"go.fabra.io/sync/temporal"
@@ -22,18 +23,18 @@ const DAY = time.Hour * 24
 const WEEK = DAY * 7
 
 type CreateSyncLinkRequest struct {
-	DisplayName    string                `json:"display_name"`
-	SourceID       int64                 `json:"source_id"`
-	ObjectID       int64                 `json:"object_id"`
-	Namespace      *string               `json:"namespace,omitempty"`
-	TableName      *string               `json:"table_name,omitempty"`
-	CustomJoin     *string               `json:"custom_join,omitempty"`
-	CursorField    *string               `json:"cursor_field,omitempty"`
-	PrimaryKey     *string               `json:"primary_key,omitempty"`
-	SyncMode       models.SyncMode       `json:"sync_mode"`
-	Frequency      int64                 `json:"frequency"`
-	FrequencyUnits models.FrequencyUnits `json:"frequency_units"`
-	FieldMappings  []input.FieldMapping  `json:"field_mappings"`
+	DisplayName       string                 `json:"display_name"`
+	SourceID          int64                  `json:"source_id"`
+	ObjectID          int64                  `json:"object_id"`
+	Namespace         *string                `json:"namespace,omitempty"`
+	TableName         *string                `json:"table_name,omitempty"`
+	CustomJoin        *string                `json:"custom_join,omitempty"`
+	SourceCursorField *string                `json:"source_cursor_field,omitempty"`
+	SourcePrimaryKey  *string                `json:"source_primary_key,omitempty"`
+	SyncMode          *models.SyncMode       `json:"sync_mode,omitempty"`
+	Frequency         *int64                 `json:"frequency,omitempty"`
+	FrequencyUnits    *models.FrequencyUnits `json:"frequency_units,omitempty"`
+	FieldMappings     []input.FieldMapping   `json:"field_mappings"`
 }
 
 func (s ApiService) LinkCreateSync(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
@@ -63,6 +64,43 @@ func (s ApiService) LinkCreateSync(auth auth.Authentication, w http.ResponseWrit
 		return errors.NewBadRequest("must have table_name and namespace or custom_join")
 	}
 
+	// this also serves to check that this organization owns the object
+	object, err := objects.LoadObjectByID(s.db, auth.Organization.ID, createSyncRequest.ObjectID)
+	if err != nil {
+		return err
+	}
+
+	objectFields, err := objects.LoadObjectFieldsByID(s.db, createSyncRequest.ObjectID)
+	if err != nil {
+		return err
+	}
+
+	// default values for the sync come from the object
+	sourceCursorField := getSourceCursorField(object, objectFields, createSyncRequest.FieldMappings)
+	sourcePrimaryKey := getSourcePrimaryKey(object, objectFields, createSyncRequest.FieldMappings)
+	syncMode := object.SyncMode
+	frequency := object.Frequency
+	frequencyUnits := object.FrequencyUnits
+
+	// TODO: validate that the organization allows customizing sync settings
+	if true {
+		if createSyncRequest.SourceCursorField != nil {
+			sourceCursorField = createSyncRequest.SourceCursorField
+		}
+		if createSyncRequest.SourcePrimaryKey != nil {
+			sourcePrimaryKey = createSyncRequest.SourcePrimaryKey
+		}
+		if createSyncRequest.SyncMode != nil {
+			syncMode = *createSyncRequest.SyncMode
+		}
+		if createSyncRequest.Frequency != nil {
+			frequency = *createSyncRequest.Frequency
+		}
+		if createSyncRequest.FrequencyUnits != nil {
+			frequencyUnits = *createSyncRequest.FrequencyUnits
+		}
+	}
+
 	// TODO: create sync schedule in Temporal
 	// TODO: create field mappings in DB using transaction
 	// TODO: validate types are mapped correctly
@@ -76,11 +114,11 @@ func (s ApiService) LinkCreateSync(auth auth.Authentication, w http.ResponseWrit
 		createSyncRequest.Namespace,
 		createSyncRequest.TableName,
 		createSyncRequest.CustomJoin,
-		createSyncRequest.CursorField,
-		createSyncRequest.PrimaryKey,
-		createSyncRequest.SyncMode,
-		createSyncRequest.Frequency,
-		createSyncRequest.FrequencyUnits,
+		sourceCursorField,
+		sourcePrimaryKey,
+		syncMode,
+		frequency,
+		frequencyUnits,
 	)
 	if err != nil {
 		return err
@@ -102,7 +140,7 @@ func (s ApiService) LinkCreateSync(auth auth.Authentication, w http.ResponseWrit
 
 	ctx := context.TODO()
 	scheduleClient := c.ScheduleClient()
-	schedule, err := createSchedule(createSyncRequest.Frequency, createSyncRequest.FrequencyUnits)
+	schedule, err := createSchedule(frequency, frequencyUnits)
 	if err != nil {
 		return err
 	}
