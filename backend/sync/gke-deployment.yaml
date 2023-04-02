@@ -21,8 +21,8 @@ spec:
         image: "gcr.io/fabra-344902/sync:latest"
         resources:
           requests:
-            cpu: "2"
-            memory: "8Gi"
+            cpu: "4"
+            memory: "32Gi"
             ephemeral-storage: "1Gi"
         env:
         - name: IS_PROD
