@@ -55,7 +55,7 @@ func (sf SnowflakeImpl) getReadQuery(sourceConnection *models.Connection, sync v
 		if sync.CursorPosition != nil {
 			// TODO: allow choosing other operators (rows smaller than current cursor)
 			// order by cursor field to simplify
-			return fmt.Sprintf("%s WHERE %s > '%s' ORDER BY %s ASC;", queryString, *sync.SourceCursorField, *sync.CursorPosition, *sync.SourceCursorField)
+			return fmt.Sprintf("%s WHERE %s > %s ORDER BY %s ASC;", queryString, *sync.SourceCursorField, *sync.CursorPosition, *sync.SourceCursorField)
 		} else {
 			return fmt.Sprintf("%s ORDER BY %s ASC;", queryString, *sync.SourceCursorField)
 		}

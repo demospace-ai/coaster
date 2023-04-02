@@ -2,7 +2,10 @@ package connectors
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"os"
+	"runtime/pprof"
 	"strings"
 
 	"cloud.google.com/go/bigquery"
@@ -58,7 +61,7 @@ func (bq BigQueryImpl) getReadQuery(sourceConnection *models.Connection, sync vi
 		if sync.CursorPosition != nil {
 			// TODO: allow choosing other operators (rows smaller than current cursor)
 			// order by cursor field to simplify
-			return fmt.Sprintf("%s WHERE %s > '%s' ORDER BY %s ASC;", queryString, *sync.SourceCursorField, *sync.CursorPosition, *sync.SourceCursorField)
+			return fmt.Sprintf("%s WHERE %s > %s ORDER BY %s ASC;", queryString, *sync.SourceCursorField, *sync.CursorPosition, *sync.SourceCursorField)
 		} else {
 			return fmt.Sprintf("%s ORDER BY %s ASC;", queryString, *sync.SourceCursorField)
 		}
@@ -86,15 +89,24 @@ func (bq BigQueryImpl) getNewCursorPosition(results *data.QueryResults, sync vie
 	}
 
 	var cursorFieldPos int
+	var cursorFieldType data.FieldType
 	for i := range results.Schema {
 		if results.Schema[i].Name == *sync.SourceCursorField {
 			cursorFieldPos = i
+			cursorFieldType = results.Schema[i].Type
 		}
 	}
 
 	// TODO: make sure we don't miss any rows
 	// we sort rows by cursor field so just take the last row
-	newCursorPos := results.Data[len(results.Data)-1][cursorFieldPos].(string)
+	var newCursorPos string
+	switch cursorFieldType {
+	case data.FieldTypeInteger:
+		newCursorPos = fmt.Sprintf("%v", results.Data[len(results.Data)-1][cursorFieldPos])
+	default:
+		newCursorPos = fmt.Sprintf("'%v'", results.Data[len(results.Data)-1][cursorFieldPos])
+	}
+
 	return &newCursorPos
 }
 
@@ -134,7 +146,11 @@ func (bq BigQueryImpl) Write(
 					// JSON-like values need to be escaped according to BigQuery expectations. Even if the destination
 					// type is not JSON, it is necessary to escape to avoid issues
 					// https://cloud.google.com/bigquery/docs/reference/standard-sql/json-data#load_from_csv_files
-					escapedValue := fmt.Sprintf("\"%s\"", strings.ReplaceAll(fmt.Sprintf("%v", value), "\"", "\"\""))
+					jsonStr, err := json.Marshal(value)
+					if err != nil {
+						return err
+					}
+					escapedValue := fmt.Sprintf("\"%s\"", strings.ReplaceAll(string(jsonStr), "\"", "\"\""))
 					rowTokens[j] = escapedValue
 				case data.FieldTypeString:
 					// escape the string so commas don't break the CSV schema
@@ -148,6 +164,13 @@ func (bq BigQueryImpl) Write(
 		rowString := strings.Join(rowTokens, ",")
 		rowStrings[i] = rowString
 	}
+
+	f, err := os.Create("dump")
+	if err != nil {
+		return (err)
+	}
+	defer f.Close()
+	pprof.WriteHeapProfile(f)
 
 	file := uuid.New().String()
 	gcsReference := fmt.Sprintf("gs://%s/%s", destinationOptions.StagingBucket, file)

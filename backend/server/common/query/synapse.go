@@ -227,9 +227,9 @@ func (sc SynapseApiClient) GetQueryIterator(ctx context.Context, queryString str
 }
 
 func convertSynapseRow(synapseRow []any) data.Row {
-	var row data.Row
-	for _, value := range synapseRow {
-		row = append(row, convertSynapseValue(value))
+	row := make(data.Row, len(synapseRow))
+	for i, value := range synapseRow {
+		row[i] = convertSynapseValue(value)
 	}
 
 	return row

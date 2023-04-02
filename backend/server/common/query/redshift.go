@@ -232,9 +232,9 @@ func getRedshiftFieldType(redshiftType string) data.FieldType {
 }
 
 func convertRedshiftRow(redshiftRow []any, schema data.Schema) data.Row {
-	var row data.Row
+	row := make(data.Row, len(redshiftRow))
 	for i, value := range redshiftRow {
-		row = append(row, convertRedshiftValue(value, schema[i].Type))
+		row[i] = convertRedshiftValue(value, schema[i].Type)
 	}
 
 	return row

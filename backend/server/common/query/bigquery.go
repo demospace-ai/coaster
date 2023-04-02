@@ -178,12 +178,12 @@ func (ac BigQueryApiClient) RunQuery(ctx context.Context, queryString string, ar
 		return nil, err
 	}
 
-	var results []data.Row
 	it, err := job.Read(ctx)
 	if err != nil {
 		return nil, err
 	}
 
+	var results []data.Row
 	for {
 		var row []bigquery.Value
 		err := it.Next(&row)
@@ -303,9 +303,9 @@ func (ac BigQueryApiClient) CleanUpStagingData(ctx context.Context, stagingOptio
 }
 
 func convertBigQueryRow(bigQueryRow []bigquery.Value, schema bigquery.Schema) data.Row {
-	var row data.Row
+	row := make(data.Row, len(bigQueryRow))
 	for i, value := range bigQueryRow {
-		row = append(row, convertBigQueryValue(value, schema[i].Type))
+		row[i] = convertBigQueryValue(value, schema[i].Type)
 	}
 
 	return row

@@ -346,11 +346,11 @@ func convertMongoDbRow(mongoDbRow bson.D, schema data.Schema) data.Row {
 		valueMap[keyPair.Key] = keyPair.Value
 	}
 
-	var row data.Row
 	// make sure every result is in the same order by looping through schema
-	for _, field := range schema {
+	row := make(data.Row, len(mongoDbRow))
+	for i, field := range schema {
 		value := convertMongoDbValue(valueMap[field.Name], field.Type)
-		row = append(row, value)
+		row[i] = value
 	}
 
 	return row

@@ -240,9 +240,9 @@ func (sc SnowflakeApiClient) GetQueryIterator(ctx context.Context, queryString s
 }
 
 func convertSnowflakeRow(snowflakeRow []any, schema data.Schema) data.Row {
-	var row data.Row
+	row := make(data.Row, len(snowflakeRow))
 	for i, value := range snowflakeRow {
-		row = append(row, convertSnowflakeValue(value, schema[i].Type))
+		row[i] = convertSnowflakeValue(value, schema[i].Type)
 	}
 
 	return row
