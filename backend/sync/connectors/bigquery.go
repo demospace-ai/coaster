@@ -115,16 +115,19 @@ func (bq BigQueryImpl) Write(
 	}
 	destClient := dc.(query.BigQueryApiClient)
 
+	// allocate the arrays and reuse them to save memory
+	rowStrings := make([]string, len(rows))
+	rowTokens := make([]string, len(fieldMappings)+1)                     // one extra token for the end customer ID
+	rowTokens[len(fieldMappings)] = fmt.Sprintf("%d", sync.EndCustomerID) // end customer ID will be the same for every row
+
 	// TODO: batch insert 10,000 rows at a time
 	// write to temporary table in destination
-	rowStrings := []string{}
-	for _, row := range rows {
-		var rowTokens []string
-		for i, value := range row {
-			sourceType := fieldMappings[i].SourceFieldType
+	for i, row := range rows {
+		for j, value := range row {
+			sourceType := fieldMappings[j].SourceFieldType
 			if value == nil {
 				// empty string for null values will be interpreted as null when loading from csv
-				rowTokens = append(rowTokens, "")
+				rowTokens[j] = ""
 			} else {
 				switch sourceType {
 				case data.FieldTypeJson:
@@ -132,19 +135,18 @@ func (bq BigQueryImpl) Write(
 					// type is not JSON, it is necessary to escape to avoid issues
 					// https://cloud.google.com/bigquery/docs/reference/standard-sql/json-data#load_from_csv_files
 					escapedValue := fmt.Sprintf("\"%s\"", strings.ReplaceAll(fmt.Sprintf("%v", value), "\"", "\"\""))
-					rowTokens = append(rowTokens, escapedValue)
+					rowTokens[j] = escapedValue
 				case data.FieldTypeString:
 					// escape the string so commas don't break the CSV schema
-					rowTokens = append(rowTokens, fmt.Sprintf("\"%v\"", value))
+					rowTokens[j] = fmt.Sprintf("\"%v\"", value)
 				default:
-					rowTokens = append(rowTokens, fmt.Sprintf("%v", value))
+					rowTokens[j] = fmt.Sprintf("%v", value)
 				}
 			}
 		}
 
-		rowTokens = append(rowTokens, fmt.Sprintf("%d", sync.EndCustomerID))
 		rowString := strings.Join(rowTokens, ",")
-		rowStrings = append(rowStrings, rowString)
+		rowStrings[i] = rowString
 	}
 
 	file := uuid.New().String()
