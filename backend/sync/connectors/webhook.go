@@ -18,7 +18,7 @@ import (
 	"golang.org/x/time/rate"
 )
 
-const MAX_BATCH_SIZE = 1_000
+const MAX_WEBHOOK_BATCH_SIZE = 1_000
 const REFILL_RATE = 100
 const MAX_BURST = 100
 
@@ -44,8 +44,16 @@ func NewWebhookConnector(queryService query.QueryService, cryptoService crypto.C
 	}
 }
 
-func (wh WebhookImpl) Read(ctx context.Context, sourceConnection views.FullConnection, sync views.Sync, fieldMappings []views.FieldMapping) ([]data.Row, *string, error) {
-	return nil, nil, errors.New("webhook source not supported")
+func (wh WebhookImpl) Read(
+	ctx context.Context,
+	sourceConnection views.FullConnection,
+	sync views.Sync,
+	fieldMappings []views.FieldMapping,
+	rowsC chan<- []data.Row,
+	cursorPosC chan<- *string,
+	errC chan<- error,
+) {
+	errC <- errors.New("webhook source not supported")
 }
 
 func (wh WebhookImpl) Write(
@@ -55,57 +63,76 @@ func (wh WebhookImpl) Write(
 	object views.Object,
 	sync views.Sync,
 	fieldMappings []views.FieldMapping,
-	rows []data.Row,
-) error {
-	currentBatchSize := 0
+	rowsC <-chan []data.Row,
+	rowsWrittenC chan<- int,
+	errC chan<- error,
+) {
 	// TODO: allow customizing the rate limit
 	limiter := rate.NewLimiter(REFILL_RATE, MAX_BURST)
 
 	decryptedSigningKey, err := wh.cryptoService.DecryptWebhookSigningKey(destinationConnection.Credentials)
 	if err != nil {
-		return err
+		errC <- err
+		return
 	}
 
 	decryptedEndCustomerApiKey, err := wh.cryptoService.DecryptEndCustomerApiKey(*wh.encryptedEndCustomerApiKey)
 	if err != nil {
-		return err
+		errC <- err
+		return
 	}
 
 	orderedObjectFields := wh.createOrderedObjectFields(object.ObjectFields, fieldMappings)
 	outputDataList := []map[string]any{}
-	for _, row := range rows {
-		outputData := map[string]any{}
-		for i, value := range row {
-			destFieldName := orderedObjectFields[i].Name
-			if value != nil {
-				outputData[destFieldName] = value
+
+	rowsWritten := 0
+	for {
+		currentBatchSize := 0
+		rows, more := <-rowsC
+		if !more {
+			break
+		}
+
+		rowsWritten += len(rows)
+		for _, row := range rows {
+			outputData := map[string]any{}
+			for i, value := range row {
+				destFieldName := orderedObjectFields[i].Name
+				if value != nil {
+					outputData[destFieldName] = value
+				}
+			}
+			outputDataList = append(outputDataList, outputData)
+
+			currentBatchSize++
+			// TODO: allow customizing batch size
+			if currentBatchSize == MAX_WEBHOOK_BATCH_SIZE {
+				// TODO: add retry
+				limiter.Wait(ctx)
+				err := wh.sendData(object.DisplayName, sync.EndCustomerID, decryptedEndCustomerApiKey, outputDataList, destinationConnection.Host, *decryptedSigningKey)
+				if err != nil {
+					errC <- err
+					return
+				}
+
+				currentBatchSize = 0
+				outputDataList = nil
 			}
 		}
-		outputDataList = append(outputDataList, outputData)
 
-		currentBatchSize++
-		// TODO: allow customizing batch size
-		if currentBatchSize == MAX_BATCH_SIZE {
-			// TODO: add retry
-			limiter.Wait(ctx)
+		if currentBatchSize > 0 {
 			err := wh.sendData(object.DisplayName, sync.EndCustomerID, decryptedEndCustomerApiKey, outputDataList, destinationConnection.Host, *decryptedSigningKey)
 			if err != nil {
-				return err
+				errC <- err
+				return
 			}
-
-			currentBatchSize = 0
-			outputDataList = nil
 		}
 	}
 
-	if currentBatchSize > 0 {
-		err := wh.sendData(object.DisplayName, sync.EndCustomerID, decryptedEndCustomerApiKey, outputDataList, destinationConnection.Host, *decryptedSigningKey)
-		if err != nil {
-			return err
-		}
-	}
+	rowsWrittenC <- rowsWritten
 
-	return nil
+	close(rowsWrittenC)
+	close(errC)
 }
 
 func (wh WebhookImpl) sendData(objectName string, endCustomerId int64, endCustomerApiKey *string, outputDataList []map[string]any, webhookUrl string, decryptedSigningKey string) error {

@@ -4,8 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
-	"runtime/pprof"
 	"strings"
 
 	"cloud.google.com/go/bigquery"
@@ -27,24 +25,67 @@ func NewBigQueryConnector(queryService query.QueryService) Connector {
 	}
 }
 
-func (bq BigQueryImpl) Read(ctx context.Context, sourceConnection views.FullConnection, sync views.Sync, fieldMappings []views.FieldMapping) ([]data.Row, *string, error) {
+func (bq BigQueryImpl) Read(
+	ctx context.Context,
+	sourceConnection views.FullConnection,
+	sync views.Sync,
+	fieldMappings []views.FieldMapping,
+	rowsC chan<- []data.Row,
+	cursorPosC chan<- *string,
+	errC chan<- error,
+) {
 	connectionModel := views.ConvertConnectionView(sourceConnection)
 
 	sc, err := bq.queryService.GetClient(ctx, connectionModel)
 	if err != nil {
-		return nil, nil, err
+		errC <- err
+		return
 	}
 	sourceClient := sc.(query.BigQueryApiClient)
 
 	readQuery := bq.getReadQuery(connectionModel, sync, fieldMappings)
 
-	results, err := sourceClient.RunQuery(ctx, readQuery)
+	iterator, err := sourceClient.GetQueryIterator(ctx, readQuery)
 	if err != nil {
-		return nil, nil, errors.NewCustomerVisibleError(err)
+		errC <- errors.NewCustomerVisibleError(err)
+		return
 	}
 
-	newCursorPosition := bq.getNewCursorPosition(results, sync)
-	return results.Data, newCursorPosition, nil
+	currentIndex := 0
+	var rowBatch []data.Row
+	var lastRow data.Row
+	for {
+		row, err := iterator.Next()
+		if err != nil {
+			if err == data.ErrDone {
+				break
+			} else {
+				errC <- err
+				return
+			}
+		}
+
+		rowBatch = append(rowBatch, row)
+		lastRow = row
+		currentIndex++
+		if currentIndex == READ_BATCH_SIZE {
+			rowsC <- rowBatch
+			currentIndex = 0
+			rowBatch = []data.Row{}
+		}
+	}
+
+	// write any remaining roows
+	if currentIndex > 0 {
+		rowsC <- rowBatch
+	}
+
+	newCursorPosition := bq.getNewCursorPosition(lastRow, iterator.Schema(), sync)
+	cursorPosC <- newCursorPosition
+
+	close(rowsC)
+	close(cursorPosC)
+	close(errC)
 }
 
 // TODO: only read 10,000 rows at once or something
@@ -79,21 +120,21 @@ func (bq BigQueryImpl) getSelectString(fieldMappings []views.FieldMapping) strin
 	return strings.Join(fields, ",")
 }
 
-func (bq BigQueryImpl) getNewCursorPosition(results *data.QueryResults, sync views.Sync) *string {
+func (bq BigQueryImpl) getNewCursorPosition(lastRow data.Row, schema data.Schema, sync views.Sync) *string {
 	if sync.SourceCursorField == nil {
 		return nil
 	}
 
-	if len(results.Data) <= 0 {
+	if lastRow == nil {
 		return nil
 	}
 
 	var cursorFieldPos int
 	var cursorFieldType data.FieldType
-	for i := range results.Schema {
-		if results.Schema[i].Name == *sync.SourceCursorField {
+	for i := range schema {
+		if schema[i].Name == *sync.SourceCursorField {
 			cursorFieldPos = i
-			cursorFieldType = results.Schema[i].Type
+			cursorFieldType = schema[i].Type
 		}
 	}
 
@@ -102,9 +143,9 @@ func (bq BigQueryImpl) getNewCursorPosition(results *data.QueryResults, sync vie
 	var newCursorPos string
 	switch cursorFieldType {
 	case data.FieldTypeInteger:
-		newCursorPos = fmt.Sprintf("%v", results.Data[len(results.Data)-1][cursorFieldPos])
+		newCursorPos = fmt.Sprintf("%v", lastRow[cursorFieldPos])
 	default:
-		newCursorPos = fmt.Sprintf("'%v'", results.Data[len(results.Data)-1][cursorFieldPos])
+		newCursorPos = fmt.Sprintf("'%v'", lastRow[cursorFieldPos])
 	}
 
 	return &newCursorPos
@@ -117,16 +158,64 @@ func (bq BigQueryImpl) Write(
 	object views.Object,
 	sync views.Sync,
 	fieldMappings []views.FieldMapping,
-	rows []data.Row,
-) error {
+	rowsC <-chan []data.Row,
+	rowsWrittenC chan<- int,
+	errC chan<- error,
+) {
 	connectionModel := views.ConvertConnectionView(destinationConnection)
 
 	dc, err := bq.queryService.GetClient(ctx, connectionModel)
 	if err != nil {
-		return err
+		errC <- err
+		return
 	}
 	destClient := dc.(query.BigQueryApiClient)
 
+	// always clean up the data in the storage bucket
+	objectPrefix := uuid.New().String()
+	wildcardObject := fmt.Sprintf("%s-*", objectPrefix)
+	gcsReference := fmt.Sprintf("gs://%s/%s", destinationOptions.StagingBucket, wildcardObject)
+	defer destClient.CleanUpStagingData(ctx, query.StagingOptions{Bucket: destinationOptions.StagingBucket, Object: wildcardObject})
+
+	batchNum := 0
+	rowsWritten := 0
+	for {
+		rows, more := <-rowsC
+		if !more {
+			break
+		}
+
+		rowsWritten += len(rows)
+		objectName := fmt.Sprintf("%s-%d", objectPrefix, batchNum)
+		err = bq.stageBatch(ctx, rows, fieldMappings, sync, destinationOptions, destClient, objectName)
+		if err != nil {
+			errC <- err
+			return
+		}
+
+		batchNum++
+	}
+
+	writeMode := bq.toBigQueryWriteMode(sync.SyncMode)
+	orderedObjectFields := bq.createOrderedObjectFields(object.ObjectFields, fieldMappings)
+	csvSchema := bq.createCsvSchema(object.EndCustomerIdField, orderedObjectFields)
+	err = destClient.LoadFromStaging(ctx, *object.Namespace, *object.TableName, query.LoadOptions{
+		GcsReference:   gcsReference,
+		BigQuerySchema: csvSchema,
+		WriteMode:      writeMode,
+	})
+	if err != nil {
+		errC <- errors.NewCustomerVisibleError(err)
+		return
+	}
+
+	rowsWrittenC <- rowsWritten
+
+	close(rowsWrittenC)
+	close(errC)
+}
+
+func (bq BigQueryImpl) stageBatch(ctx context.Context, rows []data.Row, fieldMappings []views.FieldMapping, sync views.Sync, destinationOptions DestinationOptions, destClient query.BigQueryApiClient, objectName string) error {
 	// allocate the arrays and reuse them to save memory
 	rowStrings := make([]string, len(rows))
 	rowTokens := make([]string, len(fieldMappings)+1)                     // one extra token for the end customer ID
@@ -165,32 +254,8 @@ func (bq BigQueryImpl) Write(
 		rowStrings[i] = rowString
 	}
 
-	f, err := os.Create("dump")
-	if err != nil {
-		return (err)
-	}
-	defer f.Close()
-	pprof.WriteHeapProfile(f)
-
-	file := uuid.New().String()
-	gcsReference := fmt.Sprintf("gs://%s/%s", destinationOptions.StagingBucket, file)
-
-	stagingOptions := query.StagingOptions{Bucket: destinationOptions.StagingBucket, File: file}
-	err = destClient.StageData(ctx, strings.Join(rowStrings, "\n"), stagingOptions)
-	if err != nil {
-		return errors.NewCustomerVisibleError(err)
-	}
-	// always clean up the data in the storage bucket
-	defer destClient.CleanUpStagingData(ctx, stagingOptions)
-
-	writeMode := bq.toBigQueryWriteMode(sync.SyncMode)
-	orderedObjectFields := bq.createOrderedObjectFields(object.ObjectFields, fieldMappings)
-	csvSchema := bq.createCsvSchema(object.EndCustomerIdField, orderedObjectFields)
-	err = destClient.LoadFromStaging(ctx, *object.Namespace, *object.TableName, query.LoadOptions{
-		GcsReference:   gcsReference,
-		BigQuerySchema: csvSchema,
-		WriteMode:      writeMode,
-	})
+	stagingOptions := query.StagingOptions{Bucket: destinationOptions.StagingBucket, Object: objectName}
+	err := destClient.StageData(ctx, strings.Join(rowStrings, "\n"), stagingOptions)
 	if err != nil {
 		return errors.NewCustomerVisibleError(err)
 	}

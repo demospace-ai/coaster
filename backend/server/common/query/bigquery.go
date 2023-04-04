@@ -248,7 +248,9 @@ func (ac BigQueryApiClient) StageData(ctx context.Context, csvData string, stagi
 	}
 	defer gcsClient.Close()
 
-	w := gcsClient.Bucket(stagingOptions.Bucket).Object(stagingOptions.File).NewWriter(ctx)
+	w := gcsClient.Bucket(stagingOptions.Bucket).Object(stagingOptions.Object).Retryer(
+		storage.WithPolicy(storage.RetryAlways),
+	).NewWriter(ctx)
 	if _, err := fmt.Fprint(w, csvData); err != nil {
 		return err
 	}
@@ -298,7 +300,9 @@ func (ac BigQueryApiClient) CleanUpStagingData(ctx context.Context, stagingOptio
 	}
 	defer gcsClient.Close()
 
-	object := gcsClient.Bucket(stagingOptions.Bucket).Object(stagingOptions.File)
+	object := gcsClient.Bucket(stagingOptions.Bucket).Object(stagingOptions.Object).Retryer(
+		storage.WithPolicy(storage.RetryAlways),
+	)
 	return object.Delete(ctx)
 }
 
