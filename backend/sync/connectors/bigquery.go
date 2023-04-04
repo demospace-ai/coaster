@@ -176,7 +176,6 @@ func (bq BigQueryImpl) Write(
 	objectPrefix := uuid.New().String()
 	wildcardObject := fmt.Sprintf("%s-*", objectPrefix)
 	gcsReference := fmt.Sprintf("gs://%s/%s", destinationOptions.StagingBucket, wildcardObject)
-	defer destClient.CleanUpStagingData(ctx, query.StagingOptions{Bucket: destinationOptions.StagingBucket, Object: wildcardObject})
 
 	batchNum := 0
 	rowsWritten := 0
@@ -193,6 +192,9 @@ func (bq BigQueryImpl) Write(
 			errC <- err
 			return
 		}
+
+		// use a separate context for cleanup so it won't get cancelled
+		defer destClient.CleanUpStagingData(context.Background(), query.StagingOptions{Bucket: destinationOptions.StagingBucket, Object: objectName})
 
 		batchNum++
 	}
