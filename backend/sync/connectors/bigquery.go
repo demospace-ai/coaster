@@ -31,7 +31,7 @@ func (bq BigQueryImpl) Read(
 	sync views.Sync,
 	fieldMappings []views.FieldMapping,
 	rowsC chan<- []data.Row,
-	cursorPosC chan<- *string,
+	readOutputC chan<- ReadOutput,
 	errC chan<- error,
 ) {
 	connectionModel := views.ConvertConnectionView(sourceConnection)
@@ -81,10 +81,11 @@ func (bq BigQueryImpl) Read(
 	}
 
 	newCursorPosition := bq.getNewCursorPosition(lastRow, iterator.Schema(), sync)
-	cursorPosC <- newCursorPosition
+	readOutputC <- ReadOutput{
+		CursorPosition: newCursorPosition,
+	}
 
 	close(rowsC)
-	close(cursorPosC)
 	close(errC)
 }
 
@@ -159,7 +160,7 @@ func (bq BigQueryImpl) Write(
 	sync views.Sync,
 	fieldMappings []views.FieldMapping,
 	rowsC <-chan []data.Row,
-	rowsWrittenC chan<- int,
+	writeOutputC chan<- WriteOutput,
 	errC chan<- error,
 ) {
 	connectionModel := views.ConvertConnectionView(destinationConnection)
@@ -209,9 +210,10 @@ func (bq BigQueryImpl) Write(
 		return
 	}
 
-	rowsWrittenC <- rowsWritten
+	writeOutputC <- WriteOutput{
+		RowsWritten: rowsWritten,
+	}
 
-	close(rowsWrittenC)
 	close(errC)
 }
 

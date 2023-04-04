@@ -13,6 +13,14 @@ type DestinationOptions struct {
 	StagingBucket string
 }
 
+type ReadOutput struct {
+	CursorPosition *string
+}
+
+type WriteOutput struct {
+	RowsWritten int
+}
+
 type Connector interface {
 	Read(
 		ctx context.Context,
@@ -20,7 +28,7 @@ type Connector interface {
 		sync views.Sync,
 		fieldMappings []views.FieldMapping,
 		rowsC chan<- []data.Row,
-		cursorPositionC chan<- *string,
+		readOutputC chan<- ReadOutput,
 		errC chan<- error,
 	)
 	Write(
@@ -31,7 +39,7 @@ type Connector interface {
 		sync views.Sync,
 		fieldMappings []views.FieldMapping,
 		rowsC <-chan []data.Row,
-		rowsWrittenC chan<- int,
+		writeOutputC chan<- WriteOutput,
 		errC chan<- error,
 	)
 }

@@ -28,7 +28,7 @@ func (rs RedshiftImpl) Read(
 	sync views.Sync,
 	fieldMappings []views.FieldMapping,
 	rowsC chan<- []data.Row,
-	cursorPosC chan<- *string,
+	readOutputC chan<- ReadOutput,
 	errC chan<- error,
 ) {
 	connectionModel := views.ConvertConnectionView(sourceConnection)
@@ -72,10 +72,11 @@ func (rs RedshiftImpl) Read(
 	}
 
 	newCursorPosition := rs.getNewCursorPosition(lastRow, iterator.Schema(), sync)
-	cursorPosC <- newCursorPosition
+	readOutputC <- ReadOutput{
+		CursorPosition: newCursorPosition,
+	}
 
 	close(rowsC)
-	close(cursorPosC)
 	close(errC)
 }
 
@@ -141,7 +142,7 @@ func (rs RedshiftImpl) Write(
 	sync views.Sync,
 	fieldMappings []views.FieldMapping,
 	rowsC <-chan []data.Row,
-	rowsWrittenC chan<- int,
+	writeOutputC chan<- WriteOutput,
 	errC chan<- error,
 ) {
 	errC <- errors.New("redshift destination not implemented")

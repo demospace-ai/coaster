@@ -28,7 +28,7 @@ func (sf SnowflakeImpl) Read(
 	sync views.Sync,
 	fieldMappings []views.FieldMapping,
 	rowsC chan<- []data.Row,
-	cursorPosC chan<- *string,
+	readOutputC chan<- ReadOutput,
 	errC chan<- error,
 ) {
 	connectionModel := views.ConvertConnectionView(sourceConnection)
@@ -73,10 +73,12 @@ func (sf SnowflakeImpl) Read(
 	}
 
 	newCursorPosition := sf.getNewCursorPosition(lastRow, iterator.Schema(), sync)
-	cursorPosC <- newCursorPosition
+
+	readOutputC <- ReadOutput{
+		CursorPosition: newCursorPosition,
+	}
 
 	close(rowsC)
-	close(cursorPosC)
 	close(errC)
 }
 
@@ -142,7 +144,7 @@ func (sf SnowflakeImpl) Write(
 	sync views.Sync,
 	fieldMappings []views.FieldMapping,
 	rowsC <-chan []data.Row,
-	rowsWrittenC chan<- int,
+	writeOutputC chan<- WriteOutput,
 	errC chan<- error,
 ) {
 	errC <- errors.New("snowflake destination not implemented")

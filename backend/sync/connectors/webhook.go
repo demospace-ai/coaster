@@ -50,7 +50,7 @@ func (wh WebhookImpl) Read(
 	sync views.Sync,
 	fieldMappings []views.FieldMapping,
 	rowsC chan<- []data.Row,
-	cursorPosC chan<- *string,
+	readOutputC chan<- ReadOutput,
 	errC chan<- error,
 ) {
 	errC <- errors.New("webhook source not supported")
@@ -64,7 +64,7 @@ func (wh WebhookImpl) Write(
 	sync views.Sync,
 	fieldMappings []views.FieldMapping,
 	rowsC <-chan []data.Row,
-	rowsWrittenC chan<- int,
+	writeOutputC chan<- WriteOutput,
 	errC chan<- error,
 ) {
 	// TODO: allow customizing the rate limit
@@ -129,9 +129,10 @@ func (wh WebhookImpl) Write(
 		}
 	}
 
-	rowsWrittenC <- rowsWritten
+	writeOutputC <- WriteOutput{
+		RowsWritten: rowsWritten,
+	}
 
-	close(rowsWrittenC)
 	close(errC)
 }
 

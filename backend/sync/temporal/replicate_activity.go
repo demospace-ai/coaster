@@ -36,8 +36,8 @@ func Replicate(ctx context.Context, input ReplicateInput) (*ReplicateOutput, err
 	queryService := query.NewQueryService(db, cryptoService)
 
 	rowsC := make(chan []data.Row)
-	cursorPositionC := make(chan *string)
-	rowsWrittenC := make(chan int)
+	readOutputC := make(chan connectors.ReadOutput)
+	writeOutputC := make(chan connectors.WriteOutput)
 	readErrC := make(chan error)
 	writeErrC := make(chan error)
 
@@ -51,39 +51,37 @@ func Replicate(ctx context.Context, input ReplicateInput) (*ReplicateOutput, err
 		return nil, err
 	}
 
-	go sourceConnector.Read(ctx, input.SourceConnection, input.Sync, input.FieldMappings, rowsC, cursorPositionC, readErrC)
-	go destConnector.Write(ctx, input.DestinationConnection, input.DestinationOptions, input.Object, input.Sync, input.FieldMappings, rowsC, rowsWrittenC, writeErrC)
+	go sourceConnector.Read(ctx, input.SourceConnection, input.Sync, input.FieldMappings, rowsC, readOutputC, readErrC)
+	go destConnector.Write(ctx, input.DestinationConnection, input.DestinationOptions, input.Object, input.Sync, input.FieldMappings, rowsC, writeOutputC, writeErrC)
 
-	// wait for both error channels in any order, immediately exiting if an error is returned
-	var cursorPosition *string
-	var rowsWritten int
-	var readErrReceived, writeErrReceived, cursorPositionReceived, rowsWrittenReceived bool
+	var readOutput connectors.ReadOutput
+	var writeOutput connectors.WriteOutput
+	var readDone, writeDone bool
 	for {
-		if readErrReceived && writeErrReceived && cursorPositionReceived && rowsWrittenReceived {
+		if readDone && writeDone {
 			break
 		}
 
+		// wait for both error channels in any order, immediately exiting if an error is returned
 		select {
 		case err = <-readErrC:
-			readErrReceived = true
 			if err != nil {
 				return nil, err
 			}
 		case err = <-writeErrC:
-			writeErrReceived = true
 			if err != nil {
 				return nil, err
 			}
-		case cursorPosition = <-cursorPositionC:
-			cursorPositionReceived = true
-		case rowsWritten = <-rowsWrittenC:
-			rowsWrittenReceived = true
+		case readOutput = <-readOutputC:
+			readDone = true
+		case writeOutput = <-writeOutputC:
+			writeDone = true
 		}
 	}
 
 	return &ReplicateOutput{
-		RowsWritten:    rowsWritten,
-		CursorPosition: cursorPosition,
+		RowsWritten:    writeOutput.RowsWritten,
+		CursorPosition: readOutput.CursorPosition,
 	}, nil
 }
 
