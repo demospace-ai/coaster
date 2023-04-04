@@ -52,7 +52,7 @@ func (rs RedshiftImpl) Read(
 	rowBatch := make([]data.Row, READ_BATCH_SIZE)
 	var lastRow data.Row
 	for {
-		row, err := iterator.Next()
+		row, err := iterator.Next(ctx)
 		if err != nil {
 			if err == data.ErrDone {
 				break

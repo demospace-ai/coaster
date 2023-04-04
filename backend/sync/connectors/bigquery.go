@@ -55,7 +55,7 @@ func (bq BigQueryImpl) Read(
 	var rowBatch []data.Row
 	var lastRow data.Row
 	for {
-		row, err := iterator.Next()
+		row, err := iterator.Next(ctx)
 		if err != nil {
 			if err == data.ErrDone {
 				break

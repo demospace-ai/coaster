@@ -22,9 +22,8 @@ type MongoDbApiClient struct {
 }
 
 type MongoDbIterator struct {
-	mongoDbRows  bson.A
-	currentIndex int
-	schema       data.Schema
+	schema data.Schema
+	cursor *mongo.Cursor
 }
 
 type MongoQuery struct {
@@ -34,18 +33,27 @@ type MongoQuery struct {
 	Options    options.FindOptions `json:"options"`
 }
 
-// must be pointer receiver to increment field
-func (it *MongoDbIterator) Next() (data.Row, error) {
-	if it.currentIndex < len(it.mongoDbRows) {
-		row := convertMongoDbRow(it.mongoDbRows[it.currentIndex].(bson.D), it.schema)
-		it.currentIndex++
-		return row, nil
+func (it MongoDbIterator) Next(ctx context.Context) (data.Row, error) {
+	if it.cursor.Next(ctx) {
+		var row bson.D
+		err := it.cursor.Decode(row)
+		if err != nil {
+			return nil, err
+		}
+
+		return convertMongoDbRow(row, it.schema), nil
+	}
+
+	defer it.cursor.Close(ctx)
+	err := it.cursor.Err()
+	if err != nil {
+		return nil, err
 	}
 
 	return nil, data.ErrDone
 }
 
-func (it *MongoDbIterator) Schema() data.Schema {
+func (it MongoDbIterator) Schema() data.Schema {
 	return it.schema
 }
 
@@ -210,22 +218,15 @@ func (mc MongoDbApiClient) GetQueryIterator(ctx context.Context, queryString str
 	}
 	defer cursor.Close(ctx)
 
-	var rows bson.A
-	err = cursor.All(ctx, &rows)
-	if err != nil {
-		return nil, err
-	}
-
 	schema := <-schemaC
 	err = <-errC
 	if err != nil {
 		return nil, err
 	}
 
-	return &MongoDbIterator{
-		schema:       schema,
-		currentIndex: 0,
-		mongoDbRows:  rows,
+	return MongoDbIterator{
+		schema: schema,
+		cursor: cursor,
 	}, nil
 }
 

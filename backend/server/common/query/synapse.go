@@ -27,7 +27,7 @@ type synapseSchema struct {
 	Type string `json:"type"`
 }
 
-func (it SynapseIterator) Next() (data.Row, error) {
+func (it SynapseIterator) Next(_ context.Context) (data.Row, error) {
 	if it.queryResult.Next() {
 		var row []any
 		err := it.queryResult.Scan(&row)
@@ -35,6 +35,12 @@ func (it SynapseIterator) Next() (data.Row, error) {
 			return nil, err
 		}
 		return convertSynapseRow(row), nil
+	}
+
+	defer it.queryResult.Close()
+	err := it.queryResult.Err()
+	if err != nil {
+		return nil, err
 	}
 
 	return nil, data.ErrDone

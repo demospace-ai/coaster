@@ -16,13 +16,15 @@ spec:
       labels:
         app: "fabra-sync"
     spec:
+      # 12 hour grace period to allow running replication activities to complete
+      terminationGracePeriodSeconds: 43200
       containers:
       - name: "fabra-sync"
         image: "gcr.io/fabra-344902/sync:latest"
         resources:
           requests:
             cpu: "4"
-            memory: "32Gi"
+            memory: "16Gi"
             ephemeral-storage: "1Gi"
         env:
         - name: IS_PROD

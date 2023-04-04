@@ -26,7 +26,7 @@ type RedshiftIterator struct {
 	schema      data.Schema
 }
 
-func (it RedshiftIterator) Next() (data.Row, error) {
+func (it RedshiftIterator) Next(_ context.Context) (data.Row, error) {
 	if it.queryResult.Next() {
 		var row []any
 		err := it.queryResult.Scan(&row)
@@ -34,6 +34,12 @@ func (it RedshiftIterator) Next() (data.Row, error) {
 			return nil, err
 		}
 		return convertRedshiftRow(row, it.schema), nil
+	}
+
+	defer it.queryResult.Close()
+	err := it.queryResult.Err()
+	if err != nil {
+		return nil, err
 	}
 
 	return nil, data.ErrDone

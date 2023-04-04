@@ -33,7 +33,7 @@ type snowflakeSchema struct {
 	Type string `json:"type"`
 }
 
-func (it SnowflakeIterator) Next() (data.Row, error) {
+func (it SnowflakeIterator) Next(_ context.Context) (data.Row, error) {
 	if it.queryResult.Next() {
 		var row []any
 		err := it.queryResult.Scan(&row)
@@ -41,6 +41,12 @@ func (it SnowflakeIterator) Next() (data.Row, error) {
 			return nil, err
 		}
 		return convertSnowflakeRow(row, it.schema), nil
+	}
+
+	defer it.queryResult.Close()
+	err := it.queryResult.Err()
+	if err != nil {
+		return nil, err
 	}
 
 	return nil, data.ErrDone

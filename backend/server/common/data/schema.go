@@ -1,6 +1,7 @@
 package data
 
 import (
+	"context"
 	"errors"
 )
 
@@ -33,7 +34,7 @@ type Row []any
 var ErrDone = errors.New("no more items in fabra iterator")
 
 type RowIterator interface {
-	Next() (Row, error)
+	Next(ctx context.Context) (Row, error)
 	Schema() Schema
 }
 

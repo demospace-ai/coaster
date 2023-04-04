@@ -2,6 +2,7 @@ package temporal
 
 import (
 	"context"
+	"time"
 
 	"go.fabra.io/server/common/crypto"
 	"go.fabra.io/server/common/data"
@@ -10,6 +11,7 @@ import (
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/query"
 	"go.fabra.io/sync/connectors"
+	"go.temporal.io/sdk/activity"
 )
 
 const FABRA_STAGING_BUCKET = "fabra-staging"
@@ -40,6 +42,7 @@ func Replicate(ctx context.Context, input ReplicateInput) (*ReplicateOutput, err
 	writeOutputC := make(chan connectors.WriteOutput)
 	readErrC := make(chan error)
 	writeErrC := make(chan error)
+	doneC := make(chan bool)
 
 	sourceConnector, err := getSourceConnector(input.SourceConnection.ConnectionType, queryService)
 	if err != nil {
@@ -53,6 +56,7 @@ func Replicate(ctx context.Context, input ReplicateInput) (*ReplicateOutput, err
 
 	go sourceConnector.Read(ctx, input.SourceConnection, input.Sync, input.FieldMappings, rowsC, readOutputC, readErrC)
 	go destConnector.Write(ctx, input.DestinationConnection, input.DestinationOptions, input.Object, input.Sync, input.FieldMappings, rowsC, writeOutputC, writeErrC)
+	go heartbeat(ctx, doneC) // TODO: heartbeat from the write/read methods to ensure the worker is making progress
 
 	var readOutput connectors.ReadOutput
 	var writeOutput connectors.WriteOutput
@@ -78,6 +82,9 @@ func Replicate(ctx context.Context, input ReplicateInput) (*ReplicateOutput, err
 			writeDone = true
 		}
 	}
+
+	// signal the heartbeat worker that the replication is finished
+	doneC <- true
 
 	return &ReplicateOutput{
 		RowsWritten:    writeOutput.RowsWritten,
@@ -107,5 +114,18 @@ func getDestinationConnector(connectionType models.ConnectionType, queryService 
 		return connectors.NewWebhookConnector(queryService, cryptoService, encryptedEndCustomerApiKey), nil
 	default:
 		return nil, errors.Newf("destination not implemented for %s", connectionType)
+	}
+}
+
+func heartbeat(ctx context.Context, doneC <-chan bool) {
+	timeChan := time.NewTicker(time.Minute).C
+	for {
+		activity.RecordHeartbeat(ctx)
+		select {
+		case <-doneC:
+			return
+		case <-timeChan:
+			continue
+		}
 	}
 }
