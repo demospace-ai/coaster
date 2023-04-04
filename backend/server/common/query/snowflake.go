@@ -24,16 +24,16 @@ type SnowflakeApiClient struct {
 	Host          string
 }
 
-type SnowflakeIterator struct {
-	queryResult sql.Rows
-	schema      data.Schema
-}
-
 type snowflakeSchema struct {
 	Type string `json:"type"`
 }
 
-func (it SnowflakeIterator) Next(_ context.Context) (data.Row, error) {
+type snowflakeIterator struct {
+	queryResult sql.Rows
+	schema      data.Schema
+}
+
+func (it *snowflakeIterator) Next(_ context.Context) (data.Row, error) {
 	if it.queryResult.Next() {
 		var row []any
 		err := it.queryResult.Scan(&row)
@@ -53,7 +53,7 @@ func (it SnowflakeIterator) Next(_ context.Context) (data.Row, error) {
 }
 
 // TODO: this must be in order
-func (it SnowflakeIterator) Schema() data.Schema {
+func (it *snowflakeIterator) Schema() data.Schema {
 	return it.schema
 }
 
@@ -242,7 +242,10 @@ func (sc SnowflakeApiClient) GetQueryIterator(ctx context.Context, queryString s
 		return nil, err
 	}
 
-	return SnowflakeIterator{queryResult: *queryResult, schema: convertSnowflakeSchema(columns)}, nil
+	return &snowflakeIterator{
+		queryResult: *queryResult,
+		schema:      convertSnowflakeSchema(columns),
+	}, nil
 }
 
 func convertSnowflakeRow(snowflakeRow []any, schema data.Schema) data.Row {

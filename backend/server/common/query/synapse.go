@@ -18,16 +18,16 @@ type SynapseApiClient struct {
 	Host         string
 }
 
-type SynapseIterator struct {
-	queryResult sql.Rows
-	schema      data.Schema
-}
-
 type synapseSchema struct {
 	Type string `json:"type"`
 }
 
-func (it SynapseIterator) Next(_ context.Context) (data.Row, error) {
+type synapseIterator struct {
+	queryResult sql.Rows
+	schema      data.Schema
+}
+
+func (it *synapseIterator) Next(_ context.Context) (data.Row, error) {
 	if it.queryResult.Next() {
 		var row []any
 		err := it.queryResult.Scan(&row)
@@ -47,7 +47,7 @@ func (it SynapseIterator) Next(_ context.Context) (data.Row, error) {
 }
 
 // TODO: this must be in order
-func (it SynapseIterator) Schema() data.Schema {
+func (it *synapseIterator) Schema() data.Schema {
 	return it.schema
 }
 
@@ -229,7 +229,10 @@ func (sc SynapseApiClient) GetQueryIterator(ctx context.Context, queryString str
 		return nil, err
 	}
 
-	return SynapseIterator{queryResult: *queryResult, schema: convertSynapseSchema(columns)}, nil
+	return &synapseIterator{
+		queryResult: *queryResult,
+		schema:      convertSynapseSchema(columns),
+	}, nil
 }
 
 func convertSynapseRow(synapseRow []any) data.Row {

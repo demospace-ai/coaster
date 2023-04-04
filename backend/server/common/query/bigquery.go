@@ -21,12 +21,13 @@ type BigQueryApiClient struct {
 	Location    *string
 }
 
-type BigQueryIterator struct {
+type bigQueryIterator struct {
 	iterator *bigquery.RowIterator
 	schema   data.Schema
 }
 
-func (it *BigQueryIterator) Next(_ context.Context) (data.Row, error) {
+// use a pointer receiver because schema field is updated
+func (it *bigQueryIterator) Next(_ context.Context) (data.Row, error) {
 	var row []bigquery.Value
 	err := it.iterator.Next(&row)
 	if err == iterator.Done {
@@ -40,8 +41,7 @@ func (it *BigQueryIterator) Next(_ context.Context) (data.Row, error) {
 	return convertBigQueryRow(row, it.iterator.Schema), nil
 }
 
-// use a pointer receiver because schema field is updated
-func (it *BigQueryIterator) Schema() data.Schema {
+func (it *bigQueryIterator) Schema() data.Schema {
 	if it.schema == nil {
 		// TODO: this must be in order
 		it.schema = convertBigQuerySchema(it.iterator.Schema)
@@ -237,7 +237,7 @@ func (ac BigQueryApiClient) GetQueryIterator(ctx context.Context, queryString st
 		return nil, err
 	}
 
-	return &BigQueryIterator{
+	return &bigQueryIterator{
 		iterator: it,
 	}, nil
 }

@@ -21,11 +21,6 @@ type MongoDbApiClient struct {
 	ConnectionOptions string
 }
 
-type MongoDbIterator struct {
-	schema data.Schema
-	cursor *mongo.Cursor
-}
-
 type MongoQuery struct {
 	Database   string              `json:"database"`
 	Collection string              `json:"collection"`
@@ -33,7 +28,12 @@ type MongoQuery struct {
 	Options    options.FindOptions `json:"options"`
 }
 
-func (it MongoDbIterator) Next(ctx context.Context) (data.Row, error) {
+type mongoDbIterator struct {
+	schema data.Schema
+	cursor *mongo.Cursor
+}
+
+func (it *mongoDbIterator) Next(ctx context.Context) (data.Row, error) {
 	if it.cursor.Next(ctx) {
 		var row bson.D
 		err := it.cursor.Decode(row)
@@ -53,7 +53,7 @@ func (it MongoDbIterator) Next(ctx context.Context) (data.Row, error) {
 	return nil, data.ErrDone
 }
 
-func (it MongoDbIterator) Schema() data.Schema {
+func (it *mongoDbIterator) Schema() data.Schema {
 	return it.schema
 }
 
@@ -224,7 +224,7 @@ func (mc MongoDbApiClient) GetQueryIterator(ctx context.Context, queryString str
 		return nil, err
 	}
 
-	return MongoDbIterator{
+	return &mongoDbIterator{
 		schema: schema,
 		cursor: cursor,
 	}, nil

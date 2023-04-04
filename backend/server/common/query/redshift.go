@@ -21,12 +21,12 @@ type RedshiftApiClient struct {
 	Host         string
 }
 
-type RedshiftIterator struct {
+type redshiftIterator struct {
 	queryResult sql.Rows
 	schema      data.Schema
 }
 
-func (it RedshiftIterator) Next(_ context.Context) (data.Row, error) {
+func (it *redshiftIterator) Next(_ context.Context) (data.Row, error) {
 	if it.queryResult.Next() {
 		var row []any
 		err := it.queryResult.Scan(&row)
@@ -46,7 +46,7 @@ func (it RedshiftIterator) Next(_ context.Context) (data.Row, error) {
 }
 
 // TODO: this must be in order
-func (it RedshiftIterator) Schema() data.Schema {
+func (it *redshiftIterator) Schema() data.Schema {
 	return it.schema
 }
 
@@ -211,7 +211,10 @@ func (rc RedshiftApiClient) GetQueryIterator(ctx context.Context, queryString st
 		return nil, err
 	}
 
-	return RedshiftIterator{queryResult: *queryResult, schema: convertRedshiftSchema(columns)}, nil
+	return &redshiftIterator{
+		queryResult: *queryResult,
+		schema:      convertRedshiftSchema(columns),
+	}, nil
 }
 
 func getRedshiftFieldType(redshiftType string) data.FieldType {
