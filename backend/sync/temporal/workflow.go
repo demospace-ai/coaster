@@ -37,7 +37,7 @@ var RECORD_OPTIONS = workflow.ActivityOptions{
 }
 
 var REPLICATE_OPTIONS = workflow.ActivityOptions{
-	StartToCloseTimeout: time.Hour * 2,
+	StartToCloseTimeout: time.Hour * 24,
 	RetryPolicy: &temporal.RetryPolicy{
 		InitialInterval:        time.Second,
 		BackoffCoefficient:     2.0,
