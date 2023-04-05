@@ -1,5 +1,5 @@
 import { ValidatedComboInput, ValidatedDropdownInput } from "src/components/input/Input";
-import { Connection, Destination, Field, FieldType, Object as DataObject, Source } from "src/rpc/api";
+import { Connection, Destination, FabraObject as DataObject, Field, FieldType, Source } from "src/rpc/api";
 import { useDestinations, useFieldValues, useLinkNamespaces, useLinkSchema, useLinkSources, useLinkTables, useNamespaces, useObjects, useSchema, useTables } from "src/rpc/data";
 
 type DestinationSelectorProps = {

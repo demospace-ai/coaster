@@ -6,7 +6,7 @@ export type DateRange = {
 };
 
 export const getDateStringInUTC = (d: Date): string => {
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   return months[d.getUTCMonth()] + " " + d.getUTCDate() + " " + d.getUTCFullYear();
 };
 

@@ -92,6 +92,8 @@ func (s ApiService) CreateDestination(auth auth.Authentication, w http.ResponseW
 		connection, err = connections.CreateWebhookConnection(
 			s.db, auth.Organization.ID, *createDestinationRequest.WebhookConfig, *encryptedSigningKey,
 		)
+	default:
+		return errors.Newf("unsupported connection type: %s", createDestinationRequest.ConnectionType)
 	}
 
 	if err != nil {

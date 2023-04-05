@@ -1,10 +1,10 @@
-import logo from 'src/components/images/logo.png';
+import logo from "src/components/images/logo.png";
 
 export const LogoLoading: React.FC = () => {
   return (
     <img
       src={logo}
-      className='
+      className="
         tw-m-auto
         tw-w-36
         tw-h-36
@@ -17,7 +17,7 @@ export const LogoLoading: React.FC = () => {
         tw-animate-fade-in
         tw-animate-shimmer
         [mask:linear-gradient(-60deg,#000_30%,#0005,#000_70%)_right/500%_100%]
-        '
+        "
       alt="fabra logo"
     />
   );

@@ -1,10 +1,10 @@
-import { H } from 'highlight.run';
-import { useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { rudderanalytics } from 'src/app/rudder';
-import { useDispatch } from 'src/root/model';
-import { sendRequest } from 'src/rpc/ajax';
-import { Login, Logout, Organization, SetOrganization, User } from 'src/rpc/api';
+import { H } from "highlight.run";
+import { useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { rudderanalytics } from "src/app/rudder";
+import { useDispatch } from "src/root/model";
+import { sendRequest } from "src/rpc/ajax";
+import { Login, Logout, Organization, SetOrganization, User } from "src/rpc/api";
 
 export type GoogleLoginResponse = {
   credential: string;
@@ -18,11 +18,11 @@ export function useHandleGoogleResponse(): GoogleLoginHandler {
 
   return useCallback(async (response: GoogleLoginResponse) => {
     const id_token = response.credential;
-    const payload = { 'id_token': id_token };
+    const payload = { "id_token": id_token };
     try {
       const loginResponse = await sendRequest(Login, payload);
       dispatch({
-        type: 'login.authenticated',
+        type: "login.authenticated",
         user: loginResponse.user,
         organization: loginResponse.organization,
         suggestedOrganizations: loginResponse.suggested_organizations,
@@ -31,7 +31,7 @@ export function useHandleGoogleResponse(): GoogleLoginHandler {
       onLoginSuccess(loginResponse.user, loginResponse.organization);
     } catch (e) {
       dispatch({
-        type: 'login.unauthorized',
+        type: "login.unauthorized",
       });
     }
   }, [dispatch, onLoginSuccess]);
@@ -48,17 +48,18 @@ export function useSetOrganization() {
   const onLoginSuccess = useOnLoginSuccess();
 
   return useCallback(async (user: User, args: OrganizationArgs) => {
-    const payload = { 'organization_name': args.organizationName, 'organization_id': args.organizationID };
+    const payload = { "organization_name": args.organizationName, "organization_id": args.organizationID };
     try {
       const response = await sendRequest(SetOrganization, payload);
       dispatch({
-        type: 'login.organizationSet',
+        type: "login.organizationSet",
         organization: response.organization,
       });
 
       onLoginSuccess(user, response.organization);
       navigate("/");
     } catch (e) {
+      // TODO
     }
   }, [dispatch, navigate, onLoginSuccess]);
 }
@@ -91,7 +92,7 @@ export function useLogout() {
   return useCallback(async () => {
     await sendRequest(Logout);
     dispatch({
-      type: 'login.logout',
+      type: "login.logout",
     });
   }, [dispatch]);
 }

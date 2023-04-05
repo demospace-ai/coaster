@@ -18,9 +18,9 @@ export const Syncs: React.FC<{ linkToken: string; close: () => void; }> = ({ lin
 
 const Header: React.FC<{ close: () => void; }> = ({ close }) => {
   return (
-    <div className='tw-flex tw-flex-row tw-items-center tw-w-full tw-h-20 tw-min-h-[80px]'>
+    <div className="tw-flex tw-flex-row tw-items-center tw-w-full tw-h-20 tw-min-h-[80px]">
       <button className="tw-absolute tw-flex tw-items-center t tw-right-10 tw-border-none tw-cursor-pointer tw-p-0" onClick={close}>
-        <svg className='tw-h-6 tw-fill-slate-500' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+        <svg className="tw-h-6 tw-fill-slate-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
           <path d="M5.1875 15.6875L4.3125 14.8125L9.125 10L4.3125 5.1875L5.1875 4.3125L10 9.125L14.8125 4.3125L15.6875 5.1875L10.875 10L15.6875 14.8125L14.8125 15.6875L10 10.875L5.1875 15.6875Z" />
         </svg>
       </button>
@@ -97,7 +97,7 @@ const SyncList: React.FC<{ linkToken: string; }> = ({ linkToken }) => {
                     <div className="tw-flex tw-flex-col tw-ml-8">
                       <span className="tw-text-lg tw-font-semibold tw-text-slate-500">No syncs yet.</span>
                       <span className="tw-mt-1 tw-text-slate-500">Setup a sync to connect your data and map it to fields in the application.</span>
-                      <Button className="tw-bg-blue-600 hover:tw-bg-blue-800 tw-w-32 tw-px-0 tw-mt-4" onClick={() => navigate("/newsync")}>Add a Sync</Button>
+                      <Button className="tw-w-32 tw-px-0 tw-mt-4" onClick={() => navigate("/newsync")}>Add a Sync</Button>
                     </div>
                   </td>
                 </tr>

@@ -1,5 +1,5 @@
-import Tippy, { TippyProps } from '@tippyjs/react';
-import React from 'react';
+import Tippy, { TippyProps } from "@tippyjs/react";
+import React from "react";
 
 export interface TooltipProps extends TippyProps {
   children: React.ReactElement;

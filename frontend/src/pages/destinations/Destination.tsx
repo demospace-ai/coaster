@@ -18,7 +18,7 @@ export const Destination: React.FC = () => {
   }
 
   return (
-    <div className='tw-py-5 tw-px-10 tw-h-full tw-overflow-scroll'>
+    <div className="tw-py-5 tw-px-10 tw-h-full tw-overflow-scroll">
       <div className="tw-flex tw-w-full tw-mb-1 tw-mt-2">
         <div className="tw-flex tw-flex-row tw-items-center tw-font-bold tw-text-lg">
           {destination.display_name}

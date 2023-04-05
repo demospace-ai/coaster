@@ -1,6 +1,7 @@
-import classNames from 'classnames';
-import React, { forwardRef } from 'react';
-import { NavLink, NavLinkProps, useNavigate } from 'react-router-dom';
+import classNames from "classnames";
+import React, { forwardRef } from "react";
+import { NavLink, NavLinkProps, useNavigate } from "react-router-dom";
+import { mergeClasses } from "src/utils/twmerge";
 
 type ButtonProps = {
   onClick: () => void;
@@ -11,15 +12,15 @@ type ButtonProps = {
 export const Button: React.FC<ButtonProps> = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
   const { onClick, className, children, ...remaining } = props;
 
-  const buttonStyle = classNames(
+  const buttonStyle = mergeClasses(
+    "tw-text-primary-text tw-bg-primary hover:tw-bg-primary-hover",
+    "tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition tw-select-none",
     props.className,
-    'tw-text-primary-text tw-bg-primary hover:tw-bg-primary-hover',
-    'tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition tw-select-none',
   );
   return (
     <button
       className={buttonStyle}
-      type='button'
+      type="button"
       ref={ref}
       onClick={props.onClick}
       {...remaining}
@@ -38,10 +39,10 @@ type LinkButtonProps = {
 export const LinkButton: React.FC<LinkButtonProps> = forwardRef<HTMLAnchorElement, LinkButtonProps>((props, ref) => {
   const { href, className, children, ...remaining } = props;
 
-  const buttonStyle = classNames(
+  const buttonStyle = mergeClasses(
+    "tw-text-primary-text tw-bg-primary hover:tw-bg-primary-hover",
+    "tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition tw-select-none",
     props.className,
-    'tw-text-primary-text tw-bg-primary hover:tw-bg-primary-hover',
-    'tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition tw-select-none',
   );
   return (
     <a
@@ -62,14 +63,14 @@ type FormButtonProps = {
 
 export const FormButton: React.FC<FormButtonProps> = props => {
   const buttonStyle = classNames(
-    'tw-text-primary-text tw-bg-primary hover:tw-bg-primary-hover',
-    'tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition tw-select-none',
+    "tw-text-primary-text tw-bg-primary hover:tw-bg-primary-hover",
+    "tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition tw-select-none",
     props.className
   );
   return (
     <button
       className={buttonStyle}
-      type='submit'
+      type="submit"
     >
       {props.children}
     </button>
@@ -88,14 +89,14 @@ export const BackButton: React.FC<Partial<ButtonProps>> = props => {
   };
 
   return (
-    <div className={classNames('tw-cursor-pointer tw-select-none tw-text-sm tw-font-[500] hover:tw-text-slate-600 tw-w-fit', props.className)} onClick={onClick}>{String.fromCharCode(8592)} Back</div>
+    <div className={classNames("tw-cursor-pointer tw-select-none tw-text-sm tw-font-[500] hover:tw-text-slate-600 tw-w-fit", props.className)} onClick={onClick}>{String.fromCharCode(8592)} Back</div>
   );
 };
 
 export const NavButton: React.FC<NavLinkProps> = props => {
   return (
     <NavLink
-      className={classNames('tw-bg-primary tw-text-white tw-rounded-md tw-block tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-font-bold tw-text-center tw-transition-colors hover:tw-bg-primary-hover tw-border tw-border-solid tw-border-primary-hover', props.className as string)}
+      className={classNames("tw-bg-primary tw-text-white tw-rounded-md tw-block tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-font-bold tw-text-center tw-transition-colors hover:tw-bg-primary-hover tw-border tw-border-solid tw-border-primary-hover", props.className as string)}
       to={props.to}>
       {props.children}
     </NavLink>

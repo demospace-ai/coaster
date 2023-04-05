@@ -34,7 +34,7 @@ export const Destinations: React.FC = () => {
       content = <></>;
   }
   return (
-    <div className='tw-py-5 tw-px-10 tw-h-full tw-overflow-scroll'>
+    <div className="tw-py-5 tw-px-10 tw-h-full tw-overflow-scroll">
       {content}
     </div>
   );
@@ -47,16 +47,16 @@ const DestinationList: React.FC<{ setStep: (step: Step) => void; }> = ({ setStep
     <>
       <div className="tw-flex tw-w-full tw-mb-5 tw-mt-2">
         <div className="tw-flex tw-flex-col tw-justify-end tw-font-bold tw-text-lg">Destinations</div>
-        <Button className='tw-ml-auto tw-flex tw-justify-center tw-items-center' onClick={() => setStep(Step.NewDestination)}>
+        <Button className="tw-ml-auto tw-flex tw-justify-center tw-items-center" onClick={() => setStep(Step.NewDestination)}>
           <div className="tw-flex tw-flex-col tw-justify-center tw-h-full">
-            <PlusCircleIcon className='tw-h-4 tw-inline-block tw-mr-2' />
+            <PlusCircleIcon className="tw-h-4 tw-inline-block tw-mr-2" />
           </div>
           <div className="tw-flex tw-flex-col tw-justify-center tw-mr-0.5">
             Add Destination
           </div>
         </Button>
       </div>
-      <div className='tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-lg tw-overflow-x-auto tw-overscroll-contain tw-shadow-md' >
+      <div className="tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-lg tw-overflow-x-auto tw-overscroll-contain tw-shadow-md" >
         {destinations
           ?
           <table className="tw-min-w-full tw-border-spacing-0">
@@ -64,7 +64,7 @@ const DestinationList: React.FC<{ setStep: (step: Step) => void; }> = ({ setStep
               <tr>
                 <th scope="col" className={tableHeaderStyle}>Name</th>
                 <th scope="col" className={tableHeaderStyle}>Type</th>
-                <th scope="col" className={classNames(tableHeaderStyle, 'tw-w-5')}></th>
+                <th scope="col" className={classNames(tableHeaderStyle, "tw-w-5")}></th>
               </tr>
             </thead>
             <tbody>

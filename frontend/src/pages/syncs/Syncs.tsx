@@ -15,11 +15,11 @@ export const Syncs: React.FC = () => {
   const sourceIdMap = new Map(sources?.map(source => [source.id, source]));
 
   return (
-    <div className='tw-py-5 tw-px-10 tw-h-full tw-overflow-scroll'>
+    <div className="tw-py-5 tw-px-10 tw-h-full tw-overflow-scroll">
       <div className="tw-flex tw-w-full tw-mb-5 tw-mt-2">
         <div className="tw-flex tw-flex-col tw-justify-end tw-font-bold tw-text-lg">Syncs</div>
       </div>
-      <div className='tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-lg tw-overflow-x-auto tw-overscroll-contain tw-shadow-md' >
+      <div className="tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-lg tw-overflow-x-auto tw-overscroll-contain tw-shadow-md" >
         {syncs
           ?
           <table className="tw-min-w-full tw-border-spacing-0">
@@ -29,7 +29,7 @@ export const Syncs: React.FC = () => {
                 <th scope="col" className={tableHeaderStyle}>End Customer ID</th>
                 <th scope="col" className={tableHeaderStyle}>Object</th>
                 <th scope="col" className={tableHeaderStyle}>Source</th>
-                <th scope="col" className={mergeClasses(tableHeaderStyle, 'tw-w-5')}><span className="tw-sr-only">Continue</span></th>
+                <th scope="col" className={mergeClasses(tableHeaderStyle, "tw-w-5")}><span className="tw-sr-only">Continue</span></th>
               </tr>
             </thead>
             <tbody>

@@ -14,8 +14,8 @@ export const createResizeFunction = <T extends HTMLElement>(ref: RefObject<T>, s
 
   const createStopDrag = (onDrag: (e: MouseEvent) => void) => {
     const stopDrag = () => {
-      document.documentElement.removeEventListener('mousemove', onDrag, false);
-      document.documentElement.removeEventListener('mouseup', stopDrag, false);
+      document.documentElement.removeEventListener("mousemove", onDrag, false);
+      document.documentElement.removeEventListener("mouseup", stopDrag, false);
     };
 
     return stopDrag;
@@ -26,7 +26,7 @@ export const createResizeFunction = <T extends HTMLElement>(ref: RefObject<T>, s
     const startY = e.clientY;
     const onDrag = createOnDrag(startHeight, startY);
     const stopDrag = createStopDrag(onDrag);
-    document.documentElement.addEventListener('mousemove', onDrag, false);
-    document.documentElement.addEventListener('mouseup', stopDrag, false);
+    document.documentElement.addEventListener("mousemove", onDrag, false);
+    document.documentElement.addEventListener("mouseup", stopDrag, false);
   };
 };

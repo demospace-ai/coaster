@@ -1,8 +1,8 @@
-import { useCallback } from 'react';
-import { useOnLoginSuccess } from 'src/pages/login/actions';
-import { useDispatch } from 'src/root/model';
-import { sendRequest } from 'src/rpc/ajax';
-import { CheckSession } from 'src/rpc/api';
+import { useCallback } from "react";
+import { useOnLoginSuccess } from "src/pages/login/actions";
+import { useDispatch } from "src/root/model";
+import { sendRequest } from "src/rpc/ajax";
+import { CheckSession } from "src/rpc/api";
 
 export function useStart() {
   const dispatch = useDispatch();
@@ -12,7 +12,7 @@ export function useStart() {
     try {
       const checkSessionResponse = await sendRequest(CheckSession);
       dispatch({
-        type: 'login.authenticated',
+        type: "login.authenticated",
         user: checkSessionResponse.user,
         organization: checkSessionResponse.organization,
         suggestedOrganizations: checkSessionResponse.suggested_organizations,
@@ -22,6 +22,6 @@ export function useStart() {
     } catch (e) {
     }
 
-    dispatch({ type: 'done' });
+    dispatch({ type: "done" });
   }, [dispatch, onLoginSuccess]);
 }

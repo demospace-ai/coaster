@@ -65,48 +65,23 @@ func (rc RedshiftApiClient) openConnection(ctx context.Context) (*sql.DB, error)
 }
 
 func (rc RedshiftApiClient) GetTables(ctx context.Context, namespace string) ([]string, error) {
-	client, err := rc.openConnection(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	defer client.Close()
-
 	queryString := fmt.Sprintf("SELECT DISTINCT(tablename) FROM pg_table_def WHERE schemaname = '%s'", namespace)
-	queryResult, err := client.Query(queryString)
-	if err != nil {
-		return nil, err
-	}
-	defer queryResult.Close()
 
-	columns, err := queryResult.Columns()
+	queryResult, err := rc.RunQuery(ctx, queryString)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "error running query")
 	}
-	numColumns := len(columns)
 
-	// just scan into a string list, everything can be a string
 	var tableNames []string
-	values := make([]any, numColumns)
-	valuePtrs := make([]any, numColumns)
-	for queryResult.Next() {
-		for i := 0; i < numColumns; i++ {
-			valuePtrs[i] = &values[i]
-		}
-		err := queryResult.Scan(valuePtrs...)
-		if err != nil {
-			return nil, err
-		}
-
-		// Can hardcode FieldTypeString here because we know what the return value of this query will be
-		tableNames = append(tableNames, convertRedshiftValue(values[0], data.FieldTypeString).(string))
+	for _, row := range queryResult.Data {
+		tableNames = append(tableNames, row[0].(string))
 	}
 
 	return tableNames, nil
 }
 
 func (rc RedshiftApiClient) GetSchema(ctx context.Context, namespace string, tableName string) (data.Schema, error) {
-	queryString := fmt.Sprintf("SELECT * FROM pg_table_def WHERE schemaname = '%s' AND tablename = '%s'", namespace, tableName)
+	queryString := fmt.Sprintf("SELECT pg_table_def.column, pg_table_def.type FROM pg_table_def WHERE schemaname = '%s' AND tablename = '%s'", namespace, tableName)
 
 	queryResult, err := rc.RunQuery(ctx, queryString)
 	if err != nil {
@@ -115,8 +90,8 @@ func (rc RedshiftApiClient) GetSchema(ctx context.Context, namespace string, tab
 
 	schema := data.Schema{}
 	for _, row := range queryResult.Data {
-		dataType := getRedshiftFieldType(row[3].(string))
-		schema = append(schema, data.Field{Name: row[2].(string), Type: dataType})
+		dataType := getRedshiftFieldType(row[1].(string))
+		schema = append(schema, data.Field{Name: row[0].(string), Type: dataType})
 	}
 
 	return schema, nil
@@ -139,7 +114,7 @@ func (rc RedshiftApiClient) GetFieldValues(ctx context.Context, namespace string
 }
 
 func (rc RedshiftApiClient) GetNamespaces(ctx context.Context) ([]string, error) {
-	queryString := "SELECT * FROM pg_namespace WHERE nspname NOT IN ('pg_toast', 'pg_internal', 'catalog_history', 'pg_automv', 'pg_temp_1', 'pg_catalog', 'information_schema')"
+	queryString := "SELECT nspname FROM pg_namespace WHERE nspname NOT IN ('pg_toast', 'pg_internal', 'catalog_history', 'pg_automv', 'pg_temp_1', 'pg_catalog', 'information_schema')"
 	queryResult, err := rc.RunQuery(ctx, queryString)
 	if err != nil {
 		return nil, errors.Wrap(err, "error running query")

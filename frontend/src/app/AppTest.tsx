@@ -1,9 +1,8 @@
-import { screen } from '@testing-library/react';
-import React from 'react';
-import { App } from 'src/app/App';
-import { mockStore, renderWithProvider } from 'src/test/utils';
+import { screen } from "@testing-library/react";
+import { App } from "src/app/App";
+import { mockStore, renderWithProvider } from "src/test/utils";
 
-test('renders loading when loading', async () => {
+test("renders loading when loading", async () => {
   const store = mockStore({
     app: {
       loading: true,
@@ -12,11 +11,11 @@ test('renders loading when loading', async () => {
 
   renderWithProvider(<App />, store);
 
-  const loadingElement = screen.getByTestId('loading');
+  const loadingElement = screen.getByTestId("loading");
   expect(loadingElement).toBeInTheDocument();
 });
 
-test('does not render loading when not loading', async () => {
+test("does not render loading when not loading", async () => {
   const store = mockStore({
     app: {
       loading: false,
@@ -28,6 +27,6 @@ test('does not render loading when not loading', async () => {
 
   renderWithProvider(<App />, store);
 
-  const loadingElement = screen.queryByTestId('loading');
+  const loadingElement = screen.queryByTestId("loading");
   expect(loadingElement).toBeNull();
 });

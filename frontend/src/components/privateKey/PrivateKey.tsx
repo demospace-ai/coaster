@@ -12,7 +12,7 @@ export const PrivateKey: React.FC<{ keyValue: string | undefined; }> = ({ keyVal
   };
 
   return (
-    <div className='tw-border tw-border-solid tw-border-slate-300 tw-rounded-lg tw-max-w-lg tw-overflow-x-auto tw-overscroll-contain tw-p-2 tw-bg-white' >
+    <div className="tw-border tw-border-solid tw-border-slate-300 tw-rounded-lg tw-max-w-lg tw-overflow-x-auto tw-overscroll-contain tw-p-2 tw-bg-white" >
       {visible ?
         <div className="tw-flex tw-items-center">
           <EyeSlashIcon className="tw-h-4 tw-ml-1 tw-mr-2 tw-cursor-pointer" onClick={() => setVisible(false)} />

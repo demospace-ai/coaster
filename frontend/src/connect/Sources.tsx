@@ -33,7 +33,7 @@ export const Sources: React.FC<SetupSyncProps> = ({ linkToken, state, setState }
         <Tooltip placement="right" maxWidth="500px" label="These are the data sources you've setup previously.">
           <InfoIcon className="tw-ml-1.5 tw-h-3.5 tw-fill-slate-400" />
         </Tooltip>
-        <Button className="tw-ml-auto tw-flex tw-flex-row tw-items-center tw-whitespace-nowrap tw-h-8 tw-bg-blue-600 hover:tw-bg-blue-800" onClick={() => setState({ ...state, step: SyncSetupStep.ChooseSourceType })}>
+        <Button className="tw-ml-auto tw-flex tw-flex-row tw-items-center tw-whitespace-nowrap tw-h-8" onClick={() => setState({ ...state, step: SyncSetupStep.ChooseSourceType })}>
           <PlusCircleIcon className="tw-h-5 tw-mr-2 tw-stroke-2" />
           <span className="tw-mr-1">New Source</span>
         </Button>
@@ -92,7 +92,7 @@ const SourceTable: React.FC<SetupSyncProps> = ({ linkToken, state, setState }) =
                       <div className="tw-flex tw-flex-col tw-ml-8">
                         <span className="tw-text-lg tw-font-semibold tw-text-slate-500">Add a source</span>
                         <span className="tw-text-slate-500">Start syncing your data by adding a source.</span>
-                        <Button className="tw-bg-blue-600 hover:tw-bg-blue-800 tw-w-32 tw-px-0 tw-mt-4" onClick={() => setState({ ...state, step: SyncSetupStep.ChooseSourceType })}>Add a Source</Button>
+                        <Button className="tw-w-32 tw-px-0 tw-mt-4" onClick={() => setState({ ...state, step: SyncSetupStep.ChooseSourceType })}>Add a Source</Button>
                       </div>
                     </td>
                   </tr>

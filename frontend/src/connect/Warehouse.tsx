@@ -30,6 +30,10 @@ export const WarehouseSelector: React.FC<SetupSyncProps> = (props) => {
           <ConnectionImage connectionType={ConnectionType.MongoDb} className="tw-h-6 tw-mr-1.5" />
           MongoDB
         </button>
+        <button className={connectionButton} onClick={() => onClick(ConnectionType.Synapse)}>
+          <ConnectionImage connectionType={ConnectionType.Synapse} className="tw-h-6 tw-mr-1.5" />
+          Azure Synapse
+        </button>
       </div>
     </div>
   );

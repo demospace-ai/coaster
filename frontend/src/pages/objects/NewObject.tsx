@@ -157,7 +157,7 @@ export const NewObject: React.FC<{ onComplete: () => void; }> = props => {
   return (
     <>
       <BackButton onClick={back} />
-      <div className='tw-flex tw-flex-col tw-w-[900px] tw-mt-8 tw-mb-24 tw-py-12 tw-px-10 tw-mx-auto tw-bg-white tw-rounded-lg tw-shadow-md tw-items-center'>
+      <div className="tw-flex tw-flex-col tw-w-[900px] tw-mt-8 tw-mb-24 tw-py-12 tw-px-10 tw-mx-auto tw-bg-white tw-rounded-lg tw-shadow-md tw-items-center">
         {content}
       </div>
     </>
@@ -174,7 +174,7 @@ export const DestinationSetup: React.FC<ObjectStepProps> = props => {
       } else {
         setState({ ...state, step: Step.FieldMapping });
       }
-    };
+    }
   };
 
   return (
@@ -191,19 +191,19 @@ export const DestinationSetup: React.FC<ObjectStepProps> = props => {
         className="tw-w-100"
         value={state.displayName}
         setValue={(value) => { setState({ ...state, displayName: value }); }}
-        placeholder='Display Name'
+        placeholder="Display Name"
       />
       <div className="tw-w-full  tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-3">
         <span className="tw-font-medium">Destination</span>
       </div>
       <DestinationSelector
-        className='tw-mt-0 tw-w-100'
+        className="tw-mt-0 tw-w-100"
         validated={true}
         destination={state.destination}
         setDestination={(value: Destination) => {
           if (!state.destination || value.id !== state.destination.id) {
             if (value.connection.connection_type === ConnectionType.Webhook) {
-              // Just hardcode EndCustomerIDField and TargetType for webhooks— they don't matter anyway
+              // Just hardcode EndCustomerIDField and TargetType for webhooks— they don"t matter anyway
               setState({ ...state, destination: value, namespace: undefined, tableName: undefined, targetType: TargetType.Webhook, endCustomerIdField: { name: "end_customer_id", type: FieldType.Integer }, objectFields: [] });
             } else {
               setState({ ...state, destination: value, namespace: undefined, tableName: undefined, endCustomerIdField: undefined, objectFields: [] });
@@ -211,7 +211,7 @@ export const DestinationSetup: React.FC<ObjectStepProps> = props => {
           }
         }} />
       <DestinationTarget state={state} setState={setState} />
-      <Button onClick={advance} className='tw-mt-10 tw-w-full tw-h-10' >Continue</Button>
+      <Button onClick={advance} className="tw-mt-10 tw-w-full tw-h-10" >Continue</Button>
     </div>
   );
 };
@@ -265,7 +265,7 @@ const ExistingObjectFields: React.FC<ObjectStepProps> = props => {
           <Loading />
         }
       </div>
-      <Button onClick={advance} className='tw-mt-6 tw-w-100 tw-h-10' >Continue</Button>
+      <Button onClick={advance} className="tw-mt-6 tw-w-100 tw-h-10" >Continue</Button>
     </div >
   );
 };
@@ -371,7 +371,7 @@ const NewObjectFields: React.FC<ObjectStepProps> = props => {
           <Loading className="tw-mt-5" />
         }
       </div>
-      <Button onClick={advance} className='tw-mt-16 tw-w-100 tw-h-10' >Continue</Button>
+      <Button onClick={advance} className="tw-mt-16 tw-w-100 tw-h-10" >Continue</Button>
     </div >
   );
 };
@@ -423,18 +423,20 @@ const Finalize: React.FC<ObjectStepProps & { onComplete: () => void; }> = (props
   if (createObjectSuccess) {
     return (
       <div>
-        <div className='tw-mt-10 tw-text-center tw-font-bold tw-text-lg'>🎉 Congratulations! Your object is set up. 🎉</div>
-        <Button className='tw-block tw-mt-8 tw-mx-auto tw-mb-10 tw-w-32' onClick={props.onComplete}>Done</Button>
+        <div className="tw-mt-10 tw-text-center tw-font-bold tw-text-lg">🎉 Congratulations! Your object is set up. 🎉</div>
+        <Button className="tw-block tw-mt-8 tw-mx-auto tw-mb-10 tw-w-32" onClick={props.onComplete}>Done</Button>
       </div>
     );
   }
   let recommendedCursor = <></>;
-  switch (state.syncMode) {
+  switch (state.syncMode!) {
     case SyncMode.IncrementalAppend:
       recommendedCursor = <>For <span className="tw-px-1 tw-bg-black tw-font-mono">incremental_append</span> syncs, you should use an <span className="tw-px-1 tw-bg-black tw-font-mono">created_at</span> field.</>;
       break;
     case SyncMode.IncrementalUpdate:
       recommendedCursor = <>For <span className="tw-px-1 tw-bg-black tw-font-mono">incremental_update</span> syncs, you should use an <span className="tw-px-1 tw-bg-black tw-font-mono">updated_at</span> field.</>;
+      break;
+    case SyncMode.FullOverwrite:
       break;
   }
 
@@ -455,8 +457,8 @@ const Finalize: React.FC<ObjectStepProps & { onComplete: () => void; }> = (props
             className="tw-mt-0 tw-w-100"
             field={state.cursorField}
             setField={(value: Field) => { setState({ ...state, cursorField: value }); }}
-            placeholder='Cursor Field'
-            label='Cursor Field'
+            placeholder="Cursor Field"
+            label="Cursor Field"
             noOptionsString="No Fields Available!"
             validated={true}
             predefinedFields={fields}
@@ -467,7 +469,7 @@ const Finalize: React.FC<ObjectStepProps & { onComplete: () => void; }> = (props
         <>
           <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5 tw-mb-3">
             <span className="tw-font-medium">Primary Key</span>
-            <Tooltip placement="right" label='Primary key is usually an ID field. This lets Fabra know which existing rows in the target to update when they change.' maxWidth={400}>
+            <Tooltip placement="right" label="Primary key is usually an ID field. This lets Fabra know which existing rows in the target to update when they change." maxWidth={400}>
               <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
             </Tooltip>
           </div>
@@ -475,7 +477,7 @@ const Finalize: React.FC<ObjectStepProps & { onComplete: () => void; }> = (props
             className="tw-mt-0 tw-w-100"
             field={state.primaryKey}
             setField={(value: Field) => { setState({ ...state, primaryKey: value }); }}
-            placeholder='Primary Key'
+            placeholder="Primary Key"
             noOptionsString="No Fields Available!"
             validated={true}
             predefinedFields={fields}
@@ -493,7 +495,7 @@ const Finalize: React.FC<ObjectStepProps & { onComplete: () => void; }> = (props
                 className="tw-mt-0 tw-w-100"
                 field={state.endCustomerIdField}
                 setField={(value: Field) => { setState({ ...state, endCustomerIdField: value }); }}
-                placeholder='End Customer ID Field'
+                placeholder="End Customer ID Field"
                 noOptionsString="No Fields Available!"
                 validated={true}
                 connection={state.destination?.connection}
@@ -512,7 +514,7 @@ const Finalize: React.FC<ObjectStepProps & { onComplete: () => void; }> = (props
           <ValidatedDropdownInput className="tw-mt-0 tw-w-100" options={Object.values(FrequencyUnits)} selected={props.state.frequencyUnits} setSelected={value => props.setState({ ...props.state, frequencyUnits: value })} loading={false} placeholder="Frequency Units" noOptionsString="nil" getElementForDisplay={(value) => value.charAt(0).toUpperCase() + value.slice(1)} />
         </>
       }
-      <Button onClick={() => createNewObject()} className='tw-mt-10 tw-w-full tw-h-10'>{loading ? <Loading /> : "Create Object"}</Button>
+      <Button onClick={() => createNewObject()} className="tw-mt-10 tw-w-full tw-h-10">{loading ? <Loading /> : "Create Object"}</Button>
     </div>
   );
 };
@@ -568,7 +570,7 @@ const DestinationTarget: React.FC<ObjectStepProps> = ({ state, setState }) => {
                 <label htmlFor={String(target.type)} className="tw-text-sm tw-cursor-pointer">
                   {target.title}
                 </label>
-                <Tooltip label={target.description} placement='top-start'>
+                <Tooltip label={target.description} placement="top-start">
                   <InfoIcon className="tw-ml-1.5 tw-h-3 tw-fill-slate-400" />
                 </Tooltip>
               </div>
@@ -582,7 +584,7 @@ const DestinationTarget: React.FC<ObjectStepProps> = ({ state, setState }) => {
             <span className="tw-font-medium">Namespace</span>
           </div>
           <NamespaceSelector
-            className='tw-mt-0 tw-w-100'
+            className="tw-mt-0 tw-w-100"
             validated={true}
             connection={state.destination?.connection}
             namespace={state.namespace}
@@ -661,7 +663,7 @@ const SyncModeSelector: React.FC<ObjectStepProps> = ({ state, setState }) => {
                 <label htmlFor={String(syncMode.mode)} className="tw-text-sm tw-cursor-pointer">
                   {syncMode.title}
                 </label>
-                <Tooltip label={syncMode.description} placement='top-start'>
+                <Tooltip label={syncMode.description} placement="top-start">
                   <InfoIcon className="tw-ml-1.5 tw-h-3 tw-fill-slate-400" />
                 </Tooltip>
               </div>

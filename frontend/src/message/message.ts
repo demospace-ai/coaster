@@ -3,7 +3,7 @@ import { CustomTheme } from "src/utils/theme";
 export enum MessageType {
   IFrameReady = "fabra-iframe-ready",
   LinkToken = "fabra-link-token",
-  Theme = 'fabra-theme',
+  Theme = "fabra-theme",
   Close = "fabra-window-close",
 }
 

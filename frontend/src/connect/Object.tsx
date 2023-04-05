@@ -9,10 +9,10 @@ import { ObjectSelector, SourceNamespaceSelector, SourceTableSelector } from "sr
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { SetupSyncProps } from "src/connect/state";
 import { sendLinkTokenRequest } from "src/rpc/ajax";
-import { LinkGetPreview, LinkGetPreviewRequest, Object, ResultRow, Schema } from "src/rpc/api";
+import { FabraObject, LinkGetPreview, LinkGetPreviewRequest, ResultRow, Schema } from "src/rpc/api";
 
 export const ObjectSetup: React.FC<SetupSyncProps> = (props) => {
-  const setObject = (object: Object) => props.setState({ ...props.state, object: object, fieldMappings: undefined });
+  const setObject = (object: FabraObject) => props.setState({ ...props.state, object: object, fieldMappings: undefined });
   const setNamespace = (namespace: string) => props.setState({ ...props.state, namespace: namespace, tableName: undefined });
   const setTableName = (tableName: string) => props.setState({ ...props.state, tableName: tableName });
   const [limitPreview, setLimitPreview] = useState<boolean>(true);

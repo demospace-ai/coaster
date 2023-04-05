@@ -97,7 +97,7 @@ const AppContent: React.FC<AppContentProps> = props => {
   }
 
   return (
-    <div ref={ref} className='tw-overflow-auto tw-w-full tw-h-full tw-flex tw-justify-center tw-pt-10 tw-bg-transparent'>
+    <div ref={ref} className="tw-overflow-auto tw-w-full tw-h-full tw-flex tw-justify-center tw-pt-10 tw-bg-transparent">
       {content}
     </div>
   );
@@ -105,15 +105,15 @@ const AppContent: React.FC<AppContentProps> = props => {
 
 const Header: React.FC<{ close: () => void; state: SetupSyncState; }> = ({ close, state }) => {
   return (
-    <div className='tw-flex tw-flex-row tw-items-center tw-w-full tw-h-20 tw-min-h-[80px] tw-border-b tw-border-slate-200'>
-      <div className='tw-flex tw-flex-row tw-gap-10 tw-justify-center tw-items-center tw-w-full'>
+    <div className="tw-flex tw-flex-row tw-items-center tw-w-full tw-h-20 tw-min-h-[80px] tw-border-b tw-border-slate-200">
+      <div className="tw-flex tw-flex-row tw-gap-10 tw-justify-center tw-items-center tw-w-full">
         <StepBreadcrumb step={1} content="Select source" active={state.step <= SyncSetupStep.ChooseSourceType} complete={state.step > SyncSetupStep.ChooseSourceType} />
         <StepBreadcrumb step={2} content="Connect source" active={state.step === SyncSetupStep.ConnectionDetails} complete={state.step > SyncSetupStep.ConnectionDetails} />
         <StepBreadcrumb step={3} content="Define model" active={state.step === SyncSetupStep.ChooseData} complete={state.step > SyncSetupStep.ChooseData} />
         <StepBreadcrumb step={4} content="Finalize sync" active={state.step === SyncSetupStep.Finalize} complete={state.step > SyncSetupStep.Finalize} />
       </div>
       <button className="tw-absolute tw-flex tw-items-center t tw-right-10 tw-border-none tw-cursor-pointer tw-p-0" onClick={close}>
-        <svg className='tw-h-6 tw-fill-slate-500' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+        <svg className="tw-h-6 tw-fill-slate-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
           <path d="M5.1875 15.6875L4.3125 14.8125L9.125 10L4.3125 5.1875L5.1875 4.3125L10 9.125L14.8125 4.3125L15.6875 5.1875L10.875 10L15.6875 14.8125L14.8125 15.6875L10 10.875L5.1875 15.6875Z" />
         </svg>
       </button>
@@ -123,17 +123,17 @@ const Header: React.FC<{ close: () => void; state: SetupSyncState; }> = ({ close
 
 const StepBreadcrumb: React.FC<{ content: string, step: number; active: boolean; complete: boolean; }> = ({ step, content, active, complete }) => {
   return (
-    <div className='tw-flex tw-flex-row tw-justify-center tw-items-center tw-select-none'>
+    <div className="tw-flex tw-flex-row tw-justify-center tw-items-center tw-select-none">
       <div
         className={classNames(
-          'tw-rounded-md tw-h-[18px] tw-w-[18px] tw-flex tw-justify-center tw-items-center tw-text-[10px]',
-          !active && !complete && 'tw-bg-slate-200 tw-text-slate-900',
-          active && 'tw-bg-primary tw-text-primary-text',
-          complete && 'tw-bg-green-100 tw-text-green-800'
+          "tw-rounded-md tw-h-[18px] tw-w-[18px] tw-flex tw-justify-center tw-items-center tw-text-[10px]",
+          !active && !complete && "tw-bg-slate-200 tw-text-slate-900",
+          active && "tw-bg-primary tw-text-primary-text",
+          complete && "tw-bg-green-100 tw-text-green-800"
         )}>
-        {complete ? <CheckIcon className='tw-h-3' /> : step}
+        {complete ? <CheckIcon className="tw-h-3" /> : step}
       </div>
-      <span className={classNames('tw-font-medium tw-pl-2', active && 'tw-text-primary')}>{content}</span>
+      <span className={classNames("tw-font-medium tw-pl-2", active && "tw-text-primary")}>{content}</span>
     </div>
   );
 };
@@ -186,8 +186,8 @@ export const Footer: React.FC<FooterProps> = props => {
   const showContinue = props.state.step > SyncSetupStep.ChooseSourceType;
 
   return (
-    <div className='tw-flex tw-flex-row tw-w-full tw-h-20 tw-min-h-[80px] tw-border-t tw-border-slate-200 tw-mt-auto tw-items-center tw-px-20'>
-      <button className='tw-border tw-border-slate-300 tw-font-medium tw-rounded-md tw-w-32 tw-h-10 tw-select-none hover:tw-bg-slate-100' onClick={props.back}>Back</button>
+    <div className="tw-flex tw-flex-row tw-w-full tw-h-20 tw-min-h-[80px] tw-border-t tw-border-slate-200 tw-mt-auto tw-items-center tw-px-20">
+      <button className="tw-border tw-border-slate-300 tw-font-medium tw-rounded-md tw-w-32 tw-h-10 tw-select-none hover:tw-bg-slate-100" onClick={props.back}>Back</button>
       {showContinue && (
         <Button onClick={onClick} className="tw-border tw-w-36 tw-h-10 tw-ml-auto tw-select-none">
           {loading ? <Loading light /> : continueText}

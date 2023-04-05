@@ -1,16 +1,16 @@
-import classNames from 'classnames';
-import React, { FormEvent, useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button, FormButton } from 'src/components/button/Button';
-import mail from 'src/components/images/mail.svg';
-import { LogoLoading } from 'src/components/loading/LogoLoading';
+import classNames from "classnames";
+import React, { FormEvent, useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button, FormButton } from "src/components/button/Button";
+import mail from "src/components/images/mail.svg";
+import { LogoLoading } from "src/components/loading/LogoLoading";
 import {
   GoogleLoginResponse, useHandleGoogleResponse, useSetOrganization
-} from 'src/pages/login/actions';
-import { useSelector } from 'src/root/model';
-import useWindowDimensions from 'src/utils/window';
+} from "src/pages/login/actions";
+import { useSelector } from "src/root/model";
+import useWindowDimensions from "src/utils/window";
 
-const GOOGLE_CLIENT_ID = '932264813910-egpk1omo3v2cedd89k8go851uko6djpa.apps.googleusercontent.com';
+const GOOGLE_CLIENT_ID = "932264813910-egpk1omo3v2cedd89k8go851uko6djpa.apps.googleusercontent.com";
 
 export enum LoginStep {
   Start = 1,
@@ -30,7 +30,7 @@ export const Login: React.FC = () => {
   useEffect(() => {
     let ignore = false;
     if (isAuthenticated && organization && !ignore) {
-      navigate('/');
+      navigate("/");
     }
 
     return () => {
@@ -65,9 +65,9 @@ export const Login: React.FC = () => {
           {unauthorized ?
             <div className="tw-flex tw-flex-col tw-justify-center">
               <div>
-                You don't have access to Fabra yet. Contact us at <a className="tw-text-blue-500" href="mailto:founders@fabra.io">founders@fabra.io</a> to get an account provisioned!
+                You don"t have access to Fabra yet. Contact us at <a className="tw-text-blue-500" href="mailto:founders@fabra.io">founders@fabra.io</a> to get an account provisioned!
               </div>
-              <img src={mail} alt="mail" className='tw-h-36 tw-mt-5' />
+              <img src={mail} alt="mail" className="tw-h-36 tw-mt-5" />
             </div>
             :
             <>{loginContent}</>}
@@ -113,16 +113,16 @@ const GoogleLogin: React.FC<GoogleLoginProps> = props => {
       });
       window.google.accounts.id.renderButton(
         buttonRef.current!,
-        { theme: 'filled_blue', size: 'large', text: 'continue_with', width: props.width }
+        { theme: "filled_blue", size: "large", text: "continue_with", width: props.width }
       );
     };
 
     if (googleScriptLoaded) {
       onLoad();
     } else {
-      const script = document.createElement('script');
+      const script = document.createElement("script");
 
-      script.src = 'https://accounts.google.com/gsi/client';
+      script.src = "https://accounts.google.com/gsi/client";
       script.onload = onLoad;
 
       document.head.appendChild(script);
@@ -130,7 +130,7 @@ const GoogleLogin: React.FC<GoogleLoginProps> = props => {
     }
   }, [props.onGoogleSignIn, props.width]);
 
-  return <div className='tw-flex tw-justify-center' ref={buttonRef}></div>;
+  return <div className="tw-flex tw-justify-center" ref={buttonRef}></div>;
 };
 
 type OrganizationInputProps = {
@@ -140,12 +140,12 @@ type OrganizationInputProps = {
 const OrganizationInput: React.FC<OrganizationInputProps> = props => {
   const user = useSelector(state => state.login.user);
   const suggestedOrganizations = useSelector(state => state.login.suggestedOrganizations);
-  const [organizationInput, setOrganizationInput] = useState('');
+  const [organizationInput, setOrganizationInput] = useState("");
   const setOrganization = useSetOrganization();
   const [isValid, setIsValid] = useState(true);
   const [overrideCreate, setOverrideCreate] = useState(false);
 
-  let classes = ["tw-border tw-border-slate-400 tw-rounded-md tw-px-3 tw-py-2 tw-w-full tw-box-border"];
+  const classes = ["tw-border tw-border-slate-400 tw-rounded-md tw-px-3 tw-py-2 tw-w-full tw-box-border"];
   if (!isValid) {
     classes.push("tw-border-red-500 tw-outline-none");
   }
@@ -158,7 +158,7 @@ const OrganizationInput: React.FC<OrganizationInputProps> = props => {
 
   const onKeydown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     event.stopPropagation();
-    if (event.key === 'Escape') {
+    if (event.key === "Escape") {
       event.currentTarget.blur();
     }
   };
@@ -185,11 +185,11 @@ const OrganizationInput: React.FC<OrganizationInputProps> = props => {
       <form className="tw-mt-5" onSubmit={createNewOrganization}>
         <div className="tw-mb-5">Welcome, {user!.first_name}! Let's build out your team.</div>
         <input
-          type='text'
-          id='organization'
-          name='organization'
-          autoComplete='organization'
-          placeholder='Organization Name'
+          type="text"
+          id="organization"
+          name="organization"
+          autoComplete="organization"
+          placeholder="Organization Name"
           className={classNames(classes)}
           onKeyDown={onKeydown}
           onFocus={() => setIsValid(true)}
@@ -214,7 +214,7 @@ const OrganizationInput: React.FC<OrganizationInputProps> = props => {
           </div>
         </li>
       ))}
-      <div className='tw-my-5 tw-mx-0'>or</div>
+      <div className="tw-my-5 tw-mx-0">or</div>
       <Button className="tw-w-full tw-h-10" onClick={() => setOverrideCreate(true)} >Create new organization</Button>
     </div>
   );

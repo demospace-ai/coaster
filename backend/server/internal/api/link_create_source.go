@@ -22,6 +22,7 @@ type CreateSourceLinkRequest struct {
 	SnowflakeConfig *input.SnowflakeConfig `json:"snowflake_config,omitempty"`
 	RedshiftConfig  *input.RedshiftConfig  `json:"redshift_config,omitempty"`
 	MongoDbConfig   *input.MongoDbConfig   `json:"mongodb_config,omitempty"`
+	SynapseConfig   *input.SynapseConfig   `json:"synapse_config,omitempty"`
 }
 
 func (s ApiService) LinkCreateSource(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
@@ -83,6 +84,16 @@ func (s ApiService) LinkCreateSource(auth auth.Authentication, w http.ResponseWr
 		connection, err = connections.CreateMongoDbConnection(
 			s.db, auth.Organization.ID, *createSourceRequest.MongoDbConfig, *encryptedCredentials,
 		)
+	case models.ConnectionTypeSynapse:
+		encryptedCredentials, err = s.cryptoService.EncryptConnectionCredentials(createSourceRequest.SynapseConfig.Password)
+		if err != nil {
+			return err
+		}
+		connection, err = connections.CreateSynapseConnection(
+			s.db, auth.Organization.ID, *createSourceRequest.SynapseConfig, *encryptedCredentials,
+		)
+	default:
+		return errors.Newf("unsupported connection type: %s", createSourceRequest.ConnectionType)
 	}
 
 	if err != nil {

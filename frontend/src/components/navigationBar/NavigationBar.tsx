@@ -1,9 +1,9 @@
-import { ArrowPathIcon, ArrowTopRightOnSquareIcon, BellIcon, CircleStackIcon, CubeIcon, HomeIcon, KeyIcon, MapIcon, UserPlusIcon } from '@heroicons/react/24/outline';
+import { ArrowPathIcon, ArrowTopRightOnSquareIcon, BellIcon, CircleStackIcon, CubeIcon, HomeIcon, KeyIcon, MapIcon, UserPlusIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import { NavLink } from "react-router-dom";
 import { QuestionCircleIcon } from "src/components/icons/Icons";
-import logo from 'src/components/images/logo.png';
-import { Tooltip } from 'src/components/tooltip/Tooltip';
+import logo from "src/components/images/logo.png";
+import { Tooltip } from "src/components/tooltip/Tooltip";
 import { useSelector } from "src/root/model";
 
 export const NavigationBar: React.FC = () => {
@@ -23,8 +23,8 @@ export const NavigationBar: React.FC = () => {
     <>
       <div className="tw-min-w-[240px] tw-w-60 tw-h-full tw-flex tw-flex-col tw-box-border tw-border-r tw-border-solid tw-border-slate-200 tw-bg-white">
         <NavLink className="tw-py-4 tw-px-4 tw-flex tw-flex-row tw-h-16 tw-box-border tw-cursor-pointer tw-w-full tw-mb-4" to="/">
-          <img src={logo} className='tw-h-6 tw-w-6 tw-justify-center tw-items-center tw-rounded tw-flex tw-my-auto tw-select-none' alt="fabra logo" />
-          <div className='tw-my-auto tw-ml-2.5 tw-max-w-[150px] tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-bold tw-font-[Montserrat] tw-text-2xl'>
+          <img src={logo} className="tw-h-6 tw-w-6 tw-justify-center tw-items-center tw-rounded tw-flex tw-my-auto tw-select-none" alt="fabra logo" />
+          <div className="tw-my-auto tw-ml-2.5 tw-max-w-[150px] tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-bold tw-font-[Montserrat] tw-text-2xl">
             fabra
           </div>
         </NavLink>
@@ -32,13 +32,13 @@ export const NavigationBar: React.FC = () => {
           Overview
         </div>
         <div className={routeContainer}>
-          <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-slate-200")} to={'/'}>
+          <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-slate-200")} to={"/"}>
             <HomeIcon className="tw-h-4" strokeWidth="2" />
             <div className={route}>Home</div>
           </NavLink>
         </div>
         <div className={routeContainer}>
-          <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-slate-200")} to={'/syncs'}>
+          <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-slate-200")} to={"/syncs"}>
             <ArrowPathIcon className="tw-h-4" strokeWidth="2" />
             <div className={route}>Syncs</div>
           </NavLink>
@@ -58,28 +58,28 @@ export const NavigationBar: React.FC = () => {
           Develop
         </div>
         <div className={routeContainer}>
-          <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-slate-200")} to={'/apikey'}>
+          <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-slate-200")} to={"/apikey"}>
             <KeyIcon className="tw-h-4" strokeWidth="2" />
             <div className={route}>API Keys</div>
           </NavLink>
         </div>
         <div className={routeContainer}>
-          <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-slate-200")} to={'/destinations'}>
+          <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-slate-200")} to={"/destinations"}>
             <CircleStackIcon className="tw-h-4" strokeWidth="2" />
             <div className={route}>Destinations</div>
           </NavLink>
         </div>
         <div className={routeContainer}>
-          <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-slate-200")} to={'/objects'}>
+          <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-slate-200")} to={"/objects"}>
             <CubeIcon className="tw-h-4" strokeWidth="2" />
             <div className={route}>Objects</div>
           </NavLink>
         </div>
         <div className={routeContainer}>
-          <a className={navLink} href='https://docs.fabra.io/' target="_blank" rel="noreferrer">
+          <a className={navLink} href="https://docs.fabra.io/" target="_blank" rel="noreferrer">
             <MapIcon className="tw-h-4" strokeWidth="2" />
             <div className={route}>Documentation</div>
-            <ArrowTopRightOnSquareIcon className='tw-h-4 tw-ml-auto tw-mr-3' />
+            <ArrowTopRightOnSquareIcon className="tw-h-4 tw-ml-auto tw-mr-3" />
           </a>
         </div>
         <div id="bottomSection" className="tw-mt-auto tw-mb-4">
@@ -93,7 +93,7 @@ export const NavigationBar: React.FC = () => {
             </NavLink>
           </div>
           <div className={routeContainer}>
-            <a className={navLink} href='mailto:nick@fabra.io?subject=Help with Fabra'>
+            <a className={navLink} href="mailto:nick@fabra.io?subject=Help with Fabra">
               <QuestionCircleIcon className="tw-h-[18px] tw-mt-[1px]" strokeWidth="2" />
               <div className={route}>Help</div>
             </a>

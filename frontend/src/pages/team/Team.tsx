@@ -10,19 +10,19 @@ const tableCellStyle = "tw-whitespace-nowrap tw-px-3 tw-py-4 tw-text-sm tw-text-
 export const Team: React.FC = () => {
   const { users } = useUsers();
   return (
-    <div className='tw-py-5 tw-px-10'>
+    <div className="tw-py-5 tw-px-10">
       <div className="tw-flex tw-w-full tw-mb-5 tw-mt-2">
         <div className="tw-flex tw-flex-col tw-justify-end tw-font-bold tw-text-lg">Users</div>
-        <LinkButton className='tw-ml-auto tw-flex' href='mailto:nick@fabra.io?subject=Join me on Fabra!&body=Sign up here: https://app.fabra.io'>
+        <LinkButton className="tw-ml-auto tw-flex" href="mailto:nick@fabra.io?subject=Join me on Fabra!&body=Sign up here: https://app.fabra.io">
           <div className="tw-flex tw-flex-col tw-justify-center tw-h-full">
-            <PlusCircleIcon className='tw-h-4 tw-inline-block tw-mr-2' />
+            <PlusCircleIcon className="tw-h-4 tw-inline-block tw-mr-2" />
           </div>
           <div className="tw-flex tw-flex-col tw-justify-center tw-mr-0.5">
             Invite teammate
           </div>
         </LinkButton>
       </div>
-      <div className='tw-border tw-border-solid tw-border-slate-300 tw-rounded-lg tw-max-h-64 tw-overflow-x-auto tw-overscroll-contain tw-bg-white tw-shadow-md' >
+      <div className="tw-border tw-border-solid tw-border-slate-300 tw-rounded-lg tw-max-h-64 tw-overflow-x-auto tw-overscroll-contain tw-bg-white tw-shadow-md" >
         {users
           ?
           <table className="tw-min-w-full tw-border-separate tw-border-spacing-0">
@@ -30,8 +30,8 @@ export const Team: React.FC = () => {
               <tr>
                 <th scope="col" className={tableHeaderStyle}>Name</th>
                 <th scope="col" className={tableHeaderStyle}>Email</th>
-                <th scope="col" className={classNames(tableHeaderStyle, 'tw-w-5')}></th>
-                <th scope="col" className={classNames(tableHeaderStyle, 'tw-w-5')}></th>
+                <th scope="col" className={classNames(tableHeaderStyle, "tw-w-5")}></th>
+                <th scope="col" className={classNames(tableHeaderStyle, "tw-w-5")}></th>
               </tr>
             </thead>
             <tbody>

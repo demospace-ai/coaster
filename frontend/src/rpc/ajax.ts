@@ -1,9 +1,9 @@
-import { compile } from 'path-to-regexp';
-import { rudderanalytics } from 'src/app/rudder';
-import { IEndpoint } from 'src/rpc/api';
-import { isProd } from 'src/utils/env';
+import { compile } from "path-to-regexp";
+import { rudderanalytics } from "src/app/rudder";
+import { IEndpoint } from "src/rpc/api";
+import { isProd } from "src/utils/env";
 
-const ROOT_DOMAIN = isProd() ? 'https://api.fabra.io' : 'http://localhost:8080';
+const ROOT_DOMAIN = isProd() ? "https://api.fabra.io" : "http://localhost:8080";
 
 export async function sendLinkTokenRequest<RequestType extends Record<string, any>, ResponseType>(
   endpoint: IEndpoint<RequestType, ResponseType>,
@@ -32,11 +32,11 @@ export async function sendRequest<RequestType extends Record<string, any>, Respo
   }
 
   const extraHeadersList = extraHeaders ? extraHeaders : [];
-  const headers = new Headers([['Content-Type', 'application/json'], ['X-TIME-ZONE', Intl.DateTimeFormat().resolvedOptions().timeZone], ...extraHeadersList]);
+  const headers = new Headers([["Content-Type", "application/json"], ["X-TIME-ZONE", Intl.DateTimeFormat().resolvedOptions().timeZone], ...extraHeadersList]);
   let options: RequestInit = {
     method: endpoint.method,
     headers: headers,
-    credentials: 'include',
+    credentials: "include",
   };
 
   if (["POST", "PATCH", "PUT"].includes(endpoint.method)) {

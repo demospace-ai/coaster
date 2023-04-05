@@ -130,6 +130,29 @@ func CreateMongoDbConnection(
 	return &connection, nil
 }
 
+func CreateSynapseConnection(
+	db *gorm.DB,
+	organizationID int64,
+	synapseConfig input.SynapseConfig,
+	encryptedPassword string,
+) (*models.Connection, error) {
+	connection := models.Connection{
+		OrganizationID: organizationID,
+		ConnectionType: models.ConnectionTypeSynapse,
+		Username:       database.NewNullString(synapseConfig.Username),
+		Password:       database.NewNullString(encryptedPassword),
+		DatabaseName:   database.NewNullString(synapseConfig.DatabaseName),
+		Host:           database.NewNullString(synapseConfig.Endpoint), // we just use the host field to store the endpoint
+	}
+
+	result := db.Create(&connection)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &connection, nil
+}
+
 func CreateWebhookConnection(
 	db *gorm.DB,
 	organizationID int64,

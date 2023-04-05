@@ -3,9 +3,9 @@ package query
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"net/url"
+	"time"
 
 	"go.fabra.io/server/common/data"
 	"go.fabra.io/server/common/errors"
@@ -16,10 +16,6 @@ type SynapseApiClient struct {
 	Password     string
 	DatabaseName string
 	Host         string
-}
-
-type synapseSchema struct {
-	Type string `json:"type"`
 }
 
 type synapseIterator struct {
@@ -34,7 +30,7 @@ func (it *synapseIterator) Next(_ context.Context) (data.Row, error) {
 		if err != nil {
 			return nil, err
 		}
-		return convertSynapseRow(row), nil
+		return convertSynapseRow(row, it.schema), nil
 	}
 
 	defer it.queryResult.Close()
@@ -53,7 +49,7 @@ func (it *synapseIterator) Schema() data.Schema {
 
 func (sc SynapseApiClient) openConnection(ctx context.Context) (*sql.DB, error) {
 	params := url.Values{}
-	params.Add("daabase", sc.DatabaseName)
+	params.Add("database", sc.DatabaseName)
 	params.Add("sslmode", "encrypt")
 	params.Add("TrustServerCertificate", "true")
 	dsn := url.URL{
@@ -67,47 +63,23 @@ func (sc SynapseApiClient) openConnection(ctx context.Context) (*sql.DB, error) 
 }
 
 func (sc SynapseApiClient) GetTables(ctx context.Context, namespace string) ([]string, error) {
-	client, err := sc.openConnection(ctx)
+	queryString := fmt.Sprintf("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE' AND TABLE_SCHEMA = '%s'", namespace)
+
+	queryResult, err := sc.RunQuery(ctx, queryString)
 	if err != nil {
-		return nil, errors.Wrap(err, "opening connection for get table")
+		return nil, errors.Wrap(err, "error running query")
 	}
 
-	defer client.Close()
-
-	queryString := fmt.Sprintf("SHOW TERSE TABLES IN %s", namespace)
-	queryResult, err := client.Query(queryString)
-	if err != nil {
-		return nil, errors.Wrapf(err, "running query %s", queryString)
-	}
-	defer queryResult.Close()
-
-	columns, err := queryResult.Columns()
-	if err != nil {
-		return nil, err
-	}
-	numColumns := len(columns)
-
-	// just scan into a string list, everything can be a string
 	var tableNames []string
-	values := make([]any, numColumns)
-	valuePtrs := make([]any, numColumns)
-	for queryResult.Next() {
-		for i := 0; i < numColumns; i++ {
-			valuePtrs[i] = &values[i]
-		}
-		err := queryResult.Scan(valuePtrs...)
-		if err != nil {
-			return nil, err
-		}
-
-		tableNames = append(tableNames, values[1].(string))
+	for _, row := range queryResult.Data {
+		tableNames = append(tableNames, row[0].(string))
 	}
 
 	return tableNames, nil
 }
 
 func (sc SynapseApiClient) GetSchema(ctx context.Context, namespace string, tableName string) (data.Schema, error) {
-	queryString := fmt.Sprintf("SHOW COLUMNS IN %s.%s", namespace, tableName)
+	queryString := fmt.Sprintf("SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '%s' AND table_name = '%s'", namespace, tableName)
 
 	queryResult, err := sc.RunQuery(ctx, queryString)
 	if err != nil {
@@ -116,18 +88,8 @@ func (sc SynapseApiClient) GetSchema(ctx context.Context, namespace string, tabl
 
 	schema := data.Schema{}
 	for _, row := range queryResult.Data {
-		if row[0] == nil {
-			continue
-		}
-
-		var synapseSchema synapseSchema
-		err := json.Unmarshal([]byte(row[3].(string)), &synapseSchema)
-		if err != nil {
-			return nil, err
-		}
-
-		dataType := getSynapseFieldType(synapseSchema.Type)
-		schema = append(schema, data.Field{Name: row[2].(string), Type: dataType})
+		dataType := getSynapseFieldType(row[1].(string))
+		schema = append(schema, data.Field{Name: row[0].(string), Type: dataType})
 	}
 
 	return schema, nil
@@ -154,7 +116,7 @@ func (sc SynapseApiClient) GetFieldValues(ctx context.Context, namespace string,
 }
 
 func (sc SynapseApiClient) GetNamespaces(ctx context.Context) ([]string, error) {
-	queryString := "SHOW TERSE SCHEMAS"
+	queryString := "SELECT TABLE_SCHEMA FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE'"
 	queryResult, err := sc.RunQuery(ctx, queryString)
 	if err != nil {
 		return nil, err
@@ -166,7 +128,7 @@ func (sc SynapseApiClient) GetNamespaces(ctx context.Context) ([]string, error) 
 			continue
 		}
 
-		namespaces = append(namespaces, row[1].(string))
+		namespaces = append(namespaces, row[0].(string))
 	}
 
 	return namespaces, nil
@@ -179,7 +141,7 @@ func (sc SynapseApiClient) RunQuery(ctx context.Context, queryString string, arg
 	}
 	defer client.Close()
 
-	queryResult, err := client.Query(queryString, args)
+	queryResult, err := client.Query(queryString)
 	if err != nil {
 		return nil, err
 	}
@@ -190,6 +152,7 @@ func (sc SynapseApiClient) RunQuery(ctx context.Context, queryString string, arg
 		return nil, err
 	}
 	numColumns := len(columns)
+	schema := convertSynapseSchema(columns)
 
 	var rows []data.Row
 	values := make([]any, numColumns)
@@ -203,11 +166,11 @@ func (sc SynapseApiClient) RunQuery(ctx context.Context, queryString string, arg
 			return nil, err
 		}
 
-		rows = append(rows, convertSynapseRow(values))
+		rows = append(rows, convertSynapseRow(values, schema))
 	}
 
 	return &data.QueryResults{
-		Schema: convertSynapseSchema(columns),
+		Schema: schema,
 		Data:   rows,
 	}, nil
 }
@@ -235,32 +198,49 @@ func (sc SynapseApiClient) GetQueryIterator(ctx context.Context, queryString str
 	}, nil
 }
 
-func convertSynapseRow(synapseRow []any) data.Row {
+func convertSynapseRow(synapseRow []any, schema data.Schema) data.Row {
 	row := make(data.Row, len(synapseRow))
 	for i, value := range synapseRow {
-		row[i] = convertSynapseValue(value)
+		row[i] = convertSynapseValue(value, schema[i].Type)
 	}
 
 	return row
 }
 
-func convertSynapseValue(synapseValue any) any {
-	// TODO: convert the values to the expected Fabra Golang types
-	return synapseValue
+func convertSynapseValue(synapseValue any, fieldType data.FieldType) any {
+	// Don't try to convert value that is nil
+	if synapseValue == nil {
+		return nil
+	}
+
+	switch fieldType {
+	case data.FieldTypeDateTimeTz:
+		return synapseValue.(time.Time).Format(FABRA_TIMESTAMP_TZ_FORMAT)
+	case data.FieldTypeDateTimeNtz:
+		return synapseValue.(time.Time).Format(FABRA_TIMESTAMP_NTZ_FORMAT)
+	case data.FieldTypeString:
+		return synapseValue.(string)
+	default:
+		return synapseValue
+	}
 }
 
 func getSynapseFieldType(synapseType string) data.FieldType {
 	switch synapseType {
-	case "BIT", "BOOLEAN":
+	case "BIT":
 		return data.FieldTypeBoolean
-	case "INTEGER", "BIGINT", "SMALLINT", "TINYINT":
+	case "INT", "BIGINT", "SMALLINT", "TINYINT":
 		return data.FieldTypeInteger
-	case "REAL", "DOUBLE", "DECIMAL", "NUMERIC", "FLOAT", "FIXED":
+	case "REAL", "DECIMAL", "NUMERIC", "FLOAT":
 		return data.FieldTypeNumber
-	case "TIMESTAMP_TZ":
-		return data.FieldTypeDateTimeTz
-	case "TIMESTAMP", "TIMESTAMP_NTZ":
+	case "DATE":
+		return data.FieldTypeDate
+	case "TIME":
+		return data.FieldTypeTimeNtz
+	case "DATETIME", "DATETIME2", "SMALLDATETIME":
 		return data.FieldTypeDateTimeNtz
+	case "DATETIMEOFFSET":
+		return data.FieldTypeDateTimeTz
 	default:
 		// Everything can always be treated as a string
 		return data.FieldTypeString

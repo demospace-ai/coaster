@@ -1,5 +1,5 @@
 import { sendLinkTokenRequest } from "src/rpc/ajax";
-import { BigQueryConfig, ConnectionType, Field, FieldMappingInput, FrequencyUnits, GetSources, LinkCreateSource, LinkCreateSourceRequest, LinkCreateSync, LinkCreateSyncRequest, LinkGetSources, LinkGetSyncs, MongoDbConfig, Object, RedshiftConfig, SnowflakeConfig, Source } from "src/rpc/api";
+import { BigQueryConfig, ConnectionType, FabraObject, Field, FieldMappingInput, FrequencyUnits, GetSources, LinkCreateSource, LinkCreateSourceRequest, LinkCreateSync, LinkCreateSyncRequest, LinkGetSources, LinkGetSyncs, MongoDbConfig, RedshiftConfig, SnowflakeConfig, Source, SynapseConfig } from "src/rpc/api";
 import { mutate } from "swr";
 
 export type SetupSyncProps = {
@@ -23,6 +23,7 @@ export type NewSourceState = {
   bigqueryConfig: BigQueryConfig;
   snowflakeConfig: SnowflakeConfig;
   redshiftConfig: RedshiftConfig;
+  synapseConfig: SynapseConfig;
   mongodbConfig: MongoDbConfig;
 };
 
@@ -49,6 +50,12 @@ const INITIAL_SOURCE_STATE: NewSourceState = {
     database_name: "",
     endpoint: "",
   },
+  synapseConfig: {
+    username: "",
+    password: "",
+    database_name: "",
+    endpoint: "",
+  },
   mongodbConfig: {
     username: "",
     password: "",
@@ -68,7 +75,7 @@ export type SetupSyncState = {
   error: string | undefined;
   skippedSourceSetup: boolean;
   skippedSourceSelection: boolean;
-  object: Object | undefined;
+  object: FabraObject | undefined;
   namespace: string | undefined;
   tableName: string | undefined;
   customJoin: string | undefined;
@@ -122,6 +129,12 @@ export const validateConnectionSetup = (connectionType: ConnectionType | undefin
         && state.redshiftConfig.password.length > 0
         && state.redshiftConfig.database_name.length > 0
         && state.redshiftConfig.endpoint.length > 0;
+    case ConnectionType.Synapse:
+      return state.displayName.length > 0
+        && state.synapseConfig.username.length > 0
+        && state.synapseConfig.password.length > 0
+        && state.synapseConfig.database_name.length > 0
+        && state.synapseConfig.endpoint.length > 0;
     case ConnectionType.MongoDb:
       return state.displayName.length > 0
         && state.mongodbConfig.username.length > 0
@@ -154,7 +167,7 @@ export const createNewSource = async (
     connection_type: state.connectionType!,
   };
 
-  switch (state.connectionType) {
+  switch (state.connectionType!) {
     case ConnectionType.BigQuery:
       payload.bigquery_config = state.newSourceState.bigqueryConfig;
       break;
@@ -164,11 +177,15 @@ export const createNewSource = async (
     case ConnectionType.Redshift:
       payload.redshift_config = state.newSourceState.redshiftConfig;
       break;
+    case ConnectionType.Synapse:
+      payload.synapse_config = state.newSourceState.synapseConfig;
+      break;
     case ConnectionType.MongoDb:
       payload.mongodb_config = state.newSourceState.mongodbConfig;
       break;
-    default:
-    // TODO: throw an error here
+    case ConnectionType.Webhook:
+      // TODO: throw an error
+      return;
   }
 
   try {
@@ -181,7 +198,7 @@ export const createNewSource = async (
       source: response.source,
       step: SyncSetupStep.ChooseData,
       newSourceState: { ...state.newSourceState, sourceCreated: true },
-      namespace: undefined, // set namespace and table name to undefined since we're using a new source
+      namespace: undefined, // set namespace and table name to undefined since we"re using a new source
       tableName: undefined,
     });
   } catch (e) {

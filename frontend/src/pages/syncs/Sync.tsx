@@ -15,14 +15,14 @@ export const Sync: React.FC = () => {
   const syncRuns = sync?.sync_runs ? sync.sync_runs : [];
 
   return (
-    <div className='tw-pt-5 tw-pb-24 tw-px-10 tw-h-full tw-w-full tw-overflow-scroll'>
+    <div className="tw-pt-5 tw-pb-24 tw-px-10 tw-h-full tw-w-full tw-overflow-scroll">
       <div className="tw-flex tw-w-full tw-mb-5 tw-mt-2">
         <div className="tw-flex tw-flex-row tw-items-center tw-font-bold tw-text-lg">
           {sync?.sync.display_name}
           <div className="hover:tw-bg-slate-200 tw-p-1 tw-rounded tw-ml-2 tw-cursor-pointer"><PencilIcon className="tw-h-4"></PencilIcon></div>
         </div>
       </div>
-      <div className='tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-lg tw-overflow-auto tw-overscroll-contain tw-shadow-md tw-w-full' >
+      <div className="tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-lg tw-overflow-auto tw-overscroll-contain tw-shadow-md tw-w-full" >
         {sync
           ?
           <table className="tw-min-w-full tw-border-spacing-0 tw-divide-y tw-divide-slate-200">
@@ -32,7 +32,7 @@ export const Sync: React.FC = () => {
                 <th scope="col" className={tableHeaderStyle}>Started At</th>
                 <th scope="col" className={tableHeaderStyle}>Rows Synced</th>
                 <th scope="col" className={tableHeaderStyle}>Error</th>
-                <th scope="col" className={mergeClasses(tableHeaderStyle, 'tw-w-5')}></th>
+                <th scope="col" className={mergeClasses(tableHeaderStyle, "tw-w-5")}></th>
               </tr>
             </thead>
             <tbody className="tw-divide-y tw-divide-slate-200 tw-bg-white">

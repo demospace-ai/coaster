@@ -1,20 +1,20 @@
-import React, { ReactNode, useEffect } from 'react';
-import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
-import { useStart } from 'src/app/actions';
-import { Header } from 'src/components/header/Header';
-import { Loading } from 'src/components/loading/Loading';
-import { NavigationBar } from 'src/components/navigationBar/NavigationBar';
-import { ApiKey } from 'src/pages/apikey/ApiKey';
-import { Destination } from 'src/pages/destinations/Destination';
-import { Destinations } from 'src/pages/destinations/Destinations';
-import { Home } from 'src/pages/home/Home';
-import { Login } from 'src/pages/login/Login';
-import { NotFound } from 'src/pages/notfound/NotFound';
-import { Objects } from 'src/pages/objects/Objects';
-import { Sync } from 'src/pages/syncs/Sync';
-import { Syncs } from 'src/pages/syncs/Syncs';
-import { Team } from 'src/pages/team/Team';
-import { useSelector } from 'src/root/model';
+import React, { ReactNode, useEffect } from "react";
+import { Navigate, Outlet, Route, Routes } from "react-router-dom";
+import { useStart } from "src/app/actions";
+import { Header } from "src/components/header/Header";
+import { Loading } from "src/components/loading/Loading";
+import { NavigationBar } from "src/components/navigationBar/NavigationBar";
+import { ApiKey } from "src/pages/apikey/ApiKey";
+import { Destination } from "src/pages/destinations/Destination";
+import { Destinations } from "src/pages/destinations/Destinations";
+import { Home } from "src/pages/home/Home";
+import { Login } from "src/pages/login/Login";
+import { NotFound } from "src/pages/notfound/NotFound";
+import { Objects } from "src/pages/objects/Objects";
+import { Sync } from "src/pages/syncs/Sync";
+import { Syncs } from "src/pages/syncs/Syncs";
+import { Team } from "src/pages/team/Team";
+import { useSelector } from "src/root/model";
 
 let needsInit = true;
 
@@ -40,16 +40,16 @@ export const App: React.FC = () => {
     <>
       <Routes>
         <Route element={<AppLayout />}>
-          <Route path='/login' element={<Login />} />
-          <Route path='/' element={<RequireAuth element={<Home />} />} />
-          <Route path='/apikey' element={<RequireAuth element={<ApiKey />} />} />
-          <Route path='/team' element={<RequireAuth element={<Team />} />} />
-          <Route path='/destinations' element={<RequireAuth element={<Destinations />} />} />
-          <Route path='/destination/:destinationID' element={<RequireAuth element={<Destination />} />} />
-          <Route path='/objects' element={<RequireAuth element={<Objects />} />} />
-          <Route path='/syncs' element={<RequireAuth element={<Syncs />} />} />
-          <Route path='/sync/:syncID' element={<RequireAuth element={<Sync />} />} />
-          <Route path='*' element={<NotFound />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<RequireAuth element={<Home />} />} />
+          <Route path="/apikey" element={<RequireAuth element={<ApiKey />} />} />
+          <Route path="/team" element={<RequireAuth element={<Team />} />} />
+          <Route path="/destinations" element={<RequireAuth element={<Destinations />} />} />
+          <Route path="/destination/:destinationID" element={<RequireAuth element={<Destination />} />} />
+          <Route path="/objects" element={<RequireAuth element={<Objects />} />} />
+          <Route path="/syncs" element={<RequireAuth element={<Syncs />} />} />
+          <Route path="/sync/:syncID" element={<RequireAuth element={<Sync />} />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
     </>

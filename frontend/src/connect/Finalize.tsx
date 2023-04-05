@@ -66,7 +66,7 @@ export const FinalizeSync: React.FC<SetupSyncProps> = (props) => {
                 className="tw-mt-0 tw-w-96 tw-flex"
                 field={fieldMapping?.source_field}
                 setField={(value: Field) => { updateFieldMapping({ ...fieldMapping, source_field: value }, fieldMappingIdx!); }}
-                placeholder='Choose a field'
+                placeholder="Choose a field"
                 noOptionsString="No Fields Available!"
                 validated={true}
                 source={props.state.source}
@@ -91,7 +91,7 @@ export const FinalizeSync: React.FC<SetupSyncProps> = (props) => {
 
 const MappedField: React.FC<{ objectField: ObjectField; }> = ({ objectField }) => {
   return (
-    <div className='tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-p-3 tw-w-80 tw-box-border tw-bg-slate-100 tw-outline-none tw-flex tw-flex-row tw-items-center tw-text-slate-500 tw-select-none'>
+    <div className="tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-p-3 tw-w-80 tw-box-border tw-bg-slate-100 tw-outline-none tw-flex tw-flex-row tw-items-center tw-text-slate-500 tw-select-none">
       <div>{objectField.display_name ? objectField.display_name : objectField.name}</div>
       {
         objectField.description &&

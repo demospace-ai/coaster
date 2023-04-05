@@ -8,11 +8,11 @@ import { mergeClasses } from "src/utils/twmerge";
 export const Input: React.FC<InputProps> = props => {
   const { id, value, placeholder, setValue, className, textarea, type, label, ...other } = props;
   const [focused, setFocused] = useState(false);
-  let classes = ['tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border focus:tw-border-slate-700 tw-outline-none', !props.disabled && "hover:tw-border-slate-400", props.className];
+  let classes = ["tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border focus:tw-border-slate-700 tw-outline-none", !props.disabled && "hover:tw-border-slate-400", props.className];
 
   const onKeydown = (event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     event.stopPropagation();
-    if (event.key === 'Escape') {
+    if (event.key === "Escape") {
       event.currentTarget.blur();
     }
   };
@@ -52,7 +52,7 @@ export const Input: React.FC<InputProps> = props => {
         />
         :
         <input
-          type={props.type ? props.type : 'text'}
+          type={props.type ? props.type : "text"}
           id={props.id}
           name={props.id}
           autoComplete={props.id}
@@ -60,7 +60,7 @@ export const Input: React.FC<InputProps> = props => {
           className={mergeClasses(classes)}
           onKeyDown={onKeydown}
           onFocus={() => { setFocused(true); }}
-          onChange={e => { e.target.type === 'number' ? props.setValue(parseInt(e.target.value)) : props.setValue(e.target.value); }}
+          onChange={e => { e.target.type === "number" ? props.setValue(parseInt(e.target.value)) : props.setValue(e.target.value); }}
           onBlur={() => { setFocused(false); }}
           value={props.value ? props.value : ""}
           {...other}
@@ -83,14 +83,14 @@ export const ValidatedInput: React.FC<InputProps> = props => {
   const { id, value, placeholder, setValue, className, textarea, type, label, ...other } = props;
   const [isValid, setIsValid] = useState(true);
   const [focused, setFocused] = useState(false);
-  let classes = ['tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border hover:tw-border-primary-hover focus:tw-border-primary tw-outline-none', className];
+  let classes = ["tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border hover:tw-border-primary-hover focus:tw-border-primary tw-outline-none", className];
   if (!isValid) {
-    classes.push('tw-border-red-600');
+    classes.push("tw-border-red-600");
   }
 
   const onKeydown = (event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     event.stopPropagation();
-    if (event.key === 'Escape') {
+    if (event.key === "Escape") {
       event.currentTarget.blur();
     }
   };
@@ -140,14 +140,14 @@ export const ValidatedInput: React.FC<InputProps> = props => {
         />
         :
         <input
-          type={type ? type : 'text'}
+          type={type ? type : "text"}
           name={id}
           autoComplete={id}
           placeholder={focused ? undefined : placeholder}
           className={mergeClasses(classes)}
           onKeyDown={onKeydown}
           onFocus={() => { setIsValid(true); setFocused(true); }}
-          onChange={e => { e.target.type === 'number' ? props.setValue(parseInt(e.target.value)) : props.setValue(e.target.value); }}
+          onChange={e => { e.target.type === "number" ? props.setValue(parseInt(e.target.value)) : props.setValue(e.target.value); }}
           onBlur={() => { validateNotEmpty(value); setFocused(false); }}
           value={value ? value : ""}
           {...other}
@@ -180,7 +180,7 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = pro
   const [referenceElement, setReferenceElement] = useState<HTMLButtonElement | null>(null);
   const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(null);
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
-    strategy: 'fixed',
+    strategy: "fixed",
     modifiers: [sameWidth],
   });
 
@@ -218,7 +218,7 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = pro
         </Transition>
         <Listbox.Button
           ref={setReferenceElement}
-          className={mergeClasses("tw-flex tw-justify-center tw-items-center tw-w-96 tw-mt-5 tw-rounded-md tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 hover:tw-border-primary-hover aria-expanded:tw-border-primary", props.className, props.validated && !isValid && 'tw-border-red-600')}
+          className={mergeClasses("tw-flex tw-justify-center tw-items-center tw-w-96 tw-mt-5 tw-rounded-md tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 hover:tw-border-primary-hover aria-expanded:tw-border-primary", props.className, props.validated && !isValid && "tw-border-red-600")}
         >
           <div className={mergeClasses("tw-inline-block tw-w-[calc(100%-20px)] tw-truncate tw-overflow-none", !props.selected && "tw-text-slate-400")}>
             {value ? getElementForDisplay(props.selected) : props.placeholder}
@@ -274,12 +274,12 @@ const DropdownOptions: React.FC<DropdownOptionsProps> = props => {
       <>
         {props.options!.map((option: any, index: number) => (
           <Listbox.Option key={index} value={option} className={({ active, selected }) =>
-            `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-slate-100 tw-text-slate-900' : 'tw-text-slate-900'
+            `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${(active || selected) ? "tw-bg-slate-100 tw-text-slate-900" : "tw-text-slate-900"
             }`
           }>
             {({ selected }) => (
               <>
-                <span className={`tw-block tw-truncate ${selected ? 'tw-font-medium' : 'tw-font-normal'}`}>
+                <span className={`tw-block tw-truncate ${selected ? "tw-font-medium" : "tw-font-normal"}`}>
                   {props.getElementForDisplay(option)}
                 </span>
                 {selected ? (
@@ -321,18 +321,18 @@ type ValidatedComboInputProps = {
 
 export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => {
   const [isValid, setIsValid] = useState(true);
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
   const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(null);
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
-    strategy: 'fixed',
+    strategy: "fixed",
     modifiers: [sameWidth],
   });
 
   const getFilteredOptions = () => {
-    if (query === '') {
+    if (query === "") {
       return props.options;
     }
 
@@ -381,7 +381,7 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
             {props.label}
           </label>
         </Transition>
-        <div ref={setReferenceElement} className={mergeClasses("tw-flex tw-w-96 tw-mt-5 tw-rounded-md tw-bg-white tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 hover:tw-border-primary-hover focus-within:!tw-border-primary tw-transition tw-duration-100", props.className, props.validated && !isValid && 'tw-border-red-600')}>
+        <div ref={setReferenceElement} className={mergeClasses("tw-flex tw-w-96 tw-mt-5 tw-rounded-md tw-bg-white tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 hover:tw-border-primary-hover focus-within:!tw-border-primary tw-transition tw-duration-100", props.className, props.validated && !isValid && "tw-border-red-600")}>
           <Combobox.Input
             className={"tw-inline tw-bg-transparent tw-w-[calc(100%-20px)] tw-border-none tw-text-sm tw-leading-5 tw-text-slate-900 tw-outline-none tw-text-ellipsis tw-cursor-pointer focus:tw-cursor-text"}
             displayValue={selected => selected ? getElementForDisplay(selected) : ""}
@@ -409,7 +409,7 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
             leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
             leaveTo="tw-transform tw-opacity-0 tw-scale-95"
             beforeEnter={() => setFocused(true)}
-            afterLeave={() => { validateNotUndefined(props.selected); setQuery(''); setFocused(false); }}
+            afterLeave={() => { validateNotUndefined(props.selected); setQuery(""); setFocused(false); }}
           >
             <Combobox.Options className={mergeClasses("tw-absolute tw-z-20 tw-mt-1 tw-min-w-full tw-max-h-60 tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm", props.dropdownHeight)}>
               <ComboOptions loading={props.loading} options={filteredOptions} noOptionsString={props.noOptionsString} getElementForDisplay={getElementForDisplay} query={query} allowCustom={props.allowCustom} />
@@ -444,7 +444,7 @@ const ComboOptions: React.FC<ComboOptionsProps> = props => {
       <>
         {props.allowCustom && props.query.length > 0 && (
           <Combobox.Option value={props.query} className={({ active, selected }) =>
-            `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-slate-100 tw-text-slate-900' : 'tw-text-slate-900'
+            `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${(active || selected) ? "tw-bg-slate-100 tw-text-slate-900" : "tw-text-slate-900"
             }`
           }>
             Custom: "{props.query}"
@@ -452,12 +452,12 @@ const ComboOptions: React.FC<ComboOptionsProps> = props => {
         )}
         {props.options!.map((option: any, index: number) => (
           <Combobox.Option key={index} value={option} className={({ active, selected }) =>
-            `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-slate-100 tw-text-slate-900' : 'tw-text-slate-900'
+            `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${(active || selected) ? "tw-bg-slate-100 tw-text-slate-900" : "tw-text-slate-900"
             }`
           }>
             {({ selected }) => (
               <>
-                <span className={`tw-block tw-truncate ${selected ? 'tw-font-medium' : 'tw-font-normal'}`}>
+                <span className={`tw-block tw-truncate ${selected ? "tw-font-medium" : "tw-font-normal"}`}>
                   {props.getElementForDisplay(option)}
                 </span>
                 {selected ? (
@@ -478,7 +478,7 @@ const ComboOptions: React.FC<ComboOptionsProps> = props => {
         {props.allowCustom ?
           props.allowCustom && props.query.length > 0 && (
             <Combobox.Option value={props.query} className={({ active, selected }) =>
-              `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${(active || selected) ? 'tw-bg-slate-100 tw-text-slate-900' : 'tw-text-slate-900'
+              `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${(active || selected) ? "tw-bg-slate-100 tw-text-slate-900" : "tw-text-slate-900"
               }`
             }>
               Custom: "{props.query}"

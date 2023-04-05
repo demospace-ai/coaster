@@ -2,7 +2,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export interface IEndpoint<RequestType, ResponseType> {
   name: string;
-  method: 'GET' | 'POST' | 'DELETE' | 'PUT' | 'PATCH';
+  method: "GET" | "POST" | "DELETE" | "PUT" | "PATCH";
   path: string;
   track?: boolean;
   queryParams?: string[]; // These will be used as query params instead of being used as path params
@@ -10,196 +10,196 @@ export interface IEndpoint<RequestType, ResponseType> {
 }
 
 export const Login: IEndpoint<LoginRequest, LoginResponse> = {
-  name: 'Login',
-  method: 'POST',
-  path: '/login',
+  name: "Login",
+  method: "POST",
+  path: "/login",
   track: true,
 };
 
 export const GetAllUsers: IEndpoint<undefined, GetAllUsersResponse> = {
-  name: 'All Users Fetched',
-  method: 'GET',
-  path: '/users',
+  name: "All Users Fetched",
+  method: "GET",
+  path: "/users",
 };
 
 export const GetDestinations: IEndpoint<undefined, GetDestinationsResponse> = {
-  name: 'Destinations Fetched',
-  method: 'GET',
-  path: '/destinations',
+  name: "Destinations Fetched",
+  method: "GET",
+  path: "/destinations",
 };
 
 
 export const GetDestination: IEndpoint<{ destinationID: number; }, GetDestinationResponse> = {
-  name: 'Destination Fetched',
-  method: 'GET',
-  path: '/destination/:destinationID',
+  name: "Destination Fetched",
+  method: "GET",
+  path: "/destination/:destinationID",
 };
 
 export const GetSources: IEndpoint<undefined, GetSourcesResponse> = {
-  name: 'Sources Fetched',
-  method: 'GET',
-  path: '/sources',
+  name: "Sources Fetched",
+  method: "GET",
+  path: "/sources",
 };
 
 export const GetObjects: IEndpoint<undefined, GetObjectsResponse> = {
-  name: 'Objects Fetched',
-  method: 'GET',
-  path: '/objects',
+  name: "Objects Fetched",
+  method: "GET",
+  path: "/objects",
 };
 
 export const GetObject: IEndpoint<{ objectID: number; }, GetObjectResponse> = {
-  name: 'Object Fetched',
-  method: 'GET',
-  path: '/object/:objectID',
+  name: "Object Fetched",
+  method: "GET",
+  path: "/object/:objectID",
 };
 
 export const GetSyncs: IEndpoint<undefined, GetSyncsResponse> = {
-  name: 'Syncs Fetched',
-  method: 'GET',
-  path: '/syncs',
+  name: "Syncs Fetched",
+  method: "GET",
+  path: "/syncs",
 };
 
 export const GetSync: IEndpoint<{ syncID: number; }, GetSyncResponse> = {
-  name: 'Sync Fetched',
-  method: 'GET',
-  path: '/sync/:syncID',
+  name: "Sync Fetched",
+  method: "GET",
+  path: "/sync/:syncID",
   track: true,
 };
 
 export const GetNamespaces: IEndpoint<{ connectionID: number; }, GetNamespacesResponse> = {
-  name: 'Namespaces Fetched',
-  method: 'GET',
-  path: '/connection/namespaces',
-  queryParams: ['connectionID']
+  name: "Namespaces Fetched",
+  method: "GET",
+  path: "/connection/namespaces",
+  queryParams: ["connectionID"]
 };
 
 export const GetTables: IEndpoint<{ connectionID: number, namespace: string; }, GetTablesResponse> = {
-  name: 'Tables Fetched',
-  method: 'GET',
-  path: '/connection/tables',
-  queryParams: ['connectionID', 'namespace'],
+  name: "Tables Fetched",
+  method: "GET",
+  path: "/connection/tables",
+  queryParams: ["connectionID", "namespace"],
 };
 
 export const GetSchema: IEndpoint<GetSchemaRequest, GetSchemaResponse> = {
-  name: 'Schema Fetched',
-  method: 'GET',
-  path: '/connection/schema',
-  queryParams: ['connectionID', 'namespace', 'tableName', 'customJoin'],
+  name: "Schema Fetched",
+  method: "GET",
+  path: "/connection/schema",
+  queryParams: ["connectionID", "namespace", "tableName", "customJoin"],
 };
 
 export const LinkGetPreview: IEndpoint<LinkGetPreviewRequest, QueryResults> = {
-  name: 'Get Preview',
-  method: 'POST',
-  path: '/link/preview',
+  name: "Get Preview",
+  method: "POST",
+  path: "/link/preview",
 };
 
 export const LinkGetSources: IEndpoint<undefined, GetSourcesResponse> = {
-  name: 'Sources Fetched',
-  method: 'GET',
-  path: '/link/sources',
+  name: "Sources Fetched",
+  method: "GET",
+  path: "/link/sources",
 };
 
 export const LinkGetNamespaces: IEndpoint<{ sourceID: number; }, GetNamespacesResponse> = {
-  name: 'Namespaces Fetched',
-  method: 'GET',
-  path: '/link/namespaces',
-  queryParams: ['sourceID']
+  name: "Namespaces Fetched",
+  method: "GET",
+  path: "/link/namespaces",
+  queryParams: ["sourceID"]
 };
 
 export const LinkGetTables: IEndpoint<{ sourceID: number, namespace: string; }, GetTablesResponse> = {
-  name: 'Tables Fetched',
-  method: 'GET',
-  path: '/link/tables',
-  queryParams: ['sourceID', 'namespace'],
+  name: "Tables Fetched",
+  method: "GET",
+  path: "/link/tables",
+  queryParams: ["sourceID", "namespace"],
 };
 
 export const LinkGetSchema: IEndpoint<LinkGetSchemaRequest, GetSchemaResponse> = {
-  name: 'Schema Fetched',
-  method: 'GET',
-  path: '/link/schema',
-  queryParams: ['sourceID', 'namespace', 'tableName', 'customJoin'],
+  name: "Schema Fetched",
+  method: "GET",
+  path: "/link/schema",
+  queryParams: ["sourceID", "namespace", "tableName", "customJoin"],
 };
 
 export const GetApiKey: IEndpoint<undefined, string> = {
-  name: 'API Key Fetched',
-  method: 'GET',
-  path: '/api_key',
+  name: "API Key Fetched",
+  method: "GET",
+  path: "/api_key",
   noJson: true,
 };
 
 export const CheckSession: IEndpoint<undefined, CheckSessionResponse> = {
-  name: 'Session Checked',
-  method: 'GET',
-  path: '/check_session',
+  name: "Session Checked",
+  method: "GET",
+  path: "/check_session",
 };
 
 export const Logout: IEndpoint<undefined, undefined> = {
-  name: 'Logout',
-  method: 'DELETE',
-  path: '/logout',
+  name: "Logout",
+  method: "DELETE",
+  path: "/logout",
   track: true,
 };
 
 export const SetOrganization: IEndpoint<SetOrganizationRequest, SetOrganizationResponse> = {
-  name: 'Organization Set',
-  method: 'POST',
-  path: '/organization',
+  name: "Organization Set",
+  method: "POST",
+  path: "/organization",
   track: true,
 };
 
 export const TestDataConnection: IEndpoint<TestDataConnectionRequest, undefined> = {
-  name: 'Test Data Connection',
-  method: 'POST',
-  path: '/connection/test',
+  name: "Test Data Connection",
+  method: "POST",
+  path: "/connection/test",
 };
 
 export const GetFieldValues: IEndpoint<GetFieldValuesRequest, GetFieldValuesResponse> = {
-  name: 'Field Values Fetched',
-  method: 'GET',
-  path: '/connection/field_values',
-  queryParams: ['connectionID', 'namespace', 'tableName', 'fieldName'],
+  name: "Field Values Fetched",
+  method: "GET",
+  path: "/connection/field_values",
+  queryParams: ["connectionID", "namespace", "tableName", "fieldName"],
   track: true,
 };
 
 export const CreateDestination: IEndpoint<CreateDestinationRequest, undefined> = {
-  name: 'Destination Created',
-  method: 'POST',
-  path: '/destination',
+  name: "Destination Created",
+  method: "POST",
+  path: "/destination",
   track: true,
 };
 
 export const LinkCreateSource: IEndpoint<LinkCreateSourceRequest, CreateSourceResponse> = {
-  name: 'Source Created',
-  method: 'POST',
-  path: '/link/source',
+  name: "Source Created",
+  method: "POST",
+  path: "/link/source",
   track: true,
 };
 
 export const LinkCreateSync: IEndpoint<LinkCreateSyncRequest, CreateSyncResponse> = {
-  name: 'Sync Created',
-  method: 'POST',
-  path: '/link/sync',
+  name: "Sync Created",
+  method: "POST",
+  path: "/link/sync",
   track: true,
 };
 
 export const LinkGetSyncs: IEndpoint<undefined, GetSyncsResponse> = {
-  name: 'Syncs Fetched',
-  method: 'GET',
-  path: '/link/syncs',
+  name: "Syncs Fetched",
+  method: "GET",
+  path: "/link/syncs",
   track: true,
 };
 
 export const LinkGetSync: IEndpoint<{ syncID: number; }, GetSyncResponse> = {
-  name: 'Sync Fetched',
-  method: 'GET',
-  path: '/link/sync/:syncID',
+  name: "Sync Fetched",
+  method: "GET",
+  path: "/link/sync/:syncID",
   track: true,
 };
 
 export const CreateObject: IEndpoint<CreateObjectRequest, undefined> = {
-  name: 'Object Created',
-  method: 'POST',
-  path: '/object',
+  name: "Object Created",
+  method: "POST",
+  path: "/object",
   track: true,
 };
 
@@ -210,6 +210,7 @@ export interface TestDataConnectionRequest {
   snowflake_config?: SnowflakeConfig;
   mongodb_config?: MongoDbConfig;
   redshift_config?: RedshiftConfig;
+  synapse_config?: SynapseConfig;
   webhook_config?: WebhookConfig;
 }
 
@@ -220,6 +221,7 @@ export interface CreateDestinationRequest {
   snowflake_config?: SnowflakeConfig;
   redshift_config?: RedshiftConfig;
   mongodb_config?: MongoDbConfig;
+  synapse_config?: SynapseConfig;
   webhook_config?: WebhookConfig;
 }
 
@@ -229,6 +231,7 @@ export interface LinkCreateSourceRequest {
   bigquery_config?: BigQueryConfig;
   snowflake_config?: SnowflakeConfig;
   redshift_config?: RedshiftConfig;
+  synapse_config?: SynapseConfig;
   mongodb_config?: MongoDbConfig;
 }
 
@@ -312,6 +315,13 @@ export interface RedshiftConfig {
   endpoint: string;
 }
 
+export interface SynapseConfig {
+  username: string;
+  password: string;
+  database_name: string;
+  endpoint: string;
+}
+
 export interface MongoDbConfig {
   username: string;
   password: string;
@@ -352,7 +362,7 @@ export interface CreateSyncResponse {
 export interface GetSyncsResponse {
   syncs: Sync[];
   sources: Source[];
-  objects: Object[];
+  objects: FabraObject[];
 }
 
 export interface GetSyncResponse {
@@ -372,7 +382,7 @@ export interface JSONObject {
   [x: string]: JSONValue;
 }
 
-export interface JSONArray extends Array<JSONValue> { };
+export interface JSONArray extends Array<JSONValue> { }
 
 export interface ResultRow extends Array<string | number> { }
 
@@ -443,14 +453,14 @@ export interface GetSourcesResponse {
 }
 
 export interface GetObjectsResponse {
-  objects: Object[];
+  objects: FabraObject[];
 }
 
 export interface GetObjectResponse {
-  object: Object;
+  object: FabraObject;
 }
 
-export interface Object {
+export interface FabraObject {
   id: number;
   display_name: string;
   destination_id: number;
@@ -532,6 +542,7 @@ export enum ConnectionType {
   Snowflake = "snowflake",
   Redshift = "redshift",
   MongoDb = "mongodb",
+  Synapse = "synapse",
   Webhook = "webhook",
 }
 
@@ -576,7 +587,7 @@ export enum SyncMode {
 }
 
 export const needsCursorField = (syncMode: SyncMode): boolean => {
-  // no default so it isn't possible to add a new mode without updating
+  // no default so it isn"t possible to add a new mode without updating
   switch (syncMode) {
     case SyncMode.FullOverwrite:
       return false;
@@ -588,7 +599,7 @@ export const needsCursorField = (syncMode: SyncMode): boolean => {
 };
 
 export const needsPrimaryKey = (syncMode: SyncMode): boolean => {
-  // no default so it isn't possible to add a new mode without updating
+  // no default so it isn"t possible to add a new mode without updating
   switch (syncMode) {
     case SyncMode.FullOverwrite:
       return false;
@@ -623,6 +634,8 @@ export function getConnectionType(connectionType: ConnectionType): string {
       return "Redshift";
     case ConnectionType.MongoDb:
       return "MongoDB";
+    case ConnectionType.Synapse:
+      return "Synapse";
     case ConnectionType.Webhook:
       return "Webhook";
   }

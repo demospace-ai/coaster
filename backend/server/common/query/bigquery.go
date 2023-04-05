@@ -89,7 +89,7 @@ func (ac BigQueryApiClient) GetTables(ctx context.Context, namespace string) ([]
 }
 
 func (ac BigQueryApiClient) GetSchema(ctx context.Context, namespace string, tableName string) (data.Schema, error) {
-	queryString := "SELECT * FROM " + namespace + ".INFORMATION_SCHEMA.COLUMNS WHERE table_name = '" + tableName + "'"
+	queryString := fmt.Sprintf("SELECT * FROM %s.INFORMATION_SCHEMA.COLUMNS WHERE table_name = '%s'", namespace, tableName)
 
 	queryResults, err := ac.RunQuery(ctx, queryString)
 	if err != nil {

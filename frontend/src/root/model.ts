@@ -1,9 +1,9 @@
-import { configureStore } from '@reduxjs/toolkit';
-import { Dispatch } from 'react';
-import { createSelectorHook, useDispatch as useReactDispatch } from 'react-redux';
-import { combineReducers } from 'redux';
-import { AppAction, appReducer, AppState } from 'src/app/model';
-import { LoginAction, loginReducer, LoginState } from 'src/pages/login/model';
+import { configureStore } from "@reduxjs/toolkit";
+import { Dispatch } from "react";
+import { createSelectorHook, useDispatch as useReactDispatch } from "react-redux";
+import { combineReducers } from "redux";
+import { AppAction, appReducer, AppState } from "src/app/model";
+import { LoginAction, loginReducer, LoginState } from "src/pages/login/model";
 
 
 export type RootAction = AppAction | LoginAction;

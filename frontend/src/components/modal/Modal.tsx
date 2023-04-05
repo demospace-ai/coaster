@@ -1,5 +1,5 @@
-import classNames from 'classnames';
-import { useEffect } from 'react';
+import classNames from "classnames";
+import { useEffect } from "react";
 
 interface ModalProps {
   show: boolean;
@@ -13,15 +13,15 @@ interface ModalProps {
 export const Modal: React.FC<ModalProps> = props => {
   useEffect(() => {
     const escFunction = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         if (props.close) {
           props.close();
         }
-        document.removeEventListener('keydown', escFunction);
+        document.removeEventListener("keydown", escFunction);
       }
     };
 
-    document.addEventListener('keydown', escFunction);
+    document.addEventListener("keydown", escFunction);
   });
 
   const showHideClassName = props.show ? "tw-block" : "tw-hidden";

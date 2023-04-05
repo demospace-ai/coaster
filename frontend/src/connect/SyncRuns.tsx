@@ -27,14 +27,14 @@ const SyncRunsList: React.FC<{ linkToken: string; }> = ({ linkToken }) => {
 
   return (
     <div className="tw-pb-24 tw-px-20 tw-overflow-auto">
-      <div className='tw-mt-2 tw-h-full tw-w-full'>
+      <div className="tw-mt-2 tw-h-full tw-w-full">
         <div className="tw-flex tw-w-full tw-mb-8">
           <div className="tw-flex tw-flex-row tw-items-center tw-font-bold tw-text-xl">
             Sync Runs • {sync?.sync.display_name}
             <div className="hover:tw-bg-slate-200 tw-p-1 tw-rounded tw-ml-2 tw-cursor-pointer"><PencilIcon className="tw-h-4"></PencilIcon></div>
           </div>
         </div>
-        <div className='tw-shadow tw-ring-1 tw-ring-black tw-ring-opacity-5 tw-rounded-md tw-overflow-auto tw-overscroll-contain tw-w-full tw-max-h-[420px]' >
+        <div className="tw-shadow tw-ring-1 tw-ring-black tw-ring-opacity-5 tw-rounded-md tw-overflow-auto tw-overscroll-contain tw-w-full tw-max-h-[420px]" >
           {sync
             ?
             <table className="tw-min-w-full tw-border-spacing-0 tw-divide-y tw-divide-slate-200">
@@ -44,7 +44,7 @@ const SyncRunsList: React.FC<{ linkToken: string; }> = ({ linkToken }) => {
                   <th scope="col" className={tableHeaderStyle}>Started At</th>
                   <th scope="col" className={tableHeaderStyle}>Rows Synced</th>
                   <th scope="col" className={tableHeaderStyle}>Error</th>
-                  <th scope="col" className={classNames(tableHeaderStyle, 'tw-w-5')}></th>
+                  <th scope="col" className={classNames(tableHeaderStyle, "tw-w-5")}></th>
                 </tr>
               </thead>
               <tbody className="tw-divide-y tw-divide-slate-200 tw-bg-white">
@@ -96,10 +96,10 @@ const SyncRunsList: React.FC<{ linkToken: string; }> = ({ linkToken }) => {
 const Header: React.FC<{ close: () => void; }> = ({ close }) => {
   const navigate = useNavigate();
   return (
-    <div className='tw-flex tw-flex-row tw-items-center tw-w-full tw-h-20 tw-min-h-[80px]'>
+    <div className="tw-flex tw-flex-row tw-items-center tw-w-full tw-h-20 tw-min-h-[80px]">
       <BackButton className="tw-absolute tw-left-10" onClick={() => { navigate("/"); }} />
       <button className="tw-absolute tw-flex tw-items-center t tw-right-10 tw-border-none tw-cursor-pointer tw-p-0" onClick={close}>
-        <svg className='tw-h-6 tw-fill-slate-500' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+        <svg className="tw-h-6 tw-fill-slate-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
           <path d="M5.1875 15.6875L4.3125 14.8125L9.125 10L4.3125 5.1875L5.1875 4.3125L10 9.125L14.8125 4.3125L15.6875 5.1875L10.875 10L15.6875 14.8125L14.8125 15.6875L10 10.875L5.1875 15.6875Z" />
         </svg>
       </button>

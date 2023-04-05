@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"go.fabra.io/server/common/auth"
@@ -83,9 +84,12 @@ func getPreviewQuery(connectionType models.ConnectionType, namespace string, tab
 	case models.ConnectionTypeRedshift:
 		fallthrough
 	case models.ConnectionTypeSnowflake:
-		queryStr := "SELECT * FROM " + namespace + "." + tableName + " LIMIT 100;"
+		queryStr := fmt.Sprintf("SELECT * FROM %s.%s LIMIT 100;", namespace, tableName)
+		return &queryStr, nil
+	case models.ConnectionTypeSynapse:
+		queryStr := fmt.Sprintf("SELECT TOP(100) * FROM %s.%s;", namespace, tableName)
 		return &queryStr, nil
 	default:
-		return nil, errors.New("unexpected connection type")
+		return nil, errors.Newf("unexpected connection type: %s", connectionType)
 	}
 }
