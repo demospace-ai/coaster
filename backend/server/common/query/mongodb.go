@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"go.fabra.io/server/common/data"
 	"go.mongodb.org/mongo-driver/bson"
@@ -387,21 +388,22 @@ func convertMongoDbSchema(fieldTypes map[string]string) data.Schema {
 }
 
 func getMongoDbFieldType(mongoDbType string) data.FieldType {
-	switch mongoDbType {
-	case "int", "int32", "long":
+	uppercased := strings.ToUpper(mongoDbType)
+	switch uppercased {
+	case "INT", "INT32", "LONG":
 		return data.FieldTypeInteger
-	case "date", "datetime":
+	case "DATE", "DATETIME":
 		// MongoDB dates/datetimes are in UTC
 		return data.FieldTypeDateTimeTz
-	case "timestamp":
+	case "TIMESTAMP":
 		return data.FieldTypeTimestamp
-	case "decimal", "double", "float64":
+	case "DECIMAL", "DOUBLE", "FLOAT64":
 		return data.FieldTypeNumber
-	case "array":
+	case "ARRAY":
 		return data.FieldTypeArray
-	case "object":
+	case "OBJECT":
 		return data.FieldTypeJson
-	case "bool":
+	case "BOOL":
 		return data.FieldTypeBoolean
 	default:
 		return data.FieldTypeString

@@ -49,7 +49,7 @@ func (rs RedshiftImpl) Read(
 	}
 
 	currentIndex := 0
-	rowBatch := make([]data.Row, READ_BATCH_SIZE)
+	var rowBatch []data.Row
 	var lastRow data.Row
 	for {
 		row, err := iterator.Next(ctx)
@@ -62,13 +62,19 @@ func (rs RedshiftImpl) Read(
 			}
 		}
 
-		rowBatch[currentIndex] = row
+		rowBatch = append(rowBatch, row)
 		lastRow = row
 		currentIndex++
 		if currentIndex == READ_BATCH_SIZE {
 			rowsC <- rowBatch
 			currentIndex = 0
+			rowBatch = []data.Row{}
 		}
+	}
+
+	// write any remaining roows
+	if currentIndex > 0 {
+		rowsC <- rowBatch
 	}
 
 	newCursorPosition := rs.getNewCursorPosition(lastRow, iterator.Schema(), sync)
@@ -122,15 +128,27 @@ func (rs RedshiftImpl) getNewCursorPosition(lastRow data.Row, schema data.Schema
 	}
 
 	var cursorFieldPos int
+	var cursorFieldType data.FieldType
 	for i := range schema {
 		if schema[i].Name == *sync.SourceCursorField {
 			cursorFieldPos = i
+			cursorFieldType = schema[i].Type
 		}
 	}
 
 	// TODO: make sure we don't miss any rows
 	// we sort rows by cursor field so just take the last row
-	newCursorPos := lastRow[cursorFieldPos].(string)
+	var newCursorPos string
+	switch cursorFieldType {
+	case data.FieldTypeInteger,
+		data.FieldTypeDate,
+		data.FieldTypeDateTimeTz,
+		data.FieldTypeDateTimeNtz:
+		newCursorPos = fmt.Sprintf("%v", lastRow[cursorFieldPos])
+	default:
+		newCursorPos = fmt.Sprintf("'%v'", lastRow[cursorFieldPos])
+	}
+
 	return &newCursorPos
 }
 

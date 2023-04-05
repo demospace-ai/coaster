@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -28,12 +29,19 @@ type redshiftIterator struct {
 
 func (it *redshiftIterator) Next(_ context.Context) (data.Row, error) {
 	if it.queryResult.Next() {
-		var row []any
-		err := it.queryResult.Scan(&row)
+		numColumns := len(it.schema)
+		values := make([]any, numColumns)
+		valuePtrs := make([]any, numColumns)
+		for i := 0; i < numColumns; i++ {
+			valuePtrs[i] = &values[i]
+		}
+
+		err := it.queryResult.Scan(valuePtrs...)
 		if err != nil {
 			return nil, err
 		}
-		return convertRedshiftRow(row, it.schema), nil
+
+		return convertRedshiftRow(values, it.schema), nil
 	}
 
 	defer it.queryResult.Close()
@@ -193,7 +201,8 @@ func (rc RedshiftApiClient) GetQueryIterator(ctx context.Context, queryString st
 }
 
 func getRedshiftFieldType(redshiftType string) data.FieldType {
-	switch redshiftType {
+	uppercased := strings.ToUpper(redshiftType)
+	switch uppercased {
 	case "BOOL", "BOOLEAN":
 		return data.FieldTypeBoolean
 	case "INT", "INT2", "INT4", "INT8", "BIGINT":
@@ -206,6 +215,10 @@ func getRedshiftFieldType(redshiftType string) data.FieldType {
 		return data.FieldTypeDateTimeTz
 	case "TIMESTAMP", "TIMESTAMP WITHOUT TIME ZONE":
 		return data.FieldTypeDateTimeNtz
+	case "TIME", "TIME WITHOUT TIME ZONE":
+		return data.FieldTypeTimeNtz
+	case "TIMETZ", "TIME WITH TIME ZONE":
+		return data.FieldTypeTimeTz
 	case "":
 		// Objects from Redshift will have an empty type
 		return data.FieldTypeJson

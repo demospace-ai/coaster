@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	_ "github.com/microsoft/go-mssqldb"
 	"go.fabra.io/server/common/data"
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/models"
@@ -12,17 +13,17 @@ import (
 	"go.fabra.io/server/common/views"
 )
 
-type SnowflakeImpl struct {
+type SynapseImpl struct {
 	queryService query.QueryService
 }
 
-func NewSnowflakeConnector(queryService query.QueryService) Connector {
-	return SnowflakeImpl{
+func NewSynapseConnector(queryService query.QueryService) Connector {
+	return SynapseImpl{
 		queryService: queryService,
 	}
 }
 
-func (sf SnowflakeImpl) Read(
+func (as SynapseImpl) Read(
 	ctx context.Context,
 	sourceConnection views.FullConnection,
 	sync views.Sync,
@@ -33,15 +34,14 @@ func (sf SnowflakeImpl) Read(
 ) {
 	connectionModel := views.ConvertConnectionView(sourceConnection)
 
-	sc, err := sf.queryService.GetClient(ctx, connectionModel)
+	sc, err := as.queryService.GetClient(ctx, connectionModel)
 	if err != nil {
 		errC <- err
 		return
 	}
+	sourceClient := sc.(query.SynapseApiClient)
 
-	sourceClient := sc.(query.SnowflakeApiClient)
-
-	readQuery := sf.getReadQuery(connectionModel, sync, fieldMappings)
+	readQuery := as.getReadQuery(connectionModel, sync, fieldMappings)
 
 	iterator, err := sourceClient.GetQueryIterator(ctx, readQuery)
 	if err != nil {
@@ -78,7 +78,7 @@ func (sf SnowflakeImpl) Read(
 		rowsC <- rowBatch
 	}
 
-	newCursorPosition := sf.getNewCursorPosition(lastRow, iterator.Schema(), sync)
+	newCursorPosition := as.getNewCursorPosition(lastRow, iterator.Schema(), sync)
 	readOutputC <- ReadOutput{
 		CursorPosition: newCursorPosition,
 	}
@@ -88,18 +88,18 @@ func (sf SnowflakeImpl) Read(
 }
 
 // TODO: only read 10,000 rows at once or something
-func (sf SnowflakeImpl) getReadQuery(sourceConnection *models.Connection, sync views.Sync, fieldMappings []views.FieldMapping) string {
+func (as SynapseImpl) getReadQuery(sourceConnection *models.Connection, sync views.Sync, fieldMappings []views.FieldMapping) string {
 	var queryString string
 	if sync.CustomJoin != nil {
 		queryString = *sync.CustomJoin
 	} else {
-		selectString := sf.getSelectString(fieldMappings)
+		selectString := as.getSelectString(fieldMappings)
 		queryString = fmt.Sprintf("SELECT %s FROM %s.%s", selectString, *sync.Namespace, *sync.TableName)
 	}
 
 	if sync.SyncMode.UsesCursor() {
 		if sync.CursorPosition != nil {
-			// TODO: allow choosing other operators (rows smaller than current cursor)
+			// TODO: allow choosing other operatoas (rows smaller than current cursor)
 			// order by cursor field to simplify
 			return fmt.Sprintf("%s WHERE %s > %s ORDER BY %s ASC;", queryString, *sync.SourceCursorField, *sync.CursorPosition, *sync.SourceCursorField)
 		} else {
@@ -110,7 +110,7 @@ func (sf SnowflakeImpl) getReadQuery(sourceConnection *models.Connection, sync v
 	}
 }
 
-func (sf SnowflakeImpl) getSelectString(fieldMappings []views.FieldMapping) string {
+func (as SynapseImpl) getSelectString(fieldMappings []views.FieldMapping) string {
 	fields := []string{}
 	for _, fieldMapping := range fieldMappings {
 		fields = append(fields, fieldMapping.SourceFieldName)
@@ -119,7 +119,7 @@ func (sf SnowflakeImpl) getSelectString(fieldMappings []views.FieldMapping) stri
 	return strings.Join(fields, ",")
 }
 
-func (sf SnowflakeImpl) getNewCursorPosition(lastRow data.Row, schema data.Schema, sync views.Sync) *string {
+func (as SynapseImpl) getNewCursorPosition(lastRow data.Row, schema data.Schema, sync views.Sync) *string {
 	if sync.SourceCursorField == nil {
 		return nil
 	}
@@ -150,7 +150,7 @@ func (sf SnowflakeImpl) getNewCursorPosition(lastRow data.Row, schema data.Schem
 	return &newCursorPos
 }
 
-func (sf SnowflakeImpl) Write(
+func (as SynapseImpl) Write(
 	ctx context.Context,
 	destinationConnection views.FullConnection,
 	destinationOptions DestinationOptions,
@@ -161,5 +161,5 @@ func (sf SnowflakeImpl) Write(
 	writeOutputC chan<- WriteOutput,
 	errC chan<- error,
 ) {
-	errC <- errors.New("snowflake destination not implemented")
+	errC <- errors.New("synapse destination not implemented")
 }

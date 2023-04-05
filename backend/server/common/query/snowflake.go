@@ -35,12 +35,19 @@ type snowflakeIterator struct {
 
 func (it *snowflakeIterator) Next(_ context.Context) (data.Row, error) {
 	if it.queryResult.Next() {
-		var row []any
-		err := it.queryResult.Scan(&row)
+		numColumns := len(it.schema)
+		values := make([]any, numColumns)
+		valuePtrs := make([]any, numColumns)
+		for i := 0; i < numColumns; i++ {
+			valuePtrs[i] = &values[i]
+		}
+
+		err := it.queryResult.Scan(valuePtrs...)
 		if err != nil {
 			return nil, err
 		}
-		return convertSnowflakeRow(row, it.schema), nil
+
+		return convertSnowflakeRow(values, it.schema), nil
 	}
 
 	defer it.queryResult.Close()
@@ -278,7 +285,8 @@ func convertSnowflakeValue(snowflakeValue any, fieldType data.FieldType) any {
 }
 
 func getSnowflakeFieldType(snowflakeType string) data.FieldType {
-	switch snowflakeType {
+	uppercased := strings.ToUpper(snowflakeType)
+	switch uppercased {
 	case "BIT", "BOOLEAN":
 		return data.FieldTypeBoolean
 	case "INTEGER", "BIGINT", "SMALLINT", "TINYINT":

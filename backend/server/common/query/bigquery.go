@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/bigquery"
@@ -345,7 +346,8 @@ func convertBigQueryValue(bigqueryValue any, fieldType bigquery.FieldType) any {
 }
 
 func getBigQueryFieldType(bigQueryType string) data.FieldType {
-	switch bigQueryType {
+	uppercased := strings.ToUpper(bigQueryType)
+	switch uppercased {
 	case "INTEGER", "INT64":
 		return data.FieldTypeInteger
 	case "FLOAT", "NUMERIC", "BIGNUMERIC":

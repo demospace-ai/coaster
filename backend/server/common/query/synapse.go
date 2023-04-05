@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/url"
+	"strings"
 	"time"
 
 	"go.fabra.io/server/common/data"
@@ -25,12 +26,18 @@ type synapseIterator struct {
 
 func (it *synapseIterator) Next(_ context.Context) (data.Row, error) {
 	if it.queryResult.Next() {
-		var row []any
-		err := it.queryResult.Scan(&row)
+		numColumns := len(it.schema)
+		values := make([]any, numColumns)
+		valuePtrs := make([]any, numColumns)
+		for i := 0; i < numColumns; i++ {
+			valuePtrs[i] = &values[i]
+		}
+
+		err := it.queryResult.Scan(valuePtrs...)
 		if err != nil {
 			return nil, err
 		}
-		return convertSynapseRow(row, it.schema), nil
+		return convertSynapseRow(values, it.schema), nil
 	}
 
 	defer it.queryResult.Close()
@@ -226,7 +233,8 @@ func convertSynapseValue(synapseValue any, fieldType data.FieldType) any {
 }
 
 func getSynapseFieldType(synapseType string) data.FieldType {
-	switch synapseType {
+	uppercased := strings.ToUpper(synapseType)
+	switch uppercased {
 	case "BIT":
 		return data.FieldTypeBoolean
 	case "INT", "BIGINT", "SMALLINT", "TINYINT":

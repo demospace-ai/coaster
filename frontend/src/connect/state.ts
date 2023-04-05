@@ -220,7 +220,6 @@ export const validateSyncSetup = (state: SetupSyncState): boolean => {
     && state.fieldMappings !== undefined;
 };
 
-
 export const createNewSync = async (
   linkToken: string,
   state: SetupSyncState,
