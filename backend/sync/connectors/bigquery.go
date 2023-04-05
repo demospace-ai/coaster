@@ -199,17 +199,19 @@ func (bq BigQueryImpl) Write(
 		batchNum++
 	}
 
-	writeMode := bq.toBigQueryWriteMode(sync.SyncMode)
-	orderedObjectFields := bq.createOrderedObjectFields(object.ObjectFields, fieldMappings)
-	csvSchema := bq.createCsvSchema(object.EndCustomerIdField, orderedObjectFields)
-	err = destClient.LoadFromStaging(ctx, *object.Namespace, *object.TableName, query.LoadOptions{
-		GcsReference:   gcsReference,
-		BigQuerySchema: csvSchema,
-		WriteMode:      writeMode,
-	})
-	if err != nil {
-		errC <- errors.NewCustomerVisibleError(err)
-		return
+	if rowsWritten > 0 {
+		writeMode := bq.toBigQueryWriteMode(sync.SyncMode)
+		orderedObjectFields := bq.createOrderedObjectFields(object.ObjectFields, fieldMappings)
+		csvSchema := bq.createCsvSchema(object.EndCustomerIdField, orderedObjectFields)
+		err = destClient.LoadFromStaging(ctx, *object.Namespace, *object.TableName, query.LoadOptions{
+			GcsReference:   gcsReference,
+			BigQuerySchema: csvSchema,
+			WriteMode:      writeMode,
+		})
+		if err != nil {
+			errC <- errors.NewCustomerVisibleError(err)
+			return
+		}
 	}
 
 	writeOutputC <- WriteOutput{
