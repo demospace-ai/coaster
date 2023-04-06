@@ -2,7 +2,6 @@ package query
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -23,21 +22,22 @@ type MongoDbApiClient struct {
 }
 
 type MongoQuery struct {
-	Database   string              `json:"database"`
-	Collection string              `json:"collection"`
-	Filter     bson.D              `json:"filter"`
-	Options    options.FindOptions `json:"options"`
+	Database   string               `json:"database"`
+	Collection string               `json:"collection"`
+	Filter     bson.D               `json:"filter"`
+	Options    *options.FindOptions `json:"options"`
 }
 
 type mongoDbIterator struct {
 	schema data.Schema
 	cursor *mongo.Cursor
+	client *mongo.Client
 }
 
 func (it *mongoDbIterator) Next(ctx context.Context) (data.Row, error) {
 	if it.cursor.Next(ctx) {
 		var row bson.D
-		err := it.cursor.Decode(row)
+		err := it.cursor.Decode(&row)
 		if err != nil {
 			return nil, err
 		}
@@ -46,6 +46,7 @@ func (it *mongoDbIterator) Next(ctx context.Context) (data.Row, error) {
 	}
 
 	defer it.cursor.Close(ctx)
+	defer it.client.Disconnect(ctx)
 	err := it.cursor.Err()
 	if err != nil {
 		return nil, err
@@ -137,7 +138,7 @@ func (mc MongoDbApiClient) RunQuery(ctx context.Context, queryString string, arg
 	defer client.Disconnect(ctx)
 
 	var mongoQuery MongoQuery
-	err = json.Unmarshal([]byte(queryString), &mongoQuery)
+	err = bson.Unmarshal([]byte(queryString), &mongoQuery)
 	if err != nil {
 		return nil, err
 	}
@@ -158,7 +159,7 @@ func (mc MongoDbApiClient) RunQuery(ctx context.Context, queryString string, arg
 	cursor, err := collection.Find(
 		ctx,
 		mongoQuery.Filter,
-		&mongoQuery.Options,
+		mongoQuery.Options,
 	)
 	if err != nil {
 		return nil, err
@@ -188,10 +189,9 @@ func (mc MongoDbApiClient) GetQueryIterator(ctx context.Context, queryString str
 	if err != nil {
 		return nil, err
 	}
-	defer client.Disconnect(ctx)
 
 	var mongoQuery MongoQuery
-	err = json.Unmarshal([]byte(queryString), &mongoQuery)
+	err = bson.Unmarshal([]byte(queryString), &mongoQuery)
 	if err != nil {
 		return nil, err
 	}
@@ -212,12 +212,11 @@ func (mc MongoDbApiClient) GetQueryIterator(ctx context.Context, queryString str
 	cursor, err := collection.Find(
 		ctx,
 		mongoQuery.Filter,
-		&mongoQuery.Options,
+		mongoQuery.Options,
 	)
 	if err != nil {
 		return nil, err
 	}
-	defer cursor.Close(ctx)
 
 	schema := <-schemaC
 	err = <-errC
@@ -228,6 +227,7 @@ func (mc MongoDbApiClient) GetQueryIterator(ctx context.Context, queryString str
 	return &mongoDbIterator{
 		schema: schema,
 		cursor: cursor,
+		client: client,
 	}, nil
 }
 
@@ -349,8 +349,9 @@ func convertMongoDbRow(mongoDbRow bson.D, schema data.Schema) data.Row {
 	}
 
 	// make sure every result is in the same order by looping through schema
-	row := make(data.Row, len(mongoDbRow))
+	row := make(data.Row, len(schema))
 	for i, field := range schema {
+		// if the value is missing, the map will return nil because that is the default value for "any"
 		value := convertMongoDbValue(valueMap[field.Name], field.Type)
 		row[i] = value
 	}
@@ -443,4 +444,14 @@ func ToArray(bsonArray bson.A) []any {
 	}
 
 	return output
+}
+
+func CreateMongoQueryString(mongoQuery MongoQuery) string {
+	mongoQueryBytes, err := bson.Marshal(mongoQuery)
+	if err != nil {
+		// this should never happen anyway so just panic
+		panic(err)
+	}
+
+	return string(mongoQueryBytes)
 }

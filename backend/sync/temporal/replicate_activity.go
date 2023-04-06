@@ -102,6 +102,8 @@ func getSourceConnector(connectionType models.ConnectionType, queryService query
 		return connectors.NewRedshiftConnector(queryService), nil
 	case models.ConnectionTypeSynapse:
 		return connectors.NewSynapseConnector(queryService), nil
+	case models.ConnectionTypeMongoDb:
+		return connectors.NewMongoDbConnector(queryService), nil
 	default:
 		return nil, errors.Newf("source not implemented for %s", connectionType)
 	}

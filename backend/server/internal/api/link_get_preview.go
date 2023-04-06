@@ -69,16 +69,11 @@ func getPreviewQuery(connectionType models.ConnectionType, namespace string, tab
 			Database:   namespace,
 			Collection: tableName,
 			Filter:     bson.D{},
-			Options:    *options.Find().SetLimit(100),
+			Options:    options.Find().SetLimit(100),
 		}
 
-		mongoQueryBytes, err := json.Marshal(mongoQuery)
-		if err != nil {
-			return nil, err
-		}
-
-		mongoQueryStr := string(mongoQueryBytes)
-		return &mongoQueryStr, nil
+		queryString := query.CreateMongoQueryString(mongoQuery)
+		return &queryString, nil
 	case models.ConnectionTypeBigQuery:
 		fallthrough
 	case models.ConnectionTypeRedshift:

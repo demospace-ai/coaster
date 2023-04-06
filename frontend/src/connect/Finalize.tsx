@@ -85,7 +85,7 @@ export const FinalizeSync: React.FC<SetupSyncProps> = (props) => {
         <ValidatedDropdownInput className="tw-w-96" options={Object.values(FrequencyUnits)} selected={props.state.frequencyUnits} setSelected={value => props.setState({ ...props.state, frequencyUnits: value })} loading={false} placeholder="Frequency Units" noOptionsString="nil" label="Frequency Unit" getElementForDisplay={(value) => value.charAt(0).toUpperCase() + value.slice(1)} />
         <div className="tw-pb-52"></div>
       </div>
-    </div >
+    </div>
   );
 };
 
