@@ -2,6 +2,7 @@ import classNames from "classnames";
 import React, { FormEvent, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, FormButton } from "src/components/button/Button";
+import longlogo from "src/components/images/long-logo.svg";
 import mail from "src/components/images/mail.svg";
 import { LogoLoading } from "src/components/loading/LogoLoading";
 import {
@@ -59,18 +60,23 @@ export const Login: React.FC = () => {
 
   return (
     <div className="tw-flex tw-flex-row tw-h-full tw-bg-slate-100">
-      <div className="tw-mt-48 tw-mb-auto tw-mx-auto tw-w-[400px] tw-py-20 tw-px-8 tw-rounded-lg tw-shadow-md tw-bg-white">
-        <div className="tw-font-[Montserrat] tw-select-none tw-text-3xl tw-font-bold tw-mb-5 tw-text-center">fabra</div>
-        <div className="tw-text-center tw-my-2">
-          {unauthorized ?
-            <div className="tw-flex tw-flex-col tw-justify-center">
-              <div>
-                You don"t have access to Fabra yet. Contact us at <a className="tw-text-blue-500" href="mailto:founders@fabra.io">founders@fabra.io</a> to get an account provisioned!
+      <div className="tw-mt-56 tw-mb-auto tw-mx-auto tw-w-[400px]">
+        <div className="tw-flex tw-flex-col tw-pt-12 tw-pb-10 tw-px-8 tw-rounded-lg tw-shadow-md tw-bg-white tw-items-center">
+          <img src={longlogo} className="tw-h-8 tw-select-none tw-mb-4" alt="fabra logo" />
+          <div className="tw-text-center tw-my-2">
+            {unauthorized ?
+              <div className="tw-flex tw-flex-col tw-justify-center">
+                <div>
+                  You don"t have access to Fabra yet. Contact us at <a className="tw-text-blue-500" href="mailto:founders@fabra.io">founders@fabra.io</a> to get an account provisioned!
+                </div>
+                <img src={mail} alt="mail" className="tw-h-36 tw-mt-5" />
               </div>
-              <img src={mail} alt="mail" className="tw-h-36 tw-mt-5" />
-            </div>
-            :
-            <>{loginContent}</>}
+              :
+              <>{loginContent}</>}
+          </div>
+        </div>
+        <div className="tw-text-xs tw-text-center tw-mt-4 tw-text-slate-800">
+          By continuing you agree to Fabra's <a className="tw-text-blue-500" href="https://fabra.io/terms" target="_blank" rel="noreferrer">Terms of Service</a> and <a className="tw-text-blue-500" href="https://fabra.io/privacy" target="_blank" rel="noreferrer">Privacy Policy</a>.
         </div>
       </div>
     </div>
@@ -88,7 +94,7 @@ const StartContent: React.FC<StartContentProps> = props => {
 
   return (
     <>
-      <div className="tw-text-center tw-mb-10">Sign in to your account</div>
+      <div className="tw-text-center tw-mb-10">Sign in to continue to Fabra.</div>
       <GoogleLogin onGoogleSignIn={props.onGoogleSignIn} width={googleButtonWidth} />
     </>
   );

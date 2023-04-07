@@ -1,4 +1,4 @@
-import logo from "src/components/images/logo.png";
+import logo from "src/components/images/logo.svg";
 
 export const LogoLoading: React.FC = () => {
   return (

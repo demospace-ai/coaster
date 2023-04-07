@@ -2,7 +2,7 @@ import { ArrowPathIcon, ArrowTopRightOnSquareIcon, BellIcon, CircleStackIcon, Cu
 import classNames from "classnames";
 import { NavLink } from "react-router-dom";
 import { QuestionCircleIcon } from "src/components/icons/Icons";
-import logo from "src/components/images/logo.png";
+import logo from "src/components/images/logo.svg";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { useSelector } from "src/root/model";
 
