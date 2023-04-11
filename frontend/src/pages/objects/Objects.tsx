@@ -38,6 +38,7 @@ export const Objects: React.FC = () => {
 
 const ObjectList: React.FC<{ setStep: (step: Step) => void; }> = ({ setStep }) => {
   const { objects } = useObjects();
+
   return (
     <>
       <div className="tw-flex tw-w-full tw-mb-5 tw-mt-2">
