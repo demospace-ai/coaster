@@ -1,4 +1,5 @@
 import { CheckIcon } from "@heroicons/react/24/outline";
+import classNames from "classnames";
 import React from "react";
 import { NavLink } from "react-router-dom";
 import { useDestinations, useObjects } from "src/rpc/data";
@@ -18,11 +19,11 @@ export const Home: React.FC = () => {
       <div className="tw-text-2xl tw-font-bold tw-text-slate-700 tw-mb-5">
         Setup Checklist
       </div>
-      <NavLink className={setupStep} to='/destinations'>
+      <NavLink className={classNames(setupStep, destinationCreated && "tw-line-through")} to='/destinations'>
         <div className={stepNumber}>{destinationCreated ? <CheckIcon className="tw-m-1 tw-stroke-2" /> : 1}</div>
         Connect your data warehouse as a destination
       </NavLink>
-      <NavLink className={setupStep} to='/objects'>
+      <NavLink className={classNames(setupStep, objectCreated && "tw-line-through")} to='/objects'>
         <div className={stepNumber}>{objectCreated ? <CheckIcon className="tw-m-1 tw-stroke-2" /> : 2}</div>
         Define objects that customers can send to you
       </NavLink>
