@@ -358,7 +358,7 @@ const WebhookInputs: React.FC<ConnectionConfigurationProps> = props => {
       <ValidatedInput id="displayName" value={state.displayName} setValue={(value) => { props.setState({ ...state, displayName: value }); }} placeholder="Display Name" className="tw-w-100" />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>URL</span>
-        <Tooltip placement="right" label="The URL that Fabra will send your customer&&s data to during syncs. Must use HTTPS.">
+        <Tooltip placement="right" label="The URL that Fabra will send your customer's data to during syncs. Must use HTTPS.">
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>

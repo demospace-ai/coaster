@@ -103,6 +103,8 @@ const validateCursorField = (state: NewObjectState): boolean => {
   return state.cursorField !== undefined && (
     state.cursorField.type === FieldType.TimestampNtz
     || state.cursorField.type === FieldType.TimestampTz
+    || state.cursorField.type === FieldType.Date
+    || state.cursorField.type === FieldType.Datetime
     || state.cursorField.type === FieldType.Integer
   );
 };

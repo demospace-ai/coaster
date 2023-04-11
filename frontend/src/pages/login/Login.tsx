@@ -67,7 +67,7 @@ export const Login: React.FC = () => {
             {unauthorized ?
               <div className="tw-flex tw-flex-col tw-justify-center">
                 <div>
-                  You don"t have access to Fabra yet. Contact us at <a className="tw-text-blue-500" href="mailto:founders@fabra.io">founders@fabra.io</a> to get an account provisioned!
+                  You don't have access to Fabra yet. Contact us at <a className="tw-text-blue-500" href="mailto:founders@fabra.io">founders@fabra.io</a> to get an account provisioned!
                 </div>
                 <img src={mail} alt="mail" className="tw-h-36 tw-mt-5" />
               </div>
