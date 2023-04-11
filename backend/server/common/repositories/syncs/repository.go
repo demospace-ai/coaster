@@ -77,6 +77,7 @@ func CreateFieldMappings(
 			SourceFieldName:    fieldMapping.SourceFieldName,
 			SourceFieldType:    fieldMapping.SourceFieldType,
 			DestinationFieldId: fieldMapping.DestinationFieldId,
+			IsJsonField:        fieldMapping.IsJsonField,
 		}
 
 		result := db.Create(&fieldMappingModel)

@@ -139,6 +139,7 @@ func googleLogin(ctx context.Context, db *gorm.DB, idToken string) (*models.User
 		"watershed.com":        true,
 		"watershedclimate.com": true,
 		"relate.so":            true,
+		"custify.com":          true,
 		"skypointcloud.com":    true,
 	}
 	var userEmailDomain = strings.Split(externalUserInfo.Email, "@")[1]

@@ -65,8 +65,10 @@ const INITIAL_SOURCE_STATE: NewSourceState = {
 };
 
 export interface FieldMappingState {
-  source_field: Field | undefined;
-  destination_field_id: number;
+  sourceField: Field | undefined;
+  destinationFieldId: number;
+  expandedJson: boolean;
+  jsonFields: (Field | undefined)[];
 }
 
 export type SetupSyncState = {
@@ -215,9 +217,19 @@ export const validateSyncSetup = (state: SetupSyncState): boolean => {
     && state.source !== undefined
     && state.object !== undefined
     && ((state.namespace !== undefined && state.namespace !== undefined) || state.customJoin !== undefined)
-    && state.frequency !== undefined
-    && state.frequencyUnits !== undefined
-    && state.fieldMappings !== undefined;
+    // && state.frequency !== undefined
+    // && state.frequencyUnits !== undefined
+    && state.fieldMappings !== undefined && validateFieldMappings(state.fieldMappings);
+};
+
+const validateFieldMappings = (fieldMapppings: FieldMappingState[]): boolean => {
+  return fieldMapppings.every(fieldMapping => {
+    if (fieldMapping.expandedJson) {
+      return fieldMapping.jsonFields.every(jsonField => jsonField !== undefined);
+    } else {
+      return fieldMapping.sourceField !== undefined;
+    }
+  });
 };
 
 export const createNewSync = async (
@@ -230,15 +242,27 @@ export const createNewSync = async (
     return;
   }
 
-  const fieldMappings: FieldMappingInput[] = state.fieldMappings!.map(fieldMapping => {
-    return (
-      {
-        source_field_name: fieldMapping.source_field!.name,
-        source_field_type: fieldMapping.source_field!.type,
-        destination_field_id: fieldMapping.destination_field_id,
-      }
-    );
-  });
+  const convertFieldMappings = (fieldMapping: FieldMappingState): FieldMappingInput[] => {
+    if (fieldMapping.expandedJson) {
+      return fieldMapping.jsonFields.map(jsonMapping => {
+        return {
+          source_field_name: jsonMapping!.name,
+          source_field_type: jsonMapping!.type,
+          destination_field_id: fieldMapping.destinationFieldId,
+          is_json_field: true,
+        };
+      });
+    } else {
+      return [{
+        source_field_name: fieldMapping.sourceField!.name,
+        source_field_type: fieldMapping.sourceField!.type,
+        destination_field_id: fieldMapping.destinationFieldId,
+        is_json_field: false,
+      }];
+    }
+  };
+
+  const fieldMappings: FieldMappingInput[] = state.fieldMappings!.flatMap(convertFieldMappings);
   const payload: LinkCreateSyncRequest = {
     display_name: state.displayName!,
     source_id: state.source!.id,

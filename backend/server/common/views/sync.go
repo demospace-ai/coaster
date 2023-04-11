@@ -41,6 +41,7 @@ type FieldMapping struct {
 	SourceFieldName    string         `json:"source_field_name"`
 	SourceFieldType    data.FieldType `json:"source_field_type"`
 	DestinationFieldId int64          `json:"destination_field_id"`
+	IsJsonField        bool           `json:"is_json_field"`
 }
 
 func ConvertSync(sync *models.Sync) Sync {

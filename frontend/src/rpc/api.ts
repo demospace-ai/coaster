@@ -277,6 +277,7 @@ export interface FieldMappingInput {
   source_field_name: string;
   source_field_type: FieldType;
   destination_field_id: number;
+  is_json_field: boolean;
 }
 
 export enum FieldType {

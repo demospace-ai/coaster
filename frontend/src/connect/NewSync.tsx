@@ -23,8 +23,10 @@ export const NewSync: React.FC<{ linkToken: string, close: () => void; }> = ({ l
     setPrevObject(object);
     const fieldMappings = object ? object.object_fields.filter(objectField => !objectField.omit).map(objectField => {
       return {
-        source_field: undefined,
-        destination_field_id: objectField.id,
+        sourceField: undefined,
+        destinationFieldId: objectField.id,
+        expandedJson: false,
+        jsonFields: [undefined],
       };
     }) : [];
     setState(s => {

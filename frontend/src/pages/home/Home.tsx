@@ -35,6 +35,6 @@ export const Home: React.FC = () => {
         <div className={stepNumber}>4</div>
         (Optional) Setup Slack or email notifications for any issues
       </div>
-    </div >
+    </div>
   );
 };
