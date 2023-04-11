@@ -13,8 +13,8 @@ import (
 	"gorm.io/gorm"
 )
 
-const FABRA_TIMESTAMP_TZ_FORMAT = "2006-01-02 15:04:05-07:00"
-const FABRA_TIMESTAMP_NTZ_FORMAT = "2006-01-02 15:04:05"
+const FABRA_TIMESTAMP_TZ_FORMAT = "2006-01-02 15:04:05.000-07:00"
+const FABRA_TIMESTAMP_NTZ_FORMAT = "2006-01-02 15:04:05.000"
 
 type StagingOptions struct {
 	Bucket string

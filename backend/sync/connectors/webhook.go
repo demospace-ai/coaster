@@ -97,9 +97,21 @@ func (wh WebhookImpl) Write(
 		for _, row := range rows {
 			outputData := map[string]any{}
 			for i, value := range row {
+				fieldMapping := fieldMappings[i]
 				destFieldName := orderedObjectFields[i].Name
-				if value != nil {
-					outputData[destFieldName] = value
+				// add raw values to the json object even if they're nil
+				if fieldMapping.IsJsonField {
+					existing, ok := outputData[destFieldName]
+					if !ok {
+						existing = make(map[string]any)
+						outputData[destFieldName] = existing
+					}
+
+					existing.(map[string]any)[fieldMapping.SourceFieldName] = value
+				} else {
+					if value != nil {
+						outputData[destFieldName] = value
+					}
 				}
 			}
 			outputDataList = append(outputDataList, outputData)

@@ -187,7 +187,7 @@ func (bq BigQueryImpl) Write(
 
 		rowsWritten += len(rows)
 		objectName := fmt.Sprintf("%s-%d", objectPrefix, batchNum)
-		err = bq.stageBatch(ctx, rows, fieldMappings, sync, destinationOptions, destClient, objectName)
+		err = bq.stageBatch(ctx, rows, fieldMappings, object, sync, destinationOptions, destClient, objectName)
 		if err != nil {
 			errC <- err
 			return
@@ -201,8 +201,7 @@ func (bq BigQueryImpl) Write(
 
 	if rowsWritten > 0 {
 		writeMode := bq.toBigQueryWriteMode(sync.SyncMode)
-		orderedObjectFields := bq.createOrderedObjectFields(object.ObjectFields, fieldMappings)
-		csvSchema := bq.createCsvSchema(object.EndCustomerIdField, orderedObjectFields)
+		csvSchema := bq.createCsvSchema(object.EndCustomerIdField, object.ObjectFields)
 		err = destClient.LoadFromStaging(ctx, *object.Namespace, *object.TableName, query.LoadOptions{
 			GcsReference:   gcsReference,
 			BigQuerySchema: csvSchema,
@@ -221,39 +220,74 @@ func (bq BigQueryImpl) Write(
 	close(errC)
 }
 
-func (bq BigQueryImpl) stageBatch(ctx context.Context, rows []data.Row, fieldMappings []views.FieldMapping, sync views.Sync, destinationOptions DestinationOptions, destClient query.BigQueryApiClient, objectName string) error {
+func (bq BigQueryImpl) stageBatch(ctx context.Context, rows []data.Row, fieldMappings []views.FieldMapping, object views.Object, sync views.Sync, destinationOptions DestinationOptions, destClient query.BigQueryApiClient, objectName string) error {
+	// count the fields since there may be multiple mappings for a single JSON object in the destination
+	// also track where each field should go in the output row based on the order of object fields.
+	// use the count as the index since we want to skip omitted fields in the output
+	numFields := 0
+	objectFieldsIdToIndex := make(map[int64]int)
+	for _, objectField := range object.ObjectFields {
+		if !objectField.Omit {
+			objectFieldsIdToIndex[objectField.ID] = numFields
+			numFields++
+		}
+	}
+
+	// extra field for end customer ID
+	numFields++
+
 	// allocate the arrays and reuse them to save memory
 	rowStrings := make([]string, len(rows))
-	rowTokens := make([]string, len(fieldMappings)+1)                     // one extra token for the end customer ID
-	rowTokens[len(fieldMappings)] = fmt.Sprintf("%d", sync.EndCustomerID) // end customer ID will be the same for every row
+	rowTokens := make([]string, numFields)
+	rowTokens[numFields-1] = fmt.Sprintf("%d", sync.EndCustomerID) // end customer ID will be the same for every row
 
-	// TODO: batch insert 10,000 rows at a time
 	// write to temporary table in destination
 	for i, row := range rows {
+		indexToJsonValueMap := make(map[int]map[string]any)
 		for j, value := range row {
-			sourceType := fieldMappings[j].SourceFieldType
-			if value == nil {
-				// empty string for null values will be interpreted as null when loading from csv
-				rowTokens[j] = ""
+			fieldMapping := fieldMappings[j]
+			sourceType := fieldMapping.SourceFieldType
+			destFieldIdx := objectFieldsIdToIndex[fieldMapping.DestinationFieldId]
+
+			// just collect the raw values into a map
+			if fieldMapping.IsJsonField {
+				existing, ok := indexToJsonValueMap[destFieldIdx]
+				if !ok {
+					existing = make(map[string]any)
+					indexToJsonValueMap[destFieldIdx] = existing
+				}
+
+				existing[fieldMapping.SourceFieldName] = value
 			} else {
-				switch sourceType {
-				case data.FieldTypeJson:
-					// JSON-like values need to be escaped according to BigQuery expectations. Even if the destination
-					// type is not JSON, it is necessary to escape to avoid issues
-					// https://cloud.google.com/bigquery/docs/reference/standard-sql/json-data#load_from_csv_files
-					jsonStr, err := json.Marshal(value)
-					if err != nil {
-						return err
+				if value == nil {
+					// empty string for null values will be interpreted as null when loading from csv
+					rowTokens[j] = ""
+				} else {
+					switch sourceType {
+					case data.FieldTypeJson:
+						jsonStr, err := getBigQueryJsonString(value)
+						if err != nil {
+							return err
+						}
+						rowTokens[destFieldIdx] = jsonStr
+					case data.FieldTypeString:
+						// escape the string so commas don't break the CSV schema
+						rowTokens[destFieldIdx] = fmt.Sprintf("\"%v\"", value)
+					default:
+						rowTokens[destFieldIdx] = fmt.Sprintf("%v", value)
 					}
-					escapedValue := fmt.Sprintf("\"%s\"", strings.ReplaceAll(string(jsonStr), "\"", "\"\""))
-					rowTokens[j] = escapedValue
-				case data.FieldTypeString:
-					// escape the string so commas don't break the CSV schema
-					rowTokens[j] = fmt.Sprintf("\"%v\"", value)
-				default:
-					rowTokens[j] = fmt.Sprintf("%v", value)
 				}
 			}
+		}
+
+		// insert the many-to-one mappings into the row tokens slice
+		for key, value := range indexToJsonValueMap {
+			jsonStr, err := getBigQueryJsonString(value)
+			if err != nil {
+				return err
+			}
+
+			rowTokens[key] = jsonStr
 		}
 
 		rowString := strings.Join(rowTokens, ",")
@@ -267,6 +301,17 @@ func (bq BigQueryImpl) stageBatch(ctx context.Context, rows []data.Row, fieldMap
 	}
 
 	return nil
+}
+
+// JSON-like values need to be escaped according to BigQuery expectations. Even if the destination
+// type is not JSON, it is necessary to escape to avoid issues
+// https://cloud.google.com/bigquery/docs/reference/standard-sql/json-data#load_from_csv_files
+func getBigQueryJsonString(value any) (string, error) {
+	jsonStr, err := json.Marshal(value)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("\"%s\"", strings.ReplaceAll(string(jsonStr), "\"", "\"\"")), nil
 }
 
 func (bq BigQueryImpl) toBigQueryWriteMode(syncMode models.SyncMode) bigquery.TableWriteDisposition {
@@ -285,29 +330,17 @@ func (bq BigQueryImpl) toBigQueryWriteMode(syncMode models.SyncMode) bigquery.Ta
 	}
 }
 
-func (bq BigQueryImpl) createOrderedObjectFields(objectFields []views.ObjectField, fieldMappings []views.FieldMapping) []views.ObjectField {
-	objectFieldIdToObjectField := make(map[int64]views.ObjectField)
-	for _, objectField := range objectFields {
-		objectFieldIdToObjectField[objectField.ID] = objectField
-	}
-
-	var orderedObjectFields []views.ObjectField
-	for _, fieldMapping := range fieldMappings {
-		orderedObjectFields = append(orderedObjectFields, objectFieldIdToObjectField[fieldMapping.DestinationFieldId])
-	}
-
-	return orderedObjectFields
-}
-
 func (bq BigQueryImpl) createCsvSchema(endCustomerIdColumn string, orderedObjectFields []views.ObjectField) bigquery.Schema {
 	var csvSchema bigquery.Schema
 	for _, objectField := range orderedObjectFields {
-		field := bigquery.FieldSchema{
-			Name:     objectField.Name,
-			Type:     getBigQueryType(objectField.Type),
-			Required: !objectField.Optional,
+		if !objectField.Omit {
+			field := bigquery.FieldSchema{
+				Name:     objectField.Name,
+				Type:     getBigQueryType(objectField.Type),
+				Required: !objectField.Optional,
+			}
+			csvSchema = append(csvSchema, &field)
 		}
-		csvSchema = append(csvSchema, &field)
 	}
 
 	endCustomerIdField := bigquery.FieldSchema{

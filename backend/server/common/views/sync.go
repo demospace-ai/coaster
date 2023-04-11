@@ -85,6 +85,7 @@ func ConvertFieldMappings(fieldMappings []models.FieldMapping) []FieldMapping {
 			SourceFieldName:    fieldMapping.SourceFieldName,
 			SourceFieldType:    fieldMapping.SourceFieldType,
 			DestinationFieldId: fieldMapping.DestinationFieldId,
+			IsJsonField:        fieldMapping.IsJsonField,
 		})
 	}
 
