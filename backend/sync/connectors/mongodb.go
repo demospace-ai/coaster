@@ -34,13 +34,11 @@ func (md MongoDbImpl) Read(
 ) {
 	connectionModel := views.ConvertConnectionView(sourceConnection)
 
-	sc, err := md.queryService.GetClient(ctx, connectionModel)
+	sourceClient, err := md.queryService.GetClient(ctx, connectionModel)
 	if err != nil {
 		errC <- err
 		return
 	}
-
-	sourceClient := sc.(query.MongoDbApiClient)
 
 	readQuery := md.getReadQuery(connectionModel, sync, fieldMappings)
 	queryString := query.CreateMongoQueryString(readQuery)

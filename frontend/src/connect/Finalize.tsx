@@ -169,7 +169,12 @@ const MappedField: React.FC<{ objectField: ObjectField; fieldMapping: FieldMappi
       {
         objectField.type === FieldType.Json && (
           fieldMapping.expandedJson ?
-            <div className="tw-ml-1 tw-mt-2 tw-cursor-pointer tw-text-xs tw-text-blue-600 tw-select-none" onClick={() => updateFieldMapping({ ...fieldMapping, expandedJson: false }, fieldMappingIdx!)}>Collapse JSON</div>
+            <div className="tw-ml-1 tw-mt-2 tw-flex tw-items-center tw-cursor-pointer tw-text-xs tw-text-blue-600 tw-select-none" onClick={() => updateFieldMapping({ ...fieldMapping, expandedJson: false }, fieldMappingIdx!)}>
+              Collapse JSON
+              <Tooltip placement="top-start" label="Map a single field from your data source to this destination field.">
+                <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+              </Tooltip>
+            </div>
             :
             <div className="tw-ml-1 tw-mt-2 tw-flex tw-items-center tw-cursor-pointer tw-text-xs tw-text-blue-600 tw-select-none" onClick={() => updateFieldMapping({ ...fieldMapping, expandedJson: true }, fieldMappingIdx!)}>
               Expand JSON

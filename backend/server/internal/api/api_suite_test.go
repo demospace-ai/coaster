@@ -8,6 +8,7 @@ import (
 
 	"gorm.io/gorm"
 
+	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -23,7 +24,8 @@ func TestHandlers(t *testing.T) {
 
 var _ = BeforeSuite(func() {
 	db, cleanup = test.SetupDatabase()
-	service = api.NewApiService(db, test.MockAuthService{}, test.MockCryptoService{}, test.NewMockQueryService(db))
+	ctrl := gomock.NewController(GinkgoT())
+	service = api.NewApiService(db, test.MockAuthService{}, test.MockCryptoService{}, test.NewMockQueryService(db, ctrl))
 })
 
 var _ = AfterSuite((func() {

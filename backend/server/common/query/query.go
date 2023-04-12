@@ -35,6 +35,7 @@ type QueryService interface {
 	RunQuery(ctx context.Context, connection *models.Connection, queryString string) (*data.QueryResults, error)
 	GetQueryIterator(ctx context.Context, connection *models.Connection, queryString string) (data.RowIterator, error)
 	GetClient(ctx context.Context, connection *models.Connection) (ConnectorClient, error)
+	GetWarehouseClient(ctx context.Context, connection *models.Connection) (WarehouseClient, error)
 }
 
 type QueryServiceImpl struct {
@@ -56,6 +57,13 @@ type ConnectorClient interface {
 	GetFieldValues(ctx context.Context, namespace string, tableName string, fieldName string) ([]any, error)
 	RunQuery(ctx context.Context, queryString string, args ...any) (*data.QueryResults, error)
 	GetQueryIterator(ctx context.Context, queryString string) (data.RowIterator, error)
+}
+
+type WarehouseClient interface {
+	ConnectorClient
+	StageData(ctx context.Context, csvData string, stagingOptions StagingOptions) error
+	LoadFromStaging(ctx context.Context, namespace string, tableName string, loadOptions LoadOptions) error
+	CleanUpStagingData(ctx context.Context, stagingOptions StagingOptions) error
 }
 
 func (qs QueryServiceImpl) GetClient(ctx context.Context, connection *models.Connection) (ConnectorClient, error) {
@@ -134,6 +142,34 @@ func (qs QueryServiceImpl) GetClient(ctx context.Context, connection *models.Con
 			Password:          *mongodbPassword,
 			Host:              connection.Host.String,
 			ConnectionOptions: connection.ConnectionOptions.String,
+		}, nil
+	default:
+		return nil, errors.Newf("unrecognized warehouse type %v", connection.ConnectionType)
+	}
+}
+
+func (qs QueryServiceImpl) GetWarehouseClient(ctx context.Context, connection *models.Connection) (WarehouseClient, error) {
+	switch connection.ConnectionType {
+	case models.ConnectionTypeBigQuery:
+		bigQueryCredentialsString, err := qs.cryptoService.DecryptConnectionCredentials(connection.Credentials.String)
+		if err != nil {
+			return nil, err
+		}
+
+		var bigQueryCredentials models.BigQueryCredentials
+		err = json.Unmarshal([]byte(*bigQueryCredentialsString), &bigQueryCredentials)
+		if err != nil {
+			return nil, err
+		}
+
+		if !connection.Location.Valid {
+			return nil, errors.New("bigquery connection must have location defined")
+		}
+
+		return BigQueryApiClient{
+			ProjectID:   &bigQueryCredentials.ProjectID,
+			Credentials: bigQueryCredentialsString,
+			Location:    &connection.Location.String,
 		}, nil
 	default:
 		return nil, errors.Newf("unrecognized warehouse type %v", connection.ConnectionType)

@@ -34,12 +34,11 @@ func (as SynapseImpl) Read(
 ) {
 	connectionModel := views.ConvertConnectionView(sourceConnection)
 
-	sc, err := as.queryService.GetClient(ctx, connectionModel)
+	sourceClient, err := as.queryService.GetClient(ctx, connectionModel)
 	if err != nil {
 		errC <- err
 		return
 	}
-	sourceClient := sc.(query.SynapseApiClient)
 
 	readQuery := as.getReadQuery(connectionModel, sync, fieldMappings)
 

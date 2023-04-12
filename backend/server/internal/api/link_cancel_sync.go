@@ -17,6 +17,10 @@ func (s ApiService) LinkCancelSync(auth auth.Authentication, w http.ResponseWrit
 		return errors.NewBadRequest("must setup organization first")
 	}
 
+	if auth.LinkToken == nil {
+		return errors.NewBadRequest("must send link token")
+	}
+
 	vars := mux.Vars(r)
 	strSyncId, ok := vars["syncID"]
 	if !ok {

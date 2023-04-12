@@ -33,12 +33,11 @@ func (rs RedshiftImpl) Read(
 ) {
 	connectionModel := views.ConvertConnectionView(sourceConnection)
 
-	sc, err := rs.queryService.GetClient(ctx, connectionModel)
+	sourceClient, err := rs.queryService.GetClient(ctx, connectionModel)
 	if err != nil {
 		errC <- err
 		return
 	}
-	sourceClient := sc.(query.RedshiftApiClient)
 
 	readQuery := rs.getReadQuery(connectionModel, sync, fieldMappings)
 

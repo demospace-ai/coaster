@@ -48,6 +48,9 @@ export const ConnectApp: React.FC = () => {
               handleInitTheme(message.data.theme);
             }
             break;
+          default:
+            console.log("unexpected message: " + message);
+            break;
         }
       });
       window.parent.postMessage({ messageType: MessageType.IFrameReady }, "*");

@@ -10,6 +10,7 @@ declare global {
 
 interface FabraConnectOptions {
   customTheme?: CustomTheme;
+  containerID?: string;
 }
 
 let iframe: HTMLIFrameElement | null = null;
@@ -29,7 +30,17 @@ const initialize = (options?: FabraConnectOptions) => {
   frame.style.background = "transparent";
   frame.style.display = "none";
   frame.style.colorScheme = "normal";
-  document.body.appendChild(frame);
+
+  let frameRoot = document.body;
+  if (options?.containerID !== undefined) {
+    const container = document.getElementById(options.containerID);
+    if (container !== null) {
+      frameRoot = container;
+      frame.style.position = "static";
+    }
+  }
+
+  frameRoot.appendChild(frame);
 
   if (options?.customTheme) {
     window.fabra.customTheme = options.customTheme;
@@ -38,8 +49,8 @@ const initialize = (options?: FabraConnectOptions) => {
   iframe = frame;
 };
 
-const handleMessage = (n: MessageEvent<FabraMessage>) => {
-  switch (n.data.messageType) {
+const handleMessage = (messageEvent: MessageEvent<FabraMessage>) => {
+  switch (messageEvent.data.messageType) {
     case MessageType.IFrameReady:
       // NOTE: iFrame is letting us know that initialization is complete, and user can call open.
       if (iframe && window.fabra.customTheme) {
@@ -50,6 +61,8 @@ const handleMessage = (n: MessageEvent<FabraMessage>) => {
       break;
     case MessageType.Close:
       return close();
+    default:
+      console.log("unexpected message: " + messageEvent);
   }
 };
 

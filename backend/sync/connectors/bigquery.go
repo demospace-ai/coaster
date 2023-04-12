@@ -36,12 +36,11 @@ func (bq BigQueryImpl) Read(
 ) {
 	connectionModel := views.ConvertConnectionView(sourceConnection)
 
-	sc, err := bq.queryService.GetClient(ctx, connectionModel)
+	sourceClient, err := bq.queryService.GetClient(ctx, connectionModel)
 	if err != nil {
 		errC <- err
 		return
 	}
-	sourceClient := sc.(query.BigQueryApiClient)
 
 	readQuery := bq.getReadQuery(connectionModel, sync, fieldMappings)
 
@@ -165,12 +164,11 @@ func (bq BigQueryImpl) Write(
 ) {
 	connectionModel := views.ConvertConnectionView(destinationConnection)
 
-	dc, err := bq.queryService.GetClient(ctx, connectionModel)
+	destClient, err := bq.queryService.GetWarehouseClient(ctx, connectionModel)
 	if err != nil {
 		errC <- err
 		return
 	}
-	destClient := dc.(query.BigQueryApiClient)
 
 	// always clean up the data in the storage bucket
 	objectPrefix := uuid.New().String()
@@ -220,7 +218,7 @@ func (bq BigQueryImpl) Write(
 	close(errC)
 }
 
-func (bq BigQueryImpl) stageBatch(ctx context.Context, rows []data.Row, fieldMappings []views.FieldMapping, object views.Object, sync views.Sync, destinationOptions DestinationOptions, destClient query.BigQueryApiClient, objectName string) error {
+func (bq BigQueryImpl) stageBatch(ctx context.Context, rows []data.Row, fieldMappings []views.FieldMapping, object views.Object, sync views.Sync, destinationOptions DestinationOptions, destClient query.WarehouseClient, objectName string) error {
 	// count the fields since there may be multiple mappings for a single JSON object in the destination
 	// also track where each field should go in the output row based on the order of object fields.
 	// use the count as the index since we want to skip omitted fields in the output

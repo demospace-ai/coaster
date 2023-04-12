@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"go.fabra.io/server/common/auth"
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/repositories/objects"
 	"go.fabra.io/server/common/repositories/sources"
@@ -13,6 +14,14 @@ import (
 )
 
 func (s ApiService) LinkGetSyncs(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+	if auth.Organization == nil {
+		return errors.NewBadRequest("must setup organization first")
+	}
+
+	if auth.LinkToken == nil {
+		return errors.NewBadRequest("must send link token")
+	}
+
 	syncs, err := sync_repository.LoadAllSyncsForCustomer(s.db, auth.Organization.ID, auth.LinkToken.EndCustomerID)
 	if err != nil {
 		return err

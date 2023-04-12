@@ -4,8 +4,10 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/golang/mock/gomock"
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/data"
+	mock_query "go.fabra.io/server/common/mocks"
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/query"
 
@@ -67,12 +69,14 @@ func (cs MockCryptoService) EncryptEndCustomerApiKey(endCustomerApi string) (*st
 }
 
 type MockQueryService struct {
-	db *gorm.DB
+	db   *gorm.DB
+	ctrl *gomock.Controller
 }
 
-func NewMockQueryService(db *gorm.DB) MockQueryService {
+func NewMockQueryService(db *gorm.DB, ctrl *gomock.Controller) MockQueryService {
 	return MockQueryService{
-		db: db,
+		db:   db,
+		ctrl: ctrl,
 	}
 }
 
@@ -101,5 +105,12 @@ func (qs MockQueryService) GetQueryIterator(ctx context.Context, connection *mod
 }
 
 func (qs MockQueryService) GetClient(ctx context.Context, connection *models.Connection) (query.ConnectorClient, error) {
-	return nil, nil
+	return mock_query.NewMockConnectorClient(qs.ctrl), nil
+}
+
+func (qs MockQueryService) GetWarehouseClient(ctx context.Context, connection *models.Connection) (query.WarehouseClient, error) {
+	return mock_query.NewMockWarehouseClient(qs.ctrl), nil
+}
+
+type MockWarehouseClient struct {
 }

@@ -33,13 +33,11 @@ func (sf SnowflakeImpl) Read(
 ) {
 	connectionModel := views.ConvertConnectionView(sourceConnection)
 
-	sc, err := sf.queryService.GetClient(ctx, connectionModel)
+	sourceClient, err := sf.queryService.GetClient(ctx, connectionModel)
 	if err != nil {
 		errC <- err
 		return
 	}
-
-	sourceClient := sc.(query.SnowflakeApiClient)
 
 	readQuery := sf.getReadQuery(connectionModel, sync, fieldMappings)
 
