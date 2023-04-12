@@ -20,6 +20,7 @@ const initialize = (options?: FabraConnectOptions) => {
   window.addEventListener("message", handleMessage);
 
   const frame = document.createElement("iframe");
+  frame.id = "fabra-connect-iframe";
   frame.setAttribute("src", CONNECT_ROOT + "/connect.html");
   frame.style.position = "absolute";
   frame.style.width = "100%";
