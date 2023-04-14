@@ -1,10 +1,12 @@
 package test
 
 import (
+	"log"
 	"time"
 
 	"go.fabra.io/server/common/crypto"
 	"go.fabra.io/server/common/database"
+	"go.fabra.io/server/common/input"
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/repositories/sessions"
 
@@ -34,6 +36,106 @@ func CreateUser(db *gorm.DB, organizationID int64) *models.User {
 	db.Create(&user)
 
 	return &user
+}
+
+func CreateSync(db *gorm.DB, organizationID int64, endCustomerID int64, sourceID int64, objectID int64, syncMode models.SyncMode) *models.Sync {
+	sync := models.Sync{
+		OrganizationID: organizationID,
+		EndCustomerID:  endCustomerID,
+		SourceID:       sourceID,
+		ObjectID:       objectID,
+		Namespace:      database.NewNullString("namespace"),
+		TableName:      database.NewNullString("table"),
+		SyncMode:       syncMode,
+	}
+
+	db.Create(&sync)
+
+	return &sync
+}
+
+func CreateSource(db *gorm.DB, organizationID int64, endCustomerID int64) (*models.Source, *models.Connection) {
+	connection := CreateConnection(db, organizationID)
+	source := models.Source{
+		OrganizationID: organizationID,
+		EndCustomerID:  endCustomerID,
+		ConnectionID:   connection.ID,
+	}
+
+	result := db.Create(&source)
+	if result.Error != nil {
+		log.Println(result.Error)
+	}
+
+	return &source, connection
+}
+
+func CreateDestination(db *gorm.DB, organizationID int64, endCustomerID int64) (*models.Destination, *models.Connection) {
+	connection := CreateConnection(db, organizationID)
+	destination := models.Destination{
+		OrganizationID: organizationID,
+		ConnectionID:   connection.ID,
+		StagingBucket:  database.NewNullString("staging"),
+	}
+
+	result := db.Create(&destination)
+	if result.Error != nil {
+		log.Println(result.Error)
+	}
+
+	return &destination, connection
+}
+
+func CreateObject(db *gorm.DB, organizationID int64, destinationID int64, syncMode models.SyncMode) *models.Object {
+	object := models.Object{
+		OrganizationID:     organizationID,
+		DisplayName:        "object",
+		DestinationID:      destinationID,
+		Namespace:          database.NewNullString("namespace"),
+		TableName:          database.NewNullString("table"),
+		EndCustomerIdField: "end_customer_id",
+		SyncMode:           syncMode,
+	}
+
+	result := db.Create(&object)
+	if result.Error != nil {
+		log.Println(result.Error)
+	}
+
+	return &object
+}
+
+func CreateObjectFields(db *gorm.DB, objectID int64, fields []input.ObjectField) []models.ObjectField {
+	var fieldModels []models.ObjectField
+	for _, field := range fields {
+		fieldModel := models.ObjectField{
+			ObjectID: objectID,
+			Name:     field.Name,
+			Type:     field.Type,
+		}
+
+		db.Create(&fieldModel)
+		fieldModels = append(fieldModels, fieldModel)
+	}
+
+	return fieldModels
+}
+
+func CreateFieldMappings(db *gorm.DB, syncID int64, fieldMappings []input.FieldMapping) []models.FieldMapping {
+	var fieldMappingModels []models.FieldMapping
+	for _, mapping := range fieldMappings {
+		fieldMappingModel := models.FieldMapping{
+			SyncID:             syncID,
+			SourceFieldName:    mapping.SourceFieldName,
+			SourceFieldType:    mapping.SourceFieldType,
+			DestinationFieldId: mapping.DestinationFieldId,
+		}
+
+		db.Create(&fieldMappingModel)
+		fieldMappingModels = append(fieldMappingModels, fieldMappingModel)
+	}
+
+	return fieldMappingModels
 }
 
 func CreateConnection(db *gorm.DB, organizationID int64) *models.Connection {

@@ -3,7 +3,7 @@ import { CustomTheme } from "src/utils/theme";
 export enum MessageType {
   IFrameReady = "fabra-iframe-ready",
   LinkToken = "fabra-link-token",
-  Theme = "fabra-theme",
+  Configure = "fabra-configure",
   Close = "fabra-window-close",
 }
 
@@ -15,6 +15,7 @@ export type FabraMessage = {
 } | {
   messageType: MessageType.Close;
 } | {
-  messageType: MessageType.Theme,
-  theme: CustomTheme;
+  messageType: MessageType.Configure,
+  theme: CustomTheme,
+  useContainer: boolean;
 };

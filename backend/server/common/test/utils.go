@@ -3,6 +3,8 @@ package test
 import (
 	"fmt"
 	"log"
+	"os"
+	"strings"
 	"time"
 
 	"go.fabra.io/server/common/application"
@@ -22,7 +24,7 @@ import (
 func SetupDatabase() (*gorm.DB, func()) {
 	pool, err := dockertest.NewPool("")
 	if err != nil {
-		log.Fatalf("Could not connect to docker: %s", err)
+		log.Fatalf("Could not connect to docker: %v", err)
 	}
 
 	// pulls an image, creates a container based on it and runs it
@@ -44,7 +46,7 @@ func SetupDatabase() (*gorm.DB, func()) {
 		}
 	})
 	if err != nil {
-		log.Fatalf("Could not start resource: %s", err)
+		log.Fatalf("Could not start resource: %v", err)
 	}
 
 	var host, port string
@@ -71,25 +73,38 @@ func SetupDatabase() (*gorm.DB, func()) {
 		})
 		return err
 	}); err != nil {
-		log.Fatalf("Could not connect to database: %s", err)
+		log.Fatalf("Could not connect to database: %v", err)
 	}
 
 	log.Println("Running migrations.")
 	migrateURI := fmt.Sprintf("postgres://fabratest:fabratest@%s:%s/fabratest?sslmode=disable", host, port)
-	m, err := migrate.New("file://../..//migrations", migrateURI)
+
+	wd, err := os.Getwd()
 	if err != nil {
-		log.Fatalf("unable to open migrations connection: %s, %s", migrateURI, err)
+		log.Fatalf("Could not get working directory: %v", err)
+	}
+
+	var migrationsDir string
+	if strings.Contains(wd, "/sync/") {
+		migrationsDir = "file://../../server/migrations"
+	} else {
+		migrationsDir = "file://../../migrations"
+	}
+
+	m, err := migrate.New(migrationsDir, migrateURI)
+	if err != nil {
+		log.Fatalf("Unable to open migrations connection: %s, %v", migrateURI, err)
 	}
 
 	err = m.Up()
 	if err != nil {
-		log.Fatalf("unable to run migrations: %s", err)
+		log.Fatalf("Unable to run migrations: %v", err)
 	}
 
 	cleanup := func() {
 		// You can't defer this because os.Exit doesn't care for defer
 		if err := pool.Purge(resource); err != nil {
-			log.Fatalf("Could not purge resource: %s", err)
+			log.Fatalf("Could not purge resource: %v", err)
 		}
 	}
 

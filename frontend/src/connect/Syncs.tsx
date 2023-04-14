@@ -7,23 +7,25 @@ import { Loading } from "src/components/loading/Loading";
 import { useLinkSyncs } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
 
-export const Syncs: React.FC<{ linkToken: string; close: () => void; }> = ({ linkToken, close }) => {
+export const Syncs: React.FC<{ linkToken: string; close: () => void | undefined; }> = ({ linkToken, close }) => {
   return (
-    <div className="tw-w-full">
+    <div className="tw-w-full tw-h-full tw-flex tw-flex-col">
       <Header close={close} />
       <SyncList linkToken={linkToken} />
     </div>
   );
 };
 
-const Header: React.FC<{ close: () => void; }> = ({ close }) => {
+const Header: React.FC<{ close: () => void | undefined; }> = ({ close }) => {
   return (
     <div className="tw-flex tw-flex-row tw-items-center tw-w-full tw-h-20 tw-min-h-[80px]">
-      <button className="tw-absolute tw-flex tw-items-center t tw-right-10 tw-border-none tw-cursor-pointer tw-p-0" onClick={close}>
-        <svg className="tw-h-6 tw-fill-slate-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
-          <path d="M5.1875 15.6875L4.3125 14.8125L9.125 10L4.3125 5.1875L5.1875 4.3125L10 9.125L14.8125 4.3125L15.6875 5.1875L10.875 10L15.6875 14.8125L14.8125 15.6875L10 10.875L5.1875 15.6875Z" />
-        </svg>
-      </button>
+      {close &&
+        <button className="tw-absolute tw-flex tw-items-center t tw-right-10 tw-border-none tw-cursor-pointer tw-p-0" onClick={close}>
+          <svg className="tw-h-6 tw-fill-slate-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+            <path d="M5.1875 15.6875L4.3125 14.8125L9.125 10L4.3125 5.1875L5.1875 4.3125L10 9.125L14.8125 4.3125L15.6875 5.1875L10.875 10L15.6875 14.8125L14.8125 15.6875L10 10.875L5.1875 15.6875Z" />
+          </svg>
+        </button>
+      }
     </div >
   );
 };
@@ -36,7 +38,7 @@ const SyncList: React.FC<{ linkToken: string; }> = ({ linkToken }) => {
   const sourceIdMap = new Map(sources?.map(source => [source.id, source]));
 
   return (
-    <div className="tw-mt-2 tw-px-20">
+    <div className="tw-mt-2 tw-px-20 tw-pb-16 tw-flex tw-flex-col tw-overflow-auto">
       <div className="tw-flex tw-w-full tw-mt-2">
         <div className="tw-flex-col">
           <div className="tw-flex tw-justify-start tw-font-bold tw-text-2xl">Your syncs</div>

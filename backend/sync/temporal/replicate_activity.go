@@ -6,10 +6,10 @@ import (
 
 	"go.fabra.io/server/common/crypto"
 	"go.fabra.io/server/common/data"
-	"go.fabra.io/server/common/database"
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/query"
+	"go.fabra.io/server/common/views"
 	"go.fabra.io/sync/connectors"
 	"go.temporal.io/sdk/activity"
 )
@@ -29,13 +29,8 @@ type FormatToken struct {
 }
 
 func Replicate(ctx context.Context, input ReplicateInput) (*ReplicateOutput, error) {
-	db, err := database.InitDatabase()
-	if err != nil {
-		return nil, err
-	}
-
 	cryptoService := crypto.NewCryptoService()
-	queryService := query.NewQueryService(db, cryptoService)
+	queryService := query.NewQueryService(cryptoService)
 
 	rowsC := make(chan []data.Row)
 	readOutputC := make(chan connectors.ReadOutput)
@@ -44,12 +39,12 @@ func Replicate(ctx context.Context, input ReplicateInput) (*ReplicateOutput, err
 	writeErrC := make(chan error)
 	doneC := make(chan bool)
 
-	sourceConnector, err := getSourceConnector(input.SourceConnection.ConnectionType, queryService)
+	sourceConnector, err := getSourceConnector(ctx, input.SourceConnection, queryService)
 	if err != nil {
 		return nil, err
 	}
 
-	destConnector, err := getDestinationConnector(input.DestinationConnection.ConnectionType, queryService, cryptoService, input.EncryptedEndCustomerApiKey)
+	destConnector, err := getDestinationConnector(ctx, input.DestinationConnection, queryService, cryptoService, input.EncryptedEndCustomerApiKey)
 	if err != nil {
 		return nil, err
 	}
@@ -92,10 +87,15 @@ func Replicate(ctx context.Context, input ReplicateInput) (*ReplicateOutput, err
 	}, nil
 }
 
-func getSourceConnector(connectionType models.ConnectionType, queryService query.QueryService) (connectors.Connector, error) {
-	switch connectionType {
+func getSourceConnector(ctx context.Context, connection views.FullConnection, queryService query.QueryService) (connectors.Connector, error) {
+	connectionModel := views.ConvertConnectionView(connection)
+	switch connection.ConnectionType {
 	case models.ConnectionTypeBigQuery:
-		return connectors.NewBigQueryConnector(queryService), nil
+		warehouseClient, err := queryService.GetWarehouseClient(ctx, connectionModel)
+		if err != nil {
+			return nil, err
+		}
+		return connectors.NewBigQueryConnector(warehouseClient), nil
 	case models.ConnectionTypeSnowflake:
 		return connectors.NewSnowflakeConnector(queryService), nil
 	case models.ConnectionTypeRedshift:
@@ -105,19 +105,24 @@ func getSourceConnector(connectionType models.ConnectionType, queryService query
 	case models.ConnectionTypeMongoDb:
 		return connectors.NewMongoDbConnector(queryService), nil
 	default:
-		return nil, errors.Newf("source not implemented for %s", connectionType)
+		return nil, errors.Newf("source not implemented for %s", connection.ConnectionType)
 	}
 }
 
-func getDestinationConnector(connectionType models.ConnectionType, queryService query.QueryService, cryptoService crypto.CryptoService, encryptedEndCustomerApiKey *string) (connectors.Connector, error) {
-	switch connectionType {
+func getDestinationConnector(ctx context.Context, connection views.FullConnection, queryService query.QueryService, cryptoService crypto.CryptoService, encryptedEndCustomerApiKey *string) (connectors.Connector, error) {
+	connectionModel := views.ConvertConnectionView(connection)
+	switch connection.ConnectionType {
 	case models.ConnectionTypeBigQuery:
-		return connectors.NewBigQueryConnector(queryService), nil
+		warehouseClient, err := queryService.GetWarehouseClient(ctx, connectionModel)
+		if err != nil {
+			return nil, err
+		}
+		return connectors.NewBigQueryConnector(warehouseClient), nil
 	case models.ConnectionTypeWebhook:
 		// TODO: does end customer api key belong here?
 		return connectors.NewWebhookConnector(queryService, cryptoService, encryptedEndCustomerApiKey), nil
 	default:
-		return nil, errors.Newf("destination not implemented for %s", connectionType)
+		return nil, errors.Newf("destination not implemented for %s", connection.ConnectionType)
 	}
 }
 

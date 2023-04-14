@@ -13,6 +13,7 @@ let needsInit = true;
 export const ConnectApp: React.FC = () => {
   // TODO: figure out how to prevent Redux from being used in this app
   const [linkToken, setLinkToken] = useState<string | undefined>(undefined);
+  const [useContainer, setUseContainer] = useState<boolean>(false); // whether the iFrame is nested in a container element
 
   const handleInitTheme = (theme: CustomTheme) => {
     const root = document.querySelector<HTMLElement>(":root");
@@ -43,7 +44,8 @@ export const ConnectApp: React.FC = () => {
           case MessageType.LinkToken:
             setLinkToken(message.data.linkToken);
             break;
-          case MessageType.Theme:
+          case MessageType.Configure:
+            setUseContainer(message.data.useContainer);
             if (message.data.theme) {
               handleInitTheme(message.data.theme);
             }
@@ -69,13 +71,24 @@ export const ConnectApp: React.FC = () => {
   // TODO: pull all child state out to a reducer or redux store here so state isn"t lost on navigation
   return (
     <div className="tw-fixed tw-bg-[rgb(0,0,0,0.2)] tw-w-full tw-h-full">
-      <div className="tw-fixed tw-bg-white tw-flex tw-flex-col tw-w-[70%] tw-h-[75%] tw-top-[50%] tw-left-1/2 -tw-translate-y-1/2 -tw-translate-x-1/2 tw-rounded-lg tw-shadow-modal tw-items-center">
-        <Routes>
-          <Route path="/*" element={<Syncs linkToken={linkToken} close={close} />} />
-          <Route path="/sync/:syncID" element={<SyncRuns linkToken={linkToken} close={close} />} />
-          <Route path="/newsync" element={<NewSync linkToken={linkToken} close={close} />} />
-        </Routes>
-      </div>
+      {useContainer ?
+        <div className="tw-fixed tw-bg-white tw-flex tw-flex-col tw-w-full tw-h-full tw-items-center">
+          <Routes>
+            <Route path="/*" element={<Syncs linkToken={linkToken} close={close} />} />
+            <Route path="/sync/:syncID" element={<SyncRuns linkToken={linkToken} close={close} />} />
+            <Route path="/newsync" element={<NewSync linkToken={linkToken} close={close} />} />
+          </Routes>
+        </div>
+        :
+        <div className="tw-fixed tw-bg-white tw-flex tw-flex-col tw-w-[70%] tw-h-[75%] tw-top-[50%] tw-left-1/2 -tw-translate-y-1/2 -tw-translate-x-1/2 tw-rounded-lg tw-shadow-modal tw-items-center">
+          <Routes>
+            <Route path="/*" element={<Syncs linkToken={linkToken} close={close} />} />
+            <Route path="/sync/:syncID" element={<SyncRuns linkToken={linkToken} close={close} />} />
+            <Route path="/newsync" element={<NewSync linkToken={linkToken} close={close} />} />
+          </Routes>
+        </div>
+      }
+
     </div>
   );
 };

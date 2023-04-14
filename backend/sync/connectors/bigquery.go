@@ -16,12 +16,12 @@ import (
 )
 
 type BigQueryImpl struct {
-	queryService query.QueryService
+	client query.WarehouseClient
 }
 
-func NewBigQueryConnector(queryService query.QueryService) Connector {
+func NewBigQueryConnector(client query.WarehouseClient) Connector {
 	return BigQueryImpl{
-		queryService: queryService,
+		client: client,
 	}
 }
 
@@ -34,17 +34,8 @@ func (bq BigQueryImpl) Read(
 	readOutputC chan<- ReadOutput,
 	errC chan<- error,
 ) {
-	connectionModel := views.ConvertConnectionView(sourceConnection)
-
-	sourceClient, err := bq.queryService.GetClient(ctx, connectionModel)
-	if err != nil {
-		errC <- err
-		return
-	}
-
-	readQuery := bq.getReadQuery(connectionModel, sync, fieldMappings)
-
-	iterator, err := sourceClient.GetQueryIterator(ctx, readQuery)
+	readQuery := bq.getReadQuery(sourceConnection, sync, fieldMappings)
+	iterator, err := bq.client.GetQueryIterator(ctx, readQuery)
 	if err != nil {
 		errC <- errors.NewCustomerVisibleError(err)
 		return
@@ -88,8 +79,7 @@ func (bq BigQueryImpl) Read(
 	close(errC)
 }
 
-// TODO: only read 10,000 rows at once or something
-func (bq BigQueryImpl) getReadQuery(sourceConnection *models.Connection, sync views.Sync, fieldMappings []views.FieldMapping) string {
+func (bq BigQueryImpl) getReadQuery(sourceConnection views.FullConnection, sync views.Sync, fieldMappings []views.FieldMapping) string {
 	var queryString string
 	if sync.CustomJoin != nil {
 		queryString = *sync.CustomJoin
@@ -162,14 +152,6 @@ func (bq BigQueryImpl) Write(
 	writeOutputC chan<- WriteOutput,
 	errC chan<- error,
 ) {
-	connectionModel := views.ConvertConnectionView(destinationConnection)
-
-	destClient, err := bq.queryService.GetWarehouseClient(ctx, connectionModel)
-	if err != nil {
-		errC <- err
-		return
-	}
-
 	// always clean up the data in the storage bucket
 	objectPrefix := uuid.New().String()
 	wildcardObject := fmt.Sprintf("%s-*", objectPrefix)
@@ -185,14 +167,14 @@ func (bq BigQueryImpl) Write(
 
 		rowsWritten += len(rows)
 		objectName := fmt.Sprintf("%s-%d", objectPrefix, batchNum)
-		err = bq.stageBatch(ctx, rows, fieldMappings, object, sync, destinationOptions, destClient, objectName)
+		err := bq.stageBatch(ctx, rows, fieldMappings, object, sync, destinationOptions, bq.client, objectName)
 		if err != nil {
 			errC <- err
 			return
 		}
 
 		// use a separate context for cleanup so it won't get cancelled
-		defer destClient.CleanUpStagingData(context.Background(), query.StagingOptions{Bucket: destinationOptions.StagingBucket, Object: objectName})
+		defer bq.client.CleanUpStagingData(context.Background(), query.StagingOptions{Bucket: destinationOptions.StagingBucket, Object: objectName})
 
 		batchNum++
 	}
@@ -200,7 +182,7 @@ func (bq BigQueryImpl) Write(
 	if rowsWritten > 0 {
 		writeMode := bq.toBigQueryWriteMode(sync.SyncMode)
 		csvSchema := bq.createCsvSchema(object.EndCustomerIdField, object.ObjectFields)
-		err = destClient.LoadFromStaging(ctx, *object.Namespace, *object.TableName, query.LoadOptions{
+		err := bq.client.LoadFromStaging(ctx, *object.Namespace, *object.TableName, query.LoadOptions{
 			GcsReference:   gcsReference,
 			BigQuerySchema: csvSchema,
 			WriteMode:      writeMode,

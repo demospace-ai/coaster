@@ -114,3 +114,31 @@ func (qs MockQueryService) GetWarehouseClient(ctx context.Context, connection *m
 
 type MockWarehouseClient struct {
 }
+
+type MockIterator struct {
+	idx    int
+	rows   []data.Row
+	schema data.Schema
+}
+
+func NewMockIterator(rows []data.Row, schema data.Schema) *MockIterator {
+	return &MockIterator{
+		idx:    0,
+		rows:   rows,
+		schema: schema,
+	}
+}
+
+func (it *MockIterator) Next(ctx context.Context) (data.Row, error) {
+	if it.idx >= len(it.rows) {
+		return nil, data.ErrDone
+	}
+
+	row := it.rows[it.idx]
+	it.idx++
+	return row, nil
+}
+
+func (it *MockIterator) Schema() data.Schema {
+	return it.schema
+}

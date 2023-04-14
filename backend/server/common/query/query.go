@@ -9,8 +9,6 @@ import (
 	"go.fabra.io/server/common/data"
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/models"
-
-	"gorm.io/gorm"
 )
 
 const FABRA_TIMESTAMP_TZ_FORMAT = "2006-01-02 15:04:05.000-07:00"
@@ -39,13 +37,11 @@ type QueryService interface {
 }
 
 type QueryServiceImpl struct {
-	db            *gorm.DB
 	cryptoService crypto.CryptoService
 }
 
-func NewQueryService(db *gorm.DB, cryptoService crypto.CryptoService) QueryService {
+func NewQueryService(cryptoService crypto.CryptoService) QueryService {
 	return QueryServiceImpl{
-		db:            db,
 		cryptoService: cryptoService,
 	}
 }

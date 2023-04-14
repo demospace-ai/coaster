@@ -24,7 +24,7 @@ func main() {
 
 	cryptoService := crypto.NewCryptoService()
 	authService := auth.NewAuthService(db, cryptoService)
-	queryService := query.NewQueryService(db, cryptoService)
+	queryService := query.NewQueryService(cryptoService)
 	apiService := api.NewApiService(db, authService, cryptoService, queryService)
 
 	router := router.NewRouter(authService)

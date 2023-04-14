@@ -15,6 +15,7 @@ interface FabraConnectOptions {
 
 let iframe: HTMLIFrameElement | null = null;
 let iframeReady: boolean = false;
+let useContainer: boolean = false;
 
 const initialize = (options?: FabraConnectOptions) => {
   window.addEventListener("message", handleMessage);
@@ -36,6 +37,7 @@ const initialize = (options?: FabraConnectOptions) => {
   if (options?.containerID !== undefined) {
     const container = document.getElementById(options.containerID);
     if (container !== null) {
+      useContainer = true;
       frameRoot = container;
       frame.style.position = "static";
     }
@@ -55,7 +57,7 @@ const handleMessage = (messageEvent: MessageEvent<FabraMessage>) => {
     case MessageType.IFrameReady:
       // NOTE: iFrame is letting us know that initialization is complete, and user can call open.
       if (iframe && window.fabra.customTheme) {
-        const message: FabraMessage = { messageType: MessageType.Theme, theme: window.fabra.customTheme };
+        const message: FabraMessage = { messageType: MessageType.Configure, theme: window.fabra.customTheme, useContainer: useContainer };
         iframe.contentWindow!.postMessage(message, CONNECT_ROOT);
       }
       iframeReady = true;
