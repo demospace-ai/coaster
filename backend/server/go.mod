@@ -1,6 +1,6 @@
 module go.fabra.io/server
 
-go 1.18
+go 1.20
 
 replace go.fabra.io/sync => ../sync
 
