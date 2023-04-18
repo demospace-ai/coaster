@@ -2,14 +2,13 @@ module go.fabra.io/server
 
 go 1.18
 
-replace go.fabra.io/sync => ../sync
-
 require (
 	cloud.google.com/go/bigquery v1.48.0
 	cloud.google.com/go/kms v1.9.0
 	cloud.google.com/go/secretmanager v1.10.0
 	cloud.google.com/go/storage v1.28.1
 	github.com/go-playground/validator/v10 v10.11.0
+	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/golang/mock v1.6.0
 	github.com/google/go-github v17.0.0+incompatible
@@ -22,7 +21,6 @@ require (
 	github.com/ory/dockertest/v3 v3.9.1
 	github.com/pkg/errors v0.9.1
 	github.com/snowflakedb/gosnowflake v1.6.17
-	go.fabra.io/sync v0.0.0-00010101000000-000000000000
 	go.temporal.io/sdk v1.22.1
 	gorm.io/driver/postgres v1.3.1
 	gorm.io/gorm v1.23.3
@@ -74,7 +72,6 @@ require (
 	github.com/gogo/googleapis v1.4.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/gogo/status v1.1.1 // indirect
-	github.com/golang-jwt/jwt/v5 v5.0.0 // indirect
 	github.com/golang-sql/civil v0.0.0-20190719163853-cb61b32ac6fe // indirect
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
