@@ -675,3 +675,31 @@ resource "google_kms_key_ring_iam_binding" "end-customer-api-key-ring-binding" {
     "serviceAccount:fabra-backend@fabra-344902.iam.gserviceaccount.com"
   ]
 }
+
+resource "google_kms_key_ring" "jwt-signing-key-keyring" {
+  name     = "jwt-signing-key-keyring"
+  location = "global"
+}
+
+resource "google_kms_crypto_key" "jwt-signing-key-key" {
+  name            = "jwt-signing-key-key"
+  key_ring        = google_kms_key_ring.jwt-signing-key-keyring.id
+  purpose         = "MAC"
+
+  version_template {
+    algorithm = "HMAC_SHA256"
+  }
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "google_kms_key_ring_iam_binding" "jwt-signing-key-ring-binding" {
+  key_ring_id = google_kms_key_ring.jwt-signing-key-keyring.id
+  role = "roles/cloudkms.signerVerifier"
+  members = [
+    "serviceAccount:fabra-sync@fabra-344902.iam.gserviceaccount.com",
+    "serviceAccount:fabra-backend@fabra-344902.iam.gserviceaccount.com"
+  ]
+}

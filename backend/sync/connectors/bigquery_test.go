@@ -20,11 +20,11 @@ import (
 
 var _ = Describe("BigQueryConnector", func() {
 	var (
-		sourceConnection      views.FullConnection
-		destinationConnection views.FullConnection
-		sync                  views.Sync
-		fieldMappings         []views.FieldMapping
-		object                views.Object
+		sourceConnection views.FullConnection
+		//destinationConnection views.FullConnection
+		sync          views.Sync
+		fieldMappings []views.FieldMapping
+		//object                views.Object
 	)
 
 	BeforeEach(func() {
@@ -32,8 +32,8 @@ var _ = Describe("BigQueryConnector", func() {
 		endCustomerID := int64(1)
 		source, sourceConn := test.CreateSource(db, org.ID, endCustomerID)
 		sourceConnection = views.ConvertFullConnection(sourceConn)
-		destination, destConn := test.CreateDestination(db, org.ID, endCustomerID)
-		destinationConnection = views.ConvertFullConnection(destConn)
+		destination, _ := test.CreateDestination(db, org.ID, endCustomerID)
+		//destinationConnection = views.ConvertFullConnection(destConn)
 
 		objectModel := test.CreateObject(db, org.ID, destination.ID, models.SyncModeFullAppend)
 		objectFields := test.CreateObjectFields(db, objectModel.ID, []input.ObjectField{
@@ -44,7 +44,7 @@ var _ = Describe("BigQueryConnector", func() {
 			{Name: "datetime_ntz", Type: data.FieldTypeDateTimeNtz},
 			{Name: "json", Type: data.FieldTypeJson},
 		})
-		object = views.ConvertObject(objectModel, objectFields)
+		//object = views.ConvertObject(objectModel, objectFields)
 		sync = views.ConvertSync(test.CreateSync(db, org.ID, endCustomerID, source.ID, objectModel.ID, models.SyncModeFullAppend))
 		fieldMappings = views.ConvertFieldMappings(test.CreateFieldMappings(db, sync.ID, []input.FieldMapping{
 			{SourceFieldName: "source_string", SourceFieldType: data.FieldTypeString, DestinationFieldId: objectFields[0].ID},

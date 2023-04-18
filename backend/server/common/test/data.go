@@ -26,8 +26,7 @@ func CreateOrganization(db *gorm.DB) *models.Organization {
 
 func CreateUser(db *gorm.DB, organizationID int64) *models.User {
 	user := models.User{
-		FirstName:         "Test",
-		LastName:          "User",
+		Name:              "Test Test",
 		Email:             "test@go.fabra.io",
 		ProfilePictureURL: "",
 		OrganizationID:    database.NewNullInt64(organizationID),

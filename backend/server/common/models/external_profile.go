@@ -1,8 +1,11 @@
 package models
 
+import "go.fabra.io/server/common/oauth"
+
 type ExternalProfile struct {
-	ExternalID string
-	UserID     int64
+	ExternalID    string
+	OauthProvider oauth.OauthProvider
+	UserID        int64
 
 	BaseModel
 }

@@ -38,7 +38,7 @@ export const Team: React.FC = () => {
               {users!.length > 0 ? users!.map((user, index) => (
                 <tr key={index} className="tw-border-b tw-border-solid tw-border-slate-200 last:tw-border-0">
                   <td className={tableCellStyle}>
-                    {user.first_name + " " + user.last_name}
+                    {user.name}
                   </td>
                   <td className={tableCellStyle}>
                     {user.email}

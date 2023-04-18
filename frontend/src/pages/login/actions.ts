@@ -6,19 +6,22 @@ import { useDispatch } from "src/root/model";
 import { sendRequest } from "src/rpc/ajax";
 import { Login, Logout, Organization, SetOrganization, User } from "src/rpc/api";
 
-export type GoogleLoginResponse = {
-  credential: string;
-};
-
-export type GoogleLoginHandler = (response: GoogleLoginResponse) => Promise<void>;
-
-export function useHandleGoogleResponse(): GoogleLoginHandler {
+export function useOauthLogin() {
   const dispatch = useDispatch();
   const onLoginSuccess = useOnLoginSuccess();
 
-  return useCallback(async (response: GoogleLoginResponse) => {
-    const id_token = response.credential;
-    const payload = { "id_token": id_token };
+  return useCallback(async (code: string | null, state: string | null) => {
+    if (code === null) {
+      // TODO: handle error here
+      return;
+    }
+
+    if (state === null) {
+      // TODO: handle error here
+      return;
+    }
+
+    const payload = { "code": code, "state": state };
     try {
       const loginResponse = await sendRequest(Login, payload);
       dispatch({
@@ -69,7 +72,7 @@ export function useOnLoginSuccess() {
 
   return useCallback(async (user: User, organization: Organization | undefined) => {
     rudderanalytics.identify(user.id.toString(), {
-      "name": `${user.first_name} ${user.last_name}`,
+      "name": `${user.name}`,
       "email": user.email
     });
 

@@ -102,7 +102,7 @@ const ProfileDropdown: React.FC = () => {
     <div className="tw-flex tw-flex-col tw-justify-center tw-ml-auto">
       <Menu as="div">
         <Menu.Button className="tw-bg-orange-400 tw-text-white tw-rounded-full tw-w-7 tw-h-7 tw-cursor-pointer tw-select-none">
-          {user!.first_name.charAt(0)}
+          {user!.name.charAt(0)}
         </Menu.Button>
         <Transition
           as={Fragment}
@@ -113,7 +113,7 @@ const ProfileDropdown: React.FC = () => {
           leaveFrom="tw-transform tw-opacity-100 tw-scale-97"
           leaveTo="tw-transform tw-opacity-0 tw-scale-95"
         >
-          <Menu.Items className="tw-absolute tw-origin-top-right tw-z-10 tw-divide-y tw-right-5 tw-mt-2 tw-mr-2 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none tw-w-56">
+          <Menu.Items className="tw-absolute tw-origin-top-right tw-z-10 tw-divide-y tw-right-5 tw-mt-2 tw-mr-2 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none tw-w-80">
             <div className="tw-m-2">
               <p className="tw-px-1 tw-pt-2 tw-pb-1 tw-text-xs tw-uppercase">Signed in as</p>
               <Menu.Item>
@@ -126,10 +126,10 @@ const ProfileDropdown: React.FC = () => {
                     )}
                   >
                     <div className="tw-bg-slate-400 tw-text-white tw-rounded-full tw-w-7 tw-h-7 tw-select-none tw-flex tw-items-center tw-justify-center tw-mr-3">
-                      {user!.first_name.charAt(0)}
+                      {user!.name.charAt(0)}
                     </div>
                     <div className="tw-flex tw-flex-col">
-                      <p className="tw-truncate tw-text-sm tw-font-semibold tw-text-slate-900">{user?.first_name} {user?.last_name}</p>
+                      <p className="tw-truncate tw-text-sm tw-font-semibold tw-text-slate-900">{user?.name}</p>
                       <p className="tw-truncate tw-text-sm tw-font-medium tw-text-slate-900">{user?.email}</p>
                     </div>
                   </div>

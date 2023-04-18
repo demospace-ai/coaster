@@ -159,10 +159,16 @@ func (s ApiService) UnauthenticatedRoutes() []router.UnauthenticatedRoute {
 			HandlerFunc: s.Hello,
 		},
 		{
-			Name:        "Login",
-			Method:      router.POST,
-			Pattern:     "/login",
-			HandlerFunc: s.Login,
+			Name:        "OAuth Redirect",
+			Method:      router.GET,
+			Pattern:     "/oauth_redirect",
+			HandlerFunc: s.OAuthRedirect,
+		},
+		{
+			Name:        "OAuth Login",
+			Method:      router.GET,
+			Pattern:     "/oauth_login",
+			HandlerFunc: s.OAuthLogin,
 		},
 	}
 }

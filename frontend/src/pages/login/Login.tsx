@@ -1,17 +1,16 @@
 import classNames from "classnames";
-import React, { FormEvent, useEffect, useRef, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, FormButton } from "src/components/button/Button";
+import { GithubIcon } from "src/components/icons/Github";
+import { GoogleIcon } from "src/components/icons/Google";
 import longlogo from "src/components/images/long-logo.svg";
 import mail from "src/components/images/mail.svg";
 import { LogoLoading } from "src/components/loading/LogoLoading";
-import {
-  GoogleLoginResponse, useHandleGoogleResponse, useSetOrganization
-} from "src/pages/login/actions";
+import { useSetOrganization } from "src/pages/login/actions";
 import { useSelector } from "src/root/model";
-import useWindowDimensions from "src/utils/window";
-
-const GOOGLE_CLIENT_ID = "932264813910-egpk1omo3v2cedd89k8go851uko6djpa.apps.googleusercontent.com";
+import { getEndpointUrl } from "src/rpc/ajax";
+import { OAuthProvider, OAuthRedirect } from "src/rpc/api";
 
 export enum LoginStep {
   Start = 1,
@@ -21,7 +20,6 @@ export enum LoginStep {
 
 export const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
-  const handleGoogleResponse = useHandleGoogleResponse();
   const isAuthenticated = useSelector(state => state.login.authenticated);
   const organization = useSelector(state => state.login.organization);
   const unauthorized = useSelector(state => state.login.unauthorized);
@@ -45,15 +43,9 @@ export const Login: React.FC = () => {
     );
   }
 
-  const onGoogleSignIn = async (response: GoogleLoginResponse) => {
-    setLoading(true);
-    await handleGoogleResponse(response);
-    setLoading(false);
-  };
-
   let loginContent;
   if (!isAuthenticated) {
-    loginContent = <StartContent onGoogleSignIn={onGoogleSignIn} />;
+    loginContent = <StartContent />;
   } else if (!organization) {
     loginContent = <OrganizationInput setLoading={setLoading} />;
   }
@@ -83,60 +75,20 @@ export const Login: React.FC = () => {
   );
 };
 
-type StartContentProps = {
-  onGoogleSignIn: (_: GoogleLoginResponse) => void,
-};
-
-const StartContent: React.FC<StartContentProps> = props => {
-  // Hack to adjust Google login button width for mobile since CSS is not supported
-  const { width } = useWindowDimensions();
-  const googleButtonWidth = width > 600 ? 320 : 300;
-
+const StartContent: React.FC = () => {
   return (
     <>
-      <div className="tw-text-center tw-mb-10">Sign in to continue to Fabra.</div>
-      <GoogleLogin onGoogleSignIn={props.onGoogleSignIn} width={googleButtonWidth} />
+      <div className="tw-text-center tw-mb-6">Sign in to continue to Fabra.</div>
+      <a className={classNames("tw-flex tw-items-center tw-cursor-pointer tw-justify-center tw-mt-4 tw-h-10 tw-bg-slate-100 tw-border tw-border-slate-300 hover:tw-bg-slate-200 tw-transition-colors tw-font-medium tw-w-80 tw-text-slate-800 tw-rounded")} href={getEndpointUrl(OAuthRedirect, { provider: OAuthProvider.Google })}>
+        <GoogleIcon className="tw-mr-1.5 tw-h-[18px]" />
+        Login with Google
+      </a>
+      <a className={classNames("tw-flex tw-items-center tw-cursor-pointer tw-justify-center tw-mt-4 tw-h-10 tw-bg-black hover:tw-bg-[#333333] tw-transition-colors tw-font-medium tw-w-80 tw-text-white tw-rounded")} href={getEndpointUrl(OAuthRedirect, { provider: OAuthProvider.Github })}>
+        <GithubIcon className="tw-mr-2" />
+        Login with Github
+      </a>
     </>
   );
-};
-
-type GoogleLoginProps = {
-  onGoogleSignIn: (_: GoogleLoginResponse) => void,
-  width: number,
-};
-
-let googleScriptLoaded = false;
-
-const GoogleLogin: React.FC<GoogleLoginProps> = props => {
-  const buttonRef = useRef<HTMLDivElement>(null);
-
-  // Use effect to wait until after the component is rendered
-  useEffect(() => {
-    const onLoad = () => {
-      window.google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: props.onGoogleSignIn,
-      });
-      window.google.accounts.id.renderButton(
-        buttonRef.current!,
-        { theme: "filled_blue", size: "large", text: "continue_with", width: props.width }
-      );
-    };
-
-    if (googleScriptLoaded) {
-      onLoad();
-    } else {
-      const script = document.createElement("script");
-
-      script.src = "https://accounts.google.com/gsi/client";
-      script.onload = onLoad;
-
-      document.head.appendChild(script);
-      googleScriptLoaded = true;
-    }
-  }, [props.onGoogleSignIn, props.width]);
-
-  return <div className="tw-flex tw-justify-center" ref={buttonRef}></div>;
 };
 
 type OrganizationInputProps = {
@@ -189,7 +141,7 @@ const OrganizationInput: React.FC<OrganizationInputProps> = props => {
   if (!suggestedOrganizations || suggestedOrganizations.length === 0 || overrideCreate) {
     return (
       <form className="tw-mt-5" onSubmit={createNewOrganization}>
-        <div className="tw-mb-5">Welcome, {user!.first_name}! Let's build out your team.</div>
+        <div className="tw-mb-5">Welcome, {user!.name}! Let's build out your team.</div>
         <input
           type="text"
           id="organization"
@@ -210,7 +162,7 @@ const OrganizationInput: React.FC<OrganizationInputProps> = props => {
 
   return (
     <div className="tw-mt-5" >
-      <div className="tw-mb-5">Welcome, {user!.first_name}! Join your team.</div>
+      <div className="tw-mb-5">Welcome, {user!.name}! Join your team.</div>
       {suggestedOrganizations.map((suggestion, index) => (
         <li key={index} className="tw-border tw-border-black tw-rounded-md tw-list-none tw-p-8 tw-text-left tw-flex tw-flex-row">
           <Button className="tw-inline-block tw-mr-8 tw-h-10 tw-w-1/2" onClick={() => joinOrganization(suggestion.id)}>Join</Button>

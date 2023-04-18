@@ -13,6 +13,27 @@ export async function sendLinkTokenRequest<RequestType extends Record<string, an
   return sendRequest(endpoint, payload, [["X-LINK-TOKEN", linkToken]]);
 }
 
+export function getEndpointUrl<RequestType extends Record<string, any>, ResponseType>(
+  endpoint: IEndpoint<RequestType, ResponseType>,
+  payload?: RequestType,
+  extraHeaders?: [string, string][],
+): string {
+  const toPath = compile(endpoint.path);
+  const path = toPath(payload);
+
+  const url = new URL(ROOT_DOMAIN + path);
+  if (endpoint.queryParams && payload) {
+    endpoint.queryParams.forEach(queryParam => {
+      const queryParamValue = payload[queryParam];
+      if (queryParamValue) {
+        url.searchParams.append(queryParam, queryParamValue);
+      }
+    });
+  }
+
+  return url.toString();
+}
+
 export async function sendRequest<RequestType extends Record<string, any>, ResponseType>(
   endpoint: IEndpoint<RequestType, ResponseType>,
   payload?: RequestType,

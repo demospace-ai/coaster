@@ -16,6 +16,14 @@ export const Login: IEndpoint<LoginRequest, LoginResponse> = {
   track: true,
 };
 
+export const OAuthRedirect: IEndpoint<{ provider: OAuthProvider; }, undefined> = {
+  name: "OAuth Redirect",
+  method: "GET",
+  path: "/oauth_redirect",
+  queryParams: ["provider"],
+  track: true,
+};
+
 export const GetAllUsers: IEndpoint<undefined, GetAllUsersResponse> = {
   name: "All Users Fetched",
   method: "GET",
@@ -27,7 +35,6 @@ export const GetDestinations: IEndpoint<undefined, GetDestinationsResponse> = {
   method: "GET",
   path: "/destinations",
 };
-
 
 export const GetDestination: IEndpoint<{ destinationID: number; }, GetDestinationResponse> = {
   name: "Destination Fetched",
@@ -425,15 +432,20 @@ export interface ValidationCodeRequest {
 }
 
 export interface LoginRequest {
-  id_token?: string;
+  code?: string;
+  state?: string;
   organization_name?: string;
   organization_id?: string;
 }
 
+export enum OAuthProvider {
+  Google = "google",
+  Github = "github",
+}
+
 export interface User {
   id: number;
-  first_name: string;
-  last_name: string;
+  name: string;
   email: string;
 }
 

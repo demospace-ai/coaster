@@ -3,19 +3,13 @@ package users
 import (
 	"github.com/pkg/errors"
 	"go.fabra.io/server/common/models"
+	"go.fabra.io/server/common/oauth"
 	"go.fabra.io/server/common/repositories/external_profiles"
 	"gorm.io/gorm"
 )
 
 // Maximum of 62^8 guarantees number will be at most 8 digits in base
 const MAX_RANDOM = 218340105584896
-
-type ExternalUserInfo struct {
-	ExternalID string
-	Email      string
-	FirstName  string
-	LastName   string
-}
 
 func LoadByExternalID(db *gorm.DB, externalID string) (*models.User, error) {
 	var user models.User
@@ -61,11 +55,10 @@ func LoadUserByID(db *gorm.DB, userID int64) (*models.User, error) {
 	return &user, nil
 }
 
-func create(db *gorm.DB, firstName string, lastName string, email string) (*models.User, error) {
+func create(db *gorm.DB, name string, email string) (*models.User, error) {
 	user := models.User{
-		FirstName: firstName,
-		LastName:  lastName,
-		Email:     email,
+		Name:  name,
+		Email: email,
 	}
 
 	result := db.Create(&user)
@@ -76,13 +69,13 @@ func create(db *gorm.DB, firstName string, lastName string, email string) (*mode
 	return &user, nil
 }
 
-func CreateUserForExternalInfo(db *gorm.DB, externalUserInfo *ExternalUserInfo) (*models.User, error) {
-	user, err := create(db, externalUserInfo.FirstName, externalUserInfo.LastName, externalUserInfo.Email)
+func CreateUserForExternalInfo(db *gorm.DB, externalUserInfo *oauth.ExternalUserInfo) (*models.User, error) {
+	user, err := create(db, externalUserInfo.Name, externalUserInfo.Email)
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = external_profiles.Create(db, externalUserInfo.ExternalID, user.ID)
+	_, err = external_profiles.Create(db, externalUserInfo.ExternalID, externalUserInfo.OauthProvider, user.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +92,7 @@ func SetOrganization(db *gorm.DB, user *models.User, organizationID int64) (*mod
 	return user, nil
 }
 
-func GetOrCreateForExternalInfo(db *gorm.DB, externalUserInfo *ExternalUserInfo) (*models.User, error) {
+func GetOrCreateForExternalInfo(db *gorm.DB, externalUserInfo *oauth.ExternalUserInfo) (*models.User, error) {
 	existingUser, err := LoadByExternalID(db, externalUserInfo.ExternalID)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
@@ -114,31 +107,6 @@ func GetOrCreateForExternalInfo(db *gorm.DB, externalUserInfo *ExternalUserInfo)
 
 	return user, nil
 
-}
-
-func CreateUserForEmail(db *gorm.DB, email string, firstName string, lastName string) (*models.User, error) {
-	user, err := create(db, firstName, lastName, email)
-	if err != nil {
-		return nil, err
-	}
-
-	return user, nil
-}
-
-func GetOrCreateForEmail(db *gorm.DB, email string, firstName string, lastName string) (*models.User, error) {
-	existingUser, err := LoadByEmail(db, email)
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, err
-	} else if err == nil {
-		return existingUser, nil
-	}
-
-	user, err := CreateUserForEmail(db, email, firstName, lastName)
-	if err != nil {
-		return nil, err
-	}
-
-	return user, nil
 }
 
 func LoadAllByOrganizationID(db *gorm.DB, organizationID int64) ([]models.User, error) {
