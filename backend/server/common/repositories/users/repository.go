@@ -2,6 +2,7 @@ package users
 
 import (
 	"github.com/pkg/errors"
+	"go.fabra.io/server/common/events"
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/oauth"
 	"go.fabra.io/server/common/repositories/external_profiles"
@@ -105,8 +106,9 @@ func GetOrCreateForExternalInfo(db *gorm.DB, externalUserInfo *oauth.ExternalUse
 		return nil, err
 	}
 
-	return user, nil
+	events.Track(user.ID, "User Signup")
 
+	return user, nil
 }
 
 func LoadAllByOrganizationID(db *gorm.DB, organizationID int64) ([]models.User, error) {

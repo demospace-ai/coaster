@@ -111,6 +111,8 @@ func CreateObjectFields(db *gorm.DB, objectID int64, fields []input.ObjectField)
 			ObjectID: objectID,
 			Name:     field.Name,
 			Type:     field.Type,
+			Optional: field.Optional,
+			Omit:     field.Omit,
 		}
 
 		db.Create(&fieldModel)

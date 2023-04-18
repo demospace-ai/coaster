@@ -3,7 +3,10 @@ package connectors_test
 import (
 	"context"
 	"fmt"
+	"reflect"
+	"strings"
 
+	"cloud.google.com/go/bigquery"
 	"github.com/golang/mock/gomock"
 	"go.fabra.io/server/common/data"
 	"go.fabra.io/server/common/input"
@@ -20,11 +23,11 @@ import (
 
 var _ = Describe("BigQueryConnector", func() {
 	var (
-		sourceConnection views.FullConnection
-		//destinationConnection views.FullConnection
-		sync          views.Sync
-		fieldMappings []views.FieldMapping
-		//object                views.Object
+		sourceConnection      views.FullConnection
+		destinationConnection views.FullConnection
+		sync                  views.Sync
+		fieldMappings         []views.FieldMapping
+		object                views.Object
 	)
 
 	BeforeEach(func() {
@@ -32,8 +35,8 @@ var _ = Describe("BigQueryConnector", func() {
 		endCustomerID := int64(1)
 		source, sourceConn := test.CreateSource(db, org.ID, endCustomerID)
 		sourceConnection = views.ConvertFullConnection(sourceConn)
-		destination, _ := test.CreateDestination(db, org.ID, endCustomerID)
-		//destinationConnection = views.ConvertFullConnection(destConn)
+		destination, destConn := test.CreateDestination(db, org.ID, endCustomerID)
+		destinationConnection = views.ConvertFullConnection(destConn)
 
 		objectModel := test.CreateObject(db, org.ID, destination.ID, models.SyncModeFullAppend)
 		objectFields := test.CreateObjectFields(db, objectModel.ID, []input.ObjectField{
@@ -42,9 +45,9 @@ var _ = Describe("BigQueryConnector", func() {
 			{Name: "boolean", Type: data.FieldTypeBoolean},
 			{Name: "datetime_tz", Type: data.FieldTypeDateTimeTz},
 			{Name: "datetime_ntz", Type: data.FieldTypeDateTimeNtz},
-			{Name: "json", Type: data.FieldTypeJson},
+			{Name: "json", Type: data.FieldTypeJson, Optional: true},
 		})
-		//object = views.ConvertObject(objectModel, objectFields)
+		object = views.ConvertObject(objectModel, objectFields)
 		sync = views.ConvertSync(test.CreateSync(db, org.ID, endCustomerID, source.ID, objectModel.ID, models.SyncModeFullAppend))
 		fieldMappings = views.ConvertFieldMappings(test.CreateFieldMappings(db, sync.ID, []input.FieldMapping{
 			{SourceFieldName: "source_string", SourceFieldType: data.FieldTypeString, DestinationFieldId: objectFields[0].ID},
@@ -258,63 +261,76 @@ var _ = Describe("BigQueryConnector", func() {
 			2. Out of order object fields
 			3. Various types mapped correctly to the bigquery expected format
 			4. Mapping multiple JSON fields to a single object
-			5. Test schema using gomock
 
 		*/
 
-		// It("writes correctly", func() {
-		// 	ctrl := gomock.NewController(GinkgoT())
-		// 	client := mock_query.NewMockWarehouseClient(ctrl)
-		// 	defer ctrl.Finish()
+		It("writes correctly", func() {
+			ctrl := gomock.NewController(GinkgoT())
+			client := mock_query.NewMockWarehouseClient(ctrl)
+			defer ctrl.Finish()
 
-		// 	rows := make([]data.Row, 10)
-		// 	for i := 0; i < 10; i++ {
-		// 		rows[i] = data.Row{"string", 2, false, "2006-01-02 15:04:05.000-07:00", "2006-01-02 15:04:05.000", map[string]int{"hello": 123}}
-		// 	}
+			rows := make([]data.Row, 10)
+			for i := 0; i < 10; i++ {
+				rows[i] = data.Row{"string", 2, false, "2006-01-02 15:04:05.000-07:00", "2006-01-02 15:04:05.000", map[string]int{"hello": 123}}
+			}
 
-		// 	csvRows := make([]string, 10)
-		// 	for i := 0; i < 10; i++ {
-		// 		// Strings should be quoted, while integers, numbers, and datetimes should not. JSON should be double quoted
-		// 		csvRows[i] = "\"string\",2,false,2006-01-02 15:04:05.000-07:00,2006-01-02 15:04:05.000,\"{\"\"hello\"\":123}\",1"
-		// 	}
-		// 	csvData := strings.Join(csvRows, "\n")
+			csvRows := make([]string, 10)
+			for i := 0; i < 10; i++ {
+				// Strings should be quoted, while integers, numbers, and datetimes should not. JSON should be double quoted
+				csvRows[i] = "\"string\",2,false,2006-01-02 15:04:05.000-07:00,2006-01-02 15:04:05.000,\"{\"\"hello\"\":123}\",1"
+			}
+			csvData := strings.Join(csvRows, "\n")
 
-		// 	client.EXPECT().StageData(
-		// 		gomock.Any(),
-		// 		csvData,
-		// 		MockStagingOptions{Bucket: "staging"},
-		// 	).Return(nil)
+			client.EXPECT().StageData(
+				gomock.Any(),
+				csvData,
+				MockStagingOptions{Bucket: "staging"},
+			).Return(nil)
 
-		// 	connector := connectors.NewBigQueryConnector(client)
-		// 	rowsC := make(chan []data.Row)
-		// 	writeOutputC := make(chan connectors.WriteOutput)
-		// 	errC := make(chan error)
+			client.EXPECT().LoadFromStaging(
+				gomock.Any(),
+				"namespace",
+				"table",
+				MockLoadOptions{
+					"staging",
+					bigquery.Schema{
+						{Name: "string", Type: bigquery.StringFieldType, Required: true},
+						{Name: "integer", Type: bigquery.IntegerFieldType, Required: true},
+						{Name: "boolean", Type: bigquery.BooleanFieldType, Required: true},
+						{Name: "datetime_tz", Type: bigquery.TimestampFieldType, Required: true},
+						{Name: "datetime_ntz", Type: bigquery.DateTimeFieldType, Required: true},
+						{Name: "json", Type: bigquery.JSONFieldType, Required: false},
+						{Name: "end_customer_id", Type: bigquery.IntegerFieldType, Required: true},
+					},
+					bigquery.WriteAppend,
+				},
+			).Return(nil)
 
-		// 	go func() {
-		// 		defer GinkgoRecover()
-		// 		defer func() { close(writeOutputC) }() // close the output channel so the test completes in case of an error
-		// 		connector.Write(context.TODO(), destinationConnection, connectors.DestinationOptions{StagingBucket: "staging"}, object, sync, fieldMappings, rowsC, writeOutputC, errC)
-		// 	}()
+			client.EXPECT().CleanUpStagingData(
+				gomock.Any(),
+				MockStagingOptions{Bucket: "staging"},
+			).Return(nil)
 
-		// 	rowsC <- rows
-		// 	close(rowsC)
+			connector := connectors.NewBigQueryConnector(client)
+			rowsC := make(chan []data.Row)
+			writeOutputC := make(chan connectors.WriteOutput)
+			errC := make(chan error)
 
-		// 	writeOutput, err := waitForWrite(writeOutputC, errC)
+			go func() {
+				defer GinkgoRecover()
+				defer func() { close(writeOutputC) }() // close the output channel so the test completes in case of an error
+				connector.Write(context.TODO(), destinationConnection, connectors.DestinationOptions{StagingBucket: "staging"}, object, sync, fieldMappings, rowsC, writeOutputC, errC)
+			}()
 
-		// 	currentTime := time.Now()
-		// 	object := map[string]int{
-		// 		"a": 1,
-		// 		"b": 2,
-		// 	}
-		// 	outputData := []data.Row{
-		// 		{"1", 1, currentTime, object},
-		// 	}
+			rowsC <- rows
+			close(rowsC)
 
-		// 	// TODO: make sure this is correct
-		// 	Expect(err).To(BeNil())
-		// 	Expect(writeOutput.RowsWritten).To(Equal(10))
-		// 	client.EXPECT().StageData(context.TODO(), outputData, query.StagingOptions{})
-		// })
+			writeOutput, err := waitForWrite(writeOutputC, errC)
+
+			// TODO: make sure this is correct
+			Expect(err).To(BeNil())
+			Expect(writeOutput.RowsWritten).To(Equal(10))
+		})
 	})
 })
 
@@ -381,4 +397,58 @@ func (so MockStagingOptions) Matches(x interface{}) bool {
 
 func (so MockStagingOptions) String() string {
 	return fmt.Sprintf("{%s, ANY}", so.Bucket)
+}
+
+type MockLoadOptions struct {
+	Bucket    string
+	Schema    bigquery.Schema
+	WriteMode bigquery.TableWriteDisposition
+}
+
+func (so MockLoadOptions) Matches(x interface{}) bool {
+	actual, ok := x.(query.LoadOptions)
+	if !ok {
+		return false
+	}
+
+	gcsReference := fmt.Sprintf("gs://%s/", so.Bucket)
+	return gcsReference == strings.Join(strings.SplitAfter(actual.GcsReference, "/")[0:3], "") &&
+		reflect.DeepEqual(so.Schema, actual.BigQuerySchema) &&
+		so.WriteMode == actual.WriteMode
+}
+
+func (so MockLoadOptions) Got(got interface{}) string {
+	actual, ok := got.(query.LoadOptions)
+	if !ok {
+		return fmt.Sprintf("unexpected struct: %v", got)
+	}
+
+	fieldList := make([]string, len(actual.BigQuerySchema))
+	for i, field := range actual.BigQuerySchema {
+		value := "nil"
+		if field != nil {
+			value = fmt.Sprintf("%+v", *field)
+		}
+		fieldList[i] = value
+	}
+
+	outputSchema := fmt.Sprintf("[\n\t%s\n]", strings.Join(fieldList, ",\n\t"))
+
+	return fmt.Sprintf("{\n%s, \n%v, \n%s\n}", strings.Join(strings.SplitAfter(actual.GcsReference, "/")[0:3], ""), outputSchema, actual.WriteMode)
+}
+
+func (so MockLoadOptions) String() string {
+
+	fieldList := make([]string, len(so.Schema))
+	for i, field := range so.Schema {
+		value := "nil"
+		if field != nil {
+			value = fmt.Sprintf("%+v", *field)
+		}
+		fieldList[i] = value
+	}
+
+	outputSchema := fmt.Sprintf("[\n\t%s\n]", strings.Join(fieldList, ",\n\t"))
+
+	return fmt.Sprintf("{\ngs://%s/, \n%v, \n%s\n}", so.Bucket, outputSchema, so.WriteMode)
 }
