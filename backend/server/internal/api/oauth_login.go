@@ -51,15 +51,24 @@ func (s ApiService) OAuthLogin(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	var userEmailDomain = strings.Split(externalUserInfo.Email, "@")[1]
-	if _, unauthorized := UNAUTHORIZED_DOMAINS[userEmailDomain]; unauthorized {
-		http.Redirect(w, r, getUnauthorizedRedirect(), http.StatusFound)
-		return nil
+	// separately check for existing user to bypass allowlist for domains
+	user, err := users.LoadByExternalID(s.db, externalUserInfo.ExternalID)
+	if err != nil && !errors.IsRecordNotFound(err) {
+		return err
 	}
 
-	user, err := users.GetOrCreateForExternalInfo(s.db, externalUserInfo)
-	if err != nil {
-		return err
+	// no user exists yet, so if the domain is not allowed then redirect
+	if user == nil {
+		var userEmailDomain = strings.Split(externalUserInfo.Email, "@")[1]
+		if _, unauthorized := UNAUTHORIZED_DOMAINS[userEmailDomain]; unauthorized {
+			http.Redirect(w, r, getUnauthorizedRedirect(), http.StatusFound)
+			return nil
+		}
+
+		user, err = users.CreateUserForExternalInfo(s.db, externalUserInfo)
+		if err != nil {
+			return err
+		}
 	}
 
 	sessionToken, err := sessions.Create(s.db, user.ID)

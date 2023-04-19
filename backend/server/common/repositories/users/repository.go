@@ -1,7 +1,7 @@
 package users
 
 import (
-	"github.com/pkg/errors"
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/events"
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/oauth"
@@ -95,7 +95,7 @@ func SetOrganization(db *gorm.DB, user *models.User, organizationID int64) (*mod
 
 func GetOrCreateForExternalInfo(db *gorm.DB, externalUserInfo *oauth.ExternalUserInfo) (*models.User, error) {
 	existingUser, err := LoadByExternalID(db, externalUserInfo.ExternalID)
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+	if err != nil && !errors.IsRecordNotFound(err) {
 		return nil, err
 	} else if err == nil {
 		return existingUser, nil
