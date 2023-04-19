@@ -37,10 +37,11 @@ export const App: React.FC = () => {
   }
 
   return (
-    <>
+    <div className="tw-flex tw-flex-row tw-w-full tw-h-full">
       <Routes>
         <Route element={<AppLayout />}>
           <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Login create />} />
           <Route path="/" element={<RequireAuth element={<Home />} />} />
           <Route path="/apikey" element={<RequireAuth element={<ApiKey />} />} />
           <Route path="/team" element={<RequireAuth element={<Team />} />} />
@@ -52,7 +53,7 @@ export const App: React.FC = () => {
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
-    </>
+    </div>
   );
 };
 

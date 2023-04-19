@@ -327,7 +327,6 @@ var _ = Describe("BigQueryConnector", func() {
 
 			writeOutput, err := waitForWrite(writeOutputC, errC)
 
-			// TODO: make sure this is correct
 			Expect(err).To(BeNil())
 			Expect(writeOutput.RowsWritten).To(Equal(10))
 		})

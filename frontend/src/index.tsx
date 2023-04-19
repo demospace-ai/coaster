@@ -8,6 +8,7 @@ import { Provider } from "react-redux";
 import { BrowserRouter } from "react-router-dom";
 import { App } from "src/app/App";
 import { rudderanalytics } from "src/app/rudder";
+import { UpgradeBanner } from "src/components/header/UpgradeBanner";
 import { createStore } from "src/root/model";
 import { isProd } from "src/utils/env";
 
@@ -26,6 +27,7 @@ root.render(
     <ErrorBoundary showDialog>
       <Provider store={store}>
         <BrowserRouter>
+          <UpgradeBanner />
           <App />
         </BrowserRouter>
       </Provider>

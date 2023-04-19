@@ -523,6 +523,7 @@ export interface LoginResponse {
 export interface Organization {
   id: number;
   name: string;
+  free_trial_end?: string;
 }
 
 export interface CheckSessionResponse {

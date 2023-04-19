@@ -46,6 +46,19 @@ func NewNullInt64(i int64) NullInt64 {
 	return NullInt64{sql.NullInt64{Int64: i, Valid: true}}
 }
 
+type NullTime struct{ sql.NullTime }
+
+func (t NullTime) MarshalJSON() ([]byte, error) {
+	if t.Valid {
+		return json.Marshal(t.Time)
+	}
+	return []byte(`null`), nil
+}
+
+func NewNullTime(t time.Time) NullTime {
+	return NullTime{sql.NullTime{Time: t, Valid: true}}
+}
+
 var EmptyNullInt64 = NullInt64{sql.NullInt64{Valid: false}}
 
 func InitDatabase() (*gorm.DB, error) {

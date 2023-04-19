@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import React, { FormEvent, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { Button, FormButton } from "src/components/button/Button";
 import { GithubIcon } from "src/components/icons/Github";
 import { GoogleIcon } from "src/components/icons/Google";
@@ -18,7 +18,7 @@ export enum LoginStep {
   Organization,
 }
 
-export const Login: React.FC = () => {
+export const Login: React.FC<{ create?: boolean; }> = ({ create }) => {
   const [loading, setLoading] = useState(false);
   const isAuthenticated = useSelector(state => state.login.authenticated);
   const organization = useSelector(state => state.login.organization);
@@ -45,7 +45,7 @@ export const Login: React.FC = () => {
 
   let loginContent;
   if (!isAuthenticated) {
-    loginContent = <StartContent />;
+    loginContent = <StartContent create={create} />;
   } else if (!organization) {
     loginContent = <OrganizationInput setLoading={setLoading} />;
   }
@@ -67,26 +67,27 @@ export const Login: React.FC = () => {
               <>{loginContent}</>}
           </div>
         </div>
-        <div className="tw-text-xs tw-text-center tw-mt-4 tw-text-slate-800">
-          By continuing you agree to Fabra's <a className="tw-text-blue-500" href="https://fabra.io/terms" target="_blank" rel="noreferrer">Terms of Service</a> and <a className="tw-text-blue-500" href="https://fabra.io/privacy" target="_blank" rel="noreferrer">Privacy Policy</a>.
+        <div className="tw-text-xs tw-text-center tw-mt-4 tw-text-slate-800 tw-select-none">
+          By continuing you agree to Fabra's <a className="tw-text-blue-500" href="https://fabra.io/terms" target="_blank" rel="noreferrer">Terms of Use</a> and <a className="tw-text-blue-500" href="https://fabra.io/privacy" target="_blank" rel="noreferrer">Privacy Policy</a>.
         </div>
       </div>
     </div>
   );
 };
 
-const StartContent: React.FC = () => {
+const StartContent: React.FC<{ create?: boolean; }> = ({ create }) => {
   return (
     <>
-      <div className="tw-text-center tw-mb-6">Sign in to continue to Fabra.</div>
-      <a className={classNames("tw-flex tw-items-center tw-cursor-pointer tw-justify-center tw-mt-4 tw-h-10 tw-bg-slate-100 tw-border tw-border-slate-300 hover:tw-bg-slate-200 tw-transition-colors tw-font-medium tw-w-80 tw-text-slate-800 tw-rounded")} href={getEndpointUrl(OAuthRedirect, { provider: OAuthProvider.Google })}>
+      <div className="tw-text-center tw-mb-6 tw-select-none">{create ? "Start your free 30-day trial of Fabra!" : "Sign in to continue to Fabra."}</div>
+      <a className={classNames("tw-flex tw-items-center tw-select-none tw-cursor-pointer tw-justify-center tw-mt-4 tw-h-10 tw-bg-slate-100 tw-border tw-border-slate-300 hover:tw-bg-slate-200 tw-transition-colors tw-font-medium tw-w-80 tw-text-slate-800 tw-rounded")} href={getEndpointUrl(OAuthRedirect, { provider: OAuthProvider.Google })}>
         <GoogleIcon className="tw-mr-1.5 tw-h-[18px]" />
-        Login with Google
+        Continue with Google
       </a>
-      <a className={classNames("tw-flex tw-items-center tw-cursor-pointer tw-justify-center tw-mt-4 tw-h-10 tw-bg-black hover:tw-bg-[#333333] tw-transition-colors tw-font-medium tw-w-80 tw-text-white tw-rounded")} href={getEndpointUrl(OAuthRedirect, { provider: OAuthProvider.Github })}>
+      <a className={classNames("tw-flex tw-items-center tw-select-none tw-cursor-pointer tw-justify-center tw-mt-4 tw-h-10 tw-bg-black hover:tw-bg-[#333333] tw-transition-colors tw-font-medium tw-w-80 tw-text-white tw-rounded")} href={getEndpointUrl(OAuthRedirect, { provider: OAuthProvider.Github })}>
         <GithubIcon className="tw-mr-2" />
-        Login with Github
+        Continue with Github
       </a>
+      {create ? <div className="tw-mt-5  tw-select-none">Already have an account? <NavLink className="tw-text-blue-500" to="/login">Sign in</NavLink></div> : <div className="tw-mt-5 tw-select-none">Need an account? <NavLink className="tw-text-blue-500" to="/signup">Sign up</NavLink></div>}
     </>
   );
 };

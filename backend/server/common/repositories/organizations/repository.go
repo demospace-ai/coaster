@@ -1,15 +1,22 @@
 package organizations
 
 import (
+	"time"
+
+	"go.fabra.io/server/common/database"
 	"go.fabra.io/server/common/models"
 
 	"gorm.io/gorm"
 )
 
 func Create(db *gorm.DB, organizationName string, emailDomain string) (*models.Organization, error) {
+	// 30-day free trial
+	freeTrialEnd := time.Now().Add(time.Hour * 24 * 30)
+
 	organization := models.Organization{
-		Name:        organizationName,
-		EmailDomain: emailDomain,
+		Name:         organizationName,
+		EmailDomain:  emailDomain,
+		FreeTrialEnd: database.NewNullTime(freeTrialEnd),
 	}
 
 	result := db.Create(&organization)
