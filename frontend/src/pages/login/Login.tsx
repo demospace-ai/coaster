@@ -22,7 +22,6 @@ export const Login: React.FC<{ create?: boolean; }> = ({ create }) => {
   const [loading, setLoading] = useState(false);
   const isAuthenticated = useSelector(state => state.login.authenticated);
   const organization = useSelector(state => state.login.organization);
-  const unauthorized = useSelector(state => state.login.unauthorized);
   const navigate = useNavigate();
 
   // Use effect to navigate after render if authenticated
@@ -56,15 +55,7 @@ export const Login: React.FC<{ create?: boolean; }> = ({ create }) => {
         <div className="tw-flex tw-flex-col tw-pt-12 tw-pb-10 tw-px-8 tw-rounded-lg tw-shadow-md tw-bg-white tw-items-center">
           <img src={longlogo} className="tw-h-8 tw-select-none tw-mb-4" alt="fabra logo" />
           <div className="tw-text-center tw-my-2">
-            {unauthorized ?
-              <div className="tw-flex tw-flex-col tw-justify-center">
-                <div>
-                  You don't have access to Fabra yet. Contact us at <a className="tw-text-blue-500" href="mailto:founders@fabra.io">founders@fabra.io</a> to get an account provisioned!
-                </div>
-                <img src={mail} alt="mail" className="tw-h-36 tw-mt-5" />
-              </div>
-              :
-              <>{loginContent}</>}
+            {loginContent}
           </div>
         </div>
         <div className="tw-text-xs tw-text-center tw-mt-4 tw-text-slate-800 tw-select-none">
@@ -174,7 +165,30 @@ const OrganizationInput: React.FC<OrganizationInputProps> = props => {
         </li>
       ))}
       <div className="tw-my-5 tw-mx-0">or</div>
-      <Button className="tw-w-full tw-h-10" onClick={() => setOverrideCreate(true)} >Create new organization</Button>
+      <Button className="tw-w-full tw-h-10" onClick={() => setOverrideCreate(true)}>Create new organization</Button>
+    </div>
+  );
+};
+
+export const Unauthorized: React.FC = () => {
+  return (
+    <div className="tw-flex tw-flex-row tw-h-full tw-bg-slate-100">
+      <div className="tw-mt-56 tw-mb-auto tw-mx-auto tw-w-[400px] tw-select-none">
+        <div className="tw-flex tw-flex-col tw-pt-12 tw-pb-10 tw-px-8 tw-rounded-lg tw-shadow-md tw-bg-white tw-items-center">
+          <img src={longlogo} className="tw-h-8 tw-mb-4" alt="fabra logo" />
+          <div className="tw-text-center tw-my-2">
+            <div className="tw-flex tw-flex-col tw-justify-center">
+              <div>
+                You must use a business account to access Fabra.
+              </div>
+              <div className="tw-mt-4">
+                <NavLink className="tw-text-blue-500" to="/signup">Try again</NavLink> with a different account or <a className="tw-text-blue-500" href="mailto:founders@fabra.io">contact us</a> to get an account provisioned!
+              </div>
+              <img src={mail} alt="mail" className="tw-h-36 tw-mt-5" />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

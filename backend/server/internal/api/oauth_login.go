@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"strings"
 
 	"go.fabra.io/server/common/application"
 	"go.fabra.io/server/common/auth"
@@ -10,6 +11,15 @@ import (
 	"go.fabra.io/server/common/repositories/sessions"
 	"go.fabra.io/server/common/repositories/users"
 )
+
+var UNAUTHORIZED_DOMAINS = map[string]bool{
+	"gmail.com":   true,
+	"outlook.com": true,
+	"icloud.com":  true,
+	"yahoo.com":   true,
+	"aol.com":     true,
+	"hotmail.com": true,
+}
 
 func (s ApiService) OAuthLogin(w http.ResponseWriter, r *http.Request) error {
 	if !r.URL.Query().Has("state") {
@@ -35,10 +45,16 @@ func (s ApiService) OAuthLogin(w http.ResponseWriter, r *http.Request) error {
 	case oauth.OauthProviderGithub:
 		externalUserInfo, err = oauth.FetchGithubInfo(code)
 	default:
-		// TODO: throw error
+		return errors.New("unexpected provider")
 	}
 	if err != nil {
 		return err
+	}
+
+	var userEmailDomain = strings.Split(externalUserInfo.Email, "@")[1]
+	if _, unauthorized := UNAUTHORIZED_DOMAINS[userEmailDomain]; unauthorized {
+		http.Redirect(w, r, getUnauthorizedRedirect(), http.StatusFound)
+		return nil
 	}
 
 	user, err := users.GetOrCreateForExternalInfo(s.db, externalUserInfo)
@@ -62,5 +78,13 @@ func getOauthSuccessRedirect() string {
 		return "https://app.fabra.io"
 	} else {
 		return "http://localhost:3000"
+	}
+}
+
+func getUnauthorizedRedirect() string {
+	if application.IsProd() {
+		return "https://app.fabra.io/unauthorized"
+	} else {
+		return "http://localhost:3000/unauthorized"
 	}
 }

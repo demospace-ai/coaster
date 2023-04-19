@@ -11,35 +11,31 @@ export interface LoginState {
   user?: User;
   organization?: Organization;
   suggestedOrganizations?: Organization[];
-  unauthorized?: boolean; // means that the user's domain is not allowed yet
   email?: string;
 }
 
 export type LoginAction =
   | {
-    type: 'login.authenticated',
+    type: "login.authenticated",
     user: User,
     organization?: Organization,
     suggestedOrganizations?: Organization[],
   }
   | {
-    type: 'login.validateCode',
+    type: "login.validateCode",
     email: string,
   }
   | {
-    type: 'login.logout';
+    type: "login.logout";
   }
   | {
-    type: 'login.organizationSet',
+    type: "login.organizationSet",
     organization: Organization,
-  }
-  | {
-    type: 'login.unauthorized';
   };
 
 export function loginReducer(state: LoginState = INITIAL_LOGIN_STATE, action: LoginAction): LoginState {
   switch (action.type) {
-    case 'login.authenticated':
+    case "login.authenticated":
       return {
         ...state,
         authenticated: true,
@@ -47,24 +43,19 @@ export function loginReducer(state: LoginState = INITIAL_LOGIN_STATE, action: Lo
         organization: action.organization,
         suggestedOrganizations: action.suggestedOrganizations,
       };
-    case 'login.validateCode':
+    case "login.validateCode":
       return {
         ...state,
         validatingCode: true,
         email: action.email,
       };
-    case 'login.logout':
+    case "login.logout":
       // simplify by just going back to initial state
       return INITIAL_LOGIN_STATE;
-    case 'login.organizationSet':
+    case "login.organizationSet":
       return {
         ...state,
         organization: action.organization,
-      };
-    case 'login.unauthorized':
-      return {
-        ...state,
-        unauthorized: true,
       };
     default:
       return state;

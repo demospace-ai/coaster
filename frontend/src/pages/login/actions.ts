@@ -4,41 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { rudderanalytics } from "src/app/rudder";
 import { useDispatch } from "src/root/model";
 import { sendRequest } from "src/rpc/ajax";
-import { Login, Logout, Organization, SetOrganization, User } from "src/rpc/api";
-
-export function useOauthLogin() {
-  const dispatch = useDispatch();
-  const onLoginSuccess = useOnLoginSuccess();
-
-  return useCallback(async (code: string | null, state: string | null) => {
-    if (code === null) {
-      // TODO: handle error here
-      return;
-    }
-
-    if (state === null) {
-      // TODO: handle error here
-      return;
-    }
-
-    const payload = { "code": code, "state": state };
-    try {
-      const loginResponse = await sendRequest(Login, payload);
-      dispatch({
-        type: "login.authenticated",
-        user: loginResponse.user,
-        organization: loginResponse.organization,
-        suggestedOrganizations: loginResponse.suggested_organizations,
-      });
-
-      onLoginSuccess(loginResponse.user, loginResponse.organization);
-    } catch (e) {
-      dispatch({
-        type: "login.unauthorized",
-      });
-    }
-  }, [dispatch, onLoginSuccess]);
-}
+import { Logout, Organization, SetOrganization, User } from "src/rpc/api";
 
 export interface OrganizationArgs {
   organizationName?: string;

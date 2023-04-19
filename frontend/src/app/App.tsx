@@ -8,7 +8,7 @@ import { ApiKey } from "src/pages/apikey/ApiKey";
 import { Destination } from "src/pages/destinations/Destination";
 import { Destinations } from "src/pages/destinations/Destinations";
 import { Home } from "src/pages/home/Home";
-import { Login } from "src/pages/login/Login";
+import { Login, Unauthorized } from "src/pages/login/Login";
 import { NotFound } from "src/pages/notfound/NotFound";
 import { Objects } from "src/pages/objects/Objects";
 import { Sync } from "src/pages/syncs/Sync";
@@ -40,6 +40,7 @@ export const App: React.FC = () => {
     <div className="tw-flex tw-flex-row tw-w-full tw-h-full">
       <Routes>
         <Route element={<AppLayout />}>
+          <Route path="/unauthorized" element={<Unauthorized />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Login create />} />
           <Route path="/" element={<RequireAuth element={<Home />} />} />
