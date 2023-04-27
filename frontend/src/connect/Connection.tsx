@@ -69,7 +69,7 @@ export const NewSourceConfiguration: React.FC<SetupSyncProps> = (props) => {
         <div className="tw-w-80 tw-ml-auto tw-text-xs tw-leading-5 tw-border-l tw-border-slate-200 tw-h-fit tw-py-2 tw-pl-8 tw-mr-10">
           <div className="">
             <div className="tw-text-[13px] tw-mb-1 tw-font-medium">Read our docs</div>
-            Not sure where to start? Check out <a href="docs.fabra.io" target="_blank" rel="noreferrer" className="tw-text-blue-500">the docs</a> for step-by-step instructions.
+            Not sure where to start? Check out <a href="https://docs.fabra.io" target="_blank" rel="noreferrer" className="tw-text-blue-500">the docs</a> for step-by-step instructions.
           </div>
           <div className="tw-my-5 tw-py-5 tw-border-y tw-border-slate-200">
             <div className="tw-text-[13px] tw-mb-1 tw-font-medium">Allowed IPs</div>
