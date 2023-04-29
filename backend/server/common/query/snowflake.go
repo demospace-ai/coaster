@@ -198,7 +198,7 @@ func (sc SnowflakeApiClient) RunQuery(ctx context.Context, queryString string, a
 	}
 	defer client.Close()
 
-	queryResult, err := client.Query(queryString, args)
+	queryResult, err := client.Query(queryString)
 	if err != nil {
 		return nil, err
 	}
