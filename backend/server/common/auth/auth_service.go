@@ -83,6 +83,10 @@ func (as AuthServiceImpl) authenticateCookie(r *http.Request) (*Authentication, 
 		return nil, errors.Wrap(err, "Unexpected error fetching user")
 	}
 
+	if user.Blocked {
+		return nil, errors.Forbidden
+	}
+
 	// If organization is null, this means the user still needs to set their organization
 	var organization *models.Organization
 	if user.OrganizationID.Valid {
@@ -158,6 +162,7 @@ func (as AuthServiceImpl) GetAuthentication(r *http.Request) (*Authentication, e
 	if err != nil {
 		return nil, err
 	}
+
 	if authentication.IsAuthenticated {
 		return authentication, nil
 	}

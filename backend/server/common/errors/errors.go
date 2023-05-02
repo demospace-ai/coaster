@@ -45,6 +45,13 @@ var Unauthorized = HttpError{
 	},
 }
 
+var Forbidden = HttpError{
+	code: http.StatusForbidden,
+	CustomerVisibleError: CustomerVisibleError{
+		message: "User inactive",
+	},
+}
+
 func NewCustomerVisibleError(err error) CustomerVisibleError {
 	return CustomerVisibleError{
 		message: err.Error(),

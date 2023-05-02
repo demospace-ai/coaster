@@ -3,6 +3,7 @@ import { useOnLoginSuccess } from "src/pages/login/actions";
 import { useDispatch } from "src/root/model";
 import { sendRequest } from "src/rpc/ajax";
 import { CheckSession } from "src/rpc/api";
+import { HttpError } from "src/utils/errors";
 
 export function useStart() {
   const dispatch = useDispatch();
@@ -20,6 +21,11 @@ export function useStart() {
 
       onLoginSuccess(checkSessionResponse.user, checkSessionResponse.organization);
     } catch (e) {
+      if (e instanceof HttpError) {
+        if (e.code === 403) {
+          dispatch({ type: "forbidden" });
+        }
+      }
     }
 
     dispatch({ type: "done" });

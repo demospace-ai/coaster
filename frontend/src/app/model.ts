@@ -4,14 +4,19 @@ export type AppAction =
   }
   | {
     type: "done";
+  }
+  | {
+    type: "forbidden";
   };
 
 const INITIAL_APP_STATE: AppState = {
   loading: true,
+  forbidden: false,
 };
 
 export interface AppState {
   loading: boolean;
+  forbidden: boolean;
 }
 
 export function appReducer(state: AppState = INITIAL_APP_STATE, action: AppAction): AppState {
@@ -25,6 +30,11 @@ export function appReducer(state: AppState = INITIAL_APP_STATE, action: AppActio
       return {
         ...state,
         loading: false,
+      };
+    case "forbidden":
+      return {
+        ...state,
+        forbidden: true,
       };
     default:
       return state;

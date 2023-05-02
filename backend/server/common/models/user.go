@@ -7,6 +7,7 @@ type User struct {
 	Email             string `json:"email"`
 	ProfilePictureURL string
 	OrganizationID    database.NullInt64
+	Blocked           bool `json:"-"`
 
 	BaseModel
 }

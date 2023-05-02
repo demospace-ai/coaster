@@ -13,13 +13,21 @@ import (
 )
 
 var UNAUTHORIZED_DOMAINS = map[string]bool{
-	"gmail.com":   true,
-	"outlook.com": true,
-	"icloud.com":  true,
-	"yahoo.com":   true,
-	"aol.com":     true,
-	"hotmail.com": true,
-	"hey.com":     true,
+	"gmail.com":     true,
+	"outlook.com":   true,
+	"icloud.com":    true,
+	"yahoo.com":     true,
+	"aol.com":       true,
+	"hotmail.com":   true,
+	"hey.com":       true,
+	"supaglue.com":  true,
+	"merge.dev":     true,
+	"vessel.land":   true,
+	"hightouch.com": true,
+	"getcensus.com": true,
+	"airbyte.io":    true,
+	"airbyte.com":   true,
+	"fivetran.com":  true,
 }
 
 func (s ApiService) OAuthLogin(w http.ResponseWriter, r *http.Request) error {

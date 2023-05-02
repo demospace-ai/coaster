@@ -20,6 +20,7 @@ let needsInit = true;
 
 export const App: React.FC = () => {
   const loading = useSelector(state => state.app.loading);
+  const forbidden = useSelector(state => state.app.forbidden);
   const start = useStart();
 
   useEffect(() => {
@@ -34,6 +35,10 @@ export const App: React.FC = () => {
     return (
       <Loading />
     );
+  }
+
+  if (forbidden) {
+    return <></>;
   }
 
   return (

@@ -2,6 +2,7 @@ import { compile } from "path-to-regexp";
 import { rudderanalytics } from "src/app/rudder";
 import { IEndpoint } from "src/rpc/api";
 import { isProd } from "src/utils/env";
+import { HttpError } from "src/utils/errors";
 
 const ROOT_DOMAIN = isProd() ? "https://api.fabra.io" : "http://localhost:8080";
 
@@ -68,8 +69,8 @@ export async function sendRequest<RequestType extends Record<string, any>, Respo
 
   if (!response.ok) {
     const errorMessage = response.statusText ? response.statusText : await response.text();
-    // TODO: log error in datadog (not the event framework)
-    throw new Error(errorMessage);
+    // TODO: log error
+    throw new HttpError(response.status, errorMessage);
   }
 
   if (endpoint.track) {
