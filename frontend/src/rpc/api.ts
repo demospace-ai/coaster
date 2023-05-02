@@ -624,6 +624,29 @@ export const needsPrimaryKey = (syncMode: SyncMode): boolean => {
   }
 };
 
+export const needsEndCustomerId = (destinationType: ConnectionType): boolean => {
+  // no default so it isn"t possible to add a new mode without updating
+  switch (destinationType) {
+    case ConnectionType.Webhook:
+      return false;
+    default:
+      return true;
+  }
+};
+
+export const shouldCreateFields = (destinationType: ConnectionType, targetType: TargetType): boolean => {
+  // no default so it isn"t possible to add a new mode without updating
+  if (destinationType === ConnectionType.Webhook) {
+    return true;
+  }
+
+  if (targetType === TargetType.SingleNew) {
+    return true;
+  }
+
+  return false;
+};
+
 export enum TargetType {
   SingleExisting = "single_existing",
   SingleNew = "single_new",

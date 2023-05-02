@@ -8,7 +8,7 @@ import { Loading } from "src/components/loading/Loading";
 import { DestinationSelector, FieldSelector, FieldTypeSelector, NamespaceSelector, TableSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { sendRequest } from "src/rpc/ajax";
-import { ConnectionType, CreateObject, CreateObjectRequest, Destination, Field, FieldType, FrequencyUnits, GetObjects, needsCursorField, needsPrimaryKey, ObjectFieldInput, Schema, SyncMode, TargetType } from "src/rpc/api";
+import { ConnectionType, CreateObject, CreateObjectRequest, Destination, Field, FieldType, FrequencyUnits, GetObjects, needsCursorField, needsEndCustomerId, needsPrimaryKey, ObjectFieldInput, Schema, shouldCreateFields, SyncMode, TargetType } from "src/rpc/api";
 import { useSchema } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
 import { mutate } from "swr";
@@ -34,6 +34,12 @@ type NewObjectState = {
   frequency: number | undefined;
   frequencyUnits: FrequencyUnits | undefined;
   objectFields: ObjectFieldInput[];
+  displayNameError: string | undefined;
+  destinationError: string | undefined;
+  fieldsError: string | undefined;
+  cursorFieldError: string | undefined;
+  endCustomerIdError: string | undefined;
+  frequencyError: string | undefined;
 };
 
 const INITIAL_OBJECT_STATE: NewObjectState = {
@@ -50,6 +56,12 @@ const INITIAL_OBJECT_STATE: NewObjectState = {
   frequency: undefined,
   frequencyUnits: undefined,
   objectFields: [],
+  displayNameError: undefined,
+  destinationError: undefined,
+  fieldsError: undefined,
+  cursorFieldError: undefined,
+  endCustomerIdError: undefined,
+  frequencyError: undefined,
 };
 
 type ObjectStepProps = {
@@ -57,56 +69,165 @@ type ObjectStepProps = {
   setState: React.Dispatch<React.SetStateAction<NewObjectState>>;
 };
 
-const validateDestination = (state: NewObjectState): boolean => {
-  if (
-    state.displayName !== undefined && state.displayName.length > 0
-    && state.destination !== undefined
-  ) {
-    if (state.destination.connection.connection_type === ConnectionType.Webhook) {
-      return true;
-    } else {
-      return (state.targetType !== undefined
-        && state.namespace !== undefined && state.namespace.length > 0
-        && state.tableName !== undefined && state.tableName.length > 0);
-    }
-  } else {
+const validateAll = (state: NewObjectState, setState: React.Dispatch<React.SetStateAction<NewObjectState>>): boolean => {
+  return (
+    validateDisplayName(state, setState)
+    && validateDestination(state, setState)
+    && validateFields(state, setState)
+    && state.syncMode !== undefined
+    && (!needsCursorField(state.syncMode) || validateCursorField(state, setState))
+    && (!needsPrimaryKey(state.syncMode) || state.primaryKey !== undefined)
+    && (!needsEndCustomerId(state.destination!.connection.connection_type) || state.endCustomerIdField !== undefined)
+    && validateFrequency(state, setState)
+  );
+};
+
+const validateDisplayName = (state: NewObjectState, setState: React.Dispatch<React.SetStateAction<NewObjectState>>): boolean => {
+  if (state.displayName === undefined || state.displayName.length <= 0) {
+    setState(state => {
+      return {
+        ...state, displayNameError: "Must set a display name",
+      };
+    });
     return false;
   }
+
+  setState(state => {
+    return {
+      ...state, displayNameError: undefined,
+    };
+  });
+  return true;
 };
 
-const validateFields = (state: NewObjectState): boolean => {
-  return (
-    validateDestination(state)
-    && state.objectFields !== undefined && state.objectFields.length > 0
-    && state.objectFields.every(objectField =>
-      objectField.name && objectField.name.length > 0 && objectField.type && objectField.type.length > 0
-    )
-  );
+const validateDestination = (state: NewObjectState, setState: React.Dispatch<React.SetStateAction<NewObjectState>>): boolean => {
+  if (state.destination === undefined) {
+    setState(state => {
+      return {
+        ...state, destinationError: "Must select a destination"
+      };
+    });
+    return false;
+  }
+
+  if (state.destination.connection.connection_type !== ConnectionType.Webhook) {
+    if (state.targetType === undefined) {
+      setState(state => {
+        return {
+          ...state, destinationError: "Must select a target"
+        };
+      });
+      return false;
+    }
+
+    if (state.targetType === TargetType.SingleExisting) {
+      if (state.namespace === undefined || state.namespace.length <= 0) {
+        setState(state => {
+          return {
+            ...state, destinationError: "Must select a namespace"
+          };
+        });
+        return false;
+      }
+
+      if (state.tableName === undefined || state.tableName.length <= 0) {
+        setState(state => {
+          return {
+            ...state, destinationError: "Must select a table name"
+          };
+        });
+        return false;
+      }
+    }
+  }
+
+  setState(state => {
+    return {
+      ...state, destinationError: undefined
+    };
+  });
+  return true;
 };
 
+const validateFields = (state: NewObjectState, setState: React.Dispatch<React.SetStateAction<NewObjectState>>): boolean => {
+  if (state.objectFields === undefined || state.objectFields.length <= 0) {
+    setState(state => {
+      return {
+        ...state, fieldsError: "Must create at least one object field"
+      };
+    });
+    return false;
+  }
 
-const validateAll = (state: NewObjectState): boolean => {
-  return (
-    validateDestination(state)
-    && validateFields(state)
-    && state.syncMode !== undefined
-    && (!needsCursorField(state.syncMode) || validateCursorField(state))
-    && (!needsPrimaryKey(state.syncMode) || state.primaryKey !== undefined)
-    //&& state.endCustomerIdField !== undefined
-    && state.frequency !== undefined
-    && state.frequencyUnits !== undefined
-  );
+  for (const objectField of state.objectFields) {
+    if (!objectField.name || objectField.name.length <= 0 || !objectField.type || objectField.type.length <= 0) {
+      setState(state => {
+        return {
+          ...state, fieldsError: "Must provide name and type for each object field"
+        };
+      });
+      return false;
+    }
+  };
+
+  setState(state => {
+    return {
+      ...state, fieldsError: undefined
+    };
+  });
+  return true;
 };
 
-const validateCursorField = (state: NewObjectState): boolean => {
+const validateCursorField = (state: NewObjectState, setState: React.Dispatch<React.SetStateAction<NewObjectState>>): boolean => {
   // TODO: allow using other types
-  return state.cursorField !== undefined && (
-    state.cursorField.type === FieldType.TimestampNtz
-    || state.cursorField.type === FieldType.TimestampTz
-    || state.cursorField.type === FieldType.Date
-    || state.cursorField.type === FieldType.Datetime
-    || state.cursorField.type === FieldType.Integer
-  );
+  if (state.cursorField === undefined) {
+    setState(state => {
+      return {
+        ...state, cursorFieldError: "Must set cursor field"
+      };
+    });
+    return false;
+  }
+
+  if (state.cursorField.type !== FieldType.TimestampNtz
+    && state.cursorField.type !== FieldType.TimestampTz
+    && state.cursorField.type !== FieldType.Date
+    && state.cursorField.type !== FieldType.Datetime
+    && state.cursorField.type !== FieldType.Integer
+    && state.cursorField.type !== FieldType.Number
+  ) {
+    setState(state => {
+      return {
+        ...state, cursorFieldError: "Cursor field must be an integer, number, timestamp, date, or datetime type."
+      };
+    });
+    return false;
+  }
+
+  setState(state => {
+    return {
+      ...state, cursorFieldError: undefined
+    };
+  });
+  return true;
+};
+
+const validateFrequency = (state: NewObjectState, setState: React.Dispatch<React.SetStateAction<NewObjectState>>): boolean => {
+  if (state.frequency === undefined) {
+    setState(state => {
+      return { ...state, frequencyError: "Must set frequency" };
+    });
+    return false;
+  }
+
+  if (state.frequencyUnits === undefined) {
+    setState(state => {
+      return { ...state, frequencyError: "Must set frequency units" };
+    });
+    return false;
+  }
+
+  return true;
 };
 
 export const NewObject: React.FC<{ onComplete: () => void; }> = props => {
@@ -126,9 +247,9 @@ export const NewObject: React.FC<{ onComplete: () => void; }> = props => {
         optional: false,
       };
     });
-    setState(s => {
+    setState(state => {
       return {
-        ...s,
+        ...state,
         objectFields: objectFields,
       };
     });
@@ -144,15 +265,22 @@ export const NewObject: React.FC<{ onComplete: () => void; }> = props => {
       break;
     case Step.FieldMapping:
       content = <ExistingObjectFields state={state} setState={setState} />;
-      back = () => setState({ ...state, step: Step.Initial });
+      back = () => setState({ ...state, step: Step.Initial, displayNameError: undefined, destinationError: undefined, fieldsError: undefined, cursorFieldError: undefined });
       break;
     case Step.CreateFields:
       content = <NewObjectFields state={state} setState={setState} />;
-      back = () => setState({ ...state, step: Step.Initial });
+      back = () => setState({ ...state, step: Step.Initial, displayNameError: undefined, destinationError: undefined, fieldsError: undefined, cursorFieldError: undefined });
       break;
     case Step.Finalize:
       content = <Finalize state={state} setState={setState} onComplete={props.onComplete} />;
-      back = () => setState({ ...state, step: Step.FieldMapping });
+      let prevStep: Step;
+      if (shouldCreateFields(state.destination!.connection.connection_type, state.targetType!)) {
+        prevStep = Step.CreateFields;
+      } else {
+        prevStep = Step.FieldMapping;
+      }
+
+      back = () => setState({ ...state, step: prevStep, displayNameError: undefined, destinationError: undefined, fieldsError: undefined, cursorFieldError: undefined });
       break;
   }
 
@@ -161,20 +289,29 @@ export const NewObject: React.FC<{ onComplete: () => void; }> = props => {
       <BackButton onClick={back} />
       <div className="tw-flex tw-flex-col tw-w-[900px] tw-mt-8 tw-mb-24 tw-py-12 tw-px-10 tw-mx-auto tw-bg-white tw-rounded-lg tw-shadow-md tw-items-center">
         {content}
+        {state.displayNameError && <div className="tw-mt-4 tw-text-red-700 tw-py-2 tw-px-10 tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">{state.displayNameError}</div>}
+        {state.destinationError && <div className="tw-mt-4 tw-text-red-700 tw-py-2 tw-px-10 tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">{state.destinationError}</div>}
+        {state.fieldsError && <div className="tw-mt-4 tw-text-red-700 tw-py-2 tw-px-10 tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">{state.fieldsError}</div>}
+        {state.cursorFieldError && <div className="tw-mt-4 tw-text-red-700 tw-py-2 tw-px-10 tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">{state.cursorFieldError}</div>}
+        {state.frequencyError && <div className="tw-mt-4 tw-text-red-700 tw-py-2 tw-px-10 tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">{state.frequencyError}</div>}
       </div>
     </>
   );
 };
 
 export const DestinationSetup: React.FC<ObjectStepProps> = props => {
-  const state = props.state;
-  const setState = props.setState;
+  const { state, setState } = props;
+
   const advance = () => {
-    if (validateDestination(state)) {
-      if (state.destination?.connection.connection_type === ConnectionType.Webhook) {
-        setState({ ...state, step: Step.CreateFields });
+    if (validateDisplayName(state, setState) && validateDestination(state, setState)) {
+      if (shouldCreateFields(state.destination!.connection.connection_type, state.targetType!)) {
+        setState(state => {
+          return { ...state, step: Step.CreateFields };
+        });
       } else {
-        setState({ ...state, step: Step.FieldMapping });
+        setState(state => {
+          return { ...state, step: Step.FieldMapping };
+        });
       }
     }
   };
@@ -239,8 +376,10 @@ const ExistingObjectFields: React.FC<ObjectStepProps> = props => {
   };
 
   const advance = () => {
-    if (validateFields(state)) {
-      setState({ ...state, step: Step.Finalize });
+    if (validateFields(state, setState)) {
+      setState(state => {
+        return { ...state, step: Step.Finalize };
+      });
     }
   };
 
@@ -309,8 +448,10 @@ const NewObjectFields: React.FC<ObjectStepProps> = props => {
   };
 
   const advance = () => {
-    if (validateFields(state)) {
-      setState({ ...state, step: Step.Finalize });
+    if (validateFields(state, setState)) {
+      setState(state => {
+        return { ...state, step: Step.Finalize };
+      });
     }
   };
 
@@ -385,7 +526,7 @@ const Finalize: React.FC<ObjectStepProps & { onComplete: () => void; }> = (props
   const createNewObject = async () => {
     setLoading(true);
 
-    if (!validateAll(state)) {
+    if (!validateAll(state, setState)) {
       setLoading(false);
       return;
     }
@@ -462,8 +603,9 @@ const Finalize: React.FC<ObjectStepProps & { onComplete: () => void; }> = (props
             placeholder="Cursor Field"
             label="Cursor Field"
             noOptionsString="No Fields Available!"
-            validated={true}
             predefinedFields={fields}
+            validated={true}
+            valid={state.cursorFieldError !== undefined ? false : undefined}
           />
         </>
       }

@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"go.fabra.io/server/common/auth"
+	"go.fabra.io/server/common/data"
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/input"
 	"go.fabra.io/server/common/models"
@@ -13,6 +14,15 @@ import (
 
 	"github.com/go-playground/validator/v10"
 )
+
+var VALID_CURSOR_TYPES = map[data.FieldType]bool{
+	data.FieldTypeDate:        true,
+	data.FieldTypeDateTimeTz:  true,
+	data.FieldTypeDateTimeNtz: true,
+	data.FieldTypeTimestamp:   true,
+	data.FieldTypeInteger:     true,
+	data.FieldTypeNumber:      true,
+}
 
 type CreateObjectRequest struct {
 	DisplayName        string                `json:"display_name" validate:"required"`
@@ -49,6 +59,19 @@ func (s ApiService) CreateObject(auth auth.Authentication, w http.ResponseWriter
 	err = validate.Struct(createObjectRequest)
 	if err != nil {
 		return err
+	}
+
+	if createObjectRequest.CursorField != nil {
+		var cursorField input.ObjectField
+		for _, objectField := range createObjectRequest.ObjectFields {
+			if objectField.Name == *createObjectRequest.CursorField {
+				cursorField = objectField
+			}
+		}
+
+		if _, invalidCursorField := VALID_CURSOR_TYPES[cursorField.Type]; invalidCursorField {
+			return errors.NewBadRequestf("invalid cursor field type: %s", cursorField.Type)
+		}
 	}
 
 	// TODO: create model and fields in a transaction

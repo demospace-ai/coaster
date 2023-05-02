@@ -157,8 +157,7 @@ export const ValidatedInput: React.FC<InputProps> = props => {
   );
 };
 
-type ValidatedDropdownInputProps = {
-  by?: string;
+export type ValidatedDropdownInputProps = {
   options: any[] | undefined;
   selected: any | undefined;
   setSelected: (option: any) => void;
@@ -172,10 +171,11 @@ type ValidatedDropdownInputProps = {
   noCaret?: boolean;
   label?: string;
   dropdownHeight?: string;
+  valid?: boolean;
 };
 
 export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = props => {
-  const [isValid, setIsValid] = useState(true);
+  const [computedValid, setComputedValid] = useState<boolean>(true);
   const [focused, setFocused] = useState(false);
   const [referenceElement, setReferenceElement] = useState<HTMLButtonElement | null>(null);
   const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(null);
@@ -186,7 +186,7 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = pro
 
   const validateNotUndefined = (value: number | undefined): boolean => {
     const valid = value !== undefined;
-    setIsValid(valid);
+    setComputedValid(valid);
     return valid;
   };
 
@@ -197,8 +197,11 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = pro
   // An undefined value will cause the input to be uncontrolled, so change to null
   const value = props.selected === undefined ? null : props.selected;
 
+  // Allow explicitly passing the valid property to override the computed value
+  const valid = props.valid !== undefined ? props.valid : computedValid;
+
   return (
-    <Listbox as="div" className="tw-flex tw-w-fit" by={props.by} value={value} onChange={value => { props.setSelected(value); setIsValid(true); }}>
+    <Listbox as="div" className="tw-flex tw-w-fit" value={value} onChange={value => { props.setSelected(value); setComputedValid(true); }}>
       <div className="tw-relative tw-w-fit">
         <Transition
           show={showLabel}
@@ -218,7 +221,7 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = pro
         </Transition>
         <Listbox.Button
           ref={setReferenceElement}
-          className={mergeClasses("tw-flex tw-justify-center tw-items-center tw-w-96 tw-mt-5 tw-rounded-md tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 hover:tw-border-primary-hover aria-expanded:tw-border-primary", props.className, props.validated && !isValid && "tw-border-red-600")}
+          className={mergeClasses("tw-flex tw-justify-center tw-items-center tw-w-96 tw-mt-5 tw-rounded-md tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 hover:tw-border-primary-hover aria-expanded:tw-border-primary", props.className, props.validated && !valid && "tw-border-red-600")}
         >
           <div className={mergeClasses("tw-inline-block tw-w-[calc(100%-20px)] tw-truncate tw-overflow-none", !props.selected && "tw-text-slate-400")}>
             {value ? getElementForDisplay(props.selected) : props.placeholder}
@@ -302,8 +305,7 @@ const DropdownOptions: React.FC<DropdownOptionsProps> = props => {
 };
 
 
-type ValidatedComboInputProps = {
-  by?: string;
+export type ValidatedComboInputProps = {
   options: any[] | undefined;
   selected: any | undefined;
   setSelected: (option: any) => void;
@@ -317,10 +319,11 @@ type ValidatedComboInputProps = {
   label?: string;
   dropdownHeight?: string;
   nullable?: boolean;
+  valid?: boolean;
 };
 
 export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => {
-  const [isValid, setIsValid] = useState(true);
+  const [computedValid, setComputedValid] = useState<boolean>(true);
   const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -355,15 +358,18 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
 
   const validateNotUndefined = (value: number | undefined): boolean => {
     const valid = value !== undefined;
-    setIsValid(valid);
+    setComputedValid(valid);
     return valid;
   };
 
   // An undefined value will cause the input to be uncontrolled, so change to null
   const value = props.selected === undefined ? null : props.selected;
 
+  // Allow explicitly passing the valid property to override the computed value
+  const valid = props.valid !== undefined ? props.valid : computedValid;
+
   return (
-    <Combobox as="div" className="tw-flex tw-w-fit" by={props.by} value={value} onChange={(value: number) => { props.setSelected(value); setIsValid(true); }}>
+    <Combobox as="div" className="tw-flex tw-w-fit" value={value} onChange={(value: number) => { props.setSelected(value); setComputedValid(true); }}>
       <div className="tw-relative tw-w-fit">
         <Transition
           show={showLabel}
@@ -381,7 +387,7 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
             {props.label}
           </label>
         </Transition>
-        <div ref={setReferenceElement} className={mergeClasses("tw-flex tw-w-96 tw-mt-5 tw-rounded-md tw-bg-white tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 hover:tw-border-primary-hover focus-within:!tw-border-primary tw-transition tw-duration-100", props.className, props.validated && !isValid && "tw-border-red-600")}>
+        <div ref={setReferenceElement} className={mergeClasses("tw-flex tw-w-96 tw-mt-5 tw-rounded-md tw-bg-white tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 hover:tw-border-primary-hover focus-within:!tw-border-primary tw-transition tw-duration-100", props.className, props.validated && !valid && "tw-border-red-600")}>
           <Combobox.Input
             className={"tw-inline tw-bg-transparent tw-w-[calc(100%-20px)] tw-border-none tw-text-sm tw-leading-5 tw-text-slate-900 tw-outline-none tw-text-ellipsis tw-cursor-pointer focus:tw-cursor-text"}
             displayValue={selected => selected ? getElementForDisplay(selected) : ""}

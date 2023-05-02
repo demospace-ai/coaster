@@ -1,6 +1,7 @@
 package errors
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/pkg/errors"
@@ -63,6 +64,15 @@ func NewBadRequest(clientVisibleData string) error {
 		code: http.StatusBadRequest,
 		CustomerVisibleError: CustomerVisibleError{
 			message: clientVisibleData,
+		},
+	}
+}
+
+func NewBadRequestf(clientVisibleDataFormat string, args ...any) error {
+	return HttpError{
+		code: http.StatusBadRequest,
+		CustomerVisibleError: CustomerVisibleError{
+			message: fmt.Sprintf(clientVisibleDataFormat, args...),
 		},
 	}
 }
