@@ -81,6 +81,8 @@ func CreateUserForExternalInfo(db *gorm.DB, externalUserInfo *oauth.ExternalUser
 		return nil, err
 	}
 
+	events.TrackSignup(user.ID, user.Name, user.Email)
+
 	return user, nil
 }
 
@@ -105,8 +107,6 @@ func GetOrCreateForExternalInfo(db *gorm.DB, externalUserInfo *oauth.ExternalUse
 	if err != nil {
 		return nil, err
 	}
-
-	events.Track(user.ID, "User Signup")
 
 	return user, nil
 }
