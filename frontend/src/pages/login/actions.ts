@@ -46,6 +46,13 @@ export function useOnLoginSuccess() {
       id: user.id.toString(),
     });
 
+    window.Intercom("boot", {
+      api_base: "https://api-iam.intercom.io",
+      app_id: "pdc06iv8",
+      name: user.name,
+      email: user.email,
+    });
+
     // If there's no organization, go to the login page so the user can set it
     if (!organization) {
       navigate("/login");
