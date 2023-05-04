@@ -447,6 +447,7 @@ export interface User {
   id: number;
   name: string;
   email: string;
+  intercom_hash: string;
 }
 
 export interface GetAllUsersResponse {

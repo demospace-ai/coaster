@@ -6,12 +6,14 @@ import (
 	"strings"
 
 	"go.fabra.io/server/common/auth"
+	"go.fabra.io/server/common/intercom"
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/repositories/organizations"
+	"go.fabra.io/server/common/views"
 )
 
 type CheckSessionResponse struct {
-	User                   models.User           `json:"user"`
+	User                   views.User            `json:"user"`
 	Organization           *models.Organization  `json:"organization"`
 	SuggestedOrganizations []models.Organization `json:"suggested_organizations"`
 }
@@ -37,8 +39,13 @@ func (s ApiService) CheckSession(auth auth.Authentication, w http.ResponseWriter
 		}
 	}
 
+	intercomHash, err := intercom.GenerateIntercomHash(*auth.User)
+	if err != nil {
+		return err
+	}
+
 	return json.NewEncoder(w).Encode(CheckSessionResponse{
-		User:                   *auth.User,
+		User:                   views.ConvertUser(*auth.User, *intercomHash),
 		Organization:           auth.Organization,
 		SuggestedOrganizations: suggestedOrganizations,
 	})

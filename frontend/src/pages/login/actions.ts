@@ -5,6 +5,7 @@ import { rudderanalytics } from "src/app/rudder";
 import { useDispatch } from "src/root/model";
 import { sendRequest } from "src/rpc/ajax";
 import { Logout, Organization, SetOrganization, User } from "src/rpc/api";
+import { isProd } from "src/utils/env";
 
 export interface OrganizationArgs {
   organizationName?: string;
@@ -37,6 +38,18 @@ export function useOnLoginSuccess() {
   const navigate = useNavigate();
 
   return useCallback(async (user: User, organization: Organization | undefined) => {
+    identifyUser(user);
+
+    // If there's no organization, go to the login page so the user can set it
+    if (!organization) {
+      navigate("/login");
+      return;
+    }
+  }, [navigate]);
+}
+
+function identifyUser(user: User) {
+  if (isProd()) {
     rudderanalytics.identify(user.id.toString(), {
       "name": `${user.name}`,
       "email": user.email
@@ -51,14 +64,10 @@ export function useOnLoginSuccess() {
       app_id: "pdc06iv8",
       name: user.name,
       email: user.email,
+      user_id: user.id,
+      user_hash: user.intercom_hash,
     });
-
-    // If there's no organization, go to the login page so the user can set it
-    if (!organization) {
-      navigate("/login");
-      return;
-    }
-  }, [navigate]);
+  }
 }
 
 export function useLogout() {
