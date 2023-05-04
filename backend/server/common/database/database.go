@@ -87,6 +87,14 @@ func initDatabaseDev() (*gorm.DB, error) {
 		return nil, errors.Wrap(err, "sql.Open")
 	}
 
+	sqldb, err := db.DB()
+	if err != nil {
+		return nil, errors.Wrap(err, "error getting raw DB handle")
+	}
+
+	sqldb.SetMaxOpenConns(10)
+	sqldb.SetConnMaxLifetime(time.Hour)
+
 	return db, nil
 }
 
