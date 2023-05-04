@@ -59,13 +59,15 @@ var CURSOR_OPTIONS = workflow.ActivityOptions{
 }
 
 func SyncWorkflow(ctx workflow.Context, input SyncInput) error {
+	var a *Activities // Temporal handles calling the registered activity object
+
 	recordCtx := workflow.WithActivityOptions(ctx, RECORD_OPTIONS)
 	fetchCtx := workflow.WithActivityOptions(ctx, FETCH_OPTIONS)
 	replicateCtx := workflow.WithActivityOptions(ctx, REPLICATE_OPTIONS)
 	cursorCtx := workflow.WithActivityOptions(ctx, CURSOR_OPTIONS)
 
 	var syncRun models.SyncRun
-	err := workflow.ExecuteActivity(recordCtx, RecordStatus, RecordStatusInput{
+	err := workflow.ExecuteActivity(recordCtx, a.RecordStatus, RecordStatusInput{
 		OrganizationID: input.OrganizationID,
 		SyncID:         input.SyncID,
 		UpdateType:     UpdateTypeCreate,
@@ -76,7 +78,7 @@ func SyncWorkflow(ctx workflow.Context, input SyncInput) error {
 
 	var syncConfig SyncConfig
 	fetchInput := FetchConfigInput(input)
-	err = workflow.ExecuteActivity(fetchCtx, FetchConfig, fetchInput).Get(fetchCtx, &syncConfig)
+	err = workflow.ExecuteActivity(fetchCtx, a.FetchConfig, fetchInput).Get(fetchCtx, &syncConfig)
 	if err != nil {
 		// Ignore the error returned here. It is logged by Temporal as the activity task
 		// failing, and the reason for the workflow failing is the original error
@@ -86,7 +88,7 @@ func SyncWorkflow(ctx workflow.Context, input SyncInput) error {
 
 	var replicateOutput ReplicateOutput
 	replicateInput := ReplicateInput(syncConfig)
-	err = workflow.ExecuteActivity(replicateCtx, Replicate, replicateInput).Get(replicateCtx, &replicateOutput)
+	err = workflow.ExecuteActivity(replicateCtx, a.Replicate, replicateInput).Get(replicateCtx, &replicateOutput)
 	if err != nil {
 		// Ignore the error returned here. It is logged by Temporal as the activity task
 		// failing, and the reason for the workflow failing is the original error
@@ -99,7 +101,7 @@ func SyncWorkflow(ctx workflow.Context, input SyncInput) error {
 			Sync:           syncConfig.Sync,
 			CursorPosition: *replicateOutput.CursorPosition,
 		}
-		err = workflow.ExecuteActivity(cursorCtx, UpdateCursor, cursorInput).Get(cursorCtx, nil)
+		err = workflow.ExecuteActivity(cursorCtx, a.UpdateCursor, cursorInput).Get(cursorCtx, nil)
 		if err != nil {
 			// Ignore the error returned here. It is logged by Temporal as the activity task
 			// failing, and the reason for the workflow failing is the original error
@@ -120,7 +122,8 @@ func recordFailure(ctx workflow.Context, err error, syncRun models.SyncRun) erro
 		errString = "unexpected error"
 	}
 
-	return workflow.ExecuteActivity(ctx, RecordStatus, RecordStatusInput{
+	var a *Activities // Temporal handles calling the registered activity object
+	return workflow.ExecuteActivity(ctx, a.RecordStatus, RecordStatusInput{
 		UpdateType: UpdateTypeComplete,
 		SyncRun:    syncRun,
 		NewStatus:  models.SyncRunStatusFailed,
@@ -129,7 +132,8 @@ func recordFailure(ctx workflow.Context, err error, syncRun models.SyncRun) erro
 }
 
 func recordSuccess(ctx workflow.Context, syncRun models.SyncRun, rowsWritten int) error {
-	return workflow.ExecuteActivity(ctx, RecordStatus, RecordStatusInput{
+	var a *Activities // Temporal handles calling the registered activity object
+	return workflow.ExecuteActivity(ctx, a.RecordStatus, RecordStatusInput{
 		UpdateType:  UpdateTypeComplete,
 		SyncRun:     syncRun,
 		NewStatus:   models.SyncRunStatusCompleted,

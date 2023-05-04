@@ -28,7 +28,7 @@ type FormatToken struct {
 	Index  int
 }
 
-func Replicate(ctx context.Context, input ReplicateInput) (*ReplicateOutput, error) {
+func (a Activities) Replicate(ctx context.Context, input ReplicateInput) (*ReplicateOutput, error) {
 	cryptoService := crypto.NewCryptoService()
 	queryService := query.NewQueryService(cryptoService)
 

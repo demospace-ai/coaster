@@ -3,7 +3,6 @@ package temporal
 import (
 	"context"
 
-	"go.fabra.io/server/common/database"
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/repositories/connections"
 	"go.fabra.io/server/common/repositories/destinations"
@@ -31,53 +30,48 @@ type SyncConfig struct {
 	EncryptedEndCustomerApiKey *string
 }
 
-func FetchConfig(ctx context.Context, input FetchConfigInput) (*SyncConfig, error) {
-	db, err := database.InitDatabase()
+func (a Activities) FetchConfig(ctx context.Context, input FetchConfigInput) (*SyncConfig, error) {
+	sync, err := syncs.LoadSyncByID(a.Db, input.OrganizationID, input.SyncID)
 	if err != nil {
 		return nil, err
 	}
 
-	sync, err := syncs.LoadSyncByID(db, input.OrganizationID, input.SyncID)
+	source, err := sources.LoadSourceByID(a.Db, input.OrganizationID, sync.EndCustomerID, sync.SourceID)
 	if err != nil {
 		return nil, err
 	}
 
-	source, err := sources.LoadSourceByID(db, input.OrganizationID, sync.EndCustomerID, sync.SourceID)
+	sourceConnection, err := connections.LoadConnectionByID(a.Db, input.OrganizationID, source.ConnectionID)
 	if err != nil {
 		return nil, err
 	}
 
-	sourceConnection, err := connections.LoadConnectionByID(db, input.OrganizationID, source.ConnectionID)
+	object, err := objects.LoadObjectByID(a.Db, input.OrganizationID, sync.ObjectID)
 	if err != nil {
 		return nil, err
 	}
 
-	object, err := objects.LoadObjectByID(db, input.OrganizationID, sync.ObjectID)
+	destination, err := destinations.LoadDestinationByID(a.Db, input.OrganizationID, object.DestinationID)
 	if err != nil {
 		return nil, err
 	}
 
-	destination, err := destinations.LoadDestinationByID(db, input.OrganizationID, object.DestinationID)
+	destinationConnection, err := connections.LoadConnectionByID(a.Db, input.OrganizationID, destination.ConnectionID)
 	if err != nil {
 		return nil, err
 	}
 
-	destinationConnection, err := connections.LoadConnectionByID(db, input.OrganizationID, destination.ConnectionID)
+	fieldMappings, err := syncs.LoadFieldMappingsForSync(a.Db, input.SyncID)
 	if err != nil {
 		return nil, err
 	}
 
-	fieldMappings, err := syncs.LoadFieldMappingsForSync(db, input.SyncID)
+	objectFields, err := objects.LoadObjectFieldsByID(a.Db, object.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	objectFields, err := objects.LoadObjectFieldsByID(db, object.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	encryptedEndCustomerApiKey, err := webhooks.LoadEndCustomerApiKey(db, input.OrganizationID, sync.EndCustomerID)
+	encryptedEndCustomerApiKey, err := webhooks.LoadEndCustomerApiKey(a.Db, input.OrganizationID, sync.EndCustomerID)
 	// This might be missing, but that's ok-- it isn't required
 	if err != nil && !errors.IsRecordNotFound(err) {
 		return nil, err

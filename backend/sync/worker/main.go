@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"go.fabra.io/server/common/database"
 	"go.fabra.io/sync/temporal"
 	"go.temporal.io/sdk/worker"
 )
@@ -17,12 +18,19 @@ func main() {
 	}
 	defer c.Close()
 
+	db, err := database.InitDatabase()
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
 	// This worker hosts both Workflow and Activity functions
 	w := worker.New(c, temporal.SyncTaskQueue, worker.Options{})
-	w.RegisterActivity(temporal.RecordStatus)
-	w.RegisterActivity(temporal.FetchConfig)
-	w.RegisterActivity(temporal.Replicate)
-	w.RegisterActivity(temporal.UpdateCursor)
+	activities := temporal.Activities{
+		Db: db,
+	}
+
+	w.RegisterActivity(activities)
 	w.RegisterWorkflow(temporal.SyncWorkflow)
 
 	// Start listening to the Task Queue
