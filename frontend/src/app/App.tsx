@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect } from "react";
-import { Navigate, Outlet, Route, Routes } from "react-router-dom";
+import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { useStart } from "src/app/actions";
 import { Header } from "src/components/header/Header";
 import { Loading } from "src/components/loading/Loading";
@@ -19,9 +19,14 @@ import { useSelector } from "src/root/model";
 let needsInit = true;
 
 export const App: React.FC = () => {
+  const location = useLocation();
   const loading = useSelector(state => state.app.loading);
   const forbidden = useSelector(state => state.app.forbidden);
   const start = useStart();
+
+  useEffect(() => {
+    window.Intercom("update");
+  }, [location]);
 
   useEffect(() => {
     // Recommended way to run one-time initialization: https://beta.reactjs.org/learn/you-might-not-need-an-effect#initializing-the-application

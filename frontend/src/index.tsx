@@ -17,6 +17,10 @@ const store = createStore();
 if (isProd()) {
   rudderanalytics.load("2DuH7iesuV4TtpwMqRvXqQttOvm", "https://fabranickbele.dataplane.rudderstack.com");
   H.init("7e3vw5g1");
+  window.Intercom("boot", {
+    api_base: "https://api-iam.intercom.io",
+    app_id: "pdc06iv8"
+  });
 }
 
 const container = document.getElementById("root");
