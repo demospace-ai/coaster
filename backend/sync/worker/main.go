@@ -26,7 +26,7 @@ func main() {
 
 	// This worker hosts both Workflow and Activity functions
 	w := worker.New(c, temporal.SyncTaskQueue, worker.Options{})
-	activities := temporal.Activities{
+	activities := &temporal.Activities{
 		Db: db,
 	}
 
