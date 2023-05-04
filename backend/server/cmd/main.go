@@ -2,8 +2,6 @@ package main
 
 import (
 	"log"
-	"math/rand"
-	"time"
 
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/crypto"
@@ -19,8 +17,6 @@ func main() {
 		log.Fatal(err)
 		return
 	}
-
-	rand.Seed(time.Now().UTC().UnixNano())
 
 	cryptoService := crypto.NewCryptoService()
 	authService := auth.NewAuthService(db, cryptoService)
