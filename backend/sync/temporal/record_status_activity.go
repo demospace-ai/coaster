@@ -25,7 +25,7 @@ type RecordStatusInput struct {
 	Error          *string
 }
 
-func (a Activities) RecordStatus(ctx context.Context, input RecordStatusInput) (*models.SyncRun, error) {
+func (a *Activities) RecordStatus(ctx context.Context, input RecordStatusInput) (*models.SyncRun, error) {
 	switch input.UpdateType {
 	case UpdateTypeCreate:
 		return sync_runs.CreateSyncRun(a.Db, input.OrganizationID, input.SyncID)

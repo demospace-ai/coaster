@@ -30,7 +30,7 @@ type SyncConfig struct {
 	EncryptedEndCustomerApiKey *string
 }
 
-func (a Activities) FetchConfig(ctx context.Context, input FetchConfigInput) (*SyncConfig, error) {
+func (a *Activities) FetchConfig(ctx context.Context, input FetchConfigInput) (*SyncConfig, error) {
 	sync, err := syncs.LoadSyncByID(a.Db, input.OrganizationID, input.SyncID)
 	if err != nil {
 		return nil, err

@@ -12,7 +12,7 @@ type UpdateCursorInput struct {
 	CursorPosition string
 }
 
-func (a Activities) UpdateCursor(ctx context.Context, input UpdateCursorInput) error {
+func (a *Activities) UpdateCursor(ctx context.Context, input UpdateCursorInput) error {
 	sync, err := syncs.LoadSyncByID(a.Db, input.Sync.OrganizationID, input.Sync.ID)
 	if err != nil {
 		return err
