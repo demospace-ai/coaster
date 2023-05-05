@@ -3,6 +3,7 @@ package connectors
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"go.fabra.io/server/common/data"
 	"go.fabra.io/server/common/errors"
@@ -10,6 +11,7 @@ import (
 	"go.fabra.io/server/common/query"
 	"go.fabra.io/server/common/views"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -40,8 +42,13 @@ func (md MongoDbImpl) Read(
 		return
 	}
 
-	readQuery := md.getReadQuery(connectionModel, sync, fieldMappings)
-	queryString := query.CreateMongoQueryString(readQuery)
+	readQuery, err := md.getReadQuery(connectionModel, sync, fieldMappings)
+	if err != nil {
+		errC <- err
+		return
+	}
+
+	queryString := query.CreateMongoQueryString(*readQuery)
 
 	iterator, err := sourceClient.GetQueryIterator(ctx, queryString)
 	if err != nil {
@@ -81,7 +88,12 @@ func (md MongoDbImpl) Read(
 	}
 
 	// pass field mappings not schema since the row will be reordered
-	newCursorPosition := md.getNewCursorPosition(lastRow, fieldMappings, sync)
+	newCursorPosition, err := md.getNewCursorPosition(lastRow, fieldMappings, sync)
+	if err != nil {
+		errC <- err
+		return
+	}
+
 	readOutputC <- ReadOutput{
 		CursorPosition: newCursorPosition,
 	}
@@ -91,7 +103,7 @@ func (md MongoDbImpl) Read(
 }
 
 // TODO: only read 10,000 rows at once or something
-func (md MongoDbImpl) getReadQuery(sourceConnection *models.Connection, sync views.Sync, fieldMappings []views.FieldMapping) query.MongoQuery {
+func (md MongoDbImpl) getReadQuery(sourceConnection *models.Connection, sync views.Sync, fieldMappings []views.FieldMapping) (*query.MongoQuery, error) {
 	projection := createProjection(fieldMappings)
 	mongoQuery := query.MongoQuery{
 		Database:   *sync.Namespace,
@@ -112,6 +124,23 @@ func (md MongoDbImpl) getReadQuery(sourceConnection *models.Connection, sync vie
 		})
 
 		if sync.CursorPosition != nil {
+			sourceCursorFieldType, err := getSourceCursorFieldType(*sync.SourceCursorField, fieldMappings)
+			if err != nil {
+				return nil, err
+			}
+
+			var comparisonValue any
+			switch *sourceCursorFieldType {
+			case data.FieldTypeDateTimeTz:
+				timeCursor, err := time.Parse(query.FABRA_TIMESTAMP_TZ_FORMAT, *sync.CursorPosition)
+				if err != nil {
+					return nil, err
+				}
+				comparisonValue = primitive.NewDateTimeFromTime(timeCursor)
+			default:
+				comparisonValue = *sync.CursorPosition
+			}
+
 			// TODO: allow choosing other operators (rows smaller than current cursor, etc.)
 			mongoQuery.Filter = bson.D{
 				bson.E{
@@ -119,7 +148,7 @@ func (md MongoDbImpl) getReadQuery(sourceConnection *models.Connection, sync vie
 					Value: bson.D{
 						bson.E{
 							Key:   "$gt",
-							Value: *sync.CursorPosition,
+							Value: comparisonValue,
 						},
 					},
 				},
@@ -127,9 +156,10 @@ func (md MongoDbImpl) getReadQuery(sourceConnection *models.Connection, sync vie
 		}
 	}
 
-	return mongoQuery
+	return &mongoQuery, nil
 }
 
+// Used to ensure every field is in the correct order, and to omit the _id field
 func createProjection(fieldMappings []views.FieldMapping) bson.D {
 	projection := bson.D{
 		bson.E{
@@ -148,13 +178,13 @@ func createProjection(fieldMappings []views.FieldMapping) bson.D {
 	return projection
 }
 
-func (md MongoDbImpl) getNewCursorPosition(lastRow data.Row, fieldMappings []views.FieldMapping, sync views.Sync) *string {
+func (md MongoDbImpl) getNewCursorPosition(lastRow data.Row, fieldMappings []views.FieldMapping, sync views.Sync) (*string, error) {
 	if sync.SourceCursorField == nil {
-		return nil
+		return nil, nil
 	}
 
 	if lastRow == nil {
-		return nil
+		return nil, nil
 	}
 
 	var cursorFieldPos int
@@ -170,13 +200,13 @@ func (md MongoDbImpl) getNewCursorPosition(lastRow data.Row, fieldMappings []vie
 	// we sort rows by cursor field so just take the last row
 	var newCursorPos string
 	switch cursorFieldType {
-	case data.FieldTypeInteger:
+	case data.FieldTypeInteger, data.FieldTypeNumber, data.FieldTypeTimestamp, data.FieldTypeDateTimeTz:
 		newCursorPos = fmt.Sprintf("%v", lastRow[cursorFieldPos])
 	default:
 		newCursorPos = fmt.Sprintf("'%v'", lastRow[cursorFieldPos])
 	}
 
-	return &newCursorPos
+	return &newCursorPos, nil
 }
 
 func reorderMongoRow(unorderedRow data.Row, schema data.Schema, fieldMappings []views.FieldMapping) data.Row {

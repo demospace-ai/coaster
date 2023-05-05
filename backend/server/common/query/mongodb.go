@@ -12,8 +12,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-const MONGO_TIMESTAMP_TZ_FORMAT = "2006-01-02T15:04:05.000+07:00"
-
 type MongoDbApiClient struct {
 	Username          string
 	Password          string

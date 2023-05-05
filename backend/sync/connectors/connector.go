@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"go.fabra.io/server/common/data"
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/views"
 )
 
@@ -42,4 +43,14 @@ type Connector interface {
 		writeOutputC chan<- WriteOutput,
 		errC chan<- error,
 	)
+}
+
+func getSourceCursorFieldType(sourceCursorFieldName string, fieldMappings []views.FieldMapping) (*data.FieldType, error) {
+	for _, fieldMapping := range fieldMappings {
+		if fieldMapping.SourceFieldName == sourceCursorFieldName {
+			return &fieldMapping.SourceFieldType, nil
+		}
+	}
+
+	return nil, errors.Newf("could not find field for cursor field name: %s", sourceCursorFieldName)
 }

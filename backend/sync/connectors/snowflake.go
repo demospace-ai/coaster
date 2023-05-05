@@ -139,7 +139,7 @@ func (sf SnowflakeImpl) getNewCursorPosition(lastRow data.Row, schema data.Schem
 	// we sort rows by cursor field so just take the last row
 	var newCursorPos string
 	switch cursorFieldType {
-	case data.FieldTypeInteger:
+	case data.FieldTypeInteger, data.FieldTypeNumber:
 		newCursorPos = fmt.Sprintf("%v", lastRow[cursorFieldPos])
 	default:
 		newCursorPos = fmt.Sprintf("'%v'", lastRow[cursorFieldPos])
