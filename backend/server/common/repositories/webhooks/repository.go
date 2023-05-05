@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func CreateEndCustomerApiKey(db *gorm.DB, organizationID int64, endCustomerID int64, encryptedKey string) error {
+func CreateEndCustomerApiKey(db *gorm.DB, organizationID int64, endCustomerID string, encryptedKey string) error {
 	endCustomerApiKey := models.EndCustomerApiKey{
 		OrganizationID: organizationID,
 		EndCustomerID:  endCustomerID,
@@ -22,7 +22,7 @@ func CreateEndCustomerApiKey(db *gorm.DB, organizationID int64, endCustomerID in
 	return nil
 }
 
-func LoadEndCustomerApiKey(db *gorm.DB, organizationID int64, endCustomerID int64) (*string, error) {
+func LoadEndCustomerApiKey(db *gorm.DB, organizationID int64, endCustomerID string) (*string, error) {
 	var endCustomerApiKey models.EndCustomerApiKey
 	result := db.Table("end_customer_api_keys").
 		Select("end_customer_api_keys.*").
@@ -38,7 +38,7 @@ func LoadEndCustomerApiKey(db *gorm.DB, organizationID int64, endCustomerID int6
 	return &endCustomerApiKey.EncryptedKey, nil
 }
 
-func DeactivateExistingEndCustomerApiKey(db *gorm.DB, organizationID int64, endCustomerID int64) error {
+func DeactivateExistingEndCustomerApiKey(db *gorm.DB, organizationID int64, endCustomerID string) error {
 	result := db.Table("end_customer_api_keys").
 		Where("end_customer_api_keys.organization_id = ?", organizationID).
 		Where("end_customer_api_keys.end_customer_id = ?", endCustomerID).

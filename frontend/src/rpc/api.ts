@@ -269,7 +269,7 @@ export interface CreateObjectRequest {
 }
 
 export interface CreateLinkTokenRequest {
-  end_customer_id: number;
+  end_customer_id: string;
 }
 
 export interface CreateLinkTokenResponse {
@@ -559,7 +559,7 @@ export interface Source {
   id: number;
   display_name: string;
   connection: Connection;
-  end_customer_id: number;
+  end_customer_id: string;
 }
 
 export interface Connection {
@@ -579,7 +579,7 @@ export enum ConnectionType {
 export interface Sync {
   id: number;
   display_name: string;
-  end_customer_id: number;
+  end_customer_id: string;
   source_id: number;
   object_id: number;
   namespace: string | undefined;

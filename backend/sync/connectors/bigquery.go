@@ -181,7 +181,7 @@ func (bq BigQueryImpl) Write(
 
 	if rowsWritten > 0 {
 		writeMode := bq.toBigQueryWriteMode(sync.SyncMode)
-		csvSchema := bq.createCsvSchema(object.EndCustomerIdField, object.ObjectFields)
+		csvSchema := bq.createCsvSchema(object.EndCustomerIDField, object.ObjectFields)
 		err := bq.client.LoadFromStaging(ctx, *object.Namespace, *object.TableName, query.LoadOptions{
 			GcsReference:   gcsReference,
 			BigQuerySchema: csvSchema,
@@ -219,7 +219,7 @@ func (bq BigQueryImpl) stageBatch(ctx context.Context, rows []data.Row, fieldMap
 	// allocate the arrays and reuse them to save memory
 	rowStrings := make([]string, len(rows))
 	rowTokens := make([]string, numFields)
-	rowTokens[numFields-1] = fmt.Sprintf("%d", sync.EndCustomerID) // end customer ID will be the same for every row
+	rowTokens[numFields-1] = sync.EndCustomerID // end customer ID will be the same for every row
 
 	// write to temporary table in destination
 	for i, row := range rows {
@@ -310,7 +310,7 @@ func (bq BigQueryImpl) toBigQueryWriteMode(syncMode models.SyncMode) bigquery.Ta
 	}
 }
 
-func (bq BigQueryImpl) createCsvSchema(endCustomerIdColumn string, orderedObjectFields []views.ObjectField) bigquery.Schema {
+func (bq BigQueryImpl) createCsvSchema(endCustomerIDColumn string, orderedObjectFields []views.ObjectField) bigquery.Schema {
 	var csvSchema bigquery.Schema
 	for _, objectField := range orderedObjectFields {
 		if !objectField.Omit {
@@ -323,12 +323,12 @@ func (bq BigQueryImpl) createCsvSchema(endCustomerIdColumn string, orderedObject
 		}
 	}
 
-	endCustomerIdField := bigquery.FieldSchema{
-		Name:     endCustomerIdColumn,
-		Type:     bigquery.IntegerFieldType,
+	endCustomerIDField := bigquery.FieldSchema{
+		Name:     endCustomerIDColumn,
+		Type:     bigquery.StringFieldType,
 		Required: true,
 	}
-	csvSchema = append(csvSchema, &endCustomerIdField)
+	csvSchema = append(csvSchema, &endCustomerIDField)
 
 	return csvSchema
 }

@@ -20,7 +20,7 @@ type Object struct {
 	SyncMode           SyncMode            `json:"sync_mode"`
 	CursorField        database.NullString `json:"cursor_field"` // used to determine rows to sync based on whether they changed e.g. updated_at
 	PrimaryKey         database.NullString `json:"primary_key"`  // used to map updated rows to the row in the destination (only needed for updates)
-	EndCustomerIdField string              `json:"end_customer_id_field"`
+	EndCustomerIDField string              `json:"end_customer_id_field"`
 	Frequency          int64               `json:"frequency"`
 	FrequencyUnits     FrequencyUnits      `json:"frequency_units"`
 

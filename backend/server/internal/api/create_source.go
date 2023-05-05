@@ -16,7 +16,7 @@ import (
 )
 
 type CreateSourceRequest struct {
-	EndCustomerID   int64                  `json:"end_customer_id" validate:"required"`
+	EndCustomerID   string                 `json:"end_customer_id" validate:"required"`
 	DisplayName     string                 `json:"display_name" validate:"required"`
 	ConnectionType  models.ConnectionType  `json:"connection_type"`
 	BigQueryConfig  *input.BigQueryConfig  `json:"bigquery_config,omitempty"`

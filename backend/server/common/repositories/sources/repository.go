@@ -10,7 +10,7 @@ func CreateSource(
 	db *gorm.DB,
 	organizationID int64,
 	displayName string,
-	endCustomerID int64,
+	endCustomerID string,
 	connectionID int64,
 ) (*models.Source, error) {
 
@@ -30,7 +30,7 @@ func CreateSource(
 }
 
 // TODO: test that connection credentials are not exposed
-func LoadSourceByID(db *gorm.DB, organizationID int64, endCustomerID int64, sourceID int64) (*models.Source, error) {
+func LoadSourceByID(db *gorm.DB, organizationID int64, endCustomerID string, sourceID int64) (*models.Source, error) {
 	var source models.Source
 	result := db.Table("sources").
 		Select("sources.*").
@@ -66,7 +66,7 @@ func LoadSourcesByIDs(db *gorm.DB, organizationID int64, sourceIDs []int64) ([]m
 	return sources, nil
 }
 
-func LoadSourcesByIDsForCustomer(db *gorm.DB, organizationID int64, endCustomerID int64, sourceIDs []int64) ([]models.SourceConnection, error) {
+func LoadSourcesByIDsForCustomer(db *gorm.DB, organizationID int64, endCustomerID string, sourceIDs []int64) ([]models.SourceConnection, error) {
 	var sources []models.SourceConnection
 	result := db.Table("sources").
 		Select("sources.*, connections.connection_type").
@@ -89,7 +89,7 @@ func LoadSourcesByIDsForCustomer(db *gorm.DB, organizationID int64, endCustomerI
 func LoadAllSources(
 	db *gorm.DB,
 	organizationID int64,
-	endCustomerID int64,
+	endCustomerID string,
 ) ([]models.SourceConnection, error) {
 	var sources []models.SourceConnection
 	result := db.Table("sources").

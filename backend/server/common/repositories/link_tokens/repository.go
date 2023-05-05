@@ -9,12 +9,12 @@ import (
 
 const LINK_TOKEN_EXPIRATION = time.Duration(1) * time.Hour
 
-func CreateLinkToken(db *gorm.DB, organizationID int64, endCustomerId int64, hashedToken string) (*models.LinkToken, error) {
+func CreateLinkToken(db *gorm.DB, organizationID int64, endCustomerID string, hashedToken string) (*models.LinkToken, error) {
 	expiration := time.Now().Add(LINK_TOKEN_EXPIRATION)
 
 	linkToken := models.LinkToken{
 		OrganizationID: organizationID,
-		EndCustomerID:  endCustomerId,
+		EndCustomerID:  endCustomerID,
 		HashedToken:    hashedToken,
 		Expiration:     expiration,
 	}

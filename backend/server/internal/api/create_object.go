@@ -33,7 +33,7 @@ type CreateObjectRequest struct {
 	SyncMode           models.SyncMode       `json:"sync_mode" validate:"required"`
 	CursorField        *string               `json:"cursor_field,omitempty"`
 	PrimaryKey         *string               `json:"primary_key,omitempty"`
-	EndCustomerIdField string                `json:"end_customer_id_field" validate:"required"`
+	EndCustomerIDField string                `json:"end_customer_id_field" validate:"required"`
 	Frequency          int64                 `json:"frequency" validate:"required"`
 	FrequencyUnits     models.FrequencyUnits `json:"frequency_units" validate:"required"`
 	ObjectFields       []input.ObjectField   `json:"object_fields"`
@@ -86,7 +86,7 @@ func (s ApiService) CreateObject(auth auth.Authentication, w http.ResponseWriter
 		createObjectRequest.SyncMode,
 		createObjectRequest.CursorField,
 		createObjectRequest.PrimaryKey,
-		createObjectRequest.EndCustomerIdField,
+		createObjectRequest.EndCustomerIDField,
 		createObjectRequest.Frequency,
 		createObjectRequest.FrequencyUnits,
 	)
@@ -96,7 +96,7 @@ func (s ApiService) CreateObject(auth auth.Authentication, w http.ResponseWriter
 
 	// Ensure that the end customer ID field is marked as omit. It should not be exposed to the end customer
 	for i := range createObjectRequest.ObjectFields {
-		if createObjectRequest.ObjectFields[i].Name == createObjectRequest.EndCustomerIdField {
+		if createObjectRequest.ObjectFields[i].Name == createObjectRequest.EndCustomerIDField {
 			createObjectRequest.ObjectFields[i].Omit = true
 		}
 	}

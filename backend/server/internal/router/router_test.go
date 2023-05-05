@@ -86,8 +86,8 @@ var _ = Describe("Router", func() {
 			Value: expiredSessionToken,
 		}
 		apiKey = test.CreateApiKey(db, org.ID)
-		activeLinkToken = test.CreateActiveLinkToken(db, org.ID, 123)
-		expiredLinkToken = test.CreateExpiredLinkToken(db, org.ID, 123)
+		activeLinkToken = test.CreateActiveLinkToken(db, org.ID, "123")
+		expiredLinkToken = test.CreateExpiredLinkToken(db, org.ID, "123")
 	})
 
 	It("returns 401 when no session token provided for authenticated route", func() {

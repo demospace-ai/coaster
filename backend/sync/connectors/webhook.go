@@ -24,7 +24,7 @@ const MAX_BURST = 100
 
 type WebhookData struct {
 	ObjectName        string           `json:"object_name"`
-	EndCustomerId     int64            `json:"end_customer_id"`
+	EndCustomerID     string           `json:"end_customer_id"`
 	EndCustomerApiKey *string          `json:"end_customer_api_key,omitempty"`
 	FabraTimestamp    int64            `json:"fabra_timestamp"`
 	Data              []map[string]any `json:"data"`
@@ -148,10 +148,10 @@ func (wh WebhookImpl) Write(
 	close(errC)
 }
 
-func (wh WebhookImpl) sendData(objectName string, endCustomerId int64, endCustomerApiKey *string, outputDataList []map[string]any, webhookUrl string, decryptedSigningKey string) error {
+func (wh WebhookImpl) sendData(objectName string, endCustomerID string, endCustomerApiKey *string, outputDataList []map[string]any, webhookUrl string, decryptedSigningKey string) error {
 	webhookData := WebhookData{
 		ObjectName:        objectName,
-		EndCustomerId:     endCustomerId,
+		EndCustomerID:     endCustomerID,
 		EndCustomerApiKey: endCustomerApiKey,
 		FabraTimestamp:    time.Now().Unix(),
 		Data:              outputDataList,

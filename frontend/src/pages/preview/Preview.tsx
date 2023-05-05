@@ -7,12 +7,12 @@ import { CreateLinkToken, CreateLinkTokenRequest } from "src/rpc/api";
 import { CustomTheme } from "src/utils/theme";
 
 export const Preview: React.FC = () => {
-  const [endCustomerID, setEndCustomerID] = useState<number | undefined>(undefined);
+  const [endCustomerID, setEndCustomerID] = useState<string | undefined>(undefined);
   const [baseColor, setBaseColor] = useState<string | undefined>(undefined);
   const [hoverColor, setHoverColor] = useState<string | undefined>(undefined);
   const [textColor, setTextColor] = useState<string | undefined>(undefined);
 
-  // Hack
+  // Hack to update the colors of the active iFrame
   useEffect(() => {
     updateTheme({
       colors: {
@@ -38,7 +38,7 @@ export const Preview: React.FC = () => {
     }
   });
 
-  const openPreview = async (endCustomerID: number) => {
+  const openPreview = async (endCustomerID: string) => {
     const payload: CreateLinkTokenRequest = {
       end_customer_id: endCustomerID,
     };
@@ -56,7 +56,7 @@ export const Preview: React.FC = () => {
       <div className="tw-flex tw-w-full tw-mt-2 tw-mb-3">
         <div className="tw-flex tw-flex-col tw-justify-end tw-font-bold tw-text-lg">Preview Fabra Connect</div>
       </div>
-      <Input className="tw-mb-5 tw-w-72 tw-h-10" value={endCustomerID} setValue={setEndCustomerID} type="number" placeholder="Test End Customer ID" />
+      <Input className="tw-mb-5 tw-w-72 tw-h-10" value={endCustomerID} setValue={setEndCustomerID} placeholder="Test End Customer ID" />
       <ColorPicker className="tw-w-72 tw-h-10" wrapperClass="tw-mb-5" value={baseColor} setValue={setBaseColor} placeholder="Base Color (optional)" />
       <ColorPicker className="tw-w-72 tw-h-10" wrapperClass="tw-mb-5" value={hoverColor} setValue={setHoverColor} placeholder="Hover Color (optional)" />
       <ColorPicker className="tw-w-72 tw-h-10" wrapperClass="tw-mb-5" value={textColor} setValue={setTextColor} placeholder="Text Color (optional)" />

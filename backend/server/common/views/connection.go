@@ -17,7 +17,7 @@ type Destination struct {
 type Source struct {
 	ID            int64      `json:"id"`
 	DisplayName   string     `json:"display_name"`
-	EndCustomerId int64      `json:"end_customer_id"`
+	EndCustomerID string     `json:"end_customer_id"`
 	Connection    Connection `json:"connection"`
 }
 
@@ -53,7 +53,7 @@ type Object struct {
 	SyncMode           models.SyncMode       `json:"sync_mode"`
 	CursorField        *string               `json:"cursor_field,omitempty"`
 	PrimaryKey         *string               `json:"primary_key,omitempty"`
-	EndCustomerIdField string                `json:"end_customer_id_field"`
+	EndCustomerIDField string                `json:"end_customer_id_field"`
 	Frequency          int64                 `json:"frequency"`
 	FrequencyUnits     models.FrequencyUnits `json:"frequency_units"`
 	ObjectFields       []ObjectField         `json:"object_fields"`
@@ -128,7 +128,7 @@ func ConvertSource(source models.Source, connection models.Connection) Source {
 	return Source{
 		ID:            source.ID,
 		DisplayName:   source.DisplayName,
-		EndCustomerId: source.EndCustomerID,
+		EndCustomerID: source.EndCustomerID,
 		Connection: Connection{
 			ID:             connection.ID,
 			ConnectionType: connection.ConnectionType,
@@ -142,7 +142,7 @@ func ConvertSourceConnections(sourceConnections []models.SourceConnection) []Sou
 		sources = append(sources, Source{
 			ID:            sourceConnection.ID,
 			DisplayName:   sourceConnection.DisplayName,
-			EndCustomerId: sourceConnection.EndCustomerID,
+			EndCustomerID: sourceConnection.EndCustomerID,
 			Connection: Connection{
 				ID:             sourceConnection.ConnectionID,
 				ConnectionType: sourceConnection.ConnectionType,
@@ -180,7 +180,7 @@ func ConvertObject(object *models.Object, objectFields []models.ObjectField) Obj
 		DestinationID:      object.DestinationID,
 		TargetType:         object.TargetType,
 		SyncMode:           object.SyncMode,
-		EndCustomerIdField: object.EndCustomerIdField,
+		EndCustomerIDField: object.EndCustomerIDField,
 		Frequency:          object.Frequency,
 		FrequencyUnits:     object.FrequencyUnits,
 		ObjectFields:       viewObjectFields,

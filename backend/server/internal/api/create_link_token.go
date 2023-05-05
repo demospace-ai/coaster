@@ -15,7 +15,7 @@ import (
 )
 
 type CreateLinkTokenRequest struct {
-	EndCustomerId int64              `json:"end_customer_id" validate:"required"`
+	EndCustomerID string             `json:"end_customer_id" validate:"required"`
 	WebhookData   *input.WebhookData `json:"webhook_data,omitempty"`
 }
 
@@ -36,7 +36,7 @@ func (s ApiService) CreateLinkToken(auth auth.Authentication, w http.ResponseWri
 	}
 
 	rawLinkToken := generateLinkToken()
-	_, err = link_tokens.CreateLinkToken(s.db, auth.Organization.ID, createLinkTokenRequest.EndCustomerId, crypto.HashString(rawLinkToken))
+	_, err = link_tokens.CreateLinkToken(s.db, auth.Organization.ID, createLinkTokenRequest.EndCustomerID, crypto.HashString(rawLinkToken))
 	if err != nil {
 		return err
 	}
@@ -50,12 +50,12 @@ func (s ApiService) CreateLinkToken(auth auth.Authentication, w http.ResponseWri
 
 			// TODO: use transaction
 			// this operation always replaces the existing api key
-			err = webhooks.DeactivateExistingEndCustomerApiKey(s.db, auth.Organization.ID, createLinkTokenRequest.EndCustomerId)
+			err = webhooks.DeactivateExistingEndCustomerApiKey(s.db, auth.Organization.ID, createLinkTokenRequest.EndCustomerID)
 			if err != nil {
 				return err
 			}
 
-			err = webhooks.CreateEndCustomerApiKey(s.db, auth.Organization.ID, createLinkTokenRequest.EndCustomerId, *encryptedEndCustomerApiKey)
+			err = webhooks.CreateEndCustomerApiKey(s.db, auth.Organization.ID, createLinkTokenRequest.EndCustomerID, *encryptedEndCustomerApiKey)
 			if err != nil {
 				return err
 			}

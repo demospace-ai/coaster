@@ -37,7 +37,7 @@ func CreateUser(db *gorm.DB, organizationID int64) *models.User {
 	return &user
 }
 
-func CreateSync(db *gorm.DB, organizationID int64, endCustomerID int64, sourceID int64, objectID int64, syncMode models.SyncMode) *models.Sync {
+func CreateSync(db *gorm.DB, organizationID int64, endCustomerID string, sourceID int64, objectID int64, syncMode models.SyncMode) *models.Sync {
 	sync := models.Sync{
 		OrganizationID: organizationID,
 		EndCustomerID:  endCustomerID,
@@ -53,7 +53,7 @@ func CreateSync(db *gorm.DB, organizationID int64, endCustomerID int64, sourceID
 	return &sync
 }
 
-func CreateSource(db *gorm.DB, organizationID int64, endCustomerID int64) (*models.Source, *models.Connection) {
+func CreateSource(db *gorm.DB, organizationID int64, endCustomerID string) (*models.Source, *models.Connection) {
 	connection := CreateConnection(db, organizationID)
 	source := models.Source{
 		OrganizationID: organizationID,
@@ -69,7 +69,7 @@ func CreateSource(db *gorm.DB, organizationID int64, endCustomerID int64) (*mode
 	return &source, connection
 }
 
-func CreateDestination(db *gorm.DB, organizationID int64, endCustomerID int64) (*models.Destination, *models.Connection) {
+func CreateDestination(db *gorm.DB, organizationID int64) (*models.Destination, *models.Connection) {
 	connection := CreateConnection(db, organizationID)
 	destination := models.Destination{
 		OrganizationID: organizationID,
@@ -92,7 +92,7 @@ func CreateObject(db *gorm.DB, organizationID int64, destinationID int64, syncMo
 		DestinationID:      destinationID,
 		Namespace:          database.NewNullString("namespace"),
 		TableName:          database.NewNullString("table"),
-		EndCustomerIdField: "end_customer_id",
+		EndCustomerIDField: "end_customer_id",
 		SyncMode:           syncMode,
 	}
 
@@ -195,11 +195,11 @@ func CreateApiKey(db *gorm.DB, organizationID int64) string {
 	return rawKey
 }
 
-func CreateActiveLinkToken(db *gorm.DB, organizationID int64, endCustomerId int64) string {
+func CreateActiveLinkToken(db *gorm.DB, organizationID int64, endCustomerID string) string {
 	rawToken := "linkToken"
 	hashedToken := crypto.HashString(rawToken)
 	linkToken := models.LinkToken{
-		EndCustomerID:  endCustomerId,
+		EndCustomerID:  endCustomerID,
 		OrganizationID: organizationID,
 		HashedToken:    hashedToken,
 		Expiration:     time.Now().Add(time.Duration(1) * time.Hour),
@@ -210,11 +210,11 @@ func CreateActiveLinkToken(db *gorm.DB, organizationID int64, endCustomerId int6
 	return rawToken
 }
 
-func CreateExpiredLinkToken(db *gorm.DB, organizationID int64, endCustomerId int64) string {
+func CreateExpiredLinkToken(db *gorm.DB, organizationID int64, endCustomerID string) string {
 	rawToken := "linkToken"
 	hashedToken := crypto.HashString(rawToken)
 	linkToken := models.LinkToken{
-		EndCustomerID:  endCustomerId,
+		EndCustomerID:  endCustomerID,
 		OrganizationID: organizationID,
 		HashedToken:    hashedToken,
 		Expiration:     time.Now().Add(-(time.Duration(1) * time.Hour)),

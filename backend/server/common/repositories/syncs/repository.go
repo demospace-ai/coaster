@@ -13,7 +13,7 @@ func CreateSync(
 	db *gorm.DB,
 	organizationID int64,
 	displayName string,
-	endCustomerID int64,
+	endCustomerID string,
 	sourceID int64,
 	objectID int64,
 	namespace *string,
@@ -106,7 +106,7 @@ func LoadSyncByID(db *gorm.DB, organizationID int64, syncID int64) (*models.Sync
 	return &sync, nil
 }
 
-func LoadSyncByIDAndCustomer(db *gorm.DB, organizationID int64, endCustomerID int64, syncID int64) (*models.Sync, error) {
+func LoadSyncByIDAndCustomer(db *gorm.DB, organizationID int64, endCustomerID string, syncID int64) (*models.Sync, error) {
 	var sync models.Sync
 	result := db.Table("syncs").
 		Select("syncs.*").
@@ -145,7 +145,7 @@ func LoadAllSyncs(
 func LoadAllSyncsForCustomer(
 	db *gorm.DB,
 	organizationID int64,
-	endCustomerID int64,
+	endCustomerID string,
 ) ([]models.Sync, error) {
 	var sync []models.Sync
 	result := db.Table("syncs").

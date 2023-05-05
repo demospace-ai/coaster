@@ -32,10 +32,10 @@ var _ = Describe("BigQueryConnector", func() {
 
 	BeforeEach(func() {
 		org := test.CreateOrganization(db)
-		endCustomerID := int64(1)
+		endCustomerID := "abc123"
 		source, sourceConn := test.CreateSource(db, org.ID, endCustomerID)
 		sourceConnection = views.ConvertFullConnection(sourceConn)
-		destination, destConn := test.CreateDestination(db, org.ID, endCustomerID)
+		destination, destConn := test.CreateDestination(db, org.ID)
 		destinationConnection = views.ConvertFullConnection(destConn)
 
 		objectModel := test.CreateObject(db, org.ID, destination.ID, models.SyncModeFullAppend)
@@ -300,7 +300,7 @@ var _ = Describe("BigQueryConnector", func() {
 						{Name: "datetime_tz", Type: bigquery.TimestampFieldType, Required: true},
 						{Name: "datetime_ntz", Type: bigquery.DateTimeFieldType, Required: true},
 						{Name: "json", Type: bigquery.JSONFieldType, Required: false},
-						{Name: "end_customer_id", Type: bigquery.IntegerFieldType, Required: true},
+						{Name: "end_customer_id", Type: bigquery.StringFieldType, Required: true},
 					},
 					bigquery.WriteAppend,
 				},

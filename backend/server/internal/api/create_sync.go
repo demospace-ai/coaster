@@ -23,7 +23,7 @@ const CLIENT_KEY_KEY = "projects/932264813910/secrets/temporal-client-key/versio
 
 type CreateSyncRequest struct {
 	DisplayName       string                 `json:"display_name"`
-	EndCustomerId     int64                  `json:"end_customer_id"`
+	EndCustomerID     string                 `json:"end_customer_id"`
 	SourceID          int64                  `json:"source_id"`
 	ObjectID          int64                  `json:"object_id"`
 	Namespace         *string                `json:"namespace,omitempty"`
@@ -109,7 +109,7 @@ func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, 
 		s.db,
 		auth.Organization.ID,
 		createSyncRequest.DisplayName,
-		createSyncRequest.EndCustomerId,
+		createSyncRequest.EndCustomerID,
 		createSyncRequest.SourceID,
 		createSyncRequest.ObjectID,
 		createSyncRequest.Namespace,

@@ -19,7 +19,7 @@ func CreateObject(
 	syncMode models.SyncMode,
 	cursorField *string,
 	primaryKey *string,
-	endCustomerIdColumn string,
+	endCustomerIDColumn string,
 	frequency int64,
 	frequencyUnits models.FrequencyUnits,
 ) (*models.Object, error) {
@@ -30,7 +30,7 @@ func CreateObject(
 		DestinationID:      destinationID,
 		TargetType:         targetType,
 		SyncMode:           syncMode,
-		EndCustomerIdField: endCustomerIdColumn,
+		EndCustomerIDField: endCustomerIDColumn,
 		Frequency:          frequency,
 		FrequencyUnits:     frequencyUnits,
 	}
