@@ -5,10 +5,20 @@ import { Modifier, usePopper } from "react-popper";
 import { Loading } from "src/components/loading/Loading";
 import { mergeClasses } from "src/utils/twmerge";
 
+interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+  placeholder?: string;
+  setValue: (value: any) => void;
+  className?: string;
+  wrapperClass?: string;
+  textarea?: boolean;
+  type?: HTMLInputTypeAttribute;
+  label?: string;
+};
+
 export const Input: React.FC<InputProps> = props => {
-  const { id, value, placeholder, setValue, className, textarea, type, label, ...other } = props;
+  const { id, value, placeholder, disabled, setValue, className, textarea, type, label, ...other } = props;
   const [focused, setFocused] = useState(false);
-  let classes = ["tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border focus:tw-border-slate-700 tw-outline-none", !props.disabled && "hover:tw-border-slate-400", props.className];
+  let classes = ["tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border focus:tw-border-slate-700 tw-outline-none", !disabled && "hover:tw-border-slate-400", className];
 
   const onKeydown = (event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     event.stopPropagation();
@@ -17,10 +27,10 @@ export const Input: React.FC<InputProps> = props => {
     }
   };
 
-  const showLabel = props.label !== undefined && (focused || (props.value !== undefined && (props.value !== "string" || props.value.length > 0)));
+  const showLabel = label !== undefined && (focused || (value !== undefined && (value !== "string" || value.length > 0)));
 
   return (
-    <div className={mergeClasses("tw-relative", props.label && "tw-mt-4")}>
+    <div className={mergeClasses("tw-relative", label && "tw-mt-4")}>
       <Transition
         show={showLabel}
         enter="tw-transition tw-ease tw-duration-200 tw-transform"
@@ -34,35 +44,35 @@ export const Input: React.FC<InputProps> = props => {
           htmlFor="name"
           className="tw-absolute -tw-top-2 tw-left-2 -tw-mt-px tw-inline-block tw-bg-white tw-px-1 tw-text-xs tw-font-medium tw-text-gray-900"
         >
-          {props.label}
+          {label}
         </label>
       </Transition>
-      {props.textarea ?
+      {textarea ?
         <textarea
-          id={props.id}
-          name={props.id}
-          autoComplete={props.id}
-          placeholder={focused ? undefined : props.placeholder}
+          id={id}
+          name={id}
+          autoComplete={id}
+          placeholder={focused ? undefined : placeholder}
           className={mergeClasses(classes)}
           onKeyDown={onKeydown}
           onFocus={() => { setFocused(true); }}
-          onChange={e => props.setValue(e.target.value)}
+          onChange={e => setValue(e.target.value)}
           onBlur={() => { setFocused(false); }}
-          value={props.value ? props.value : ""}
+          value={value ? value : ""}
         />
         :
         <input
-          type={props.type ? props.type : "text"}
-          id={props.id}
-          name={props.id}
-          autoComplete={props.id}
-          placeholder={focused ? undefined : props.placeholder}
+          type={type ? type : "text"}
+          id={id}
+          name={id}
+          autoComplete={id}
+          placeholder={focused ? undefined : placeholder}
           className={mergeClasses(classes)}
           onKeyDown={onKeydown}
           onFocus={() => { setFocused(true); }}
-          onChange={e => { e.target.type === "number" ? props.setValue(parseInt(e.target.value)) : props.setValue(e.target.value); }}
+          onChange={e => { e.target.type === "number" ? setValue(parseInt(e.target.value)) : setValue(e.target.value); }}
           onBlur={() => { setFocused(false); }}
-          value={props.value ? props.value : ""}
+          value={value ? value : ""}
           {...other}
         />
       }
@@ -70,13 +80,16 @@ export const Input: React.FC<InputProps> = props => {
   );
 };
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-  placeholder?: string;
-  setValue: (value: any) => void;
-  className?: string;
-  textarea?: boolean;
-  type?: HTMLInputTypeAttribute;
-  label?: string;
+export const ColorPicker: React.FC<InputProps> = props => {
+  const { id, value, setValue, className, wrapperClass, textarea, type, label, ...other } = props;
+  let classes = ["tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border focus:tw-border-slate-700 tw-outline-none", className];
+
+  return (
+    <div className={mergeClasses("tw-flex tw-items-center", wrapperClass)}>
+      <input className={mergeClasses(classes)} value={value} onChange={e => setValue(e.target.value)} {...other} />
+      <input className="tw-w-6 tw-relative tw-right-8" value={value} onChange={e => setValue(e.target.value)} type="color" />
+    </div>
+  );
 };
 
 export const ValidatedInput: React.FC<InputProps> = props => {
@@ -147,7 +160,7 @@ export const ValidatedInput: React.FC<InputProps> = props => {
           className={mergeClasses(classes)}
           onKeyDown={onKeydown}
           onFocus={() => { setIsValid(true); setFocused(true); }}
-          onChange={e => { e.target.type === "number" ? props.setValue(parseInt(e.target.value)) : props.setValue(e.target.value); }}
+          onChange={e => { e.target.type === "number" ? setValue(parseInt(e.target.value)) : setValue(e.target.value); }}
           onBlur={() => { validateNotEmpty(value); setFocused(false); }}
           value={value ? value : ""}
           {...other}

@@ -210,6 +210,13 @@ export const CreateObject: IEndpoint<CreateObjectRequest, undefined> = {
   track: true,
 };
 
+export const CreateLinkToken: IEndpoint<CreateLinkTokenRequest, CreateLinkTokenResponse> = {
+  name: "Link Token Created",
+  method: "POST",
+  path: "/link_token",
+  track: true,
+};
+
 export interface TestDataConnectionRequest {
   display_name: string;
   connection_type: ConnectionType;
@@ -259,6 +266,14 @@ export interface CreateObjectRequest {
   object_fields: ObjectFieldInput[];
   cursor_field?: string; // required for incremental append: need cursor field to detect new data
   primary_key?: string; // required  for incremental update: need primary key to match up rows
+}
+
+export interface CreateLinkTokenRequest {
+  end_customer_id: number;
+}
+
+export interface CreateLinkTokenResponse {
+  link_token: string;
 }
 
 export interface ObjectField {

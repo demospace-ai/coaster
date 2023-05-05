@@ -20,11 +20,11 @@ export const Home: React.FC = () => {
         Setup Checklist
       </div>
       <NavLink className={classNames(setupStep, destinationCreated && "tw-line-through")} to='/destinations'>
-        <div className={stepNumber}>{destinationCreated ? <CheckIcon className="tw-m-0.5 tw-stroke-2" /> : 1}</div>
+        <div className={stepNumber}>{destinationCreated ? <CheckIcon className="tw-m-0.5 tw-w-full tw-stroke-2" /> : 1}</div>
         Connect your data warehouse as a destination
       </NavLink>
       <NavLink className={classNames(setupStep, objectCreated && "tw-line-through")} to='/objects'>
-        <div className={stepNumber}>{objectCreated ? <CheckIcon className="tw-m-0.5 tw-stroke-2" /> : 2}</div>
+        <div className={stepNumber}>{objectCreated ? <CheckIcon className="tw-m-0.5 tw-w-full  tw-stroke-2" /> : 2}</div>
         Define objects that customers can send to you
       </NavLink>
       <a className={setupStep} href="https://docs.fabra.io/guides/fabra-connect" target="_blank" rel="noreferrer">

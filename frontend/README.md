@@ -32,6 +32,5 @@ Your app is ready to be deployed!
 tcm src
 
 ## Serve initialize.js locally
-
 Run `npm run dev-initialize`
 Then run `npx http-server build`

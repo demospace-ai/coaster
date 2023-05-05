@@ -117,14 +117,14 @@ export function useLinkSources(linkToken: string) {
 
 export function useLinkSyncs(linkToken: string) {
   const fetcher: Fetcher<GetSyncsResponse, {}> = () => sendLinkTokenRequest(LinkGetSyncs, linkToken);
-  const { data, mutate, error, isLoading, isValidating } = useSWR({ GetSyncs }, fetcher);
+  const { data, mutate, error, isLoading, isValidating } = useSWR({ LinkGetSyncs }, fetcher);
   return { syncs: data?.syncs, objects: data?.objects, sources: data?.sources, mutate, error, loading: isLoading || isValidating };
 }
 
 export function useLinkSync(syncID: number | undefined, linkToken: string) {
   const shouldFetch = syncID;
   const fetcher: Fetcher<GetSyncResponse, { syncID: number; }> = (payload: { syncID: number; }) => sendLinkTokenRequest(LinkGetSync, linkToken, payload);
-  const { data, mutate, error, isLoading, isValidating } = useSWR(shouldFetch ? { GetSync: GetSync, syncID } : null, fetcher);
+  const { data, mutate, error, isLoading, isValidating } = useSWR(shouldFetch ? { LinkGetSync: LinkGetSync, syncID } : null, fetcher);
   return { sync: data, mutate, error, loading: isLoading || isValidating };
 }
 

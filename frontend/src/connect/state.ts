@@ -276,7 +276,7 @@ export const createNewSync = async (
 
   try {
     await sendLinkTokenRequest(LinkCreateSync, linkToken, payload);
-    // Tell SWRs to refetch sources
+    // Tell SWRs to refetch syncs
     mutate({ LinkGetSyncs });
     setState({
       ...state,

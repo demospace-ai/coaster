@@ -1,11 +1,14 @@
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "src/components/button/Button";
 import { AddDatabase } from "src/components/icons/Icons";
 import { ConnectionImage } from "src/components/images/Connections";
 import { Loading } from "src/components/loading/Loading";
+import { LinkGetSyncs } from "src/rpc/api";
 import { useLinkSyncs } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
+import { mutate } from "swr";
 
 export const Syncs: React.FC<{ linkToken: string; close: () => void | undefined; }> = ({ linkToken, close }) => {
   return (
@@ -36,6 +39,11 @@ const SyncList: React.FC<{ linkToken: string; }> = ({ linkToken }) => {
   const { syncs, objects, sources } = useLinkSyncs(linkToken);
   const objectIdMap = new Map(objects?.map(object => [object.id, object]));
   const sourceIdMap = new Map(sources?.map(source => [source.id, source]));
+
+  // Tell SWRs to refetch syncs whenever link token changes
+  useEffect(() => {
+    mutate({ LinkGetSyncs });
+  }, [linkToken]);
 
   return (
     <div className="tw-mt-2 tw-px-20 tw-pb-16 tw-flex tw-flex-col tw-overflow-auto">

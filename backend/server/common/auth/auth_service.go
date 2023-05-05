@@ -3,6 +3,7 @@ package auth
 import (
 	"net/http"
 
+	"go.fabra.io/server/common/application"
 	"go.fabra.io/server/common/crypto"
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/models"
@@ -37,9 +38,9 @@ func addCookie(w http.ResponseWriter, name string, value string) {
 	cookie := http.Cookie{
 		Name:     name,
 		Value:    value,
-		Secure:   true,
+		Secure:   application.IsProd(), // disable secure for local testing
 		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
+		SameSite: http.SameSiteStrictMode,
 	}
 	http.SetCookie(w, &cookie)
 }

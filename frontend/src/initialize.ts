@@ -17,7 +17,12 @@ let iframe: HTMLIFrameElement | null = null;
 let iframeReady: boolean = false;
 let useContainer: boolean = false;
 
-const initialize = (options?: FabraConnectOptions) => {
+// exported for Preview page
+export const initialize = (options?: FabraConnectOptions) => {
+  if (window.fabra.initialized || document.querySelectorAll("#fabra-connect-iframe").length > 0) {
+    return;
+  }
+
   window.addEventListener("message", handleMessage);
 
   const frame = document.createElement("iframe");
@@ -29,9 +34,8 @@ const initialize = (options?: FabraConnectOptions) => {
   frame.style.top = "0";
   frame.style.left = "0";
   frame.style.zIndex = "999";
-  frame.style.background = "transparent";
   frame.style.display = "none";
-  frame.style.colorScheme = "normal";
+  frame.style.colorScheme = "light";
 
   let frameRoot = document.body;
   if (options?.containerID !== undefined) {
@@ -50,6 +54,7 @@ const initialize = (options?: FabraConnectOptions) => {
   }
 
   iframe = frame;
+  window.fabra.initialized = true;
 };
 
 const handleMessage = (messageEvent: MessageEvent<FabraMessage>) => {
@@ -66,6 +71,16 @@ const handleMessage = (messageEvent: MessageEvent<FabraMessage>) => {
       return close();
     default:
       console.log("unexpected message: " + messageEvent);
+  }
+};
+
+// Exported for Preview page
+export const updateTheme = (customTheme: CustomTheme) => {
+  if (iframe && iframeReady) {
+    const message: FabraMessage = { messageType: MessageType.Configure, theme: customTheme, useContainer: useContainer };
+    iframe.contentWindow!.postMessage(message, CONNECT_ROOT);
+  } else {
+    window.setTimeout(() => updateTheme(customTheme), 100);
   }
 };
 

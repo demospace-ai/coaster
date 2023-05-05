@@ -1,4 +1,4 @@
-import { ArrowPathIcon, ArrowTopRightOnSquareIcon, BellIcon, CircleStackIcon, CubeIcon, HomeIcon, KeyIcon, MapIcon, UserPlusIcon } from "@heroicons/react/24/outline";
+import { ArrowPathIcon, ArrowTopRightOnSquareIcon, BellIcon, CircleStackIcon, CubeIcon, EyeIcon, HomeIcon, KeyIcon, MapIcon, UserPlusIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import { NavLink } from "react-router-dom";
 import { QuestionCircleIcon } from "src/components/icons/Icons";
@@ -56,6 +56,12 @@ export const NavigationBar: React.FC = () => {
         </div>
         <div className="tw-mx-4 tw-my-2 tw-uppercase tw-text-xs tw-text-slate-500 tw-font-medium">
           Develop
+        </div>
+        <div className={routeContainer}>
+          <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-slate-200")} to={"/preview"}>
+            <EyeIcon className="tw-h-4" strokeWidth="2" />
+            <div className={route}>Preview</div>
+          </NavLink>
         </div>
         <div className={routeContainer}>
           <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-slate-200")} to={"/apikey"}>

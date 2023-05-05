@@ -5,7 +5,6 @@ import { NewSync } from "src/connect/NewSync";
 import { SyncRuns } from "src/connect/SyncRuns";
 import { Syncs } from "src/connect/Syncs";
 import { FabraMessage, MessageType } from "src/message/message";
-import { isProd } from "src/utils/env";
 import { CustomTheme } from "src/utils/theme";
 
 let needsInit = true;
@@ -31,12 +30,6 @@ export const ConnectApp: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!isProd()) {
-      setLinkToken(import.meta.env.VITE_LINK_TOKEN);
-    }
-  }, []);
-
-  useEffect(() => {
     // Recommended way to run one-time initialization: https://beta.reactjs.org/learn/you-might-not-need-an-effect#initializing-the-application
     if (needsInit) {
       window.addEventListener("message", (message: MessageEvent<FabraMessage>) => {
@@ -51,7 +44,6 @@ export const ConnectApp: React.FC = () => {
             }
             break;
           default:
-            console.log("unexpected message: " + message);
             break;
         }
       });

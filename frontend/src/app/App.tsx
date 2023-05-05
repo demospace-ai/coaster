@@ -11,6 +11,7 @@ import { Home } from "src/pages/home/Home";
 import { Login, Unauthorized } from "src/pages/login/Login";
 import { NotFound } from "src/pages/notfound/NotFound";
 import { Objects } from "src/pages/objects/Objects";
+import { Preview } from "src/pages/preview/Preview";
 import { Sync } from "src/pages/syncs/Sync";
 import { Syncs } from "src/pages/syncs/Syncs";
 import { Team } from "src/pages/team/Team";
@@ -55,6 +56,7 @@ export const App: React.FC = () => {
           <Route path="/signup" element={<Login create />} />
           <Route path="/" element={<RequireAuth element={<Home />} />} />
           <Route path="/apikey" element={<RequireAuth element={<ApiKey />} />} />
+          <Route path="/preview" element={<RequireAuth element={<Preview />} />} />
           <Route path="/team" element={<RequireAuth element={<Team />} />} />
           <Route path="/destinations" element={<RequireAuth element={<Destinations />} />} />
           <Route path="/destination/:destinationID" element={<RequireAuth element={<Destination />} />} />
