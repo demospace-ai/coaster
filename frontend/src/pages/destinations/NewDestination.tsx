@@ -396,8 +396,8 @@ const BigQueryInputs: React.FC<ConnectionConfigurationProps> = props => {
       </div>
       <ValidatedInput id="staging-bucket" value={state.staging_bucket} setValue={(value) => { props.setState({ ...state, staging_bucket: value }); }} placeholder="Staging Bucket" className="tw-w-100" />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
-        <span>Credentials</span>
-        <Tooltip placement="right" label="This can be obtained in the Google Cloud web console by navigating to the IAM page and clicking on Service Accounts in the left sidebar. Then, find your service account in the list, go to its Keys tab, and click Add Key. Finally, click on Create new key and choose JSON." interactive maxWidth={500}>
+        <span>Service Account Key</span>
+        <Tooltip placement="right" label="This can be obtained in the Google Cloud web console by navigating to the IAM page and clicking on Service Accounts in the left sidebar. Then, find your service account in the list, go to its Keys tab, and click Add Key. Finally, click on Create new key and choose JSON. Fabra requires the BigQuery Data Editor, BigQuery Job User, Storage Object Creator, and Storage Object Viewer roles." interactive maxWidth={500}>
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>

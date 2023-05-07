@@ -16,7 +16,7 @@ export const Syncs: React.FC = () => {
 
   return (
     <div className="tw-py-5 tw-px-10 tw-h-full tw-overflow-scroll">
-      <div className="tw-flex tw-w-full tw-mb-5 tw-mt-2">
+      <div className="tw-flex tw-w-full tw-mb-5 tw-mt-2 tw-h-[29px]">
         <div className="tw-flex tw-flex-col tw-justify-end tw-font-bold tw-text-lg">Syncs</div>
       </div>
       <div className="tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-lg tw-overflow-x-auto tw-overscroll-contain tw-shadow-md" >

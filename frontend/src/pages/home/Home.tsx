@@ -15,10 +15,9 @@ export const Home: React.FC = () => {
   const objectCreated = objects && objects.length > 0;
 
   return (
-    <div className="tw-h-full tw-py-8 tw-px-10">
-      <div className="tw-text-2xl tw-font-bold tw-text-slate-700 tw-mb-5">
-        Setup Checklist
-      </div>
+    <div className="tw-h-full tw-py-7 tw-px-10">
+      <div className="tw-flex tw-flex-col tw-mb-5 tw-justify-end tw-font-bold tw-text-2xl">Welcome to Fabra!</div>
+      <div className="tw-flex tw-flex-col tw-mb-5 tw-justify-end tw-font-bold tw-text-lg tw-h-[29px]">Setup Checklist</div>
       <NavLink className={classNames(setupStep, destinationCreated && "tw-line-through")} to='/destinations'>
         <div className={stepNumber}>{destinationCreated ? <CheckIcon className="tw-m-0.5 tw-w-full tw-stroke-2" /> : 1}</div>
         Connect your data warehouse as a destination

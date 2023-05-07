@@ -162,7 +162,7 @@ const SnowflakeInputs: React.FC<ConnectionConfigurationProps> = props => {
       <ValidatedInput id="displayName" value={state.displayName} setValue={(value) => { props.setState({ ...state, displayName: value }); }} placeholder="Display Name" />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Username</span>
-        <Tooltip placement="right" label="You can choose your personal username or create a dedicated user for syncing.">
+        <Tooltip placement="right" label="We recommend you create a dedicated user for syncing.">
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
@@ -219,7 +219,7 @@ const RedshiftInputs: React.FC<ConnectionConfigurationProps> = props => {
       <ValidatedInput id="displayName" value={state.displayName} setValue={(value) => { props.setState({ ...state, displayName: value }); }} placeholder="Display Name" />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Username</span>
-        <Tooltip placement="right" label="You can choose your personal username or create a dedicated user for syncing.">
+        <Tooltip placement="right" label="We recommend you create a dedicated user for syncing.">
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
@@ -269,7 +269,7 @@ const SynapseInputs: React.FC<ConnectionConfigurationProps> = props => {
       <ValidatedInput id="displayName" value={state.displayName} setValue={(value) => { props.setState({ ...state, displayName: value }); }} placeholder="Display Name" />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Username</span>
-        <Tooltip placement="right" label="You can choose your personal username or create a dedicated user for syncing.">
+        <Tooltip placement="right" label="We recommend you create a dedicated user for syncing.">
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
@@ -338,7 +338,7 @@ const BigQueryInputs: React.FC<ConnectionConfigurationProps> = props => {
       </div>
       <ValidatedInput id="location" value={state.bigqueryConfig.location} setValue={(value) => { props.setState({ ...state, bigqueryConfig: { ...state.bigqueryConfig, location: value } }); }} placeholder="Location" />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
-        <span>Credentials</span>
+        <span>Service Account Key</span>
         <Tooltip placement="right" label="This can be obtained in the Google Cloud web console by navigating to the IAM page and clicking on Service Accounts in the left sidebar. Then, find your service account in the list, go to its Keys tab, and click Add Key. Finally, click on Create new key and choose JSON." interactive maxWidth={500}>
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
