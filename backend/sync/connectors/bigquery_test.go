@@ -277,7 +277,7 @@ var _ = Describe("BigQueryConnector", func() {
 			csvRows := make([]string, 10)
 			for i := 0; i < 10; i++ {
 				// Strings should be quoted, while integers, numbers, and datetimes should not. JSON should be double quoted
-				csvRows[i] = "\"string\",2,false,2006-01-02 15:04:05.000-07:00,2006-01-02 15:04:05.000,\"{\"\"hello\"\":123}\",1"
+				csvRows[i] = "\"string\",2,false,2006-01-02 15:04:05.000-07:00,2006-01-02 15:04:05.000,\"{\"\"hello\"\":123}\",abc123"
 			}
 			csvData := strings.Join(csvRows, "\n")
 
