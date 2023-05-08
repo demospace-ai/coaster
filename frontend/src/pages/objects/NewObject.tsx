@@ -10,6 +10,7 @@ import { Tooltip } from "src/components/tooltip/Tooltip";
 import { sendRequest } from "src/rpc/ajax";
 import { ConnectionType, CreateObject, CreateObjectRequest, Destination, Field, FieldType, FrequencyUnits, GetObjects, needsCursorField, needsEndCustomerId, needsPrimaryKey, ObjectFieldInput, Schema, shouldCreateFields, SyncMode, TargetType } from "src/rpc/api";
 import { useSchema } from "src/rpc/data";
+import { HttpError } from "src/utils/errors";
 import { mergeClasses } from "src/utils/twmerge";
 import { mutate } from "swr";
 
@@ -40,6 +41,7 @@ type NewObjectState = {
   cursorFieldError: string | undefined;
   endCustomerIdError: string | undefined;
   frequencyError: string | undefined;
+  createError: string | undefined;
 };
 
 const INITIAL_OBJECT_STATE: NewObjectState = {
@@ -62,6 +64,7 @@ const INITIAL_OBJECT_STATE: NewObjectState = {
   cursorFieldError: undefined,
   endCustomerIdError: undefined,
   frequencyError: undefined,
+  createError: undefined,
 };
 
 type ObjectStepProps = {
@@ -189,10 +192,10 @@ const validateCursorField = (state: NewObjectState, setState: React.Dispatch<Rea
     return false;
   }
 
-  if (state.cursorField.type !== FieldType.TimestampNtz
-    && state.cursorField.type !== FieldType.TimestampTz
+  if (state.cursorField.type !== FieldType.Timestamp
+    && state.cursorField.type !== FieldType.DatetimeTz
+    && state.cursorField.type !== FieldType.DatetimeNtz
     && state.cursorField.type !== FieldType.Date
-    && state.cursorField.type !== FieldType.Datetime
     && state.cursorField.type !== FieldType.Integer
     && state.cursorField.type !== FieldType.Number
   ) {
@@ -294,6 +297,7 @@ export const NewObject: React.FC<{ onComplete: () => void; }> = props => {
         {state.fieldsError && <div className="tw-mt-4 tw-text-red-700 tw-py-2 tw-px-10 tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">{state.fieldsError}</div>}
         {state.cursorFieldError && <div className="tw-mt-4 tw-text-red-700 tw-py-2 tw-px-10 tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">{state.cursorFieldError}</div>}
         {state.frequencyError && <div className="tw-mt-4 tw-text-red-700 tw-py-2 tw-px-10 tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">{state.frequencyError}</div>}
+        {state.createError && <div className="tw-mt-4 tw-text-red-700 tw-py-2 tw-px-10 tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">{state.createError}</div>}
       </div>
     </>
   );
@@ -552,6 +556,12 @@ const Finalize: React.FC<ObjectStepProps & { onComplete: () => void; }> = (props
       setCreateObjectSuccess(true);
     } catch (e) {
       setCreateObjectSuccess(false);
+      if (e instanceof HttpError) {
+        const createError = e.message;
+        setState(state => {
+          return { ...state, createError };
+        });
+      }
     }
 
     setLoading(false);

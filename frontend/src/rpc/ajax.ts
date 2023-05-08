@@ -68,7 +68,7 @@ export async function sendRequest<RequestType extends Record<string, any>, Respo
   const response = await fetch(url, options);
 
   if (!response.ok) {
-    const errorMessage = response.statusText ? response.statusText : await response.text();
+    const errorMessage = response.statusText + ": " + await response.text();
     // TODO: log error
     throw new HttpError(response.status, errorMessage);
   }
