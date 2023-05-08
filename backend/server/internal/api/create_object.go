@@ -69,7 +69,7 @@ func (s ApiService) CreateObject(auth auth.Authentication, w http.ResponseWriter
 			}
 		}
 
-		if _, invalidCursorField := VALID_CURSOR_TYPES[cursorField.Type]; invalidCursorField {
+		if _, validCursorField := VALID_CURSOR_TYPES[cursorField.Type]; !validCursorField {
 			return errors.NewBadRequestf("invalid cursor field type: %s", cursorField.Type)
 		}
 	}
