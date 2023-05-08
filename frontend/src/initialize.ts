@@ -70,7 +70,7 @@ const handleMessage = (messageEvent: MessageEvent<FabraMessage>) => {
     case MessageType.Close:
       return close();
     default:
-      console.log("unexpected message: " + messageEvent);
+      break;
   }
 };
 
