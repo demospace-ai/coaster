@@ -1,16 +1,16 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "src/components/button/Button";
 import { ColorPicker, Input } from "src/components/input/Input";
-import { initialize, updateTheme } from "src/initialize";
+import { initialize, open, updateTheme } from "src/initialize-internal";
 import { sendRequest } from "src/rpc/ajax";
 import { CreateLinkToken, CreateLinkTokenRequest } from "src/rpc/api";
 import { CustomTheme } from "src/utils/theme";
 
 export const Preview: React.FC = () => {
-  const [endCustomerID, setEndCustomerID] = useState<string | undefined>(undefined);
-  const [baseColor, setBaseColor] = useState<string | undefined>(undefined);
-  const [hoverColor, setHoverColor] = useState<string | undefined>(undefined);
-  const [textColor, setTextColor] = useState<string | undefined>(undefined);
+  const [endCustomerID, setEndCustomerID] = useState<string>("");
+  const [baseColor, setBaseColor] = useState<string>("#475569");
+  const [hoverColor, setHoverColor] = useState<string>("#1e293b");
+  const [textColor, setTextColor] = useState<string>("#ffffff");
 
   // Hack to update the colors of the active iFrame
   useEffect(() => {
@@ -25,7 +25,7 @@ export const Preview: React.FC = () => {
     });
   }, [baseColor, hoverColor, textColor]);
 
-  const { open } = useFabraConnect({
+  useFabraConnect({
     containerID: "fabra-container",
     customTheme: {
       colors: {
@@ -66,29 +66,8 @@ export const Preview: React.FC = () => {
 };
 
 // Slightly customized version of ReactFabraConnect to use local Connect code in development
-const useFabraConnect = (options?: { customTheme?: CustomTheme; containerID?: string; }): {
-  open: (linkToken: string) => void;
-  close: () => void;
-} => {
+const useFabraConnect = (options?: { customTheme?: CustomTheme; containerID?: string; }) => {
   useEffect(() => {
     initialize(options);
   }, []);
-
-
-  const open = useCallback((linkToken: string) => {
-    if (window.fabra) {
-      window.fabra.open(linkToken);
-    }
-  }, []);
-
-  const close = useCallback(() => {
-    if (window.fabra) {
-      window.fabra.close();
-    }
-  }, []);
-
-  return {
-    open,
-    close,
-  };
 };
