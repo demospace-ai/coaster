@@ -10,6 +10,7 @@ import (
 	"go.fabra.io/server/common/errors"
 
 	"github.com/gorilla/mux"
+	highlightGorillaMux "github.com/highlight/highlight/sdk/highlight-go/middleware/gorillamux"
 )
 
 var ALLOWED_ORIGINS = []string{"https://app.fabra.io", "https://connect.fabra.io"}
@@ -64,6 +65,7 @@ func (r Router) RegisterRoutes(service ApiService) {
 	}
 
 	r.router.Use(CORSMiddleware)
+	r.router.Use(highlightGorillaMux.Middleware)
 }
 
 func (r Router) wrapAuthenticatedRoute(handler AuthenticatedHandlerFunc) http.Handler {

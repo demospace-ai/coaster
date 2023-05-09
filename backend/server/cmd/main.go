@@ -9,6 +9,8 @@ import (
 	"go.fabra.io/server/common/query"
 	"go.fabra.io/server/internal/api"
 	"go.fabra.io/server/internal/router"
+
+	"github.com/highlight/highlight/sdk/highlight-go"
 )
 
 func main() {
@@ -17,6 +19,10 @@ func main() {
 		log.Fatal(err)
 		return
 	}
+
+	highlight.SetProjectID("7e3vw5g1")
+	highlight.Start()
+	defer highlight.Stop()
 
 	cryptoService := crypto.NewCryptoService()
 	authService := auth.NewAuthService(db, cryptoService)
