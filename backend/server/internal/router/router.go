@@ -124,8 +124,10 @@ func (r Router) wrapWithErrorHandling(handler ErrorHandlerFunc) http.Handler {
 
 		switch e := err.(type) {
 		case errors.HttpError:
+			log.Printf("HTTP error: %+v", err)
 			http.Error(w, e.Error(), e.Code())
 		case errors.CustomerVisibleError:
+			log.Printf("Customer visible error: %+v", err)
 			http.Error(w, e.Error(), http.StatusBadRequest)
 		default:
 			log.Printf("Unexpected error: %+v", err)

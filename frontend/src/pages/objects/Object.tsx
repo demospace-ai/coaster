@@ -19,10 +19,10 @@ export const Object: React.FC = () => {
   return (
     <div className="tw-pt-5 tw-pb-24 tw-px-10 tw-h-full tw-w-full tw-overflow-scroll">
       <BackButton onClick={() => navigate("/objects")} />
-      <div className="tw-flex tw-flex-col tw-w-full tw-mb-5 tw-mt-4">
-        <div className="tw-flex tw-flex-row tw-items-center tw-font-bold tw-text-2xl tw-mb-4">
-          {object.display_name}
-        </div>
+      <div className="tw-flex tw-flex-row tw-items-center tw-font-bold tw-text-2xl tw-my-4">
+        {object.display_name}
+      </div>
+      <div className="tw-flex tw-flex-col tw-flex-wrap tw-items-start tw-h-32 tw-w-1/2 tw-p-4 tw-mb-5 tw-bg-white tw-border tw-border-slate-200 tw-rounded-md">
         <div className="tw-flex tw-flex-row tw-items-center tw-text-base tw-mt-1">
           <span className="tw-font-medium tw-whitespace-pre">Destination ID: </span>{object.destination_id}
         </div>

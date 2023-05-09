@@ -12,7 +12,12 @@ import { isProd } from "src/utils/env";
 // Initialize Highlight tracking for production
 if (isProd()) {
   rudderanalytics.load("2NhFGB9sihlA85YlkD7p2kSuen4", "https://fabranickbele.dataplane.rudderstack.com");
-  H.init("6gllomg9");
+  H.init("6gllomg9", {
+    tracingOrigins: ["localhost", "api.fabra.io"],
+    networkRecording: {
+      enabled: true,
+    }
+  });
 }
 
 const container = document.getElementById("root");
