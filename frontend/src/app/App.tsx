@@ -10,6 +10,7 @@ import { Destinations } from "src/pages/destinations/Destinations";
 import { Home } from "src/pages/home/Home";
 import { Login, Unauthorized } from "src/pages/login/Login";
 import { NotFound } from "src/pages/notfound/NotFound";
+import { Object } from "src/pages/objects/Object";
 import { Objects } from "src/pages/objects/Objects";
 import { Preview } from "src/pages/preview/Preview";
 import { Sync } from "src/pages/syncs/Sync";
@@ -61,6 +62,7 @@ export const App: React.FC = () => {
           <Route path="/destinations" element={<RequireAuth element={<Destinations />} />} />
           <Route path="/destination/:destinationID" element={<RequireAuth element={<Destination />} />} />
           <Route path="/objects" element={<RequireAuth element={<Objects />} />} />
+          <Route path="/object/:objectID" element={<RequireAuth element={<Object />} />} />
           <Route path="/syncs" element={<RequireAuth element={<Syncs />} />} />
           <Route path="/sync/:syncID" element={<RequireAuth element={<Sync />} />} />
           <Route path="*" element={<NotFound />} />

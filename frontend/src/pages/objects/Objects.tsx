@@ -1,6 +1,7 @@
 import { ChevronRightIcon, PlusCircleIcon } from "@heroicons/react/20/solid";
 import classNames from "classnames";
 import { ReactElement, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "src/components/button/Button";
 import { Loading } from "src/components/loading/Loading";
 import { NewObject } from "src/pages/objects/NewObject";
@@ -37,6 +38,7 @@ export const Objects: React.FC = () => {
 };
 
 const ObjectList: React.FC<{ setStep: (step: Step) => void; }> = ({ setStep }) => {
+  const navigate = useNavigate();
   const { objects } = useObjects();
 
   return (
@@ -64,7 +66,7 @@ const ObjectList: React.FC<{ setStep: (step: Step) => void; }> = ({ setStep }) =
             </thead>
             <tbody>
               {objects!.length > 0 ? objects!.map((object, index) => (
-                <tr key={index} className="tw-border-b tw-border-solid tw-border-slate-200 last:tw-border-0 tw-cursor-pointer hover:tw-bg-slate-50">
+                <tr key={index} className="tw-border-b tw-border-solid tw-border-slate-200 last:tw-border-0 tw-cursor-pointer hover:tw-bg-slate-50" onClick={() => navigate(`/object/${object.id}`)}>
                   <td className={tableCellStyle}>
                     {object.display_name}
                   </td>

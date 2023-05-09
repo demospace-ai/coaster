@@ -80,7 +80,7 @@ const validateAll = (state: NewObjectState, setState: React.Dispatch<React.SetSt
     && state.syncMode !== undefined
     && (!needsCursorField(state.syncMode) || validateCursorField(state, setState))
     && (!needsPrimaryKey(state.syncMode) || state.primaryKey !== undefined)
-    && (!needsEndCustomerId(state.destination!.connection.connection_type) || state.endCustomerIdField !== undefined)
+    && (!needsEndCustomerId(state.targetType!) || state.endCustomerIdField !== undefined)
     && validateFrequency(state, setState)
   );
 };

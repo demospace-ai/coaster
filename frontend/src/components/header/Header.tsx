@@ -6,7 +6,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import { Loading } from "src/components/loading/Loading";
 import { useLogout } from "src/pages/login/actions";
 import { useSelector } from "src/root/model";
-import { useDestination, useSync } from "src/rpc/data";
+import { useDestination, useObject, useSync } from "src/rpc/data";
 import { toTitleCase } from "src/utils/string";
 
 export const Header: React.FC = () => {
@@ -42,6 +42,8 @@ const Breadcrumbs: React.FC<{ pathname: string; }> = props => {
       return <PageBreadcrumbs title={"API Keys"} pathname={props.pathname} />;
     case "sync":
       return <SyncBreadcrumbs id={pathTokens[2]} pathname={props.pathname} />;
+    case "object":
+      return <ObjectBreadcrumbs id={pathTokens[2]} pathname={props.pathname} />;
     case "destination":
       return <DestinationBreadcrumbs id={pathTokens[2]} pathname={props.pathname} />;
     default:
@@ -53,6 +55,15 @@ const SyncBreadcrumbs: React.FC<{ id: string, pathname: string; }> = props => {
   const { sync } = useSync(Number(props.id)); // This is deduped by SWR so don"t worry about the extra fetch
   const title = sync?.sync.display_name;
   const crumbs: Breadcrumb[] = [{ title: "Syncs", path: "/syncs" }, { title, path: props.pathname }];
+  document.title = title + " | Fabra";
+
+  return <BreadcrumbsLayout crumbs={crumbs} />;
+};
+
+const ObjectBreadcrumbs: React.FC<{ id: string, pathname: string; }> = props => {
+  const { object } = useObject(Number(props.id)); // This is deduped by SWR so don"t worry about the extra fetch
+  const title = object?.display_name;
+  const crumbs: Breadcrumb[] = [{ title: "Objects", path: "/objects" }, { title, path: props.pathname }];
   document.title = title + " | Fabra";
 
   return <BreadcrumbsLayout crumbs={crumbs} />;

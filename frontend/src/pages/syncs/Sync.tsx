@@ -1,5 +1,6 @@
 import { ChevronRightIcon, PencilIcon } from "@heroicons/react/24/outline";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { BackButton } from "src/components/button/Button";
 import { DotsLoading, Loading } from "src/components/loading/Loading";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { SyncRunStatus } from "src/rpc/api";
@@ -10,13 +11,15 @@ const tableHeaderStyle = "tw-sticky tw-top-0 tw-z-0 tw-border-b tw-border-slate-
 const tableCellStyle = "tw-whitespace-nowrap tw-left tw-overflow-hidden tw-py-4 tw-pl-4 tw-text-sm tw-text-slate-800 tw-hidden sm:tw-table-cell";
 
 export const Sync: React.FC = () => {
+  const navigate = useNavigate();
   const { syncID } = useParams<{ syncID: string; }>();
   const { sync } = useSync(Number(syncID));
   const syncRuns = sync?.sync_runs ? sync.sync_runs : [];
 
   return (
     <div className="tw-pt-5 tw-pb-24 tw-px-10 tw-h-full tw-w-full tw-overflow-scroll">
-      <div className="tw-flex tw-w-full tw-mb-5 tw-mt-2">
+      <BackButton onClick={() => navigate("/syncs")} />
+      <div className="tw-flex tw-w-full tw-mb-5 tw-mt-4">
         <div className="tw-flex tw-flex-row tw-items-center tw-font-bold tw-text-lg">
           {sync?.sync.display_name}
           <div className="hover:tw-bg-slate-200 tw-p-1 tw-rounded tw-ml-2 tw-cursor-pointer"><PencilIcon className="tw-h-4"></PencilIcon></div>

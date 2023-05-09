@@ -493,10 +493,17 @@ export interface FabraObject {
   id: number;
   display_name: string;
   destination_id: number;
+  target_type: TargetType;
   namespace?: string;
   table_name?: string;
   custom_join?: string;
   object_fields: ObjectField[];
+  end_customer_id_field: string;
+  sync_mode: SyncMode;
+  frequency: number;
+  frequency_units: FrequencyUnits;
+  cursor_field?: string;
+  primary_key?: string;
 }
 
 export interface GetNamespacesResponse {
@@ -640,12 +647,14 @@ export const needsPrimaryKey = (syncMode: SyncMode): boolean => {
   }
 };
 
-export const needsEndCustomerId = (destinationType: ConnectionType): boolean => {
+export const needsEndCustomerId = (targetType: TargetType): boolean => {
   // no default so it isn"t possible to add a new mode without updating
-  switch (destinationType) {
-    case ConnectionType.Webhook:
+  switch (targetType) {
+    case TargetType.Webhook:
       return false;
-    default:
+    case TargetType.SingleExisting:
+    case TargetType.SingleNew:
+    case TargetType.TablePerCustomer:
       return true;
   }
 };
@@ -668,6 +677,19 @@ export enum TargetType {
   SingleNew = "single_new",
   TablePerCustomer = "table_per_customer",
   Webhook = "webhook",
+}
+
+export function targetTypeToString(targetType: TargetType) {
+  switch (targetType) {
+    case TargetType.SingleExisting:
+      return "Single Existing Table";
+    case TargetType.SingleNew:
+      return "Single New Table";
+    case TargetType.TablePerCustomer:
+      return "Table Per Customer";
+    case TargetType.Webhook:
+      return "Webhook";
+  }
 }
 
 export enum FrequencyUnits {
