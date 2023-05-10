@@ -17,7 +17,6 @@ interface FabraConnectOptions {
 
 let iframe: HTMLIFrameElement | null = null;
 let iframeReady: boolean = false;
-let useContainer: boolean = false;
 
 // exported for Preview page
 export const initialize = (options?: FabraConnectOptions) => {
@@ -44,19 +43,16 @@ export const initialize = (options?: FabraConnectOptions) => {
     window.fabra.containerID = options.containerID;
     const container = document.getElementById(options.containerID);
     if (container !== null) {
-      useContainer = true;
       frameRoot = container;
       frame.style.position = "static";
     }
   }
 
-  frameRoot.appendChild(frame);
-
   if (options?.customTheme) {
     window.fabra.customTheme = options.customTheme;
   }
 
-  iframe = frame;
+  iframe = frameRoot.appendChild(frame);
   window.fabra.initialized = true;
 };
 
@@ -68,7 +64,7 @@ export const updateTheme = (customTheme: CustomTheme) => {
       reattach(window.fabra.containerID);
     }
 
-    const message: FabraMessage = { messageType: MessageType.Configure, theme: customTheme, useContainer: useContainer };
+    const message: FabraMessage = { messageType: MessageType.Configure, theme: customTheme, useContainer: Boolean(window.fabra.containerID) };
     iframe.contentWindow!.postMessage(message, CONNECT_ROOT);
   } else {
     window.setTimeout(() => updateTheme(customTheme), 100);
@@ -85,7 +81,7 @@ const handleMessage = (messageEvent: MessageEvent<FabraMessage>) => {
           reattach(window.fabra.containerID);
         }
 
-        const message: FabraMessage = { messageType: MessageType.Configure, theme: window.fabra.customTheme, useContainer: useContainer };
+        const message: FabraMessage = { messageType: MessageType.Configure, theme: window.fabra.customTheme, useContainer: Boolean(window.fabra.containerID) };
         iframe.contentWindow!.postMessage(message, CONNECT_ROOT);
       }
       iframeReady = true;
@@ -121,7 +117,7 @@ const reattach = (containerID: string) => {
   window.fabra.containerID = containerID;
   const container = document.getElementById(containerID);
   if (container && iframe) {
-    container.appendChild(iframe);
+    iframe = container.appendChild(iframe);
   }
 };
 
@@ -132,9 +128,9 @@ const destroy = () => {
 
   window.fabra.initialized = false;
   window.fabra.customTheme = undefined;
+  window.fabra.containerID = undefined;
   iframe = null;
   iframeReady = false;
-  useContainer = false;
 };
 
 // Special object to hold state and functions
