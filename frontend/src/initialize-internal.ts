@@ -11,6 +11,8 @@ declare global {
 interface FabraConnectOptions {
   customTheme?: CustomTheme;
   containerID?: string;
+  supportEmail?: string;
+  docsLink?: string;
 }
 
 let iframe: HTMLIFrameElement | null = null;

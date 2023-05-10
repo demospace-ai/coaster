@@ -54,30 +54,33 @@ export const Preview: React.FC = () => {
   };
 
   return (
-    <div className="tw-py-5 tw-px-10">
-      <div className="tw-flex tw-w-full tw-mt-2 tw-mb-3">
-        <div className="tw-flex tw-flex-col tw-justify-end tw-font-bold tw-text-lg">Preview Fabra Connect</div>
+    <div className="tw-py-5 tw-px-10 tw-flex tw-w-full tw-h-full">
+      <div className="tw-w-1/4">
+        <div className="tw-flex tw-w-full tw-mt-2 tw-mb-3">
+          <div className="tw-flex tw-flex-col tw-justify-end tw-font-bold tw-text-lg">Preview Fabra Connect</div>
+        </div>
+        <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1 tw-font-medium">
+          <span>Test End Customer ID</span>
+          <Tooltip placement="right" label="This can be any string. If you use an actual ID for one of your users, you can see what that user will see.">
+            <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+          </Tooltip>
+        </div>
+        <Input className="tw-h-10" wrapperClass="tw-mr-6" value={endCustomerID} setValue={setEndCustomerID} placeholder="Test End Customer ID" />
+        <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1 tw-font-medium">
+          <span>Base Color</span>
+        </div>
+        <ColorPicker className="tw-h-10" value={baseColor} setValue={setBaseColor} placeholder="Base Color (optional)" />
+        <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1 tw-font-medium">
+          <span>Hover Color</span>
+        </div>
+        <ColorPicker className="tw-h-10" value={hoverColor} setValue={setHoverColor} placeholder="Hover Color (optional)" />
+        <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1 tw-font-medium">
+          <span>Text Color</span>
+        </div>
+        <ColorPicker className="tw-h-10" value={textColor} setValue={setTextColor} placeholder="Text Color (optional)" />
+        <Button className="tw-px-4 tw-h-10 tw-mt-6" onClick={() => endCustomerID && openPreview(endCustomerID)}>Open Fabra Connect</Button>
       </div>
-      <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1 tw-font-medium">
-        <span>Test End Customer ID</span>
-        <Tooltip placement="right" label="This can be any string. If you use an actual ID for one of your users, you can see what that user will see.">
-          <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
-        </Tooltip>
-      </div>
-      <Input className="tw-w-72 tw-h-10" value={endCustomerID} setValue={setEndCustomerID} placeholder="Test End Customer ID" />
-      <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1 tw-font-medium">
-        <span>Base Color</span>
-      </div>
-      <ColorPicker className="tw-w-72 tw-h-10" value={baseColor} setValue={setBaseColor} placeholder="Base Color (optional)" />
-      <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1 tw-font-medium">
-        <span>Hover Color</span>
-      </div>
-      <ColorPicker className="tw-w-72 tw-h-10" value={hoverColor} setValue={setHoverColor} placeholder="Hover Color (optional)" />
-      <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1 tw-font-medium">
-        <span>Text Color</span>
-      </div>
-      <ColorPicker className="tw-w-72 tw-h-10" value={textColor} setValue={setTextColor} placeholder="Text Color (optional)" />
-      <Button className="tw-px-4 tw-h-10 tw-mt-6" onClick={() => endCustomerID && openPreview(endCustomerID)}>Open Fabra Connect</Button>
+      <div id="fabra-container" className="tw-w-full tw-h-full tw-border tw-border-slate-200 tw-rounded-md tw-overflow-clip" />
     </div>
   );
 };

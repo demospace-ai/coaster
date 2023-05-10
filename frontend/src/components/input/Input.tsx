@@ -16,7 +16,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 };
 
 export const Input: React.FC<InputProps> = props => {
-  const { id, value, placeholder, disabled, setValue, className, textarea, type, label, ...other } = props;
+  const { id, value, placeholder, disabled, setValue, className, wrapperClass, textarea, type, label, ...other } = props;
   const [focused, setFocused] = useState(false);
   let classes = ["tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border focus:tw-border-slate-700 tw-outline-none", !disabled && "hover:tw-border-slate-400", className];
 
@@ -30,7 +30,7 @@ export const Input: React.FC<InputProps> = props => {
   const showLabel = label !== undefined && (focused || (value !== undefined && (value !== "string" || value.length > 0)));
 
   return (
-    <div className={mergeClasses("tw-relative", label && "tw-mt-4")}>
+    <div className={mergeClasses("tw-relative", label && "tw-mt-4", wrapperClass)}>
       <Transition
         show={showLabel}
         enter="tw-transition tw-ease tw-duration-200 tw-transform"
