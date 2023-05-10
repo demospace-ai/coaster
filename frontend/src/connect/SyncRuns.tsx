@@ -94,7 +94,7 @@ const SyncRunsList: React.FC<{ linkToken: string; }> = ({ linkToken }) => {
 
 const Header: React.FC<{ close: (() => void) | undefined; }> = ({ close }) => {
   return (
-    <div className="tw-flex tw-flex-row tw-items-center tw-w-full tw-h-20 tw-min-h-[80px]">
+    <div className={classNames("tw-flex tw-flex-row tw-items-center tw-w-full", close ? "tw-h-20 tw-min-h-[80px]" : "tw-h-10 tw-min-h-[48px]")}>
       {close &&
         <button className="tw-absolute tw-flex tw-items-center t tw-right-10 tw-border-none tw-cursor-pointer tw-p-0" onClick={close}>
           <svg className="tw-h-6 tw-fill-slate-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
