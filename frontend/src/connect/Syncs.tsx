@@ -10,7 +10,7 @@ import { useLinkSyncs } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
 import { mutate } from "swr";
 
-export const Syncs: React.FC<{ linkToken: string; close: () => void | undefined; }> = ({ linkToken, close }) => {
+export const Syncs: React.FC<{ linkToken: string; close: (() => void) | undefined; }> = ({ linkToken, close }) => {
   return (
     <div className="tw-w-full tw-h-full tw-flex tw-flex-col">
       <Header close={close} />
@@ -19,7 +19,7 @@ export const Syncs: React.FC<{ linkToken: string; close: () => void | undefined;
   );
 };
 
-const Header: React.FC<{ close: () => void | undefined; }> = ({ close }) => {
+const Header: React.FC<{ close: (() => void) | undefined; }> = ({ close }) => {
   return (
     <div className="tw-flex tw-flex-row tw-items-center tw-w-full tw-h-20 tw-min-h-[80px]">
       {close &&

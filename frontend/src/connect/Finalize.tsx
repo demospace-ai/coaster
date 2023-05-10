@@ -1,5 +1,6 @@
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "src/components/button/Button";
 import { InfoIcon } from "src/components/icons/Icons";
 import rocket from "src/components/images/rocket.svg";
@@ -7,17 +8,26 @@ import { ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { LinkFieldSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
+import { resetState } from "src/connect/NewSync";
 import { FieldMappingState, SetupSyncProps } from "src/connect/state";
 import { Field, FieldType, ObjectField } from "src/rpc/api";
 import { useObject } from "src/rpc/data";
 
 export const FinalizeSync: React.FC<SetupSyncProps> = (props) => {
+  const navigate = useNavigate();
   if (props.state.syncCreated) {
     return (
       <div className="tw-flex tw-flex-col tw-items-center tw-mt-6">
         <span className=" tw-text-2xl tw-font-semibold tw-text-slate-800">Sync Created!</span>
         <span className="tw-mb-6 tw-mt-2 tw-text-base tw-text-slate-500">Your data should start syncing over shortly.</span>
         <img className="tw-h-56" src={rocket} alt="rocket success" />
+        <Button className="tw-border tw-w-36 tw-h-10 tw-mt-10 tw-select-none" onClick={() => {
+          // just reset state and return to the original page on done
+          resetState(props.setState);
+          navigate("/");
+        }}>
+          Done
+        </Button>
       </div>
     );
   }

@@ -52,7 +52,8 @@ export const ConnectApp: React.FC = () => {
     }
   }, []);
 
-  const close = () => {
+  // No close function if Connect is embedded into a container, since it isn't a popup
+  const close = useContainer ? undefined : () => {
     window.parent.postMessage({ messageType: MessageType.Close }, "*");
   };
 

@@ -1,4 +1,4 @@
-import { ChevronRightIcon, PencilIcon } from "@heroicons/react/24/outline";
+import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useNavigate, useParams } from "react-router-dom";
 import { BackButton } from "src/components/button/Button";
 import { DotsLoading, Loading } from "src/components/loading/Loading";
@@ -20,9 +20,9 @@ export const Sync: React.FC = () => {
     <div className="tw-pt-5 tw-pb-24 tw-px-10 tw-h-full tw-w-full tw-overflow-scroll">
       <BackButton onClick={() => navigate("/syncs")} />
       <div className="tw-flex tw-w-full tw-mb-5 tw-mt-4">
-        <div className="tw-flex tw-flex-row tw-items-center tw-font-bold tw-text-lg">
+        <div className="tw-flex tw-flex-row tw-w-full tw-items-center tw-font-bold tw-text-lg">
           {sync?.sync.display_name}
-          <div className="hover:tw-bg-slate-200 tw-p-1 tw-rounded tw-ml-2 tw-cursor-pointer"><PencilIcon className="tw-h-4"></PencilIcon></div>
+          <button className="tw-ml-auto tw-px-4 tw-py-2 tw-rounded-md tw-font-medium tw-text-base hover:tw-bg-slate-100 tw-text-blue-600" onClick={() => { }}>Edit</button>
         </div>
       </div>
       <div className="tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-lg tw-overflow-auto tw-overscroll-contain tw-shadow-md tw-w-full" >

@@ -39,6 +39,7 @@ export const initialize = (options?: FabraConnectOptions) => {
 
   let frameRoot = document.body;
   if (options?.containerID !== undefined) {
+    window.fabra.containerID = options.containerID;
     const container = document.getElementById(options.containerID);
     if (container !== null) {
       useContainer = true;
@@ -60,6 +61,11 @@ export const initialize = (options?: FabraConnectOptions) => {
 // Exported for Preview page
 export const updateTheme = (customTheme: CustomTheme) => {
   if (iframe && iframeReady) {
+    // If content window is undefined, try to reattach
+    if (!iframe.contentWindow) {
+      reattach(window.fabra.containerID);
+    }
+
     const message: FabraMessage = { messageType: MessageType.Configure, theme: customTheme, useContainer: useContainer };
     iframe.contentWindow!.postMessage(message, CONNECT_ROOT);
   } else {
@@ -72,6 +78,11 @@ const handleMessage = (messageEvent: MessageEvent<FabraMessage>) => {
     case MessageType.IFrameReady:
       // NOTE: iFrame is letting us know that initialization is complete, and user can call open.
       if (iframe && window.fabra.customTheme) {
+        // If content window is undefined, try to reattach
+        if (!iframe.contentWindow) {
+          reattach(window.fabra.containerID);
+        }
+
         const message: FabraMessage = { messageType: MessageType.Configure, theme: window.fabra.customTheme, useContainer: useContainer };
         iframe.contentWindow!.postMessage(message, CONNECT_ROOT);
       }
@@ -86,6 +97,11 @@ const handleMessage = (messageEvent: MessageEvent<FabraMessage>) => {
 
 export const open = (linkToken: string) => {
   if (iframe && iframeReady) {
+    // If content window is undefined, try to reattach
+    if (!iframe.contentWindow) {
+      reattach(window.fabra.containerID);
+    }
+
     iframe.contentWindow!.postMessage({ messageType: MessageType.LinkToken, linkToken }, CONNECT_ROOT);
     iframe.style.display = "block";
   } else {
@@ -99,9 +115,31 @@ export const close = () => {
   }
 };
 
+const reattach = (containerID: string) => {
+  window.fabra.containerID = containerID;
+  const container = document.getElementById(containerID);
+  if (container && iframe) {
+    container.appendChild(iframe);
+  }
+};
+
+const destroy = () => {
+  if (iframe) {
+    iframe.remove();
+  };
+
+  window.fabra.initialized = false;
+  window.fabra.customTheme = undefined;
+  iframe = null;
+  iframeReady = false;
+  useContainer = false;
+};
+
 // Special object to hold state and functions
 window.fabra = {
   open: open,
   close: close,
   initialize,
+  reattach,
+  destroy,
 };
