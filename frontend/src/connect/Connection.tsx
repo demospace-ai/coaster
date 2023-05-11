@@ -2,11 +2,10 @@ import React, { useState } from "react";
 import { Button } from "src/components/button/Button";
 import { InfoIcon } from "src/components/icons/Icons";
 import { ConnectionImage } from "src/components/images/Connections";
-import sync from "src/components/images/sync.svg";
 import { Input, ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { Tooltip } from "src/components/tooltip/Tooltip";
-import { NewSourceState, SetupSyncProps, validateConnectionSetup } from "src/connect/state";
+import { NewSourceState, SetupSyncProps, SyncSetupStep, validateConnectionSetup } from "src/connect/state";
 import { sendRequest } from "src/rpc/ajax";
 import { ConnectionType, getConnectionType, TestDataConnection, TestDataConnectionRequest } from "src/rpc/api";
 import { HttpError } from "src/utils/errors";
@@ -16,7 +15,7 @@ export const NewSourceConfiguration: React.FC<SetupSyncProps> = (props) => {
   const state = props.state.newSourceState;
 
   // setState computes the NewSourceState using the provided function, then passes that new state to the parent setState
-  const setState = (getNewSourceState: (newSourceState: NewSourceState) => NewSourceState) => {
+  const setNewSourceState = (getNewSourceState: (newSourceState: NewSourceState) => NewSourceState) => {
     props.setState(state => {
       const newSourceState = getNewSourceState(state.newSourceState);
       return { ...state, newSourceState: newSourceState };
@@ -30,28 +29,26 @@ export const NewSourceConfiguration: React.FC<SetupSyncProps> = (props) => {
   }
 
   if (props.state.newSourceState.sourceCreated) {
-    return <div className="tw-flex tw-flex-col tw-justify-top">
-      <span className="tw-text-center tw-text-2xl tw-font-bold tw-mb-10">Source is all setup!</span>
-      <img src={sync} alt="sync success illustration" className="tw-h-[300px]" />
-    </div>;
+    props.setState(state => ({ ...state, step: SyncSetupStep.ExistingSources }));
+    return <Loading />;
   }
 
   let inputs: React.ReactElement;
   switch (connectionType) {
     case ConnectionType.Snowflake:
-      inputs = <SnowflakeInputs state={props.state.newSourceState} setState={setState} />;
+      inputs = <SnowflakeInputs state={props.state.newSourceState} setState={setNewSourceState} />;
       break;
     case ConnectionType.BigQuery:
-      inputs = <BigQueryInputs state={state} setState={setState} />;
+      inputs = <BigQueryInputs state={state} setState={setNewSourceState} />;
       break;
     case ConnectionType.Redshift:
-      inputs = <RedshiftInputs state={state} setState={setState} />;
+      inputs = <RedshiftInputs state={state} setState={setNewSourceState} />;
       break;
     case ConnectionType.MongoDb:
-      inputs = <MongoDbInputs state={state} setState={setState} />;
+      inputs = <MongoDbInputs state={state} setState={setNewSourceState} />;
       break;
     case ConnectionType.Synapse:
-      inputs = <SynapseInputs state={state} setState={setState} />;
+      inputs = <SynapseInputs state={state} setState={setNewSourceState} />;
       break;
     case ConnectionType.Webhook:
       inputs = <>Unexpected</>;
@@ -68,7 +65,7 @@ export const NewSourceConfiguration: React.FC<SetupSyncProps> = (props) => {
         <div className="tw-pb-16 tw-w-[500px] tw-mr-10">
           <div className="tw-mb-4 tw-text-slate-600">Provide the settings and credentials for your data source.</div>
           {inputs}
-          <TestConnectionButton state={state} setState={setState} connectionType={connectionType} />
+          <TestConnectionButton state={state} setState={setNewSourceState} connectionType={connectionType} />
           {state.error && <div className="tw-mt-4 tw-text-red-700 tw-p-2 tw-text-center tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">{state.error}</div>}
         </div>
         <div className="tw-w-80 tw-ml-auto tw-text-xs tw-leading-5 tw-border-l tw-border-slate-200 tw-h-fit tw-py-2 tw-pl-8 tw-mr-10">
