@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/errors"
@@ -52,18 +53,20 @@ func (s ApiService) TestDataConnection(auth auth.Authentication, w http.Response
 
 	switch testDataConnectionRequest.ConnectionType {
 	case models.ConnectionTypeBigQuery:
-		return testBigQueryConnection(*testDataConnectionRequest.BigQueryConfig)
+		err = testBigQueryConnection(*testDataConnectionRequest.BigQueryConfig)
 	case models.ConnectionTypeSnowflake:
-		return testSnowflakeConnection(*testDataConnectionRequest.SnowflakeConfig)
+		err = testSnowflakeConnection(*testDataConnectionRequest.SnowflakeConfig)
 	case models.ConnectionTypeMongoDb:
-		return testMongoDbConnection(*testDataConnectionRequest.MongoDbConfig)
+		err = testMongoDbConnection(*testDataConnectionRequest.MongoDbConfig)
 	case models.ConnectionTypeRedshift:
-		return testRedshiftConnection(*testDataConnectionRequest.RedshiftConfig)
+		err = testRedshiftConnection(*testDataConnectionRequest.RedshiftConfig)
 	case models.ConnectionTypeSynapse:
-		return testSynapseConnection(*testDataConnectionRequest.SynapseConfig)
+		err = testSynapseConnection(*testDataConnectionRequest.SynapseConfig)
 	default:
-		return errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", testDataConnectionRequest.ConnectionType))
+		err = errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", testDataConnectionRequest.ConnectionType))
 	}
+
+	return errors.NewCustomerVisibleError(err)
 }
 
 func testBigQueryConnection(bigqueryConfig input.BigQueryConfig) error {
@@ -95,13 +98,15 @@ func testBigQueryConnection(bigqueryConfig input.BigQueryConfig) error {
 func testSnowflakeConnection(snowflakeConfig input.SnowflakeConfig) error {
 	account := strings.Split(snowflakeConfig.Host, ".")[0] // TODO: remove the https/http
 	config := gosnowflake.Config{
-		Account:   account,
-		User:      snowflakeConfig.Username,
-		Password:  snowflakeConfig.Password,
-		Warehouse: snowflakeConfig.WarehouseName,
-		Database:  snowflakeConfig.DatabaseName,
-		Role:      snowflakeConfig.Role,
-		Host:      snowflakeConfig.Host,
+		Account:       account,
+		User:          snowflakeConfig.Username,
+		Password:      snowflakeConfig.Password,
+		Warehouse:     snowflakeConfig.WarehouseName,
+		Database:      snowflakeConfig.DatabaseName,
+		Role:          snowflakeConfig.Role,
+		Host:          snowflakeConfig.Host,
+		LoginTimeout:  3 * time.Second,
+		ClientTimeout: 3 * time.Second,
 	}
 
 	dsn, err := gosnowflake.DSN(&config)
@@ -148,6 +153,7 @@ func testRedshiftConnection(redshiftConfig input.RedshiftConfig) error {
 
 	params := url.Values{}
 	params.Add("sslmode", "require")
+	params.Add("connect_timeout", "5")
 	dsn.RawQuery = params.Encode()
 
 	db, err := sql.Open("postgres", dsn.String())

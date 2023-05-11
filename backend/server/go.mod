@@ -16,12 +16,14 @@ require (
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/mux v1.8.0
+	github.com/highlight/highlight/sdk/highlight-go v0.9.9
 	github.com/lib/pq v1.10.8
 	github.com/microsoft/go-mssqldb v0.21.0
 	github.com/onsi/ginkgo/v2 v2.9.2
 	github.com/onsi/gomega v1.27.6
 	github.com/ory/dockertest/v3 v3.10.0
 	github.com/pkg/errors v0.9.1
+	github.com/rudderlabs/analytics-go v3.3.3+incompatible
 	github.com/snowflakedb/gosnowflake v1.6.19
 	go.fabra.io/sync v0.0.0-00010101000000-000000000000
 	go.temporal.io/sdk v1.22.1
@@ -57,6 +59,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.14.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.31.3 // indirect
 	github.com/aws/smithy-go v1.13.5 // indirect
+	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/containerd/continuity v0.3.0 // indirect
 	github.com/danieljoos/wincred v1.1.2 // indirect
@@ -94,7 +97,6 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.15.2 // indirect
 	github.com/gsterjov/go-libsecret v0.0.0-20161001094733-a6f4afe4910c // indirect
 	github.com/hasura/go-graphql-client v0.9.3 // indirect
-	github.com/highlight/highlight/sdk/highlight-go v0.9.9 // indirect
 	github.com/imdario/mergo v0.3.15 // indirect
 	github.com/jackc/pgx/v5 v5.3.1 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
@@ -115,7 +117,6 @@ require (
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/robfig/cron v1.2.0 // indirect
-	github.com/rudderlabs/analytics-go v3.3.3+incompatible // indirect
 	github.com/segmentio/backo-go v1.0.1 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect

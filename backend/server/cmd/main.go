@@ -2,6 +2,9 @@ package main
 
 import (
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/crypto"
@@ -19,6 +22,13 @@ func main() {
 		log.Fatal(err)
 		return
 	}
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		os.Exit(1)
+	}()
 
 	highlight.SetProjectID("7e3vw5g1")
 	highlight.Start()

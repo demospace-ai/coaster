@@ -15,7 +15,7 @@ import { mergeClasses } from "src/utils/twmerge";
 export const NewSourceConfiguration: React.FC<SetupSyncProps> = (props) => {
   const state = props.state.newSourceState;
 
-  // setState computes the new state using the provided function, then passes that new state to the parent setState
+  // setState computes the NewSourceState using the provided function, then passes that new state to the parent setState
   const setState = (getNewSourceState: (newSourceState: NewSourceState) => NewSourceState) => {
     props.setState(state => {
       const newSourceState = getNewSourceState(state.newSourceState);
@@ -152,7 +152,7 @@ const TestConnectionButton: React.FC<{ state: NewSourceState, setState: React.Di
     setTestLoading(false);
   };
 
-  const testColor = testConnectionSuccess === null ? null : testConnectionSuccess ? "tw-bg-green-700" : "tw-bg-red-700";
+  const testColor = testConnectionSuccess ? "tw-bg-green-700" : null;
   return (
     <Button className={mergeClasses("tw-mt-8 tw-border-slate-200 tw-w-48 tw-h-10", testColor)} onClick={testConnection}>{testLoading ? <Loading /> : "Test"}</Button>
   );
