@@ -152,9 +152,12 @@ const TestConnectionButton: React.FC<{ state: NewSourceState, setState: React.Di
     setTestLoading(false);
   };
 
-  const testColor = testConnectionSuccess ? "tw-bg-green-700" : null;
+  const testColor = testConnectionSuccess ? "tw-bg-green-700 hover:tw-bg-green-800" : null;
   return (
-    <Button className={mergeClasses("tw-mt-8 tw-border-slate-200 tw-w-48 tw-h-10", testColor)} onClick={testConnection}>{testLoading ? <Loading /> : "Test"}</Button>
+    <>
+      <Button className={mergeClasses("tw-mt-8 tw-border-slate-200 tw-w-48 tw-h-10", testColor)} onClick={testConnection}>{testLoading ? <Loading /> : "Test"}</Button>
+      {testConnectionSuccess && <div className="tw-mt-4 tw-w-48 tw-text-green-700 tw-p-2 tw-text-center tw-bg-green-50 tw-border tw-border-green-600 tw-rounded">Success!</div>}
+    </>
   );
 };
 

@@ -66,7 +66,11 @@ func (s ApiService) TestDataConnection(auth auth.Authentication, w http.Response
 		err = errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", testDataConnectionRequest.ConnectionType))
 	}
 
-	return errors.NewCustomerVisibleError(err)
+	if err != nil {
+		return errors.NewCustomerVisibleError(err)
+	}
+
+	return nil
 }
 
 func testBigQueryConnection(bigqueryConfig input.BigQueryConfig) error {
@@ -144,17 +148,17 @@ func testSnowflakeConnection(snowflakeConfig input.SnowflakeConfig) error {
 }
 
 func testRedshiftConnection(redshiftConfig input.RedshiftConfig) error {
-	dsn := url.URL{
-		Scheme: "postgres",
-		User:   url.UserPassword(redshiftConfig.Username, redshiftConfig.Password),
-		Host:   redshiftConfig.Endpoint,
-		Path:   redshiftConfig.DatabaseName,
-	}
-
 	params := url.Values{}
 	params.Add("sslmode", "require")
 	params.Add("connect_timeout", "5")
-	dsn.RawQuery = params.Encode()
+
+	dsn := url.URL{
+		Scheme:   "postgres",
+		User:     url.UserPassword(redshiftConfig.Username, redshiftConfig.Password),
+		Host:     redshiftConfig.Endpoint,
+		Path:     redshiftConfig.DatabaseName,
+		RawQuery: params.Encode(),
+	}
 
 	db, err := sql.Open("postgres", dsn.String())
 	if err != nil {
@@ -190,6 +194,8 @@ func testSynapseConnection(synapseConfig input.SynapseConfig) error {
 	params.Add("database", synapseConfig.DatabaseName)
 	params.Add("sslmode", "encrypt")
 	params.Add("TrustServerCertificate", "true")
+	params.Add("dial timeout", "3")
+
 	dsn := url.URL{
 		Scheme:   "sqlserver",
 		User:     url.UserPassword(synapseConfig.Username, synapseConfig.Password),
