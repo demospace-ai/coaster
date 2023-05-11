@@ -38,14 +38,14 @@ func (s ApiService) LinkCreateSource(auth auth.Authentication, w http.ResponseWr
 	var createSourceRequest CreateSourceLinkRequest
 	err := decoder.Decode(&createSourceRequest)
 	if err != nil {
-		return err
+		return errors.NewCustomerVisibleError(err)
 	}
 
 	// TODO: validate connection parameters
 	validate := validator.New()
 	err = validate.Struct(createSourceRequest)
 	if err != nil {
-		return err
+		return errors.NewCustomerVisibleError(err)
 	}
 
 	// TODO: Create connection + source in a transaction

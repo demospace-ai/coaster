@@ -12,9 +12,9 @@ import { sendLinkTokenRequest } from "src/rpc/ajax";
 import { FabraObject, LinkGetPreview, LinkGetPreviewRequest, ResultRow, Schema } from "src/rpc/api";
 
 export const ObjectSetup: React.FC<SetupSyncProps> = (props) => {
-  const setObject = (object: FabraObject) => props.setState({ ...props.state, object: object, fieldMappings: undefined });
-  const setNamespace = (namespace: string) => props.setState({ ...props.state, namespace: namespace, tableName: undefined });
-  const setTableName = (tableName: string) => props.setState({ ...props.state, tableName: tableName });
+  const setObject = (object: FabraObject) => props.setState(state => ({ ...state, object: object, fieldMappings: undefined }));
+  const setNamespace = (namespace: string) => props.setState(state => ({ ...state, namespace: namespace, tableName: undefined }));
+  const setTableName = (tableName: string) => props.setState(state => ({ ...state, tableName: tableName }));
   const [limitPreview, setLimitPreview] = useState<boolean>(true);
   const [previewLoading, setPreviewLoading] = useState<boolean>(false);
   const [previewData, setPreviewData] = useState<ResultRow[] | undefined>(undefined);

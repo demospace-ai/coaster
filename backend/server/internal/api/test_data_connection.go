@@ -42,12 +42,12 @@ func (s ApiService) TestDataConnection(auth auth.Authentication, w http.Response
 	var testDataConnectionRequest TestDataConnectionRequest
 	err := decoder.Decode(&testDataConnectionRequest)
 	if err != nil {
-		return err
+		return errors.NewCustomerVisibleError(err)
 	}
 
 	err = validateTestDataConnectionRequest(testDataConnectionRequest)
 	if err != nil {
-		return err
+		return errors.NewCustomerVisibleError(err)
 	}
 
 	switch testDataConnectionRequest.ConnectionType {

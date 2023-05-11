@@ -8,8 +8,7 @@ import { ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { LinkFieldSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
-import { resetState } from "src/connect/NewSync";
-import { FieldMappingState, SetupSyncProps } from "src/connect/state";
+import { FieldMappingState, resetState, SetupSyncProps } from "src/connect/state";
 import { Field, FieldType, ObjectField } from "src/rpc/api";
 import { useObject } from "src/rpc/data";
 
@@ -38,7 +37,7 @@ export const FinalizeSync: React.FC<SetupSyncProps> = (props) => {
       <div className="tw-w-[100%] tw-min-w-[400px] tw-h-full">
         <div className="tw-text-base tw-font-medium tw-mb-1 tw-text-slate-800">Display Name</div>
         <div className="tw-text-slate-600 tw-mb-4">Choose a name to help you identify this sync in the future.</div>
-        <ValidatedInput id="display_name" className="tw-w-96" value={props.state.displayName} setValue={value => props.setState({ ...props.state, displayName: value })} placeholder="Display Name" />
+        <ValidatedInput id="display_name" className="tw-w-96" value={props.state.displayName} setValue={value => props.setState(state => ({ ...props.state, displayName: value }))} placeholder="Display Name" />
         <div className="tw-text-base tw-font-medium tw-mt-9 tw-mb-1 tw-text-slate-800">Field Mapping</div>
         <div className="tw-text-slate-600 tw-mb-4">This is how your data will be mapped to the fields in the application.</div>
         <FieldMappings linkToken={props.linkToken} state={props.state} setState={props.setState} />
@@ -48,6 +47,7 @@ export const FinalizeSync: React.FC<SetupSyncProps> = (props) => {
         <ValidatedInput id="frequency" className="tw-w-96" min={props.state.frequencyUnits === FrequencyUnits.Minutes ? 30 : 1} type="number" value={props.state.frequency} setValue={value => props.setState({ ...props.state, frequency: value })} placeholder="Sync Frequency" label="Sync Frequency" />
         <ValidatedDropdownInput className="tw-w-96" options={Object.values(FrequencyUnits)} selected={props.state.frequencyUnits} setSelected={value => props.setState({ ...props.state, frequencyUnits: value })} loading={false} placeholder="Frequency Units" noOptionsString="nil" label="Frequency Unit" getElementForDisplay={(value) => value.charAt(0).toUpperCase() + value.slice(1)} />
         */}
+        {props.state.error && <div className="tw-mt-4 tw-text-red-700 tw-p-2 tw-text-center tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">{props.state.error}</div>}
         <div className="tw-pb-52"></div>
       </div>
     </div>
@@ -61,20 +61,22 @@ const FieldMappings: React.FC<SetupSyncProps> = (props) => {
   }
 
   const updateFieldMapping = (newFieldMapping: FieldMappingState, index: number) => {
-    if (!props.state.fieldMappings) {
-      // TODO: should not happen
-      return;
-    }
+    props.setState(state => {
+      if (!state.fieldMappings) {
+        // TODO: should not happen
+        return state;
+      }
 
-    props.setState({
-      ...props.state,
-      fieldMappings: props.state.fieldMappings.map((original, i) => {
-        if (i === index) {
-          return newFieldMapping;
-        } else {
-          return original;
-        }
-      })
+      return {
+        ...state,
+        fieldMappings: state.fieldMappings.map((original, i) => {
+          if (i === index) {
+            return newFieldMapping;
+          } else {
+            return original;
+          }
+        })
+      };
     });
   };
 

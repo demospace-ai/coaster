@@ -1,11 +1,12 @@
 import { sendLinkTokenRequest } from "src/rpc/ajax";
 import { BigQueryConfig, ConnectionType, FabraObject, Field, FieldMappingInput, FrequencyUnits, GetSources, LinkCreateSource, LinkCreateSourceRequest, LinkCreateSync, LinkCreateSyncRequest, LinkGetSources, LinkGetSyncs, MongoDbConfig, RedshiftConfig, SnowflakeConfig, Source, SynapseConfig } from "src/rpc/api";
+import { HttpError } from "src/utils/errors";
 import { mutate } from "swr";
 
 export type SetupSyncProps = {
   linkToken: string;
   state: SetupSyncState;
-  setState: (state: SetupSyncState) => void;
+  setState: React.Dispatch<React.SetStateAction<SetupSyncState>>;
 };
 
 export enum SyncSetupStep {
@@ -62,6 +63,12 @@ const INITIAL_SOURCE_STATE: NewSourceState = {
     host: "",
     connection_options: "",
   },
+};
+
+export const resetState = (setState: React.Dispatch<React.SetStateAction<SetupSyncState>>) => {
+  setState(_ => {
+    return INITIAL_SETUP_STATE;
+  });
 };
 
 export interface FieldMappingState {
@@ -150,7 +157,7 @@ export const validateConnectionSetup = (connectionType: ConnectionType | undefin
 export const createNewSource = async (
   linkToken: string,
   state: SetupSyncState,
-  setState: (state: SetupSyncState) => void,
+  setState: React.Dispatch<React.SetStateAction<SetupSyncState>>,
 ) => {
   if (!validateConnectionSetup(state.connectionType, state.newSourceState)) {
     // show alert and make all input boxes red
@@ -160,7 +167,7 @@ export const createNewSource = async (
   if (state.newSourceState.sourceCreated) {
     // TODO: clear success if one of the inputs change and just update the already created source
     // Already created the source, just continue again
-    setState({ ...state, step: SyncSetupStep.ChooseData });
+    setState(state => ({ ...state, step: SyncSetupStep.ChooseData }));
     return;
   }
 
@@ -195,16 +202,19 @@ export const createNewSource = async (
     // Tell SWRs to refetch sources
     mutate({ GetSources });
     mutate({ LinkGetSources }); // Tell SWRs to refetch sources
-    setState({
+    setState(state => ({
       ...state,
       source: response.source,
       step: SyncSetupStep.ChooseData,
       newSourceState: { ...state.newSourceState, sourceCreated: true },
       namespace: undefined, // set namespace and table name to undefined since we"re using a new source
       tableName: undefined,
-    });
+    }));
   } catch (e) {
-    setState({ ...state, newSourceState: { ...state.newSourceState, error: String(e) } });
+    if (e instanceof HttpError) {
+      const errorMessage = e.message;
+      setState(state => ({ ...state, newSourceState: { ...state.newSourceState, error: errorMessage } }));
+    }
   }
 };
 
@@ -235,7 +245,7 @@ const validateFieldMappings = (fieldMapppings: FieldMappingState[]): boolean => 
 export const createNewSync = async (
   linkToken: string,
   state: SetupSyncState,
-  setState: (state: SetupSyncState) => void,
+  setState: React.Dispatch<React.SetStateAction<SetupSyncState>>,
 ) => {
   if (!validateSyncSetup(state)) {
     // show alert and make all input boxes red
@@ -278,11 +288,14 @@ export const createNewSync = async (
     await sendLinkTokenRequest(LinkCreateSync, linkToken, payload);
     // Tell SWRs to refetch syncs
     mutate({ LinkGetSyncs });
-    setState({
+    setState(state => ({
       ...state,
       syncCreated: true,
-    });
+    }));
   } catch (e) {
-    setState({ ...state, error: String(e) });
+    if (e instanceof HttpError) {
+      const errorMessage = e.message;
+      setState(state => ({ ...state, error: errorMessage }));
+    }
   }
 };

@@ -8,7 +8,7 @@ import { NewSourceConfiguration } from "src/connect/Connection";
 import { FinalizeSync } from "src/connect/Finalize";
 import { ObjectSetup } from "src/connect/Object";
 import { Sources } from "src/connect/Sources";
-import { createNewSource, createNewSync, INITIAL_SETUP_STATE, SetupSyncState, SyncSetupStep, validateObjectSetup } from "src/connect/state";
+import { createNewSource, createNewSync, FieldMappingState, INITIAL_SETUP_STATE, SetupSyncState, SyncSetupStep, validateObjectSetup } from "src/connect/state";
 import { WarehouseSelector } from "src/connect/Warehouse";
 import { useObject } from "src/rpc/data";
 
@@ -21,7 +21,7 @@ export const NewSync: React.FC<{ linkToken: string, close: (() => void) | undefi
   // Setup the initial values for the field mappings
   if (object && object !== prevObject) {
     setPrevObject(object);
-    const fieldMappings = object ? object.object_fields.filter(objectField => !objectField.omit).map(objectField => {
+    const fieldMappings: FieldMappingState[] = object ? object.object_fields.filter(objectField => !objectField.omit).map(objectField => {
       return {
         sourceField: undefined,
         destinationFieldId: objectField.id,
@@ -29,12 +29,7 @@ export const NewSync: React.FC<{ linkToken: string, close: (() => void) | undefi
         jsonFields: [undefined],
       };
     }) : [];
-    setState(s => {
-      return {
-        ...s,
-        fieldMappings: fieldMappings,
-      };
-    });
+    setState(state => ({ ...state, fieldMappings }));
   }
 
   const back = () => {
@@ -51,7 +46,8 @@ export const NewSync: React.FC<{ linkToken: string, close: (() => void) | undefi
       prevStep = SyncSetupStep.ExistingSources;
     }
 
-    setState({ ...state, step: prevStep });
+    // clear errors here since it looks bad when they linger
+    setState(state => ({ ...state, step: prevStep, error: undefined, newSourceState: { ...state.newSourceState, error: undefined } }));
   };
 
   return (
@@ -66,7 +62,7 @@ export const NewSync: React.FC<{ linkToken: string, close: (() => void) | undefi
 type AppContentProps = {
   linkToken: string;
   state: SetupSyncState;
-  setState: (state: SetupSyncState) => void;
+  setState: React.Dispatch<React.SetStateAction<SetupSyncState>>;
 };
 
 const AppContent: React.FC<AppContentProps> = props => {
@@ -125,10 +121,6 @@ const Header: React.FC<{ close: (() => void) | undefined; state: SetupSyncState;
   );
 };
 
-export const resetState = (setState: (state: SetupSyncState) => void) => {
-  setState(INITIAL_SETUP_STATE);
-};
-
 const StepBreadcrumb: React.FC<{ content: string, step: number; active: boolean; complete: boolean; }> = ({ step, content, active, complete }) => {
   return (
     <div className="tw-flex tw-flex-row tw-justify-center tw-items-center tw-select-none">
@@ -150,7 +142,7 @@ type FooterProps = {
   back: () => void;
   linkToken: string;
   state: SetupSyncState;
-  setState: (state: SetupSyncState) => void;
+  setState: React.Dispatch<React.SetStateAction<SetupSyncState>>;
 };
 
 export const Footer: React.FC<FooterProps> = props => {
@@ -175,7 +167,7 @@ export const Footer: React.FC<FooterProps> = props => {
     case SyncSetupStep.ChooseData:
       onClick = () => {
         if (validateObjectSetup(props.state)) {
-          props.setState({ ...props.state, step: props.state.step + 1 });
+          props.setState(state => ({ ...state, step: props.state.step + 1 }));
         }
       };
       break;
