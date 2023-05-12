@@ -8,7 +8,7 @@ declare global {
   interface Window { fabra: any; }
 }
 
-interface FabraConnectOptions {
+export interface FabraConnectOptions {
   customTheme?: CustomTheme;
   containerID?: string;
   supportEmail?: string;
@@ -52,6 +52,14 @@ export const initialize = (options?: FabraConnectOptions) => {
     window.fabra.customTheme = options.customTheme;
   }
 
+  if (options?.supportEmail) {
+    window.fabra.supportEmail = options.supportEmail;
+  }
+
+  if (options?.docsLink) {
+    window.fabra.docsLink = options.docsLink;
+  }
+
   iframe = frameRoot.appendChild(frame);
   window.fabra.initialized = true;
 };
@@ -64,7 +72,13 @@ export const updateTheme = (customTheme: CustomTheme) => {
       reattach(window.fabra.containerID);
     }
 
-    const message: FabraMessage = { messageType: MessageType.Configure, theme: customTheme, useContainer: Boolean(window.fabra.containerID) };
+    const message: FabraMessage = {
+      messageType: MessageType.Configure,
+      theme: customTheme,
+      useContainer: Boolean(window.fabra.containerID),
+      supportEmail: window.fabra.supportEmail,
+      docsLink: window.fabra.docsLink,
+    };
     iframe.contentWindow!.postMessage(message, CONNECT_ROOT);
   } else {
     window.setTimeout(() => updateTheme(customTheme), 100);
@@ -81,7 +95,13 @@ const handleMessage = (messageEvent: MessageEvent<FabraMessage>) => {
           reattach(window.fabra.containerID);
         }
 
-        const message: FabraMessage = { messageType: MessageType.Configure, theme: window.fabra.customTheme, useContainer: Boolean(window.fabra.containerID) };
+        const message: FabraMessage = {
+          messageType: MessageType.Configure,
+          theme: window.fabra.customTheme,
+          useContainer: Boolean(window.fabra.containerID),
+          supportEmail: window.fabra.supportEmail,
+          docsLink: window.fabra.docsLink,
+        };
         iframe.contentWindow!.postMessage(message, CONNECT_ROOT);
       }
       iframeReady = true;

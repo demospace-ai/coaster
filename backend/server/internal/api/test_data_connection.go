@@ -247,8 +247,9 @@ func testMongoDbConnection(mongodbConfig input.MongoDbConfig) error {
 	)
 	serverAPIOptions := options.ServerAPI(options.ServerAPIVersion1)
 	clientOptions := options.Client().
-		ApplyURI(connectionString).
-		SetServerAPIOptions(serverAPIOptions)
+		SetServerAPIOptions(serverAPIOptions).
+		SetConnectTimeout(3 * time.Second).
+		ApplyURI(connectionString) // Apply URI last since this contains connection options from the user
 	_, err := mongo.Connect(context.TODO(), clientOptions)
 	return err
 }

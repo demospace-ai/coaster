@@ -4,6 +4,7 @@ import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "src/components/button/Button";
 import { Loading } from "src/components/loading/Loading";
+import { FabraDisplayOptions } from "src/connect/ConnectApp";
 import { NewSourceConfiguration } from "src/connect/Connection";
 import { FinalizeSync } from "src/connect/Finalize";
 import { ObjectSetup } from "src/connect/Object";
@@ -12,7 +13,7 @@ import { createNewSource, createNewSync, FieldMappingState, INITIAL_SETUP_STATE,
 import { WarehouseSelector } from "src/connect/Warehouse";
 import { useObject } from "src/rpc/data";
 
-export const NewSync: React.FC<{ linkToken: string, close: (() => void) | undefined; }> = ({ linkToken, close }) => {
+export const NewSync: React.FC<{ linkToken: string, close: (() => void) | undefined; } & FabraDisplayOptions> = ({ linkToken, close, supportEmail, docsLink }) => {
   const [state, setState] = useState<SetupSyncState>(INITIAL_SETUP_STATE);
   const [prevObject, setPrevObject] = useState<Object | undefined>(undefined);
   const { object } = useObject(state.object?.id, linkToken);
@@ -53,7 +54,7 @@ export const NewSync: React.FC<{ linkToken: string, close: (() => void) | undefi
   return (
     <>
       <Header close={close} state={state} />
-      <AppContent linkToken={linkToken} state={state} setState={setState} />
+      <AppContent linkToken={linkToken} state={state} setState={setState} supportEmail={supportEmail} docsLink={docsLink} />
       <Footer back={back} linkToken={linkToken} state={state} setState={setState} />
     </>
   );
@@ -63,7 +64,7 @@ type AppContentProps = {
   linkToken: string;
   state: SetupSyncState;
   setState: React.Dispatch<React.SetStateAction<SetupSyncState>>;
-};
+} & FabraDisplayOptions;
 
 const AppContent: React.FC<AppContentProps> = props => {
   const ref = useRef<HTMLDivElement>(null);
@@ -81,7 +82,7 @@ const AppContent: React.FC<AppContentProps> = props => {
       content = <WarehouseSelector linkToken={props.linkToken} state={props.state} setState={props.setState} />;
       break;
     case SyncSetupStep.ConnectionDetails:
-      content = <NewSourceConfiguration linkToken={props.linkToken} state={props.state} setState={props.setState} />;
+      content = <NewSourceConfiguration linkToken={props.linkToken} state={props.state} setState={props.setState} supportEmail={props.supportEmail} docsLink={props.docsLink} />;
       break;
     case SyncSetupStep.ChooseData:
       content = <ObjectSetup linkToken={props.linkToken} state={props.state} setState={props.setState} />;

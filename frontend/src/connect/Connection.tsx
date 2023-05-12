@@ -5,13 +5,14 @@ import { ConnectionImage } from "src/components/images/Connections";
 import { Input, ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { Tooltip } from "src/components/tooltip/Tooltip";
+import { FabraDisplayOptions } from "src/connect/ConnectApp";
 import { NewSourceState, SetupSyncProps, SyncSetupStep, validateConnectionSetup } from "src/connect/state";
 import { sendRequest } from "src/rpc/ajax";
 import { ConnectionType, getConnectionType, TestDataConnection, TestDataConnectionRequest } from "src/rpc/api";
 import { HttpError } from "src/utils/errors";
 import { mergeClasses } from "src/utils/twmerge";
 
-export const NewSourceConfiguration: React.FC<SetupSyncProps> = (props) => {
+export const NewSourceConfiguration: React.FC<SetupSyncProps & FabraDisplayOptions> = (props) => {
   const state = props.state.newSourceState;
 
   // setState computes the NewSourceState using the provided function, then passes that new state to the parent setState
@@ -71,7 +72,7 @@ export const NewSourceConfiguration: React.FC<SetupSyncProps> = (props) => {
         <div className="tw-w-80 tw-ml-auto tw-text-xs tw-leading-5 tw-border-l tw-border-slate-200 tw-h-fit tw-py-2 tw-pl-8 tw-mr-10">
           <div className="">
             <div className="tw-text-[13px] tw-mb-1 tw-font-medium">Read our docs</div>
-            Not sure where to start? Check out <a href="https://docs.fabra.io" target="_blank" rel="noreferrer" className="tw-text-blue-500">the docs</a> for step-by-step instructions.
+            Not sure where to start? Check out <a href={props.docsLink ? props.docsLink : "https://docs.fabra.io"} target="_blank" rel="noreferrer" className="tw-text-blue-500">the docs</a> for step-by-step instructions.
           </div>
           <div className="tw-my-5 tw-py-5 tw-border-y tw-border-slate-200">
             <div className="tw-text-[13px] tw-mb-1 tw-font-medium">Allowed IPs</div>
@@ -83,7 +84,7 @@ export const NewSourceConfiguration: React.FC<SetupSyncProps> = (props) => {
           </div>
           <div>
             <div className="tw-text-[13px] tw-mb-1 tw-font-medium">Contact support</div>
-            We"re here to help! <a href="mailto:help@fabra.io" className="tw-text-blue-500">Reach out</a> if you feel stuck or have any questions.
+            We"re here to help! <a href={props.supportEmail ? "mailto:" + props.supportEmail : "mailto:help@fabra.io"} className="tw-text-blue-500">Reach out</a> if you feel stuck or have any questions.
           </div>
         </div>
       </div>

@@ -9,10 +9,17 @@ import { CustomTheme } from "src/utils/theme";
 
 let needsInit = true;
 
+export type FabraDisplayOptions = {
+  supportEmail: string | undefined,
+  docsLink: string | undefined;
+};
+
 export const ConnectApp: React.FC = () => {
   // TODO: figure out how to prevent Redux from being used in this app
   const [linkToken, setLinkToken] = useState<string | undefined>(undefined);
   const [useContainer, setUseContainer] = useState<boolean>(false); // whether the iFrame is nested in a container element
+  const [supportEmail, setSupportEmail] = useState<string | undefined>(undefined);
+  const [docsLink, setDocsLink] = useState<string | undefined>(undefined);
 
   const handleInitTheme = (theme: CustomTheme) => {
     const root = document.querySelector<HTMLElement>(":root");
@@ -38,10 +45,12 @@ export const ConnectApp: React.FC = () => {
             setLinkToken(message.data.linkToken);
             break;
           case MessageType.Configure:
-            setUseContainer(message.data.useContainer);
             if (message.data.theme) {
               handleInitTheme(message.data.theme);
             }
+            setSupportEmail(message.data.supportEmail);
+            setDocsLink(message.data.docsLink);
+            setUseContainer(message.data.useContainer);
             break;
           default:
             break;
@@ -69,7 +78,7 @@ export const ConnectApp: React.FC = () => {
           <Routes>
             <Route path="/*" element={<Syncs linkToken={linkToken} close={close} />} />
             <Route path="/sync/:syncID" element={<SyncRuns linkToken={linkToken} close={close} />} />
-            <Route path="/newsync" element={<NewSync linkToken={linkToken} close={close} />} />
+            <Route path="/newsync" element={<NewSync linkToken={linkToken} close={close} supportEmail={supportEmail} docsLink={docsLink} />} />
           </Routes>
         </div>
         :
@@ -77,7 +86,7 @@ export const ConnectApp: React.FC = () => {
           <Routes>
             <Route path="/*" element={<Syncs linkToken={linkToken} close={close} />} />
             <Route path="/sync/:syncID" element={<SyncRuns linkToken={linkToken} close={close} />} />
-            <Route path="/newsync" element={<NewSync linkToken={linkToken} close={close} />} />
+            <Route path="/newsync" element={<NewSync linkToken={linkToken} close={close} supportEmail={supportEmail} docsLink={docsLink} />} />
           </Routes>
         </div>
       }

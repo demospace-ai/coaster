@@ -16,6 +16,8 @@ export type FabraMessage = {
   messageType: MessageType.Close;
 } | {
   messageType: MessageType.Configure,
-  theme: CustomTheme,
-  useContainer: boolean;
+  theme: CustomTheme | undefined,
+  useContainer: boolean,
+  supportEmail: string | undefined,
+  docsLink: string | undefined,
 };

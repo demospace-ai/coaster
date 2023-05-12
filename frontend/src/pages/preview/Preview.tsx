@@ -3,10 +3,9 @@ import { Button } from "src/components/button/Button";
 import { InfoIcon } from "src/components/icons/Icons";
 import { ColorPicker, Input } from "src/components/input/Input";
 import { Tooltip } from "src/components/tooltip/Tooltip";
-import { initialize, open, updateTheme } from "src/initialize-internal";
+import { FabraConnectOptions, initialize, open, updateTheme } from "src/initialize-internal";
 import { sendRequest } from "src/rpc/ajax";
 import { CreateLinkToken, CreateLinkTokenRequest } from "src/rpc/api";
-import { CustomTheme } from "src/utils/theme";
 
 export const Preview: React.FC = () => {
   const [endCustomerID, setEndCustomerID] = useState<string>("");
@@ -86,7 +85,7 @@ export const Preview: React.FC = () => {
 };
 
 // Slightly customized version of ReactFabraConnect to use local Connect code in development
-const useFabraConnect = (options?: { customTheme?: CustomTheme; containerID?: string; }) => {
+const useFabraConnect = (options?: FabraConnectOptions) => {
   useEffect(() => {
     initialize(options);
   }, []);
