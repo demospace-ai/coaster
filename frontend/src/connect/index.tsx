@@ -16,6 +16,9 @@ if (isProd()) {
     tracingOrigins: ["localhost", "api.fabra.io"],
     networkRecording: {
       enabled: true,
+      recordHeadersAndBody: true,
+      networkHeadersToRedact: ["X-LINK-TOKEN"],
+      networkBodyKeysToRedact: ["link_token"],
     }
   });
 }
