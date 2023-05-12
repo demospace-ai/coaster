@@ -78,6 +78,8 @@ func getPreviewQuery(connectionType models.ConnectionType, namespace string, tab
 		fallthrough
 	case models.ConnectionTypeRedshift:
 		fallthrough
+	case models.ConnectionTypePostgres:
+		fallthrough
 	case models.ConnectionTypeSnowflake:
 		queryStr := fmt.Sprintf("SELECT * FROM %s.%s LIMIT 100;", namespace, tableName)
 		return &queryStr, nil

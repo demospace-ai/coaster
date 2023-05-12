@@ -225,6 +225,7 @@ export interface TestDataConnectionRequest {
   mongodb_config?: MongoDbConfig;
   redshift_config?: RedshiftConfig;
   synapse_config?: SynapseConfig;
+  postgres_config?: PostgresConfig;
   webhook_config?: WebhookConfig;
 }
 
@@ -237,6 +238,7 @@ export interface CreateDestinationRequest {
   mongodb_config?: MongoDbConfig;
   synapse_config?: SynapseConfig;
   webhook_config?: WebhookConfig;
+  postgres_config?: PostgresConfig;
 }
 
 export interface LinkCreateSourceRequest {
@@ -247,6 +249,7 @@ export interface LinkCreateSourceRequest {
   redshift_config?: RedshiftConfig;
   synapse_config?: SynapseConfig;
   mongodb_config?: MongoDbConfig;
+  postgres_config?: PostgresConfig;
 }
 
 export interface CreateSourceResponse {
@@ -332,6 +335,13 @@ export interface SnowflakeConfig {
 }
 
 export interface RedshiftConfig {
+  username: string;
+  password: string;
+  database_name: string;
+  endpoint: string;
+}
+
+export interface PostgresConfig {
   username: string;
   password: string;
   database_name: string;
@@ -580,6 +590,7 @@ export enum ConnectionType {
   Redshift = "redshift",
   MongoDb = "mongodb",
   Synapse = "synapse",
+  Postgres = "postgres",
   Webhook = "webhook",
 }
 
@@ -711,6 +722,8 @@ export function getConnectionType(connectionType: ConnectionType): string {
       return "MongoDB";
     case ConnectionType.Synapse:
       return "Synapse";
+    case ConnectionType.Postgres:
+      return "Postgres";
     case ConnectionType.Webhook:
       return "Webhook";
   }

@@ -6,7 +6,8 @@ import { ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { sendRequest } from "src/rpc/ajax";
-import { BigQueryConfig, ConnectionType, CreateDestination, CreateDestinationRequest, getConnectionType, GetDestinations, MongoDbConfig, RedshiftConfig, SnowflakeConfig, SynapseConfig, TestDataConnection, TestDataConnectionRequest, WebhookConfig } from "src/rpc/api";
+import { BigQueryConfig, ConnectionType, CreateDestination, CreateDestinationRequest, getConnectionType, GetDestinations, MongoDbConfig, PostgresConfig, RedshiftConfig, SnowflakeConfig, SynapseConfig, TestDataConnection, TestDataConnectionRequest, WebhookConfig } from "src/rpc/api";
+import { HttpError } from "src/utils/errors";
 import { mergeClasses } from "src/utils/twmerge";
 import { mutate } from "swr";
 
@@ -50,6 +51,8 @@ type NewDestinationState = {
   synapseConfig: SynapseConfig;
   mongodbConfig: MongoDbConfig;
   webhookConfig: WebhookConfig;
+  postgresConfig: PostgresConfig;
+  error: string | undefined;
 };
 
 // Values must be empty strings otherwise the input will be uncontrolled
@@ -90,6 +93,13 @@ const INITIAL_DESTINATION_STATE: NewDestinationState = {
     url: "",
     headers: [],
   },
+  postgresConfig: {
+    username: "",
+    password: "",
+    database_name: "",
+    endpoint: "",
+  },
+  error: undefined,
 };
 
 const validateAll = (connectionType: ConnectionType, state: NewDestinationState): boolean => {
@@ -124,6 +134,12 @@ const validateAll = (connectionType: ConnectionType, state: NewDestinationState)
         && state.mongodbConfig.username.length > 0
         && state.mongodbConfig.password.length > 0
         && state.mongodbConfig.host.length > 0; // connection options is optional
+    case ConnectionType.Postgres:
+      return state.displayName.length > 0
+        && state.postgresConfig.username.length > 0
+        && state.postgresConfig.password.length > 0
+        && state.postgresConfig.database_name.length > 0
+        && state.postgresConfig.endpoint.length > 0;
     case ConnectionType.Webhook:
       return state.displayName.length > 0
         && state.webhookConfig.url.length > 0;
@@ -164,6 +180,9 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = p
       case ConnectionType.MongoDb:
         payload.mongodb_config = state.mongodbConfig;
         break;
+      case ConnectionType.Postgres:
+        payload.postgres_config = state.postgresConfig;
+        break;
       case ConnectionType.Webhook:
         payload.webhook_config = state.webhookConfig;
         break;
@@ -194,6 +213,7 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = p
     case ConnectionType.Redshift:
     case ConnectionType.MongoDb:
     case ConnectionType.Synapse:
+    case ConnectionType.Postgres:
       inputs = <></>;
       break; // TODO: throw error
   }
@@ -216,11 +236,13 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = p
       <form onSubmit={createNewDestination}>
         {inputs}
         <div className="tw-flex tw-flex-row tw-justify-start tw-w-100 tw-gap-5 tw-mt-16">
-          <TestConnectionButton state={state} connectionType={props.connectionType} />
+          <TestConnectionButton state={state} setState={setState} connectionType={props.connectionType} />
           <FormButton className="tw-w-full tw-h-10">{saveLoading ? <Loading /> : "Save"}</FormButton>
           {createConnectionSuccess !== null &&
-            /* TODO: return error message here */
-            <div className="tw-mt-3 tw-text-center">{createConnectionSuccess ? "Success!" : "Failure"}</div>
+            <>
+              {state.error && <div className="tw-mt-4 tw-text-red-700 tw-p-2 tw-text-center tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">{state.error}</div>}
+              <div className="tw-mt-3 tw-text-center">{createConnectionSuccess ? "Success!" : "Failure"}</div>
+            </>
           }
         </div>
       </form >
@@ -228,7 +250,7 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = p
   );
 };
 
-const TestConnectionButton: React.FC<{ state: NewDestinationState, connectionType: ConnectionType; }> = props => {
+const TestConnectionButton: React.FC<ConnectionConfigurationProps & { connectionType: ConnectionType; }> = props => {
   const [testLoading, setTestLoading] = useState(false);
   const [testConnectionSuccess, setTestConnectionSuccess] = useState<boolean | null>(null);
   const state = props.state;
@@ -261,6 +283,9 @@ const TestConnectionButton: React.FC<{ state: NewDestinationState, connectionTyp
       case ConnectionType.Synapse:
         payload.synapse_config = state.synapseConfig;
         break;
+      case ConnectionType.Postgres:
+        payload.postgres_config = state.postgresConfig;
+        break;
       case ConnectionType.Webhook:
         payload.webhook_config = state.webhookConfig;
         break;
@@ -269,8 +294,17 @@ const TestConnectionButton: React.FC<{ state: NewDestinationState, connectionTyp
     try {
       await sendRequest(TestDataConnection, payload);
       setTestConnectionSuccess(true);
+      props.setState(state => {
+        return { ...state, error: undefined };
+      });
     } catch (e) {
       setTestConnectionSuccess(false);
+      if (e instanceof HttpError) {
+        const errorMessage = e.message;
+        props.setState(state => {
+          return { ...state, error: errorMessage };
+        });
+      }
     }
 
     setTestLoading(false);
@@ -284,7 +318,7 @@ const TestConnectionButton: React.FC<{ state: NewDestinationState, connectionTyp
 
 type ConnectionConfigurationProps = {
   state: NewDestinationState;
-  setState: (state: NewDestinationState) => void;
+  setState: React.Dispatch<React.SetStateAction<NewDestinationState>>;
 };
 
 const SnowflakeInputs: React.FC<ConnectionConfigurationProps> = props => {

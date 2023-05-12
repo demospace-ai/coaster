@@ -10,6 +10,7 @@ const (
 	ConnectionTypeMongoDb   ConnectionType = "mongodb"
 	ConnectionTypeRedshift  ConnectionType = "redshift"
 	ConnectionTypeSnowflake ConnectionType = "snowflake"
+	ConnectionTypePostgres  ConnectionType = "postgres"
 	ConnectionTypeWebhook   ConnectionType = "webhook"
 )
 

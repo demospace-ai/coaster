@@ -104,6 +104,8 @@ func getSourceConnector(ctx context.Context, connection views.FullConnection, qu
 		return connectors.NewSynapseConnector(queryService), nil
 	case models.ConnectionTypeMongoDb:
 		return connectors.NewMongoDbConnector(queryService), nil
+	case models.ConnectionTypePostgres:
+		return connectors.NewPostgresConnector(queryService), nil
 	default:
 		return nil, errors.Newf("source not implemented for %s", connection.ConnectionType)
 	}

@@ -139,6 +139,19 @@ func (qs QueryServiceImpl) GetClient(ctx context.Context, connection *models.Con
 			Host:              connection.Host.String,
 			ConnectionOptions: connection.ConnectionOptions.String,
 		}, nil
+	case models.ConnectionTypePostgres:
+		postgresPassword, err := qs.cryptoService.DecryptConnectionCredentials(connection.Password.String)
+		if err != nil {
+			return nil, err
+		}
+
+		// TODO: validate all connection params
+		return PostgresApiClient{
+			Username:     connection.Username.String,
+			Password:     *postgresPassword,
+			DatabaseName: connection.DatabaseName.String,
+			Host:         connection.Host.String,
+		}, nil
 	default:
 		return nil, errors.Newf("unrecognized warehouse type %v", connection.ConnectionType)
 	}

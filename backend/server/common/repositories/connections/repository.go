@@ -153,6 +153,29 @@ func CreateSynapseConnection(
 	return &connection, nil
 }
 
+func CreatePostgresConnection(
+	db *gorm.DB,
+	organizationID int64,
+	postgresConfig input.PostgresConfig,
+	encryptedPassword string,
+) (*models.Connection, error) {
+	connection := models.Connection{
+		OrganizationID: organizationID,
+		ConnectionType: models.ConnectionTypePostgres,
+		Username:       database.NewNullString(postgresConfig.Username),
+		Password:       database.NewNullString(encryptedPassword),
+		DatabaseName:   database.NewNullString(postgresConfig.DatabaseName),
+		Host:           database.NewNullString(postgresConfig.Endpoint), // we just use the host field to store the endpoint
+	}
+
+	result := db.Create(&connection)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &connection, nil
+}
+
 func CreateWebhookConnection(
 	db *gorm.DB,
 	organizationID int64,

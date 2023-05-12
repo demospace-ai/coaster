@@ -51,6 +51,9 @@ export const NewSourceConfiguration: React.FC<SetupSyncProps & FabraDisplayOptio
     case ConnectionType.Synapse:
       inputs = <SynapseInputs state={state} setState={setNewSourceState} />;
       break;
+    case ConnectionType.Postgres:
+      inputs = <PostgresInputs state={state} setState={setNewSourceState} />;
+      break;
     case ConnectionType.Webhook:
       inputs = <>Unexpected</>;
       break;
@@ -129,6 +132,9 @@ const TestConnectionButton: React.FC<{ state: NewSourceState, setState: React.Di
       case ConnectionType.Synapse:
         payload.synapse_config = state.synapseConfig;
         break;
+      case ConnectionType.Postgres:
+        payload.postgres_config = state.postgresConfig;
+        break;
       case ConnectionType.Webhook:
         // TODO: throw error
         return;
@@ -137,6 +143,9 @@ const TestConnectionButton: React.FC<{ state: NewSourceState, setState: React.Di
     try {
       await sendRequest(TestDataConnection, payload);
       setTestConnectionSuccess(true);
+      setState(state => {
+        return { ...state, error: undefined };
+      });
     } catch (e) {
       setTestConnectionSuccess(false);
       if (e instanceof HttpError) {
@@ -261,8 +270,8 @@ const RedshiftInputs: React.FC<ConnectionConfigurationProps> = props => {
             <div className="tw-mt-2 tw-w-full tw-bg-slate-900 tw-rounded-md tw-p-2">your-cluster.abc123.us-west-2.redshift.amazonaws.com</div>
             <div className="tw-mt-3">For Serverless Redshift, <a className="tw-text-blue-400" target="_blank" rel="noreferrer" href="https://docs.aws.amazon.com/redshift/latest/mgmt/serverless-connecting.html">visit the Redshift docs.</a> The following is the expected format for Serverless Redshift:</div>
             <div className="tw-mt-2 tw-w-full tw-bg-slate-900 tw-rounded-md tw-p-2"><span className="tw-italic">workgroup-name</span>.<span className="tw-italic">account-number</span>.<span className="tw-italic">aws-region</span>.redshift-serverless.amazonaws.com</div>
-          </div>}
-          interactive maxWidth={640}>
+          </div>
+        } interactive maxWidth={640}>
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div >
@@ -317,6 +326,49 @@ const SynapseInputs: React.FC<ConnectionConfigurationProps> = props => {
         </Tooltip>
       </div >
       <ValidatedInput id="endpoint" value={state.synapseConfig.endpoint} setValue={(value) => { props.setState(state => ({ ...state, synapseConfig: { ...state.synapseConfig, endpoint: value } })); }} placeholder="Endpoint" />
+    </>
+  );
+};
+
+const PostgresInputs: React.FC<ConnectionConfigurationProps> = props => {
+  const state = props.state;
+  return (
+    <>
+      <div className="tw-flex tw-flex-row tw-items-center tw-mt-2 tw-mb-1">
+        <span>Display Name</span>
+        <Tooltip placement="right" label="Pick a name to help you identify this source in the future.">
+          <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+        </Tooltip>
+      </div>
+      <ValidatedInput id="displayName" value={state.displayName} setValue={(value) => { props.setState(state => ({ ...state, displayName: value })); }} placeholder="Display Name" />
+      <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
+        <span>Username</span>
+        <Tooltip placement="right" label="We recommend you create a dedicated user for syncing.">
+          <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+        </Tooltip>
+      </div>
+      <ValidatedInput id="username" value={state.postgresConfig.username} setValue={(value) => { props.setState(state => ({ ...state, postgresConfig: { ...state.postgresConfig, username: value } })); }} placeholder="Username" />
+      <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
+        <span>Password</span>
+        <Tooltip placement="right" label="Password for the user specified above.">
+          <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+        </Tooltip>
+      </div>
+      <ValidatedInput id="password" type="password" value={state.postgresConfig.password} setValue={(value) => { props.setState(state => ({ ...state, postgresConfig: { ...state.postgresConfig, password: value } })); }} placeholder="Password" />
+      <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
+        <span>Database Name</span>
+        <Tooltip placement="right" label="The Postgres database to sync from.">
+          <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+        </Tooltip>
+      </div>
+      <ValidatedInput id="databaseName" value={state.postgresConfig.database_name} setValue={(value) => { props.setState(state => ({ ...state, postgresConfig: { ...state.postgresConfig, database_name: value } })); }} placeholder="Database Name" />
+      <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
+        <span>Endpoint</span>
+        <Tooltip placement="right" label="This is the endpoint for your Postgres database. It must be in the format <host>:<port>, i.e. 127.0.0.1:5432" interactive maxWidth={640}>
+          <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+        </Tooltip>
+      </div >
+      <ValidatedInput id="host" value={state.postgresConfig.endpoint} setValue={(value) => { props.setState(state => ({ ...state, postgresConfig: { ...state.postgresConfig, endpoint: value } })); }} placeholder="Endpoint" />
     </>
   );
 };

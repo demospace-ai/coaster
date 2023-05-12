@@ -31,6 +31,7 @@ type TestDataConnectionRequest struct {
 	SnowflakeConfig *input.SnowflakeConfig `json:"snowflake_config,omitempty"`
 	RedshiftConfig  *input.RedshiftConfig  `json:"redshift_config,omitempty"`
 	SynapseConfig   *input.SynapseConfig   `json:"synapse_config,omitempty"`
+	PostgresConfig  *input.PostgresConfig  `json:"postgres_config,omitempty"`
 	MongoDbConfig   *input.MongoDbConfig   `json:"mongodb_config,omitempty"`
 }
 
@@ -62,6 +63,8 @@ func (s ApiService) TestDataConnection(auth auth.Authentication, w http.Response
 		err = testRedshiftConnection(*testDataConnectionRequest.RedshiftConfig)
 	case models.ConnectionTypeSynapse:
 		err = testSynapseConnection(*testDataConnectionRequest.SynapseConfig)
+	case models.ConnectionTypePostgres:
+		err = testPostgresConnection(*testDataConnectionRequest.PostgresConfig)
 	default:
 		err = errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", testDataConnectionRequest.ConnectionType))
 	}
@@ -254,6 +257,48 @@ func testMongoDbConnection(mongodbConfig input.MongoDbConfig) error {
 	return err
 }
 
+func testPostgresConnection(postgresConfig input.PostgresConfig) error {
+	params := url.Values{}
+	params.Add("sslmode", "require")
+	params.Add("connect_timeout", "5")
+
+	dsn := url.URL{
+		Scheme:   "postgres",
+		User:     url.UserPassword(postgresConfig.Username, postgresConfig.Password),
+		Host:     postgresConfig.Endpoint,
+		Path:     postgresConfig.DatabaseName,
+		RawQuery: params.Encode(),
+	}
+
+	db, err := sql.Open("postgres", dsn.String())
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	rows, err := db.Query("SELECT 1")
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	var v int
+	for rows.Next() {
+		err := rows.Scan(&v)
+		if err != nil {
+			return err
+		}
+		if v != 1 {
+			return err
+		}
+	}
+	if rows.Err() != nil {
+		return err
+	}
+
+	return nil
+}
+
 func validateTestDataConnectionRequest(request TestDataConnectionRequest) error {
 	switch request.ConnectionType {
 	case models.ConnectionTypeBigQuery:
@@ -266,6 +311,8 @@ func validateTestDataConnectionRequest(request TestDataConnectionRequest) error 
 		return validateTestMongoConnection(request)
 	case models.ConnectionTypeSynapse:
 		return validateTestSynapseConnection(request)
+	case models.ConnectionTypePostgres:
+		return validateTestPostgresConnection(request)
 	default:
 		return errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", request.ConnectionType))
 	}
@@ -320,6 +367,16 @@ func validateTestMongoConnection(request TestDataConnectionRequest) error {
 func validateTestSynapseConnection(request TestDataConnectionRequest) error {
 	if request.SynapseConfig == nil {
 		return errors.NewBadRequest("missing Synapse configuration")
+	}
+
+	// TODO: validate the fields all exist in the credentials object
+
+	return nil
+}
+
+func validateTestPostgresConnection(request TestDataConnectionRequest) error {
+	if request.PostgresConfig == nil {
+		return errors.NewBadRequest("missing Postgres configuration")
 	}
 
 	// TODO: validate the fields all exist in the credentials object

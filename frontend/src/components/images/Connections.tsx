@@ -1,5 +1,6 @@
 import bigquery from "src/components/images/bigquery.svg";
 import mongodb from "src/components/images/mongodb.svg";
+import postgres from "src/components/images/postgres.svg";
 import redshift from "src/components/images/redshift.svg";
 import snowflake from "src/components/images/snowflake.svg";
 import synapse from "src/components/images/synapse.svg";
@@ -18,6 +19,8 @@ function getConnectionTypeImg(connectionType: ConnectionType): string {
       return mongodb;
     case ConnectionType.Synapse:
       return synapse;
+    case ConnectionType.Postgres:
+      return postgres;
     case ConnectionType.Webhook:
       return webhook;
   }

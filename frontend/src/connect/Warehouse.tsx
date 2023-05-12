@@ -13,7 +13,7 @@ export const WarehouseSelector: React.FC<SetupSyncProps> = (props) => {
     <div className="tw-w-full tw-px-20">
       <div className="tw-text-left tw-mb-2 tw-text-2xl tw-font-semibold tw-text-slate-900">Add a new data source</div>
       <div className="tw-text-left tw-mb-10 tw-text-slate-600">Choose the data warehouse, database, or data lake to connect.</div>
-      <div className="tw-flex tw-flex-row tw-gap-5 tw-flex-wrap tw-justify-between">
+      <div className="tw-flex tw-flex-row tw-gap-5 tw-flex-wrap tw-justify-center">
         <button className={connectionButton} onClick={() => onClick(ConnectionType.Snowflake)}>
           <ConnectionImage connectionType={ConnectionType.Snowflake} className="tw-h-6 tw-mr-1.5" />
           Snowflake
@@ -33,6 +33,10 @@ export const WarehouseSelector: React.FC<SetupSyncProps> = (props) => {
         <button className={connectionButton} onClick={() => onClick(ConnectionType.Synapse)}>
           <ConnectionImage connectionType={ConnectionType.Synapse} className="tw-h-6 tw-mr-1.5" />
           Azure Synapse
+        </button>
+        <button className={connectionButton} onClick={() => onClick(ConnectionType.Postgres)}>
+          <ConnectionImage connectionType={ConnectionType.Postgres} className="tw-h-6 tw-mr-1.5" />
+          Postgres
         </button>
       </div>
     </div>

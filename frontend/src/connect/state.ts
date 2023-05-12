@@ -1,5 +1,5 @@
 import { sendLinkTokenRequest } from "src/rpc/ajax";
-import { BigQueryConfig, ConnectionType, FabraObject, Field, FieldMappingInput, FrequencyUnits, GetSources, LinkCreateSource, LinkCreateSourceRequest, LinkCreateSync, LinkCreateSyncRequest, LinkGetSources, LinkGetSyncs, MongoDbConfig, RedshiftConfig, SnowflakeConfig, Source, SynapseConfig } from "src/rpc/api";
+import { BigQueryConfig, ConnectionType, FabraObject, Field, FieldMappingInput, FrequencyUnits, GetSources, LinkCreateSource, LinkCreateSourceRequest, LinkCreateSync, LinkCreateSyncRequest, LinkGetSources, LinkGetSyncs, MongoDbConfig, PostgresConfig, RedshiftConfig, SnowflakeConfig, Source, SynapseConfig } from "src/rpc/api";
 import { HttpError } from "src/utils/errors";
 import { mutate } from "swr";
 
@@ -25,6 +25,7 @@ export type NewSourceState = {
   snowflakeConfig: SnowflakeConfig;
   redshiftConfig: RedshiftConfig;
   synapseConfig: SynapseConfig;
+  postgresConfig: PostgresConfig;
   mongodbConfig: MongoDbConfig;
 };
 
@@ -62,6 +63,12 @@ const INITIAL_SOURCE_STATE: NewSourceState = {
     password: "",
     host: "",
     connection_options: "",
+  },
+  postgresConfig: {
+    username: "",
+    password: "",
+    database_name: "",
+    endpoint: "",
   },
 };
 
@@ -149,6 +156,12 @@ export const validateConnectionSetup = (connectionType: ConnectionType | undefin
         && state.mongodbConfig.username.length > 0
         && state.mongodbConfig.password.length > 0
         && state.mongodbConfig.host.length > 0; // connection options is optional
+    case ConnectionType.Postgres:
+      return state.displayName.length > 0
+        && state.postgresConfig.username.length > 0
+        && state.postgresConfig.password.length > 0
+        && state.postgresConfig.database_name.length > 0
+        && state.postgresConfig.endpoint.length > 0;
     case ConnectionType.Webhook:
       return false; // cannot create a sync with a webhook source
   }
@@ -191,6 +204,9 @@ export const createNewSource = async (
       break;
     case ConnectionType.MongoDb:
       payload.mongodb_config = state.newSourceState.mongodbConfig;
+      break;
+    case ConnectionType.Postgres:
+      payload.postgres_config = state.newSourceState.postgresConfig;
       break;
     case ConnectionType.Webhook:
       // TODO: throw an error
