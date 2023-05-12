@@ -14,7 +14,7 @@ import (
 )
 
 var ALLOWED_ORIGINS = []string{"https://app.fabra.io", "https://connect.fabra.io"}
-var ALLOWED_HEADERS = []string{"Content-Type", "X-LINK-TOKEN", "X-API-TOKEN", "X-TIME-ZONE"}
+var ALLOWED_HEADERS = []string{"Content-Type", "X-LINK-TOKEN", "X-API-TOKEN", "X-TIME-ZONE", "X-HIGHLIGHT-REQUEST"}
 
 type ApiService interface {
 	AuthenticatedRoutes() []AuthenticatedRoute

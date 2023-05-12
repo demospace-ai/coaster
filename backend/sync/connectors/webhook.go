@@ -76,10 +76,13 @@ func (wh WebhookImpl) Write(
 		return
 	}
 
-	decryptedEndCustomerApiKey, err := wh.cryptoService.DecryptEndCustomerApiKey(*wh.encryptedEndCustomerApiKey)
-	if err != nil {
-		errC <- err
-		return
+	var decryptedEndCustomerApiKey *string
+	if wh.encryptedEndCustomerApiKey != nil {
+		decryptedEndCustomerApiKey, err = wh.cryptoService.DecryptEndCustomerApiKey(*wh.encryptedEndCustomerApiKey)
+		if err != nil {
+			errC <- err
+			return
+		}
 	}
 
 	orderedObjectFields := wh.createOrderedObjectFields(object.ObjectFields, fieldMappings)
