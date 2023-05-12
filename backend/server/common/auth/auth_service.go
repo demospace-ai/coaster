@@ -40,7 +40,6 @@ func addCookie(w http.ResponseWriter, name string, value string) {
 		Value:    value,
 		Secure:   application.IsProd(), // disable secure for local testing
 		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
 	}
 	http.SetCookie(w, &cookie)
 }
