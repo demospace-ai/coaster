@@ -49,8 +49,14 @@ func (a *Activities) Replicate(ctx context.Context, input ReplicateInput) (*Repl
 		return nil, err
 	}
 
-	go sourceConnector.Read(ctx, input.SourceConnection, input.Sync, input.FieldMappings, rowsC, readOutputC, readErrC)
-	go destConnector.Write(ctx, input.DestinationConnection, input.DestinationOptions, input.Object, input.Sync, input.FieldMappings, rowsC, writeOutputC, writeErrC)
+	go safeCall(func() {
+		sourceConnector.Read(ctx, input.SourceConnection, input.Sync, input.FieldMappings, rowsC, readOutputC, readErrC)
+	}, readErrC)
+
+	go safeCall(func() {
+		destConnector.Write(ctx, input.DestinationConnection, input.DestinationOptions, input.Object, input.Sync, input.FieldMappings, rowsC, writeOutputC, writeErrC)
+	}, writeErrC)
+
 	go heartbeat(ctx, doneC) // TODO: heartbeat from the write/read methods to ensure the worker is making progress
 
 	var readOutput connectors.ReadOutput
@@ -126,6 +132,17 @@ func getDestinationConnector(ctx context.Context, connection views.FullConnectio
 	default:
 		return nil, errors.Newf("destination not implemented for %s", connection.ConnectionType)
 	}
+}
+
+// Any new goroutines can crash the whole worker unless we recover from panics
+func safeCall(fn func(), errC chan<- error) {
+	defer func() {
+		if r := recover(); r != nil {
+			errC <- errors.Newf("panic: %v", r)
+		}
+	}()
+
+	fn()
 }
 
 func heartbeat(ctx context.Context, doneC <-chan bool) {
