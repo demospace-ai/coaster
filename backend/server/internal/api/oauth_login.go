@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -70,6 +71,7 @@ func (s ApiService) OAuthLogin(w http.ResponseWriter, r *http.Request) error {
 	if user == nil {
 		var userEmailDomain = strings.Split(externalUserInfo.Email, "@")[1]
 		if _, unauthorized := UNAUTHORIZED_DOMAINS[userEmailDomain]; unauthorized {
+			fmt.Printf("Unauthorized login: %v", externalUserInfo)
 			http.Redirect(w, r, getUnauthorizedRedirect(), http.StatusFound)
 			return nil
 		}
