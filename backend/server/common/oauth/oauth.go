@@ -21,10 +21,10 @@ import (
 
 const GITHUB_PRODUCTION_CLIENT_ID = "7eff3cfd664e1e01e19b"
 const GITHUB_DEVELOPMENT_CLIENT_ID = "f84f670b7af18144af4a"
+const GOOGLE_CLIENT_ID = "932264813910-egpk1omo3v2cedd89k8go851uko6djpa.apps.googleusercontent.com"
+
 const GITHUB_PRODUCTION_SECRET_KEY = "projects/932264813910/secrets/github-prod-client-secret/versions/latest"
 const GITHUB_DEVELOPMENT_SECRET_KEY = "projects/932264813910/secrets/github-dev-client-secret/versions/latest"
-
-const GOOGLE_CLIENT_ID = "932264813910-egpk1omo3v2cedd89k8go851uko6djpa.apps.googleusercontent.com"
 const GOOGLE_SECRET_KEY = "projects/932264813910/secrets/google-oauth-client-secret/versions/latest"
 
 type StateClaims struct {
