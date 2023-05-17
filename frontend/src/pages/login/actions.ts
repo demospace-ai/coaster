@@ -72,10 +72,11 @@ function identifyUser(user: User) {
 
 export function useLogout() {
   const dispatch = useDispatch();
-  rudderanalytics.reset();
-  window.Intercom("shutdown");
 
   return useCallback(async () => {
+    rudderanalytics.reset();
+    window.Intercom("shutdown");
+
     await sendRequest(Logout);
     dispatch({
       type: "login.logout",
