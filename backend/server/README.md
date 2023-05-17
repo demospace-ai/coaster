@@ -51,8 +51,10 @@ make
 ```
 
 
-Notes:
-When setting up a new GCP project, you may need to run
+## Appendix
+
+### Notes
+When setting up a new GCP project, you may need to run:
 ```
 gcloud compute project-info add-metadata --metadata serial-port-logging-enable=true
 ```
