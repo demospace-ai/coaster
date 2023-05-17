@@ -5,7 +5,6 @@ import { combineReducers } from "redux";
 import { AppAction, appReducer, AppState } from "src/app/model";
 import { LoginAction, loginReducer, LoginState } from "src/pages/login/model";
 
-
 export type RootAction = AppAction | LoginAction;
 
 export interface RootState {
