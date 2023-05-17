@@ -38,13 +38,9 @@ ALTER USER fabra WITH PASSWORD 'fabra';
 
 You'll need to [install the gcloud CLI](https://cloud.google.com/sdk/docs/install).
 
-You'll also need to be added to the Fabra Google cloud project.
+You'll also need to be added to the Fabra Developer Google Cloud project. Ask Nick for help here.
 
 Once you've been added, you can login via `gcloud auth login`.
-
-Alternatively, you can run off a separate Google Cloud Project by modifying the secret keys in:
-- `server/common/oauth/oauth.go`
-- `server/common/crypto/crypto.go`
 
 7. Build and run the server
 
