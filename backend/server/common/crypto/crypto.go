@@ -10,6 +10,7 @@ import (
 
 	kms "cloud.google.com/go/kms/apiv1"
 	"cloud.google.com/go/kms/apiv1/kmspb"
+	"go.fabra.io/server/common/application"
 	"go.fabra.io/server/common/errors"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
@@ -52,6 +53,12 @@ func GenerateSigningKey() string {
 }
 
 func encrypt(keyName string, plaintextString string) (*string, error) {
+	// don't encrypt in dev
+	if !application.IsProd() {
+		hexEncoded := hex.EncodeToString([]byte(plaintextString))
+		return &hexEncoded, nil
+	}
+
 	ctx := context.Background()
 	client, err := kms.NewKeyManagementClient(ctx)
 	if err != nil {
@@ -93,6 +100,11 @@ func decrypt(keyName string, ciphertextString string) (*string, error) {
 	ciphertext, err := hex.DecodeString(ciphertextString)
 	if err != nil {
 		return nil, err
+	}
+
+	// don't encrypt in dev
+	if !application.IsProd() {
+		return &ciphertextString, nil
 	}
 
 	ctx := context.Background()
