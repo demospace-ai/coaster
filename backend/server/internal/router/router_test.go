@@ -1,10 +1,12 @@
 package router_test
 
 import (
+	"io"
 	"net/http"
 	"net/http/httptest"
 
 	"go.fabra.io/server/common/auth"
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/test"
 	"go.fabra.io/server/internal/router"
 
@@ -34,6 +36,18 @@ func (s FakeService) UnauthenticatedRoutes() []router.UnauthenticatedRoute {
 			Pattern:     "/unauthenticated",
 			HandlerFunc: s.Unauthenticated,
 		},
+		{
+			Name:        "Error",
+			Method:      router.GET,
+			Pattern:     "/error",
+			HandlerFunc: s.Error,
+		},
+		{
+			Name:        "Error",
+			Method:      router.GET,
+			Pattern:     "/httperror",
+			HandlerFunc: s.HttpError,
+		},
 	}
 }
 
@@ -58,6 +72,14 @@ func (s FakeService) Unauthenticated(w http.ResponseWriter, r *http.Request) err
 
 func (s FakeService) LinkAuthenticated(_ auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	return nil
+}
+
+func (s FakeService) Error(w http.ResponseWriter, r *http.Request) error {
+	return errors.Wrap(errors.NewCustomerVisibleError(errors.Wrap(errors.New("error"), "should be visible")), "should not be visible")
+}
+
+func (s FakeService) HttpError(w http.ResponseWriter, r *http.Request) error {
+	return errors.Wrap(errors.NewBadRequest("should be visible"), "should not be visible")
 }
 
 var _ = Describe("Router", func() {
@@ -219,5 +241,35 @@ var _ = Describe("Router", func() {
 
 		result := rr.Result()
 		Expect(result.StatusCode).To(Equal(http.StatusOK))
+	})
+
+	It("returns only customer visible portion of error", func() {
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequest("GET", "/error", nil)
+		Expect(err).To(BeNil())
+
+		r.ServeHTTP(rr, req)
+
+		result := rr.Result()
+		body, err := io.ReadAll(result.Body)
+		Expect(err).To(BeNil())
+		Expect(string(body)).To(Equal("should be visible: error\n"))
+		Expect(string(body)).ToNot(ContainSubstring("should not be visible"))
+		Expect(result.StatusCode).To(Equal(http.StatusBadRequest))
+	})
+
+	It("returns customer visible http error", func() {
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequest("GET", "/httperror", nil)
+		Expect(err).To(BeNil())
+
+		r.ServeHTTP(rr, req)
+
+		result := rr.Result()
+		body, err := io.ReadAll(result.Body)
+		Expect(err).To(BeNil())
+		Expect(string(body)).To(Equal("should be visible\n"))
+		Expect(string(body)).ToNot(ContainSubstring("should not be visible"))
+		Expect(result.StatusCode).To(Equal(http.StatusBadRequest))
 	})
 })

@@ -65,7 +65,10 @@ func (r Router) RegisterRoutes(service ApiService) {
 	}
 
 	r.router.Use(CORSMiddleware)
-	r.router.Use(highlightGorillaMux.Middleware)
+
+	if application.IsProd() {
+		r.router.Use(highlightGorillaMux.Middleware)
+	}
 }
 
 func (r Router) wrapAuthenticatedRoute(handler AuthenticatedHandlerFunc) http.Handler {

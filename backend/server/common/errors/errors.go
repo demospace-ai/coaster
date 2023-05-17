@@ -25,54 +25,54 @@ func (e HttpError) Code() int {
 	return e.code
 }
 
-var NotFound = HttpError{
+var NotFound = &HttpError{
 	code: http.StatusNotFound,
 	CustomerVisibleError: CustomerVisibleError{
 		message: http.StatusText(http.StatusNotFound),
 	},
 }
 
-var BadRequest = HttpError{
+var BadRequest = &HttpError{
 	code: http.StatusBadRequest,
 	CustomerVisibleError: CustomerVisibleError{
 		message: http.StatusText(http.StatusBadRequest),
 	},
 }
 
-var Unauthorized = HttpError{
+var Unauthorized = &HttpError{
 	code: http.StatusUnauthorized,
 	CustomerVisibleError: CustomerVisibleError{
 		message: http.StatusText(http.StatusUnauthorized),
 	},
 }
 
-var Forbidden = HttpError{
+var Forbidden = &HttpError{
 	code: http.StatusForbidden,
 	CustomerVisibleError: CustomerVisibleError{
 		message: "User inactive",
 	},
 }
 
-func NewCustomerVisibleError(err error) CustomerVisibleError {
-	return CustomerVisibleError{
+func NewCustomerVisibleError(err error) error {
+	return &CustomerVisibleError{
 		message: err.Error(),
 	}
 }
 
-func NewBadRequest(clientVisibleData string) error {
-	return HttpError{
+func NewBadRequest(customerVisibleError string) error {
+	return &HttpError{
 		code: http.StatusBadRequest,
 		CustomerVisibleError: CustomerVisibleError{
-			message: clientVisibleData,
+			message: customerVisibleError,
 		},
 	}
 }
 
-func NewBadRequestf(clientVisibleDataFormat string, args ...any) error {
-	return HttpError{
+func NewBadRequestf(customerVisibleErrorFmt string, args ...any) error {
+	return &HttpError{
 		code: http.StatusBadRequest,
 		CustomerVisibleError: CustomerVisibleError{
-			message: fmt.Sprintf(clientVisibleDataFormat, args...),
+			message: fmt.Sprintf(customerVisibleErrorFmt, args...),
 		},
 	}
 }

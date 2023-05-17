@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"go.fabra.io/server/common/application"
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/crypto"
 	"go.fabra.io/server/common/database"
@@ -30,9 +31,11 @@ func main() {
 		os.Exit(1)
 	}()
 
-	highlight.SetProjectID("7e3vw5g1")
-	highlight.Start()
-	defer highlight.Stop()
+	if application.IsProd() {
+		highlight.SetProjectID("7e3vw5g1")
+		highlight.Start()
+		defer highlight.Stop()
+	}
 
 	cryptoService := crypto.NewCryptoService()
 	authService := auth.NewAuthService(db, cryptoService)
