@@ -53,6 +53,7 @@ func GenerateSigningKey() string {
 }
 
 func encrypt(keyName string, plaintextString string) (*string, error) {
+	// TODO: encrypt with local keys here
 	// don't encrypt in dev
 	if !application.IsProd() {
 		hexEncoded := hex.EncodeToString([]byte(plaintextString))
@@ -102,6 +103,7 @@ func decrypt(keyName string, ciphertextString string) (*string, error) {
 		return nil, err
 	}
 
+	// TODO: decrypt with local keys here
 	// don't encrypt in dev
 	if !application.IsProd() {
 		return &ciphertextString, nil

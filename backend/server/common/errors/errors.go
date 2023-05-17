@@ -1,10 +1,10 @@
 package errors
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
-	"github.com/pkg/errors"
 	"gorm.io/gorm"
 )
 
@@ -78,23 +78,20 @@ func NewBadRequestf(clientVisibleDataFormat string, args ...any) error {
 }
 
 func Wrap(err error, message string) error {
-	return errors.Wrap(err, message)
+	return fmt.Errorf("%s: %w", message, err)
 }
 
 func Wrapf(err error, format string, args ...any) error {
-	return errors.Wrapf(err, format, args...)
+	message := fmt.Sprintf(format, args...)
+	return Wrap(err, message)
 }
 
 func New(message string) error {
-	return errors.New(message)
+	return fmt.Errorf(message)
 }
 
 func Newf(format string, a ...any) error {
-	return errors.Errorf(format, a...)
-}
-
-func WithStack(err error) error {
-	return err
+	return fmt.Errorf(format, a...)
 }
 
 func IsRecordNotFound(err error) bool {
