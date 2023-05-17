@@ -2,7 +2,6 @@ package crypto
 
 import (
 	"context"
-	"fmt"
 
 	kms "cloud.google.com/go/kms/apiv1"
 	"cloud.google.com/go/kms/apiv1/kmspb"
@@ -76,7 +75,7 @@ func (s *SigningMethodKMS) Verify(signingString string, signature []byte, key in
 
 	client, err := kms.NewKeyManagementClient(ctx)
 	if err != nil {
-		return fmt.Errorf("failed to create kms client: %v", err)
+		return errors.Newf("failed to create kms client: %v", err)
 	}
 	defer client.Close()
 
