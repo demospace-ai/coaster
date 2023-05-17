@@ -21,11 +21,13 @@ import (
 
 const GITHUB_PRODUCTION_CLIENT_ID = "7eff3cfd664e1e01e19b"
 const GITHUB_DEVELOPMENT_CLIENT_ID = "f84f670b7af18144af4a"
-const GOOGLE_CLIENT_ID = "932264813910-egpk1omo3v2cedd89k8go851uko6djpa.apps.googleusercontent.com"
+const GOOGLE_DEVELOPMENT_CLIENT_ID = "932264813910-0a9n8pdd6ocqvduipfih1sgouh460451.apps.googleusercontent.com"
+const GOOGLE_PRODUCTION_CLIENT_ID = "932264813910-egpk1omo3v2cedd89k8go851uko6djpa.apps.googleusercontent.com"
 
 const GITHUB_PRODUCTION_SECRET_KEY = "projects/932264813910/secrets/github-prod-client-secret/versions/latest"
 const GITHUB_DEVELOPMENT_SECRET_KEY = "projects/932264813910/secrets/github-dev-client-secret/versions/latest"
-const GOOGLE_SECRET_KEY = "projects/932264813910/secrets/google-oauth-client-secret/versions/latest"
+const GOOGLE_DEVELOPMENT_SECRET_KEY = "projects/932264813910/secrets/google-dev-client-secret/versions/latest"
+const GOOGLE_PRODUCTION_SECRET_KEY = "projects/932264813910/secrets/google-prod-client-secret/versions/latest"
 
 type StateClaims struct {
 	Provider OauthProvider `json:"provider"`
@@ -99,13 +101,13 @@ func FetchGithubInfo(code string) (*ExternalUserInfo, error) {
 }
 
 func FetchGoogleInfo(code string) (*ExternalUserInfo, error) {
-	secretKey := GOOGLE_SECRET_KEY
+	secretKey := getGoogleSecretKey()
 	googleClientSecret, err := secret.FetchSecret(context.TODO(), secretKey)
 	if err != nil {
 		return nil, err
 	}
 
-	clientId := GOOGLE_CLIENT_ID
+	clientId := getGoogleClientID()
 	oauthConf := &oauth2.Config{
 		ClientID:     clientId,
 		ClientSecret: *googleClientSecret,
@@ -150,7 +152,7 @@ func GetOauthRedirect(strProvider string) (*string, error) {
 	switch provider {
 	case OauthProviderGoogle:
 		oauthConf = &oauth2.Config{
-			ClientID:    GOOGLE_CLIENT_ID,
+			ClientID:    getGoogleClientID(),
 			Scopes:      []string{"email", "profile", "openid"},
 			RedirectURL: getOauthRedirectUrl(),
 			Endpoint:    googleoauth.Endpoint,
@@ -217,6 +219,22 @@ func getGithubClientID() string {
 		return GITHUB_PRODUCTION_CLIENT_ID
 	} else {
 		return GITHUB_DEVELOPMENT_CLIENT_ID
+	}
+}
+
+func getGoogleSecretKey() string {
+	if application.IsProd() {
+		return GOOGLE_PRODUCTION_SECRET_KEY
+	} else {
+		return GOOGLE_DEVELOPMENT_SECRET_KEY
+	}
+}
+
+func getGoogleClientID() string {
+	if application.IsProd() {
+		return GOOGLE_PRODUCTION_CLIENT_ID
+	} else {
+		return GOOGLE_DEVELOPMENT_CLIENT_ID
 	}
 }
 

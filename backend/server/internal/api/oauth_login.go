@@ -70,7 +70,8 @@ func (s ApiService) OAuthLogin(w http.ResponseWriter, r *http.Request) error {
 	// no user exists yet, so if the domain is not allowed then redirect
 	if user == nil {
 		var userEmailDomain = strings.Split(externalUserInfo.Email, "@")[1]
-		if _, unauthorized := UNAUTHORIZED_DOMAINS[userEmailDomain]; unauthorized {
+		// allow unauthorized domains in development
+		if _, unauthorized := UNAUTHORIZED_DOMAINS[userEmailDomain]; unauthorized && application.IsProd() {
 			fmt.Printf("Unauthorized login: %v", externalUserInfo)
 			http.Redirect(w, r, getUnauthorizedRedirect(), http.StatusFound)
 			return nil
