@@ -26,7 +26,6 @@ const SyncRunsList: React.FC<{ linkToken: string; }> = ({ linkToken }) => {
   const syncRuns = sync?.sync_runs ? sync.sync_runs : [];
 
   return (
-
     <div className="tw-mt-2 tw-pb-16 tw-px-20 tw-flex tw-flex-col tw-overflow-auto">
       <div className="tw-flex tw-w-full tw-mb-8">
         <div className="tw-flex tw-flex-row tw-w-full tw-items-center tw-font-bold tw-text-xl">

@@ -44,6 +44,8 @@ func (s ApiService) RunSync(auth auth.Authentication, w http.ResponseWriter, r *
 	ctx := context.TODO()
 	scheduleClient := c.ScheduleClient()
 	workflow := scheduleClient.GetHandle(ctx, sync.WorkflowID)
+	// This will trigger the workflow execution if not already running, otherwise it will be a no-op.
+	// This is due to the OverlapPolicy being set to SCHEDULE_OVERLAP_POLICY_SKIP by default.
 	err = workflow.Trigger(ctx, client.ScheduleTriggerOptions{})
 	if err != nil {
 		return err
