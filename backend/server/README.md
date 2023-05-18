@@ -41,14 +41,13 @@ brew install golang-migrate
 make migrate
 ```
 
-
 7. Configure GCloud Secret Manager
 
 You'll need to [install the gcloud CLI](https://cloud.google.com/sdk/docs/install).
 
 You'll also need to be added to the Fabra Developer Google Cloud project. Ask Nick for help here.
 
-Once you've been added, you can login via `gcloud auth login`.
+Once you've been added, you can login via `gcloud auth application-default login`.
 
 8. Build and run the server
 
