@@ -1,8 +1,8 @@
-import React, { ReactNode, useEffect } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { useStart } from "src/app/actions";
 import { Header } from "src/components/header/Header";
-import { Loading } from "src/components/loading/Loading";
+import { LogoLoading } from "src/components/loading/LogoLoading";
 import { NavigationBar } from "src/components/navigationBar/NavigationBar";
 import { ApiKey } from "src/pages/apikey/ApiKey";
 import { Destination } from "src/pages/destinations/Destination";
@@ -23,6 +23,7 @@ let needsInit = true;
 export const App: React.FC = () => {
   const location = useLocation();
   const loading = useSelector(state => state.app.loading);
+  const [minLoading, setMinLoading] = useState(true);
   const forbidden = useSelector(state => state.app.forbidden);
   const start = useStart();
 
@@ -38,9 +39,17 @@ export const App: React.FC = () => {
     }
   }, [start]);
 
-  if (loading) {
+  // Super hacky way to prevent the loading screen from flashing on the screen for a split second
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMinLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading || minLoading) {
     return (
-      <Loading />
+      <LogoLoading />
     );
   }
 
