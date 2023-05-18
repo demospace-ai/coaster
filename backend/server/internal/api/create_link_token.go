@@ -12,6 +12,7 @@ import (
 	"go.fabra.io/server/common/input"
 	"go.fabra.io/server/common/repositories/link_tokens"
 	"go.fabra.io/server/common/repositories/webhooks"
+	"gorm.io/gorm"
 )
 
 type CreateLinkTokenRequest struct {
@@ -48,14 +49,21 @@ func (s ApiService) CreateLinkToken(auth auth.Authentication, w http.ResponseWri
 				return err
 			}
 
-			// TODO: use transaction
 			// this operation always replaces the existing api key
-			err = webhooks.DeactivateExistingEndCustomerApiKey(s.db, auth.Organization.ID, createLinkTokenRequest.EndCustomerID)
-			if err != nil {
-				return err
-			}
+			err = s.db.Transaction(func(tx *gorm.DB) error {
+				err = webhooks.DeactivateExistingEndCustomerApiKey(tx, auth.Organization.ID, createLinkTokenRequest.EndCustomerID)
+				if err != nil {
+					return err
+				}
 
-			err = webhooks.CreateEndCustomerApiKey(s.db, auth.Organization.ID, createLinkTokenRequest.EndCustomerID, *encryptedEndCustomerApiKey)
+				err = webhooks.CreateEndCustomerApiKey(tx, auth.Organization.ID, createLinkTokenRequest.EndCustomerID, *encryptedEndCustomerApiKey)
+				if err != nil {
+					return err
+				}
+
+				return nil
+			})
+
 			if err != nil {
 				return err
 			}

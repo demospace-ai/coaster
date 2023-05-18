@@ -5,6 +5,7 @@ import (
 
 	"go.fabra.io/server/common/database"
 	"go.fabra.io/sync/temporal"
+	"go.temporal.io/sdk/interceptor"
 	"go.temporal.io/sdk/worker"
 )
 
@@ -25,7 +26,13 @@ func main() {
 	}
 
 	// This worker hosts both Workflow and Activity functions
-	w := worker.New(c, temporal.SyncTaskQueue, worker.Options{})
+	w := worker.New(c, temporal.SyncTaskQueue, worker.Options{
+		// Create interceptor that will unwrap CustomerVisibleError and set it at top level
+		Interceptors: []interceptor.WorkerInterceptor{
+			temporal.NewErrorInterceptor(),
+		},
+	})
+
 	activities := &temporal.Activities{
 		Db: db,
 	}

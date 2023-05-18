@@ -117,6 +117,7 @@ func recordFailure(ctx workflow.Context, err error, syncRun models.SyncRun) erro
 	var applicationErr *temporal.ApplicationError
 	var errString string
 	if errors.As(err, &applicationErr) && applicationErr.Type() == "CustomerVisibleError" {
+		// Interceptor will update the error message to only include the CustomerVisisbleError message
 		errString = applicationErr.Message()
 	} else {
 		errString = "unexpected error"
