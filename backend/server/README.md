@@ -34,7 +34,15 @@ ALTER USER fabra WITH SUPERUSER;
 ALTER USER fabra WITH PASSWORD 'fabra';
 ```
 
-6. Configure GCloud Secret Manager
+6. Setup initial tables (run this again when adding migrations).
+
+```
+brew install golang-migrate
+make migrate
+```
+
+
+7. Configure GCloud Secret Manager
 
 You'll need to [install the gcloud CLI](https://cloud.google.com/sdk/docs/install).
 
@@ -42,10 +50,9 @@ You'll also need to be added to the Fabra Developer Google Cloud project. Ask Ni
 
 Once you've been added, you can login via `gcloud auth login`.
 
-7. Build and run the server
+8. Build and run the server
 
 ```
-make migrate
 make
 ./bin/server
 ```
@@ -57,4 +64,10 @@ make
 When setting up a new GCP project, you may need to run:
 ```
 gcloud compute project-info add-metadata --metadata serial-port-logging-enable=true
+```
+
+### Adding migrations
+From the `backend/server` directory, run
+```
+migrate create -ext sql -dir migrations -seq the-name-of-your-migration
 ```
