@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useEffect } from "react";
 import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { useStart } from "src/app/actions";
 import { Header } from "src/components/header/Header";
@@ -23,7 +23,6 @@ let needsInit = true;
 export const App: React.FC = () => {
   const location = useLocation();
   const loading = useSelector(state => state.app.loading);
-  const [minLoading, setMinLoading] = useState(true);
   const forbidden = useSelector(state => state.app.forbidden);
   const start = useStart();
 
@@ -39,15 +38,7 @@ export const App: React.FC = () => {
     }
   }, [start]);
 
-  // Super hacky way to prevent the loading screen from flashing on the screen for a split second
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setMinLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (loading || minLoading) {
+  if (loading) {
     return (
       <LogoLoading />
     );
