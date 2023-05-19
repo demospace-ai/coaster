@@ -13,6 +13,7 @@ type UpdateType string
 const (
 	UpdateTypeCreate   UpdateType = "create"
 	UpdateTypeComplete UpdateType = "complete"
+	UpdateTypeStart    UpdateType = "start"
 )
 
 type RecordStatusInput struct {
@@ -29,6 +30,8 @@ func (a *Activities) RecordStatus(ctx context.Context, input RecordStatusInput) 
 	switch input.UpdateType {
 	case UpdateTypeCreate:
 		return sync_runs.CreateSyncRun(a.Db, input.OrganizationID, input.SyncID)
+	case UpdateTypeStart:
+		return sync_runs.StartSyncRun(a.Db, &input.SyncRun)
 	case UpdateTypeComplete:
 		return sync_runs.CompleteSyncRun(a.Db, &input.SyncRun, input.NewStatus, input.Error, input.RowsWritten)
 	default:
