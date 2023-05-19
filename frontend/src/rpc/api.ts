@@ -1,3 +1,4 @@
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export interface IEndpoint<RequestType, ResponseType> {
   name: string;
@@ -15,14 +16,13 @@ export const Login: IEndpoint<LoginRequest, LoginResponse> = {
   track: true,
 };
 
-export const OAuthRedirect: IEndpoint<{ provider: OAuthProvider }, undefined> =
-  {
-    name: "OAuth Redirect",
-    method: "GET",
-    path: "/oauth_redirect",
-    queryParams: ["provider"],
-    track: true,
-  };
+export const OAuthRedirect: IEndpoint<{ provider: OAuthProvider; }, undefined> = {
+  name: "OAuth Redirect",
+  method: "GET",
+  path: "/oauth_redirect",
+  queryParams: ["provider"],
+  track: true,
+};
 
 export const GetAllUsers: IEndpoint<undefined, GetAllUsersResponse> = {
   name: "All Users Fetched",
@@ -36,10 +36,7 @@ export const GetDestinations: IEndpoint<undefined, GetDestinationsResponse> = {
   path: "/destinations",
 };
 
-export const GetDestination: IEndpoint<
-  { destinationID: number },
-  GetDestinationResponse
-> = {
+export const GetDestination: IEndpoint<{ destinationID: number; }, GetDestinationResponse> = {
   name: "Destination Fetched",
   method: "GET",
   path: "/destination/:destinationID",
@@ -57,7 +54,7 @@ export const GetObjects: IEndpoint<undefined, GetObjectsResponse> = {
   path: "/objects",
 };
 
-export const GetObject: IEndpoint<{ objectID: number }, GetObjectResponse> = {
+export const GetObject: IEndpoint<{ objectID: number; }, GetObjectResponse> = {
   name: "Object Fetched",
   method: "GET",
   path: "/object/:objectID",
@@ -69,27 +66,21 @@ export const GetSyncs: IEndpoint<undefined, GetSyncsResponse> = {
   path: "/syncs",
 };
 
-export const GetSync: IEndpoint<{ syncID: number }, GetSyncResponse> = {
+export const GetSync: IEndpoint<{ syncID: number; }, GetSyncResponse> = {
   name: "Sync Fetched",
   method: "GET",
   path: "/sync/:syncID",
   track: true,
 };
 
-export const GetNamespaces: IEndpoint<
-  { connectionID: number },
-  GetNamespacesResponse
-> = {
+export const GetNamespaces: IEndpoint<{ connectionID: number; }, GetNamespacesResponse> = {
   name: "Namespaces Fetched",
   method: "GET",
   path: "/connection/namespaces",
-  queryParams: ["connectionID"],
+  queryParams: ["connectionID"]
 };
 
-export const GetTables: IEndpoint<
-  { connectionID: number; namespace: string },
-  GetTablesResponse
-> = {
+export const GetTables: IEndpoint<{ connectionID: number, namespace: string; }, GetTablesResponse> = {
   name: "Tables Fetched",
   method: "GET",
   path: "/connection/tables",
@@ -115,33 +106,26 @@ export const LinkGetSources: IEndpoint<undefined, GetSourcesResponse> = {
   path: "/link/sources",
 };
 
-export const LinkGetNamespaces: IEndpoint<
-  { sourceID: number },
-  GetNamespacesResponse
-> = {
+export const LinkGetNamespaces: IEndpoint<{ sourceID: number; }, GetNamespacesResponse> = {
   name: "Namespaces Fetched",
   method: "GET",
   path: "/link/namespaces",
-  queryParams: ["sourceID"],
+  queryParams: ["sourceID"]
 };
 
-export const LinkGetTables: IEndpoint<
-  { sourceID: number; namespace: string },
-  GetTablesResponse
-> = {
+export const LinkGetTables: IEndpoint<{ sourceID: number, namespace: string; }, GetTablesResponse> = {
   name: "Tables Fetched",
   method: "GET",
   path: "/link/tables",
   queryParams: ["sourceID", "namespace"],
 };
 
-export const LinkGetSchema: IEndpoint<LinkGetSchemaRequest, GetSchemaResponse> =
-  {
-    name: "Schema Fetched",
-    method: "GET",
-    path: "/link/schema",
-    queryParams: ["sourceID", "namespace", "tableName", "customJoin"],
-  };
+export const LinkGetSchema: IEndpoint<LinkGetSchemaRequest, GetSchemaResponse> = {
+  name: "Schema Fetched",
+  method: "GET",
+  path: "/link/schema",
+  queryParams: ["sourceID", "namespace", "tableName", "customJoin"],
+};
 
 export const GetApiKey: IEndpoint<undefined, string> = {
   name: "API Key Fetched",
@@ -163,29 +147,20 @@ export const Logout: IEndpoint<undefined, undefined> = {
   track: true,
 };
 
-export const SetOrganization: IEndpoint<
-  SetOrganizationRequest,
-  SetOrganizationResponse
-> = {
+export const SetOrganization: IEndpoint<SetOrganizationRequest, SetOrganizationResponse> = {
   name: "Organization Set",
   method: "POST",
   path: "/organization",
   track: true,
 };
 
-export const TestDataConnection: IEndpoint<
-  TestDataConnectionRequest,
-  undefined
-> = {
+export const TestDataConnection: IEndpoint<TestDataConnectionRequest, undefined> = {
   name: "Test Data Connection",
   method: "POST",
   path: "/connection/test",
 };
 
-export const GetFieldValues: IEndpoint<
-  GetFieldValuesRequest,
-  GetFieldValuesResponse
-> = {
+export const GetFieldValues: IEndpoint<GetFieldValuesRequest, GetFieldValuesResponse> = {
   name: "Field Values Fetched",
   method: "GET",
   path: "/connection/field_values",
@@ -193,18 +168,15 @@ export const GetFieldValues: IEndpoint<
   track: true,
 };
 
-export const CreateDestination: IEndpoint<CreateDestinationRequest, undefined> =
-  {
-    name: "Destination Created",
-    method: "POST",
-    path: "/destination",
-    track: true,
-  };
+export const CreateDestination: IEndpoint<CreateDestinationRequest, undefined> = {
+  name: "Destination Created",
+  method: "POST",
+  path: "/destination",
+  track: true,
+};
 
-export const LinkCreateSource: IEndpoint<
-  LinkCreateSourceRequest,
-  CreateSourceResponse
-> = {
+
+export const LinkCreateSource: IEndpoint<LinkCreateSourceRequest, CreateSourceResponse> = {
   name: "Source Created",
   method: "POST",
   path: "/link/source",
@@ -216,12 +188,9 @@ export const RunSync: IEndpoint<RunSyncRequest, RunSyncResponse> = {
   method: "POST",
   path: "/sync/:syncID/run",
   track: true,
-};
+}
 
-export const LinkCreateSync: IEndpoint<
-  LinkCreateSyncRequest,
-  CreateSyncResponse
-> = {
+export const LinkCreateSync: IEndpoint<LinkCreateSyncRequest, CreateSyncResponse> = {
   name: "Sync Created",
   method: "POST",
   path: "/link/sync",
@@ -235,7 +204,7 @@ export const LinkGetSyncs: IEndpoint<undefined, GetSyncsResponse> = {
   track: true,
 };
 
-export const LinkGetSync: IEndpoint<{ syncID: number }, GetSyncResponse> = {
+export const LinkGetSync: IEndpoint<{ syncID: number; }, GetSyncResponse> = {
   name: "Sync Fetched",
   method: "GET",
   path: "/link/sync/:syncID",
@@ -249,10 +218,7 @@ export const CreateObject: IEndpoint<CreateObjectRequest, undefined> = {
   track: true,
 };
 
-export const CreateLinkToken: IEndpoint<
-  CreateLinkTokenRequest,
-  CreateLinkTokenResponse
-> = {
+export const CreateLinkToken: IEndpoint<CreateLinkTokenRequest, CreateLinkTokenResponse> = {
   name: "Link Token Created",
   method: "POST",
   path: "/link_token",
@@ -419,7 +385,7 @@ export interface RunSyncRequest {}
 export interface RunSyncResponse {
   sync: Sync;
   next_run_time: string;
-  result: "success" | "failure";
+  result: "success" | "failure"
 }
 
 export interface LinkCreateSyncRequest {
@@ -454,22 +420,27 @@ export interface GetSyncResponse {
   sync_runs: SyncRun[];
 }
 
-export type JSONValue = string | number | boolean | JSONObject | JSONArray;
+export type JSONValue =
+  | string
+  | number
+  | boolean
+  | JSONObject
+  | JSONArray;
 
 export interface JSONObject {
   [x: string]: JSONValue;
 }
 
-export interface JSONArray extends Array<JSONValue> {}
+export interface JSONArray extends Array<JSONValue> { }
 
-export interface ResultRow extends Array<string | number> {}
+export interface ResultRow extends Array<string | number> { }
 
 export interface Field {
   name: string;
   type: FieldType;
 }
 
-export interface Schema extends Array<Field> {}
+export interface Schema extends Array<Field> { }
 
 export interface LinkGetPreviewRequest {
   source_id: number;
@@ -570,17 +541,17 @@ export interface GetTablesResponse {
 }
 
 export interface GetSchemaRequest {
-  connectionID: number;
-  namespace?: string;
-  tableName?: string;
-  customJoin?: string;
+  connectionID: number,
+  namespace?: string,
+  tableName?: string,
+  customJoin?: string,
 }
 
 export interface LinkGetSchemaRequest {
-  sourceID: number;
-  namespace?: string;
-  tableName?: string;
-  customJoin?: string;
+  sourceID: number,
+  namespace?: string,
+  tableName?: string,
+  customJoin?: string,
 }
 
 export interface QueryResults {
@@ -606,7 +577,7 @@ export interface Organization {
 
 export interface CheckSessionResponse {
   user: User;
-  organization?: Organization;
+  organization?: Organization,
   suggested_organizations?: Organization[];
 }
 
@@ -715,10 +686,7 @@ export const needsEndCustomerId = (targetType: TargetType): boolean => {
   }
 };
 
-export const shouldCreateFields = (
-  destinationType: ConnectionType,
-  targetType: TargetType
-): boolean => {
+export const shouldCreateFields = (destinationType: ConnectionType, targetType: TargetType): boolean => {
   // no default so it isn"t possible to add a new mode without updating
   if (destinationType === ConnectionType.Webhook) {
     return true;
