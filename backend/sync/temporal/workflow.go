@@ -16,6 +16,16 @@ type SyncInput struct {
 	SyncID         int64
 }
 
+var START_SYNC_OPTIONS = workflow.ActivityOptions{
+	StartToCloseTimeout: time.Minute * 3,
+	RetryPolicy: &temporal.RetryPolicy{
+		InitialInterval:    time.Second,
+		BackoffCoefficient: 2.0,
+		MaximumInterval:    time.Minute,
+		MaximumAttempts:    3,
+	},
+}
+
 var FETCH_OPTIONS = workflow.ActivityOptions{
 	StartToCloseTimeout: time.Minute * 2,
 	RetryPolicy: &temporal.RetryPolicy{
@@ -61,17 +71,17 @@ var CURSOR_OPTIONS = workflow.ActivityOptions{
 func SyncWorkflow(ctx workflow.Context, input SyncInput) error {
 	var a *Activities // Temporal handles calling the registered activity object
 
+	startSyncCtx := workflow.WithActivityOptions(ctx, START_SYNC_OPTIONS)
 	recordCtx := workflow.WithActivityOptions(ctx, RECORD_OPTIONS)
 	fetchCtx := workflow.WithActivityOptions(ctx, FETCH_OPTIONS)
 	replicateCtx := workflow.WithActivityOptions(ctx, REPLICATE_OPTIONS)
 	cursorCtx := workflow.WithActivityOptions(ctx, CURSOR_OPTIONS)
 
 	var syncRun models.SyncRun
-	err := workflow.ExecuteActivity(recordCtx, a.RecordStatus, RecordStatusInput{
+	err := workflow.ExecuteActivity(startSyncCtx, a.StartSync, StartSyncInput{
 		OrganizationID: input.OrganizationID,
 		SyncID:         input.SyncID,
-		UpdateType:     UpdateTypeCreate,
-	}).Get(recordCtx, &syncRun)
+	}).Get(startSyncCtx, &syncRun)
 	if err != nil {
 		return err
 	}

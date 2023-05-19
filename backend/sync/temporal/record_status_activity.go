@@ -29,7 +29,7 @@ type RecordStatusInput struct {
 func (a *Activities) RecordStatus(ctx context.Context, input RecordStatusInput) (*models.SyncRun, error) {
 	switch input.UpdateType {
 	case UpdateTypeCreate:
-		return sync_runs.CreateSyncRun(a.Db, input.OrganizationID, input.SyncID)
+		return sync_runs.QueueSyncRun(a.Db, input.OrganizationID, input.SyncID)
 	case UpdateTypeStart:
 		return sync_runs.StartSyncRun(a.Db, &input.SyncRun)
 	case UpdateTypeComplete:
