@@ -36,7 +36,7 @@ func (s ApiService) RunSync(auth auth.Authentication, w http.ResponseWriter, r *
 		return err
 	}
 
-	_syncRun, err := sync_runs.CreateSyncRun(s.db, auth.Organization.ID, syncId)
+	_, err = sync_runs.QueueSyncRun(s.db, auth.Organization.ID, syncId)
 	if err != nil {
 		return err
 	}
