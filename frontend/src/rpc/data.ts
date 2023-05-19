@@ -77,7 +77,7 @@ export function useTables(connectionID: number | undefined, namespace: string | 
 
 export function useSyncs() {
   const fetcher: Fetcher<GetSyncsResponse, {}> = () => sendRequest(GetSyncs);
-  const { data, mutate, error, isLoading, isValidating } = useSWR({ GetSyncs }, fetcher);
+  const { data, mutate, error, isLoading, isValidating } = useSWR({ GetSyncs }, fetcher, { refreshInterval: 1000 });
   return { syncs: data?.syncs, objects: data?.objects, sources: data?.sources, mutate, error, loading: isLoading || isValidating };
 }
 
