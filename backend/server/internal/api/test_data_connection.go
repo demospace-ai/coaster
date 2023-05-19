@@ -152,7 +152,7 @@ func testSnowflakeConnection(snowflakeConfig input.SnowflakeConfig) error {
 
 func testRedshiftConnection(redshiftConfig input.RedshiftConfig) error {
 	params := url.Values{}
-	params.Add("sslmode", "")
+	params.Add("sslmode", "required")
 	params.Add("connect_timeout", "5")
 
 	dsn := url.URL{

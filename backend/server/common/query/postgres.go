@@ -60,7 +60,7 @@ func (it *postgresIterator) Schema() data.Schema {
 
 func (pc PostgresApiClient) openConnection(ctx context.Context) (*sql.DB, error) {
 	params := url.Values{}
-	params.Add("sslmode", "disable")
+	params.Add("sslmode", "required")
 	dsn := url.URL{
 		Scheme:   "postgres",
 		User:     url.UserPassword(pc.Username, pc.Password),
