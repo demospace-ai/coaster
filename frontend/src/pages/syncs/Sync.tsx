@@ -8,7 +8,7 @@ import { BackButton } from "src/components/button/Button";
 import { DotsLoading, Loading } from "src/components/loading/Loading";
 import { EmptyTable } from "src/components/table/Table";
 import { Tooltip } from "src/components/tooltip/Tooltip";
-import { RunSync, GetSyncs, SyncRunStatus } from "src/rpc/api";
+import { RunSync, GetSync, SyncRunStatus } from "src/rpc/api";
 import { useSync } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
 import { sendRequest } from "../../rpc/ajax";
