@@ -6,7 +6,7 @@ import { useSyncs } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
 
 const tableHeaderStyle = "tw-sticky tw-top-0 tw-z-0 tw-border-b tw-border-slate-300 tw-py-3.5 tw-pl-3 tw-text-left tw-whitespace-nowrap";
-const tableCellStyle = "tw-whitespace-nowrap tw-left tw-pl-3 tw-min-w-[200px] tw-py-4 tw-text-sm tw-text-slate-800";
+const tableCellStyle = "tw-whitespace-nowrap tw-left tw-pl-3 tw-min-w-[200px] tw-h-16 tw-text-sm tw-text-slate-800";
 
 export const Syncs: React.FC = () => {
   const navigate = useNavigate();
@@ -37,7 +37,7 @@ export const Syncs: React.FC = () => {
                 const object = objectIdMap.get(sync.object_id);
                 const source = sourceIdMap.get(sync.source_id);
                 return (
-                  <tr key={index} className="tw-border-b tw-border-solid tw-border-slate-200 last:tw-border-0 tw-cursor-pointer hover:tw-bg-slate-50" onClick={() => navigate(`/sync/${sync.id}`)}>
+                  <tr key={index} className="gtw-border-b tw-border-solid tw-border-slate-200 last:tw-border-0 tw-cursor-pointer hover:tw-bg-slate-50" onClick={() => navigate(`/sync/${sync.id}`)}>
                     <td className={tableCellStyle}>
                       {sync.display_name}
                     </td>

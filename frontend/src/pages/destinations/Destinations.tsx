@@ -12,7 +12,7 @@ import { useDestinations } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
 
 const tableHeaderStyle = "tw-sticky tw-top-0 tw-z-0 tw-border-b tw-border-slate-300 tw-py-3.5 tw-pr-4 tw-pl-3 sm:tw-pr-6 lg:tw-pr-8 tw-text-left";
-const tableCellStyle = "tw-whitespace-nowrap tw-px-3 tw-py-4 tw-text-sm tw-text-slate-800 tw-hidden sm:tw-table-cell";
+const tableCellStyle = "tw-whitespace-nowrap tw-px-3 tw-h-16 tw-text-sm tw-text-slate-800 tw-hidden sm:tw-table-cell";
 
 enum Step {
   Initial,
