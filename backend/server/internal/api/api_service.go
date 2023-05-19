@@ -114,7 +114,7 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 		{
 			Name:        "Run sync",
 			Method:      router.POST,
-			Pattern:     "/sync/{syncID}/run",
+			Pattern:     "/sync/{syncID}",
 			HandlerFunc: s.RunSync,
 		},
 		{
