@@ -1,7 +1,11 @@
-import { ChevronRightIcon } from "@heroicons/react/24/outline";
+import {
+  ChevronRightIcon,
+  CheckIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 import { useNavigate, useParams } from "react-router-dom";
 import { BackButton } from "src/components/button/Button";
-import { DotsLoading } from "src/components/loading/Loading";
+import { DotsLoading, Loading } from "src/components/loading/Loading";
 import { EmptyTable } from "src/components/table/Table";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { RunSync, GetSyncs, SyncRunStatus } from "src/rpc/api";
@@ -28,19 +32,35 @@ export const Sync: React.FC = () => {
 
   const handleRunSync = async () => {
     setIsLoading(true);
-
     try {
-      await sendRequest(RunSync, { syncID })
+      await sendRequest(RunSync, { syncID });
       mutate({ GetSyncs });
-      console.log("Mutated");
-      // await new Promise(resolve => setTimeout(resolve, 3000));
       setRunSyncResult("Success");
     } catch (err) {
       console.error(err);
       setRunSyncResult("Failure");
+    } finally {
+      setTimeout(() => {
+        setRunSyncResult(null);
+      }, 2000);
+    }
+    setIsLoading(false);
+  };
+
+  const renderButtonStatus = () => {
+    if (isLoading) {
+      return <Loading light className="tw-w-4 tw-h-4" />;
     }
 
-    setIsLoading(false);
+    if (runSyncResult === "Success") {
+      return <CheckIcon className="tw-w-4 tw-h-4 tw-text-green-500" />;
+    }
+
+    if (runSyncResult === "Failure") {
+      return <XMarkIcon className="tw-w-4 tw-h-4 tw-text-red-500" />;
+    }
+
+    return null;
   };
 
   return (
@@ -50,12 +70,19 @@ export const Sync: React.FC = () => {
         <div className="tw-flex tw-flex-row tw-w-full tw-items-center tw-font-bold tw-text-lg tw-justify-between">
           <div>{sync?.sync.display_name}</div>
           <div>
-            {runSyncResult}
             <button
-              className="tw-ml-auto tw-px-4 tw-py-2 tw-rounded-md tw-font-medium tw-text-base tw-bg-blue-600 hover:tw-bg-blue-500 tw-text-white tw-mr-2"
+              disabled={isLoading}
+              className="tw-ml-auto tw-px-8 tw-py-2 tw-rounded-md tw-font-medium tw-text-base tw-bg-blue-600 hover:tw-bg-blue-500 tw-text-white tw-mr-2 tw-relative disabled:tw-bg-gray-500"
               onClick={handleRunSync}
             >
+<<<<<<< HEAD
               {isLoading ? "Triggering..." : "Sync"}
+=======
+              <div className="tw-absolute tw-left-2 tw-top-1/2 tw-transform -tw-translate-y-1/2">
+                {renderButtonStatus()}
+              </div>
+              Sync
+>>>>>>> 171eb93 (Update the button)
             </button>
             <button
               className="tw-ml-auto tw-px-4 tw-py-2 tw-rounded-md tw-font-medium tw-text-base hover:tw-bg-slate-100 tw-text-blue-600"
