@@ -8,11 +8,10 @@ import { BackButton } from "src/components/button/Button";
 import { DotsLoading, Loading } from "src/components/loading/Loading";
 import { EmptyTable } from "src/components/table/Table";
 import { Tooltip } from "src/components/tooltip/Tooltip";
-import { RunSync, GetSyncs, SyncRunStatus } from "src/rpc/api";
+import { RunSync, GetSync, SyncRunStatus } from "src/rpc/api";
 import { useSync } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
 import { sendRequest } from "../../rpc/ajax";
-import { mutate } from "swr";
 import { useState } from "react";
 
 const tableHeaderStyle =
@@ -23,7 +22,7 @@ const tableCellStyle =
 export const Sync: React.FC = () => {
   const navigate = useNavigate();
   const { syncID } = useParams<{ syncID: string }>();
-  const { sync } = useSync(Number(syncID));
+  const { sync, mutate } = useSync(Number(syncID));
   const syncRuns = sync?.sync_runs ? sync.sync_runs : [];
   const [runSyncResult, setRunSyncResult] = useState<
     "Success" | "Failure" | null
@@ -34,7 +33,7 @@ export const Sync: React.FC = () => {
     setIsLoading(true);
     try {
       await sendRequest(RunSync, { syncID });
-      mutate({ GetSyncs });
+      mutate();
       setRunSyncResult("Success");
     } catch (err) {
       console.error(err);

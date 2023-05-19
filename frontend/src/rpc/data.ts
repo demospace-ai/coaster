@@ -82,9 +82,9 @@ export function useSyncs() {
 }
 
 export function useSync(syncID: number | undefined) {
-  const shouldFetch = syncID;
+  const shouldFetch = !!syncID;
   const fetcher: Fetcher<GetSyncResponse, { syncID: number; }> = (payload: { syncID: number; }) => sendRequest(GetSync, payload);
-  const { data, mutate, error, isLoading, isValidating } = useSWR(shouldFetch ? { GetSync: GetSync, syncID } : null, fetcher);
+  const { data, mutate, error, isLoading, isValidating } = useSWR(shouldFetch ? { GetSync, syncID } : null, fetcher);
   return { sync: data, mutate, error, loading: isLoading || isValidating };
 }
 
