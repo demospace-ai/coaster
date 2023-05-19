@@ -13,9 +13,13 @@ import (
 	"go.temporal.io/sdk/client"
 )
 
-func (s ApiService) RunSync(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) LinkRunSync(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
 		return errors.NewBadRequest("must setup organization first")
+	}
+
+	if auth.LinkToken == nil {
+		return errors.NewBadRequest("must send link token")
 	}
 
 	vars := mux.Vars(r)
@@ -29,8 +33,8 @@ func (s ApiService) RunSync(auth auth.Authentication, w http.ResponseWriter, r *
 		return err
 	}
 
-	// check the sync belongs to the right organization
-	sync, err := syncs.LoadSyncByID(s.db, auth.Organization.ID, syncId)
+	// check the sync belongs to the right organization and customer
+	sync, err := syncs.LoadSyncByIDAndCustomer(s.db, auth.Organization.ID, auth.LinkToken.EndCustomerID, syncId)
 	if err != nil {
 		return err
 	}

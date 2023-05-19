@@ -259,7 +259,7 @@ func testMongoDbConnection(mongodbConfig input.MongoDbConfig) error {
 
 func testPostgresConnection(postgresConfig input.PostgresConfig) error {
 	params := url.Values{}
-	params.Add("sslmode", "disable")
+	params.Add("sslmode", "require")
 	params.Add("connect_timeout", "5")
 
 	dsn := url.URL{
@@ -269,7 +269,6 @@ func testPostgresConnection(postgresConfig input.PostgresConfig) error {
 		Path:     postgresConfig.DatabaseName,
 		RawQuery: params.Encode(),
 	}
-	fmt.Printf("dsn: %s\n", dsn.String())
 
 	db, err := sql.Open("postgres", dsn.String())
 	if err != nil {

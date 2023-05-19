@@ -211,6 +211,13 @@ export const LinkGetSync: IEndpoint<{ syncID: number; }, GetSyncResponse> = {
   track: true,
 };
 
+export const LinkRunSync: IEndpoint<{ syncID: string }, RunSyncResponse> = {
+  name: "Sync Run",
+  method: "POST",
+  path: "/link/sync/:syncID/run",
+  track: true,
+}
+
 export const CreateObject: IEndpoint<CreateObjectRequest, undefined> = {
   name: "Object Created",
   method: "POST",

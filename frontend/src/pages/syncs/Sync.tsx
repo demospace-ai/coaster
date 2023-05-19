@@ -1,18 +1,18 @@
 import {
-  ChevronRightIcon,
   CheckIcon,
+  ChevronRightIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { BackButton } from "src/components/button/Button";
 import { DotsLoading, Loading } from "src/components/loading/Loading";
 import { EmptyTable } from "src/components/table/Table";
 import { Tooltip } from "src/components/tooltip/Tooltip";
-import { RunSync, GetSyncs, SyncRunStatus } from "src/rpc/api";
+import { RunSync, SyncRunStatus } from "src/rpc/api";
 import { useSync } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
 import { sendRequest } from "../../rpc/ajax";
-import { useState } from "react";
 
 const tableHeaderStyle =
   "tw-sticky tw-top-0 tw-z-0 tw-border-b tw-border-slate-300 tw-py-3.5 tw-px-4 sm:tw-pr-6 lg:tw-pr-8 tw-text-left tw-whitespace-nowrap";
@@ -70,20 +70,20 @@ export const Sync: React.FC = () => {
           <div>{sync?.sync.display_name}</div>
           <div>
             <button
+              className="tw-ml-auto tw-px-4 tw-py-2 tw-rounded-md tw-font-medium tw-text-base hover:tw-bg-slate-100 tw-text-blue-600 tw-mr-2"
+              onClick={() => {}}
+            >
+              Edit
+            </button>
+            <button
               disabled={isLoading}
-              className="tw-ml-auto tw-px-8 tw-py-2 tw-rounded-md tw-font-medium tw-text-base tw-bg-blue-600 hover:tw-bg-blue-500 tw-text-white tw-mr-2 tw-relative disabled:tw-bg-gray-500"
+              className="tw-ml-auto tw-px-8 tw-py-2 tw-rounded-md tw-font-medium tw-text-base tw-bg-blue-600 hover:tw-bg-blue-500 tw-text-white tw-relative disabled:tw-bg-gray-500"
               onClick={handleRunSync}
             >
               <div className="tw-absolute tw-left-2 tw-top-1/2 tw-transform -tw-translate-y-1/2">
                 {renderButtonStatus()}
               </div>
               Sync
-            </button>
-            <button
-              className="tw-ml-auto tw-px-4 tw-py-2 tw-rounded-md tw-font-medium tw-text-base hover:tw-bg-slate-100 tw-text-blue-600"
-              onClick={() => {}}
-            >
-              Edit
             </button>
           </div>
         </div>

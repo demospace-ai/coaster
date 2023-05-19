@@ -1,14 +1,23 @@
-import { ChevronRightIcon } from "@heroicons/react/24/outline";
+import {
+  CheckIcon,
+  ChevronRightIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 import classNames from "classnames";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { DotsLoading } from "src/components/loading/Loading";
+import { DotsLoading, Loading } from "src/components/loading/Loading";
 import { EmptyTable } from "src/components/table/Table";
 import { Tooltip } from "src/components/tooltip/Tooltip";
-import { SyncRunStatus } from "src/rpc/api";
+import { LinkRunSync, SyncRunStatus } from "src/rpc/api";
 import { useLinkSync } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
+import { sendLinkTokenRequest, sendRequest } from "../rpc/ajax";
 
-export const SyncRuns: React.FC<{ linkToken: string; close: (() => void) | undefined; }> = ({ linkToken, close }) => {
+export const SyncRuns: React.FC<{
+  linkToken: string;
+  close: (() => void) | undefined;
+}> = ({ linkToken, close }) => {
   return (
     <div className="tw-w-full tw-h-full tw-flex tw-flex-col">
       <Header close={close} />
@@ -18,43 +27,121 @@ export const SyncRuns: React.FC<{ linkToken: string; close: (() => void) | undef
   );
 };
 
-const tableHeaderStyle = "tw-sticky tw-top-0 tw-z-0 tw-py-3.5 tw-px-4 sm:tw-pr-6 lg:tw-pr-8 tw-text-left tw-whitespace-nowrap";
-const tableCellStyle = "tw-whitespace-nowrap tw-left tw-overflow-hidden tw-py-4 tw-pl-4 tw-text-sm tw-text-slate-800 tw-hidden sm:tw-table-cell";
+const tableHeaderStyle =
+  "tw-sticky tw-top-0 tw-z-0 tw-py-3.5 tw-px-4 sm:tw-pr-6 lg:tw-pr-8 tw-text-left tw-whitespace-nowrap";
+const tableCellStyle =
+  "tw-whitespace-nowrap tw-left tw-overflow-hidden tw-py-4 tw-pl-4 tw-text-sm tw-text-slate-800 tw-hidden sm:tw-table-cell";
 
-const SyncRunsList: React.FC<{ linkToken: string; }> = ({ linkToken }) => {
-  const { syncID } = useParams<{ syncID: string; }>();
-  const { sync } = useLinkSync(Number(syncID), linkToken);
-  const syncRuns = sync?.sync_runs ? sync.sync_runs : [];
+const SyncRunsList: React.FC<{ linkToken: string }> = ({ linkToken }) => {
+  const { syncID } = useParams<{ syncID: string }>();
+  const { sync, mutate } = useLinkSync(Number(syncID), linkToken);
+  const syncRuns = sync?.sync_runs ?? [];
+
+  const [runSyncResult, setRunSyncResult] = useState<
+    "Success" | "Failure" | null
+  >(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleRunSync = async () => {
+    setIsLoading(true);
+    try {
+      await sendLinkTokenRequest(LinkRunSync, linkToken, { syncID: syncID! });
+      mutate();
+      setRunSyncResult("Success");
+    } catch (err) {
+      console.error(err);
+      setRunSyncResult("Failure");
+    } finally {
+      setTimeout(() => {
+        setRunSyncResult(null);
+      }, 2000);
+    }
+    setIsLoading(false);
+  };
+
+  const renderButtonStatus = () => {
+    if (isLoading) {
+      return <Loading light className="tw-w-4 tw-h-4" />;
+    }
+
+    if (runSyncResult === "Success") {
+      return <CheckIcon className="tw-w-4 tw-h-4 tw-text-green-500" />;
+    }
+
+    if (runSyncResult === "Failure") {
+      return <XMarkIcon className="tw-w-4 tw-h-4 tw-text-red-500" />;
+    }
+
+    return null;
+  };
 
   return (
     <div className="tw-mt-2 tw-pb-16 tw-px-20 tw-flex tw-flex-col tw-overflow-auto">
       <div className="tw-flex tw-w-full tw-mb-8">
-        <div className="tw-flex tw-flex-row tw-w-full tw-items-center tw-font-bold tw-text-xl">
+        <div className="tw-flex tw-flex-row tw-w-full tw-items-center tw-font-bold tw-text-xl tw-justify-between">
           Sync Runs • {sync?.sync.display_name}
-          <button className="tw-ml-auto tw-px-4 tw-py-2 tw-rounded-md tw-font-medium tw-text-base hover:tw-bg-slate-100 tw-text-blue-600" onClick={() => { }}>Edit</button>
+          <div>
+            <button
+              className="tw-ml-auto tw-px-4 tw-py-2 tw-rounded-md tw-font-medium tw-text-base hover:tw-bg-slate-100 tw-text-blue-600 tw-mr-2"
+              onClick={() => {}}
+            >
+              Edit
+            </button>
+            <button
+              disabled={isLoading}
+              className="tw-ml-auto tw-px-8 tw-py-2 tw-rounded-md tw-font-medium tw-text-base tw-bg-blue-600 hover:tw-bg-blue-500 tw-text-white tw-mr-2 tw-relative disabled:tw-bg-gray-500"
+              onClick={handleRunSync}
+            >
+              <div className="tw-absolute tw-left-2 tw-top-1/2 tw-transform -tw-translate-y-1/2">
+                {renderButtonStatus()}
+              </div>
+              Sync
+            </button>
+          </div>
         </div>
       </div>
-      <div className="tw-shadow tw-ring-1 tw-ring-black tw-ring-opacity-5 tw-rounded-md tw-overflow-auto tw-overscroll-contain tw-w-full" >
-        {sync
-          ?
+      <div className="tw-shadow tw-ring-1 tw-ring-black tw-ring-opacity-5 tw-rounded-md tw-overflow-auto tw-overscroll-contain tw-w-full">
+        {sync ? (
           <table className="tw-min-w-full tw-border-spacing-0 tw-divide-y tw-divide-slate-200">
             <thead className="tw-sticky tw-top-0 tw-bg-slate-100">
               <tr>
-                <th scope="col" className={tableHeaderStyle}>Status</th>
-                <th scope="col" className={tableHeaderStyle}>Started At</th>
-                <th scope="col" className={tableHeaderStyle}>Rows Synced</th>
-                <th scope="col" className={tableHeaderStyle}>Error</th>
-                <th scope="col" className={classNames(tableHeaderStyle, "tw-w-5")}></th>
+                <th scope="col" className={tableHeaderStyle}>
+                  Status
+                </th>
+                <th scope="col" className={tableHeaderStyle}>
+                  Started At
+                </th>
+                <th scope="col" className={tableHeaderStyle}>
+                  Rows Synced
+                </th>
+                <th scope="col" className={tableHeaderStyle}>
+                  Error
+                </th>
+                <th
+                  scope="col"
+                  className={classNames(tableHeaderStyle, "tw-w-5")}
+                ></th>
               </tr>
             </thead>
             <tbody className="tw-divide-y tw-divide-slate-200 tw-bg-white">
-              {syncRuns.length > 0
-                ?
+              {syncRuns.length > 0 ? (
                 syncRuns.map((syncRun, index) => (
-                  <tr key={index} className="tw-cursor-pointer hover:tw-bg-slate-50" onClick={() => { }}>
+                  <tr
+                    key={index}
+                    className="tw-cursor-pointer hover:tw-bg-slate-50"
+                    onClick={() => {}}
+                  >
                     <td className={tableCellStyle}>
-                      <div className={mergeClasses("tw-flex tw-justify-center tw-items-center tw-py-1 tw-px-2 tw-rounded tw-text-center tw-w-[110px] tw-border tw-text-xs tw-font-medium", getStatusStyle(syncRun.status))}>
-                        {syncRun.status.toUpperCase()} {syncRun.status === SyncRunStatus.Running && <DotsLoading className="tw-ml-1.5" />}
+                      <div
+                        className={mergeClasses(
+                          "tw-flex tw-justify-center tw-items-center tw-py-1 tw-px-2 tw-rounded tw-text-center tw-w-[110px] tw-border tw-text-xs tw-font-medium",
+                          getStatusStyle(syncRun.status)
+                        )}
+                      >
+                        {syncRun.status.toUpperCase()}{" "}
+                        {syncRun.status === SyncRunStatus.Running && (
+                          <DotsLoading className="tw-ml-1.5" />
+                        )}
                       </div>
                     </td>
                     <td className={tableCellStyle}>
@@ -62,52 +149,76 @@ const SyncRunsList: React.FC<{ linkToken: string; }> = ({ linkToken }) => {
                         <div className="tw-font-medium tw-mb-0.5">
                           {syncRun.started_at}
                         </div>
-                        {syncRun.duration &&
+                        {syncRun.duration && (
                           <div className="tw-text-xs tw-text-slate-500">
                             Duration: {syncRun.duration}
                           </div>
-                        }
+                        )}
                       </div>
                     </td>
+                    <td className={tableCellStyle}>{syncRun.rows_written}</td>
                     <td className={tableCellStyle}>
-                      {syncRun.rows_written}
-                    </td>
-                    <td className={tableCellStyle}>
-                      <Tooltip label={<div className="tw-m-2 tw-cursor-text tw-font-mono">{syncRun.error}</div>} maxWidth={600} interactive>
+                      <Tooltip
+                        label={
+                          <div className="tw-m-2 tw-cursor-text tw-font-mono">
+                            {syncRun.error}
+                          </div>
+                        }
+                        maxWidth={600}
+                        interactive
+                      >
                         <div className="tw-overflow-hidden tw-text-ellipsis tw-max-w-[240px]">
                           {syncRun.error}
                         </div>
                       </Tooltip>
                     </td>
                     <td className={mergeClasses(tableCellStyle, "tw-pr-5")}>
-                      <ChevronRightIcon className="tw-ml-auto tw-h-4 tw-w-4 tw-text-slate-400" aria-hidden="true" />
+                      <ChevronRightIcon
+                        className="tw-ml-auto tw-h-4 tw-w-4 tw-text-slate-400"
+                        aria-hidden="true"
+                      />
                     </td>
                   </tr>
                 ))
-                :
-                <tr><td className={tableCellStyle}>No sync runs yet!</td></tr>
-              }
+              ) : (
+                <tr>
+                  <td className={tableCellStyle}>No sync runs yet!</td>
+                </tr>
+              )}
             </tbody>
           </table>
-          :
+        ) : (
           <EmptyTable />
-        }
+        )}
       </div>
     </div>
   );
 };
 
-const Header: React.FC<{ close: (() => void) | undefined; }> = ({ close }) => {
+const Header: React.FC<{ close: (() => void) | undefined }> = ({ close }) => {
   return (
-    <div className={classNames("tw-flex tw-flex-row tw-items-center tw-w-full", close ? "tw-h-20 tw-min-h-[80px]" : "tw-h-10 tw-min-h-[48px]")}>
-      {close &&
-        <button className="tw-absolute tw-flex tw-items-center t tw-right-10 tw-border-none tw-cursor-pointer tw-p-0" onClick={close}>
-          <svg className="tw-h-6 tw-fill-slate-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+    <div
+      className={classNames(
+        "tw-flex tw-flex-row tw-items-center tw-w-full",
+        close ? "tw-h-20 tw-min-h-[80px]" : "tw-h-10 tw-min-h-[48px]"
+      )}
+    >
+      {close && (
+        <button
+          className="tw-absolute tw-flex tw-items-center t tw-right-10 tw-border-none tw-cursor-pointer tw-p-0"
+          onClick={close}
+        >
+          <svg
+            className="tw-h-6 tw-fill-slate-500"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="none"
+          >
             <path d="M5.1875 15.6875L4.3125 14.8125L9.125 10L4.3125 5.1875L5.1875 4.3125L10 9.125L14.8125 4.3125L15.6875 5.1875L10.875 10L15.6875 14.8125L14.8125 15.6875L10 10.875L5.1875 15.6875Z" />
           </svg>
         </button>
-      }
-    </div >
+      )}
+    </div>
   );
 };
 
@@ -115,7 +226,12 @@ const Footer: React.FC = () => {
   const navigate = useNavigate();
   return (
     <div className="tw-flex tw-flex-row tw-w-full tw-h-20 tw-min-h-[80px] tw-border-t tw-border-slate-200 tw-mt-auto tw-items-center tw-px-20">
-      <button className="tw-border tw-border-slate-300 tw-font-medium tw-rounded-md tw-w-32 tw-h-10 tw-select-none hover:tw-bg-slate-100" onClick={() => navigate("/")}>Back</button>
+      <button
+        className="tw-border tw-border-slate-300 tw-font-medium tw-rounded-md tw-w-32 tw-h-10 tw-select-none hover:tw-bg-slate-100"
+        onClick={() => navigate("/")}
+      >
+        Back
+      </button>
     </div>
   );
 };

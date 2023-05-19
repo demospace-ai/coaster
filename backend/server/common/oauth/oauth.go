@@ -102,17 +102,12 @@ func FetchGithubInfo(code string) (*ExternalUserInfo, error) {
 
 func FetchGoogleInfo(code string) (*ExternalUserInfo, error) {
 	secretKey := getGoogleSecretKey()
-	fmt.Print("secret: ", secretKey)
 	googleClientSecret, err := secret.FetchSecret(context.TODO(), secretKey)
 	if err != nil {
-		fmt.Print("Failed to fetch secret: ", err)
 		return nil, err
 	}
 
-	fmt.Print("googleClientSecret: ", *googleClientSecret)
-
 	clientId := getGoogleClientID()
-	fmt.Print("clientId: ", clientId)
 	oauthConf := &oauth2.Config{
 		ClientID:     clientId,
 		ClientSecret: *googleClientSecret,
