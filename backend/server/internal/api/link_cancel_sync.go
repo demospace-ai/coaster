@@ -48,7 +48,7 @@ func (s ApiService) LinkCancelSync(auth auth.Authentication, w http.ResponseWrit
 	err = c.CancelWorkflow(
 		ctx,
 		sync.WorkflowID,
-		"",
+		"", // Empty RunID will result in the currently running workflow to be cancelled
 	)
 	if err != nil {
 		return err

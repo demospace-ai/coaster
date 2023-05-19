@@ -12,7 +12,7 @@ export const EmptyTable: React.FC = () => {
         </tr>
       </thead>
       <tbody className="tw-divide-y tw-divide-slate-200 tw-bg-white">
-        <tr><td className={tableCellStyle}><Loading className="tw-my-24" /></td></tr>
+        <tr><td className={tableCellStyle}><Loading className="tw-my-10" /></td></tr>
       </tbody>
     </table>
   );

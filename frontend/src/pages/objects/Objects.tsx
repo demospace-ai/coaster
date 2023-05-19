@@ -70,7 +70,7 @@ const ObjectList: React.FC<{ setStep: (step: Step) => void; }> = ({ setStep }) =
                   <td className={tableCellStyle}>
                     {object.display_name}
                   </td>
-                  <td className={mergeClasses(tableCellStyle, "tw-w-full tw-pr-5")}>
+                  <td className={mergeClasses(tableCellStyle, "tw-pr-5")}>
                     <ChevronRightIcon className="tw-ml-auto tw-h-4 tw-w-4 tw-text-slate-400" aria-hidden="true" />
                   </td>
                 </tr>

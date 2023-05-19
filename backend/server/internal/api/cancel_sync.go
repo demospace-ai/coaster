@@ -44,7 +44,7 @@ func (s ApiService) CancelSync(auth auth.Authentication, w http.ResponseWriter, 
 	err = c.CancelWorkflow(
 		ctx,
 		sync.WorkflowID,
-		"",
+		"", // Empty RunID will result in the currently running workflow to be cancelled
 	)
 	if err != nil {
 		return err
