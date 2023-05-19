@@ -3,7 +3,7 @@ import classNames from "classnames";
 import { ReactElement, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "src/components/button/Button";
-import { Loading } from "src/components/loading/Loading";
+import { EmptyTable } from "src/components/table/Table";
 import { NewObject } from "src/pages/objects/NewObject";
 import { useObjects } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
@@ -78,7 +78,7 @@ const ObjectList: React.FC<{ setStep: (step: Step) => void; }> = ({ setStep }) =
             </tbody>
           </table>
           :
-          <Loading className="tw-my-5" />
+          <EmptyTable />
         }
       </div>
     </>

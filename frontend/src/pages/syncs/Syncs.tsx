@@ -1,7 +1,7 @@
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
 import { ConnectionImage } from "src/components/images/Connections";
-import { Loading } from "src/components/loading/Loading";
+import { EmptyTable } from "src/components/table/Table";
 import { useSyncs } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
 
@@ -60,7 +60,7 @@ export const Syncs: React.FC = () => {
             </tbody>
           </table>
           :
-          <Loading className="tw-my-5" />
+          <EmptyTable />
         }
       </div>
     </div>

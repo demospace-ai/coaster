@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "src/components/button/Button";
 import { AddDatabase } from "src/components/icons/Icons";
 import { ConnectionImage } from "src/components/images/Connections";
-import { Loading } from "src/components/loading/Loading";
+import { EmptyTable } from "src/components/table/Table";
 import { LinkGetSyncs } from "src/rpc/api";
 import { useLinkSyncs } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
@@ -116,7 +116,7 @@ const SyncList: React.FC<{ linkToken: string; }> = ({ linkToken }) => {
             </tbody>
           </table>
           :
-          <Loading></Loading>
+          <EmptyTable />
         }
       </div>
     </div>

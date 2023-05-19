@@ -1,7 +1,8 @@
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import { useNavigate, useParams } from "react-router-dom";
-import { DotsLoading, Loading } from "src/components/loading/Loading";
+import { DotsLoading } from "src/components/loading/Loading";
+import { EmptyTable } from "src/components/table/Table";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { SyncRunStatus } from "src/rpc/api";
 import { useLinkSync } from "src/rpc/data";
@@ -47,44 +48,49 @@ const SyncRunsList: React.FC<{ linkToken: string; }> = ({ linkToken }) => {
               </tr>
             </thead>
             <tbody className="tw-divide-y tw-divide-slate-200 tw-bg-white">
-              {syncRuns.length > 0 ? syncRuns.map((syncRun, index) => (
-                <tr key={index} className="tw-cursor-pointer hover:tw-bg-slate-50" onClick={() => { }}>
-                  <td className={tableCellStyle}>
-                    <div className={mergeClasses("tw-flex tw-justify-center tw-items-center tw-py-1 tw-px-2 tw-rounded tw-text-center tw-w-[110px] tw-border tw-text-xs tw-font-medium", getStatusStyle(syncRun.status))}>
-                      {syncRun.status.toUpperCase()} {syncRun.status === SyncRunStatus.Running && <DotsLoading className="tw-ml-1.5" />}
-                    </div>
-                  </td>
-                  <td className={tableCellStyle}>
-                    <div>
-                      <div className="tw-font-medium tw-mb-0.5">
-                        {syncRun.started_at}
+              {syncRuns.length > 0
+                ?
+                syncRuns.map((syncRun, index) => (
+                  <tr key={index} className="tw-cursor-pointer hover:tw-bg-slate-50" onClick={() => { }}>
+                    <td className={tableCellStyle}>
+                      <div className={mergeClasses("tw-flex tw-justify-center tw-items-center tw-py-1 tw-px-2 tw-rounded tw-text-center tw-w-[110px] tw-border tw-text-xs tw-font-medium", getStatusStyle(syncRun.status))}>
+                        {syncRun.status.toUpperCase()} {syncRun.status === SyncRunStatus.Running && <DotsLoading className="tw-ml-1.5" />}
                       </div>
-                      {syncRun.duration &&
-                        <div className="tw-text-xs tw-text-slate-500">
-                          Duration: {syncRun.duration}
+                    </td>
+                    <td className={tableCellStyle}>
+                      <div>
+                        <div className="tw-font-medium tw-mb-0.5">
+                          {syncRun.started_at}
                         </div>
-                      }
-                    </div>
-                  </td>
-                  <td className={tableCellStyle}>
-                    {syncRun.rows_written}
-                  </td>
-                  <td className={tableCellStyle}>
-                    <Tooltip label={<div className="tw-m-2 tw-cursor-text tw-font-mono">{syncRun.error}</div>} maxWidth={600} interactive>
-                      <div className="tw-overflow-hidden tw-text-ellipsis tw-max-w-[240px]">
-                        {syncRun.error}
+                        {syncRun.duration &&
+                          <div className="tw-text-xs tw-text-slate-500">
+                            Duration: {syncRun.duration}
+                          </div>
+                        }
                       </div>
-                    </Tooltip>
-                  </td>
-                  <td className={mergeClasses(tableCellStyle, "tw-pr-5")}>
-                    <ChevronRightIcon className="tw-ml-auto tw-h-4 tw-w-4 tw-text-slate-400" aria-hidden="true" />
-                  </td>
-                </tr>
-              )) : <tr><td className={tableCellStyle}>No sync runs yet!</td></tr>}
+                    </td>
+                    <td className={tableCellStyle}>
+                      {syncRun.rows_written}
+                    </td>
+                    <td className={tableCellStyle}>
+                      <Tooltip label={<div className="tw-m-2 tw-cursor-text tw-font-mono">{syncRun.error}</div>} maxWidth={600} interactive>
+                        <div className="tw-overflow-hidden tw-text-ellipsis tw-max-w-[240px]">
+                          {syncRun.error}
+                        </div>
+                      </Tooltip>
+                    </td>
+                    <td className={mergeClasses(tableCellStyle, "tw-pr-5")}>
+                      <ChevronRightIcon className="tw-ml-auto tw-h-4 tw-w-4 tw-text-slate-400" aria-hidden="true" />
+                    </td>
+                  </tr>
+                ))
+                :
+                <tr><td className={tableCellStyle}>No sync runs yet!</td></tr>
+              }
             </tbody>
           </table>
           :
-          <Loading className="tw-my-5" />
+          <EmptyTable />
         }
       </div>
     </div>

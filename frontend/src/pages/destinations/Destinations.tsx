@@ -5,7 +5,7 @@ import { ReactElement, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "src/components/button/Button";
 import { ConnectionImage } from "src/components/images/Connections";
-import { Loading } from "src/components/loading/Loading";
+import { EmptyTable } from "src/components/table/Table";
 import { NewDestination } from "src/pages/destinations/NewDestination";
 import { getConnectionType } from "src/rpc/api";
 import { useDestinations } from "src/rpc/data";
@@ -87,7 +87,7 @@ const DestinationList: React.FC<{ setStep: (step: Step) => void; }> = ({ setStep
             </tbody>
           </table>
           :
-          <Loading className="tw-my-5" />
+          <EmptyTable />
         }
       </div>
     </>

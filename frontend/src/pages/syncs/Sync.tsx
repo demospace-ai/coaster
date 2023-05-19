@@ -1,7 +1,8 @@
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useNavigate, useParams } from "react-router-dom";
 import { BackButton } from "src/components/button/Button";
-import { DotsLoading, Loading } from "src/components/loading/Loading";
+import { DotsLoading } from "src/components/loading/Loading";
+import { EmptyTable } from "src/components/table/Table";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { SyncRunStatus } from "src/rpc/api";
 import { useSync } from "src/rpc/data";
@@ -76,7 +77,7 @@ export const Sync: React.FC = () => {
             </tbody>
           </table>
           :
-          <Loading className="tw-my-5" />
+          <EmptyTable />
         }
       </div>
     </div>
