@@ -26,24 +26,23 @@ func getTemporalNamespace() string {
 }
 
 func CreateClient(certPem string, certKey string) (client.Client, error) {
-	clientPem, err := secret.FetchSecret(context.TODO(), certPem)
-	if err != nil {
-		return nil, err
-	}
-
-	clientKey, err := secret.FetchSecret(context.TODO(), certKey)
-	if err != nil {
-		return nil, err
-	}
-
-	cert, err := tls.X509KeyPair([]byte(*clientPem), []byte(*clientKey))
-	if err != nil {
-		return nil, err
-	}
-
 	// Create the client object just once per process
 	var connectionOptions client.ConnectionOptions
 	if application.IsProd() {
+		clientPem, err := secret.FetchSecret(context.TODO(), certPem)
+		if err != nil {
+			return nil, err
+		}
+
+		clientKey, err := secret.FetchSecret(context.TODO(), certKey)
+		if err != nil {
+			return nil, err
+		}
+
+		cert, err := tls.X509KeyPair([]byte(*clientPem), []byte(*clientKey))
+		if err != nil {
+			return nil, err
+		}
 		connectionOptions = client.ConnectionOptions{
 			TLS: &tls.Config{
 				Certificates: []tls.Certificate{cert},

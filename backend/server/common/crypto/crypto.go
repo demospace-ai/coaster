@@ -106,7 +106,8 @@ func decrypt(keyName string, ciphertextString string) (*string, error) {
 	// TODO: decrypt with local keys here
 	// don't encrypt in dev
 	if !application.IsProd() {
-		return &ciphertextString, nil
+		ciphertextStr := string(ciphertext)
+		return &ciphertextStr, nil
 	}
 
 	ctx := context.Background()
