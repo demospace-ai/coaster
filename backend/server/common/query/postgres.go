@@ -68,7 +68,6 @@ func (pc PostgresApiClient) openConnection(ctx context.Context) (*sql.DB, error)
 		Path:     pc.DatabaseName,
 		RawQuery: params.Encode(),
 	}
-	fmt.Printf("DSN: %s\n", dsn.String())
 
 	return sql.Open("postgres", dsn.String())
 }

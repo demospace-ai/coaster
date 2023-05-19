@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"go.fabra.io/server/common/application"
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/input"
@@ -133,13 +132,7 @@ func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, 
 		return err
 	}
 
-	clientPem := CLIENT_PEM_KEY
-	clientKey := CLIENT_KEY_KEY
-	if !application.IsProd() {
-		// Todo: figure out what to do.
-
-	}
-	c, err := temporal.CreateClient(clientPem, clientKey)
+	c, err := temporal.CreateClient(CLIENT_PEM_KEY, CLIENT_KEY_KEY)
 	if err != nil {
 		return err
 	}
