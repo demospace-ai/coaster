@@ -8,3 +8,4 @@ export const mockStore = createMockStore();
 export function renderWithProvider<Props>(node: ReactElement<Props>, store: MockStore) {
   render(<Provider store={store}>{node}</Provider>);
 }
+

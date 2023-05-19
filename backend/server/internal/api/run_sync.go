@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/errors"
+	"go.fabra.io/server/common/repositories/sync_runs"
 	"go.fabra.io/server/common/repositories/syncs"
 	"go.fabra.io/sync/temporal"
 	"go.temporal.io/sdk/client"
@@ -31,6 +32,11 @@ func (s ApiService) RunSync(auth auth.Authentication, w http.ResponseWriter, r *
 
 	// check the sync belongs to the right organization
 	sync, err := syncs.LoadSyncByID(s.db, auth.Organization.ID, syncId)
+	if err != nil {
+		return err
+	}
+
+	_syncRun, err := sync_runs.CreateSyncRun(s.db, auth.Organization.ID, syncId)
 	if err != nil {
 		return err
 	}

@@ -45,6 +45,8 @@ func (s ApiService) OAuthLogin(w http.ResponseWriter, r *http.Request) error {
 
 	provider, err := oauth.ValidateState(state)
 	if err != nil {
+		print("error validating state")
+		println(err)
 		return err
 	}
 
@@ -58,6 +60,8 @@ func (s ApiService) OAuthLogin(w http.ResponseWriter, r *http.Request) error {
 		return errors.New("unexpected provider")
 	}
 	if err != nil {
+		print("error fetching external user info")
+		println(err)
 		return err
 	}
 
