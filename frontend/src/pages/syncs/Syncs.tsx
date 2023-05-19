@@ -37,7 +37,7 @@ export const Syncs: React.FC = () => {
                 const object = objectIdMap.get(sync.object_id);
                 const source = sourceIdMap.get(sync.source_id);
                 return (
-                  <tr key={index} className="gtw-border-b tw-border-solid tw-border-slate-200 last:tw-border-0 tw-cursor-pointer hover:tw-bg-slate-50" onClick={() => navigate(`/sync/${sync.id}`)}>
+                  <tr key={index} className="tw-border-b tw-border-solid tw-border-slate-200 last:tw-border-0 tw-cursor-pointer hover:tw-bg-slate-50" onClick={() => navigate(`/sync/${sync.id}`)}>
                     <td className={tableCellStyle}>
                       {sync.display_name}
                     </td>
