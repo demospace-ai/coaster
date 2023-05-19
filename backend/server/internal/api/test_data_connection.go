@@ -152,7 +152,7 @@ func testSnowflakeConnection(snowflakeConfig input.SnowflakeConfig) error {
 
 func testRedshiftConnection(redshiftConfig input.RedshiftConfig) error {
 	params := url.Values{}
-	params.Add("sslmode", "required")
+	params.Add("sslmode", "require")
 	params.Add("connect_timeout", "5")
 
 	dsn := url.URL{
@@ -195,7 +195,7 @@ func testRedshiftConnection(redshiftConfig input.RedshiftConfig) error {
 func testSynapseConnection(synapseConfig input.SynapseConfig) error {
 	params := url.Values{}
 	params.Add("database", synapseConfig.DatabaseName)
-	params.Add("sslmode", "required")
+	params.Add("sslmode", "require")
 	params.Add("TrustServerCertificate", "true")
 	params.Add("dial timeout", "3")
 
