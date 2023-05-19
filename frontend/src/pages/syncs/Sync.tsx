@@ -74,6 +74,7 @@ export const Sync: React.FC = () => {
               className="tw-ml-auto tw-px-8 tw-py-2 tw-rounded-md tw-font-medium tw-text-base tw-bg-blue-600 hover:tw-bg-blue-500 tw-text-white tw-mr-2 tw-relative disabled:tw-bg-gray-500"
               onClick={handleRunSync}
             >
+
               <div className="tw-absolute tw-left-2 tw-top-1/2 tw-transform -tw-translate-y-1/2">
                 {renderButtonStatus()}
               </div>
