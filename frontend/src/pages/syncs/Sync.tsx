@@ -30,9 +30,10 @@ export const Sync: React.FC = () => {
     setIsLoading(true);
 
     try {
-      await sendRequest(RunSync, { syncID });
-      await new Promise((resolve) => setTimeout(resolve, 3000));
+      await sendRequest(RunSync, { syncID })
       mutate({ GetSyncs });
+      console.log("Mutated");
+      // await new Promise(resolve => setTimeout(resolve, 3000));
       setRunSyncResult("Success");
     } catch (err) {
       console.error(err);
