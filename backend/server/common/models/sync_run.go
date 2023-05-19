@@ -9,6 +9,7 @@ import (
 type SyncRunStatus string
 
 const (
+	SyncRunStatusQueued    SyncRunStatus = "queued"
 	SyncRunStatusRunning   SyncRunStatus = "running"
 	SyncRunStatusFailed    SyncRunStatus = "failed"
 	SyncRunStatusCompleted SyncRunStatus = "completed"

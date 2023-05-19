@@ -175,12 +175,20 @@ export const CreateDestination: IEndpoint<CreateDestinationRequest, undefined> =
   track: true,
 };
 
+
 export const LinkCreateSource: IEndpoint<LinkCreateSourceRequest, CreateSourceResponse> = {
   name: "Source Created",
   method: "POST",
   path: "/link/source",
   track: true,
 };
+
+export const RunSync: IEndpoint<RunSyncRequest, RunSyncResponse> = {
+  name: "Sync Run",
+  method: "POST",
+  path: "/sync/:syncID/run",
+  track: true,
+}
 
 export const LinkCreateSync: IEndpoint<LinkCreateSyncRequest, CreateSyncResponse> = {
   name: "Sync Created",
@@ -370,6 +378,16 @@ export interface WebhookConfig {
 export interface HeaderInput {
   name: string;
   value: string;
+}
+
+export interface RunSyncRequest {
+
+}
+
+export interface RunSyncResponse {
+  sync: Sync;
+  next_run_time: string;
+  result: "success" | "failure"
 }
 
 export interface LinkCreateSyncRequest {

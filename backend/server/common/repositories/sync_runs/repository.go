@@ -29,6 +29,23 @@ func CreateSyncRun(
 	return &syncRun, nil
 }
 
+func StartSyncRun(
+	db *gorm.DB,
+	syncRun *models.SyncRun,
+) (*models.SyncRun, error) {
+	updates := models.SyncRun{
+		Status:    models.SyncRunStatusRunning,
+		StartedAt: time.Now(),
+	}
+
+	result := db.Model(syncRun).Updates(updates)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return syncRun, nil
+}
+
 func CompleteSyncRun(db *gorm.DB, syncRun *models.SyncRun, status models.SyncRunStatus, syncError *string, rowsWritten int) (*models.SyncRun, error) {
 	updates := models.SyncRun{
 		CompletedAt: time.Now(),
