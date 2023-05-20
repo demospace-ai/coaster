@@ -110,10 +110,10 @@ func SyncWorkflow(ctx workflow.Context, input SyncInput) error {
 		return err
 	}
 
-	workflow.Sleep(ctx, 5*time.Minute)
-	if ctx.Err() != nil {
-		return ctx.Err()
-	}
+	// workflow.Sleep(ctx, 5*time.Minute)
+	// if ctx.Err() != nil {
+	// 	return ctx.Err()
+	// }
 
 	var replicateOutput ReplicateOutput
 	replicateInput := ReplicateInput(syncConfig)
