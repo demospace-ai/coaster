@@ -16,6 +16,16 @@ type SyncInput struct {
 	SyncID         int64
 }
 
+var CLEANUP_OPTIONS = workflow.ActivityOptions{
+	StartToCloseTimeout: time.Second * 10,
+	RetryPolicy: &temporal.RetryPolicy{
+		InitialInterval:    time.Second,
+		BackoffCoefficient: 2.0,
+		MaximumInterval:    time.Minute,
+		MaximumAttempts:    3,
+	},
+}
+
 var FETCH_OPTIONS = workflow.ActivityOptions{
 	StartToCloseTimeout: time.Minute * 2,
 	RetryPolicy: &temporal.RetryPolicy{
@@ -60,11 +70,25 @@ var CURSOR_OPTIONS = workflow.ActivityOptions{
 
 func SyncWorkflow(ctx workflow.Context, input SyncInput) error {
 	var a *Activities // Temporal handles calling the registered activity object
-
 	recordCtx := workflow.WithActivityOptions(ctx, RECORD_OPTIONS)
 	fetchCtx := workflow.WithActivityOptions(ctx, FETCH_OPTIONS)
 	replicateCtx := workflow.WithActivityOptions(ctx, REPLICATE_OPTIONS)
 	cursorCtx := workflow.WithActivityOptions(ctx, CURSOR_OPTIONS)
+
+	logger := workflow.GetLogger(ctx)
+
+	defer func() {
+		if !errors.Is(ctx.Err(), workflow.ErrCanceled) {
+			return
+		}
+
+		newCtx, _ := workflow.NewDisconnectedContext(ctx)
+		cleanupCtx := workflow.WithActivityOptions(newCtx, CLEANUP_OPTIONS)
+		err := workflow.ExecuteActivity(cleanupCtx, a.Cleanup).Get(newCtx, nil)
+		if err != nil {
+			logger.Error("failed to cleanup sync workflow", "error", err)
+		}
+	}()
 
 	var syncRun models.SyncRun
 	err := workflow.ExecuteActivity(recordCtx, a.RecordStatus, RecordStatusInput{
@@ -84,6 +108,11 @@ func SyncWorkflow(ctx workflow.Context, input SyncInput) error {
 		// failing, and the reason for the workflow failing is the original error
 		recordFailure(recordCtx, err, syncRun)
 		return err
+	}
+
+	workflow.Sleep(ctx, 5*time.Minute)
+	if ctx.Err() != nil {
+		return ctx.Err()
 	}
 
 	var replicateOutput ReplicateOutput
