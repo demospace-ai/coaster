@@ -8,40 +8,33 @@ gcloud sql connect fabra-database-instance -d=fabra-db -u=db_user --quiet
 
 1. [Install Go here](https://go.dev/doc/install)
 
-2. Install PostgresQL:
+2. [Install Docker](https://docs.docker.com/get-docker/)
+
+3. Spin up the Dev Postgres Docker instance 
 
 ```
-brew install postgresql
+cd server/dev
+docker compose up # Runs it in the terminal
+docker compose up -d  # Detaches it so it runs in the background
+
+docker compose logs fabra_db # fabra_db is the service name, use this to view logs of a detached service.
 ```
 
-3. [Install Docker](https://docs.docker.com/get-docker/)
-
-4. Spin up a Postgres Docker container
+To spin down the container:
 
 ```
-docker pull postgres
-docker run -e POSTGRES_PASSWORD=password -p 5432:5432 -d postgres
+docker compose down # Stops container but doesn't delete DB
+docker compose down -v # Deletes all volumes, i.e. the DB, so you can recreate it
 ```
 
-5. Create the necessary users and permissions.
-
-```
-psql -h 0.0.0.0 -U postgres
-
-CREATE DATABASE fabra;
-CREATE USER fabra;
-ALTER USER fabra WITH SUPERUSER;
-ALTER USER fabra WITH PASSWORD 'fabra';
-```
-
-6. Setup initial tables (run this again when adding migrations).
+4. Setup initial tables (run this again when adding migrations).
 
 ```
 brew install golang-migrate
 make migrate
 ```
 
-7. Configure GCloud Secret Manager
+5. Configure GCloud Secret Manager
 
 You'll need to [install the gcloud CLI](https://cloud.google.com/sdk/docs/install).
 
@@ -49,7 +42,7 @@ You'll also need to be added to the Fabra Developer Google Cloud project. Ask Ni
 
 Once you've been added, you can login via `gcloud auth application-default login`.
 
-8. Build and run the server
+6. Build and run the server
 
 ```
 make
