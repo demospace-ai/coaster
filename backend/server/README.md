@@ -12,7 +12,7 @@ gcloud sql connect fabra-database-instance -d=fabra-db -u=db_user --quiet
 
 3. Spin up the Dev Postgres Docker instance 
 
-```
+```sh
 cd server/dev
 docker compose up # Runs it in the terminal
 docker compose up -d  # Detaches it so it runs in the background
@@ -22,14 +22,14 @@ docker compose logs fabra_db # fabra_db is the service name, use this to view lo
 
 To spin down the container:
 
-```
+```sh
 docker compose down # Stops container but doesn't delete DB
 docker compose down -v # Deletes all volumes, i.e. the DB, so you can recreate it
 ```
 
 4. Setup initial tables (run this again when adding migrations).
 
-```
+```sh
 brew install golang-migrate
 make migrate
 ```
@@ -44,7 +44,7 @@ Once you've been added, you can login via `gcloud auth application-default login
 
 6. Build and run the server
 
-```
+```sh
 make
 ./bin/server
 ```
@@ -54,12 +54,12 @@ make
 
 ### Notes
 When setting up a new GCP project, you may need to run:
-```
+```sh
 gcloud compute project-info add-metadata --metadata serial-port-logging-enable=true
 ```
 
 ### Adding migrations
 From the `backend/server` directory, run
-```
+```sh
 migrate create -ext sql -dir migrations -seq the-name-of-your-migration
 ```
