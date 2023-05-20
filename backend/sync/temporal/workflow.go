@@ -77,19 +77,6 @@ func SyncWorkflow(ctx workflow.Context, input SyncInput) error {
 
 	logger := workflow.GetLogger(ctx)
 
-	defer func() {
-		if !errors.Is(ctx.Err(), workflow.ErrCanceled) {
-			return
-		}
-
-		newCtx, _ := workflow.NewDisconnectedContext(ctx)
-		cleanupCtx := workflow.WithActivityOptions(newCtx, CLEANUP_OPTIONS)
-		err := workflow.ExecuteActivity(cleanupCtx, a.Cleanup).Get(newCtx, nil)
-		if err != nil {
-			logger.Error("failed to cleanup sync workflow", "error", err)
-		}
-	}()
-
 	var syncRun models.SyncRun
 	err := workflow.ExecuteActivity(recordCtx, a.RecordStatus, RecordStatusInput{
 		OrganizationID: input.OrganizationID,
@@ -99,6 +86,19 @@ func SyncWorkflow(ctx workflow.Context, input SyncInput) error {
 	if err != nil {
 		return err
 	}
+
+	defer func() {
+		if !errors.Is(ctx.Err(), workflow.ErrCanceled) {
+			return
+		}
+
+		newCtx, _ := workflow.NewDisconnectedContext(ctx)
+		cleanupCtx := workflow.WithActivityOptions(newCtx, CLEANUP_OPTIONS)
+		err := workflow.ExecuteActivity(cleanupCtx, a.Cleanup, syncRun).Get(newCtx, nil)
+		if err != nil {
+			logger.Error("failed to cleanup sync workflow", "error", err)
+		}
+	}()
 
 	var syncConfig SyncConfig
 	fetchInput := FetchConfigInput(input)
@@ -140,6 +140,15 @@ func SyncWorkflow(ctx workflow.Context, input SyncInput) error {
 	}
 
 	return recordSuccess(recordCtx, syncRun, replicateOutput.RowsWritten)
+}
+
+func recordCancel(ctx workflow.Context, syncRun models.SyncRun) error {
+	var a *Activities // Temporal handles calling the registered activity object
+	return workflow.ExecuteActivity(ctx, a.RecordStatus, RecordStatusInput{
+		UpdateType: UpdateTypeComplete,
+		SyncRun:    syncRun,
+		NewStatus:  models.SyncRunStatusCanceled,
+	}).Get(ctx, nil)
 }
 
 func recordFailure(ctx workflow.Context, err error, syncRun models.SyncRun) error {
