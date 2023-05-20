@@ -195,7 +195,7 @@ func testRedshiftConnection(redshiftConfig input.RedshiftConfig) error {
 func testSynapseConnection(synapseConfig input.SynapseConfig) error {
 	params := url.Values{}
 	params.Add("database", synapseConfig.DatabaseName)
-	params.Add("sslmode", "require")
+	params.Add("sslmode", "encrypt")
 	params.Add("TrustServerCertificate", "true")
 	params.Add("dial timeout", "3")
 
@@ -259,7 +259,7 @@ func testMongoDbConnection(mongodbConfig input.MongoDbConfig) error {
 
 func testPostgresConnection(postgresConfig input.PostgresConfig) error {
 	params := url.Values{}
-	params.Add("sslmode", "disable")
+	params.Add("sslmode", "require")
 	params.Add("connect_timeout", "5")
 
 	dsn := url.URL{

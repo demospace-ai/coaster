@@ -48,20 +48,6 @@ func CompleteSyncRun(db *gorm.DB, syncRun *models.SyncRun, status models.SyncRun
 	return syncRun, nil
 }
 
-func CancelSyncRun(db *gorm.DB, syncRun *models.SyncRun) (*models.SyncRun, error) {
-	updates := models.SyncRun{
-		Status:      models.SyncRunStatusCanceled,
-		CompletedAt: time.Now(),
-	}
-
-	result := db.Model(syncRun).Updates(updates)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-
-	return syncRun, nil
-}
-
 func LoadAllRunsForSync(db *gorm.DB, organizationID int64, syncID int64) ([]models.SyncRun, error) {
 	var syncRuns []models.SyncRun
 	result := db.Table("sync_runs").

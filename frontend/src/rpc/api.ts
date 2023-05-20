@@ -175,7 +175,6 @@ export const CreateDestination: IEndpoint<CreateDestinationRequest, undefined> =
   track: true,
 };
 
-
 export const LinkCreateSource: IEndpoint<LinkCreateSourceRequest, CreateSourceResponse> = {
   name: "Source Created",
   method: "POST",

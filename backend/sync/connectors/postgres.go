@@ -50,35 +50,28 @@ func (pg PostgresImpl) Read(
 	currentIndex := 0
 	var rowBatch []data.Row
 	var lastRow data.Row
-Loop:
 	for {
-		select {
-		case <-ctx.Done():
-			errC <- ctx.Err()
-			return
-		default:
-			row, err := iterator.Next(ctx)
-			if err != nil {
-				if err == data.ErrDone {
-					break Loop
-				} else {
-					errC <- err
-					return
-				}
+		row, err := iterator.Next(ctx)
+		if err != nil {
+			if err == data.ErrDone {
+				break
+			} else {
+				errC <- err
+				return
 			}
+		}
 
-			rowBatch = append(rowBatch, row)
-			lastRow = row
-			currentIndex++
-			if currentIndex == READ_BATCH_SIZE {
-				rowsC <- rowBatch
-				currentIndex = 0
-				rowBatch = []data.Row{}
-			}
+		rowBatch = append(rowBatch, row)
+		lastRow = row
+		currentIndex++
+		if currentIndex == READ_BATCH_SIZE {
+			rowsC <- rowBatch
+			currentIndex = 0
+			rowBatch = []data.Row{}
 		}
 	}
 
-	// write any remaining rows
+	// write any remaining roows
 	if currentIndex > 0 {
 		rowsC <- rowBatch
 	}
