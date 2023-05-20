@@ -81,6 +81,10 @@ func (a *Activities) Replicate(ctx context.Context, input ReplicateInput) (*Repl
 			readDone = true
 		case writeOutput = <-writeOutputC:
 			writeDone = true
+		case <-ctx.Done():
+			// This case will be selected when the context is cancelled
+			// Add cleanup code here if necessary
+			return nil, ctx.Err() // ctx.Err() will be workflow.ErrCanceled when the workflow is cancelled
 		}
 	}
 
