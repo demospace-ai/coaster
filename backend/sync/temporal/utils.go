@@ -26,7 +26,6 @@ func getTemporalNamespace() string {
 }
 
 func CreateClient(certPem string, certKey string) (client.Client, error) {
-
 	// Create the client object just once per process
 	var connectionOptions client.ConnectionOptions
 	if application.IsProd() {
