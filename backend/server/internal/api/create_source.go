@@ -33,30 +33,30 @@ type CreateSourceResponse struct {
 
 func (s ApiService) CreateSource(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.NewBadRequest("must setup organization first")
+		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "CreateSource")
 	}
 
 	decoder := json.NewDecoder(r.Body)
 	var createSourceRequest CreateSourceRequest
 	err := decoder.Decode(&createSourceRequest)
 	if err != nil {
-		return errors.NewCustomerVisibleError(err)
+		return errors.Wrap(errors.NewCustomerVisibleError(err), "CreateSource")
 	}
 
 	// TODO: validate connection parameters
 	validate := validator.New()
 	err = validate.Struct(createSourceRequest)
 	if err != nil {
-		return errors.NewCustomerVisibleError(err)
+		return errors.Wrap(errors.NewCustomerVisibleError(err), "CreateSource")
 	}
 
 	if createSourceRequest.EndCustomerID == nil {
-		return errors.NewBadRequest("must provide end customer ID")
+		return errors.Wrap(errors.NewBadRequest("must provide end customer ID"), "CreateSource")
 	}
 
 	source, connection, err := s.createSource(auth, createSourceRequest, *createSourceRequest.EndCustomerID)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "CreateSource")
 	}
 
 	return json.NewEncoder(w).Encode(CreateSourceResponse{
@@ -81,7 +81,7 @@ func (s ApiService) createSource(auth auth.Authentication, createSourceRequest C
 	case models.ConnectionTypeSnowflake:
 		encryptedCredentials, err = s.cryptoService.EncryptConnectionCredentials(createSourceRequest.SnowflakeConfig.Password)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, errors.Wrap(err, "createSource")
 		}
 		connection, err = connections.CreateSnowflakeConnection(
 			s.db, auth.Organization.ID, *createSourceRequest.SnowflakeConfig, *encryptedCredentials,
@@ -89,7 +89,7 @@ func (s ApiService) createSource(auth auth.Authentication, createSourceRequest C
 	case models.ConnectionTypeRedshift:
 		encryptedCredentials, err = s.cryptoService.EncryptConnectionCredentials(createSourceRequest.RedshiftConfig.Password)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, errors.Wrap(err, "createSource")
 		}
 		connection, err = connections.CreateRedshiftConnection(
 			s.db, auth.Organization.ID, *createSourceRequest.RedshiftConfig, *encryptedCredentials,
@@ -97,7 +97,7 @@ func (s ApiService) createSource(auth auth.Authentication, createSourceRequest C
 	case models.ConnectionTypeMongoDb:
 		encryptedCredentials, err = s.cryptoService.EncryptConnectionCredentials(createSourceRequest.MongoDbConfig.Password)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, errors.Wrap(err, "createSource")
 		}
 		connection, err = connections.CreateMongoDbConnection(
 			s.db, auth.Organization.ID, *createSourceRequest.MongoDbConfig, *encryptedCredentials,
@@ -105,7 +105,7 @@ func (s ApiService) createSource(auth auth.Authentication, createSourceRequest C
 	case models.ConnectionTypeSynapse:
 		encryptedCredentials, err = s.cryptoService.EncryptConnectionCredentials(createSourceRequest.SynapseConfig.Password)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, errors.Wrap(err, "createSource")
 		}
 		connection, err = connections.CreateSynapseConnection(
 			s.db, auth.Organization.ID, *createSourceRequest.SynapseConfig, *encryptedCredentials,
@@ -113,17 +113,17 @@ func (s ApiService) createSource(auth auth.Authentication, createSourceRequest C
 	case models.ConnectionTypePostgres:
 		encryptedCredentials, err = s.cryptoService.EncryptConnectionCredentials(createSourceRequest.PostgresConfig.Password)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, errors.Wrap(err, "createSource")
 		}
 		connection, err = connections.CreatePostgresConnection(
 			s.db, auth.Organization.ID, *createSourceRequest.PostgresConfig, *encryptedCredentials,
 		)
 	default:
-		return nil, nil, errors.Newf("unsupported connection type: %s", createSourceRequest.ConnectionType)
+		return nil, nil, errors.Wrap(errors.Newf("unsupported connection type: %s", createSourceRequest.ConnectionType), "createSource")
 	}
 
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, errors.Wrap(err, "createSource")
 	}
 
 	source, err := sources.CreateSource(
@@ -134,7 +134,7 @@ func (s ApiService) createSource(auth auth.Authentication, createSourceRequest C
 		connection.ID,
 	)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, errors.Wrap(err, "createSource")
 	}
 
 	return source, connection, nil

@@ -87,10 +87,10 @@ func encrypt(keyName string, plaintextString string) (*string, error) {
 	}
 
 	if !result.VerifiedPlaintextCrc32C {
-		return nil, errors.Newf("encrypt: request corrupted in-transit")
+		return nil, errors.Wrap(errors.Newf("encrypt: request corrupted in-transit"), "encrypt")
 	}
 	if int64(crc32c(result.Ciphertext)) != result.CiphertextCrc32C.Value {
-		return nil, errors.Newf("encrypt: response corrupted in-transit")
+		return nil, errors.Wrap(errors.Newf("encrypt: response corrupted in-transit"), "encrypt")
 	}
 
 	ciphertext := hex.EncodeToString(result.Ciphertext)
@@ -135,7 +135,7 @@ func decrypt(keyName string, ciphertextString string) (*string, error) {
 	}
 
 	if int64(crc32c(result.Plaintext)) != result.PlaintextCrc32C.Value {
-		return nil, errors.Newf("decrypt: response corrupted in-transit")
+		return nil, errors.Wrap(errors.Newf("decrypt: response corrupted in-transit"), "decrypt")
 	}
 
 	plaintext := string(result.Plaintext)
@@ -145,7 +145,7 @@ func decrypt(keyName string, ciphertextString string) (*string, error) {
 func (cs CryptoServiceImpl) DecryptConnectionCredentials(encryptedCredentials string) (*string, error) {
 	credentials, err := decrypt(CONNECTION_KEY, encryptedCredentials)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "DecryptConnectionCredentials")
 	}
 
 	return credentials, nil
@@ -172,7 +172,7 @@ func (cs CryptoServiceImpl) DecryptApiKey(encryptedApiKey string) (*string, erro
 func (cs CryptoServiceImpl) EncryptApiKey(apiKey string) (*string, error) {
 	encryptedApiKey, err := encrypt(API_KEY_KEY, apiKey)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "EncryptApiKey")
 	}
 
 	return encryptedApiKey, nil
@@ -181,7 +181,7 @@ func (cs CryptoServiceImpl) EncryptApiKey(apiKey string) (*string, error) {
 func (cs CryptoServiceImpl) DecryptWebhookSigningKey(encryptedWebhookSigningKey string) (*string, error) {
 	webhookSigningKey, err := decrypt(WEBHOOK_SIGNING_KEY_KEY, encryptedWebhookSigningKey)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "DecryptWebhookSigningKey")
 	}
 
 	return webhookSigningKey, nil
@@ -190,7 +190,7 @@ func (cs CryptoServiceImpl) DecryptWebhookSigningKey(encryptedWebhookSigningKey 
 func (cs CryptoServiceImpl) EncryptWebhookSigningKey(webhookSigningKey string) (*string, error) {
 	encryptedWebhookSigningKey, err := encrypt(WEBHOOK_SIGNING_KEY_KEY, webhookSigningKey)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "EncryptWebhookSigningKey")
 	}
 
 	return encryptedWebhookSigningKey, nil
@@ -199,7 +199,7 @@ func (cs CryptoServiceImpl) EncryptWebhookSigningKey(webhookSigningKey string) (
 func (cs CryptoServiceImpl) DecryptEndCustomerApiKey(encryptedEndCustomerApiKey string) (*string, error) {
 	endCustomerApiKey, err := decrypt(END_CUSTOMER_API_KEY_KEY, encryptedEndCustomerApiKey)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "DecryptEndCustomerApiKey")
 	}
 
 	return endCustomerApiKey, nil
@@ -208,7 +208,7 @@ func (cs CryptoServiceImpl) DecryptEndCustomerApiKey(encryptedEndCustomerApiKey 
 func (cs CryptoServiceImpl) EncryptEndCustomerApiKey(endCustomerApi string) (*string, error) {
 	encryptedEndCustomerApiKey, err := encrypt(END_CUSTOMER_API_KEY_KEY, endCustomerApi)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "EncryptEndCustomerApiKey")
 	}
 
 	return encryptedEndCustomerApiKey, nil

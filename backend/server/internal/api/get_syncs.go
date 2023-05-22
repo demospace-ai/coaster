@@ -6,6 +6,7 @@ import (
 
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/models"
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/repositories/objects"
 	"go.fabra.io/server/common/repositories/sources"
 	sync_repository "go.fabra.io/server/common/repositories/syncs"
@@ -22,7 +23,7 @@ type GetSyncsResponse struct {
 func (s ApiService) GetSyncs(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	syncs, err := sync_repository.LoadAllSyncs(s.db, auth.Organization.ID)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "GetSyncs")
 	}
 
 	sourceIDset := make(map[int64]bool)
@@ -44,12 +45,12 @@ func (s ApiService) GetSyncs(auth auth.Authentication, w http.ResponseWriter, r 
 
 	sources, err := sources.LoadSourcesByIDs(s.db, auth.Organization.ID, sourceIDs)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "GetSyncs")
 	}
 
 	objects, err := objects.LoadObjectsByIDs(s.db, auth.Organization.ID, objectIDs)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "GetSyncs")
 	}
 
 	syncViews := []views.Sync{}

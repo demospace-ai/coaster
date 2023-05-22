@@ -7,6 +7,7 @@ import (
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/repositories/destinations"
 	"go.fabra.io/server/common/views"
+	"go.fabra.io/server/common/errors"
 )
 
 type GetDestinationsResponse struct {
@@ -17,7 +18,7 @@ func (s ApiService) GetDestinations(auth auth.Authentication, w http.ResponseWri
 
 	destinations, err := destinations.LoadAllDestinations(s.db, auth.Organization.ID)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "GetDestinations")
 	}
 
 	return json.NewEncoder(w).Encode(GetDestinationsResponse{

@@ -14,16 +14,16 @@ import (
 
 func (s ApiService) GetApiKey(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.NewBadRequest("cannot request users without organization")
+		return errors.Wrap(errors.NewBadRequest("cannot request users without organization"), "GetApiKey")
 	}
 
 	apiKey, err := s.GetOrCreateApiKey(auth.Organization.ID)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "GetApiKey")
 	}
 
 	_, err = fmt.Fprintf(w, *apiKey)
-	return err
+	return errors.Wrap(err, "GetApiKey")
 }
 
 func (s ApiService) GetOrCreateApiKey(organizationID int64) (*string, error) {
@@ -34,17 +34,17 @@ func (s ApiService) GetOrCreateApiKey(organizationID int64) (*string, error) {
 			rawApiKey := generateKey()
 			encryptedApiKey, err := s.cryptoService.EncryptApiKey(rawApiKey)
 			if err != nil {
-				return nil, err
+				return nil, errors.Wrap(err, "GetOrCreateApiKey")
 			}
 
 			_, err = api_keys.CreateApiKey(s.db, organizationID, *encryptedApiKey, crypto.HashString(rawApiKey))
 			if err != nil {
-				return nil, err
+				return nil, errors.Wrap(err, "GetOrCreateApiKey")
 			}
 
 			return &rawApiKey, nil
 		} else {
-			return nil, err
+			return nil, errors.Wrap(err, "GetOrCreateApiKey")
 		}
 	}
 

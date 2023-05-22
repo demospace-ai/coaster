@@ -45,20 +45,20 @@ type CreateObjectResponse struct {
 
 func (s ApiService) CreateObject(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.NewBadRequest("must setup organization first")
+		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "CreateObject")
 	}
 
 	decoder := json.NewDecoder(r.Body)
 	var createObjectRequest CreateObjectRequest
 	err := decoder.Decode(&createObjectRequest)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "CreateObject")
 	}
 
 	validate := validator.New()
 	err = validate.Struct(createObjectRequest)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "CreateObject")
 	}
 
 	if createObjectRequest.CursorField != nil {
@@ -70,7 +70,7 @@ func (s ApiService) CreateObject(auth auth.Authentication, w http.ResponseWriter
 		}
 
 		if _, validCursorField := VALID_CURSOR_TYPES[cursorField.Type]; !validCursorField {
-			return errors.NewBadRequestf("invalid cursor field type: %s", cursorField.Type)
+			return errors.Wrap(errors.NewBadRequestf("invalid cursor field type: %s", cursorField.Type), "CreateObject")
 		}
 	}
 
@@ -91,7 +91,7 @@ func (s ApiService) CreateObject(auth auth.Authentication, w http.ResponseWriter
 		createObjectRequest.FrequencyUnits,
 	)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "CreateObject")
 	}
 
 	// Ensure that the end customer ID field is marked as omit. It should not be exposed to the end customer
@@ -103,7 +103,7 @@ func (s ApiService) CreateObject(auth auth.Authentication, w http.ResponseWriter
 
 	objectFields, err := objects.CreateObjectFields(s.db, auth.Organization.ID, object.ID, createObjectRequest.ObjectFields)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "CreateObject")
 	}
 
 	return json.NewEncoder(w).Encode(CreateObjectResponse{

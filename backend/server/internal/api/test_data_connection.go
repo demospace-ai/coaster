@@ -37,19 +37,19 @@ type TestDataConnectionRequest struct {
 
 func (s ApiService) TestDataConnection(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.NewBadRequest("must setup organization first")
+		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "TestDataConnection")
 	}
 
 	decoder := json.NewDecoder(r.Body)
 	var testDataConnectionRequest TestDataConnectionRequest
 	err := decoder.Decode(&testDataConnectionRequest)
 	if err != nil {
-		return errors.NewCustomerVisibleError(err)
+		return errors.Wrap(errors.NewCustomerVisibleError(err), "TestDataConnection")
 	}
 
 	err = validateTestDataConnectionRequest(testDataConnectionRequest)
 	if err != nil {
-		return errors.NewCustomerVisibleError(err)
+		return errors.Wrap(errors.NewCustomerVisibleError(err), "TestDataConnection")
 	}
 
 	switch testDataConnectionRequest.ConnectionType {
@@ -70,7 +70,7 @@ func (s ApiService) TestDataConnection(auth auth.Authentication, w http.Response
 	}
 
 	if err != nil {
-		return errors.NewCustomerVisibleError(err)
+		return errors.Wrap(errors.NewCustomerVisibleError(err), "TestDataConnection")
 	}
 
 	return nil
@@ -80,7 +80,7 @@ func testBigQueryConnection(bigqueryConfig input.BigQueryConfig) error {
 	var bigQueryCredentials models.BigQueryCredentials
 	err := json.Unmarshal([]byte(bigqueryConfig.Credentials), &bigQueryCredentials)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "testBigQueryConnection")
 	}
 
 	credentialOption := option.WithCredentialsJSON([]byte(bigqueryConfig.Credentials))
@@ -88,7 +88,7 @@ func testBigQueryConnection(bigqueryConfig input.BigQueryConfig) error {
 	ctx := context.Background()
 	client, err := bigquery.NewClient(ctx, bigQueryCredentials.ProjectID, credentialOption)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "testBigQueryConnection")
 	}
 	defer client.Close()
 
@@ -96,7 +96,7 @@ func testBigQueryConnection(bigqueryConfig input.BigQueryConfig) error {
 	_, err = it.Next()
 
 	if err != nil && err != iterator.Done {
-		return err
+		return errors.Wrap(err, "testBigQueryConnection")
 	}
 
 	return nil
@@ -123,13 +123,13 @@ func testSnowflakeConnection(snowflakeConfig input.SnowflakeConfig) error {
 
 	db, err := sql.Open("snowflake", dsn)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "testSnowflakeConnection")
 	}
 	defer db.Close()
 
 	rows, err := db.Query("SELECT 1")
 	if err != nil {
-		return err
+		return errors.Wrap(err, "testSnowflakeConnection")
 	}
 	defer rows.Close()
 
@@ -137,14 +137,14 @@ func testSnowflakeConnection(snowflakeConfig input.SnowflakeConfig) error {
 	for rows.Next() {
 		err := rows.Scan(&v)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "testSnowflakeConnection")
 		}
 		if v != 1 {
-			return err
+			return errors.Wrap(err, "testSnowflakeConnection")
 		}
 	}
 	if rows.Err() != nil {
-		return err
+		return errors.Wrap(err, "testSnowflakeConnection")
 	}
 
 	return nil
@@ -165,13 +165,13 @@ func testRedshiftConnection(redshiftConfig input.RedshiftConfig) error {
 
 	db, err := sql.Open("postgres", dsn.String())
 	if err != nil {
-		return err
+		return errors.Wrap(err, "testRedshiftConnection")
 	}
 	defer db.Close()
 
 	rows, err := db.Query("SELECT 1")
 	if err != nil {
-		return err
+		return errors.Wrap(err, "testRedshiftConnection")
 	}
 	defer rows.Close()
 
@@ -179,14 +179,14 @@ func testRedshiftConnection(redshiftConfig input.RedshiftConfig) error {
 	for rows.Next() {
 		err := rows.Scan(&v)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "testRedshiftConnection")
 		}
 		if v != 1 {
-			return err
+			return errors.Wrap(err, "testRedshiftConnection")
 		}
 	}
 	if rows.Err() != nil {
-		return err
+		return errors.Wrap(err, "testRedshiftConnection")
 	}
 
 	return nil
@@ -208,13 +208,13 @@ func testSynapseConnection(synapseConfig input.SynapseConfig) error {
 
 	db, err := sql.Open("sqlserver", dsn.String())
 	if err != nil {
-		return err
+		return errors.Wrap(err, "testSynapseConnection")
 	}
 	defer db.Close()
 
 	rows, err := db.Query("SELECT 1")
 	if err != nil {
-		return err
+		return errors.Wrap(err, "testSynapseConnection")
 	}
 	defer rows.Close()
 
@@ -222,14 +222,14 @@ func testSynapseConnection(synapseConfig input.SynapseConfig) error {
 	for rows.Next() {
 		err := rows.Scan(&v)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "testSynapseConnection")
 		}
 		if v != 1 {
-			return err
+			return errors.Wrap(err, "testSynapseConnection")
 		}
 	}
 	if rows.Err() != nil {
-		return err
+		return errors.Wrap(err, "testSynapseConnection")
 	}
 
 	return nil
@@ -254,7 +254,7 @@ func testMongoDbConnection(mongodbConfig input.MongoDbConfig) error {
 		SetConnectTimeout(3 * time.Second).
 		ApplyURI(connectionString) // Apply URI last since this contains connection options from the user
 	_, err := mongo.Connect(context.TODO(), clientOptions)
-	return err
+	return errors.Wrap(err, "testMongoDbConnection")
 }
 
 func testPostgresConnection(postgresConfig input.PostgresConfig) error {
@@ -272,13 +272,13 @@ func testPostgresConnection(postgresConfig input.PostgresConfig) error {
 
 	db, err := sql.Open("postgres", dsn.String())
 	if err != nil {
-		return err
+		return errors.Wrap(err, "testPostgresConnection")
 	}
 	defer db.Close()
 
 	rows, err := db.Query("SELECT 1")
 	if err != nil {
-		return err
+		return errors.Wrap(err, "testPostgresConnection")
 	}
 	defer rows.Close()
 
@@ -286,14 +286,14 @@ func testPostgresConnection(postgresConfig input.PostgresConfig) error {
 	for rows.Next() {
 		err := rows.Scan(&v)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "testPostgresConnection")
 		}
 		if v != 1 {
-			return err
+			return errors.Wrap(err, "testPostgresConnection")
 		}
 	}
 	if rows.Err() != nil {
-		return err
+		return errors.Wrap(err, "testPostgresConnection")
 	}
 
 	return nil
@@ -314,19 +314,19 @@ func validateTestDataConnectionRequest(request TestDataConnectionRequest) error 
 	case models.ConnectionTypePostgres:
 		return validateTestPostgresConnection(request)
 	default:
-		return errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", request.ConnectionType))
+		return errors.Wrap(errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", request.ConnectionType)), "validateTestDataConnectionRequest")
 	}
 }
 
 func validateTestBigQueryConnection(request TestDataConnectionRequest) error {
 	if request.BigQueryConfig == nil {
-		return errors.NewBadRequest("missing BigQuery configuration")
+		return errors.Wrap(errors.NewBadRequest("missing BigQuery configuration"),"validateTestBigQueryConnection")
 	}
 
 	var bigQueryCredentials models.BigQueryCredentials
 	err := json.Unmarshal([]byte(request.BigQueryConfig.Credentials), &bigQueryCredentials)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "validateTestBigQueryConnection")
 	}
 
 	// TODO: validate the fields all exist in the credentials object
@@ -336,7 +336,7 @@ func validateTestBigQueryConnection(request TestDataConnectionRequest) error {
 
 func validateTestSnowflakeConnection(request TestDataConnectionRequest) error {
 	if request.SnowflakeConfig == nil {
-		return errors.NewBadRequest("missing Snowflake configuration")
+		return errors.Wrap(errors.NewBadRequest("missing Snowflake configuration"), "validateTestSnowflakeConnection")
 	}
 
 	// TODO: validate the fields all exist in the credentials object
@@ -346,7 +346,7 @@ func validateTestSnowflakeConnection(request TestDataConnectionRequest) error {
 
 func validateTestRedshiftConnection(request TestDataConnectionRequest) error {
 	if request.RedshiftConfig == nil {
-		return errors.NewBadRequest("missing Redshift configuration")
+		return errors.Wrap(errors.NewBadRequest("missing Redshift configuration"), "validateTestRedshiftConnection")
 	}
 
 	// TODO: validate the fields all exist in the credentials object
@@ -356,7 +356,7 @@ func validateTestRedshiftConnection(request TestDataConnectionRequest) error {
 
 func validateTestMongoConnection(request TestDataConnectionRequest) error {
 	if request.MongoDbConfig == nil {
-		return errors.NewBadRequest("missing MongoDB configuration")
+		return errors.Wrap(errors.NewBadRequest("missing MongoDB configuration"), "validateTestMongoConnection")
 	}
 
 	// TODO: validate the fields all exist in the credentials object
@@ -366,7 +366,7 @@ func validateTestMongoConnection(request TestDataConnectionRequest) error {
 
 func validateTestSynapseConnection(request TestDataConnectionRequest) error {
 	if request.SynapseConfig == nil {
-		return errors.NewBadRequest("missing Synapse configuration")
+		return errors.Wrap(errors.NewBadRequest("missing Synapse configuration"), "validateTestSynapseConnection")
 	}
 
 	// TODO: validate the fields all exist in the credentials object
@@ -376,7 +376,7 @@ func validateTestSynapseConnection(request TestDataConnectionRequest) error {
 
 func validateTestPostgresConnection(request TestDataConnectionRequest) error {
 	if request.PostgresConfig == nil {
-		return errors.NewBadRequest("missing Postgres configuration")
+		return errors.Wrap(errors.NewBadRequest("missing Postgres configuration"), "validateTestPostgresConnection")
 	}
 
 	// TODO: validate the fields all exist in the credentials object

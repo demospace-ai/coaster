@@ -6,6 +6,7 @@ import (
 
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/models"
+	"go.fabra.io/server/common/errors"
 )
 
 type UpdateOrganizationRequest struct {
@@ -23,7 +24,7 @@ func (s ApiService) UpdateOrganization(auth auth.Authentication, w http.Response
 	var updateOrganizationRequest UpdateOrganizationRequest
 	err := decoder.Decode(&updateOrganizationRequest)
 	if err != nil {
-		return err
+		return errors.Wrap(err,"UpdateOrganization")
 	}
 
 	organization := auth.Organization

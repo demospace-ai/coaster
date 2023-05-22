@@ -15,16 +15,16 @@ import (
 
 func (s ApiService) LinkGetSyncs(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.NewBadRequest("must setup organization first")
+		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "LinkGetSyncs")
 	}
 
 	if auth.LinkToken == nil {
-		return errors.NewBadRequest("must send link token")
+		return errors.Wrap(errors.NewBadRequest("must send link token"), "LinkGetSyncs")
 	}
 
 	syncs, err := sync_repository.LoadAllSyncsForCustomer(s.db, auth.Organization.ID, auth.LinkToken.EndCustomerID)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "LinkGetSyncs")
 	}
 
 	sourceIDset := make(map[int64]bool)
@@ -46,12 +46,12 @@ func (s ApiService) LinkGetSyncs(auth auth.Authentication, w http.ResponseWriter
 
 	sources, err := sources.LoadSourcesByIDsForCustomer(s.db, auth.Organization.ID, auth.LinkToken.EndCustomerID, sourceIDs)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "LinkGetSyncs")
 	}
 
 	objects, err := objects.LoadObjectsByIDs(s.db, auth.Organization.ID, objectIDs)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "LinkGetSyncs")
 	}
 
 	syncViews := []views.Sync{}
