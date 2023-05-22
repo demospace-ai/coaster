@@ -8,7 +8,7 @@ import (
 )
 
 func TrackSignup(userID int64, name string, email string) {
-	if application.IsProd() {
+	if !application.IsProd() {
 		return
 	}
 
