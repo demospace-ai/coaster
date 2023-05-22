@@ -183,7 +183,7 @@ export const LinkCreateSource: IEndpoint<LinkCreateSourceRequest, CreateSourceRe
   track: true,
 };
 
-export const RunSync: IEndpoint<RunSyncRequest, RunSyncResponse> = {
+export const RunSync: IEndpoint<undefined, RunSyncResponse> = {
   name: "Sync Run",
   method: "POST",
   path: "/sync/:syncID/run",
@@ -379,8 +379,6 @@ export interface HeaderInput {
   name: string;
   value: string;
 }
-
-export interface RunSyncRequest {}
 
 export interface RunSyncResponse {
   sync: Sync;
