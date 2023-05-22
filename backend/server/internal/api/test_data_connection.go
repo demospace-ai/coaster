@@ -195,7 +195,7 @@ func testRedshiftConnection(redshiftConfig input.RedshiftConfig) error {
 func testSynapseConnection(synapseConfig input.SynapseConfig) error {
 	params := url.Values{}
 	params.Add("database", synapseConfig.DatabaseName)
-	params.Add("sslmode", "require")
+	params.Add("sslmode", "encrypt")
 	params.Add("TrustServerCertificate", "true")
 	params.Add("dial timeout", "3")
 
