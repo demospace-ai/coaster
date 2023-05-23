@@ -12,6 +12,7 @@ export function useStart() {
   return useCallback(async () => {
     try {
       const checkSessionResponse = await sendRequest(CheckSession);
+      // throw new Error("Failed to authenticate");
       dispatch({
         type: "login.authenticated",
         user: checkSessionResponse.user,
@@ -19,16 +20,15 @@ export function useStart() {
         suggestedOrganizations: checkSessionResponse.suggested_organizations,
       });
 
-      onLoginSuccess(
-        checkSessionResponse.user,
-        checkSessionResponse.organization
-      );
+      onLoginSuccess(checkSessionResponse.user, checkSessionResponse.organization);
+      dispatch({ type: "login.error", error: null });
     } catch (e) {
       if (e instanceof HttpError) {
         if (e.code === 403) {
           dispatch({ type: "forbidden" });
         }
       }
+      dispatch({ type: "login.error", error: e?.toString() ?? JSON.stringify(e) });
       consumeError(e);
     }
 
