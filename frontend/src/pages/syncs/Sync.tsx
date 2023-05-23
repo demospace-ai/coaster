@@ -65,7 +65,9 @@ export const Sync: React.FC = () => {
           <div>
             <button
               className="tw-ml-auto tw-px-4 tw-py-2 tw-rounded-md tw-font-medium tw-text-base hover:tw-bg-slate-100 tw-text-blue-600 tw-mr-2"
-              onClick={() => {}}
+              onClick={() => {
+                throw new Error("Not implemented");
+              }}
             >
               Edit
             </button>
