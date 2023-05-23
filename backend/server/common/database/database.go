@@ -70,7 +70,7 @@ func InitDatabase() (*gorm.DB, error) {
 }
 
 func initDatabaseDev() (*gorm.DB, error) {
-	dbURI := "user=fabra password=fabra database=fabra host=localhost"
+	dbURI := "user=fabra password=fabra database=fabra host=localhost sslmode=require"
 
 	db, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{
 		Logger: logger.New(
@@ -111,6 +111,7 @@ func initDatabaseProd() (*gorm.DB, error) {
 		return nil, err
 	}
 
+	// TODO: use client certificates here and enforce SSL verify full on Cloud SQL
 	dbURI := fmt.Sprintf("host=%s user=%s password=%s port=%s database=%s", dbHost, dbUser, *dbPwd, dbPort, dbName)
 
 	db, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{
