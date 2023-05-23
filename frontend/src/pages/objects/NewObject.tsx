@@ -33,7 +33,7 @@ import {
   TargetType,
 } from "src/rpc/api";
 import { useSchema } from "src/rpc/data";
-import { HttpError } from "src/utils/errors";
+import { HttpError, consumeError } from "src/utils/errors";
 import { mergeClasses } from "src/utils/twmerge";
 import { mutate } from "swr";
 
@@ -743,6 +743,7 @@ const Finalize: React.FC<ObjectStepProps & { onComplete: () => void }> = (props)
           return { ...state, createError };
         });
       }
+      consumeError(e);
     }
 
     setLoading(false);

@@ -10,6 +10,7 @@ import { Tooltip } from "src/components/tooltip/Tooltip";
 import { SetupSyncProps } from "src/connect/state";
 import { sendLinkTokenRequest } from "src/rpc/ajax";
 import { FabraObject, LinkGetPreview, LinkGetPreviewRequest, ResultRow, Schema } from "src/rpc/api";
+import { consumeError } from "../utils/errors";
 
 export const ObjectSetup: React.FC<SetupSyncProps> = (props) => {
   const setObject = (object: FabraObject) =>
@@ -48,8 +49,8 @@ export const ObjectSetup: React.FC<SetupSyncProps> = (props) => {
       setPreviewSchema(response.schema);
       setPreviewLoading(false);
     } catch (e) {
-      // TODO: handle error
       setPreviewLoading(false);
+      consumeError(e);
     }
   };
 

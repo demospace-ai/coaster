@@ -8,7 +8,8 @@ import { Tooltip } from "src/components/tooltip/Tooltip";
 import { LinkRunSync, SyncRunStatus } from "src/rpc/api";
 import { useLinkSync } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
-import { sendLinkTokenRequest } from "../rpc/ajax";
+import { sendLinkTokenRequest, sendRequest } from "../rpc/ajax";
+import { consumeError } from "../utils/errors";
 
 export const SyncRuns: React.FC<{
   linkToken: string;
@@ -43,7 +44,7 @@ const SyncRunsList: React.FC<{ linkToken: string }> = ({ linkToken }) => {
       mutate();
       setRunSyncResult("Success");
     } catch (err) {
-      console.error(err);
+      consumeError(err);
       setRunSyncResult("Failure");
     } finally {
       setTimeout(() => {
