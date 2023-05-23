@@ -17,42 +17,48 @@ export function useSetOrganization() {
   const navigate = useNavigate();
   const onLoginSuccess = useOnLoginSuccess();
 
-  return useCallback(async (user: User, args: OrganizationArgs) => {
-    const payload = { "organization_name": args.organizationName, "organization_id": args.organizationID };
-    try {
-      const response = await sendRequest(SetOrganization, payload);
-      dispatch({
-        type: "login.organizationSet",
-        organization: response.organization,
-      });
+  return useCallback(
+    async (user: User, args: OrganizationArgs) => {
+      const payload = { organization_name: args.organizationName, organization_id: args.organizationID };
+      try {
+        const response = await sendRequest(SetOrganization, payload);
+        dispatch({
+          type: "login.organizationSet",
+          organization: response.organization,
+        });
 
-      onLoginSuccess(user, response.organization);
-      navigate("/");
-    } catch (e) {
-      // TODO
-    }
-  }, [dispatch, navigate, onLoginSuccess]);
+        onLoginSuccess(user, response.organization);
+        navigate("/");
+      } catch (e) {
+        // TODO
+      }
+    },
+    [dispatch, navigate, onLoginSuccess],
+  );
 }
 
 export function useOnLoginSuccess() {
   const navigate = useNavigate();
 
-  return useCallback(async (user: User, organization: Organization | undefined) => {
-    identifyUser(user);
+  return useCallback(
+    async (user: User, organization: Organization | undefined) => {
+      identifyUser(user);
 
-    // If there's no organization, go to the login page so the user can set it
-    if (!organization) {
-      navigate("/login");
-      return;
-    }
-  }, [navigate]);
+      // If there's no organization, go to the login page so the user can set it
+      if (!organization) {
+        navigate("/login");
+        return;
+      }
+    },
+    [navigate],
+  );
 }
 
 function identifyUser(user: User) {
   if (isProd()) {
     rudderanalytics.identify(user.id.toString(), {
-      "name": `${user.name}`,
-      "email": user.email
+      name: `${user.name}`,
+      email: user.email,
     });
 
     H.identify(user.email, {

@@ -8,7 +8,6 @@ type NotificationProps = {
 };
 
 export const Notification: React.FC<NotificationProps> = ({ show, setShow }) => {
-
   return (
     <>
       {/* Global notification live region, render this permanently at the end of the document */}

@@ -22,8 +22,8 @@ let needsInit = true;
 
 export const App: React.FC = () => {
   const location = useLocation();
-  const loading = useSelector(state => state.app.loading);
-  const forbidden = useSelector(state => state.app.forbidden);
+  const loading = useSelector((state) => state.app.loading);
+  const forbidden = useSelector((state) => state.app.forbidden);
   const start = useStart();
 
   useEffect(() => {
@@ -39,9 +39,7 @@ export const App: React.FC = () => {
   }, [start]);
 
   if (loading) {
-    return (
-      <LogoLoading />
-    );
+    return <LogoLoading />;
   }
 
   if (forbidden) {
@@ -76,13 +74,9 @@ type AuthenticationProps = {
   element: ReactNode;
 };
 
-const RequireAuth: React.FC<AuthenticationProps> = props => {
-  const isAuthenticated = useSelector(state => state.login.authenticated);
-  return (
-    <>
-      {isAuthenticated ? props.element : <Navigate to="/login" replace />}
-    </>
-  );
+const RequireAuth: React.FC<AuthenticationProps> = (props) => {
+  const isAuthenticated = useSelector((state) => state.login.authenticated);
+  return <>{isAuthenticated ? props.element : <Navigate to="/login" replace />}</>;
 };
 
 const AppLayout: React.FC = () => {

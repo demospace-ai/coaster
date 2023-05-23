@@ -26,8 +26,9 @@ function getConnectionTypeImg(connectionType: ConnectionType): string {
   }
 }
 
-export const ConnectionImage: React.FC<{ connectionType: ConnectionType; className?: string; }> = ({ connectionType, className }) => {
-  return (
-    <img src={getConnectionTypeImg(connectionType)} alt="data source logo" className={className} />
-  );
+export const ConnectionImage: React.FC<{ connectionType: ConnectionType; className?: string }> = ({
+  connectionType,
+  className,
+}) => {
+  return <img src={getConnectionTypeImg(connectionType)} alt="data source logo" className={className} />;
 };

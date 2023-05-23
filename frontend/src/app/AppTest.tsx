@@ -6,7 +6,7 @@ test("renders loading when loading", async () => {
   const store = mockStore({
     app: {
       loading: true,
-    }
+    },
   });
 
   renderWithProvider(<App />, store);
@@ -22,7 +22,7 @@ test("does not render loading when not loading", async () => {
     },
     login: {
       authenticated: false,
-    }
+    },
   });
 
   renderWithProvider(<App />, store);

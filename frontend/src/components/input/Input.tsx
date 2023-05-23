@@ -13,12 +13,17 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   textarea?: boolean;
   type?: HTMLInputTypeAttribute;
   label?: string;
-};
+}
 
-export const Input: React.FC<InputProps> = props => {
-  const { id, value, placeholder, disabled, setValue, className, wrapperClass, textarea, type, label, ...other } = props;
+export const Input: React.FC<InputProps> = (props) => {
+  const { id, value, placeholder, disabled, setValue, className, wrapperClass, textarea, type, label, ...other } =
+    props;
   const [focused, setFocused] = useState(false);
-  let classes = ["tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border focus:tw-border-slate-700 tw-outline-none", !disabled && "hover:tw-border-slate-400", className];
+  let classes = [
+    "tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border focus:tw-border-slate-700 tw-outline-none",
+    !disabled && "hover:tw-border-slate-400",
+    className,
+  ];
 
   const onKeydown = (event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     event.stopPropagation();
@@ -27,7 +32,8 @@ export const Input: React.FC<InputProps> = props => {
     }
   };
 
-  const showLabel = label !== undefined && (focused || (value !== undefined && (value !== "string" || value.length > 0)));
+  const showLabel =
+    label !== undefined && (focused || (value !== undefined && (value !== "string" || value.length > 0)));
 
   return (
     <div className={mergeClasses("tw-relative", label && "tw-mt-4", wrapperClass)}>
@@ -47,7 +53,7 @@ export const Input: React.FC<InputProps> = props => {
           {label}
         </label>
       </Transition>
-      {textarea ?
+      {textarea ? (
         <textarea
           id={id}
           name={id}
@@ -55,12 +61,16 @@ export const Input: React.FC<InputProps> = props => {
           placeholder={focused ? undefined : placeholder}
           className={mergeClasses(classes)}
           onKeyDown={onKeydown}
-          onFocus={() => { setFocused(true); }}
-          onChange={e => setValue(e.target.value)}
-          onBlur={() => { setFocused(false); }}
+          onFocus={() => {
+            setFocused(true);
+          }}
+          onChange={(e) => setValue(e.target.value)}
+          onBlur={() => {
+            setFocused(false);
+          }}
           value={value ? value : ""}
         />
-        :
+      ) : (
         <input
           type={type ? type : "text"}
           id={id}
@@ -69,34 +79,51 @@ export const Input: React.FC<InputProps> = props => {
           placeholder={focused ? undefined : placeholder}
           className={mergeClasses(classes)}
           onKeyDown={onKeydown}
-          onFocus={() => { setFocused(true); }}
-          onChange={e => { e.target.type === "number" ? setValue(parseInt(e.target.value)) : setValue(e.target.value); }}
-          onBlur={() => { setFocused(false); }}
+          onFocus={() => {
+            setFocused(true);
+          }}
+          onChange={(e) => {
+            e.target.type === "number" ? setValue(parseInt(e.target.value)) : setValue(e.target.value);
+          }}
+          onBlur={() => {
+            setFocused(false);
+          }}
           value={value ? value : ""}
           {...other}
         />
-      }
+      )}
     </div>
   );
 };
 
-export const ColorPicker: React.FC<InputProps> = props => {
+export const ColorPicker: React.FC<InputProps> = (props) => {
   const { id, value, setValue, className, wrapperClass, textarea, type, label, ...other } = props;
-  let classes = ["tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border focus:tw-border-slate-700 tw-outline-none", className];
+  let classes = [
+    "tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border focus:tw-border-slate-700 tw-outline-none",
+    className,
+  ];
 
   return (
     <div className={mergeClasses("tw-flex tw-items-center", wrapperClass)}>
-      <input className={mergeClasses(classes)} value={value} onChange={e => setValue(e.target.value)} {...other} />
-      <input className="tw-w-6 tw-relative tw-right-8" value={value} onChange={e => setValue(e.target.value)} type="color" />
+      <input className={mergeClasses(classes)} value={value} onChange={(e) => setValue(e.target.value)} {...other} />
+      <input
+        className="tw-w-6 tw-relative tw-right-8"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        type="color"
+      />
     </div>
   );
 };
 
-export const ValidatedInput: React.FC<InputProps> = props => {
+export const ValidatedInput: React.FC<InputProps> = (props) => {
   const { id, value, placeholder, setValue, className, textarea, type, label, ...other } = props;
   const [isValid, setIsValid] = useState(true);
   const [focused, setFocused] = useState(false);
-  let classes = ["tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border hover:tw-border-primary-hover focus:tw-border-primary tw-outline-none", className];
+  let classes = [
+    "tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border hover:tw-border-primary-hover focus:tw-border-primary tw-outline-none",
+    className,
+  ];
   if (!isValid) {
     classes.push("tw-border-red-600");
   }
@@ -118,7 +145,8 @@ export const ValidatedInput: React.FC<InputProps> = props => {
     return valid;
   };
 
-  const showLabel = label !== undefined && (focused || (value !== undefined && (value !== "string" || value.length > 0)));
+  const showLabel =
+    label !== undefined && (focused || (value !== undefined && (value !== "string" || value.length > 0)));
 
   return (
     <div className={mergeClasses("tw-relative", label && "tw-mt-4")}>
@@ -138,7 +166,7 @@ export const ValidatedInput: React.FC<InputProps> = props => {
           {label}
         </label>
       </Transition>
-      {textarea ?
+      {textarea ? (
         <textarea
           id={id}
           name={id}
@@ -146,12 +174,18 @@ export const ValidatedInput: React.FC<InputProps> = props => {
           placeholder={focused ? undefined : placeholder}
           className={mergeClasses(classes)}
           onKeyDown={onKeydown}
-          onFocus={() => { setIsValid(true); setFocused(true); }}
-          onChange={e => setValue(e.target.value)}
-          onBlur={() => { validateNotEmpty(value); setFocused(false); }}
+          onFocus={() => {
+            setIsValid(true);
+            setFocused(true);
+          }}
+          onChange={(e) => setValue(e.target.value)}
+          onBlur={() => {
+            validateNotEmpty(value);
+            setFocused(false);
+          }}
           value={value ? value : ""}
         />
-        :
+      ) : (
         <input
           type={type ? type : "text"}
           name={id}
@@ -159,13 +193,21 @@ export const ValidatedInput: React.FC<InputProps> = props => {
           placeholder={focused ? undefined : placeholder}
           className={mergeClasses(classes)}
           onKeyDown={onKeydown}
-          onFocus={() => { setIsValid(true); setFocused(true); }}
-          onChange={e => { e.target.type === "number" ? setValue(parseInt(e.target.value)) : setValue(e.target.value); }}
-          onBlur={() => { validateNotEmpty(value); setFocused(false); }}
+          onFocus={() => {
+            setIsValid(true);
+            setFocused(true);
+          }}
+          onChange={(e) => {
+            e.target.type === "number" ? setValue(parseInt(e.target.value)) : setValue(e.target.value);
+          }}
+          onBlur={() => {
+            validateNotEmpty(value);
+            setFocused(false);
+          }}
           value={value ? value : ""}
           {...other}
         />
-      }
+      )}
     </div>
   );
 };
@@ -187,7 +229,7 @@ export type ValidatedDropdownInputProps = {
   valid?: boolean;
 };
 
-export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = props => {
+export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = (props) => {
   const [computedValid, setComputedValid] = useState<boolean>(true);
   const [focused, setFocused] = useState(false);
   const [referenceElement, setReferenceElement] = useState<HTMLButtonElement | null>(null);
@@ -205,7 +247,7 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = pro
 
   const getElementForDisplay = props.getElementForDisplay ? props.getElementForDisplay : (value: any) => value;
   const getElementForDropdown = props.getElementForDropdown ? props.getElementForDropdown : getElementForDisplay;
-  const showLabel = props.label !== undefined && (focused || (props.selected !== undefined));
+  const showLabel = props.label !== undefined && (focused || props.selected !== undefined);
 
   // An undefined value will cause the input to be uncontrolled, so change to null
   const value = props.selected === undefined ? null : props.selected;
@@ -214,7 +256,15 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = pro
   const valid = props.valid !== undefined ? props.valid : computedValid;
 
   return (
-    <Listbox as="div" className="tw-flex tw-w-fit" value={value} onChange={value => { props.setSelected(value); setComputedValid(true); }}>
+    <Listbox
+      as="div"
+      className="tw-flex tw-w-fit"
+      value={value}
+      onChange={(value) => {
+        props.setSelected(value);
+        setComputedValid(true);
+      }}
+    >
       <div className="tw-relative tw-w-fit">
         <Transition
           show={showLabel}
@@ -234,18 +284,28 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = pro
         </Transition>
         <Listbox.Button
           ref={setReferenceElement}
-          className={mergeClasses("tw-flex tw-justify-center tw-items-center tw-w-96 tw-mt-5 tw-rounded-md tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 hover:tw-border-primary-hover aria-expanded:tw-border-primary", props.className, props.validated && !valid && "tw-border-red-600")}
+          className={mergeClasses(
+            "tw-flex tw-justify-center tw-items-center tw-w-96 tw-mt-5 tw-rounded-md tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 hover:tw-border-primary-hover aria-expanded:tw-border-primary",
+            props.className,
+            props.validated && !valid && "tw-border-red-600",
+          )}
         >
-          <div className={mergeClasses("tw-inline-block tw-w-[calc(100%-20px)] tw-truncate tw-overflow-none", !props.selected && "tw-text-slate-400")}>
+          <div
+            className={mergeClasses(
+              "tw-inline-block tw-w-[calc(100%-20px)] tw-truncate tw-overflow-none",
+              !props.selected && "tw-text-slate-400",
+            )}
+          >
             {value ? getElementForDisplay(props.selected) : props.placeholder}
           </div>
-          {!props.noCaret &&
+          {!props.noCaret && (
             <span className="tw-pointer-events-none pr-2">
               <ChevronUpDownIcon
                 className="tw-inline tw-float-right tw-h-5 tw-w-5 tw-text-slate-400"
                 aria-hidden="true"
               />
-            </span>}
+            </span>
+          )}
         </Listbox.Button>
         <div className="tw-relative tw-z-10" ref={setPopperElement} style={styles.popper} {...attributes.popper}>
           <Transition
@@ -257,10 +317,23 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = pro
             leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
             leaveTo="tw-transform tw-opacity-0 tw-scale-95"
             beforeEnter={() => setFocused(true)}
-            afterLeave={() => { validateNotUndefined(props.selected); setFocused(false); }}
+            afterLeave={() => {
+              validateNotUndefined(props.selected);
+              setFocused(false);
+            }}
           >
-            <Listbox.Options className={mergeClasses("tw-absolute tw-z-20 tw-mt-1 tw-max-h-60 tw-min-w-full tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm", props.dropdownHeight)}>
-              <DropdownOptions loading={props.loading} options={props.options} noOptionsString={props.noOptionsString} getElementForDisplay={getElementForDropdown} />
+            <Listbox.Options
+              className={mergeClasses(
+                "tw-absolute tw-z-20 tw-mt-1 tw-max-h-60 tw-min-w-full tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm",
+                props.dropdownHeight,
+              )}
+            >
+              <DropdownOptions
+                loading={props.loading}
+                options={props.options}
+                noOptionsString={props.noOptionsString}
+                getElementForDisplay={getElementForDropdown}
+              />
             </Listbox.Options>
           </Transition>
         </div>
@@ -270,13 +343,13 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = pro
 };
 
 type DropdownOptionsProps = {
-  loading: boolean,
-  options: any[] | undefined,
-  noOptionsString: string,
-  getElementForDisplay: (value: any) => string | React.ReactElement,
+  loading: boolean;
+  options: any[] | undefined;
+  noOptionsString: string;
+  getElementForDisplay: (value: any) => string | React.ReactElement;
 };
 
-const DropdownOptions: React.FC<DropdownOptionsProps> = props => {
+const DropdownOptions: React.FC<DropdownOptionsProps> = (props) => {
   if (props.loading) {
     return (
       <div className="tw-p-2">
@@ -289,10 +362,15 @@ const DropdownOptions: React.FC<DropdownOptionsProps> = props => {
     return (
       <>
         {props.options!.map((option: any, index: number) => (
-          <Listbox.Option key={index} value={option} className={({ active, selected }) =>
-            `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${(active || selected) ? "tw-bg-slate-100 tw-text-slate-900" : "tw-text-slate-900"
-            }`
-          }>
+          <Listbox.Option
+            key={index}
+            value={option}
+            className={({ active, selected }) =>
+              `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${
+                active || selected ? "tw-bg-slate-100 tw-text-slate-900" : "tw-text-slate-900"
+              }`
+            }
+          >
             {({ selected }) => (
               <>
                 <span className={`tw-block tw-truncate ${selected ? "tw-font-medium" : "tw-font-normal"}`}>
@@ -306,17 +384,13 @@ const DropdownOptions: React.FC<DropdownOptionsProps> = props => {
               </>
             )}
           </Listbox.Option>
-        ))
-        }
+        ))}
       </>
     );
   } else {
-    return (
-      <div className="tw-p-2 tw-pl-4 tw-select-none">{props.noOptionsString}</div>
-    );
+    return <div className="tw-p-2 tw-pl-4 tw-select-none">{props.noOptionsString}</div>;
   }
 };
-
 
 export type ValidatedComboInputProps = {
   options: any[] | undefined;
@@ -335,7 +409,7 @@ export type ValidatedComboInputProps = {
   valid?: boolean;
 };
 
-export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => {
+export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = (props) => {
   const [computedValid, setComputedValid] = useState<boolean>(true);
   const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(false);
@@ -367,7 +441,7 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
   };
   const filteredOptions = getFilteredOptions();
   const getElementForDisplay = props.getElementForDisplay ? props.getElementForDisplay : (value: any) => value;
-  const showLabel = props.label !== undefined && (focused || (props.selected !== undefined));
+  const showLabel = props.label !== undefined && (focused || props.selected !== undefined);
 
   const validateNotUndefined = (value: number | undefined): boolean => {
     const valid = value !== undefined;
@@ -382,7 +456,15 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
   const valid = props.valid !== undefined ? props.valid : computedValid;
 
   return (
-    <Combobox as="div" className="tw-flex tw-w-fit" value={value} onChange={(value: number) => { props.setSelected(value); setComputedValid(true); }}>
+    <Combobox
+      as="div"
+      className="tw-flex tw-w-fit"
+      value={value}
+      onChange={(value: number) => {
+        props.setSelected(value);
+        setComputedValid(true);
+      }}
+    >
       <div className="tw-relative tw-w-fit">
         <Transition
           show={showLabel}
@@ -400,15 +482,23 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
             {props.label}
           </label>
         </Transition>
-        <div ref={setReferenceElement} className={mergeClasses("tw-flex tw-w-96 tw-mt-5 tw-rounded-md tw-bg-white tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 hover:tw-border-primary-hover focus-within:!tw-border-primary tw-transition tw-duration-100", props.className, props.validated && !valid && "tw-border-red-600")}>
+        <div
+          ref={setReferenceElement}
+          className={mergeClasses(
+            "tw-flex tw-w-96 tw-mt-5 tw-rounded-md tw-bg-white tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 hover:tw-border-primary-hover focus-within:!tw-border-primary tw-transition tw-duration-100",
+            props.className,
+            props.validated && !valid && "tw-border-red-600",
+          )}
+        >
           <Combobox.Input
-            className={"tw-inline tw-bg-transparent tw-w-[calc(100%-20px)] tw-border-none tw-text-sm tw-leading-5 tw-text-slate-900 tw-outline-none tw-text-ellipsis tw-cursor-pointer focus:tw-cursor-text"}
-            displayValue={selected => selected ? getElementForDisplay(selected) : ""}
-            onChange={event => setQuery(event.target.value)}
+            className={
+              "tw-inline tw-bg-transparent tw-w-[calc(100%-20px)] tw-border-none tw-text-sm tw-leading-5 tw-text-slate-900 tw-outline-none tw-text-ellipsis tw-cursor-pointer focus:tw-cursor-text"
+            }
+            displayValue={(selected) => (selected ? getElementForDisplay(selected) : "")}
+            onChange={(event) => setQuery(event.target.value)}
             placeholder={props.placeholder}
             onClick={() => buttonRef.current?.click()}
-          >
-          </Combobox.Input>
+          ></Combobox.Input>
           <Combobox.Button className="tw-inline-block tw-h-full" ref={buttonRef}>
             <span className="tw-pointer-events-none pr-2">
               <ChevronUpDownIcon
@@ -428,28 +518,44 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = props => 
             leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
             leaveTo="tw-transform tw-opacity-0 tw-scale-95"
             beforeEnter={() => setFocused(true)}
-            afterLeave={() => { validateNotUndefined(props.selected); setQuery(""); setFocused(false); }}
+            afterLeave={() => {
+              validateNotUndefined(props.selected);
+              setQuery("");
+              setFocused(false);
+            }}
           >
-            <Combobox.Options className={mergeClasses("tw-absolute tw-z-20 tw-mt-1 tw-min-w-full tw-max-h-60 tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm", props.dropdownHeight)}>
-              <ComboOptions loading={props.loading} options={filteredOptions} noOptionsString={props.noOptionsString} getElementForDisplay={getElementForDisplay} query={query} allowCustom={props.allowCustom} />
+            <Combobox.Options
+              className={mergeClasses(
+                "tw-absolute tw-z-20 tw-mt-1 tw-min-w-full tw-max-h-60 tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm",
+                props.dropdownHeight,
+              )}
+            >
+              <ComboOptions
+                loading={props.loading}
+                options={filteredOptions}
+                noOptionsString={props.noOptionsString}
+                getElementForDisplay={getElementForDisplay}
+                query={query}
+                allowCustom={props.allowCustom}
+              />
             </Combobox.Options>
           </Transition>
         </div>
       </div>
-    </Combobox >
+    </Combobox>
   );
 };
 
 type ComboOptionsProps = {
-  loading: boolean,
-  options: any[] | undefined,
-  noOptionsString: string,
-  getElementForDisplay: (value: any) => string | React.ReactElement,
-  query: string,
-  allowCustom?: boolean,
+  loading: boolean;
+  options: any[] | undefined;
+  noOptionsString: string;
+  getElementForDisplay: (value: any) => string | React.ReactElement;
+  query: string;
+  allowCustom?: boolean;
 };
 
-const ComboOptions: React.FC<ComboOptionsProps> = props => {
+const ComboOptions: React.FC<ComboOptionsProps> = (props) => {
   if (props.loading) {
     return (
       <div className="tw-p-2">
@@ -462,18 +568,27 @@ const ComboOptions: React.FC<ComboOptionsProps> = props => {
     return (
       <>
         {props.allowCustom && props.query.length > 0 && (
-          <Combobox.Option value={props.query} className={({ active, selected }) =>
-            `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${(active || selected) ? "tw-bg-slate-100 tw-text-slate-900" : "tw-text-slate-900"
-            }`
-          }>
+          <Combobox.Option
+            value={props.query}
+            className={({ active, selected }) =>
+              `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${
+                active || selected ? "tw-bg-slate-100 tw-text-slate-900" : "tw-text-slate-900"
+              }`
+            }
+          >
             Custom: "{props.query}"
           </Combobox.Option>
         )}
         {props.options!.map((option: any, index: number) => (
-          <Combobox.Option key={index} value={option} className={({ active, selected }) =>
-            `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${(active || selected) ? "tw-bg-slate-100 tw-text-slate-900" : "tw-text-slate-900"
-            }`
-          }>
+          <Combobox.Option
+            key={index}
+            value={option}
+            className={({ active, selected }) =>
+              `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${
+                active || selected ? "tw-bg-slate-100 tw-text-slate-900" : "tw-text-slate-900"
+              }`
+            }
+          >
             {({ selected }) => (
               <>
                 <span className={`tw-block tw-truncate ${selected ? "tw-font-medium" : "tw-font-normal"}`}>
@@ -487,25 +602,29 @@ const ComboOptions: React.FC<ComboOptionsProps> = props => {
               </>
             )}
           </Combobox.Option>
-        ))
-        }
+        ))}
       </>
     );
   } else {
     return (
       <>
-        {props.allowCustom ?
-          props.allowCustom && props.query.length > 0 && (
-            <Combobox.Option value={props.query} className={({ active, selected }) =>
-              `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${(active || selected) ? "tw-bg-slate-100 tw-text-slate-900" : "tw-text-slate-900"
-              }`
-            }>
+        {props.allowCustom ? (
+          props.allowCustom &&
+          props.query.length > 0 && (
+            <Combobox.Option
+              value={props.query}
+              className={({ active, selected }) =>
+                `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${
+                  active || selected ? "tw-bg-slate-100 tw-text-slate-900" : "tw-text-slate-900"
+                }`
+              }
+            >
               Custom: "{props.query}"
             </Combobox.Option>
           )
-          :
+        ) : (
           <div className="tw-p-2 tw-pl-4 tw-select-none">{props.noOptionsString}</div>
-        }
+        )}
       </>
     );
   }
@@ -521,5 +640,5 @@ const sameWidth: Modifier<"sameWidth"> = {
   },
   effect: ({ state }) => {
     state.elements.popper.style.width = `${state.elements.reference.getBoundingClientRect().width}px`;
-  }
+  },
 };

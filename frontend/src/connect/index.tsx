@@ -19,7 +19,7 @@ if (isProd()) {
       recordHeadersAndBody: true,
       networkHeadersToRedact: ["X-LINK-TOKEN"],
       networkBodyKeysToRedact: ["link_token"],
-    }
+    },
   });
 }
 
@@ -33,5 +33,5 @@ root.render(
         <ConnectApp />
       </BrowserRouter>
     </ErrorBoundary>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

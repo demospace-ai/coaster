@@ -14,11 +14,11 @@ export default defineConfig({
         {
           dir: "build",
           entryFileNames: "initialize.js",
-        }
-      ]
-    }
+        },
+      ],
+    },
   },
   server: {
     port: 3000,
-  }
+  },
 });

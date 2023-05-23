@@ -1,8 +1,8 @@
 import { Schema } from "src/rpc/api";
 
 export type DateRange = {
-  minDate: Date,
-  maxDate: Date,
+  minDate: Date;
+  maxDate: Date;
 };
 
 export const getDateStringInUTC = (d: Date): string => {
@@ -11,7 +11,7 @@ export const getDateStringInUTC = (d: Date): string => {
 };
 
 export const formatSchema = (schema: Schema): Schema => {
-  return schema.map(fieldSchema => {
+  return schema.map((fieldSchema) => {
     return {
       name: fieldSchema.name.replaceAll("_", " "),
       type: fieldSchema.type,

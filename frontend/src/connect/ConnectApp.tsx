@@ -10,7 +10,7 @@ import { CustomTheme } from "src/utils/theme";
 let needsInit = true;
 
 export type FabraDisplayOptions = {
-  supportEmail: string | undefined,
+  supportEmail: string | undefined;
   docsLink: string | undefined;
 };
 
@@ -33,7 +33,7 @@ export const ConnectApp: React.FC = () => {
       if (theme.colors?.primary?.text) {
         root.style.setProperty("--color-primary-text", theme.colors.primary.text);
       }
-    };
+    }
   };
 
   useEffect(() => {
@@ -62,36 +62,42 @@ export const ConnectApp: React.FC = () => {
   }, []);
 
   // No close function if Connect is embedded into a container, since it isn't a popup
-  const close = useContainer ? undefined : () => {
-    window.parent.postMessage({ messageType: MessageType.Close }, "*");
-  };
+  const close = useContainer
+    ? undefined
+    : () => {
+        window.parent.postMessage({ messageType: MessageType.Close }, "*");
+      };
 
   if (!linkToken) {
-    return (<Loading />);
+    return <Loading />;
   }
 
   // TODO: pull all child state out to a reducer or redux store here so state isn"t lost on navigation
   return (
     <div className="tw-fixed tw-bg-[rgb(0,0,0,0.2)] tw-w-full tw-h-full">
-      {useContainer ?
+      {useContainer ? (
         <div className="tw-fixed tw-bg-white tw-flex tw-flex-col tw-w-full tw-h-full tw-items-center">
           <Routes>
             <Route path="/*" element={<Syncs linkToken={linkToken} close={close} />} />
             <Route path="/sync/:syncID" element={<SyncRuns linkToken={linkToken} close={close} />} />
-            <Route path="/newsync" element={<NewSync linkToken={linkToken} close={close} supportEmail={supportEmail} docsLink={docsLink} />} />
+            <Route
+              path="/newsync"
+              element={<NewSync linkToken={linkToken} close={close} supportEmail={supportEmail} docsLink={docsLink} />}
+            />
           </Routes>
         </div>
-        :
+      ) : (
         <div className="tw-fixed tw-bg-white tw-flex tw-flex-col tw-w-[70%] tw-h-[75%] tw-top-[50%] tw-left-1/2 -tw-translate-y-1/2 -tw-translate-x-1/2 tw-rounded-lg tw-shadow-modal tw-items-center">
           <Routes>
             <Route path="/*" element={<Syncs linkToken={linkToken} close={close} />} />
             <Route path="/sync/:syncID" element={<SyncRuns linkToken={linkToken} close={close} />} />
-            <Route path="/newsync" element={<NewSync linkToken={linkToken} close={close} supportEmail={supportEmail} docsLink={docsLink} />} />
+            <Route
+              path="/newsync"
+              element={<NewSync linkToken={linkToken} close={close} supportEmail={supportEmail} docsLink={docsLink} />}
+            />
           </Routes>
         </div>
-      }
-
+      )}
     </div>
   );
 };
-

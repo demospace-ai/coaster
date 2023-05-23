@@ -7,17 +7,21 @@ export enum MessageType {
   Close = "fabra-window-close",
 }
 
-export type FabraMessage = {
-  messageType: MessageType.IFrameReady;
-} | {
-  messageType: MessageType.LinkToken;
-  linkToken: string;
-} | {
-  messageType: MessageType.Close;
-} | {
-  messageType: MessageType.Configure,
-  theme: CustomTheme | undefined,
-  useContainer: boolean,
-  supportEmail: string | undefined,
-  docsLink: string | undefined,
-};
+export type FabraMessage =
+  | {
+      messageType: MessageType.IFrameReady;
+    }
+  | {
+      messageType: MessageType.LinkToken;
+      linkToken: string;
+    }
+  | {
+      messageType: MessageType.Close;
+    }
+  | {
+      messageType: MessageType.Configure;
+      theme: CustomTheme | undefined;
+      useContainer: boolean;
+      supportEmail: string | undefined;
+      docsLink: string | undefined;
+    };

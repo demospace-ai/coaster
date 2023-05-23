@@ -16,22 +16,22 @@ export interface LoginState {
 
 export type LoginAction =
   | {
-    type: "login.authenticated",
-    user: User,
-    organization?: Organization,
-    suggestedOrganizations?: Organization[],
-  }
+      type: "login.authenticated";
+      user: User;
+      organization?: Organization;
+      suggestedOrganizations?: Organization[];
+    }
   | {
-    type: "login.validateCode",
-    email: string,
-  }
+      type: "login.validateCode";
+      email: string;
+    }
   | {
-    type: "login.logout";
-  }
+      type: "login.logout";
+    }
   | {
-    type: "login.organizationSet",
-    organization: Organization,
-  };
+      type: "login.organizationSet";
+      organization: Organization;
+    };
 
 export function loginReducer(state: LoginState = INITIAL_LOGIN_STATE, action: LoginAction): LoginState {
   switch (action.type) {

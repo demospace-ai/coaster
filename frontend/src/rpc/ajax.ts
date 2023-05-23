@@ -24,7 +24,7 @@ export function getEndpointUrl<RequestType extends Record<string, any>, Response
 
   const url = new URL(ROOT_DOMAIN + path);
   if (endpoint.queryParams && payload) {
-    endpoint.queryParams.forEach(queryParam => {
+    endpoint.queryParams.forEach((queryParam) => {
       const queryParamValue = payload[queryParam];
       if (queryParamValue) {
         url.searchParams.append(queryParam, queryParamValue);
@@ -45,7 +45,7 @@ export async function sendRequest<RequestType extends Record<string, any>, Respo
 
   const url = new URL(ROOT_DOMAIN + path);
   if (endpoint.queryParams && payload) {
-    endpoint.queryParams.forEach(queryParam => {
+    endpoint.queryParams.forEach((queryParam) => {
       const queryParamValue = payload[queryParam];
       if (queryParamValue) {
         url.searchParams.append(queryParam, queryParamValue);
@@ -54,7 +54,11 @@ export async function sendRequest<RequestType extends Record<string, any>, Respo
   }
 
   const extraHeadersList = extraHeaders ? extraHeaders : [];
-  const headers = new Headers([["Content-Type", "application/json"], ["X-TIME-ZONE", Intl.DateTimeFormat().resolvedOptions().timeZone], ...extraHeadersList]);
+  const headers = new Headers([
+    ["Content-Type", "application/json"],
+    ["X-TIME-ZONE", Intl.DateTimeFormat().resolvedOptions().timeZone],
+    ...extraHeadersList,
+  ]);
   let options: RequestInit = {
     method: endpoint.method,
     headers: headers,
@@ -68,7 +72,7 @@ export async function sendRequest<RequestType extends Record<string, any>, Respo
   const response = await fetch(url, options);
 
   if (!response.ok) {
-    const errorMessage = response.statusText + ": " + await response.text();
+    const errorMessage = response.statusText + ": " + (await response.text());
     // TODO: log error
     throw new HttpError(response.status, errorMessage);
   }

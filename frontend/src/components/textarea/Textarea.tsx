@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 
-export const ExpandingTextarea: React.FC<React.DetailedHTMLProps<React.TextareaHTMLAttributes<HTMLTextAreaElement>, HTMLTextAreaElement>> = props => {
+export const ExpandingTextarea: React.FC<
+  React.DetailedHTMLProps<React.TextareaHTMLAttributes<HTMLTextAreaElement>, HTMLTextAreaElement>
+> = (props) => {
   const ref = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
     if (ref.current) {

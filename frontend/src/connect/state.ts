@@ -1,5 +1,25 @@
 import { sendLinkTokenRequest } from "src/rpc/ajax";
-import { BigQueryConfig, ConnectionType, FabraObject, Field, FieldMappingInput, FrequencyUnits, GetSources, LinkCreateSource, LinkCreateSourceRequest, LinkCreateSync, LinkCreateSyncRequest, LinkGetSources, LinkGetSyncs, MongoDbConfig, PostgresConfig, RedshiftConfig, SnowflakeConfig, Source, SynapseConfig } from "src/rpc/api";
+import {
+  BigQueryConfig,
+  ConnectionType,
+  FabraObject,
+  Field,
+  FieldMappingInput,
+  FrequencyUnits,
+  GetSources,
+  LinkCreateSource,
+  LinkCreateSourceRequest,
+  LinkCreateSync,
+  LinkCreateSyncRequest,
+  LinkGetSources,
+  LinkGetSyncs,
+  MongoDbConfig,
+  PostgresConfig,
+  RedshiftConfig,
+  SnowflakeConfig,
+  Source,
+  SynapseConfig,
+} from "src/rpc/api";
 import { HttpError } from "src/utils/errors";
 import { mutate } from "swr";
 
@@ -73,7 +93,7 @@ export const INITIAL_SOURCE_STATE: NewSourceState = {
 };
 
 export const resetState = (setState: React.Dispatch<React.SetStateAction<SetupSyncState>>) => {
-  setState(_ => {
+  setState((_) => {
     return INITIAL_SETUP_STATE;
   });
 };
@@ -98,9 +118,9 @@ export type SetupSyncState = {
   connectionType: ConnectionType | undefined;
   source: Source | undefined;
   newSourceState: NewSourceState;
-  displayName: string | undefined,
-  frequency: number | undefined,
-  frequencyUnits: FrequencyUnits | undefined,
+  displayName: string | undefined;
+  frequency: number | undefined;
+  frequencyUnits: FrequencyUnits | undefined;
   fieldMappings: FieldMappingState[] | undefined;
 };
 
@@ -130,38 +150,48 @@ export const validateConnectionSetup = (connectionType: ConnectionType | undefin
 
   switch (connectionType) {
     case ConnectionType.Snowflake:
-      return state.displayName.length > 0
-        && state.snowflakeConfig.username.length > 0
-        && state.snowflakeConfig.password.length > 0
-        && state.snowflakeConfig.database_name.length > 0
-        && state.snowflakeConfig.warehouse_name.length > 0
-        && state.snowflakeConfig.role.length > 0
-        && state.snowflakeConfig.host.length > 0;
+      return (
+        state.displayName.length > 0 &&
+        state.snowflakeConfig.username.length > 0 &&
+        state.snowflakeConfig.password.length > 0 &&
+        state.snowflakeConfig.database_name.length > 0 &&
+        state.snowflakeConfig.warehouse_name.length > 0 &&
+        state.snowflakeConfig.role.length > 0 &&
+        state.snowflakeConfig.host.length > 0
+      );
     case ConnectionType.BigQuery:
       return state.displayName.length > 0 && state.bigqueryConfig.credentials.length > 0;
     case ConnectionType.Redshift:
-      return state.displayName.length > 0
-        && state.redshiftConfig.username.length > 0
-        && state.redshiftConfig.password.length > 0
-        && state.redshiftConfig.database_name.length > 0
-        && state.redshiftConfig.endpoint.length > 0;
+      return (
+        state.displayName.length > 0 &&
+        state.redshiftConfig.username.length > 0 &&
+        state.redshiftConfig.password.length > 0 &&
+        state.redshiftConfig.database_name.length > 0 &&
+        state.redshiftConfig.endpoint.length > 0
+      );
     case ConnectionType.Synapse:
-      return state.displayName.length > 0
-        && state.synapseConfig.username.length > 0
-        && state.synapseConfig.password.length > 0
-        && state.synapseConfig.database_name.length > 0
-        && state.synapseConfig.endpoint.length > 0;
+      return (
+        state.displayName.length > 0 &&
+        state.synapseConfig.username.length > 0 &&
+        state.synapseConfig.password.length > 0 &&
+        state.synapseConfig.database_name.length > 0 &&
+        state.synapseConfig.endpoint.length > 0
+      );
     case ConnectionType.MongoDb:
-      return state.displayName.length > 0
-        && state.mongodbConfig.username.length > 0
-        && state.mongodbConfig.password.length > 0
-        && state.mongodbConfig.host.length > 0; // connection options is optional
+      return (
+        state.displayName.length > 0 &&
+        state.mongodbConfig.username.length > 0 &&
+        state.mongodbConfig.password.length > 0 &&
+        state.mongodbConfig.host.length > 0
+      ); // connection options is optional
     case ConnectionType.Postgres:
-      return state.displayName.length > 0
-        && state.postgresConfig.username.length > 0
-        && state.postgresConfig.password.length > 0
-        && state.postgresConfig.database_name.length > 0
-        && state.postgresConfig.endpoint.length > 0;
+      return (
+        state.displayName.length > 0 &&
+        state.postgresConfig.username.length > 0 &&
+        state.postgresConfig.password.length > 0 &&
+        state.postgresConfig.database_name.length > 0 &&
+        state.postgresConfig.endpoint.length > 0
+      );
     case ConnectionType.Webhook:
       return false; // cannot create a sync with a webhook source
   }
@@ -180,7 +210,7 @@ export const createNewSource = async (
   if (state.newSourceState.sourceCreated) {
     // TODO: clear success if one of the inputs change and just update the already created source
     // Already created the source, just continue again
-    setState(state => ({ ...state, step: SyncSetupStep.ChooseData }));
+    setState((state) => ({ ...state, step: SyncSetupStep.ChooseData }));
     return;
   }
 
@@ -218,7 +248,7 @@ export const createNewSource = async (
     // Tell SWRs to refetch sources
     mutate({ GetSources });
     mutate({ LinkGetSources }); // Tell SWRs to refetch sources
-    setState(state => ({
+    setState((state) => ({
       ...state,
       source: response.source,
       step: SyncSetupStep.ChooseData,
@@ -229,29 +259,33 @@ export const createNewSource = async (
   } catch (e) {
     if (e instanceof HttpError) {
       const errorMessage = e.message;
-      setState(state => ({ ...state, newSourceState: { ...state.newSourceState, error: errorMessage } }));
+      setState((state) => ({ ...state, newSourceState: { ...state.newSourceState, error: errorMessage } }));
     }
   }
 };
 
 export const validateObjectSetup = (state: SetupSyncState): boolean => {
-  return (state.object !== undefined && state.namespace !== undefined && state.tableName !== undefined);
+  return state.object !== undefined && state.namespace !== undefined && state.tableName !== undefined;
 };
 
 export const validateSyncSetup = (state: SetupSyncState): boolean => {
-  return state.displayName !== undefined && state.displayName.length > 0
-    && state.source !== undefined
-    && state.object !== undefined
-    && ((state.namespace !== undefined && state.namespace !== undefined) || state.customJoin !== undefined)
+  return (
+    state.displayName !== undefined &&
+    state.displayName.length > 0 &&
+    state.source !== undefined &&
+    state.object !== undefined &&
+    ((state.namespace !== undefined && state.namespace !== undefined) || state.customJoin !== undefined) &&
     // && state.frequency !== undefined
     // && state.frequencyUnits !== undefined
-    && state.fieldMappings !== undefined && validateFieldMappings(state.fieldMappings);
+    state.fieldMappings !== undefined &&
+    validateFieldMappings(state.fieldMappings)
+  );
 };
 
 const validateFieldMappings = (fieldMapppings: FieldMappingState[]): boolean => {
-  return fieldMapppings.every(fieldMapping => {
+  return fieldMapppings.every((fieldMapping) => {
     if (fieldMapping.expandedJson) {
-      return fieldMapping.jsonFields.every(jsonField => jsonField !== undefined);
+      return fieldMapping.jsonFields.every((jsonField) => jsonField !== undefined);
     } else {
       return fieldMapping.sourceField !== undefined;
     }
@@ -270,7 +304,7 @@ export const createNewSync = async (
 
   const convertFieldMappings = (fieldMapping: FieldMappingState): FieldMappingInput[] => {
     if (fieldMapping.expandedJson) {
-      return fieldMapping.jsonFields.map(jsonMapping => {
+      return fieldMapping.jsonFields.map((jsonMapping) => {
         return {
           source_field_name: jsonMapping!.name,
           source_field_type: jsonMapping!.type,
@@ -279,12 +313,14 @@ export const createNewSync = async (
         };
       });
     } else {
-      return [{
-        source_field_name: fieldMapping.sourceField!.name,
-        source_field_type: fieldMapping.sourceField!.type,
-        destination_field_id: fieldMapping.destinationFieldId,
-        is_json_field: false,
-      }];
+      return [
+        {
+          source_field_name: fieldMapping.sourceField!.name,
+          source_field_type: fieldMapping.sourceField!.type,
+          destination_field_id: fieldMapping.destinationFieldId,
+          is_json_field: false,
+        },
+      ];
     }
   };
 
@@ -297,21 +333,21 @@ export const createNewSync = async (
     table_name: state.tableName,
     frequency: state.frequency!,
     frequency_units: state.frequencyUnits!,
-    field_mappings: fieldMappings
+    field_mappings: fieldMappings,
   };
 
   try {
     await sendLinkTokenRequest(LinkCreateSync, linkToken, payload);
     // Tell SWRs to refetch syncs
     mutate({ LinkGetSyncs });
-    setState(state => ({
+    setState((state) => ({
       ...state,
       syncCreated: true,
     }));
   } catch (e) {
     if (e instanceof HttpError) {
       const errorMessage = e.message;
-      setState(state => ({ ...state, error: errorMessage }));
+      setState((state) => ({ ...state, error: errorMessage }));
     }
   }
 };

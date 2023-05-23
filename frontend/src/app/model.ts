@@ -1,13 +1,13 @@
 export type AppAction =
   | {
-    type: "loading";
-  }
+      type: "loading";
+    }
   | {
-    type: "done";
-  }
+      type: "done";
+    }
   | {
-    type: "forbidden";
-  };
+      type: "forbidden";
+    };
 
 const INITIAL_APP_STATE: AppState = {
   loading: true,

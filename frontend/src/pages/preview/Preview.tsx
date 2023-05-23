@@ -21,8 +21,8 @@ export const Preview: React.FC = () => {
           base: baseColor,
           hover: hoverColor,
           text: textColor,
-        }
-      }
+        },
+      },
     });
   }, [baseColor, hoverColor, textColor]);
 
@@ -34,9 +34,9 @@ export const Preview: React.FC = () => {
           base: baseColor,
           hover: hoverColor,
           text: textColor,
-        }
-      }
-    }
+        },
+      },
+    },
   });
 
   const openPreview = async (endCustomerID: string) => {
@@ -60,26 +60,55 @@ export const Preview: React.FC = () => {
         </div>
         <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1 tw-font-medium">
           <span>Test End Customer ID</span>
-          <Tooltip placement="right" label="This can be any string. If you use an actual ID for one of your users, you can see what that user will see.">
+          <Tooltip
+            placement="right"
+            label="This can be any string. If you use an actual ID for one of your users, you can see what that user will see."
+          >
             <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
           </Tooltip>
         </div>
-        <Input className="tw-h-10" wrapperClass="tw-mr-6" value={endCustomerID} setValue={setEndCustomerID} placeholder="Test End Customer ID" />
+        <Input
+          className="tw-h-10"
+          wrapperClass="tw-mr-6"
+          value={endCustomerID}
+          setValue={setEndCustomerID}
+          placeholder="Test End Customer ID"
+        />
         <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1 tw-font-medium">
           <span>Base Color</span>
         </div>
-        <ColorPicker className="tw-h-10" value={baseColor} setValue={setBaseColor} placeholder="Base Color (optional)" />
+        <ColorPicker
+          className="tw-h-10"
+          value={baseColor}
+          setValue={setBaseColor}
+          placeholder="Base Color (optional)"
+        />
         <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1 tw-font-medium">
           <span>Hover Color</span>
         </div>
-        <ColorPicker className="tw-h-10" value={hoverColor} setValue={setHoverColor} placeholder="Hover Color (optional)" />
+        <ColorPicker
+          className="tw-h-10"
+          value={hoverColor}
+          setValue={setHoverColor}
+          placeholder="Hover Color (optional)"
+        />
         <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1 tw-font-medium">
           <span>Text Color</span>
         </div>
-        <ColorPicker className="tw-h-10" value={textColor} setValue={setTextColor} placeholder="Text Color (optional)" />
-        <Button className="tw-px-4 tw-h-10 tw-mt-6" onClick={() => endCustomerID && openPreview(endCustomerID)}>Open Fabra Connect</Button>
+        <ColorPicker
+          className="tw-h-10"
+          value={textColor}
+          setValue={setTextColor}
+          placeholder="Text Color (optional)"
+        />
+        <Button className="tw-px-4 tw-h-10 tw-mt-6" onClick={() => endCustomerID && openPreview(endCustomerID)}>
+          Open Fabra Connect
+        </Button>
       </div>
-      <div id="fabra-container" className="tw-w-full tw-h-full tw-border tw-border-slate-200 tw-rounded-md tw-overflow-clip" />
+      <div
+        id="fabra-container"
+        className="tw-w-full tw-h-full tw-border tw-border-slate-200 tw-rounded-md tw-overflow-clip"
+      />
     </div>
   );
 };

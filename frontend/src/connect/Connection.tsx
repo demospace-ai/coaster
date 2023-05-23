@@ -17,7 +17,7 @@ export const NewSourceConfiguration: React.FC<SetupSyncProps & FabraDisplayOptio
 
   // setState computes the NewSourceState using the provided function, then passes that new state to the parent setState
   const setNewSourceState = (getNewSourceState: (newSourceState: NewSourceState) => NewSourceState) => {
-    props.setState(state => {
+    props.setState((state) => {
       const newSourceState = getNewSourceState(state.newSourceState);
       return { ...state, newSourceState: newSourceState };
     });
@@ -30,7 +30,7 @@ export const NewSourceConfiguration: React.FC<SetupSyncProps & FabraDisplayOptio
   }
 
   if (props.state.newSourceState.sourceCreated) {
-    props.setState(state => ({ ...state, step: SyncSetupStep.ExistingSources }));
+    props.setState((state) => ({ ...state, step: SyncSetupStep.ExistingSources }));
     return <Loading />;
   }
 
@@ -70,12 +70,25 @@ export const NewSourceConfiguration: React.FC<SetupSyncProps & FabraDisplayOptio
           <div className="tw-mb-4 tw-text-slate-600">Provide the settings and credentials for your data source.</div>
           {inputs}
           <TestConnectionButton state={state} setState={setNewSourceState} connectionType={connectionType} />
-          {state.error && <div className="tw-mt-4 tw-text-red-700 tw-p-2 tw-text-center tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">{state.error}</div>}
+          {state.error && (
+            <div className="tw-mt-4 tw-text-red-700 tw-p-2 tw-text-center tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">
+              {state.error}
+            </div>
+          )}
         </div>
         <div className="tw-w-80 tw-ml-auto tw-text-xs tw-leading-5 tw-border-l tw-border-slate-200 tw-h-fit tw-py-2 tw-pl-8 tw-mr-10">
           <div className="">
             <div className="tw-text-[13px] tw-mb-1 tw-font-medium">Read our docs</div>
-            Not sure where to start? Check out <a href={props.docsLink ? props.docsLink : "https://docs.fabra.io"} target="_blank" rel="noreferrer" className="tw-text-blue-500">the docs</a> for step-by-step instructions.
+            Not sure where to start? Check out{" "}
+            <a
+              href={props.docsLink ? props.docsLink : "https://docs.fabra.io"}
+              target="_blank"
+              rel="noreferrer"
+              className="tw-text-blue-500"
+            >
+              the docs
+            </a>{" "}
+            for step-by-step instructions.
           </div>
           <div className="tw-my-5 tw-py-5 tw-border-y tw-border-slate-200">
             <div className="tw-text-[13px] tw-mb-1 tw-font-medium">Allowed IPs</div>
@@ -87,7 +100,14 @@ export const NewSourceConfiguration: React.FC<SetupSyncProps & FabraDisplayOptio
           </div>
           <div>
             <div className="tw-text-[13px] tw-mb-1 tw-font-medium">Contact support</div>
-            We"re here to help! <a href={props.supportEmail ? "mailto:" + props.supportEmail : "mailto:help@fabra.io"} className="tw-text-blue-500">Reach out</a> if you feel stuck or have any questions.
+            We"re here to help!{" "}
+            <a
+              href={props.supportEmail ? "mailto:" + props.supportEmail : "mailto:help@fabra.io"}
+              className="tw-text-blue-500"
+            >
+              Reach out
+            </a>{" "}
+            if you feel stuck or have any questions.
           </div>
         </div>
       </div>
@@ -95,7 +115,11 @@ export const NewSourceConfiguration: React.FC<SetupSyncProps & FabraDisplayOptio
   );
 };
 
-const TestConnectionButton: React.FC<{ state: NewSourceState, setState: React.Dispatch<(state: NewSourceState) => NewSourceState>, connectionType: ConnectionType; }> = props => {
+const TestConnectionButton: React.FC<{
+  state: NewSourceState;
+  setState: React.Dispatch<(state: NewSourceState) => NewSourceState>;
+  connectionType: ConnectionType;
+}> = (props) => {
   const [testLoading, setTestLoading] = useState(false);
   const [testConnectionSuccess, setTestConnectionSuccess] = useState<boolean | null>(null);
   const { state, setState } = props;
@@ -105,15 +129,15 @@ const TestConnectionButton: React.FC<{ state: NewSourceState, setState: React.Di
     if (!validateConnectionSetup(props.connectionType, state)) {
       setTestLoading(false);
       setTestConnectionSuccess(false);
-      setState(state => {
+      setState((state) => {
         return { ...state, error: "Must fill out all required fields" };
       });
       return;
     }
 
     const payload: TestDataConnectionRequest = {
-      "display_name": state.displayName,
-      "connection_type": props.connectionType,
+      display_name: state.displayName,
+      connection_type: props.connectionType,
     };
 
     switch (props.connectionType) {
@@ -143,14 +167,14 @@ const TestConnectionButton: React.FC<{ state: NewSourceState, setState: React.Di
     try {
       await sendRequest(TestDataConnection, payload);
       setTestConnectionSuccess(true);
-      setState(state => {
+      setState((state) => {
         return { ...state, error: undefined };
       });
     } catch (e) {
       setTestConnectionSuccess(false);
       if (e instanceof HttpError) {
         const errorMessage = e.message;
-        setState(state => {
+        setState((state) => {
           return { ...state, error: errorMessage };
         });
       }
@@ -162,8 +186,17 @@ const TestConnectionButton: React.FC<{ state: NewSourceState, setState: React.Di
   const testColor = testConnectionSuccess ? "tw-bg-green-700 hover:tw-bg-green-800" : null;
   return (
     <>
-      <Button className={mergeClasses("tw-mt-8 tw-border-slate-200 tw-w-48 tw-h-10", testColor)} onClick={testConnection}>{testLoading ? <Loading /> : "Test"}</Button>
-      {testConnectionSuccess && <div className="tw-mt-4 tw-w-48 tw-text-green-700 tw-p-2 tw-text-center tw-bg-green-50 tw-border tw-border-green-600 tw-rounded">Success!</div>}
+      <Button
+        className={mergeClasses("tw-mt-8 tw-border-slate-200 tw-w-48 tw-h-10", testColor)}
+        onClick={testConnection}
+      >
+        {testLoading ? <Loading /> : "Test"}
+      </Button>
+      {testConnectionSuccess && (
+        <div className="tw-mt-4 tw-w-48 tw-text-green-700 tw-p-2 tw-text-center tw-bg-green-50 tw-border tw-border-green-600 tw-rounded">
+          Success!
+        </div>
+      )}
     </>
   );
 };
@@ -173,7 +206,7 @@ type ConnectionConfigurationProps = {
   setState: React.Dispatch<(state: NewSourceState) => NewSourceState>;
 };
 
-const SnowflakeInputs: React.FC<ConnectionConfigurationProps> = props => {
+const SnowflakeInputs: React.FC<ConnectionConfigurationProps> = (props) => {
   const state = props.state;
   return (
     <>
@@ -183,54 +216,133 @@ const SnowflakeInputs: React.FC<ConnectionConfigurationProps> = props => {
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
-      <ValidatedInput id="displayName" value={state.displayName} setValue={(value) => { props.setState(state => ({ ...state, displayName: value })); }} placeholder="Display Name" />
+      <ValidatedInput
+        id="displayName"
+        value={state.displayName}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, displayName: value }));
+        }}
+        placeholder="Display Name"
+      />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Username</span>
         <Tooltip placement="right" label="We recommend you create a dedicated user for syncing.">
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
-      <ValidatedInput id="username" value={state.snowflakeConfig.username} setValue={(value) => { props.setState(state => ({ ...state, snowflakeConfig: { ...state.snowflakeConfig, username: value } })); }} placeholder="Username" />
+      <ValidatedInput
+        id="username"
+        value={state.snowflakeConfig.username}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, snowflakeConfig: { ...state.snowflakeConfig, username: value } }));
+        }}
+        placeholder="Username"
+      />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Password</span>
         <Tooltip placement="right" label="Password for the user specified above.">
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
-      <ValidatedInput id="password" type="password" value={state.snowflakeConfig.password} setValue={(value) => { props.setState(state => ({ ...state, snowflakeConfig: { ...state.snowflakeConfig, password: value } })); }} placeholder="Password" />
+      <ValidatedInput
+        id="password"
+        type="password"
+        value={state.snowflakeConfig.password}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, snowflakeConfig: { ...state.snowflakeConfig, password: value } }));
+        }}
+        placeholder="Password"
+      />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Database Name</span>
         <Tooltip placement="right" label="The Snowflake database to sync from.">
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
-      <ValidatedInput id="databaseName" value={state.snowflakeConfig.database_name} setValue={(value) => { props.setState(state => ({ ...state, snowflakeConfig: { ...state.snowflakeConfig, database_name: value } })); }} placeholder="Database Name" />
+      <ValidatedInput
+        id="databaseName"
+        value={state.snowflakeConfig.database_name}
+        setValue={(value) => {
+          props.setState((state) => ({
+            ...state,
+            snowflakeConfig: { ...state.snowflakeConfig, database_name: value },
+          }));
+        }}
+        placeholder="Database Name"
+      />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Warehouse Name</span>
         <Tooltip placement="right" label="The warehouse that will be used to run syncs in Snowflake.">
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
-      <ValidatedInput id="warehouseName" value={state.snowflakeConfig.warehouse_name} setValue={(value) => { props.setState(state => ({ ...state, snowflakeConfig: { ...state.snowflakeConfig, warehouse_name: value } })); }} placeholder="Warehouse Name" />
+      <ValidatedInput
+        id="warehouseName"
+        value={state.snowflakeConfig.warehouse_name}
+        setValue={(value) => {
+          props.setState((state) => ({
+            ...state,
+            snowflakeConfig: { ...state.snowflakeConfig, warehouse_name: value },
+          }));
+        }}
+        placeholder="Warehouse Name"
+      />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Role</span>
         <Tooltip placement="right" label="The role that will be used to run syncs.">
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
-      <ValidatedInput id="role" value={state.snowflakeConfig.role} setValue={(value) => { props.setState(state => ({ ...state, snowflakeConfig: { ...state.snowflakeConfig, role: value } })); }} placeholder="Role" />
+      <ValidatedInput
+        id="role"
+        value={state.snowflakeConfig.role}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, snowflakeConfig: { ...state.snowflakeConfig, role: value } }));
+        }}
+        placeholder="Role"
+      />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Host</span>
-        <Tooltip placement="right" label={<div className="tw-m-2"><span>This is your Snowflake URL. Format may differ based on Snowflake account age. For details, </span><a className="tw-text-blue-400" target="_blank" rel="noreferrer" href="https://docs.snowflake.com/en/user-guide/admin-account-identifier.html">visit the Snowflake docs.</a><div className="tw-mt-2"><span>Example:</span><div className="tw-mt-2 tw-w-full tw-bg-slate-900 tw-rounded-md tw-p-2">abc123.us-east1.gcp.snowflakecomputing.com</div></div></div>} interactive maxWidth={500}>
+        <Tooltip
+          placement="right"
+          label={
+            <div className="tw-m-2">
+              <span>This is your Snowflake URL. Format may differ based on Snowflake account age. For details, </span>
+              <a
+                className="tw-text-blue-400"
+                target="_blank"
+                rel="noreferrer"
+                href="https://docs.snowflake.com/en/user-guide/admin-account-identifier.html"
+              >
+                visit the Snowflake docs.
+              </a>
+              <div className="tw-mt-2">
+                <span>Example:</span>
+                <div className="tw-mt-2 tw-w-full tw-bg-slate-900 tw-rounded-md tw-p-2">
+                  abc123.us-east1.gcp.snowflakecomputing.com
+                </div>
+              </div>
+            </div>
+          }
+          interactive
+          maxWidth={500}
+        >
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
-      </div >
-      <ValidatedInput id="host" value={state.snowflakeConfig.host} setValue={(value) => { props.setState(state => ({ ...state, snowflakeConfig: { ...state.snowflakeConfig, host: value } })); }} placeholder="Host" />
+      </div>
+      <ValidatedInput
+        id="host"
+        value={state.snowflakeConfig.host}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, snowflakeConfig: { ...state.snowflakeConfig, host: value } }));
+        }}
+        placeholder="Host"
+      />
     </>
   );
 };
 
-const RedshiftInputs: React.FC<ConnectionConfigurationProps> = props => {
+const RedshiftInputs: React.FC<ConnectionConfigurationProps> = (props) => {
   const state = props.state;
   return (
     <>
@@ -240,47 +352,107 @@ const RedshiftInputs: React.FC<ConnectionConfigurationProps> = props => {
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
-      <ValidatedInput id="displayName" value={state.displayName} setValue={(value) => { props.setState(state => ({ ...state, displayName: value })); }} placeholder="Display Name" />
+      <ValidatedInput
+        id="displayName"
+        value={state.displayName}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, displayName: value }));
+        }}
+        placeholder="Display Name"
+      />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Username</span>
         <Tooltip placement="right" label="We recommend you create a dedicated user for syncing.">
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
-      <ValidatedInput id="username" value={state.redshiftConfig.username} setValue={(value) => { props.setState(state => ({ ...state, redshiftConfig: { ...state.redshiftConfig, username: value } })); }} placeholder="Username" />
+      <ValidatedInput
+        id="username"
+        value={state.redshiftConfig.username}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, redshiftConfig: { ...state.redshiftConfig, username: value } }));
+        }}
+        placeholder="Username"
+      />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Password</span>
         <Tooltip placement="right" label="Password for the user specified above.">
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
-      <ValidatedInput id="password" type="password" value={state.redshiftConfig.password} setValue={(value) => { props.setState(state => ({ ...state, redshiftConfig: { ...state.redshiftConfig, password: value } })); }} placeholder="Password" />
+      <ValidatedInput
+        id="password"
+        type="password"
+        value={state.redshiftConfig.password}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, redshiftConfig: { ...state.redshiftConfig, password: value } }));
+        }}
+        placeholder="Password"
+      />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Database Name</span>
         <Tooltip placement="right" label="The Redshift database to sync from.">
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
-      <ValidatedInput id="databaseName" value={state.redshiftConfig.database_name} setValue={(value) => { props.setState(state => ({ ...state, redshiftConfig: { ...state.redshiftConfig, database_name: value } })); }} placeholder="Database Name" />
+      <ValidatedInput
+        id="databaseName"
+        value={state.redshiftConfig.database_name}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, redshiftConfig: { ...state.redshiftConfig, database_name: value } }));
+        }}
+        placeholder="Database Name"
+      />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Endpoint</span>
-        <Tooltip placement="right" label={
-          <div className="tw-m-2">
-            <div>This is the URL for your Redshift data warehouse. For Redshift clusters, it can be found on the specific cluster page under "General Information" and should look like:</div>
-            <div className="tw-mt-2 tw-w-full tw-bg-slate-900 tw-rounded-md tw-p-2">your-cluster.abc123.us-west-2.redshift.amazonaws.com</div>
-            <div className="tw-mt-3">For Serverless Redshift, <a className="tw-text-blue-400" target="_blank" rel="noreferrer" href="https://docs.aws.amazon.com/redshift/latest/mgmt/serverless-connecting.html">visit the Redshift docs.</a> The following is the expected format for Serverless Redshift:</div>
-            <div className="tw-mt-2 tw-w-full tw-bg-slate-900 tw-rounded-md tw-p-2"><span className="tw-italic">workgroup-name</span>.<span className="tw-italic">account-number</span>.<span className="tw-italic">aws-region</span>.redshift-serverless.amazonaws.com</div>
-          </div>
-        } interactive maxWidth={640}>
+        <Tooltip
+          placement="right"
+          label={
+            <div className="tw-m-2">
+              <div>
+                This is the URL for your Redshift data warehouse. For Redshift clusters, it can be found on the specific
+                cluster page under "General Information" and should look like:
+              </div>
+              <div className="tw-mt-2 tw-w-full tw-bg-slate-900 tw-rounded-md tw-p-2">
+                your-cluster.abc123.us-west-2.redshift.amazonaws.com
+              </div>
+              <div className="tw-mt-3">
+                For Serverless Redshift,{" "}
+                <a
+                  className="tw-text-blue-400"
+                  target="_blank"
+                  rel="noreferrer"
+                  href="https://docs.aws.amazon.com/redshift/latest/mgmt/serverless-connecting.html"
+                >
+                  visit the Redshift docs.
+                </a>{" "}
+                The following is the expected format for Serverless Redshift:
+              </div>
+              <div className="tw-mt-2 tw-w-full tw-bg-slate-900 tw-rounded-md tw-p-2">
+                <span className="tw-italic">workgroup-name</span>.<span className="tw-italic">account-number</span>.
+                <span className="tw-italic">aws-region</span>.redshift-serverless.amazonaws.com
+              </div>
+            </div>
+          }
+          interactive
+          maxWidth={640}
+        >
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
-      </div >
-      <ValidatedInput id="endpoint" value={state.redshiftConfig.endpoint} setValue={(value) => { props.setState(state => ({ ...state, redshiftConfig: { ...state.redshiftConfig, endpoint: value } })); }} placeholder="Endpoint" />
+      </div>
+      <ValidatedInput
+        id="endpoint"
+        value={state.redshiftConfig.endpoint}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, redshiftConfig: { ...state.redshiftConfig, endpoint: value } }));
+        }}
+        placeholder="Endpoint"
+      />
     </>
   );
 };
 
-const SynapseInputs: React.FC<ConnectionConfigurationProps> = props => {
+const SynapseInputs: React.FC<ConnectionConfigurationProps> = (props) => {
   const state = props.state;
   return (
     <>
@@ -290,47 +462,93 @@ const SynapseInputs: React.FC<ConnectionConfigurationProps> = props => {
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
-      <ValidatedInput id="displayName" value={state.displayName} setValue={(value) => { props.setState(state => ({ ...state, displayName: value })); }} placeholder="Display Name" />
+      <ValidatedInput
+        id="displayName"
+        value={state.displayName}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, displayName: value }));
+        }}
+        placeholder="Display Name"
+      />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Username</span>
         <Tooltip placement="right" label="We recommend you create a dedicated user for syncing.">
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
-      <ValidatedInput id="username" value={state.synapseConfig.username} setValue={(value) => { props.setState(state => ({ ...state, synapseConfig: { ...state.synapseConfig, username: value } })); }} placeholder="Username" />
+      <ValidatedInput
+        id="username"
+        value={state.synapseConfig.username}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, synapseConfig: { ...state.synapseConfig, username: value } }));
+        }}
+        placeholder="Username"
+      />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Password</span>
         <Tooltip placement="right" label="Password for the user specified above.">
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
-      <ValidatedInput id="password" type="password" value={state.synapseConfig.password} setValue={(value) => { props.setState(state => ({ ...state, synapseConfig: { ...state.synapseConfig, password: value } })); }} placeholder="Password" />
+      <ValidatedInput
+        id="password"
+        type="password"
+        value={state.synapseConfig.password}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, synapseConfig: { ...state.synapseConfig, password: value } }));
+        }}
+        placeholder="Password"
+      />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Database Name</span>
         <Tooltip placement="right" label="The Synapse database to sync from.">
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
-      <ValidatedInput id="databaseName" value={state.synapseConfig.database_name} setValue={(value) => { props.setState(state => ({ ...state, synapseConfig: { ...state.synapseConfig, database_name: value } })); }} placeholder="Database Name" />
+      <ValidatedInput
+        id="databaseName"
+        value={state.synapseConfig.database_name}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, synapseConfig: { ...state.synapseConfig, database_name: value } }));
+        }}
+        placeholder="Database Name"
+      />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Endpoint</span>
-        <Tooltip placement="right" label={
-          <div className="tw-m-2">
-            <div>This is the URL for your Synapse data warehouse. It can be found on your Synapse Workspace Overview page under "Essentials". For Dedicated SQL pools it should look like:</div>
-            <div className="tw-mt-2 tw-w-full tw-bg-slate-900 tw-rounded-md tw-p-2">abc123.sql.azuresynapse.net</div>
-            <div className="tw-mt-3">For Serverless Synapse, it should look like:</div>
-            <div className="tw-mt-2 tw-w-full tw-bg-slate-900 tw-rounded-md tw-p-2">abc123-ondemand.sql.azuresynapse.net</div>
-          </div>}
-          interactive maxWidth={640}>
+        <Tooltip
+          placement="right"
+          label={
+            <div className="tw-m-2">
+              <div>
+                This is the URL for your Synapse data warehouse. It can be found on your Synapse Workspace Overview page
+                under "Essentials". For Dedicated SQL pools it should look like:
+              </div>
+              <div className="tw-mt-2 tw-w-full tw-bg-slate-900 tw-rounded-md tw-p-2">abc123.sql.azuresynapse.net</div>
+              <div className="tw-mt-3">For Serverless Synapse, it should look like:</div>
+              <div className="tw-mt-2 tw-w-full tw-bg-slate-900 tw-rounded-md tw-p-2">
+                abc123-ondemand.sql.azuresynapse.net
+              </div>
+            </div>
+          }
+          interactive
+          maxWidth={640}
+        >
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
-      </div >
-      <ValidatedInput id="endpoint" value={state.synapseConfig.endpoint} setValue={(value) => { props.setState(state => ({ ...state, synapseConfig: { ...state.synapseConfig, endpoint: value } })); }} placeholder="Endpoint" />
+      </div>
+      <ValidatedInput
+        id="endpoint"
+        value={state.synapseConfig.endpoint}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, synapseConfig: { ...state.synapseConfig, endpoint: value } }));
+        }}
+        placeholder="Endpoint"
+      />
     </>
   );
 };
 
-const PostgresInputs: React.FC<ConnectionConfigurationProps> = props => {
+const PostgresInputs: React.FC<ConnectionConfigurationProps> = (props) => {
   const state = props.state;
   return (
     <>
@@ -340,53 +558,138 @@ const PostgresInputs: React.FC<ConnectionConfigurationProps> = props => {
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
-      <ValidatedInput id="displayName" value={state.displayName} setValue={(value) => { props.setState(state => ({ ...state, displayName: value })); }} placeholder="Display Name" />
+      <ValidatedInput
+        id="displayName"
+        value={state.displayName}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, displayName: value }));
+        }}
+        placeholder="Display Name"
+      />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Username</span>
         <Tooltip placement="right" label="We recommend you create a dedicated user for syncing.">
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
-      <ValidatedInput id="username" value={state.postgresConfig.username} setValue={(value) => { props.setState(state => ({ ...state, postgresConfig: { ...state.postgresConfig, username: value } })); }} placeholder="Username" />
+      <ValidatedInput
+        id="username"
+        value={state.postgresConfig.username}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, postgresConfig: { ...state.postgresConfig, username: value } }));
+        }}
+        placeholder="Username"
+      />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Password</span>
         <Tooltip placement="right" label="Password for the user specified above.">
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
-      <ValidatedInput id="password" type="password" value={state.postgresConfig.password} setValue={(value) => { props.setState(state => ({ ...state, postgresConfig: { ...state.postgresConfig, password: value } })); }} placeholder="Password" />
+      <ValidatedInput
+        id="password"
+        type="password"
+        value={state.postgresConfig.password}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, postgresConfig: { ...state.postgresConfig, password: value } }));
+        }}
+        placeholder="Password"
+      />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Database Name</span>
         <Tooltip placement="right" label="The Postgres database to sync from.">
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
-      <ValidatedInput id="databaseName" value={state.postgresConfig.database_name} setValue={(value) => { props.setState(state => ({ ...state, postgresConfig: { ...state.postgresConfig, database_name: value } })); }} placeholder="Database Name" />
+      <ValidatedInput
+        id="databaseName"
+        value={state.postgresConfig.database_name}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, postgresConfig: { ...state.postgresConfig, database_name: value } }));
+        }}
+        placeholder="Database Name"
+      />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Endpoint</span>
-        <Tooltip placement="right" label="This is the endpoint for your Postgres database. It must be in the format <host>:<port>, i.e. 127.0.0.1:5432" interactive maxWidth={640}>
+        <Tooltip
+          placement="right"
+          label="This is the endpoint for your Postgres database. It must be in the format <host>:<port>, i.e. 127.0.0.1:5432"
+          interactive
+          maxWidth={640}
+        >
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
-      </div >
-      <ValidatedInput id="host" value={state.postgresConfig.endpoint} setValue={(value) => { props.setState(state => ({ ...state, postgresConfig: { ...state.postgresConfig, endpoint: value } })); }} placeholder="Endpoint" />
+      </div>
+      <ValidatedInput
+        id="host"
+        value={state.postgresConfig.endpoint}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, postgresConfig: { ...state.postgresConfig, endpoint: value } }));
+        }}
+        placeholder="Endpoint"
+      />
     </>
   );
 };
 
-const MongoDbInputs: React.FC<ConnectionConfigurationProps> = props => {
+const MongoDbInputs: React.FC<ConnectionConfigurationProps> = (props) => {
   const state = props.state;
   return (
     <>
-      <ValidatedInput id="displayName" value={state.displayName} setValue={(value) => { props.setState(state => ({ ...state, displayName: value })); }} placeholder="Display Name" label="Display Name" />
-      <ValidatedInput id="username" value={state.mongodbConfig.username} setValue={(value) => { props.setState(state => ({ ...state, mongodbConfig: { ...state.mongodbConfig, username: value } })); }} placeholder="Username" label="Username" />
-      <ValidatedInput id="password" type="password" value={state.mongodbConfig.password} setValue={(value) => { props.setState(state => ({ ...state, mongodbConfig: { ...state.mongodbConfig, password: value } })); }} placeholder="Password" label="Password" />
-      <ValidatedInput id="host" value={state.mongodbConfig.host} setValue={(value) => { props.setState(state => ({ ...state, mongodbConfig: { ...state.mongodbConfig, host: value } })); }} placeholder="Host" label="Host" />
-      <Input id="connectionOptions" value={state.mongodbConfig.connection_options} setValue={(value) => { props.setState(state => ({ ...state, mongodbConfig: { ...state.mongodbConfig, connection_options: value } })); }} placeholder="Connection Options (optional)" label="Connection Options (optional)" />
+      <ValidatedInput
+        id="displayName"
+        value={state.displayName}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, displayName: value }));
+        }}
+        placeholder="Display Name"
+        label="Display Name"
+      />
+      <ValidatedInput
+        id="username"
+        value={state.mongodbConfig.username}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, mongodbConfig: { ...state.mongodbConfig, username: value } }));
+        }}
+        placeholder="Username"
+        label="Username"
+      />
+      <ValidatedInput
+        id="password"
+        type="password"
+        value={state.mongodbConfig.password}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, mongodbConfig: { ...state.mongodbConfig, password: value } }));
+        }}
+        placeholder="Password"
+        label="Password"
+      />
+      <ValidatedInput
+        id="host"
+        value={state.mongodbConfig.host}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, mongodbConfig: { ...state.mongodbConfig, host: value } }));
+        }}
+        placeholder="Host"
+        label="Host"
+      />
+      <Input
+        id="connectionOptions"
+        value={state.mongodbConfig.connection_options}
+        setValue={(value) => {
+          props.setState((state) => ({
+            ...state,
+            mongodbConfig: { ...state.mongodbConfig, connection_options: value },
+          }));
+        }}
+        placeholder="Connection Options (optional)"
+        label="Connection Options (optional)"
+      />
     </>
   );
 };
 
-const BigQueryInputs: React.FC<ConnectionConfigurationProps> = props => {
+const BigQueryInputs: React.FC<ConnectionConfigurationProps> = (props) => {
   const state = props.state;
   return (
     <>
@@ -396,17 +699,36 @@ const BigQueryInputs: React.FC<ConnectionConfigurationProps> = props => {
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
-      <ValidatedInput id="displayName" value={state.displayName} setValue={(value) => { props.setState(state => ({ ...state, displayName: value })); }} placeholder="Display Name" />
+      <ValidatedInput
+        id="displayName"
+        value={state.displayName}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, displayName: value }));
+        }}
+        placeholder="Display Name"
+      />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Location</span>
         <Tooltip placement="right" label="The geographic location of your BigQuery dataset(s).">
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
-      <ValidatedInput id="location" value={state.bigqueryConfig.location} setValue={(value) => { props.setState(state => ({ ...state, bigqueryConfig: { ...state.bigqueryConfig, location: value } })); }} placeholder="Location" />
+      <ValidatedInput
+        id="location"
+        value={state.bigqueryConfig.location}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, bigqueryConfig: { ...state.bigqueryConfig, location: value } }));
+        }}
+        placeholder="Location"
+      />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Service Account Key</span>
-        <Tooltip placement="right" label="This can be obtained in the Google Cloud web console by navigating to the IAM page and clicking on Service Accounts in the left sidebar. Then, find your service account in the list, go to its Keys tab, and click Add Key. Finally, click on Create new key and choose JSON." interactive maxWidth={500}>
+        <Tooltip
+          placement="right"
+          label="This can be obtained in the Google Cloud web console by navigating to the IAM page and clicking on Service Accounts in the left sidebar. Then, find your service account in the list, go to its Keys tab, and click Add Key. Finally, click on Create new key and choose JSON."
+          interactive
+          maxWidth={500}
+        >
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
@@ -414,7 +736,9 @@ const BigQueryInputs: React.FC<ConnectionConfigurationProps> = props => {
         className="tw-h-24 tw-min-h-[40px] tw-max-h-80"
         id="credentials"
         value={state.bigqueryConfig.credentials}
-        setValue={(value) => { props.setState(state => ({ ...state, bigqueryConfig: { ...state.bigqueryConfig, credentials: value } })); }}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, bigqueryConfig: { ...state.bigqueryConfig, credentials: value } }));
+        }}
         placeholder="Credentials (paste JSON here)"
         textarea={true}
       />

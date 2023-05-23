@@ -4,9 +4,9 @@ import React from "react";
 export interface TooltipProps extends TippyProps {
   children: React.ReactElement;
   label?: React.ReactElement | string;
-};
+}
 
-export const Tooltip: React.FC<TooltipProps> = props => {
+export const Tooltip: React.FC<TooltipProps> = (props) => {
   const { label, ...other } = props;
 
   return (

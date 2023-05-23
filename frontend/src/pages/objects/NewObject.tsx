@@ -5,10 +5,33 @@ import { Checkbox } from "src/components/checkbox/Checkbox";
 import { InfoIcon } from "src/components/icons/Icons";
 import { Input, ValidatedDropdownInput, ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
-import { DestinationSelector, FieldSelector, FieldTypeSelector, NamespaceSelector, TableSelector } from "src/components/selector/Selector";
+import {
+  DestinationSelector,
+  FieldSelector,
+  FieldTypeSelector,
+  NamespaceSelector,
+  TableSelector,
+} from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { sendRequest } from "src/rpc/ajax";
-import { ConnectionType, CreateObject, CreateObjectRequest, Destination, Field, FieldType, FrequencyUnits, GetObjects, needsCursorField, needsEndCustomerId, needsPrimaryKey, ObjectFieldInput, Schema, shouldCreateFields, SyncMode, TargetType } from "src/rpc/api";
+import {
+  ConnectionType,
+  CreateObject,
+  CreateObjectRequest,
+  Destination,
+  Field,
+  FieldType,
+  FrequencyUnits,
+  GetObjects,
+  needsCursorField,
+  needsEndCustomerId,
+  needsPrimaryKey,
+  ObjectFieldInput,
+  Schema,
+  shouldCreateFields,
+  SyncMode,
+  TargetType,
+} from "src/rpc/api";
 import { useSchema } from "src/rpc/data";
 import { HttpError } from "src/utils/errors";
 import { mergeClasses } from "src/utils/twmerge";
@@ -72,42 +95,54 @@ type ObjectStepProps = {
   setState: React.Dispatch<React.SetStateAction<NewObjectState>>;
 };
 
-const validateAll = (state: NewObjectState, setState: React.Dispatch<React.SetStateAction<NewObjectState>>): boolean => {
+const validateAll = (
+  state: NewObjectState,
+  setState: React.Dispatch<React.SetStateAction<NewObjectState>>,
+): boolean => {
   return (
-    validateDisplayName(state, setState)
-    && validateDestination(state, setState)
-    && validateFields(state, setState)
-    && state.syncMode !== undefined
-    && (!needsCursorField(state.syncMode) || validateCursorField(state, setState))
-    && (!needsPrimaryKey(state.syncMode) || state.primaryKey !== undefined)
-    && (!needsEndCustomerId(state.targetType!) || state.endCustomerIdField !== undefined)
-    && validateFrequency(state, setState)
+    validateDisplayName(state, setState) &&
+    validateDestination(state, setState) &&
+    validateFields(state, setState) &&
+    state.syncMode !== undefined &&
+    (!needsCursorField(state.syncMode) || validateCursorField(state, setState)) &&
+    (!needsPrimaryKey(state.syncMode) || state.primaryKey !== undefined) &&
+    (!needsEndCustomerId(state.targetType!) || state.endCustomerIdField !== undefined) &&
+    validateFrequency(state, setState)
   );
 };
 
-const validateDisplayName = (state: NewObjectState, setState: React.Dispatch<React.SetStateAction<NewObjectState>>): boolean => {
+const validateDisplayName = (
+  state: NewObjectState,
+  setState: React.Dispatch<React.SetStateAction<NewObjectState>>,
+): boolean => {
   if (state.displayName === undefined || state.displayName.length <= 0) {
-    setState(state => {
+    setState((state) => {
       return {
-        ...state, displayNameError: "Must set a display name",
+        ...state,
+        displayNameError: "Must set a display name",
       };
     });
     return false;
   }
 
-  setState(state => {
+  setState((state) => {
     return {
-      ...state, displayNameError: undefined,
+      ...state,
+      displayNameError: undefined,
     };
   });
   return true;
 };
 
-const validateDestination = (state: NewObjectState, setState: React.Dispatch<React.SetStateAction<NewObjectState>>): boolean => {
+const validateDestination = (
+  state: NewObjectState,
+  setState: React.Dispatch<React.SetStateAction<NewObjectState>>,
+): boolean => {
   if (state.destination === undefined) {
-    setState(state => {
+    setState((state) => {
       return {
-        ...state, destinationError: "Must select a destination"
+        ...state,
+        destinationError: "Must select a destination",
       };
     });
     return false;
@@ -115,9 +150,10 @@ const validateDestination = (state: NewObjectState, setState: React.Dispatch<Rea
 
   if (state.destination.connection.connection_type !== ConnectionType.Webhook) {
     if (state.targetType === undefined) {
-      setState(state => {
+      setState((state) => {
         return {
-          ...state, destinationError: "Must select a target"
+          ...state,
+          destinationError: "Must select a target",
         };
       });
       return false;
@@ -125,18 +161,20 @@ const validateDestination = (state: NewObjectState, setState: React.Dispatch<Rea
 
     if (state.targetType === TargetType.SingleExisting) {
       if (state.namespace === undefined || state.namespace.length <= 0) {
-        setState(state => {
+        setState((state) => {
           return {
-            ...state, destinationError: "Must select a namespace"
+            ...state,
+            destinationError: "Must select a namespace",
           };
         });
         return false;
       }
 
       if (state.tableName === undefined || state.tableName.length <= 0) {
-        setState(state => {
+        setState((state) => {
           return {
-            ...state, destinationError: "Must select a table name"
+            ...state,
+            destinationError: "Must select a table name",
           };
         });
         return false;
@@ -144,19 +182,24 @@ const validateDestination = (state: NewObjectState, setState: React.Dispatch<Rea
     }
   }
 
-  setState(state => {
+  setState((state) => {
     return {
-      ...state, destinationError: undefined
+      ...state,
+      destinationError: undefined,
     };
   });
   return true;
 };
 
-const validateFields = (state: NewObjectState, setState: React.Dispatch<React.SetStateAction<NewObjectState>>): boolean => {
+const validateFields = (
+  state: NewObjectState,
+  setState: React.Dispatch<React.SetStateAction<NewObjectState>>,
+): boolean => {
   if (state.objectFields === undefined || state.objectFields.length <= 0) {
-    setState(state => {
+    setState((state) => {
       return {
-        ...state, fieldsError: "Must create at least one object field"
+        ...state,
+        fieldsError: "Must create at least one object field",
       };
     });
     return false;
@@ -164,67 +207,79 @@ const validateFields = (state: NewObjectState, setState: React.Dispatch<React.Se
 
   for (const objectField of state.objectFields) {
     if (!objectField.name || objectField.name.length <= 0 || !objectField.type || objectField.type.length <= 0) {
-      setState(state => {
+      setState((state) => {
         return {
-          ...state, fieldsError: "Must provide name and type for each object field"
+          ...state,
+          fieldsError: "Must provide name and type for each object field",
         };
       });
       return false;
     }
-  };
+  }
 
-  setState(state => {
+  setState((state) => {
     return {
-      ...state, fieldsError: undefined
+      ...state,
+      fieldsError: undefined,
     };
   });
   return true;
 };
 
-const validateCursorField = (state: NewObjectState, setState: React.Dispatch<React.SetStateAction<NewObjectState>>): boolean => {
+const validateCursorField = (
+  state: NewObjectState,
+  setState: React.Dispatch<React.SetStateAction<NewObjectState>>,
+): boolean => {
   // TODO: allow using other types
   if (state.cursorField === undefined) {
-    setState(state => {
+    setState((state) => {
       return {
-        ...state, cursorFieldError: "Must set cursor field"
+        ...state,
+        cursorFieldError: "Must set cursor field",
       };
     });
     return false;
   }
 
-  if (state.cursorField.type !== FieldType.Timestamp
-    && state.cursorField.type !== FieldType.DatetimeTz
-    && state.cursorField.type !== FieldType.DatetimeNtz
-    && state.cursorField.type !== FieldType.Date
-    && state.cursorField.type !== FieldType.Integer
-    && state.cursorField.type !== FieldType.Number
+  if (
+    state.cursorField.type !== FieldType.Timestamp &&
+    state.cursorField.type !== FieldType.DatetimeTz &&
+    state.cursorField.type !== FieldType.DatetimeNtz &&
+    state.cursorField.type !== FieldType.Date &&
+    state.cursorField.type !== FieldType.Integer &&
+    state.cursorField.type !== FieldType.Number
   ) {
-    setState(state => {
+    setState((state) => {
       return {
-        ...state, cursorFieldError: "Cursor field must be an integer, number, timestamp, date, or datetime type."
+        ...state,
+        cursorFieldError: "Cursor field must be an integer, number, timestamp, date, or datetime type.",
       };
     });
     return false;
   }
 
-  setState(state => {
+  setState((state) => {
     return {
-      ...state, cursorFieldError: undefined
+      ...state,
+      cursorFieldError: undefined,
     };
   });
   return true;
 };
 
-const validateFrequency = (state: NewObjectState, setState: React.Dispatch<React.SetStateAction<NewObjectState>>): boolean => {
+const validateFrequency = (
+  state: NewObjectState,
+  setState: React.Dispatch<React.SetStateAction<NewObjectState>>,
+): boolean => {
   if (state.frequency === undefined) {
-    setState(state => {
+    setState((state) => {
       return { ...state, frequencyError: "Must set frequency" };
     });
     return false;
   }
 
   if (state.frequencyUnits === undefined) {
-    setState(state => {
+    setState((state) => {
       return { ...state, frequencyError: "Must set frequency units" };
     });
     return false;
@@ -233,7 +288,7 @@ const validateFrequency = (state: NewObjectState, setState: React.Dispatch<React
   return true;
 };
 
-export const NewObject: React.FC<{ onComplete: () => void; }> = props => {
+export const NewObject: React.FC<{ onComplete: () => void }> = (props) => {
   const [state, setState] = useState<NewObjectState>(INITIAL_OBJECT_STATE);
   const [prevSchema, setPrevSchema] = useState<Schema | undefined>(undefined);
   const { schema } = useSchema(state.destination?.connection.id, state.namespace, state.tableName);
@@ -241,7 +296,7 @@ export const NewObject: React.FC<{ onComplete: () => void; }> = props => {
   // Initialize object fields from schema
   if (schema && schema !== prevSchema) {
     setPrevSchema(schema);
-    const objectFields = schema.map(field => {
+    const objectFields = schema.map((field) => {
       // automatically omit end customer ID field
       return {
         name: field.name,
@@ -250,7 +305,7 @@ export const NewObject: React.FC<{ onComplete: () => void; }> = props => {
         optional: false,
       };
     });
-    setState(state => {
+    setState((state) => {
       return {
         ...state,
         objectFields: objectFields,
@@ -268,11 +323,27 @@ export const NewObject: React.FC<{ onComplete: () => void; }> = props => {
       break;
     case Step.FieldMapping:
       content = <ExistingObjectFields state={state} setState={setState} />;
-      back = () => setState({ ...state, step: Step.Initial, displayNameError: undefined, destinationError: undefined, fieldsError: undefined, cursorFieldError: undefined });
+      back = () =>
+        setState({
+          ...state,
+          step: Step.Initial,
+          displayNameError: undefined,
+          destinationError: undefined,
+          fieldsError: undefined,
+          cursorFieldError: undefined,
+        });
       break;
     case Step.CreateFields:
       content = <NewObjectFields state={state} setState={setState} />;
-      back = () => setState({ ...state, step: Step.Initial, displayNameError: undefined, destinationError: undefined, fieldsError: undefined, cursorFieldError: undefined });
+      back = () =>
+        setState({
+          ...state,
+          step: Step.Initial,
+          displayNameError: undefined,
+          destinationError: undefined,
+          fieldsError: undefined,
+          cursorFieldError: undefined,
+        });
       break;
     case Step.Finalize:
       content = <Finalize state={state} setState={setState} onComplete={props.onComplete} />;
@@ -283,7 +354,15 @@ export const NewObject: React.FC<{ onComplete: () => void; }> = props => {
         prevStep = Step.FieldMapping;
       }
 
-      back = () => setState({ ...state, step: prevStep, displayNameError: undefined, destinationError: undefined, fieldsError: undefined, cursorFieldError: undefined });
+      back = () =>
+        setState({
+          ...state,
+          step: prevStep,
+          displayNameError: undefined,
+          destinationError: undefined,
+          fieldsError: undefined,
+          cursorFieldError: undefined,
+        });
       break;
   }
 
@@ -292,28 +371,52 @@ export const NewObject: React.FC<{ onComplete: () => void; }> = props => {
       <BackButton onClick={back} />
       <div className="tw-flex tw-flex-col tw-w-[900px] tw-mt-8 tw-mb-24 tw-py-12 tw-px-10 tw-mx-auto tw-bg-white tw-rounded-lg tw-shadow-md tw-items-center">
         {content}
-        {state.displayNameError && <div className="tw-mt-4 tw-text-red-700 tw-py-2 tw-px-10 tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">{state.displayNameError}</div>}
-        {state.destinationError && <div className="tw-mt-4 tw-text-red-700 tw-py-2 tw-px-10 tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">{state.destinationError}</div>}
-        {state.fieldsError && <div className="tw-mt-4 tw-text-red-700 tw-py-2 tw-px-10 tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">{state.fieldsError}</div>}
-        {state.cursorFieldError && <div className="tw-mt-4 tw-text-red-700 tw-py-2 tw-px-10 tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">{state.cursorFieldError}</div>}
-        {state.frequencyError && <div className="tw-mt-4 tw-text-red-700 tw-py-2 tw-px-10 tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">{state.frequencyError}</div>}
-        {state.createError && <div className="tw-mt-4 tw-text-red-700 tw-py-2 tw-px-10 tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">{state.createError}</div>}
+        {state.displayNameError && (
+          <div className="tw-mt-4 tw-text-red-700 tw-py-2 tw-px-10 tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">
+            {state.displayNameError}
+          </div>
+        )}
+        {state.destinationError && (
+          <div className="tw-mt-4 tw-text-red-700 tw-py-2 tw-px-10 tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">
+            {state.destinationError}
+          </div>
+        )}
+        {state.fieldsError && (
+          <div className="tw-mt-4 tw-text-red-700 tw-py-2 tw-px-10 tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">
+            {state.fieldsError}
+          </div>
+        )}
+        {state.cursorFieldError && (
+          <div className="tw-mt-4 tw-text-red-700 tw-py-2 tw-px-10 tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">
+            {state.cursorFieldError}
+          </div>
+        )}
+        {state.frequencyError && (
+          <div className="tw-mt-4 tw-text-red-700 tw-py-2 tw-px-10 tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">
+            {state.frequencyError}
+          </div>
+        )}
+        {state.createError && (
+          <div className="tw-mt-4 tw-text-red-700 tw-py-2 tw-px-10 tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">
+            {state.createError}
+          </div>
+        )}
       </div>
     </>
   );
 };
 
-export const DestinationSetup: React.FC<ObjectStepProps> = props => {
+export const DestinationSetup: React.FC<ObjectStepProps> = (props) => {
   const { state, setState } = props;
 
   const advance = () => {
     if (validateDisplayName(state, setState) && validateDestination(state, setState)) {
       if (shouldCreateFields(state.destination!.connection.connection_type, state.targetType!)) {
-        setState(state => {
+        setState((state) => {
           return { ...state, step: Step.CreateFields };
         });
       } else {
-        setState(state => {
+        setState((state) => {
           return { ...state, step: Step.FieldMapping };
         });
       }
@@ -333,7 +436,9 @@ export const DestinationSetup: React.FC<ObjectStepProps> = props => {
       <ValidatedInput
         className="tw-w-100"
         value={state.displayName}
-        setValue={(value) => { setState({ ...state, displayName: value }); }}
+        setValue={(value) => {
+          setState({ ...state, displayName: value });
+        }}
         placeholder="Display Name"
       />
       <div className="tw-w-full  tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-3">
@@ -347,19 +452,37 @@ export const DestinationSetup: React.FC<ObjectStepProps> = props => {
           if (!state.destination || value.id !== state.destination.id) {
             if (value.connection.connection_type === ConnectionType.Webhook) {
               // Just hardcode EndCustomerIDField and TargetType for webhooks— they don"t matter anyway
-              setState({ ...state, destination: value, namespace: undefined, tableName: undefined, targetType: TargetType.Webhook, endCustomerIdField: { name: "end_customer_id", type: FieldType.Integer }, objectFields: [] });
+              setState({
+                ...state,
+                destination: value,
+                namespace: undefined,
+                tableName: undefined,
+                targetType: TargetType.Webhook,
+                endCustomerIdField: { name: "end_customer_id", type: FieldType.Integer },
+                objectFields: [],
+              });
             } else {
-              setState({ ...state, destination: value, namespace: undefined, tableName: undefined, endCustomerIdField: undefined, objectFields: [] });
+              setState({
+                ...state,
+                destination: value,
+                namespace: undefined,
+                tableName: undefined,
+                endCustomerIdField: undefined,
+                objectFields: [],
+              });
             }
           }
-        }} />
+        }}
+      />
       <DestinationTarget state={state} setState={setState} />
-      <Button onClick={advance} className="tw-mt-10 tw-w-full tw-h-10" >Continue</Button>
+      <Button onClick={advance} className="tw-mt-10 tw-w-full tw-h-10">
+        Continue
+      </Button>
     </div>
   );
 };
 
-const ExistingObjectFields: React.FC<ObjectStepProps> = props => {
+const ExistingObjectFields: React.FC<ObjectStepProps> = (props) => {
   const { state, setState } = props;
   const updateObjectField = (newObject: ObjectFieldInput, index: number) => {
     if (!state.objectFields) {
@@ -375,13 +498,13 @@ const ExistingObjectFields: React.FC<ObjectStepProps> = props => {
         } else {
           return original;
         }
-      })
+      }),
     });
   };
 
   const advance = () => {
     if (validateFields(state, setState)) {
-      setState(state => {
+      setState((state) => {
         return { ...state, step: Step.Finalize };
       });
     }
@@ -392,30 +515,52 @@ const ExistingObjectFields: React.FC<ObjectStepProps> = props => {
       <div className="tw-w-full tw-text-center tw-mb-2 tw-font-bold tw-text-lg">Object Fields</div>
       <div className="tw-text-center tw-mb-3">Provide customer-facing names and descriptions for each field.</div>
       <div className="tw-w-full tw-px-24">
-        {state.objectFields.length > 0 ?
+        {state.objectFields.length > 0 ? (
           state.objectFields.map((objectField, i) => (
             <div key={objectField.name} className={mergeClasses("tw-mt-5 tw-mb-7 tw-text-left")}>
               <span className="tw-text-base tw-font-semibold">{objectField.name}</span>
               <div className="tw-flex tw-items-center tw-mt-2 tw-pb-1.5">
                 <span className="">Omit?</span>
-                <Checkbox className="tw-ml-2 tw-h-4 tw-w-4 tw-" checked={Boolean(objectField.omit)} onCheckedChange={() => updateObjectField({ ...objectField, omit: !objectField.omit }, i)} />
+                <Checkbox
+                  className="tw-ml-2 tw-h-4 tw-w-4 tw-"
+                  checked={Boolean(objectField.omit)}
+                  onCheckedChange={() => updateObjectField({ ...objectField, omit: !objectField.omit }, i)}
+                />
                 <span className="tw-ml-4">Optional?</span>
-                <Checkbox className="tw-ml-2 tw-h-4 tw-w-4" checked={Boolean(objectField.optional)} onCheckedChange={() => updateObjectField({ ...objectField, optional: !objectField.optional }, i)} />
+                <Checkbox
+                  className="tw-ml-2 tw-h-4 tw-w-4"
+                  checked={Boolean(objectField.optional)}
+                  onCheckedChange={() => updateObjectField({ ...objectField, optional: !objectField.optional }, i)}
+                />
               </div>
-              <Input className="tw-mb-2" value={objectField.display_name} setValue={value => updateObjectField({ ...objectField, display_name: value }, i)} placeholder="Display Name (optional)" label="Display Name" />
-              <Input className="tw-mb-2" value={objectField.description} setValue={value => updateObjectField({ ...objectField, description: value }, i)} placeholder="Description (optional)" label="Description" />
+              <Input
+                className="tw-mb-2"
+                value={objectField.display_name}
+                setValue={(value) => updateObjectField({ ...objectField, display_name: value }, i)}
+                placeholder="Display Name (optional)"
+                label="Display Name"
+              />
+              <Input
+                className="tw-mb-2"
+                value={objectField.description}
+                setValue={(value) => updateObjectField({ ...objectField, description: value }, i)}
+                placeholder="Description (optional)"
+                label="Description"
+              />
             </div>
           ))
-          :
+        ) : (
           <Loading />
-        }
+        )}
       </div>
-      <Button onClick={advance} className="tw-mt-6 tw-w-100 tw-h-10" >Continue</Button>
-    </div >
+      <Button onClick={advance} className="tw-mt-6 tw-w-100 tw-h-10">
+        Continue
+      </Button>
+    </div>
   );
 };
 
-const NewObjectFields: React.FC<ObjectStepProps> = props => {
+const NewObjectFields: React.FC<ObjectStepProps> = (props) => {
   const { state, setState } = props;
   const updateObjectField = (newObject: ObjectFieldInput, index: number) => {
     if (!state.objectFields) {
@@ -431,7 +576,7 @@ const NewObjectFields: React.FC<ObjectStepProps> = props => {
         } else {
           return original;
         }
-      })
+      }),
     });
   };
 
@@ -442,18 +587,21 @@ const NewObjectFields: React.FC<ObjectStepProps> = props => {
 
     setState({
       ...state,
-      objectFields: [...state.objectFields, {
-        name: undefined,
-        type: undefined,
-        omit: false,
-        optional: false,
-      }]
+      objectFields: [
+        ...state.objectFields,
+        {
+          name: undefined,
+          type: undefined,
+          omit: false,
+          optional: false,
+        },
+      ],
     });
   };
 
   const advance = () => {
     if (validateFields(state, setState)) {
-      setState(state => {
+      setState((state) => {
         return { ...state, step: Step.Finalize };
       });
     }
@@ -464,24 +612,35 @@ const NewObjectFields: React.FC<ObjectStepProps> = props => {
       <div className="tw-w-full tw-text-center tw-mb-2 tw-font-bold tw-text-lg">Object Fields</div>
       <div className="tw-text-center tw-mb-3">Provide customer-facing names and descriptions for each field.</div>
       <div className="tw-w-full tw-px-24">
-        {state.objectFields ?
+        {state.objectFields ? (
           <div>
             {state.objectFields.map((objectField, i) => (
               <div key={i} className="tw-mt-5 tw-mb-7 tw-text-left tw-p-4 tw-border tw-rounded-lg">
                 <span className="tw-font-semibold tw-text-lg">Field {i + 1}</span>
                 <div className="tw-flex tw-items-center tw-mt-3">
                   <span>Optional?</span>
-                  <Checkbox className="tw-ml-2 tw-h-4 tw-w-4" checked={Boolean(objectField.optional)} onCheckedChange={() => updateObjectField({ ...objectField, optional: !objectField.optional }, i)} />
+                  <Checkbox
+                    className="tw-ml-2 tw-h-4 tw-w-4"
+                    checked={Boolean(objectField.optional)}
+                    onCheckedChange={() => updateObjectField({ ...objectField, optional: !objectField.optional }, i)}
+                  />
                 </div>
                 <div className="tw-flex tw-w-full tw-items-center tw-mb-2">
                   <div className="tw-w-full tw-mr-4">
                     <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
                       <span>Field Key</span>
-                      <Tooltip placement="right" label="Choose a valid JSON key that will be used when sending this field to your webhook.">
+                      <Tooltip
+                        placement="right"
+                        label="Choose a valid JSON key that will be used when sending this field to your webhook."
+                      >
                         <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
                       </Tooltip>
                     </div>
-                    <Input value={objectField.name} setValue={value => updateObjectField({ ...objectField, name: value }, i)} placeholder="Field Key" />
+                    <Input
+                      value={objectField.name}
+                      setValue={(value) => updateObjectField({ ...objectField, name: value }, i)}
+                      placeholder="Field Key"
+                    />
                   </div>
                   <div>
                     <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
@@ -490,23 +649,43 @@ const NewObjectFields: React.FC<ObjectStepProps> = props => {
                         <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
                       </Tooltip>
                     </div>
-                    <FieldTypeSelector className="tw-w-48 tw-m-0" type={objectField.type} setFieldType={value => updateObjectField({ ...objectField, type: value }, i)} />
+                    <FieldTypeSelector
+                      className="tw-w-48 tw-m-0"
+                      type={objectField.type}
+                      setFieldType={(value) => updateObjectField({ ...objectField, type: value }, i)}
+                    />
                   </div>
                 </div>
                 <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
                   <span>Display Name</span>
-                  <Tooltip placement="right" label="Set a customer-facing name that your customers will see when setting up a sync.">
+                  <Tooltip
+                    placement="right"
+                    label="Set a customer-facing name that your customers will see when setting up a sync."
+                  >
                     <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
                   </Tooltip>
                 </div>
-                <Input className="tw-mb-2" value={objectField.display_name} setValue={value => updateObjectField({ ...objectField, display_name: value }, i)} placeholder="Display Name (optional)" />
+                <Input
+                  className="tw-mb-2"
+                  value={objectField.display_name}
+                  setValue={(value) => updateObjectField({ ...objectField, display_name: value }, i)}
+                  placeholder="Display Name (optional)"
+                />
                 <div className="tw-flex tw-flex-row tw-items-center tw-mt-2 tw-mb-1">
                   <span>Description</span>
-                  <Tooltip placement="right" label="Add any extra information that will help your customers understand how to map their data to this object.">
+                  <Tooltip
+                    placement="right"
+                    label="Add any extra information that will help your customers understand how to map their data to this object."
+                  >
                     <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
                   </Tooltip>
                 </div>
-                <Input className="tw-mb-2" value={objectField.description} setValue={value => updateObjectField({ ...objectField, description: value }, i)} placeholder="Description (optional)" />
+                <Input
+                  className="tw-mb-2"
+                  value={objectField.description}
+                  setValue={(value) => updateObjectField({ ...objectField, description: value }, i)}
+                  placeholder="Description (optional)"
+                />
               </div>
             ))}
             <Button className="tw-mt-7 tw-mx-auto tw-flex tw-items-center" onClick={addObjectField}>
@@ -514,16 +693,18 @@ const NewObjectFields: React.FC<ObjectStepProps> = props => {
               Add Object Field
             </Button>
           </div>
-          :
+        ) : (
           <Loading className="tw-mt-5" />
-        }
+        )}
       </div>
-      <Button onClick={advance} className="tw-mt-16 tw-w-100 tw-h-10" >Continue</Button>
-    </div >
+      <Button onClick={advance} className="tw-mt-16 tw-w-100 tw-h-10">
+        Continue
+      </Button>
+    </div>
   );
 };
 
-const Finalize: React.FC<ObjectStepProps & { onComplete: () => void; }> = (props) => {
+const Finalize: React.FC<ObjectStepProps & { onComplete: () => void }> = (props) => {
   const { state, setState } = props;
   const [loading, setLoading] = useState<boolean>(false);
   const [createObjectSuccess, setCreateObjectSuccess] = useState<boolean | null>(null);
@@ -558,7 +739,7 @@ const Finalize: React.FC<ObjectStepProps & { onComplete: () => void; }> = (props
       setCreateObjectSuccess(false);
       if (e instanceof HttpError) {
         const createError = e.message;
-        setState(state => {
+        setState((state) => {
           return { ...state, createError };
         });
       }
@@ -567,27 +748,43 @@ const Finalize: React.FC<ObjectStepProps & { onComplete: () => void; }> = (props
     setLoading(false);
   };
 
-  const fields: Field[] = state.objectFields ? state.objectFields
-    .filter(field => field.name && field.type && !field.omit && !field.optional)
-    .map(field => {
-      return { name: field.name!, type: field.type! };
-    }) : [];
+  const fields: Field[] = state.objectFields
+    ? state.objectFields
+        .filter((field) => field.name && field.type && !field.omit && !field.optional)
+        .map((field) => {
+          return { name: field.name!, type: field.type! };
+        })
+    : [];
 
   if (createObjectSuccess) {
     return (
       <div>
-        <div className="tw-mt-10 tw-text-center tw-font-bold tw-text-lg">🎉 Congratulations! Your object is set up. 🎉</div>
-        <Button className="tw-block tw-mt-8 tw-mx-auto tw-mb-10 tw-w-32" onClick={props.onComplete}>Done</Button>
+        <div className="tw-mt-10 tw-text-center tw-font-bold tw-text-lg">
+          🎉 Congratulations! Your object is set up. 🎉
+        </div>
+        <Button className="tw-block tw-mt-8 tw-mx-auto tw-mb-10 tw-w-32" onClick={props.onComplete}>
+          Done
+        </Button>
       </div>
     );
   }
   let recommendedCursor = <></>;
   switch (state.syncMode!) {
     case SyncMode.IncrementalAppend:
-      recommendedCursor = <>For <span className="tw-px-1 tw-bg-black tw-font-mono">incremental_append</span> syncs, you should use an <span className="tw-px-1 tw-bg-black tw-font-mono">created_at</span> field.</>;
+      recommendedCursor = (
+        <>
+          For <span className="tw-px-1 tw-bg-black tw-font-mono">incremental_append</span> syncs, you should use an{" "}
+          <span className="tw-px-1 tw-bg-black tw-font-mono">created_at</span> field.
+        </>
+      );
       break;
     case SyncMode.IncrementalUpdate:
-      recommendedCursor = <>For <span className="tw-px-1 tw-bg-black tw-font-mono">incremental_update</span> syncs, you should use an <span className="tw-px-1 tw-bg-black tw-font-mono">updated_at</span> field.</>;
+      recommendedCursor = (
+        <>
+          For <span className="tw-px-1 tw-bg-black tw-font-mono">incremental_update</span> syncs, you should use an{" "}
+          <span className="tw-px-1 tw-bg-black tw-font-mono">updated_at</span> field.
+        </>
+      );
       break;
     case SyncMode.FullOverwrite:
       break;
@@ -598,18 +795,30 @@ const Finalize: React.FC<ObjectStepProps & { onComplete: () => void; }> = (props
       <div className="tw-w-full tw-text-center tw-mb-2 tw-font-bold tw-text-lg">Object Settings</div>
       <div className="tw-text-center tw-mb-3">Enter default settings for object syncs.</div>
       <SyncModeSelector state={state} setState={setState} />
-      {[SyncMode.IncrementalAppend, SyncMode.IncrementalUpdate].includes(state.syncMode!) &&
+      {[SyncMode.IncrementalAppend, SyncMode.IncrementalUpdate].includes(state.syncMode!) && (
         <>
           <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5 tw-mb-3">
             <span className="tw-font-medium">Cursor Field</span>
-            <Tooltip placement="right" label={<>Cursor field is usually a timestamp. This lets Fabra know what data has changed since the last sync. {recommendedCursor}</>} maxWidth={400} interactive>
+            <Tooltip
+              placement="right"
+              label={
+                <>
+                  Cursor field is usually a timestamp. This lets Fabra know what data has changed since the last sync.{" "}
+                  {recommendedCursor}
+                </>
+              }
+              maxWidth={400}
+              interactive
+            >
               <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
             </Tooltip>
           </div>
           <FieldSelector
             className="tw-mt-0 tw-w-100"
             field={state.cursorField}
-            setField={(value: Field) => { setState({ ...state, cursorField: value }); }}
+            setField={(value: Field) => {
+              setState({ ...state, cursorField: value });
+            }}
             placeholder="Cursor Field"
             label="Cursor Field"
             noOptionsString="No Fields Available!"
@@ -618,29 +827,35 @@ const Finalize: React.FC<ObjectStepProps & { onComplete: () => void; }> = (props
             valid={state.cursorFieldError !== undefined ? false : undefined}
           />
         </>
-      }
-      {[SyncMode.IncrementalUpdate].includes(state.syncMode!) &&
+      )}
+      {[SyncMode.IncrementalUpdate].includes(state.syncMode!) && (
         <>
           <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5 tw-mb-3">
             <span className="tw-font-medium">Primary Key</span>
-            <Tooltip placement="right" label="Primary key is usually an ID field. This lets Fabra know which existing rows in the target to update when they change." maxWidth={400}>
+            <Tooltip
+              placement="right"
+              label="Primary key is usually an ID field. This lets Fabra know which existing rows in the target to update when they change."
+              maxWidth={400}
+            >
               <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
             </Tooltip>
           </div>
           <FieldSelector
             className="tw-mt-0 tw-w-100"
             field={state.primaryKey}
-            setField={(value: Field) => { setState({ ...state, primaryKey: value }); }}
+            setField={(value: Field) => {
+              setState({ ...state, primaryKey: value });
+            }}
             placeholder="Primary Key"
             noOptionsString="No Fields Available!"
             validated={true}
             predefinedFields={fields}
           />
         </>
-      }
-      {state.syncMode !== undefined &&
+      )}
+      {state.syncMode !== undefined && (
         <>
-          {state.destination?.connection.connection_type !== ConnectionType.Webhook &&
+          {state.destination?.connection.connection_type !== ConnectionType.Webhook && (
             <>
               <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5 tw-mb-3">
                 <span className="tw-font-medium">End Customer ID</span>
@@ -648,7 +863,9 @@ const Finalize: React.FC<ObjectStepProps & { onComplete: () => void; }> = (props
               <FieldSelector
                 className="tw-mt-0 tw-w-100"
                 field={state.endCustomerIdField}
-                setField={(value: Field) => { setState({ ...state, endCustomerIdField: value }); }}
+                setField={(value: Field) => {
+                  setState({ ...state, endCustomerIdField: value });
+                }}
                 placeholder="End Customer ID Field"
                 noOptionsString="No Fields Available!"
                 validated={true}
@@ -657,18 +874,37 @@ const Finalize: React.FC<ObjectStepProps & { onComplete: () => void; }> = (props
                 tableName={state.tableName}
               />
             </>
-          }
+          )}
           <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5 tw-mb-3">
             <span className="tw-font-medium">Frequency</span>
           </div>
-          <ValidatedInput id="frequency" className="tw-w-100" min={props.state.frequencyUnits === FrequencyUnits.Minutes ? 30 : 1} type="number" value={props.state.frequency} setValue={value => props.setState({ ...props.state, frequency: value })} placeholder="Sync Frequency" />
+          <ValidatedInput
+            id="frequency"
+            className="tw-w-100"
+            min={props.state.frequencyUnits === FrequencyUnits.Minutes ? 30 : 1}
+            type="number"
+            value={props.state.frequency}
+            setValue={(value) => props.setState({ ...props.state, frequency: value })}
+            placeholder="Sync Frequency"
+          />
           <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5 tw-mb-3">
             <span className="tw-font-medium">Frequency Units</span>
           </div>
-          <ValidatedDropdownInput className="tw-mt-0 tw-w-100" options={Object.values(FrequencyUnits)} selected={props.state.frequencyUnits} setSelected={value => props.setState({ ...props.state, frequencyUnits: value })} loading={false} placeholder="Frequency Units" noOptionsString="nil" getElementForDisplay={(value) => value.charAt(0).toUpperCase() + value.slice(1)} />
+          <ValidatedDropdownInput
+            className="tw-mt-0 tw-w-100"
+            options={Object.values(FrequencyUnits)}
+            selected={props.state.frequencyUnits}
+            setSelected={(value) => props.setState({ ...props.state, frequencyUnits: value })}
+            loading={false}
+            placeholder="Frequency Units"
+            noOptionsString="nil"
+            getElementForDisplay={(value) => value.charAt(0).toUpperCase() + value.slice(1)}
+          />
         </>
-      }
-      <Button onClick={() => createNewObject()} className="tw-mt-10 tw-w-full tw-h-10">{loading ? <Loading /> : "Create Object"}</Button>
+      )}
+      <Button onClick={() => createNewObject()} className="tw-mt-10 tw-w-full tw-h-10">
+        {loading ? <Loading /> : "Create Object"}
+      </Button>
     </div>
   );
 };
@@ -683,7 +919,8 @@ const DestinationTarget: React.FC<ObjectStepProps> = ({ state, setState }) => {
     {
       type: TargetType.SingleExisting,
       title: "Single Existing Table",
-      description: "Data from all of your customers will be stored in a single existing table, with an extra ID column to distinguish between customers."
+      description:
+        "Data from all of your customers will be stored in a single existing table, with an extra ID column to distinguish between customers.",
     },
     // TODO
     // {
@@ -717,7 +954,9 @@ const DestinationTarget: React.FC<ObjectStepProps> = ({ state, setState }) => {
                 type="radio"
                 checked={state.targetType === target.type}
                 value={target.type}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setState({ ...state, targetType: e.target.value as TargetType })}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setState({ ...state, targetType: e.target.value as TargetType })
+                }
                 className="tw-h-4 tw-w-4 tw-border-slate-300 tw-text-indigo-600 focus:tw-ring-indigo-600 tw-cursor-pointer"
               />
               <div className="tw-flex tw-flex-row tw-items-center tw-ml-3 tw-leading-6">
@@ -732,7 +971,7 @@ const DestinationTarget: React.FC<ObjectStepProps> = ({ state, setState }) => {
           ))}
         </div>
       </fieldset>
-      {state.targetType === TargetType.SingleExisting &&
+      {state.targetType === TargetType.SingleExisting && (
         <>
           <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5 tw-mb-3">
             <span className="tw-font-medium">Namespace</span>
@@ -744,7 +983,13 @@ const DestinationTarget: React.FC<ObjectStepProps> = ({ state, setState }) => {
             namespace={state.namespace}
             setNamespace={(value: string) => {
               if (value !== state.namespace) {
-                setState({ ...state, namespace: value, tableName: undefined, endCustomerIdField: undefined, objectFields: [] });
+                setState({
+                  ...state,
+                  namespace: value,
+                  tableName: undefined,
+                  endCustomerIdField: undefined,
+                  objectFields: [],
+                });
               }
             }}
             noOptionsString="No Namespaces Available! (Choose a data source)"
@@ -766,7 +1011,7 @@ const DestinationTarget: React.FC<ObjectStepProps> = ({ state, setState }) => {
             validated={true}
           />
         </>
-      }
+      )}
     </div>
   );
 };
@@ -781,12 +1026,12 @@ const SyncModeSelector: React.FC<ObjectStepProps> = ({ state, setState }) => {
     {
       mode: SyncMode.FullOverwrite,
       title: "Full Overwrite",
-      description: "Fabra will overwrite the entire target table on every sync."
+      description: "Fabra will overwrite the entire target table on every sync.",
     },
     {
       mode: SyncMode.IncrementalAppend,
       title: "Incremental Append",
-      description: "Fabra will append any new rows since the last sync to the existing target table."
+      description: "Fabra will append any new rows since the last sync to the existing target table.",
     },
     // TODO
     // {
@@ -810,7 +1055,9 @@ const SyncModeSelector: React.FC<ObjectStepProps> = ({ state, setState }) => {
                 type="radio"
                 checked={state.syncMode === syncMode.mode}
                 value={syncMode.mode}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setState({ ...state, syncMode: e.target.value as SyncMode })}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setState({ ...state, syncMode: e.target.value as SyncMode })
+                }
                 className="tw-h-4 tw-w-4 tw-border-slate-300 tw-text-indigo-600 focus:tw-ring-indigo-600 tw-cursor-pointer"
               />
               <div className="tw-flex tw-flex-row tw-items-center tw-ml-3 tw-leading-6">

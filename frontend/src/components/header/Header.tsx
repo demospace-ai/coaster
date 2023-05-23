@@ -11,13 +11,13 @@ import { toTitleCase } from "src/utils/string";
 
 export const Header: React.FC = () => {
   const location = useLocation();
-  const isAuthenticated = useSelector(state => state.login.authenticated);
-  const organization = useSelector(state => state.login.organization);
+  const isAuthenticated = useSelector((state) => state.login.authenticated);
+  const organization = useSelector((state) => state.login.organization);
 
   // No header whatsoever for login and home page
   if (!isAuthenticated || !organization) {
     return <></>;
-  };
+  }
 
   return (
     <>
@@ -35,7 +35,7 @@ type Breadcrumb = {
 };
 
 // Gluten free
-const Breadcrumbs: React.FC<{ pathname: string; }> = props => {
+const Breadcrumbs: React.FC<{ pathname: string }> = (props) => {
   const pathTokens = props.pathname.split("/");
   switch (pathTokens[1]) {
     case "apikey":
@@ -51,35 +51,43 @@ const Breadcrumbs: React.FC<{ pathname: string; }> = props => {
   }
 };
 
-const SyncBreadcrumbs: React.FC<{ id: string, pathname: string; }> = props => {
+const SyncBreadcrumbs: React.FC<{ id: string; pathname: string }> = (props) => {
   const { sync } = useSync(Number(props.id)); // This is deduped by SWR so don"t worry about the extra fetch
   const title = sync?.sync.display_name;
-  const crumbs: Breadcrumb[] = [{ title: "Syncs", path: "/syncs" }, { title, path: props.pathname }];
+  const crumbs: Breadcrumb[] = [
+    { title: "Syncs", path: "/syncs" },
+    { title, path: props.pathname },
+  ];
   document.title = title + " | Fabra";
 
   return <BreadcrumbsLayout crumbs={crumbs} />;
 };
 
-const ObjectBreadcrumbs: React.FC<{ id: string, pathname: string; }> = props => {
+const ObjectBreadcrumbs: React.FC<{ id: string; pathname: string }> = (props) => {
   const { object } = useObject(Number(props.id)); // This is deduped by SWR so don"t worry about the extra fetch
   const title = object?.display_name;
-  const crumbs: Breadcrumb[] = [{ title: "Objects", path: "/objects" }, { title, path: props.pathname }];
+  const crumbs: Breadcrumb[] = [
+    { title: "Objects", path: "/objects" },
+    { title, path: props.pathname },
+  ];
   document.title = title + " | Fabra";
 
   return <BreadcrumbsLayout crumbs={crumbs} />;
 };
 
-const DestinationBreadcrumbs: React.FC<{ id: string, pathname: string; }> = props => {
+const DestinationBreadcrumbs: React.FC<{ id: string; pathname: string }> = (props) => {
   const { destination } = useDestination(Number(props.id)); // This is deduped by SWR so don"t worry about the extra fetch
   const title = destination?.display_name;
-  const crumbs: Breadcrumb[] = [{ title: "Destinations", path: "/destinations" }, { title, path: props.pathname }];
+  const crumbs: Breadcrumb[] = [
+    { title: "Destinations", path: "/destinations" },
+    { title, path: props.pathname },
+  ];
   document.title = title + " | Fabra";
 
   return <BreadcrumbsLayout crumbs={crumbs} />;
 };
 
-
-const PageBreadcrumbs: React.FC<{ title?: string, pathname: string; }> = props => {
+const PageBreadcrumbs: React.FC<{ title?: string; pathname: string }> = (props) => {
   let crumbs: Breadcrumb[] = [];
   if (props.title) {
     crumbs.push({ title: props.title, path: props.pathname });
@@ -90,14 +98,21 @@ const PageBreadcrumbs: React.FC<{ title?: string, pathname: string; }> = props =
 
   return <BreadcrumbsLayout crumbs={crumbs} />;
 };
-const BreadcrumbsLayout: React.FC<{ crumbs: Breadcrumb[]; }> = props => {
+const BreadcrumbsLayout: React.FC<{ crumbs: Breadcrumb[] }> = (props) => {
   return (
     <div className="tw-flex tw-flex-row tw-items-center">
-      <NavLink className="tw-text-sm tw-font-medium tw-select-none tw-text-slate-900 hover:tw-text-slate-600" to="/">Home</NavLink>
+      <NavLink className="tw-text-sm tw-font-medium tw-select-none tw-text-slate-900 hover:tw-text-slate-600" to="/">
+        Home
+      </NavLink>
       {props.crumbs.map((crumb, index) => (
         <div key={index} className="tw-flex tw-flex-row tw-items-center">
           <ChevronRightIcon className="tw-h-3 tw-mx-3" />
-          <NavLink className="tw-text-sm tw-font-medium tw-select-none tw-text-slate-900 tw-truncate hover:tw-text-slate-600" to={crumb.path}>{crumb.title ? crumb.title : <Loading className="tw-h-4 tw-w-4" />}</NavLink>
+          <NavLink
+            className="tw-text-sm tw-font-medium tw-select-none tw-text-slate-900 tw-truncate hover:tw-text-slate-600"
+            to={crumb.path}
+          >
+            {crumb.title ? crumb.title : <Loading className="tw-h-4 tw-w-4" />}
+          </NavLink>
         </div>
       ))}
     </div>
@@ -105,7 +120,7 @@ const BreadcrumbsLayout: React.FC<{ crumbs: Breadcrumb[]; }> = props => {
 };
 
 const ProfileDropdown: React.FC = () => {
-  const user = useSelector(state => state.login.user);
+  const user = useSelector((state) => state.login.user);
   const logout = useLogout();
   const menuItem = "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded";
 
@@ -133,7 +148,7 @@ const ProfileDropdown: React.FC = () => {
                     className={classNames(
                       active ? "tw-bg-slate-200 tw-text-slate-900" : "tw-text-slate-700",
                       menuItem,
-                      "tw-pl-2"
+                      "tw-pl-2",
                     )}
                   >
                     <div className="tw-bg-slate-400 tw-text-white tw-rounded-full tw-w-7 tw-h-7 tw-select-none tw-flex tw-items-center tw-justify-center tw-mr-3">
@@ -151,10 +166,7 @@ const ProfileDropdown: React.FC = () => {
               <Menu.Item>
                 {({ active }) => (
                   <div
-                    className={classNames(
-                      active ? "tw-bg-slate-200 tw-text-slate-900" : "tw-text-slate-700",
-                      menuItem
-                    )}
+                    className={classNames(active ? "tw-bg-slate-200 tw-text-slate-900" : "tw-text-slate-700", menuItem)}
                     onClick={logout}
                   >
                     <ArrowRightOnRectangleIcon className="tw-h-4 tw-inline tw-mr-2 tw-stroke-2" />

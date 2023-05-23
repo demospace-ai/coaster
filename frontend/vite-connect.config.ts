@@ -11,11 +11,11 @@ export default defineConfig({
       output: [
         {
           dir: "build",
-        }
-      ]
-    }
+        },
+      ],
+    },
   },
   server: {
     port: 3000,
-  }
+  },
 });

@@ -5,7 +5,9 @@ import { CustomTheme } from "src/utils/theme";
 const CONNECT_ROOT = isProd() ? "https://connect.fabra.io" : "http://localhost:3000";
 
 declare global {
-  interface Window { fabra: any; }
+  interface Window {
+    fabra: any;
+  }
 }
 
 export interface FabraConnectOptions {
@@ -144,7 +146,7 @@ const reattach = (containerID: string) => {
 const destroy = () => {
   if (iframe) {
     iframe.remove();
-  };
+  }
 
   window.fabra.initialized = false;
   window.fabra.customTheme = undefined;

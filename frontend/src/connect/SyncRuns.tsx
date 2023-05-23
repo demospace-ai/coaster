@@ -1,8 +1,4 @@
-import {
-  CheckIcon,
-  ChevronRightIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+import { CheckIcon, ChevronRightIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -12,7 +8,7 @@ import { Tooltip } from "src/components/tooltip/Tooltip";
 import { LinkRunSync, SyncRunStatus } from "src/rpc/api";
 import { useLinkSync } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
-import { sendLinkTokenRequest, sendRequest } from "../rpc/ajax";
+import { sendLinkTokenRequest } from "../rpc/ajax";
 
 export const SyncRuns: React.FC<{
   linkToken: string;
@@ -37,9 +33,7 @@ const SyncRunsList: React.FC<{ linkToken: string }> = ({ linkToken }) => {
   const { sync, mutate } = useLinkSync(Number(syncID), linkToken);
   const syncRuns = sync?.sync_runs ?? [];
 
-  const [runSyncResult, setRunSyncResult] = useState<
-    "Success" | "Failure" | null
-  >(null);
+  const [runSyncResult, setRunSyncResult] = useState<"Success" | "Failure" | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleRunSync = async () => {
@@ -117,66 +111,44 @@ const SyncRunsList: React.FC<{ linkToken: string }> = ({ linkToken }) => {
                 <th scope="col" className={tableHeaderStyle}>
                   Error
                 </th>
-                <th
-                  scope="col"
-                  className={classNames(tableHeaderStyle, "tw-w-5")}
-                ></th>
+                <th scope="col" className={classNames(tableHeaderStyle, "tw-w-5")}></th>
               </tr>
             </thead>
             <tbody className="tw-divide-y tw-divide-slate-200 tw-bg-white">
               {syncRuns.length > 0 ? (
                 syncRuns.map((syncRun, index) => (
-                  <tr
-                    key={index}
-                    className="tw-cursor-pointer hover:tw-bg-slate-50"
-                    onClick={() => {}}
-                  >
+                  <tr key={index} className="tw-cursor-pointer hover:tw-bg-slate-50" onClick={() => {}}>
                     <td className={tableCellStyle}>
                       <div
                         className={mergeClasses(
                           "tw-flex tw-justify-center tw-items-center tw-py-1 tw-px-2 tw-rounded tw-text-center tw-w-[110px] tw-border tw-text-xs tw-font-medium",
-                          getStatusStyle(syncRun.status)
+                          getStatusStyle(syncRun.status),
                         )}
                       >
                         {syncRun.status.toUpperCase()}{" "}
-                        {syncRun.status === SyncRunStatus.Running && (
-                          <DotsLoading className="tw-ml-1.5" />
-                        )}
+                        {syncRun.status === SyncRunStatus.Running && <DotsLoading className="tw-ml-1.5" />}
                       </div>
                     </td>
                     <td className={tableCellStyle}>
                       <div>
-                        <div className="tw-font-medium tw-mb-0.5">
-                          {syncRun.started_at}
-                        </div>
+                        <div className="tw-font-medium tw-mb-0.5">{syncRun.started_at}</div>
                         {syncRun.duration && (
-                          <div className="tw-text-xs tw-text-slate-500">
-                            Duration: {syncRun.duration}
-                          </div>
+                          <div className="tw-text-xs tw-text-slate-500">Duration: {syncRun.duration}</div>
                         )}
                       </div>
                     </td>
                     <td className={tableCellStyle}>{syncRun.rows_written}</td>
                     <td className={tableCellStyle}>
                       <Tooltip
-                        label={
-                          <div className="tw-m-2 tw-cursor-text tw-font-mono">
-                            {syncRun.error}
-                          </div>
-                        }
+                        label={<div className="tw-m-2 tw-cursor-text tw-font-mono">{syncRun.error}</div>}
                         maxWidth={600}
                         interactive
                       >
-                        <div className="tw-overflow-hidden tw-text-ellipsis tw-max-w-[240px]">
-                          {syncRun.error}
-                        </div>
+                        <div className="tw-overflow-hidden tw-text-ellipsis tw-max-w-[240px]">{syncRun.error}</div>
                       </Tooltip>
                     </td>
                     <td className={mergeClasses(tableCellStyle, "tw-pr-5")}>
-                      <ChevronRightIcon
-                        className="tw-ml-auto tw-h-4 tw-w-4 tw-text-slate-400"
-                        aria-hidden="true"
-                      />
+                      <ChevronRightIcon className="tw-ml-auto tw-h-4 tw-w-4 tw-text-slate-400" aria-hidden="true" />
                     </td>
                   </tr>
                 ))
@@ -200,7 +172,7 @@ const Header: React.FC<{ close: (() => void) | undefined }> = ({ close }) => {
     <div
       className={classNames(
         "tw-flex tw-flex-row tw-items-center tw-w-full",
-        close ? "tw-h-20 tw-min-h-[80px]" : "tw-h-10 tw-min-h-[48px]"
+        close ? "tw-h-20 tw-min-h-[80px]" : "tw-h-10 tw-min-h-[48px]",
       )}
     >
       {close && (
@@ -208,12 +180,7 @@ const Header: React.FC<{ close: (() => void) | undefined }> = ({ close }) => {
           className="tw-absolute tw-flex tw-items-center t tw-right-10 tw-border-none tw-cursor-pointer tw-p-0"
           onClick={close}
         >
-          <svg
-            className="tw-h-6 tw-fill-slate-500"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="none"
-          >
+          <svg className="tw-h-6 tw-fill-slate-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
             <path d="M5.1875 15.6875L4.3125 14.8125L9.125 10L4.3125 5.1875L5.1875 4.3125L10 9.125L14.8125 4.3125L15.6875 5.1875L10.875 10L15.6875 14.8125L14.8125 15.6875L10 10.875L5.1875 15.6875Z" />
           </svg>
         </button>

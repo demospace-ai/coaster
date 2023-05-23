@@ -16,7 +16,7 @@ export const useDispatch = () => useReactDispatch<Dispatch<RootAction>>();
 export const useSelector = createSelectorHook<RootState>();
 
 export function createStore() {
-  const rootReducer = combineReducers({ app: appReducer, login: loginReducer, });
+  const rootReducer = combineReducers({ app: appReducer, login: loginReducer });
 
   return configureStore({ reducer: rootReducer });
 }

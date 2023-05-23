@@ -9,11 +9,24 @@ import { NewSourceConfiguration } from "src/connect/Connection";
 import { FinalizeSync } from "src/connect/Finalize";
 import { ObjectSetup } from "src/connect/Object";
 import { Sources } from "src/connect/Sources";
-import { createNewSource, createNewSync, FieldMappingState, INITIAL_SETUP_STATE, SetupSyncState, SyncSetupStep, validateObjectSetup } from "src/connect/state";
+import {
+  createNewSource,
+  createNewSync,
+  FieldMappingState,
+  INITIAL_SETUP_STATE,
+  SetupSyncState,
+  SyncSetupStep,
+  validateObjectSetup,
+} from "src/connect/state";
 import { WarehouseSelector } from "src/connect/Warehouse";
 import { useObject } from "src/rpc/data";
 
-export const NewSync: React.FC<{ linkToken: string, close: (() => void) | undefined; } & FabraDisplayOptions> = ({ linkToken, close, supportEmail, docsLink }) => {
+export const NewSync: React.FC<{ linkToken: string; close: (() => void) | undefined } & FabraDisplayOptions> = ({
+  linkToken,
+  close,
+  supportEmail,
+  docsLink,
+}) => {
   const [state, setState] = useState<SetupSyncState>(INITIAL_SETUP_STATE);
   const [prevObject, setPrevObject] = useState<Object | undefined>(undefined);
   const { object } = useObject(state.object?.id, linkToken);
@@ -22,15 +35,19 @@ export const NewSync: React.FC<{ linkToken: string, close: (() => void) | undefi
   // Setup the initial values for the field mappings
   if (object && object !== prevObject) {
     setPrevObject(object);
-    const fieldMappings: FieldMappingState[] = object ? object.object_fields.filter(objectField => !objectField.omit).map(objectField => {
-      return {
-        sourceField: undefined,
-        destinationFieldId: objectField.id,
-        expandedJson: false,
-        jsonFields: [undefined],
-      };
-    }) : [];
-    setState(state => ({ ...state, fieldMappings }));
+    const fieldMappings: FieldMappingState[] = object
+      ? object.object_fields
+          .filter((objectField) => !objectField.omit)
+          .map((objectField) => {
+            return {
+              sourceField: undefined,
+              destinationFieldId: objectField.id,
+              expandedJson: false,
+              jsonFields: [undefined],
+            };
+          })
+      : [];
+    setState((state) => ({ ...state, fieldMappings }));
   }
 
   const back = () => {
@@ -48,13 +65,24 @@ export const NewSync: React.FC<{ linkToken: string, close: (() => void) | undefi
     }
 
     // clear errors here since it looks bad when they linger
-    setState(state => ({ ...state, step: prevStep, error: undefined, newSourceState: { ...state.newSourceState, error: undefined } }));
+    setState((state) => ({
+      ...state,
+      step: prevStep,
+      error: undefined,
+      newSourceState: { ...state.newSourceState, error: undefined },
+    }));
   };
 
   return (
     <>
       <Header close={close} state={state} />
-      <AppContent linkToken={linkToken} state={state} setState={setState} supportEmail={supportEmail} docsLink={docsLink} />
+      <AppContent
+        linkToken={linkToken}
+        state={state}
+        setState={setState}
+        supportEmail={supportEmail}
+        docsLink={docsLink}
+      />
       <Footer back={back} linkToken={linkToken} state={state} setState={setState} />
     </>
   );
@@ -66,7 +94,7 @@ type AppContentProps = {
   setState: React.Dispatch<React.SetStateAction<SetupSyncState>>;
 } & FabraDisplayOptions;
 
-const AppContent: React.FC<AppContentProps> = props => {
+const AppContent: React.FC<AppContentProps> = (props) => {
   const ref = useRef<HTMLDivElement>(null);
   // Scroll to the top on step change
   React.useEffect(() => {
@@ -82,7 +110,15 @@ const AppContent: React.FC<AppContentProps> = props => {
       content = <WarehouseSelector linkToken={props.linkToken} state={props.state} setState={props.setState} />;
       break;
     case SyncSetupStep.ConnectionDetails:
-      content = <NewSourceConfiguration linkToken={props.linkToken} state={props.state} setState={props.setState} supportEmail={props.supportEmail} docsLink={props.docsLink} />;
+      content = (
+        <NewSourceConfiguration
+          linkToken={props.linkToken}
+          state={props.state}
+          setState={props.setState}
+          supportEmail={props.supportEmail}
+          docsLink={props.docsLink}
+        />
+      );
       break;
     case SyncSetupStep.ChooseData:
       content = <ObjectSetup linkToken={props.linkToken} state={props.state} setState={props.setState} />;
@@ -96,33 +132,64 @@ const AppContent: React.FC<AppContentProps> = props => {
   }
 
   return (
-    <div ref={ref} className="tw-overflow-auto tw-w-full tw-h-full tw-flex tw-justify-center tw-pt-10 tw-bg-transparent">
+    <div
+      ref={ref}
+      className="tw-overflow-auto tw-w-full tw-h-full tw-flex tw-justify-center tw-pt-10 tw-bg-transparent"
+    >
       {content}
     </div>
   );
 };
 
-const Header: React.FC<{ close: (() => void) | undefined; state: SetupSyncState; }> = ({ close, state }) => {
+const Header: React.FC<{ close: (() => void) | undefined; state: SetupSyncState }> = ({ close, state }) => {
   return (
     <div className="tw-flex tw-flex-row tw-items-center tw-w-full tw-h-20 tw-min-h-[80px] tw-border-b tw-border-slate-200">
       <div className="tw-flex tw-flex-row tw-gap-10 tw-justify-center tw-items-center tw-w-full">
-        <StepBreadcrumb step={1} content="Select source" active={state.step <= SyncSetupStep.ChooseSourceType} complete={state.step > SyncSetupStep.ChooseSourceType} />
-        <StepBreadcrumb step={2} content="Connect source" active={state.step === SyncSetupStep.ConnectionDetails} complete={state.step > SyncSetupStep.ConnectionDetails} />
-        <StepBreadcrumb step={3} content="Define model" active={state.step === SyncSetupStep.ChooseData} complete={state.step > SyncSetupStep.ChooseData} />
-        <StepBreadcrumb step={4} content="Finalize sync" active={state.step === SyncSetupStep.Finalize} complete={state.step > SyncSetupStep.Finalize} />
+        <StepBreadcrumb
+          step={1}
+          content="Select source"
+          active={state.step <= SyncSetupStep.ChooseSourceType}
+          complete={state.step > SyncSetupStep.ChooseSourceType}
+        />
+        <StepBreadcrumb
+          step={2}
+          content="Connect source"
+          active={state.step === SyncSetupStep.ConnectionDetails}
+          complete={state.step > SyncSetupStep.ConnectionDetails}
+        />
+        <StepBreadcrumb
+          step={3}
+          content="Define model"
+          active={state.step === SyncSetupStep.ChooseData}
+          complete={state.step > SyncSetupStep.ChooseData}
+        />
+        <StepBreadcrumb
+          step={4}
+          content="Finalize sync"
+          active={state.step === SyncSetupStep.Finalize}
+          complete={state.step > SyncSetupStep.Finalize}
+        />
       </div>
-      {close &&
-        <button className="tw-absolute tw-flex tw-items-center t tw-right-10 tw-border-none tw-cursor-pointer tw-p-0" onClick={close}>
+      {close && (
+        <button
+          className="tw-absolute tw-flex tw-items-center t tw-right-10 tw-border-none tw-cursor-pointer tw-p-0"
+          onClick={close}
+        >
           <svg className="tw-h-6 tw-fill-slate-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
             <path d="M5.1875 15.6875L4.3125 14.8125L9.125 10L4.3125 5.1875L5.1875 4.3125L10 9.125L14.8125 4.3125L15.6875 5.1875L10.875 10L15.6875 14.8125L14.8125 15.6875L10 10.875L5.1875 15.6875Z" />
           </svg>
         </button>
-      }
-    </div >
+      )}
+    </div>
   );
 };
 
-const StepBreadcrumb: React.FC<{ content: string, step: number; active: boolean; complete: boolean; }> = ({ step, content, active, complete }) => {
+const StepBreadcrumb: React.FC<{ content: string; step: number; active: boolean; complete: boolean }> = ({
+  step,
+  content,
+  active,
+  complete,
+}) => {
   return (
     <div className="tw-flex tw-flex-row tw-justify-center tw-items-center tw-select-none">
       <div
@@ -130,8 +197,9 @@ const StepBreadcrumb: React.FC<{ content: string, step: number; active: boolean;
           "tw-rounded-md tw-h-[18px] tw-w-[18px] tw-flex tw-justify-center tw-items-center tw-text-[10px]",
           !active && !complete && "tw-bg-slate-200 tw-text-slate-900",
           active && "tw-bg-primary tw-text-primary-text",
-          complete && "tw-bg-green-100 tw-text-green-800"
-        )}>
+          complete && "tw-bg-green-100 tw-text-green-800",
+        )}
+      >
         {complete ? <CheckIcon className="tw-h-3" /> : step}
       </div>
       <span className={classNames("tw-font-medium tw-pl-2", active && "tw-text-primary")}>{content}</span>
@@ -146,9 +214,9 @@ type FooterProps = {
   setState: React.Dispatch<React.SetStateAction<SetupSyncState>>;
 };
 
-export const Footer: React.FC<FooterProps> = props => {
+export const Footer: React.FC<FooterProps> = (props) => {
   const [loading, setLoading] = useState<boolean>(false);
-  let onClick = () => { };
+  let onClick = () => {};
   let continueText: string = "Continue";
   let showContinue = true;
   switch (props.state.step) {
@@ -168,7 +236,7 @@ export const Footer: React.FC<FooterProps> = props => {
     case SyncSetupStep.ChooseData:
       onClick = () => {
         if (validateObjectSetup(props.state)) {
-          props.setState(state => ({ ...state, step: props.state.step + 1 }));
+          props.setState((state) => ({ ...state, step: props.state.step + 1 }));
         }
       };
       break;
@@ -190,7 +258,14 @@ export const Footer: React.FC<FooterProps> = props => {
 
   return (
     <div className="tw-flex tw-flex-row tw-w-full tw-h-20 tw-min-h-[80px] tw-border-t tw-border-slate-200 tw-mt-auto tw-items-center tw-px-20">
-      {showBack && <button className="tw-border tw-border-slate-300 tw-font-medium tw-rounded-md tw-w-32 tw-h-10 tw-select-none hover:tw-bg-slate-100" onClick={props.back}>Back</button>}
+      {showBack && (
+        <button
+          className="tw-border tw-border-slate-300 tw-font-medium tw-rounded-md tw-w-32 tw-h-10 tw-select-none hover:tw-bg-slate-100"
+          onClick={props.back}
+        >
+          Back
+        </button>
+      )}
       {showContinue && (
         <Button onClick={onClick} className="tw-border tw-w-36 tw-h-10 tw-ml-auto tw-select-none">
           {loading ? <Loading light /> : continueText}

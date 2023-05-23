@@ -18,13 +18,7 @@ export const Button: React.FC<ButtonProps> = forwardRef<HTMLButtonElement, Butto
     props.className,
   );
   return (
-    <button
-      className={buttonStyle}
-      type="button"
-      ref={ref}
-      onClick={props.onClick}
-      {...remaining}
-    >
+    <button className={buttonStyle} type="button" ref={ref} onClick={props.onClick} {...remaining}>
       {props.children}
     </button>
   );
@@ -45,12 +39,7 @@ export const LinkButton: React.FC<LinkButtonProps> = forwardRef<HTMLAnchorElemen
     props.className,
   );
   return (
-    <a
-      className={buttonStyle}
-      ref={ref}
-      href={props.href}
-      {...remaining}
-    >
+    <a className={buttonStyle} ref={ref} href={props.href} {...remaining}>
       {props.children}
     </a>
   );
@@ -61,23 +50,20 @@ type FormButtonProps = {
   children: React.ReactNode;
 };
 
-export const FormButton: React.FC<FormButtonProps> = props => {
+export const FormButton: React.FC<FormButtonProps> = (props) => {
   const buttonStyle = classNames(
     "tw-text-primary-text tw-bg-primary hover:tw-bg-primary-hover",
     "tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition tw-select-none",
-    props.className
+    props.className,
   );
   return (
-    <button
-      className={buttonStyle}
-      type="submit"
-    >
+    <button className={buttonStyle} type="submit">
       {props.children}
     </button>
   );
 };
 
-export const BackButton: React.FC<Partial<ButtonProps>> = props => {
+export const BackButton: React.FC<Partial<ButtonProps>> = (props) => {
   const navigate = useNavigate();
 
   const onClick = () => {
@@ -89,22 +75,43 @@ export const BackButton: React.FC<Partial<ButtonProps>> = props => {
   };
 
   return (
-    <div className={classNames("tw-cursor-pointer tw-select-none tw-text-sm tw-font-[500] hover:tw-text-slate-600 tw-w-fit", props.className)} onClick={onClick}>{String.fromCharCode(8592)} Back</div>
+    <div
+      className={classNames(
+        "tw-cursor-pointer tw-select-none tw-text-sm tw-font-[500] hover:tw-text-slate-600 tw-w-fit",
+        props.className,
+      )}
+      onClick={onClick}
+    >
+      {String.fromCharCode(8592)} Back
+    </div>
   );
 };
 
-export const NavButton: React.FC<NavLinkProps> = props => {
+export const NavButton: React.FC<NavLinkProps> = (props) => {
   return (
     <NavLink
-      className={classNames("tw-bg-primary tw-text-white tw-rounded-md tw-block tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-font-bold tw-text-center tw-transition-colors hover:tw-bg-primary-hover tw-border tw-border-solid tw-border-primary-hover", props.className as string)}
-      to={props.to}>
+      className={classNames(
+        "tw-bg-primary tw-text-white tw-rounded-md tw-block tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-font-bold tw-text-center tw-transition-colors hover:tw-bg-primary-hover tw-border tw-border-solid tw-border-primary-hover",
+        props.className as string,
+      )}
+      to={props.to}
+    >
       {props.children}
     </NavLink>
   );
 };
 
-export const DivButton: React.FC<ButtonProps> = props => {
+export const DivButton: React.FC<ButtonProps> = (props) => {
   return (
-    <div className={props.className} tabIndex={0} onClick={props.onClick} onKeyDown={(event: React.KeyboardEvent<HTMLDivElement>) => { if (event.key === "Enter") props.onClick(); }}>{props.children}</div>
+    <div
+      className={props.className}
+      tabIndex={0}
+      onClick={props.onClick}
+      onKeyDown={(event: React.KeyboardEvent<HTMLDivElement>) => {
+        if (event.key === "Enter") props.onClick();
+      }}
+    >
+      {props.children}
+    </div>
   );
 };

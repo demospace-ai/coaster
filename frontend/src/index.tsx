@@ -23,11 +23,11 @@ if (isProd()) {
       recordHeadersAndBody: true,
       networkHeadersToRedact: ["X-LINK-TOKEN"],
       networkBodyKeysToRedact: ["link_token"],
-    }
+    },
   });
   window.Intercom("boot", {
     api_base: "https://api-iam.intercom.io",
-    app_id: "pdc06iv8"
+    app_id: "pdc06iv8",
   });
 }
 
@@ -44,5 +44,5 @@ root.render(
         </BrowserRouter>
       </Provider>
     </ErrorBoundary>
-  </React.StrictMode>
+  </React.StrictMode>,
 );
