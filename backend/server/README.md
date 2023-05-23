@@ -14,7 +14,11 @@ gcloud sql connect fabra-database-instance -d=fabra-db -u=db_user --quiet
 
 ```sh
 cd server/dev
-docker compose up # Runs it in the terminal
+
+# Make sure the certificates have the right permissions since file permissions aren't stored by Git
+chmod go-rwx certs/server.key
+chmod go-rwx certs/server.crt
+
 docker compose up -d  # Detaches it so it runs in the background
 
 docker compose logs fabra_db # fabra_db is the service name, use this to view logs of a detached service.
