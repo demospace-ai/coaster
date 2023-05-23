@@ -4,12 +4,13 @@ import { InfoIcon } from "src/components/icons/Icons";
 import { ConnectionImage } from "src/components/images/Connections";
 import { Input, ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
+import { GoogleLocationSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { FabraDisplayOptions } from "src/connect/ConnectApp";
 import { NewSourceState, SetupSyncProps, SyncSetupStep, validateConnectionSetup } from "src/connect/state";
 import { sendRequest } from "src/rpc/ajax";
 import { ConnectionType, getConnectionType, TestDataConnection, TestDataConnectionRequest } from "src/rpc/api";
-import { HttpError, consumeError } from "src/utils/errors";
+import { consumeError, HttpError } from "src/utils/errors";
 import { mergeClasses } from "src/utils/twmerge";
 
 export const NewSourceConfiguration: React.FC<SetupSyncProps & FabraDisplayOptions> = (props) => {
@@ -142,7 +143,10 @@ const TestConnectionButton: React.FC<{
 
     switch (props.connectionType) {
       case ConnectionType.BigQuery:
-        payload.bigquery_config = state.bigqueryConfig;
+        payload.bigquery_config = {
+          location: state.bigqueryConfig.location!.code,
+          credentials: state.bigqueryConfig.credentials,
+        };
         break;
       case ConnectionType.Snowflake:
         payload.snowflake_config = state.snowflakeConfig;
@@ -714,13 +718,14 @@ const BigQueryInputs: React.FC<ConnectionConfigurationProps> = (props) => {
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
-      <ValidatedInput
+      <GoogleLocationSelector
         id="location"
-        value={state.bigqueryConfig.location}
-        setValue={(value) => {
+        location={state.bigqueryConfig.location}
+        setLocation={(value) => {
           props.setState((state) => ({ ...state, bigqueryConfig: { ...state.bigqueryConfig, location: value } }));
         }}
         placeholder="Location"
+        className="tw-mt-0 tw-w-full"
       />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Service Account Key</span>

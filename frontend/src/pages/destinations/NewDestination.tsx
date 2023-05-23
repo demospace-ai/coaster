@@ -4,10 +4,11 @@ import { InfoIcon } from "src/components/icons/Icons";
 import { ConnectionImage } from "src/components/images/Connections";
 import { ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
+import { GoogleLocationSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { sendRequest } from "src/rpc/ajax";
 import {
-  BigQueryConfig,
+  BigQueryConfigState,
   ConnectionType,
   CreateDestination,
   CreateDestinationRequest,
@@ -22,7 +23,7 @@ import {
   TestDataConnectionRequest,
   WebhookConfig,
 } from "src/rpc/api";
-import { HttpError, consumeError } from "src/utils/errors";
+import { consumeError, HttpError } from "src/utils/errors";
 import { mergeClasses } from "src/utils/twmerge";
 import { mutate } from "swr";
 
@@ -64,7 +65,7 @@ type NewConnectionConfigurationProps = {
 type NewDestinationState = {
   displayName: string;
   staging_bucket: string;
-  bigqueryConfig: BigQueryConfig;
+  bigqueryConfig: BigQueryConfigState;
   snowflakeConfig: SnowflakeConfig;
   redshiftConfig: RedshiftConfig;
   synapseConfig: SynapseConfig;
@@ -80,7 +81,7 @@ const INITIAL_DESTINATION_STATE: NewDestinationState = {
   staging_bucket: "",
   bigqueryConfig: {
     credentials: "",
-    location: "",
+    location: undefined,
   },
   snowflakeConfig: {
     username: "",
@@ -137,7 +138,7 @@ const validateAll = (connectionType: ConnectionType, state: NewDestinationState)
       return (
         state.displayName.length > 0 &&
         state.staging_bucket.length > 0 &&
-        state.bigqueryConfig.location.length > 0 &&
+        state.bigqueryConfig.location !== undefined &&
         state.bigqueryConfig.credentials.length > 0
       );
     case ConnectionType.Redshift:
@@ -200,7 +201,10 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = (
 
     switch (props.connectionType) {
       case ConnectionType.BigQuery:
-        payload.bigquery_config = state.bigqueryConfig;
+        payload.bigquery_config = {
+          location: state.bigqueryConfig.location!.code,
+          credentials: state.bigqueryConfig.credentials,
+        };
         break;
       case ConnectionType.Snowflake:
         payload.snowflake_config = state.snowflakeConfig;
@@ -312,7 +316,10 @@ const TestConnectionButton: React.FC<ConnectionConfigurationProps & { connection
 
     switch (props.connectionType) {
       case ConnectionType.BigQuery:
-        payload.bigquery_config = state.bigqueryConfig;
+        payload.bigquery_config = {
+          location: state.bigqueryConfig.location!.code,
+          credentials: state.bigqueryConfig.credentials,
+        };
         break;
       case ConnectionType.Snowflake:
         payload.snowflake_config = state.snowflakeConfig;
@@ -585,14 +592,14 @@ const BigQueryInputs: React.FC<ConnectionConfigurationProps> = (props) => {
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
-      <ValidatedInput
+      <GoogleLocationSelector
         id="location"
-        value={state.bigqueryConfig.location}
-        setValue={(value) => {
+        location={state.bigqueryConfig.location}
+        setLocation={(value) => {
           props.setState({ ...state, bigqueryConfig: { ...state.bigqueryConfig, location: value } });
         }}
         placeholder="Location"
-        className="tw-w-100"
+        className="tw-w-100 tw-mt-0"
       />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Staging Bucket</span>

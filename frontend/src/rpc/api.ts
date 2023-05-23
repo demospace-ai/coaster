@@ -334,6 +334,16 @@ export enum FieldType {
   Json = "JSON",
 }
 
+export type GCPLocation = {
+  name: string;
+  code: string;
+};
+
+export interface BigQueryConfigState {
+  credentials: string;
+  location: GCPLocation | undefined;
+}
+
 export interface BigQueryConfig {
   credentials: string;
   location: string;

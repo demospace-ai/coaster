@@ -4,7 +4,7 @@ import {
   ValidatedDropdownInput,
   ValidatedDropdownInputProps,
 } from "src/components/input/Input";
-import { Connection, Destination, FabraObject as DataObject, Field, FieldType, Source } from "src/rpc/api";
+import { Connection, Destination, FabraObject as DataObject, Field, FieldType, GCPLocation, Source } from "src/rpc/api";
 import {
   useDestinations,
   useFieldValues,
@@ -513,6 +513,46 @@ export const DateRangeSelector: React.FC<DateRangeSelectorProps> = (props) => {
         "Year to date",
         "All time",
       ]}
+      loading={false}
+      noOptionsString=""
+      placeholder={placeholder ? placeholder : "Choose date range"}
+      validated={validated}
+      {...other}
+    />
+  );
+};
+
+type GoogleLocationSelectorProps = Omit<
+  Partial<ValidatedDropdownInputProps>,
+  "selected" | "setSelected" | "getElementForDisplay" | "loading"
+> & {
+  location: GCPLocation | undefined;
+  setLocation: (location: GCPLocation) => void;
+};
+
+export const GoogleLocationSelector: React.FC<GoogleLocationSelectorProps> = (props) => {
+  const { location, setLocation, className, noOptionsString, placeholder, validated, label, ...other } = props;
+  const locations: GCPLocation[] = [
+    { name: "United States (us)", code: "us" },
+    { name: "European Union (eu)", code: "eu" },
+    { name: "South Carolina (us-east1)", code: "us-east1" },
+    { name: "Northern Virginia (us-east4)", code: "us-east4" },
+    { name: "Iowa (us-central1)", code: "us-central1" },
+    { name: "Oregon (us-west1)", code: "us-west1" },
+    { name: "Los Angeles (us-west2)", code: "us-west2" },
+    { name: "Salt Lake City (us-west3)", code: "us-west3" },
+    { name: "Las Vegas (us-west4)", code: "us-west4" },
+    { name: "Taiwan (asia-east1)", code: "asia-east1" },
+    { name: "Tokyo (asia-northeast1)", code: "asia-northeast1" },
+  ];
+
+  return (
+    <ValidatedDropdownInput
+      className={className}
+      selected={location}
+      setSelected={setLocation}
+      options={locations}
+      getElementForDisplay={(location: GCPLocation) => location.name}
       loading={false}
       noOptionsString=""
       placeholder={placeholder ? placeholder : "Choose date range"}

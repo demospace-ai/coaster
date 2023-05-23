@@ -213,6 +213,7 @@ export const ValidatedInput: React.FC<InputProps> = (props) => {
 };
 
 export type ValidatedDropdownInputProps = {
+  id?: string;
   options: any[] | undefined;
   selected: any | undefined;
   setSelected: (option: any) => void;
@@ -257,15 +258,13 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = (pr
 
   return (
     <Listbox
-      as="div"
-      className="tw-flex tw-w-fit"
       value={value}
       onChange={(value) => {
         props.setSelected(value);
         setComputedValid(true);
       }}
     >
-      <div className="tw-relative tw-w-fit">
+      <div className="tw-relative">
         <Transition
           show={showLabel}
           enter="tw-transition tw-ease tw-duration-200 tw-transform"
@@ -277,7 +276,7 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = (pr
         >
           <label
             htmlFor="name"
-            className="tw-absolute tw-top-3 tw-left-2 -tw-mt-px tw-inline-block tw-bg-white tw-px-1 tw-text-xs tw-font-medium tw-text-primary"
+            className="tw-absolute -tw-top-2 tw-left-2 -tw-mt-px tw-inline-block tw-bg-white tw-px-1 tw-text-xs tw-font-medium tw-text-primary"
           >
             {props.label}
           </label>
@@ -457,15 +456,13 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = (props) =
 
   return (
     <Combobox
-      as="div"
-      className="tw-flex tw-w-fit"
       value={value}
       onChange={(value: number) => {
         props.setSelected(value);
         setComputedValid(true);
       }}
     >
-      <div className="tw-relative tw-w-fit">
+      <div className="tw-relative">
         <Transition
           show={showLabel}
           enter="tw-transition tw-ease tw-duration-200 tw-transform"
@@ -477,7 +474,7 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = (props) =
         >
           <label
             htmlFor="name"
-            className="tw-absolute tw-top-3 tw-left-2 -tw-mt-px tw-inline-block tw-bg-white tw-px-1 tw-text-xs tw-font-medium tw-text-primary"
+            className="tw-absolute -tw-top-2 tw-left-2 -tw-mt-px tw-inline-block tw-bg-white tw-px-1 tw-text-xs tw-font-medium tw-text-primary"
           >
             {props.label}
           </label>

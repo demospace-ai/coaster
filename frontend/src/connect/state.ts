@@ -1,6 +1,6 @@
 import { sendLinkTokenRequest } from "src/rpc/ajax";
 import {
-  BigQueryConfig,
+  BigQueryConfigState,
   ConnectionType,
   FabraObject,
   Field,
@@ -41,7 +41,7 @@ export type NewSourceState = {
   sourceCreated: boolean;
   error: string | undefined;
   displayName: string;
-  bigqueryConfig: BigQueryConfig;
+  bigqueryConfig: BigQueryConfigState;
   snowflakeConfig: SnowflakeConfig;
   redshiftConfig: RedshiftConfig;
   synapseConfig: SynapseConfig;
@@ -56,7 +56,7 @@ export const INITIAL_SOURCE_STATE: NewSourceState = {
   displayName: "",
   bigqueryConfig: {
     credentials: "",
-    location: "",
+    location: undefined,
   },
   snowflakeConfig: {
     username: "",
@@ -221,7 +221,10 @@ export const createNewSource = async (
 
   switch (state.connectionType!) {
     case ConnectionType.BigQuery:
-      payload.bigquery_config = state.newSourceState.bigqueryConfig;
+      payload.bigquery_config = {
+        location: state.newSourceState.bigqueryConfig.location!.code,
+        credentials: state.newSourceState.bigqueryConfig.credentials,
+      };
       break;
     case ConnectionType.Snowflake:
       payload.snowflake_config = state.newSourceState.snowflakeConfig;
