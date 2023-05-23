@@ -6,6 +6,7 @@ import { useDispatch } from "src/root/model";
 import { sendRequest } from "src/rpc/ajax";
 import { Logout, Organization, SetOrganization, User } from "src/rpc/api";
 import { isProd } from "src/utils/env";
+import { consumeError } from "../../utils/errors";
 
 export interface OrganizationArgs {
   organizationName?: string;
@@ -30,7 +31,7 @@ export function useSetOrganization() {
         onLoginSuccess(user, response.organization);
         navigate("/");
       } catch (e) {
-        // TODO
+        consumeError(e);
       }
     },
     [dispatch, navigate, onLoginSuccess],

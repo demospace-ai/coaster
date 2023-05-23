@@ -9,7 +9,7 @@ import { FabraDisplayOptions } from "src/connect/ConnectApp";
 import { NewSourceState, SetupSyncProps, SyncSetupStep, validateConnectionSetup } from "src/connect/state";
 import { sendRequest } from "src/rpc/ajax";
 import { ConnectionType, getConnectionType, TestDataConnection, TestDataConnectionRequest } from "src/rpc/api";
-import { HttpError } from "src/utils/errors";
+import { HttpError, consumeError } from "src/utils/errors";
 import { mergeClasses } from "src/utils/twmerge";
 
 export const NewSourceConfiguration: React.FC<SetupSyncProps & FabraDisplayOptions> = (props) => {
@@ -178,6 +178,7 @@ const TestConnectionButton: React.FC<{
           return { ...state, error: errorMessage };
         });
       }
+      consumeError(e);
     }
 
     setTestLoading(false);

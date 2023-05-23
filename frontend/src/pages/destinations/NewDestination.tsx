@@ -22,7 +22,7 @@ import {
   TestDataConnectionRequest,
   WebhookConfig,
 } from "src/rpc/api";
-import { HttpError } from "src/utils/errors";
+import { HttpError, consumeError } from "src/utils/errors";
 import { mergeClasses } from "src/utils/twmerge";
 import { mutate } from "swr";
 
@@ -228,6 +228,7 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = (
       setCreateConnectionSuccess(true);
     } catch (e) {
       setCreateConnectionSuccess(false);
+      consumeError(e);
     }
 
     setSaveLoading(false);
@@ -347,6 +348,7 @@ const TestConnectionButton: React.FC<ConnectionConfigurationProps & { connection
           return { ...state, error: errorMessage };
         });
       }
+      consumeError(e);
     }
 
     setTestLoading(false);

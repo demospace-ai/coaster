@@ -6,6 +6,7 @@ import { Tooltip } from "src/components/tooltip/Tooltip";
 import { FabraConnectOptions, initialize, open, updateTheme } from "src/initialize-internal";
 import { sendRequest } from "src/rpc/ajax";
 import { CreateLinkToken, CreateLinkTokenRequest } from "src/rpc/api";
+import { consumeError } from "../../utils/errors";
 
 export const Preview: React.FC = () => {
   const [endCustomerID, setEndCustomerID] = useState<string>("");
@@ -48,7 +49,7 @@ export const Preview: React.FC = () => {
       const response = await sendRequest(CreateLinkToken, payload);
       open(response.link_token);
     } catch (e) {
-      // TODO
+      consumeError(e);
     }
   };
 

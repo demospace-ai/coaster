@@ -20,7 +20,7 @@ import {
   Source,
   SynapseConfig,
 } from "src/rpc/api";
-import { HttpError } from "src/utils/errors";
+import { consumeError, HttpError } from "src/utils/errors";
 import { mutate } from "swr";
 
 export type SetupSyncProps = {
@@ -261,6 +261,7 @@ export const createNewSource = async (
       const errorMessage = e.message;
       setState((state) => ({ ...state, newSourceState: { ...state.newSourceState, error: errorMessage } }));
     }
+    consumeError(e);
   }
 };
 
@@ -349,5 +350,6 @@ export const createNewSync = async (
       const errorMessage = e.message;
       setState((state) => ({ ...state, error: errorMessage }));
     }
+    consumeError(e);
   }
 };

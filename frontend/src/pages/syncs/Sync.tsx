@@ -9,6 +9,7 @@ import { sendRequest } from "src/rpc/ajax";
 import { RunSync, SyncRunStatus } from "src/rpc/api";
 import { useSync } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
+import { consumeError } from "src/utils/errors";
 
 const tableHeaderStyle =
   "tw-sticky tw-top-0 tw-z-0 tw-border-b tw-border-slate-300 tw-py-3.5 tw-px-4 sm:tw-pr-6 lg:tw-pr-8 tw-text-left tw-whitespace-nowrap";
@@ -30,7 +31,7 @@ export const Sync: React.FC = () => {
       mutate();
       setRunSyncResult("Success");
     } catch (err) {
-      console.error(err);
+      consumeError(err);
       setRunSyncResult("Failure");
     } finally {
       setTimeout(() => {
@@ -65,7 +66,9 @@ export const Sync: React.FC = () => {
           <div>
             <button
               className="tw-ml-auto tw-px-4 tw-py-2 tw-rounded-md tw-font-medium tw-text-base hover:tw-bg-slate-100 tw-text-blue-600 tw-mr-2"
-              onClick={() => {}}
+              onClick={() => {
+                throw new Error("Not implemented");
+              }}
             >
               Edit
             </button>
