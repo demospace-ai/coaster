@@ -8,8 +8,8 @@ import { Tooltip } from "src/components/tooltip/Tooltip";
 import { sendRequest } from "src/rpc/ajax";
 import { RunSync, SyncRunStatus } from "src/rpc/api";
 import { useSync } from "src/rpc/data";
-import { mergeClasses } from "src/utils/twmerge";
 import { consumeError } from "src/utils/errors";
+import { mergeClasses } from "src/utils/twmerge";
 
 const tableHeaderStyle =
   "tw-sticky tw-top-0 tw-z-0 tw-border-b tw-border-slate-300 tw-py-3.5 tw-px-4 sm:tw-pr-6 lg:tw-pr-8 tw-text-left tw-whitespace-nowrap";
@@ -65,7 +65,7 @@ export const Sync: React.FC = () => {
           <div>{sync?.sync.display_name}</div>
           <div>
             <button
-              className="tw-ml-auto tw-px-4 tw-py-2 tw-rounded-md tw-font-medium tw-text-base hover:tw-bg-slate-100 tw-text-blue-600 tw-mr-2"
+              className="tw-ml-auto tw-px-3 tw-py-1 tw-rounded-md tw-font-medium tw-text-base hover:tw-bg-slate-100 tw-text-blue-600 tw-mr-2"
               onClick={() => {
                 throw new Error("Not implemented");
               }}
@@ -74,13 +74,13 @@ export const Sync: React.FC = () => {
             </button>
             <button
               disabled={isLoading}
-              className="tw-ml-auto tw-px-8 tw-py-2 tw-rounded-md tw-font-medium tw-text-base tw-bg-blue-600 hover:tw-bg-blue-500 tw-text-white tw-relative disabled:tw-bg-gray-500"
+              className="tw-ml-auto tw-px-4 tw-py-1 tw-rounded-md tw-font-medium tw-text-base tw-bg-blue-600 hover:tw-bg-blue-500 tw-text-white tw-relative disabled:tw-bg-gray-500"
               onClick={handleRunSync}
             >
               <div className="tw-absolute tw-left-2 tw-top-1/2 tw-transform -tw-translate-y-1/2">
                 {renderButtonStatus()}
               </div>
-              Sync
+              Run sync
             </button>
           </div>
         </div>

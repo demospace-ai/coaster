@@ -8,7 +8,7 @@ import { Tooltip } from "src/components/tooltip/Tooltip";
 import { LinkRunSync, SyncRunStatus } from "src/rpc/api";
 import { useLinkSync } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
-import { sendLinkTokenRequest, sendRequest } from "../rpc/ajax";
+import { sendLinkTokenRequest } from "../rpc/ajax";
 import { consumeError } from "../utils/errors";
 
 export const SyncRuns: React.FC<{
@@ -77,20 +77,20 @@ const SyncRunsList: React.FC<{ linkToken: string }> = ({ linkToken }) => {
           Sync Runs • {sync?.sync.display_name}
           <div>
             <button
-              className="tw-ml-auto tw-px-4 tw-py-2 tw-rounded-md tw-font-medium tw-text-base hover:tw-bg-slate-100 tw-text-blue-600 tw-mr-2"
+              className="tw-ml-auto tw-px-3 tw-py-1 tw-rounded-md tw-font-medium tw-text-base hover:tw-bg-slate-100 tw-text-blue-600 tw-mr-2"
               onClick={() => {}}
             >
               Edit
             </button>
             <button
               disabled={isLoading}
-              className="tw-ml-auto tw-px-8 tw-py-2 tw-rounded-md tw-font-medium tw-text-base tw-bg-blue-600 hover:tw-bg-blue-500 tw-text-white tw-mr-2 tw-relative disabled:tw-bg-gray-500"
+              className="tw-ml-auto tw-px-4 tw-py-1 tw-rounded-md tw-font-medium tw-text-base tw-bg-blue-600 hover:tw-bg-blue-500 tw-text-white tw-mr-2 tw-relative disabled:tw-bg-gray-500"
               onClick={handleRunSync}
             >
               <div className="tw-absolute tw-left-2 tw-top-1/2 tw-transform -tw-translate-y-1/2">
                 {renderButtonStatus()}
               </div>
-              Sync
+              Run sync
             </button>
           </div>
         </div>
