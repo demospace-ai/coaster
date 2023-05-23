@@ -11,6 +11,7 @@ import { SetupSyncProps } from "src/connect/state";
 import { sendLinkTokenRequest } from "src/rpc/ajax";
 import { FabraObject, LinkGetPreview, LinkGetPreviewRequest, ResultRow, Schema } from "src/rpc/api";
 import { consumeError } from "../utils/errors";
+import { useMutation } from "../utils/queryHelpers";
 
 export const ObjectSetup: React.FC<SetupSyncProps> = (props) => {
   const setObject = (object: FabraObject) =>
@@ -19,40 +20,26 @@ export const ObjectSetup: React.FC<SetupSyncProps> = (props) => {
     props.setState((state) => ({ ...state, namespace: namespace, tableName: undefined }));
   const setTableName = (tableName: string) => props.setState((state) => ({ ...state, tableName: tableName }));
   const [limitPreview, setLimitPreview] = useState<boolean>(true);
-  const [previewLoading, setPreviewLoading] = useState<boolean>(false);
-  const [previewData, setPreviewData] = useState<ResultRow[] | undefined>(undefined);
-  const [previewSchema, setPreviewSchema] = useState<Schema | undefined>(undefined);
 
-  const runQuery = async () => {
-    if (props.state.source === undefined) {
-      return;
+  const fetchPreviewMutation = useMutation(async () => {
+    const {
+      state: { source, namespace, tableName },
+    } = props;
+    if (!source?.id || !namespace || !tableName) {
+      throw new Error("missing required fields");
     }
-
-    if (props.state.namespace === undefined) {
-      return;
-    }
-
-    if (props.state.tableName === undefined) {
-      return;
-    }
-
     const payload: LinkGetPreviewRequest = {
-      source_id: props.state.source!.id,
-      namespace: props.state.namespace,
-      table_name: props.state.tableName,
+      source_id: source.id,
+      namespace,
+      table_name: tableName,
     };
 
-    setPreviewLoading(true);
-    try {
-      const response = await sendLinkTokenRequest(LinkGetPreview, props.linkToken, payload);
-      setPreviewData(response.data);
-      setPreviewSchema(response.schema);
-      setPreviewLoading(false);
-    } catch (e) {
-      setPreviewLoading(false);
-      consumeError(e);
-    }
-  };
+    const response = await sendLinkTokenRequest(LinkGetPreview, props.linkToken, payload);
+    return response;
+  });
+
+  const previewData = fetchPreviewMutation.data?.data;
+  const previewSchema = fetchPreviewMutation.data?.schema;
 
   return (
     <div className="tw-w-full tw-pl-20 tw-pr-[72px] tw-flex tw-flex-col">
@@ -82,22 +69,27 @@ export const ObjectSetup: React.FC<SetupSyncProps> = (props) => {
           namespace={props.state.namespace}
           dropdownHeight="tw-max-h-40"
         />
-        <div className="tw-flex tw-flex-row tw-mt-4 tw-items-center">
-          <Button className="tw-h-10 tw-w-32" onClick={runQuery}>
-            {previewLoading ? <Loading light /> : "Preview"}
-          </Button>
-          <Checkbox
-            checked={limitPreview}
-            onCheckedChange={() => setLimitPreview(!limitPreview)}
-            className="tw-ml-4 tw-mr-2 tw-h-5 tw-w-5"
-          />
-          <span>Limit preview to 100 records</span>
-          <Tooltip
-            placement="right"
-            label="Automatically add a LIMIT expression to the query to keep the number of rows fetched to 100."
-          >
-            <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
-          </Tooltip>
+        <div>
+          <div className="tw-flex tw-flex-row tw-mt-4 tw-items-center">
+            <Button className="tw-h-10 tw-w-32" onClick={() => fetchPreviewMutation.mutate()}>
+              {fetchPreviewMutation.isLoading ? <Loading light /> : "Preview"}
+            </Button>
+            <Checkbox
+              checked={limitPreview}
+              onCheckedChange={() => setLimitPreview(!limitPreview)}
+              className="tw-ml-4 tw-mr-2 tw-h-5 tw-w-5"
+            />
+            <span>Limit preview to 100 records</span>
+            <Tooltip
+              placement="right"
+              label="Automatically add a LIMIT expression to the query to keep the number of rows fetched to 100."
+            >
+              <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+            </Tooltip>
+          </div>
+          {fetchPreviewMutation.error && (
+            <div className="tw-text-red-500 tw-mt-1">{fetchPreviewMutation.error.message}</div>
+          )}
         </div>
       </div>
       <div className="tw-mt-10 tw-h-full tw-max-h-[400px] tw-w-full tw-rounded-md tw-border tw-border-gray-200">
@@ -105,7 +97,7 @@ export const ObjectSetup: React.FC<SetupSyncProps> = (props) => {
           <MemoizedResultsTable schema={previewSchema} results={previewData} />
         ) : (
           <div className="tw-h-full tw-w-full tw-rounded-md tw-bg-slate-50 tw-justify-center tw-items-center tw-text-center tw-flex tw-flex-col">
-            <DataPreview className="tw-h-20 tw-mb-3" animate={previewLoading} />
+            <DataPreview className="tw-h-20 tw-mb-3" animate={fetchPreviewMutation.isLoading} />
             <div className="tw-text-xl tw-font-semibold tw-mb-1 tw-text-slate-600">Preview your data</div>
             <div className="tw-text-slate-500">A preview of the resulting rows will appear here!</div>
           </div>
