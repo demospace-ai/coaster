@@ -1,21 +1,24 @@
 import { useState } from "react";
 import { consumeError } from "./errors";
 
-type AsyncFunction<T = any, U = any> = (...args: U[]) => Promise<T>;
+type AsyncFunction<Data = any, Args = any> = (variables?: Args) => Promise<Data>;
 
-export function useMutation<T = any, U = any>(
-  mutationFn: AsyncFunction<T, U>,
-  opts: { onSuccess?: (data: T) => void; onError?: (err: Error) => void } = { onSuccess: () => {}, onError: () => {} },
+export function useMutation<Data = any, Args = any>(
+  mutationFn: AsyncFunction<Data, Args>,
+  opts: { onSuccess?: (data: Data) => void; onError?: (err: Error) => void } = {
+    onSuccess: () => {},
+    onError: () => {},
+  },
 ) {
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isFailed, setIsFailed] = useState(false);
-  const [data, setData] = useState<T | undefined>();
-  const mutate = async (...args: U[]) => {
+  const [data, setData] = useState<Data | undefined>();
+  const mutate = async (variables?: Args) => {
     setIsLoading(true);
     try {
-      const response = await mutationFn(...args);
+      const response = await mutationFn(variables);
       setIsSuccess(true);
       setData(response);
       setError(null);
