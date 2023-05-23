@@ -7,6 +7,7 @@ import { FabraConnectOptions, initialize, open, updateTheme } from "src/initiali
 import { sendRequest } from "src/rpc/ajax";
 import { CreateLinkToken, CreateLinkTokenRequest } from "src/rpc/api";
 import { consumeError } from "../../utils/errors";
+import { useMutation } from "../../utils/queryHelpers";
 
 export const Preview: React.FC = () => {
   const [endCustomerID, setEndCustomerID] = useState<string>("");
@@ -40,18 +41,20 @@ export const Preview: React.FC = () => {
     },
   });
 
-  const openPreview = async (endCustomerID: string) => {
-    const payload: CreateLinkTokenRequest = {
-      end_customer_id: endCustomerID,
-    };
-
-    try {
+  const openPreviewMutation = useMutation(
+    async () => {
+      const payload: CreateLinkTokenRequest = {
+        end_customer_id: endCustomerID,
+      };
       const response = await sendRequest(CreateLinkToken, payload);
-      open(response.link_token);
-    } catch (e) {
-      consumeError(e);
-    }
-  };
+      return response.link_token;
+    },
+    {
+      onSuccess: (link_token) => {
+        open(link_token);
+      },
+    },
+  );
 
   return (
     <div className="tw-py-5 tw-px-10 tw-flex tw-w-full tw-h-full">
@@ -102,7 +105,11 @@ export const Preview: React.FC = () => {
           setValue={setTextColor}
           placeholder="Text Color (optional)"
         />
-        <Button className="tw-px-4 tw-h-10 tw-mt-6" onClick={() => endCustomerID && openPreview(endCustomerID)}>
+        <Button
+          className="tw-px-4 tw-h-10 tw-mt-6"
+          onClick={() => openPreviewMutation.mutate()}
+          disabled={!endCustomerID}
+        >
           Open Fabra Connect
         </Button>
       </div>

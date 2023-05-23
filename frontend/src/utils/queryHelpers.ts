@@ -12,9 +12,9 @@ export function useMutation<Data = any, Args = any>(
 ) {
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [data, setData] = useState<Data | undefined>();
   const [isSuccess, setIsSuccess] = useState(false);
   const [isFailed, setIsFailed] = useState(false);
-  const [data, setData] = useState<Data | undefined>();
   const mutate = async (variables?: Args) => {
     setIsLoading(true);
     try {

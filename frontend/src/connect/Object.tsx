@@ -9,8 +9,7 @@ import { ObjectSelector, SourceNamespaceSelector, SourceTableSelector } from "sr
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { SetupSyncProps } from "src/connect/state";
 import { sendLinkTokenRequest } from "src/rpc/ajax";
-import { FabraObject, LinkGetPreview, LinkGetPreviewRequest, ResultRow, Schema } from "src/rpc/api";
-import { consumeError } from "../utils/errors";
+import { FabraObject, LinkGetPreview, LinkGetPreviewRequest } from "src/rpc/api";
 import { useMutation } from "../utils/queryHelpers";
 
 export const ObjectSetup: React.FC<SetupSyncProps> = (props) => {

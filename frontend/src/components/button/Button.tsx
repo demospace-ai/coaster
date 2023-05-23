@@ -7,6 +7,7 @@ type ButtonProps = {
   onClick: () => void;
   className?: string;
   children: React.ReactNode;
+  disabled?: boolean;
 };
 
 export const Button: React.FC<ButtonProps> = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {

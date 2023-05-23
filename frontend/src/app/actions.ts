@@ -12,7 +12,7 @@ export function useStart() {
   return useCallback(async () => {
     try {
       const checkSessionResponse = await sendRequest(CheckSession);
-      throw new Error("Failed to authenticate");
+      // throw new Error("Failed to authenticate");
       dispatch({
         type: "login.authenticated",
         user: checkSessionResponse.user,
