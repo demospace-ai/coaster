@@ -71,8 +71,10 @@ export const Login: React.FC<{ create?: boolean }> = ({ create }) => {
 };
 
 const StartContent: React.FC<{ create?: boolean }> = ({ create }) => {
+  const loginError = useSelector((state) => state.login.error);
   return (
     <>
+      {loginError && <div className="tw-text-red-500">{loginError?.toString()}</div>}
       <div className="tw-text-center tw-mb-6 tw-select-none">
         {create ? "Start your free 30-day trial of Fabra!" : "Sign in to continue to Fabra."}
       </div>

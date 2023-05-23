@@ -3,6 +3,7 @@ import { Organization, User } from "src/rpc/api";
 const INITIAL_LOGIN_STATE: LoginState = {
   authenticated: false,
   validatingCode: false,
+  error: null,
 };
 
 export interface LoginState {
@@ -12,6 +13,7 @@ export interface LoginState {
   organization?: Organization;
   suggestedOrganizations?: Organization[];
   email?: string;
+  error: string | null;
 }
 
 export type LoginAction =
@@ -31,6 +33,10 @@ export type LoginAction =
   | {
       type: "login.organizationSet";
       organization: Organization;
+    }
+  | {
+      type: "login.error";
+      error: string | null;
     };
 
 export function loginReducer(state: LoginState = INITIAL_LOGIN_STATE, action: LoginAction): LoginState {
@@ -56,6 +62,11 @@ export function loginReducer(state: LoginState = INITIAL_LOGIN_STATE, action: Lo
       return {
         ...state,
         organization: action.organization,
+      };
+    case "login.error":
+      return {
+        ...state,
+        error: action.error,
       };
     default:
       return state;
