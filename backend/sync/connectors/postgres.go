@@ -85,7 +85,6 @@ func (pg PostgresImpl) Read(
 	close(errC)
 }
 
-// TODO: only read 10,000 rows at once or something
 func (pg PostgresImpl) getReadQuery(sourceConnection *models.Connection, sync views.Sync, fieldMappings []views.FieldMapping) string {
 	var queryString string
 	if sync.CustomJoin != nil {
