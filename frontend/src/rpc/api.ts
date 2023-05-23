@@ -188,7 +188,7 @@ export const RunSync: IEndpoint<undefined, RunSyncResponse> = {
   method: "POST",
   path: "/sync/:syncID/run",
   track: true,
-}
+};
 
 export const LinkCreateSync: IEndpoint<LinkCreateSyncRequest, CreateSyncResponse> = {
   name: "Sync Created",
@@ -211,12 +211,12 @@ export const LinkGetSync: IEndpoint<{ syncID: number; }, GetSyncResponse> = {
   track: true,
 };
 
-export const LinkRunSync: IEndpoint<{ syncID: string }, RunSyncResponse> = {
+export const LinkRunSync: IEndpoint<{ syncID: string; }, RunSyncResponse> = {
   name: "Sync Run",
   method: "POST",
   path: "/link/sync/:syncID/run",
   track: true,
-}
+};
 
 export const CreateObject: IEndpoint<CreateObjectRequest, undefined> = {
   name: "Object Created",
@@ -247,6 +247,7 @@ export interface TestDataConnectionRequest {
 export interface CreateDestinationRequest {
   display_name: string;
   connection_type: ConnectionType;
+  staging_bucket?: string;
   bigquery_config?: BigQueryConfig;
   snowflake_config?: SnowflakeConfig;
   redshift_config?: RedshiftConfig;
@@ -390,7 +391,7 @@ export interface HeaderInput {
 export interface RunSyncResponse {
   sync: Sync;
   next_run_time: string;
-  result: "success" | "failure"
+  result: "success" | "failure";
 }
 
 export interface LinkCreateSyncRequest {

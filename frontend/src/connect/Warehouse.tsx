@@ -1,12 +1,13 @@
 import React from "react";
 import { ConnectionImage } from "src/components/images/Connections";
-import { SetupSyncProps, SyncSetupStep } from "src/connect/state";
+import { INITIAL_SOURCE_STATE, SetupSyncProps, SyncSetupStep } from "src/connect/state";
 import { ConnectionType } from "src/rpc/api";
 
 export const WarehouseSelector: React.FC<SetupSyncProps> = (props) => {
   const connectionButton = "tw-flex tw-flex-row tw-justify-center tw-items-center tw-py-5 tw-font-bold tw-w-56 tw-rounded-md tw-cursor-pointer tw-bg-white tw-text-slate-800 tw-border tw-border-slate-300 hover:tw-bg-slate-100 tw-tracking-[1px] tw-shadow tw-select-none";
   const onClick = (connectionType: ConnectionType) => {
-    props.setState({ ...props.state, connectionType: connectionType, step: SyncSetupStep.ConnectionDetails, skippedSourceSetup: false });
+    // Reset new source state to initial state when user selects a new connection type
+    props.setState({ ...props.state, connectionType: connectionType, step: SyncSetupStep.ConnectionDetails, skippedSourceSetup: false, newSourceState: INITIAL_SOURCE_STATE });
   };
 
   return (

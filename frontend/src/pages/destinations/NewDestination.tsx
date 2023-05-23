@@ -164,6 +164,10 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = p
       "connection_type": props.connectionType,
     };
 
+    if (state.staging_bucket) {
+      payload.staging_bucket = state.staging_bucket;
+    }
+
     switch (props.connectionType) {
       case ConnectionType.BigQuery:
         payload.bigquery_config = state.bigqueryConfig;

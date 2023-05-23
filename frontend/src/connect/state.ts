@@ -30,7 +30,7 @@ export type NewSourceState = {
 };
 
 // Values must be empty strings otherwise the input will be uncontrolled
-const INITIAL_SOURCE_STATE: NewSourceState = {
+export const INITIAL_SOURCE_STATE: NewSourceState = {
   sourceCreated: false,
   error: undefined,
   displayName: "",
