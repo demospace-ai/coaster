@@ -4,7 +4,6 @@ services:
   fabra_db:
     image: postgres
     volumes:
-      - ./certs:/var/lib/postgresql/certs
       - ./init_fabra.sql:/docker-entrypoint-initdb.d/init_fabra.sql
       - ./init_source.sql:/docker-entrypoint-initdb.d/init_source.sql
       - dbdata:/var/lib/postgresql/data
@@ -14,7 +13,7 @@ services:
       POSTGRES_PASSWORD: password
       PGDATA: /var/lib/postgresql/data/pgdata
       POSTGRES_HOST_AUTH_METHOD: scram-sha-256
-    command: postgres -c ssl=on -c ssl_cert_file=/var/lib/postgresql/certs/server.crt -c ssl_key_file=/var/lib/postgresql/certs/server.key
+    command: postgres
 
 volumes:
   dbdata:

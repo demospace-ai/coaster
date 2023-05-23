@@ -27,12 +27,14 @@ docker compose down # Stops container but doesn't delete DB
 docker compose down -v # Deletes all volumes, i.e. the DB, so you can recreate it
 ```
 
-4. Setup initial tables (run this again when adding migrations).
+4. Setup initial tables.
 
 ```sh
 brew install golang-migrate
 make migrate
 ```
+
+When adding new migrations, run `make migrate` to apply them.
 
 5. Configure GCloud Secret Manager
 
