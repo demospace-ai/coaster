@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"go.fabra.io/server/common/application"
-	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/models"
 
 	"github.com/golang-migrate/migrate"
@@ -72,7 +71,7 @@ func SetupDatabase() (*gorm.DB, func()) {
 		db, err = gorm.Open(postgres.Open(dbURI), &gorm.Config{
 			Logger: logger.Default.LogMode(logger.Silent),
 		})
-		return errors.Wrap(err, "(test.SetupDatabase)")
+		return err
 	}); err != nil {
 		log.Fatalf("Could not connect to database: %v", err)
 	}
