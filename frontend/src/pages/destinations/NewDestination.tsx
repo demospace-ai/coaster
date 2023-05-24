@@ -181,63 +181,61 @@ const validateAll = (connectionType: ConnectionType, state: NewDestinationState)
 
 const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = (props) => {
   const [state, setState] = useState<NewDestinationState>(INITIAL_DESTINATION_STATE);
-  const [saveLoading, setSaveLoading] = useState(false);
-  const [createConnectionSuccess, setCreateConnectionSuccess] = useState<boolean | null>(null);
 
-  const createNewDestination = async (e: FormEvent) => {
+  const newDestinationMutation = useMutation(
+    async () => {
+      const payload: CreateDestinationRequest = {
+        display_name: state.displayName,
+        connection_type: props.connectionType,
+      };
+
+      if (state.staging_bucket) {
+        payload.staging_bucket = state.staging_bucket;
+      }
+
+      switch (props.connectionType) {
+        case ConnectionType.BigQuery:
+          payload.bigquery_config = {
+            location: state.bigqueryConfig.location!.code,
+            credentials: state.bigqueryConfig.credentials,
+          };
+          break;
+        case ConnectionType.Snowflake:
+          payload.snowflake_config = state.snowflakeConfig;
+          break;
+        case ConnectionType.Redshift:
+          payload.redshift_config = state.redshiftConfig;
+          break;
+        case ConnectionType.Synapse:
+          payload.synapse_config = state.synapseConfig;
+          break;
+        case ConnectionType.MongoDb:
+          payload.mongodb_config = state.mongodbConfig;
+          break;
+        case ConnectionType.Postgres:
+          payload.postgres_config = state.postgresConfig;
+          break;
+        case ConnectionType.Webhook:
+          payload.webhook_config = state.webhookConfig;
+          break;
+      }
+
+      await sendRequest(CreateDestination, payload);
+    },
+    {
+      onSuccess: () => {
+        mutate({ GetDestinations }); // Tell SWRs to refetch destinations
+      },
+    },
+  );
+
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    setSaveLoading(true);
     if (!validateAll(props.connectionType, state)) {
-      setSaveLoading(false);
       return;
     }
 
-    const payload: CreateDestinationRequest = {
-      display_name: state.displayName,
-      connection_type: props.connectionType,
-    };
-
-    if (state.staging_bucket) {
-      payload.staging_bucket = state.staging_bucket;
-    }
-
-    switch (props.connectionType) {
-      case ConnectionType.BigQuery:
-        payload.bigquery_config = {
-          location: state.bigqueryConfig.location!.code,
-          credentials: state.bigqueryConfig.credentials,
-        };
-        break;
-      case ConnectionType.Snowflake:
-        payload.snowflake_config = state.snowflakeConfig;
-        break;
-      case ConnectionType.Redshift:
-        payload.redshift_config = state.redshiftConfig;
-        break;
-      case ConnectionType.Synapse:
-        payload.synapse_config = state.synapseConfig;
-        break;
-      case ConnectionType.MongoDb:
-        payload.mongodb_config = state.mongodbConfig;
-        break;
-      case ConnectionType.Postgres:
-        payload.postgres_config = state.postgresConfig;
-        break;
-      case ConnectionType.Webhook:
-        payload.webhook_config = state.webhookConfig;
-        break;
-    }
-
-    try {
-      await sendRequest(CreateDestination, payload);
-      mutate({ GetDestinations }); // Tell SWRs to refetch destinations
-      setCreateConnectionSuccess(true);
-    } catch (e) {
-      setCreateConnectionSuccess(false);
-      consumeError(e);
-    }
-
-    setSaveLoading(false);
+    newDestinationMutation.mutate();
   };
 
   let inputs: React.ReactElement;
@@ -259,7 +257,7 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = (
       break; // TODO: throw error
   }
 
-  if (createConnectionSuccess) {
+  if (newDestinationMutation.isSuccess) {
     return (
       <div>
         <div className="tw-mt-10 tw-text-center tw-font-bold tw-text-lg">
@@ -278,23 +276,21 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = (
         <ConnectionImage connectionType={props.connectionType} className="tw-h-6 tw-mr-1.5" />
         <div className="tw-font-medium">Enter your {getConnectionType(props.connectionType)} configuration:</div>
       </div>
-      <form onSubmit={createNewDestination}>
+      <form onSubmit={handleSubmit}>
         {inputs}
         <div className="tw-flex tw-flex-row tw-justify-start tw-w-100 tw-gap-5 tw-mt-16">
           <TestConnectionButton state={state} setState={setState} connectionType={props.connectionType} />
-          <FormButton className="tw-w-full tw-h-10">{saveLoading ? <Loading /> : "Save"}</FormButton>
-          {createConnectionSuccess !== null && (
-            <>
-              {state.error && (
-                <div className="tw-mt-4 tw-text-red-700 tw-p-2 tw-text-center tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">
-                  {state.error}
-                </div>
-              )}
-              <div className="tw-mt-3 tw-text-center">{createConnectionSuccess ? "Success!" : "Failure"}</div>
-            </>
-          )}
+          <FormButton className="tw-w-full tw-h-10">
+            {newDestinationMutation.isLoading ? <Loading /> : "Save"}
+          </FormButton>
+          <></>
         </div>
       </form>
+      {newDestinationMutation.error && (
+        <div className="tw-mt-4 tw-text-red-700 tw-p-2 tw-text-center tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">
+          {newDestinationMutation.error?.message || "Could not save destination"}
+        </div>
+      )}
     </div>
   );
 };
