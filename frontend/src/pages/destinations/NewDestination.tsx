@@ -23,9 +23,11 @@ import {
   TestDataConnectionRequest,
   WebhookConfig,
 } from "src/rpc/api";
-import { consumeError, HttpError } from "src/utils/errors";
+import { consumeError, forceError, HttpError } from "src/utils/errors";
 import { mergeClasses } from "src/utils/twmerge";
 import { mutate } from "swr";
+import { useMutation } from "../../utils/queryHelpers";
+import { ErrorDisplay } from "../../components/error/Error";
 
 export const NewDestination: React.FC<{ onComplete: () => void }> = (props) => {
   const [connectionType, setConnectionType] = useState<ConnectionType | null>(null);
@@ -38,10 +40,10 @@ export const NewDestination: React.FC<{ onComplete: () => void }> = (props) => {
   };
 
   return (
-    <>
+    <div className="tw-max-w-4xl tw-mx-auto">
       <BackButton className="tw-mt-3" onClick={onBack} />
-      <div className="tw-flex tw-flex-col tw-w-[900px] tw-mt-8 tw-mb-24 tw-py-12 tw-px-10 tw-mx-auto tw-bg-white tw-rounded-lg tw-shadow-md tw-items-center">
-        <div className="tw-w-full tw-text-center tw-mb-5 tw-font-bold tw-text-lg">New Destination</div>
+      <div className="tw-flex tw-flex-col tw-mt-8 tw-mb-24 tw-py-12 tw-px-10 tw-bg-white tw-rounded-lg tw-shadow-md tw-items-center">
+        <div className="tw-text-center tw-mb-5 tw-font-bold tw-text-lg">New Destination</div>
         {connectionType ? (
           <NewDestinationConfiguration
             connectionType={connectionType}
@@ -52,7 +54,7 @@ export const NewDestination: React.FC<{ onComplete: () => void }> = (props) => {
           <ConnectionTypeSelector setConnectionType={setConnectionType} />
         )}
       </div>
-    </>
+    </div>
   );
 };
 
@@ -271,7 +273,7 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = (
   }
 
   return (
-    <div className="tw-w-full">
+    <div>
       <div className="tw-flex tw-items-center tw-mb-8">
         <ConnectionImage connectionType={props.connectionType} className="tw-h-6 tw-mr-1.5" />
         <div className="tw-font-medium">Enter your {getConnectionType(props.connectionType)} configuration:</div>
@@ -298,80 +300,88 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = (
 };
 
 const TestConnectionButton: React.FC<ConnectionConfigurationProps & { connectionType: ConnectionType }> = (props) => {
-  const [testLoading, setTestLoading] = useState(false);
-  const [testConnectionSuccess, setTestConnectionSuccess] = useState<boolean | null>(null);
   const state = props.state;
 
-  const testConnection = async () => {
-    setTestLoading(true);
+  const testConnectionMutation = useMutation(
+    async () => {
+      const payload: TestDataConnectionRequest = {
+        display_name: state.displayName,
+        connection_type: props.connectionType,
+      };
+
+      switch (props.connectionType) {
+        case ConnectionType.BigQuery:
+          payload.bigquery_config = {
+            location: state.bigqueryConfig.location!.code,
+            credentials: state.bigqueryConfig.credentials,
+          };
+          break;
+        case ConnectionType.Snowflake:
+          payload.snowflake_config = state.snowflakeConfig;
+          break;
+        case ConnectionType.Redshift:
+          payload.redshift_config = state.redshiftConfig;
+          break;
+        case ConnectionType.MongoDb:
+          payload.mongodb_config = state.mongodbConfig;
+          break;
+        case ConnectionType.Synapse:
+          payload.synapse_config = state.synapseConfig;
+          break;
+        case ConnectionType.Postgres:
+          payload.postgres_config = state.postgresConfig;
+          break;
+        case ConnectionType.Webhook:
+          payload.webhook_config = state.webhookConfig;
+          break;
+      }
+
+      await sendRequest(TestDataConnection, payload);
+    },
+    {
+      onSuccess: () => {
+        props.setState((state) => {
+          return { ...state, error: undefined };
+        });
+      },
+      onError: (e) => {
+        const err = forceError(e);
+        console.log(err?.message);
+        props.setState((state) => ({
+          ...state,
+          error: err?.message,
+        }));
+      },
+    },
+  );
+
+  const handleTestConnection = () => {
     if (!validateAll(props.connectionType, state)) {
-      setTestLoading(false);
+      props.setState((state) => ({
+        ...state,
+        error: "Please fill out all required fields.",
+      }));
       return;
     }
 
-    const payload: TestDataConnectionRequest = {
-      display_name: state.displayName,
-      connection_type: props.connectionType,
-    };
-
-    switch (props.connectionType) {
-      case ConnectionType.BigQuery:
-        payload.bigquery_config = {
-          location: state.bigqueryConfig.location!.code,
-          credentials: state.bigqueryConfig.credentials,
-        };
-        break;
-      case ConnectionType.Snowflake:
-        payload.snowflake_config = state.snowflakeConfig;
-        break;
-      case ConnectionType.Redshift:
-        payload.redshift_config = state.redshiftConfig;
-        break;
-      case ConnectionType.MongoDb:
-        payload.mongodb_config = state.mongodbConfig;
-        break;
-      case ConnectionType.Synapse:
-        payload.synapse_config = state.synapseConfig;
-        break;
-      case ConnectionType.Postgres:
-        payload.postgres_config = state.postgresConfig;
-        break;
-      case ConnectionType.Webhook:
-        payload.webhook_config = state.webhookConfig;
-        break;
-    }
-
-    try {
-      await sendRequest(TestDataConnection, payload);
-      setTestConnectionSuccess(true);
-      props.setState((state) => {
-        return { ...state, error: undefined };
-      });
-    } catch (e) {
-      setTestConnectionSuccess(false);
-      if (e instanceof HttpError) {
-        const errorMessage = e.message;
-        props.setState((state) => {
-          return { ...state, error: errorMessage };
-        });
-      }
-      consumeError(e);
-    }
-
-    setTestLoading(false);
+    testConnectionMutation.mutate();
   };
 
-  const testColor = testConnectionSuccess === null ? null : testConnectionSuccess ? "tw-bg-green-700" : "tw-bg-red-700";
   return (
-    <Button
-      className={mergeClasses(
-        "tw-bg-slate-200 tw-text-slate-900 hover:tw-bg-slate-300 tw-border-slate-200 tw-w-full tw-h-10",
-        testColor,
+    <div className="tw-w-full">
+      <Button
+        className="tw-bg-slate-200 tw-text-slate-900 hover:tw-bg-slate-300 tw-border-slate-200 tw-w-full tw-h-10"
+        onClick={handleTestConnection}
+      >
+        {testConnectionMutation.isLoading ? <Loading /> : "Test"}
+      </Button>
+      {!testConnectionMutation.isLoading && testConnectionMutation.isSuccess && (
+        <div className="tw-text-green-500 tw-mt-1">Connection success!</div>
       )}
-      onClick={testConnection}
-    >
-      {testLoading ? <Loading /> : "Test"}
-    </Button>
+      {!testConnectionMutation.isLoading && (
+        <ErrorDisplay error={testConnectionMutation.error} className="tw-text-red-500 tw-mt-1" />
+      )}
+    </div>
   );
 };
 
@@ -550,11 +560,8 @@ const WebhookInputs: React.FC<ConnectionConfigurationProps> = (props) => {
         </Tooltip>
       </div>
       <div className="tw-flex tw-items-center tw-w-100 tw-border tw-border-slate-300 hover:tw-border-primary-hover focus:tw-border-primary tw-rounded-md tw-overflow-clip">
-        <span className="tw-select-none tw-text-slate-500 tw-px-2 tw-bg-slate-100 tw-h-10 tw-flex tw-items-center">
-          https://
-        </span>
         <ValidatedInput
-          className="tw-w-100 tw-pl-1 tw-border-0 tw-bg-transparent tw-rounded-none"
+          className="tw-w-100 tw-border-0 tw-bg-transparent tw-rounded-none"
           id="URL"
           value={state.webhookConfig.url}
           setValue={(value) => {
