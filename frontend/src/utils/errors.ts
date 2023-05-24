@@ -11,6 +11,7 @@ export class HttpError extends Error {
   }
 }
 
+/** Tries its best to turn something into an Error. */
 export function forceError(maybe: Error | unknown | string | null): Error | null {
   if (maybe instanceof Error) {
     return maybe;
