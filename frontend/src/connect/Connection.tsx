@@ -728,24 +728,40 @@ const MongoDbInputs: React.FC<ConnectionConfigurationProps> = (props) => {
   const state = props.state;
   return (
     <>
+      <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
+        <span>Display Name</span>
+        <Tooltip placement="right" label="Pick a name to help you identify this source in the future.">
+          <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+        </Tooltip>
+      </div>
       <ValidatedInput
         id="displayName"
         value={state.displayName}
         setValue={(value) => {
           props.setState((state) => ({ ...state, displayName: value }));
         }}
-        placeholder="Display Name"
-        label="Display Name"
+        placeholder="MongoDB Source"
       />
+      <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
+        <span>Username</span>
+        <Tooltip placement="right" label="We recommend you create a dedicated user for syncing.">
+          <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+        </Tooltip>
+      </div>
       <ValidatedInput
         id="username"
         value={state.mongodbConfig.username}
         setValue={(value) => {
           props.setState((state) => ({ ...state, mongodbConfig: { ...state.mongodbConfig, username: value } }));
         }}
-        placeholder="Username"
-        label="Username"
+        placeholder="sync_user"
       />
+      <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
+        <span>Password</span>
+        <Tooltip placement="right" label="Password for the user specified above.">
+          <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+        </Tooltip>
+      </div>
       <ValidatedInput
         id="password"
         type="password"
@@ -753,18 +769,45 @@ const MongoDbInputs: React.FC<ConnectionConfigurationProps> = (props) => {
         setValue={(value) => {
           props.setState((state) => ({ ...state, mongodbConfig: { ...state.mongodbConfig, password: value } }));
         }}
-        placeholder="Password"
-        label="Password"
+        placeholder="VerySecurePassword1"
       />
+      <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
+        <span>Host</span>
+        <Tooltip placement="right" label="The hostname of your MongoDB instance.">
+          <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+        </Tooltip>
+      </div>
       <ValidatedInput
         id="host"
         value={state.mongodbConfig.host}
         setValue={(value) => {
           props.setState((state) => ({ ...state, mongodbConfig: { ...state.mongodbConfig, host: value } }));
         }}
-        placeholder="Host"
-        label="Host"
+        placeholder="mymongo.abc123.mongodb.net"
       />
+      <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
+        <span>Connection Options (optional)</span>
+        <Tooltip
+          placement="right"
+          interactive
+          label={
+            <div>
+              Any additional options to apply to the MongoDB connection. See more{" "}
+              <a
+                className="tw-text-blue-400"
+                target="_blank"
+                rel="noreferrer"
+                href="https://www.mongodb.com/docs/drivers/node/current/fundamentals/connection/connection-options/"
+              >
+                here
+              </a>
+              .
+            </div>
+          }
+        >
+          <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+        </Tooltip>
+      </div>
       <Input
         id="connectionOptions"
         value={state.mongodbConfig.connection_options}
@@ -774,8 +817,7 @@ const MongoDbInputs: React.FC<ConnectionConfigurationProps> = (props) => {
             mongodbConfig: { ...state.mongodbConfig, connection_options: value },
           }));
         }}
-        placeholder="Connection Options (optional)"
-        label="Connection Options (optional)"
+        placeholder="connectTimeoutMS=30&timeoutMS=1000"
       />
     </>
   );
