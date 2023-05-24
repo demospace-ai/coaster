@@ -87,10 +87,10 @@ func encrypt(keyName string, plaintextString string) (*string, error) {
 	}
 
 	if !result.VerifiedPlaintextCrc32C {
-		return nil, errors.Wrap(errors.Newf("encrypt: request corrupted in-transit"), "encrypt")
+		return nil, errors.Newf("encrypt: request corrupted in-transit (encrypt)")
 	}
 	if int64(crc32c(result.Ciphertext)) != result.CiphertextCrc32C.Value {
-		return nil, errors.Wrap(errors.Newf("encrypt: response corrupted in-transit"), "encrypt")
+		return nil, errors.Newf("encrypt: response corrupted in-transit (encrypt)")
 	}
 
 	ciphertext := hex.EncodeToString(result.Ciphertext)
@@ -135,7 +135,7 @@ func decrypt(keyName string, ciphertextString string) (*string, error) {
 	}
 
 	if int64(crc32c(result.Plaintext)) != result.PlaintextCrc32C.Value {
-		return nil, errors.Wrap(errors.Newf("decrypt: response corrupted in-transit"), "decrypt")
+		return nil, errors.Newf("decrypt: response corrupted in-transit (decrypt)")
 	}
 
 	plaintext := string(result.Plaintext)

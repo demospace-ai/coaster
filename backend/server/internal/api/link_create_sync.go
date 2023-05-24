@@ -39,11 +39,11 @@ type CreateSyncLinkRequest struct {
 
 func (s ApiService) LinkCreateSync(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "LinkCreateSync")
+		return errors.NewBadRequest("must setup organization first")
 	}
 
 	if auth.LinkToken == nil {
-		return errors.Wrap(errors.NewBadRequest("must send link token"), "LinkCreateSync")
+		return errors.NewBadRequest("must send link token")
 	}
 
 	decoder := json.NewDecoder(r.Body)
@@ -61,7 +61,7 @@ func (s ApiService) LinkCreateSync(auth auth.Authentication, w http.ResponseWrit
 	}
 
 	if (createSyncRequest.TableName == nil || createSyncRequest.Namespace == nil) && createSyncRequest.CustomJoin == nil {
-		return errors.Wrap(errors.NewBadRequest("must have table_name and namespace or custom_join"), "LinkCreateSync")
+		return errors.NewBadRequest("must have table_name and namespace or custom_join")
 	}
 
 	// this also serves to check that this organization owns the object
@@ -186,6 +186,6 @@ func createSchedule(frequency int64, frequencyUnits models.FrequencyUnits) (time
 		return frequencyDuration * WEEK, nil
 	default:
 		// TODO: this should not happen
-		return WEEK, errors.Wrap(errors.Newf("unexpected frequency unit: %s", string(frequencyUnits)), "createSchedule")
+		return WEEK, errors.Newf("unexpected frequency unit (createSchedule): %s", string(frequencyUnits))
 	}
 }

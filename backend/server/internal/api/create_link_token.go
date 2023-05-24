@@ -26,7 +26,7 @@ type CreateLinkTokenResponse struct {
 
 func (s ApiService) CreateLinkToken(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.Wrap(errors.NewBadRequest("cannot request users without organization"), "CreateLinkToken")
+		return errors.NewBadRequest("cannot request users without organization")
 	}
 
 	decoder := json.NewDecoder(r.Body)

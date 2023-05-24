@@ -14,17 +14,17 @@ import (
 
 func (s ApiService) LinkCancelSync(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "LinkCancelSync")
+		return errors.NewBadRequest("must setup organization first")
 	}
 
 	if auth.LinkToken == nil {
-		return errors.Wrap(errors.NewBadRequest("must send link token"), "LinkCancelSync")
+		return errors.NewBadRequest("must send link token")
 	}
 
 	vars := mux.Vars(r)
 	strSyncId, ok := vars["syncID"]
 	if !ok {
-		return errors.Wrap(errors.Newf("missing sync ID from RunSync request URL: %s", r.URL.RequestURI()), "LinkCancelSync")
+		return errors.Newf("missing sync ID from RunSync request URL (LinkCancelSync): %s", r.URL.RequestURI())
 	}
 
 	syncId, err := strconv.ParseInt(strSyncId, 10, 64)

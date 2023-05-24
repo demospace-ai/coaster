@@ -9,7 +9,7 @@ import (
 
 func (s ApiService) OAuthRedirect(w http.ResponseWriter, r *http.Request) error {
 	if !r.URL.Query().Has("provider") {
-		return errors.Wrap(errors.Newf("missing provider from OAuth Login request URL: %s", r.URL.RequestURI()), "OAuthRedirect")
+		return errors.Newf("missing provider from OAuth Login request URL (OAuthRedirect): %s", r.URL.RequestURI())
 	}
 
 	strProvider := r.URL.Query().Get("provider")

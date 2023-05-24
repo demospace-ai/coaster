@@ -36,7 +36,7 @@ func (it *bigQueryIterator) Next(_ context.Context) (data.Row, error) {
 	}
 
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "*bigQueryIterator.Next")
 	}
 
 	return convertBigQueryRow(row, it.iterator.Schema), nil
@@ -53,7 +53,7 @@ func (it *bigQueryIterator) Schema() data.Schema {
 
 func (ac BigQueryApiClient) openConnection(ctx context.Context) (*bigquery.Client, error) {
 	if ac.ProjectID == nil {
-		return nil, errors.Newf("missing project ID")
+		return nil, errors.Newf("missing project ID (BigQueryApiClient.openConnection)")
 	}
 
 	var credentialOption option.ClientOption
@@ -67,7 +67,7 @@ func (ac BigQueryApiClient) openConnection(ctx context.Context) (*bigquery.Clien
 func (ac BigQueryApiClient) GetTables(ctx context.Context, namespace string) ([]string, error) {
 	client, err := ac.openConnection(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "BigQueryApiClient.GetTables")
 	}
 
 	defer client.Close()
@@ -80,7 +80,7 @@ func (ac BigQueryApiClient) GetTables(ctx context.Context, namespace string) ([]
 			break
 		}
 		if err != nil {
-			return nil, errors.Wrapf(err, "getting tables for namespace %s", namespace)
+			return nil, errors.Wrapf(err, "getting tables for namespace %s, BigQueryApiClient.GetTables", namespace)
 		}
 
 		results = append(results, table.TableID)
@@ -94,7 +94,7 @@ func (ac BigQueryApiClient) GetSchema(ctx context.Context, namespace string, tab
 
 	queryResults, err := ac.RunQuery(ctx, queryString)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "BigQueryApiClient.GetSchema")
 	}
 
 	schema := data.Schema{}
@@ -114,7 +114,7 @@ func (ac BigQueryApiClient) GetFieldValues(ctx context.Context, namespace string
 
 	queryResults, err := ac.RunQuery(ctx, queryString)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "BigQueryApiClient.GetFieldValues")
 	}
 
 	values := []any{}
@@ -145,7 +145,7 @@ func (ac BigQueryApiClient) GetNamespaces(ctx context.Context) ([]string, error)
 			break
 		}
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "BigQueryApiClient.GetNamespaces")
 		}
 
 		results = append(results, dataset.DatasetID)
@@ -157,7 +157,7 @@ func (ac BigQueryApiClient) GetNamespaces(ctx context.Context) ([]string, error)
 func (ac BigQueryApiClient) RunQuery(ctx context.Context, queryString string, args ...any) (*data.QueryResults, error) {
 	client, err := ac.openConnection(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "BigQueryApiClient.RunQuery")
 	}
 	defer client.Close()
 
@@ -172,22 +172,22 @@ func (ac BigQueryApiClient) RunQuery(ctx context.Context, queryString string, ar
 	// Run the query and print results when the query job is completed.
 	job, err := q.Run(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "BigQueryApiClient.RunQuery")
 	}
 
 	// If an error happens here it isn't actually a failure, the query was just wrong. Send the details back.
 	// TODO: make special error type for this
 	status, err := job.Wait(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "BigQueryApiClient.RunQuery")
 	}
 	if err := status.Err(); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "BigQueryApiClient.RunQuery")
 	}
 
 	it, err := job.Read(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "BigQueryApiClient.RunQuery")
 	}
 
 	var results []data.Row
@@ -198,7 +198,7 @@ func (ac BigQueryApiClient) RunQuery(ctx context.Context, queryString string, ar
 			break
 		}
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "BigQueryApiClient.RunQuery")
 		}
 		results = append(results, convertBigQueryRow(row, it.Schema))
 	}
@@ -212,7 +212,7 @@ func (ac BigQueryApiClient) RunQuery(ctx context.Context, queryString string, ar
 func (ac BigQueryApiClient) GetQueryIterator(ctx context.Context, queryString string) (data.RowIterator, error) {
 	client, err := ac.openConnection(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "BigQueryApiClient.GetQueryIterator")
 	}
 	defer client.Close()
 
@@ -224,18 +224,18 @@ func (ac BigQueryApiClient) GetQueryIterator(ctx context.Context, queryString st
 	// Run the query and print results when the query job is completed.
 	job, err := q.Run(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "BigQueryApiClient.GetQueryIterator")
 	}
 
 	// Both of these are not actually a failure, the query was just wrong. Send the details back to them.
 	_, err = job.Wait(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "BigQueryApiClient.GetQueryIterator")
 	}
 
 	it, err := job.Read(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "BigQueryApiClient.GetQueryIterator")
 	}
 
 	return &bigQueryIterator{
@@ -251,7 +251,7 @@ func (ac BigQueryApiClient) StageData(ctx context.Context, csvData string, stagi
 
 	gcsClient, err := storage.NewClient(ctx, credentialOption)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "BigQueryApiClient.GetQueryIterator")
 	}
 	defer gcsClient.Close()
 
@@ -259,11 +259,11 @@ func (ac BigQueryApiClient) StageData(ctx context.Context, csvData string, stagi
 		storage.WithPolicy(storage.RetryAlways),
 	).NewWriter(ctx)
 	if _, err := fmt.Fprint(w, csvData); err != nil {
-		return err
+		return errors.Wrap(err, "BigQueryApiClient.GetQueryIterator")
 	}
 
 	if err := w.Close(); err != nil {
-		return err
+		return errors.Wrap(err, "BigQueryApiClient.GetQueryIterator")
 	}
 
 	return nil
@@ -272,7 +272,7 @@ func (ac BigQueryApiClient) StageData(ctx context.Context, csvData string, stagi
 func (ac BigQueryApiClient) LoadFromStaging(ctx context.Context, namespace string, tableName string, loadOptions LoadOptions) error {
 	client, err := ac.openConnection(ctx)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "BigQueryApiClient.LoadFromStaging")
 	}
 	defer client.Close()
 
@@ -285,11 +285,11 @@ func (ac BigQueryApiClient) LoadFromStaging(ctx context.Context, namespace strin
 
 	job, err := loader.Run(ctx)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "BigQueryApiClient.LoadFromStaging")
 	}
 	status, err := job.Wait(ctx)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "BigQueryApiClient.LoadFromStaging")
 	}
 
 	return status.Err()
@@ -303,7 +303,7 @@ func (ac BigQueryApiClient) CleanUpStagingData(ctx context.Context, stagingOptio
 
 	gcsClient, err := storage.NewClient(ctx, credentialOption)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "BigQueryApiClient.CleanUpStagingData")
 	}
 	defer gcsClient.Close()
 

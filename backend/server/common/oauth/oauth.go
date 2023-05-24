@@ -53,7 +53,7 @@ func FetchGithubInfo(code string) (*ExternalUserInfo, error) {
 	secretKey := getGithubSecretKey()
 	githubClientSecret, err := secret.FetchSecret(context.TODO(), secretKey)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "FetchGithubInfo")
 	}
 
 	oauthConf := &oauth2.Config{
@@ -66,19 +66,19 @@ func FetchGithubInfo(code string) (*ExternalUserInfo, error) {
 
 	token, err := oauthConf.Exchange(context.TODO(), code)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "FetchGithubInfo")
 	}
 
 	oauthClient := oauthConf.Client(context.TODO(), token)
 	client := github.NewClient(oauthClient)
 	user, _, err := client.Users.Get(context.TODO(), "") // empty string will get info for authenticated user
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "FetchGithubInfo")
 	}
 
 	emails, _, err := client.Users.ListEmails(context.TODO(), nil)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "FetchGithubInfo")
 	}
 
 	var primaryEmail string
@@ -104,7 +104,7 @@ func FetchGoogleInfo(code string) (*ExternalUserInfo, error) {
 	secretKey := getGoogleSecretKey()
 	googleClientSecret, err := secret.FetchSecret(context.TODO(), secretKey)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "FetchGoogleInfo")
 	}
 
 	clientId := getGoogleClientID()
@@ -118,23 +118,23 @@ func FetchGoogleInfo(code string) (*ExternalUserInfo, error) {
 
 	oauth2Token, err := oauthConf.Exchange(context.TODO(), code)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "FetchGoogleInfo")
 	}
 
 	// Extract the ID Token from OAuth2 token.
 	rawIDToken, ok := oauth2Token.Extra("id_token").(string)
 	if !ok {
-		return nil, errors.Newf("no id_token included in token exchange response: %+v", oauth2Token)
+		return nil, errors.Newf("no id_token included in token exchange response (FetchGoogleInfo): %+v", oauth2Token)
 	}
 
 	validator, err := idtoken.NewValidator(context.TODO())
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "FetchGoogleInfo")
 	}
 
 	payload, err := validator.Validate(context.TODO(), rawIDToken, clientId)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "FetchGoogleInfo")
 	}
 
 	return &ExternalUserInfo{
@@ -165,7 +165,7 @@ func GetOauthRedirect(strProvider string) (*string, error) {
 			Endpoint:    githuboauth.Endpoint,
 		}
 	default:
-		return nil, errors.Newf("unsupported login method: %s", strProvider)
+		return nil, errors.Newf("unsupported login method (GetOauthRedirect): %s", strProvider)
 	}
 
 	token := jwt.NewWithClaims(crypto.SigningMethodKMSHS256, StateClaims{
@@ -177,7 +177,7 @@ func GetOauthRedirect(strProvider string) (*string, error) {
 
 	signedString, err := token.SignedString(nil)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "GetOauthRedirect")
 	}
 
 	url := oauthConf.AuthCodeURL(signedString, oauth2.AccessTypeOnline, oauth2.ApprovalForce)
@@ -191,16 +191,16 @@ func ValidateState(state string) (*OauthProvider, error) {
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "ValidateState")
 	}
 
 	if !token.Valid {
-		return nil, errors.Newf("token invalid: %v", token.Raw)
+		return nil, errors.Newf("token invalid (ValidateState): %v", token.Raw)
 	}
 
 	claims, ok := token.Claims.(*StateClaims)
 	if !ok {
-		return nil, errors.Newf("token invalid: %v", token.Raw)
+		return nil, errors.Newf("token invalid (ValidateState): %v", token.Raw)
 	}
 
 	return &claims.Provider, nil

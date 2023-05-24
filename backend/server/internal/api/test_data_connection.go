@@ -37,7 +37,7 @@ type TestDataConnectionRequest struct {
 
 func (s ApiService) TestDataConnection(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "TestDataConnection")
+		return errors.NewBadRequest("must setup organization first")
 	}
 
 	decoder := json.NewDecoder(r.Body)
@@ -314,13 +314,13 @@ func validateTestDataConnectionRequest(request TestDataConnectionRequest) error 
 	case models.ConnectionTypePostgres:
 		return validateTestPostgresConnection(request)
 	default:
-		return errors.Wrap(errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", request.ConnectionType)), "validateTestDataConnectionRequest")
+		return errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", request.ConnectionType))
 	}
 }
 
 func validateTestBigQueryConnection(request TestDataConnectionRequest) error {
 	if request.BigQueryConfig == nil {
-		return errors.Wrap(errors.NewBadRequest("missing BigQuery configuration"),"validateTestBigQueryConnection")
+		return errors.NewBadRequest("missing BigQuery configuration")
 	}
 
 	var bigQueryCredentials models.BigQueryCredentials
@@ -336,7 +336,7 @@ func validateTestBigQueryConnection(request TestDataConnectionRequest) error {
 
 func validateTestSnowflakeConnection(request TestDataConnectionRequest) error {
 	if request.SnowflakeConfig == nil {
-		return errors.Wrap(errors.NewBadRequest("missing Snowflake configuration"), "validateTestSnowflakeConnection")
+		return errors.NewBadRequest("missing Snowflake configuration")
 	}
 
 	// TODO: validate the fields all exist in the credentials object
@@ -346,7 +346,7 @@ func validateTestSnowflakeConnection(request TestDataConnectionRequest) error {
 
 func validateTestRedshiftConnection(request TestDataConnectionRequest) error {
 	if request.RedshiftConfig == nil {
-		return errors.Wrap(errors.NewBadRequest("missing Redshift configuration"), "validateTestRedshiftConnection")
+		return errors.NewBadRequest("missing Redshift configuration")
 	}
 
 	// TODO: validate the fields all exist in the credentials object
@@ -356,7 +356,7 @@ func validateTestRedshiftConnection(request TestDataConnectionRequest) error {
 
 func validateTestMongoConnection(request TestDataConnectionRequest) error {
 	if request.MongoDbConfig == nil {
-		return errors.Wrap(errors.NewBadRequest("missing MongoDB configuration"), "validateTestMongoConnection")
+		return errors.NewBadRequest("missing MongoDB configuration")
 	}
 
 	// TODO: validate the fields all exist in the credentials object
@@ -366,7 +366,7 @@ func validateTestMongoConnection(request TestDataConnectionRequest) error {
 
 func validateTestSynapseConnection(request TestDataConnectionRequest) error {
 	if request.SynapseConfig == nil {
-		return errors.Wrap(errors.NewBadRequest("missing Synapse configuration"), "validateTestSynapseConnection")
+		return errors.NewBadRequest("missing Synapse configuration")
 	}
 
 	// TODO: validate the fields all exist in the credentials object
@@ -376,7 +376,7 @@ func validateTestSynapseConnection(request TestDataConnectionRequest) error {
 
 func validateTestPostgresConnection(request TestDataConnectionRequest) error {
 	if request.PostgresConfig == nil {
-		return errors.Wrap(errors.NewBadRequest("missing Postgres configuration"), "validateTestPostgresConnection")
+		return errors.NewBadRequest("missing Postgres configuration")
 	}
 
 	// TODO: validate the fields all exist in the credentials object

@@ -21,12 +21,12 @@ type GetSchemaResponse struct {
 func (s ApiService) GetSchema(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 
 	if auth.Organization == nil {
-		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "GetSchema")
+		return errors.NewBadRequest("must setup organization first")
 	}
 
 	strConnectionID := r.URL.Query().Get("connectionID")
 	if len(strConnectionID) == 0 {
-		return errors.Wrap(errors.Newf("missing connection ID from GetSchema request URL: %s", r.URL.RequestURI()), "GetSchema")
+		return errors.Newf("missing connection ID from GetSchema request URL (GetSchema): %s", r.URL.RequestURI())
 	}
 
 	connectionID, err := strconv.ParseInt(strConnectionID, 10, 64)
@@ -38,7 +38,7 @@ func (s ApiService) GetSchema(auth auth.Authentication, w http.ResponseWriter, r
 	tableName := r.URL.Query().Get("tableName")
 	customJoin := r.URL.Query().Get("customJoin")
 	if (len(namespace) == 0 || len(tableName) == 0) && len(customJoin) == 0 {
-		return errors.Wrap(errors.Newf("must provide both namespace and table name or custom join in GetSchema request: %s", r.URL.RequestURI()), "GetSchema")
+		return errors.Newf("must provide both namespace and table name or custom join in GetSchema request (GetSchema): %s", r.URL.RequestURI())
 	}
 
 	// TODO: write test to make sure only authorized users can use the data connection
@@ -70,8 +70,8 @@ func (s ApiService) getSchemaForCustomJoin(connection models.Connection, customJ
 	case models.ConnectionTypeBigQuery:
 		fallthrough
 	case models.ConnectionTypeSnowflake:
-		return nil, errors.Wrap(errors.NewBadRequest("custom join not supported"), "GetSchema")
+		return nil, errors.NewBadRequest("custom join not supported")
 	default:
-		return nil, errors.Wrap(errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", connection.ConnectionType)), "GetSchema")
+		return nil, errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", connection.ConnectionType))
 	}
 }

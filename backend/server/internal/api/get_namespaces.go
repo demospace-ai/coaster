@@ -18,12 +18,12 @@ type GetNamespacesResponse struct {
 func (s ApiService) GetNamespaces(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	ctx := context.Background()
 	if auth.Organization == nil {
-		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "GetNamespaces")
+		return errors.NewBadRequest("must setup organization first")
 	}
 
 	strConnectionID := r.URL.Query().Get("connectionID")
 	if len(strConnectionID) == 0 {
-		return errors.Wrap(errors.Newf("missing connection ID from GetNamespaces request URL: %s", r.URL.RequestURI()), "GetNamespaces")
+		return errors.Newf("missing connection ID from GetNamespaces request URL (GetNamespaces): %s", r.URL.RequestURI())
 	}
 
 	connectionID, err := strconv.ParseInt(strConnectionID, 10, 64)

@@ -32,7 +32,7 @@ type CreateDestinationResponse struct {
 
 func (s ApiService) CreateDestination(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "CreateDestination")
+		return errors.NewBadRequest("must setup organization first")
 	}
 
 	decoder := json.NewDecoder(r.Body)
@@ -93,7 +93,7 @@ func (s ApiService) CreateDestination(auth auth.Authentication, w http.ResponseW
 			s.db, auth.Organization.ID, *createDestinationRequest.WebhookConfig, *encryptedSigningKey,
 		)
 	default:
-		return errors.Wrap(errors.Newf("unsupported connection type: %s", createDestinationRequest.ConnectionType), "CreateDestination")
+		return errors.Newf("unsupported connection type (CreateDestination): %s", createDestinationRequest.ConnectionType)
 	}
 
 	if err != nil {
@@ -140,13 +140,13 @@ func validateCreateDestinationRequest(request CreateDestinationRequest) error {
 	case models.ConnectionTypeWebhook:
 		return validateCreateWebhookDestination(request)
 	default:
-		return errors.Wrap(errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", request.ConnectionType)), "validateCreateDestinationRequest")
+		return errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", request.ConnectionType))
 	}
 }
 
 func validateCreateBigQueryDestination(request CreateDestinationRequest) error {
 	if request.BigQueryConfig == nil {
-		return errors.Wrap(errors.NewBadRequest("missing BigQuery configuration"), "validateCreateBigQueryDestination")
+		return errors.NewBadRequest("missing BigQuery configuration")
 	}
 
 	var bigQueryCredentials models.BigQueryCredentials
@@ -162,7 +162,7 @@ func validateCreateBigQueryDestination(request CreateDestinationRequest) error {
 
 func validateCreateSnowflakeDestination(request CreateDestinationRequest) error {
 	if request.SnowflakeConfig == nil {
-		return errors.Wrap(errors.NewBadRequest("missing Snowflake configuration"), "validateCreateSnowflakeDestination")
+		return errors.NewBadRequest("missing Snowflake configuration")
 	}
 
 	// TODO: validate the fields all exist in the credentials object
@@ -172,7 +172,7 @@ func validateCreateSnowflakeDestination(request CreateDestinationRequest) error 
 
 func validateCreateRedshiftDestination(request CreateDestinationRequest) error {
 	if request.RedshiftConfig == nil {
-		return errors.Wrap(errors.NewBadRequest("missing Redshift configuration"), "validateCreateRedshiftDestination")
+		return errors.NewBadRequest("missing Redshift configuration")
 	}
 
 	// TODO: validate the fields all exist in the credentials object
@@ -182,7 +182,7 @@ func validateCreateRedshiftDestination(request CreateDestinationRequest) error {
 
 func validateCreateMongoDbDestination(request CreateDestinationRequest) error {
 	if request.MongoDbConfig == nil {
-		return errors.Wrap(errors.NewBadRequest("missing MongoDB configuration"), "validateCreateMongoDbDestination")
+		return errors.NewBadRequest("missing MongoDB configuration")
 	}
 
 	// TODO: validate the fields all exist in the credentials object
@@ -192,7 +192,7 @@ func validateCreateMongoDbDestination(request CreateDestinationRequest) error {
 
 func validateCreateWebhookDestination(request CreateDestinationRequest) error {
 	if request.WebhookConfig == nil {
-		return errors.Wrap(errors.NewBadRequest("missing Webhook configuration"), "validateCreateWebhookDestination")
+		return errors.NewBadRequest("missing Webhook configuration")
 	}
 
 	// TODO: validate the fields all exist in the credentials object

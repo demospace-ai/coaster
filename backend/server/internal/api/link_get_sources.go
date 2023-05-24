@@ -16,11 +16,11 @@ type GetSourcesResponse struct {
 
 func (s ApiService) LinkGetSources(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "LinkGetSources")
+		return errors.NewBadRequest("must setup organization first")
 	}
 
 	if auth.LinkToken == nil {
-		return errors.Wrap(errors.NewBadRequest("must send link token"), "LinkGetSources")
+		return errors.NewBadRequest("must send link token")
 	}
 
 	// TODO: write test to make sure only authorized users can use the data connection

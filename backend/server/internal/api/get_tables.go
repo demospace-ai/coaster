@@ -18,12 +18,12 @@ type GetTablesResponse struct {
 func (s ApiService) GetTables(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	ctx := context.Background()
 	if auth.Organization == nil {
-		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "GetTables")
+		return errors.NewBadRequest("must setup organization first")
 	}
 
 	strConnectionID := r.URL.Query().Get("connectionID")
 	if len(strConnectionID) == 0 {
-		return errors.Wrap(errors.Newf("missing connection ID from GetDatasets request URL: %s", r.URL.RequestURI()), "GetTables")
+		return errors.Newf("missing connection ID from GetDatasets request URL (GetTables): %s", r.URL.RequestURI())
 	}
 
 	connectionID, err := strconv.ParseInt(strConnectionID, 10, 64)
@@ -33,7 +33,7 @@ func (s ApiService) GetTables(auth auth.Authentication, w http.ResponseWriter, r
 
 	namespace := r.URL.Query().Get("namespace")
 	if len(namespace) == 0 {
-		return errors.Wrap(errors.Newf("missing namespace from GetTables request URL: %s", r.URL.RequestURI()), "GetTables")
+		return errors.Newf("missing namespace from GetTables request URL (GetTables): %s", r.URL.RequestURI())
 	}
 
 	// TODO: write test to make sure only authorized users can use the data connection

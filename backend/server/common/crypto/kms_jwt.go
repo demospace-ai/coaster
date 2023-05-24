@@ -59,7 +59,7 @@ func (s *SigningMethodKMS) Sign(signingString string, key interface{}) ([]byte, 
 	// Generate HMAC of data.
 	result, err := client.MacSign(ctx, req)
 	if err != nil {
-		return nil, errors.Wrap(errors.Newf("failed to hmac sign: %v", err), "Sign")
+		return nil, errors.Newf("failed to hmac sign (SigningMethodKMS.Sign): %v", err)
 	}
 
 	return result.Mac, nil
@@ -75,7 +75,7 @@ func (s *SigningMethodKMS) Verify(signingString string, signature []byte, key in
 
 	client, err := kms.NewKeyManagementClient(ctx)
 	if err != nil {
-		return errors.Wrap(errors.Newf("failed to create kms client: %v", err), "Verify")
+		return errors.Newf("failed to create kms client (SigningMethodKMS.Verify): %v", err)
 	}
 	defer client.Close()
 
@@ -89,11 +89,11 @@ func (s *SigningMethodKMS) Verify(signingString string, signature []byte, key in
 	// Verify the signature.
 	result, err := client.MacVerify(ctx, req)
 	if err != nil {
-		return errors.Wrap(errors.Newf("failed to verify signature: %v", err), "Verify")
+		return errors.Newf("failed to verify signature (SigningMethodKMS.Verify): %v", err)
 	}
 
 	if !result.Success {
-		return errors.Wrap(errors.Newf("failed to verify signature: %v", result), "Verify")
+		return errors.Newf("failed to verify signature (SigningMethodKMS.Verify): %v", result)
 	}
 
 	return nil

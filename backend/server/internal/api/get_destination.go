@@ -22,7 +22,7 @@ func (s ApiService) GetDestination(auth auth.Authentication, w http.ResponseWrit
 	vars := mux.Vars(r)
 	strDestinationId, ok := vars["destinationID"]
 	if !ok {
-		return errors.Wrap(errors.Newf("missing destination ID from GetDestination request URL: %s", r.URL.RequestURI()), "GetDestination")
+		return errors.Newf("missing destination ID from GetDestination request URL (GetDestination): %s", r.URL.RequestURI())
 	}
 
 	destinationId, err := strconv.ParseInt(strDestinationId, 10, 64)

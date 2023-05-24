@@ -24,11 +24,11 @@ type LinkGetPreviewRequest struct {
 
 func (s ApiService) LinkGetPreview(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "LinkGetPreview")
+		return errors.NewBadRequest("must setup organization first")
 	}
 
 	if auth.LinkToken == nil {
-		return errors.Wrap(errors.NewBadRequest("must send link token"), "LinkGetPreview")
+		return errors.NewBadRequest("must send link token")
 	}
 
 	decoder := json.NewDecoder(r.Body)
@@ -87,6 +87,6 @@ func getPreviewQuery(connectionType models.ConnectionType, namespace string, tab
 		queryStr := fmt.Sprintf("SELECT TOP(100) * FROM %s.%s;", namespace, tableName)
 		return &queryStr, nil
 	default:
-		return nil, errors.Wrap(errors.Newf("unexpected connection type: %s", connectionType), "getPreviewQuery")
+		return nil, errors.Newf("unexpected connection type (getPreviewQuery): %s", connectionType)
 	}
 }

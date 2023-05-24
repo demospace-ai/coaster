@@ -14,7 +14,7 @@ import (
 
 func (s ApiService) GetApiKey(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.Wrap(errors.NewBadRequest("cannot request users without organization"), "GetApiKey")
+		return errors.NewBadRequest("cannot request users without organization")
 	}
 
 	apiKey, err := s.GetOrCreateApiKey(auth.Organization.ID)

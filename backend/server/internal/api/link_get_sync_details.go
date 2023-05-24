@@ -16,11 +16,11 @@ import (
 
 func (s ApiService) LinkGetSync(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "LinkGetSync")
+		return errors.NewBadRequest("must setup organization first")
 	}
 
 	if auth.LinkToken == nil {
-		return errors.Wrap(errors.NewBadRequest("must send link token"), "LinkGetSync")
+		return errors.NewBadRequest("must send link token")
 	}
 
 	timezone := timeutils.GetTimezoneHeader(r)
@@ -28,7 +28,7 @@ func (s ApiService) LinkGetSync(auth auth.Authentication, w http.ResponseWriter,
 	vars := mux.Vars(r)
 	strSyncId, ok := vars["syncID"]
 	if !ok {
-		return errors.Wrap(errors.Newf("missing sync ID from GetSyncDetails request URL: %s", r.URL.RequestURI()), "LinkGetSync")
+		return errors.Newf("missing sync ID from GetSyncDetails request URL (LinkGetSync): %s", r.URL.RequestURI())
 	}
 
 	syncId, err := strconv.ParseInt(strSyncId, 10, 64)

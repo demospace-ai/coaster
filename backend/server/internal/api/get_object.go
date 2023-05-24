@@ -20,7 +20,7 @@ func (s ApiService) GetObject(auth auth.Authentication, w http.ResponseWriter, r
 	vars := mux.Vars(r)
 	strObjectId, ok := vars["objectID"]
 	if !ok {
-		return errors.Wrap(errors.Newf("missing object ID from GetObject request URL: %s", r.URL.RequestURI()), "GetObject")
+		return errors.Newf("missing object ID from GetObject request URL (GetObject): %s", r.URL.RequestURI())
 	}
 
 	objectId, err := strconv.ParseInt(strObjectId, 10, 64)

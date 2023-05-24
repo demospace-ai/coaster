@@ -14,16 +14,16 @@ import (
 
 func (s ApiService) LinkGetNamespaces(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "LinkGetNamespaces")
+		return errors.NewBadRequest("must setup organization first")
 	}
 
 	if auth.LinkToken == nil {
-		return errors.Wrap(errors.NewBadRequest("must send link token"), "LinkGetNamespaces")
+		return errors.NewBadRequest("must send link token")
 	}
 
 	strSourceId := r.URL.Query().Get("sourceID")
 	if len(strSourceId) == 0 {
-		return errors.Wrap(errors.Newf("missing source ID from LinkGetNamespaces request URL: %s", r.URL.RequestURI()), "LinkGetNamespaces")
+		return errors.Newf("missing source ID from LinkGetNamespaces request URL (LinkGetNamespaces): %s", r.URL.RequestURI())
 	}
 
 	sourceId, err := strconv.ParseInt(strSourceId, 10, 64)

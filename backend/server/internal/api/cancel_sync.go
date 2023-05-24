@@ -14,13 +14,13 @@ import (
 
 func (s ApiService) CancelSync(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "CancelSync")
+		return errors.NewBadRequest("must setup organization first")
 	}
 
 	vars := mux.Vars(r)
 	strSyncId, ok := vars["syncID"]
 	if !ok {
-		return errors.Wrap(errors.Newf("missing sync ID from RunSync request URL: %s", r.URL.RequestURI()), "CancelSync")
+		return errors.Newf("missing sync ID from RunSync request URL (CancelSync): %s", r.URL.RequestURI())
 	}
 
 	syncId, err := strconv.ParseInt(strSyncId, 10, 64)

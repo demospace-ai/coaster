@@ -45,7 +45,7 @@ type CreateObjectResponse struct {
 
 func (s ApiService) CreateObject(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "CreateObject")
+		return errors.NewBadRequest("must setup organization first")
 	}
 
 	decoder := json.NewDecoder(r.Body)
@@ -70,7 +70,7 @@ func (s ApiService) CreateObject(auth auth.Authentication, w http.ResponseWriter
 		}
 
 		if _, validCursorField := VALID_CURSOR_TYPES[cursorField.Type]; !validCursorField {
-			return errors.Wrap(errors.NewBadRequestf("invalid cursor field type: %s", cursorField.Type), "CreateObject")
+			return errors.NewBadRequestf("invalid cursor field type: %s", cursorField.Type)
 		}
 	}
 

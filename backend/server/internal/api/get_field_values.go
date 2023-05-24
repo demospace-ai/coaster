@@ -18,7 +18,7 @@ type GetFieldValuesResponse struct {
 func (s ApiService) GetFieldValues(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	strConnectionID := r.URL.Query().Get("connectionID")
 	if len(strConnectionID) == 0 {
-		return errors.Wrap(errors.Newf("missing connection ID from GetPropertyValues request URL: %s", r.URL.RequestURI()), "GetFieldValues")
+		return errors.Newf("missing connection ID from GetPropertyValues request URL (GetFieldValues): %s", r.URL.RequestURI())
 	}
 
 	connectionID, err := strconv.ParseInt(strConnectionID, 10, 64)
@@ -28,17 +28,17 @@ func (s ApiService) GetFieldValues(auth auth.Authentication, w http.ResponseWrit
 
 	namespace := r.URL.Query().Get("namespace")
 	if len(namespace) == 0 {
-		return errors.Wrap(errors.Newf("missing namespace from GetFieldValues request URL: %s", r.URL.RequestURI()), "GetFieldValues")
+		return errors.Newf("missing namespace from GetFieldValues request URL (GetFieldValues): %s", r.URL.RequestURI())
 	}
 
 	tableName := r.URL.Query().Get("tableName")
 	if len(tableName) == 0 {
-		return errors.Wrap(errors.Newf("missing table name from GetFieldValues request URL: %s", r.URL.RequestURI()), "GetFieldValues")
+		return errors.Newf("missing table name from GetFieldValues request URL (GetFieldValues): %s", r.URL.RequestURI())
 	}
 
 	fieldName := r.URL.Query().Get("fieldName")
 	if len(fieldName) == 0 {
-		return errors.Wrap(errors.Newf("missing field name from GetFieldValues request URL: %s", r.URL.RequestURI()), "GetFieldValues")
+		return errors.Newf("missing field name from GetFieldValues request URL (GetFieldValues): %s", r.URL.RequestURI())
 	}
 
 	// TODO: write test to make sure only authorized users can use the data connection

@@ -14,16 +14,16 @@ import (
 
 func (s ApiService) LinkGetTables(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "LinkGetTables")
+		return errors.NewBadRequest("must setup organization first")
 	}
 
 	if auth.LinkToken == nil {
-		return errors.Wrap(errors.NewBadRequest("must send link token"), "LinkGetTables")
+		return errors.NewBadRequest("must send link token")
 	}
 
 	strSourceId := r.URL.Query().Get("sourceID")
 	if len(strSourceId) == 0 {
-		return errors.Wrap(errors.Newf("missing source ID from LinkGetTables request URL: %s", r.URL.RequestURI()), "LinkGetTables")
+		return errors.Newf("missing source ID from LinkGetTables request URL (LinkGetTables): %s", r.URL.RequestURI())
 	}
 
 	sourceId, err := strconv.ParseInt(strSourceId, 10, 64)
@@ -33,7 +33,7 @@ func (s ApiService) LinkGetTables(auth auth.Authentication, w http.ResponseWrite
 
 	namespace := r.URL.Query().Get("namespace")
 	if len(namespace) == 0 {
-		return errors.Wrap(errors.Newf("missing namespace from LinkGetTables request URL: %s", r.URL.RequestURI()), "LinkGetTables")
+		return errors.Newf("missing namespace from LinkGetTables request URL (LinkGetTables): %s", r.URL.RequestURI())
 	}
 
 	// TODO: write test to make sure only authorized users can use the data connection

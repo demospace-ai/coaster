@@ -15,16 +15,16 @@ import (
 
 func (s ApiService) LinkGetSchema(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "LinkGetSchema")
+		return errors.NewBadRequest("must setup organization first")
 	}
 
 	if auth.LinkToken == nil {
-		return errors.Wrap(errors.NewBadRequest("must send link token"), "LinkGetSchema")
+		return errors.NewBadRequest("must send link token")
 	}
 
 	strSourceId := r.URL.Query().Get("sourceID")
 	if len(strSourceId) == 0 {
-		return errors.Wrap(errors.Newf("missing source ID from LinkGetSchema request URL: %s", r.URL.RequestURI()), "LinkGetSchema")
+		return errors.Newf("missing source ID from LinkGetSchema request URL (LinkGetSchema): %s", r.URL.RequestURI())
 	}
 
 	sourceId, err := strconv.ParseInt(strSourceId, 10, 64)
@@ -36,7 +36,7 @@ func (s ApiService) LinkGetSchema(auth auth.Authentication, w http.ResponseWrite
 	tableName := r.URL.Query().Get("tableName")
 	customJoin := r.URL.Query().Get("customJoin")
 	if (len(namespace) == 0 || len(tableName) == 0) && len(customJoin) == 0 {
-		return errors.Wrap(errors.Newf("must provide both namespace and table name or custom join in GetSchema request: %s", r.URL.RequestURI()), "LinkGetSchema")
+		return errors.Newf("must provide both namespace and table name or custom join in GetSchema request (LinkGetSchema): %s", r.URL.RequestURI())
 	}
 
 	// TODO: write test to make sure only authorized users can use the data connection

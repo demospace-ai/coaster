@@ -13,25 +13,25 @@ import (
 
 func (s ApiService) LinkCreateSource(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "LinkCreateSource")
+		return errors.NewBadRequest("must setup organization first")
 	}
 
 	if auth.LinkToken == nil {
-		return errors.Wrap(errors.NewBadRequest("must send link token"), "LinkCreateSource")
+		return errors.NewBadRequest("must send link token")
 	}
 
 	decoder := json.NewDecoder(r.Body)
 	var createSourceRequest CreateSourceRequest
 	err := decoder.Decode(&createSourceRequest)
 	if err != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "LinkCreateSource")
+		return errors.NewCustomerVisibleError(err)
 	}
 
 	// TODO: validate connection parameters
 	validate := validator.New()
 	err = validate.Struct(createSourceRequest)
 	if err != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "LinkCreateSource")
+		return errors.NewCustomerVisibleError(err)
 	}
 
 	// Ignore end customer ID from request, use the one from the link token

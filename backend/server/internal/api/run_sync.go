@@ -15,13 +15,13 @@ import (
 
 func (s ApiService) RunSync(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "RunSync")
+		return errors.NewBadRequest("must setup organization first")
 	}
 
 	vars := mux.Vars(r)
 	strSyncId, ok := vars["syncID"]
 	if !ok {
-		return errors.Wrap(errors.Newf("missing sync ID from RunSync request URL: %s", r.URL.RequestURI()), "RunSync")
+		return errors.Newf("missing sync ID from RunSync request URL (RunSync): %s", r.URL.RequestURI())
 	}
 
 	syncId, err := strconv.ParseInt(strSyncId, 10, 64)

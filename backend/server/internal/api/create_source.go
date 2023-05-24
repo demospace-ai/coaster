@@ -33,25 +33,25 @@ type CreateSourceResponse struct {
 
 func (s ApiService) CreateSource(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "CreateSource")
+		return errors.NewBadRequest("must setup organization first")
 	}
 
 	decoder := json.NewDecoder(r.Body)
 	var createSourceRequest CreateSourceRequest
 	err := decoder.Decode(&createSourceRequest)
 	if err != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "CreateSource")
+		return errors.NewCustomerVisibleError(err)
 	}
 
 	// TODO: validate connection parameters
 	validate := validator.New()
 	err = validate.Struct(createSourceRequest)
 	if err != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "CreateSource")
+		return errors.NewCustomerVisibleError(err)
 	}
 
 	if createSourceRequest.EndCustomerID == nil {
-		return errors.Wrap(errors.NewBadRequest("must provide end customer ID"), "CreateSource")
+		return errors.NewBadRequest("must provide end customer ID")
 	}
 
 	source, connection, err := s.createSource(auth, createSourceRequest, *createSourceRequest.EndCustomerID)
@@ -119,7 +119,7 @@ func (s ApiService) createSource(auth auth.Authentication, createSourceRequest C
 			s.db, auth.Organization.ID, *createSourceRequest.PostgresConfig, *encryptedCredentials,
 		)
 	default:
-		return nil, nil, errors.Wrap(errors.Newf("unsupported connection type: %s", createSourceRequest.ConnectionType), "createSource")
+		return nil, nil, errors.Newf("unsupported connection type (createSource): %s", createSourceRequest.ConnectionType)
 	}
 
 	if err != nil {

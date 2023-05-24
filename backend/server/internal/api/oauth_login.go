@@ -33,11 +33,11 @@ var UNAUTHORIZED_DOMAINS = map[string]bool{
 
 func (s ApiService) OAuthLogin(w http.ResponseWriter, r *http.Request) error {
 	if !r.URL.Query().Has("state") {
-		return errors.Wrap(errors.Newf("missing state from OAuth Login request URL: %s", r.URL.RequestURI()), "OAuthLogin")
+		return errors.Newf("missing state from OAuth Login request URL (OAuthLogin): %s", r.URL.RequestURI())
 	}
 
 	if !r.URL.Query().Has("code") {
-		return errors.Wrap(errors.Newf("missing code from OAuth Login request URL: %s", r.URL.RequestURI()), "OAuthLogin")
+		return errors.Newf("missing code from OAuth Login request URL (OAuthLogin): %s", r.URL.RequestURI())
 	}
 
 	state := r.URL.Query().Get("state")
