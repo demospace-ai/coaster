@@ -19,14 +19,16 @@ export const Home: React.FC = () => {
   return (
     <div className="tw-h-full tw-py-7 tw-px-10">
       <div className="tw-m-auto tw-max-w-lg">
-        <div className="tw-flex tw-flex-col tw-mb-5 tw-justify-end tw-font-bold tw-text-2xl">Welcome to Fabra!</div>
+        <div className="tw-flex tw-flex-col tw-mt-10 tw-mb-5 tw-justify-end tw-font-bold tw-text-2xl">
+          Welcome to Fabra!
+        </div>
         <div className="tw-mb-4">
           Follow these steps to provide Fabra with information about your data warehouse and define the data objects
           customers will send. <br />
           <br />
-          Then, you can preview what it all looks like to the end customer.
+          Then, you can preview what it all looks like to your end customer.
         </div>
-        <div className="tw-flex tw-flex-col tw-mb-5 tw-justify-end tw-font-bold tw-text-lg tw-h-[29px]">
+        <div className="tw-flex tw-flex-col tw-mt-8 tw-mb-5 tw-justify-end tw-font-bold tw-text-lg tw-h-[29px]">
           Setup Checklist
         </div>
         <NavLink className={classNames(setupStep, destinationCreated && "tw-line-through")} to="/destinations">
@@ -43,7 +45,7 @@ export const Home: React.FC = () => {
         </NavLink>
         <a className={setupStep} href="https://docs.fabra.io/guides/fabra-connect" target="_blank" rel="noreferrer">
           <div className={stepNumber}>3</div>
-          Add the Fabra Connect frontend component to your application
+          Add the Fabra Connect component to your application
         </a>
         {/* Remove until there's a real notifications tab, otherwise customer clicks on it and it doesn't do anything. Bad experience. */}
         {/* <div className={setupStep}>
