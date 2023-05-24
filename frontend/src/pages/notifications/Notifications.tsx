@@ -1,14 +1,6 @@
 import { WrenchIcon } from "@heroicons/react/20/solid";
 
 export const Notifications: React.FC = () => {
-  //   const navigate = useNavigate();
-  //   const { objectID } = useParams<{ objectID: string }>();
-  //   const { object } = useObject(Number(objectID));
-
-  //   if (!object) {
-  //     return <Loading />;
-  //   }
-
   return (
     <div className="tw-h-full tw-flex tw-justify-center">
       <div className="tw-mt-48 tw-max-w-sm">
