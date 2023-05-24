@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Button } from "src/components/button/Button";
 import { InfoIcon } from "src/components/icons/Icons";
 import { ColorPicker, Input } from "src/components/input/Input";
@@ -8,12 +8,19 @@ import { sendRequest } from "src/rpc/ajax";
 import { CreateLinkToken, CreateLinkTokenRequest } from "src/rpc/api";
 import { consumeError } from "../../utils/errors";
 import { useMutation } from "../../utils/queryHelpers";
+import { ErrorDisplay } from "../../components/error/Error";
 
 export const Preview: React.FC = () => {
   const [endCustomerID, setEndCustomerID] = useState<string>("");
   const [baseColor, setBaseColor] = useState<string>("#475569");
   const [hoverColor, setHoverColor] = useState<string>("#1e293b");
   const [textColor, setTextColor] = useState<string>("#ffffff");
+  const [validationErrors, setValidationErrors] = useState<{
+    endCustomerID?: string;
+    baseColor?: string;
+    hoverColor?: string;
+    textColor?: string;
+  }>({});
 
   // Hack to update the colors of the active iFrame
   useEffect(() => {
@@ -46,6 +53,7 @@ export const Preview: React.FC = () => {
       const payload: CreateLinkTokenRequest = {
         end_customer_id: endCustomerID,
       };
+      // throw new Error("Failed to open preview.");
       const response = await sendRequest(CreateLinkToken, payload);
       return response.link_token;
     },
@@ -55,6 +63,29 @@ export const Preview: React.FC = () => {
       },
     },
   );
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (!endCustomerID) {
+      setValidationErrors({
+        ...validationErrors,
+        endCustomerID: "End Customer ID is required",
+      });
+      return;
+    }
+
+    const hasValidationErrors = Object.values(validationErrors).filter((v) => v).length > 0;
+    if (hasValidationErrors) {
+      return;
+    }
+
+    setValidationErrors({
+      ...validationErrors,
+      endCustomerID: undefined,
+    });
+
+    openPreviewMutation.mutate();
+  };
 
   return (
     <div className="tw-py-5 tw-px-10 tw-flex tw-w-full tw-h-full">
@@ -71,47 +102,49 @@ export const Preview: React.FC = () => {
             <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
           </Tooltip>
         </div>
-        <Input
-          className="tw-h-10"
-          wrapperClass="tw-mr-6"
-          value={endCustomerID}
-          setValue={setEndCustomerID}
-          placeholder="Test End Customer ID"
-        />
-        <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1 tw-font-medium">
-          <span>Base Color</span>
-        </div>
-        <ColorPicker
-          className="tw-h-10"
-          value={baseColor}
-          setValue={setBaseColor}
-          placeholder="Base Color (optional)"
-        />
-        <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1 tw-font-medium">
-          <span>Hover Color</span>
-        </div>
-        <ColorPicker
-          className="tw-h-10"
-          value={hoverColor}
-          setValue={setHoverColor}
-          placeholder="Hover Color (optional)"
-        />
-        <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1 tw-font-medium">
-          <span>Text Color</span>
-        </div>
-        <ColorPicker
-          className="tw-h-10"
-          value={textColor}
-          setValue={setTextColor}
-          placeholder="Text Color (optional)"
-        />
-        <Button
-          className="tw-px-4 tw-h-10 tw-mt-6"
-          onClick={() => openPreviewMutation.mutate()}
-          disabled={!endCustomerID}
-        >
-          Open Fabra Connect
-        </Button>
+        <form onSubmit={handleSubmit}>
+          <Input
+            className="tw-h-10"
+            wrapperClass="tw-mr-6"
+            value={endCustomerID}
+            setValue={setEndCustomerID}
+            placeholder="Test End Customer ID"
+          />
+          {validationErrors.endCustomerID && <div className="tw-text-red-500">{validationErrors.endCustomerID}</div>}
+          <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1 tw-font-medium">
+            <span>Base Color</span>
+          </div>
+          <ColorPicker
+            className="tw-h-10"
+            value={baseColor}
+            setValue={setBaseColor}
+            placeholder="Base Color (optional)"
+          />
+          <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1 tw-font-medium">
+            <span>Hover Color</span>
+          </div>
+          <ColorPicker
+            className="tw-h-10"
+            value={hoverColor}
+            setValue={setHoverColor}
+            placeholder="Hover Color (optional)"
+          />
+          <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1 tw-font-medium">
+            <span>Text Color</span>
+          </div>
+          <ColorPicker
+            className="tw-h-10"
+            value={textColor}
+            setValue={setTextColor}
+            placeholder="Text Color (optional)"
+          />
+          <div>
+            <Button className="tw-px-4 tw-h-10 tw-mt-6" type="submit">
+              Open Fabra Connect
+            </Button>
+            <ErrorDisplay error={openPreviewMutation.error} className="tw-text-red-500" />
+          </div>
+        </form>
       </div>
       <div
         id="fabra-container"

@@ -11,10 +11,24 @@ export class HttpError extends Error {
   }
 }
 
-export function consumeError(
-  error: Error | unknown,
-  opts: { message?: string } = {}
-) {
+export function forceError(maybe: Error | unknown | string | null): Error | null {
+  if (maybe instanceof Error) {
+    return maybe;
+  } else if (typeof maybe === "string") {
+    return new Error(maybe);
+  } else if (maybe === null) {
+    return null;
+  } else {
+    try {
+      const errStr = maybe?.toString() ?? JSON.stringify(maybe);
+      return new Error(errStr);
+    } catch (err) {
+      return new Error("Unknown error");
+    }
+  }
+}
+
+export function consumeError(error: Error | unknown, opts: { message?: string } = {}) {
   let e;
   let payload;
   if (typeof error === "string") {
