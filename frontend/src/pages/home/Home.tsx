@@ -19,6 +19,10 @@ export const Home: React.FC = () => {
   return (
     <div className="tw-h-full tw-py-7 tw-px-10">
       <div className="tw-flex tw-flex-col tw-mb-5 tw-justify-end tw-font-bold tw-text-2xl">Welcome to Fabra!</div>
+      <div className="tw-mb-4">
+        Let's get started! We can quickly help you offer your customers a seamless method to sync their data to your
+        data warehouse.
+      </div>
       <div className="tw-flex tw-flex-col tw-mb-5 tw-justify-end tw-font-bold tw-text-lg tw-h-[29px]">
         Setup Checklist
       </div>
@@ -38,10 +42,10 @@ export const Home: React.FC = () => {
         <div className={stepNumber}>3</div>
         Add the Fabra Connect frontend component to your application
       </a>
-      <div className={setupStep}>
+      {/* <div className={setupStep}>
         <div className={stepNumber}>4</div>
         (Optional) Setup Slack or email notifications for any issues
-      </div>
+      </div> */}
     </div>
   );
 };
