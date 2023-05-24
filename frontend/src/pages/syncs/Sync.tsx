@@ -1,8 +1,9 @@
-import { CheckIcon, ChevronRightIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { CheckCircleIcon, ChevronRightIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { BackButton } from "src/components/button/Button";
 import { DotsLoading, Loading } from "src/components/loading/Loading";
+import { Toast } from "src/components/notifications/Notifications";
 import { EmptyTable } from "src/components/table/Table";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { sendRequest } from "src/rpc/ajax";
@@ -42,16 +43,22 @@ export const Sync: React.FC = () => {
   };
 
   const renderButtonStatus = () => {
-    if (isLoading) {
-      return <Loading light className="tw-w-4 tw-h-4" />;
-    }
-
     if (runSyncResult === "Success") {
-      return <CheckIcon className="tw-w-4 tw-h-4 tw-text-green-500" />;
+      return (
+        <div className="tw-flex tw-flex-row tw-items-center tw-justify-start">
+          <CheckCircleIcon className="tw-w-5 tw-h-5 tw-text-green-500 tw-stroke-2" />
+          <p className="tw-ml-2 tw-text-base tw-text-gray-900">Success! Sync will start shortly.</p>
+        </div>
+      );
     }
 
     if (runSyncResult === "Failure") {
-      return <XMarkIcon className="tw-w-4 tw-h-4 tw-text-red-500" />;
+      return (
+        <div className="tw-flex tw-flex-row tw-items-center tw-justify-start">
+          <XCircleIcon className="tw-w-5 tw-h-5 tw-text-red-500 tw-stroke-2" />
+          <p className="tw-ml-2 tw-text-sm tw-text-gray-900">Failed!</p>
+        </div>
+      );
     }
 
     return null;
@@ -60,27 +67,27 @@ export const Sync: React.FC = () => {
   return (
     <div className="tw-pt-5 tw-pb-24 tw-px-10 tw-h-full tw-w-full tw-overflow-scroll">
       <BackButton onClick={() => navigate("/syncs")} />
+      <div className="tw-pointer-events-none tw-fixed tw-w-full tw-h-full">
+        <Toast content={renderButtonStatus()} show={!!runSyncResult} setShow={() => setRunSyncResult(null)} />
+      </div>
       <div className="tw-flex tw-w-full tw-mb-5 tw-mt-4">
         <div className="tw-flex tw-flex-row tw-w-full tw-items-center tw-font-bold tw-text-lg tw-justify-between">
           <div>{sync?.sync.display_name}</div>
-          <div>
+          <div className="tw-flex">
             <button
               className="tw-ml-auto tw-px-3 tw-py-1 tw-rounded-md tw-font-medium tw-text-base hover:tw-bg-slate-100 tw-text-blue-600 tw-mr-2"
               onClick={() => {
-                throw new Error("Not implemented");
+                throw new Error("Edit sync not implemented");
               }}
             >
               Edit
             </button>
             <button
               disabled={isLoading}
-              className="tw-ml-auto tw-px-4 tw-py-1 tw-rounded-md tw-font-medium tw-text-base tw-bg-blue-600 hover:tw-bg-blue-500 tw-text-white tw-relative disabled:tw-bg-gray-500"
+              className="tw-ml-auto tw-h-8 tw-w-24 tw-rounded-md tw-font-medium tw-text-base tw-bg-blue-600 hover:tw-bg-blue-500 tw-text-white tw-relative disabled:tw-bg-gray-500"
               onClick={handleRunSync}
             >
-              <div className="tw-absolute tw-left-2 tw-top-1/2 tw-transform -tw-translate-y-1/2">
-                {renderButtonStatus()}
-              </div>
-              Run sync
+              {isLoading ? <Loading light className="tw-w-4 tw-h-4" /> : "Run sync"}
             </button>
           </div>
         </div>

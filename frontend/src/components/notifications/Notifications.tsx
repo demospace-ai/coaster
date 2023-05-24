@@ -2,12 +2,13 @@ import { Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Fragment } from "react";
 
-type NotificationProps = {
+type ToastProps = {
+  content: React.ReactNode;
   show: boolean;
   setShow: (show: boolean) => void;
 };
 
-export const Notification: React.FC<NotificationProps> = ({ show, setShow }) => {
+export const Toast: React.FC<ToastProps> = ({ content, show, setShow }) => {
   return (
     <>
       {/* Global notification live region, render this permanently at the end of the document */}
@@ -30,19 +31,11 @@ export const Notification: React.FC<NotificationProps> = ({ show, setShow }) => 
             <div className="tw-pointer-events-auto tw-w-full tw-max-w-sm tw-overflow-hidden tw-rounded-lg tw-bg-white tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5">
               <div className="tw-p-4">
                 <div className="tw-flex tw-items-center">
-                  <div className="tw-flex tw-w-0 tw-flex-1 tw-justify-between">
-                    <p className="tw-w-0 tw-flex-1 tw-text-sm tw-font-medium tw-text-slate-900">Discussion archived</p>
-                    <button
-                      type="button"
-                      className="tw-ml-3 tw-flex-shrink-0 tw-rounded-md tw-bg-white tw-text-sm tw-font-medium tw-text-indigo-600 hover:tw-text-indigo-500 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-indigo-500 focus:tw-ring-offset-2"
-                    >
-                      Undo
-                    </button>
-                  </div>
+                  <div className="tw-ml-3 tw-w-0 tw-flex-1 tw-pt-0.5">{content}</div>
                   <div className="tw-ml-4 tw-flex tw-flex-shrink-0">
                     <button
                       type="button"
-                      className="tw-inline-flex tw-rounded-md tw-bg-white tw-text-slate-400 hover:tw-text-slate-500 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-indigo-500 focus:tw-ring-offset-2"
+                      className="tw-inline-flex tw-rounded-md tw-bg-white tw-text-gray-400 hover:tw-text-gray-500 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-indigo-500 focus:tw-ring-offset-2"
                       onClick={() => {
                         setShow(false);
                       }}
