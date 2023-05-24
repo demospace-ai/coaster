@@ -27,7 +27,7 @@ export const Home: React.FC = () => {
           that your customers can send.
           <br />
           <br />
-          Then, you can preview what it all looks like to your end customer with{" "}
+          Then, you can preview what it will look like to your end customer with{" "}
           <NavLink to="/preview" className="tw-font-medium tw-text-slate-800 hover:tw-text-slate-600">
             our Preview page
           </NavLink>
