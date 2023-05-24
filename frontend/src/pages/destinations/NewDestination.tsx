@@ -1,5 +1,6 @@
 import React, { FormEvent, useState } from "react";
 import { BackButton, Button, FormButton } from "src/components/button/Button";
+import { ErrorDisplay } from "src/components/error/Error";
 import { InfoIcon } from "src/components/icons/Icons";
 import { ConnectionImage } from "src/components/images/Connections";
 import { ValidatedInput } from "src/components/input/Input";
@@ -12,6 +13,7 @@ import {
   ConnectionType,
   CreateDestination,
   CreateDestinationRequest,
+  getConnectionType,
   GetDestinations,
   MongoDbConfig,
   PostgresConfig,
@@ -21,12 +23,10 @@ import {
   TestDataConnection,
   TestDataConnectionRequest,
   WebhookConfig,
-  getConnectionType,
 } from "src/rpc/api";
 import { forceError } from "src/utils/errors";
+import { useMutation } from "src/utils/queryHelpers";
 import { mutate } from "swr";
-import { ErrorDisplay } from "../../components/error/Error";
-import { useMutation } from "../../utils/queryHelpers";
 
 export const NewDestination: React.FC<{ onComplete: () => void }> = (props) => {
   const [connectionType, setConnectionType] = useState<ConnectionType | null>(null);
