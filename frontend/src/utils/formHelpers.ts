@@ -1,5 +1,9 @@
-import { Dispatch, FormEvent, SetStateAction, useState } from "react";
+import { FormEvent, SetStateAction, useState } from "react";
 
+/**
+ * Manages form state. API is similar to that of react-hook-form's useForm.
+ * https://react-hook-form.com/get-started
+ */
 export function useForm<S = any>(
   initialState: S,
   opts: {
