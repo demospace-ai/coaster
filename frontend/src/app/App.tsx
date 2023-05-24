@@ -17,6 +17,7 @@ import { Sync } from "src/pages/syncs/Sync";
 import { Syncs } from "src/pages/syncs/Syncs";
 import { Team } from "src/pages/team/Team";
 import { useSelector } from "src/root/model";
+import { Notifications } from "../pages/notifications/Notifications";
 
 let needsInit = true;
 
@@ -54,6 +55,7 @@ export const App: React.FC = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Login create />} />
           <Route path="/" element={<RequireAuth element={<Home />} />} />
+          <Route path="/notifications" element={<RequireAuth element={<Notifications />} />} />
           <Route path="/apikey" element={<RequireAuth element={<ApiKey />} />} />
           <Route path="/preview" element={<RequireAuth element={<Preview />} />} />
           <Route path="/team" element={<RequireAuth element={<Team />} />} />

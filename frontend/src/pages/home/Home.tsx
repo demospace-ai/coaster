@@ -45,6 +45,7 @@ export const Home: React.FC = () => {
           <div className={stepNumber}>3</div>
           Add the Fabra Connect frontend component to your application
         </a>
+        {/* Remove until there's a real notifications tab, otherwise customer clicks on it and it doesn't do anything. Bad experience. */}
         {/* <div className={setupStep}>
         <div className={stepNumber}>4</div>
         (Optional) Setup Slack or email notifications for any issues

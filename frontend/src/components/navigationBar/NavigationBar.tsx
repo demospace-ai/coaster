@@ -61,13 +61,15 @@ export const NavigationBar: React.FC = () => {
           </NavLink>
         </div>
         <div className={routeContainer}>
-          <Tooltip label="Coming soon!">
-            <div className={navLink}>
-              <BellIcon className="tw-h-4" strokeWidth="2" />
-              <div className={route}>Notifications</div>
-            </div>
-          </Tooltip>
+          <NavLink
+            className={({ isActive }) => classNames(navLink, isActive && "tw-bg-slate-200")}
+            to={"/notifications"}
+          >
+            <BellIcon className="tw-h-4" strokeWidth="2" />
+            <div className={route}>Notifications</div>
+          </NavLink>
         </div>
+
         <div className="tw-my-5 tw-px-4">
           <div className="tw-border-b tw-border-solid tw-border-slate-300" />
         </div>
