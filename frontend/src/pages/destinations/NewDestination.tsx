@@ -13,6 +13,7 @@ import {
   ConnectionType,
   CreateDestination,
   CreateDestinationRequest,
+  DemoDestinationConfig,
   getConnectionType,
   GetDestinations,
   MongoDbConfig,
@@ -73,6 +74,7 @@ type NewDestinationState = {
   mongodbConfig: MongoDbConfig;
   webhookConfig: WebhookConfig;
   postgresConfig: PostgresConfig;
+  demoDestinationConfig: DemoDestinationConfig;
   error: string | undefined;
 };
 
@@ -114,6 +116,7 @@ const INITIAL_DESTINATION_STATE: NewDestinationState = {
     url: "",
     headers: [],
   },
+  demoDestinationConfig: {},
   postgresConfig: {
     username: "",
     password: "",
@@ -144,6 +147,8 @@ const validateAll = (connectionType: ConnectionType, state: NewDestinationState)
       );
     case ConnectionType.Webhook:
       return state.displayName.length > 0 && state.webhookConfig.url.length > 0;
+    case ConnectionType.DemoDestination:
+      return state.displayName.length > 0;
     case ConnectionType.Redshift:
     case ConnectionType.Synapse:
     case ConnectionType.MongoDb:
@@ -180,6 +185,9 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = (
           break;
         case ConnectionType.Webhook:
           payload.webhook_config = state.webhookConfig;
+          break;
+        case ConnectionType.DemoDestination:
+          payload.demo_destination_config = state.demoDestinationConfig;
           break;
         case ConnectionType.Redshift:
         case ConnectionType.MongoDb:
@@ -218,6 +226,9 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = (
       break;
     case ConnectionType.Webhook:
       inputs = <WebhookInputs state={state} setState={setState} />;
+      break;
+    case ConnectionType.DemoDestination:
+      inputs = <DemoDestinationInputs state={state} setState={setState} />;
       break;
     case ConnectionType.Redshift:
     case ConnectionType.MongoDb:
@@ -288,6 +299,9 @@ const TestConnectionButton: React.FC<ConnectionConfigurationProps & { connection
           break;
         case ConnectionType.Webhook:
           payload.webhook_config = state.webhookConfig;
+          break;
+        case ConnectionType.DemoDestination:
+          payload.demo_destination_config = state.demoDestinationConfig;
           break;
         case ConnectionType.Redshift:
         case ConnectionType.MongoDb:
@@ -644,7 +658,33 @@ const ConnectionTypeSelector: React.FC<ConnectionTypeSelectorProps> = (props) =>
           <ConnectionImage connectionType={ConnectionType.Webhook} className="tw-h-6 tw-mr-1.5" />
           Webhook
         </button>
+        <button className={connectionButton} onClick={() => props.setConnectionType(ConnectionType.DemoDestination)}>
+          <ConnectionImage connectionType={ConnectionType.DemoDestination} className="tw-h-6 tw-mr-1.5" />
+          Demo
+        </button>
       </div>
+    </>
+  );
+};
+
+const DemoDestinationInputs: React.FC<ConnectionConfigurationProps> = ({ state, setState }) => {
+  return (
+    <>
+      <div className="tw-flex tw-flex-row tw-items-center tw-mt-2 tw-mb-1">
+        <span>Display Name</span>
+        <Tooltip placement="right" label="Pick a name to help you identify this source in the future.">
+          <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+        </Tooltip>
+      </div>
+      <ValidatedInput
+        id="displayName"
+        value={state.displayName}
+        setValue={(value) => {
+          setState({ ...state, displayName: value });
+        }}
+        placeholder="Display Name"
+        className="tw-w-100"
+      />
     </>
   );
 };

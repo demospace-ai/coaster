@@ -15,14 +15,15 @@ import (
 )
 
 type CreateDestinationRequest struct {
-	DisplayName     string                 `json:"display_name"`
-	ConnectionType  models.ConnectionType  `json:"connection_type"`
-	StagingBucket   *string                `json:"staging_bucket"`
-	BigQueryConfig  *input.BigQueryConfig  `json:"bigquery_config,omitempty"`
-	SnowflakeConfig *input.SnowflakeConfig `json:"snowflake_config,omitempty"`
-	RedshiftConfig  *input.RedshiftConfig  `json:"redshift_config,omitempty"`
-	MongoDbConfig   *input.MongoDbConfig   `json:"mongodb_config,omitempty"`
-	WebhookConfig   *input.WebhookConfig   `json:"webhook_config,omitempty"`
+	DisplayName           string                       `json:"display_name"`
+	ConnectionType        models.ConnectionType        `json:"connection_type"`
+	StagingBucket         *string                      `json:"staging_bucket"`
+	BigQueryConfig        *input.BigQueryConfig        `json:"bigquery_config,omitempty"`
+	SnowflakeConfig       *input.SnowflakeConfig       `json:"snowflake_config,omitempty"`
+	RedshiftConfig        *input.RedshiftConfig        `json:"redshift_config,omitempty"`
+	MongoDbConfig         *input.MongoDbConfig         `json:"mongodb_config,omitempty"`
+	WebhookConfig         *input.WebhookConfig         `json:"webhook_config,omitempty"`
+	DemoDestinationConfig *input.DemoDestinationConfig `json:"demo_destination_config,omitempty"`
 }
 
 type CreateDestinationResponse struct {
@@ -91,6 +92,13 @@ func (s ApiService) CreateDestination(auth auth.Authentication, w http.ResponseW
 		connection, err = connections.CreateWebhookConnection(
 			s.db, auth.Organization.ID, *createDestinationRequest.WebhookConfig, *encryptedSigningKey,
 		)
+	case models.ConnectionTypeDemoDestination:
+		webhookSigningKey = crypto.GenerateSigningKey()
+		encryptedSigningKey, encryptionErr := s.cryptoService.EncryptWebhookSigningKey(webhookSigningKey)
+		if encryptionErr != nil {
+			return errors.Wrap(encryptionErr, "(api.CreateDestination)")
+		}
+		connection, err = connections.CreateDemoDestinationConnection(s.db, auth.Organization.ID, *createDestinationRequest.DemoDestinationConfig, *encryptedSigningKey)
 	default:
 		return errors.Newf("(api.CreateDestination) unsupported connection type: %s", createDestinationRequest.ConnectionType)
 	}
@@ -138,6 +146,8 @@ func validateCreateDestinationRequest(request CreateDestinationRequest) error {
 		return validateCreateMongoDbDestination(request)
 	case models.ConnectionTypeWebhook:
 		return validateCreateWebhookDestination(request)
+	case models.ConnectionTypeDemoDestination:
+		return nil
 	default:
 		return errors.Wrap(errors.NewBadRequestf("unknown connection type: %s", request.ConnectionType), "(api.validateCreateDestinationRequest)")
 	}

@@ -129,6 +129,8 @@ func getDestinationConnector(ctx context.Context, connection views.FullConnectio
 	case models.ConnectionTypeWebhook:
 		// TODO: does end customer api key belong here?
 		return connectors.NewWebhookConnector(queryService, cryptoService, encryptedEndCustomerApiKey), nil
+	case models.ConnectionTypeDemoDestination:
+		return connectors.NewWebhookConnector(queryService, cryptoService, encryptedEndCustomerApiKey), nil
 	default:
 		return nil, errors.Newf("(temporal.getDestinationConnector) destination not implemented for %s", connection.ConnectionType)
 	}

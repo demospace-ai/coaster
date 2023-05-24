@@ -241,6 +241,7 @@ export interface TestDataConnectionRequest {
   postgres_config?: PostgresConfig;
   mysql_config?: MySqlConfig;
   webhook_config?: WebhookConfig;
+  demo_destination_config?: DemoDestinationConfig;
 }
 
 export interface CreateDestinationRequest {
@@ -254,6 +255,7 @@ export interface CreateDestinationRequest {
   synapse_config?: SynapseConfig;
   webhook_config?: WebhookConfig;
   postgres_config?: PostgresConfig;
+  demo_destination_config?: DemoDestinationConfig;
 }
 
 export interface LinkCreateSourceRequest {
@@ -373,6 +375,8 @@ export interface PostgresConfig {
   database_name: string;
   endpoint: string;
 }
+
+export interface DemoDestinationConfig {}
 
 export interface MySqlConfig {
   username: string;
@@ -627,6 +631,7 @@ export enum ConnectionType {
   Postgres = "postgres",
   MySQL = "mysql",
   Webhook = "webhook",
+  DemoDestination = "demo_destination",
 }
 
 export interface Sync {
@@ -747,6 +752,8 @@ export enum FrequencyUnits {
 
 export function getConnectionType(connectionType: ConnectionType): string {
   switch (connectionType) {
+    case ConnectionType.DemoDestination:
+      return "DemoDestination";
     case ConnectionType.BigQuery:
       return "BigQuery";
     case ConnectionType.Snowflake:

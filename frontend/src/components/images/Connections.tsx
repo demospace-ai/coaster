@@ -24,6 +24,7 @@ function getConnectionTypeImg(connectionType: ConnectionType): string {
       return postgres;
     case ConnectionType.MySQL:
       return mysql;
+    case ConnectionType.DemoDestination:
     case ConnectionType.Webhook:
       return webhook;
   }

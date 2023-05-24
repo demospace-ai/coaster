@@ -220,3 +220,22 @@ func CreateWebhookConnection(
 
 	return &connection, nil
 }
+
+func CreateDemoDestinationConnection(
+	db *gorm.DB,
+	organizationID int64,
+	config input.DemoDestinationConfig,
+	encryptedSigningKey string,
+) (*models.Connection, error) {
+	connection := models.Connection{
+		OrganizationID: organizationID,
+		ConnectionType: models.ConnectionTypeDemoDestination,
+	}
+
+	result := db.Create(&connection)
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(connections.CreateDemoDestinationConnection)")
+	}
+
+	return &connection, nil
+}

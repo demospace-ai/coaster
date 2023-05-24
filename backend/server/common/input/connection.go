@@ -61,6 +61,12 @@ type BigQueryConfig struct {
 	Location    string `json:"location,omitempty"`
 }
 
+type DemoDestinationConfig struct {
+}
+
+type DemoSourceConfig struct {
+}
+
 type ObjectField struct {
 	Name        string         `json:"name"`
 	Type        data.FieldType `json:"type"`

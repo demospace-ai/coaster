@@ -26,16 +26,18 @@ import (
 )
 
 type TestDataConnectionRequest struct {
-	DisplayName     string                 `json:"display_name"`
-	ConnectionType  models.ConnectionType  `json:"connection_type"`
-	BigQueryConfig  *input.BigQueryConfig  `json:"bigquery_config,omitempty"`
-	SnowflakeConfig *input.SnowflakeConfig `json:"snowflake_config,omitempty"`
-	RedshiftConfig  *input.RedshiftConfig  `json:"redshift_config,omitempty"`
-	SynapseConfig   *input.SynapseConfig   `json:"synapse_config,omitempty"`
-	PostgresConfig  *input.PostgresConfig  `json:"postgres_config,omitempty"`
-	MySqlConfig     *input.MySqlConfig     `json:"mysql_config,omitempty"`
-	MongoDbConfig   *input.MongoDbConfig   `json:"mongodb_config,omitempty"`
-	WebhookConfig   *input.WebhookConfig   `json:"webhook_config,omitempty"`
+	DisplayName           string                       `json:"display_name"`
+	ConnectionType        models.ConnectionType        `json:"connection_type"`
+	BigQueryConfig        *input.BigQueryConfig        `json:"bigquery_config,omitempty"`
+	SnowflakeConfig       *input.SnowflakeConfig       `json:"snowflake_config,omitempty"`
+	RedshiftConfig        *input.RedshiftConfig        `json:"redshift_config,omitempty"`
+	SynapseConfig         *input.SynapseConfig         `json:"synapse_config,omitempty"`
+	PostgresConfig        *input.PostgresConfig        `json:"postgres_config,omitempty"`
+	MySqlConfig           *input.MySqlConfig           `json:"mysql_config,omitempty"`
+	MongoDbConfig         *input.MongoDbConfig         `json:"mongodb_config,omitempty"`
+	WebhookConfig         *input.WebhookConfig         `json:"webhook_config,omitempty"`
+	DemoDestinationConfig *input.DemoDestinationConfig `json:"demo_destination_config,omitempty"`
+	DemoSourceConfig      *input.DemoSourceConfig      `json:"demo_source_config,omitempty"`
 }
 
 func (s ApiService) TestDataConnection(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
@@ -72,6 +74,10 @@ func (s ApiService) TestDataConnection(auth auth.Authentication, w http.Response
 		err = testMySqlConnection(*testDataConnectionRequest.MySqlConfig)
 	case models.ConnectionTypeWebhook:
 		err = testWebhookConnection(*testDataConnectionRequest.WebhookConfig)
+	case models.ConnectionTypeDemoDestination:
+		err = testDemoDestinationConnection(*testDataConnectionRequest.DemoDestinationConfig)
+	case models.ConnectionTypeDemoSource:
+		err = testDemoSourceConnection(*testDataConnectionRequest.DemoSourceConfig)
 	default:
 		err = errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", testDataConnectionRequest.ConnectionType))
 	}
@@ -361,6 +367,14 @@ func testWebhookConnection(webhookConfig input.WebhookConfig) error {
 	return nil
 }
 
+func testDemoDestinationConnection(config input.DemoDestinationConfig) error {
+	return nil
+}
+
+func testDemoSourceConnection(config input.DemoSourceConfig) error {
+	return nil
+}
+
 func validateTestDataConnectionRequest(request TestDataConnectionRequest) error {
 	switch request.ConnectionType {
 	case models.ConnectionTypeBigQuery:
@@ -379,6 +393,10 @@ func validateTestDataConnectionRequest(request TestDataConnectionRequest) error 
 		return validateTestMySqlConnection(request)
 	case models.ConnectionTypeWebhook:
 		return validateTestWebhookConnection(request)
+	case models.ConnectionTypeDemoDestination:
+		return nil
+	case models.ConnectionTypeDemoSource:
+		return nil
 	default:
 		return errors.Wrap(errors.NewBadRequestf("unknown connection type: %s", request.ConnectionType), "(api.validateTestDataConnectionRequest)")
 	}
