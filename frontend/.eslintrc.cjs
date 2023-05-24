@@ -4,7 +4,10 @@ module.exports = {
   ignorePatterns: ["postcss.config.cjs", "tailwind.config.cjs", "vite-*.ts"],
   rules: {
     "@typescript-eslint/switch-exhaustiveness-check": "error",
-    "@typescript-eslint/quotes": ["error", "double"]
+    "@typescript-eslint/quotes": ["error", "double"],
+    "no-restricted-imports": ["error", {
+      "patterns": [".*"]
+    }],
   },
   parser: "@typescript-eslint/parser",
   parserOptions: {

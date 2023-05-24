@@ -10,6 +10,7 @@ import { Destinations } from "src/pages/destinations/Destinations";
 import { Home } from "src/pages/home/Home";
 import { Login, Unauthorized } from "src/pages/login/Login";
 import { NotFound } from "src/pages/notfound/NotFound";
+import { Notifications } from "src/pages/notifications/Notifications";
 import { Object } from "src/pages/objects/Object";
 import { Objects } from "src/pages/objects/Objects";
 import { Preview } from "src/pages/preview/Preview";
@@ -17,7 +18,6 @@ import { Sync } from "src/pages/syncs/Sync";
 import { Syncs } from "src/pages/syncs/Syncs";
 import { Team } from "src/pages/team/Team";
 import { useSelector } from "src/root/model";
-import { Notifications } from "../pages/notifications/Notifications";
 
 let needsInit = true;
 

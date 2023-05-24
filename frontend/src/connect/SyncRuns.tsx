@@ -1,17 +1,15 @@
 import { CheckCircleIcon, ChevronRightIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
-import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { DotsLoading, Loading } from "src/components/loading/Loading";
 import { Toast } from "src/components/notifications/Notifications";
 import { EmptyTable } from "src/components/table/Table";
 import { Tooltip } from "src/components/tooltip/Tooltip";
+import { sendLinkTokenRequest } from "src/rpc/ajax";
 import { LinkRunSync, SyncRunStatus } from "src/rpc/api";
 import { useLinkSync } from "src/rpc/data";
+import { useMutation } from "src/utils/queryHelpers";
 import { mergeClasses } from "src/utils/twmerge";
-import { sendLinkTokenRequest } from "../rpc/ajax";
-import { consumeError } from "../utils/errors";
-import { useMutation } from "../utils/queryHelpers";
 
 export const SyncRuns: React.FC<{
   linkToken: string;

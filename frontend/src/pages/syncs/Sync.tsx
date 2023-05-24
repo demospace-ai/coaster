@@ -1,5 +1,4 @@
 import { CheckCircleIcon, ChevronRightIcon, XCircleIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { BackButton } from "src/components/button/Button";
 import { DotsLoading, Loading } from "src/components/loading/Loading";
@@ -9,9 +8,8 @@ import { Tooltip } from "src/components/tooltip/Tooltip";
 import { sendRequest } from "src/rpc/ajax";
 import { RunSync, SyncRunStatus } from "src/rpc/api";
 import { useSync } from "src/rpc/data";
-import { consumeError } from "src/utils/errors";
+import { useMutation } from "src/utils/queryHelpers";
 import { mergeClasses } from "src/utils/twmerge";
-import { useMutation } from "../../utils/queryHelpers";
 
 const tableHeaderStyle =
   "tw-sticky tw-top-0 tw-z-0 tw-border-b tw-border-slate-300 tw-py-3.5 tw-px-4 sm:tw-pr-6 lg:tw-pr-8 tw-text-left tw-whitespace-nowrap";
