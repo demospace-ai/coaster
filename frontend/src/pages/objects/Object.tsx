@@ -22,7 +22,7 @@ export const Object: React.FC = () => {
     <div className="tw-pt-5 tw-pb-24 tw-px-10 tw-h-full tw-w-full tw-overflow-scroll">
       <BackButton onClick={() => navigate("/objects")} />
       <div className="tw-flex tw-flex-row tw-items-center tw-font-bold tw-text-2xl tw-my-4">{object.display_name}</div>
-      <div className="tw-flex tw-flex-col tw-flex-wrap tw-items-start tw-h-32 tw-w-1/2 tw-p-4 tw-mb-5 tw-bg-white tw-border tw-border-slate-200 tw-rounded-md">
+      <div className="tw-flex tw-flex-col tw-flex-wrap tw-items-start tw-w-1/2 tw-min-w-[400px] tw-p-4 tw-mb-5 tw-bg-white tw-border tw-border-slate-200 tw-rounded-md">
         <div className="tw-flex tw-flex-row tw-items-center tw-text-base tw-mt-1">
           <span className="tw-font-medium tw-whitespace-pre">Destination ID: </span>
           {object.destination_id}
@@ -68,7 +68,7 @@ export const Object: React.FC = () => {
       </div>
 
       <div className="tw-font-bold tw-text-lg tw-mt-10 tw-mb-2">Object Fields</div>
-      <div className="tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-lg tw-overflow-auto tw-overscroll-contain tw-shadow-md tw-w-1/2">
+      <div className="tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-lg tw-overflow-auto tw-overscroll-contain tw-shadow-md tw-w-1/2 tw-min-w-[400px]">
         <table className="tw-min-w-full tw-border-spacing-0 tw-divide-y tw-divide-slate-200">
           <thead className="tw-bg-slate-600 tw-text-white">
             <tr>
