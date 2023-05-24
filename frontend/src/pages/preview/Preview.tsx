@@ -1,15 +1,14 @@
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "src/components/button/Button";
+import { ErrorDisplay } from "src/components/error/Error";
 import { InfoIcon } from "src/components/icons/Icons";
 import { ColorPicker, Input } from "src/components/input/Input";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { FabraConnectOptions, initialize, open, updateTheme } from "src/initialize-internal";
 import { sendRequest } from "src/rpc/ajax";
 import { CreateLinkToken, CreateLinkTokenRequest } from "src/rpc/api";
-import { consumeError } from "../../utils/errors";
-import { useMutation } from "../../utils/queryHelpers";
-import { ErrorDisplay } from "../../components/error/Error";
-import { useForm } from "../../utils/formHelpers";
+import { useForm } from "src/utils/formHelpers";
+import { useMutation } from "src/utils/queryHelpers";
 
 export const Preview: React.FC = () => {
   const [currCustomerId, setCurrCustomerId] = useState<string>("");
