@@ -20,7 +20,7 @@ export const Home: React.FC = () => {
   return (
     <div className="tw-h-full tw-py-7 tw-px-10">
       <div className="tw-m-auto tw-max-w-2xl tw-h-full">
-        <div className="tw-flex tw-flex-col tw-mt-10 tw-mb-5 tw-justify-end tw-font-bold tw-text-3xl">
+        <div className="tw-flex tw-flex-col tw-mt-8 tw-mb-5 tw-justify-end tw-font-bold tw-text-3xl">
           Welcome to Fabra!
         </div>
         <div className="tw-mb-4">
@@ -82,7 +82,7 @@ export const Home: React.FC = () => {
               </a>
               <button
                 onClick={() => {
-                  if (isProd()) window.Intercom("showNewMessage", "pre-populated content");
+                  if (isProd()) window.Intercom("showNewMessage", "I'd like some help getting started.");
                 }}
                 className="tw-inline-flex tw-items-center tw-rounded-md tw-border tw-border-solid tw-border-slate-300 tw-px-3 tw-py-2 tw-text-sm tw-font-medium tw-shadow hover:tw-bg-slate-100"
               >
