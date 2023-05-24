@@ -20,7 +20,7 @@ spec:
       terminationGracePeriodSeconds: 43200
       containers:
       - name: "fabra-sync"
-        image: "'us-docker.pkg.dev/fabra-344902/fabra-sync/sync:latest"
+        image: "us-docker.pkg.dev/fabra-344902/fabra-sync/sync:latest"
         resources:
           requests:
             cpu: "4"
