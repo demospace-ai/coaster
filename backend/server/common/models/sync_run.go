@@ -17,6 +17,7 @@ const (
 type SyncRun struct {
 	OrganizationID int64
 	SyncID         int64               `json:"sync_id"`
+	WorkflowID     string              `json:"workflow_id"`
 	Status         SyncRunStatus       `json:"status"`
 	Error          database.NullString `json:"error"`
 	RowsWritten    int                 `json:"rows_written"`

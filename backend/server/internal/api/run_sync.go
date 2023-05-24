@@ -41,6 +41,8 @@ func (s ApiService) RunSync(auth auth.Authentication, w http.ResponseWriter, r *
 	}
 	defer c.Close()
 
+	// TODO: create the sync run in the DB so we can give immediate feedback to the user. This will
+	// require some thought so that we don't overwrite existing syncs runs or create duplicates.
 	ctx := context.TODO()
 	scheduleClient := c.ScheduleClient()
 	workflow := scheduleClient.GetHandle(ctx, sync.WorkflowID)

@@ -70,6 +70,7 @@ func SyncWorkflow(ctx workflow.Context, input SyncInput) error {
 	err := workflow.ExecuteActivity(recordCtx, a.RecordStatus, RecordStatusInput{
 		OrganizationID: input.OrganizationID,
 		SyncID:         input.SyncID,
+		WorkflowID:     workflow.GetInfo(ctx).WorkflowExecution.ID,
 		UpdateType:     UpdateTypeCreate,
 	}).Get(recordCtx, &syncRun)
 	if err != nil {
