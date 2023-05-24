@@ -6,7 +6,7 @@ import { useDestinations, useObjects } from "src/rpc/data";
 
 export const Home: React.FC = () => {
   const setupStep =
-    "tw-py-3 tw-px-4 tw-text-base tw-font-medium tw-bg-white tw-border tw-border-slate-100 tw-rounded-lg tw-flex tw-items-center tw-mb-5 tw-cursor-pointer tw-shadow-md hover:tw-bg-slate-100";
+    "tw-py-3 tw-px-4 tw-text-base tw-font-medium tw-bg-white tw-border tw-border-slate-100 tw-rounded-lg tw-flex tw-items-center tw-mb-5 tw-cursor-pointer tw-shadow hover:tw-bg-slate-100";
   const stepNumber =
     "tw-h-6 tw-w-6 tw-text-sm tw-rounded-full tw-border-2 tw-border-slate-400 tw-flex tw-justify-center tw-items-center tw-mr-4 tw-bg-white";
 
@@ -18,7 +18,7 @@ export const Home: React.FC = () => {
 
   return (
     <div className="tw-h-full tw-py-7 tw-px-10">
-      <div className="tw-m-auto tw-max-w-2xl">
+      <div className="tw-m-auto tw-max-w-2xl tw-h-full">
         <div className="tw-flex tw-flex-col tw-mt-10 tw-mb-5 tw-justify-end tw-font-bold tw-text-3xl">
           Welcome to Fabra!
         </div>
@@ -60,6 +60,27 @@ export const Home: React.FC = () => {
         <div className={stepNumber}>4</div>
         (Optional) Setup Slack or email notifications for any issues
       </div> */}
+        <div className="tw-bg-white tw-shadow tw-border tw-border-slate-100 tw-border-solid sm:tw-rounded-lg tw-mt-12">
+          <div className="tw-px-4 tw-py-5 sm:tw-p-6">
+            <h3 className="tw-text-base tw-font-medium tw-leading-6 tw-text-gray-900">Need help?</h3>
+            <div className="tw-mt-2 tw-max-w-xl tw-text-sm tw-text-gray-500">
+              <p>
+                If you have any trouble getting setup, let us know! Our team will help you get everything configured and
+                test your first sync.
+              </p>
+            </div>
+            <div className="tw-mt-5">
+              <a
+                href="https://calendly.com/fabra-io/onboarding"
+                target="_blank"
+                rel="noreferrer"
+                className="tw-inline-flex tw-items-center tw-rounded-md tw-bg-slate-600 tw-px-3 tw-py-2 tw-text-sm tw-font-semibold tw-text-white tw-shadow hover:tw-bg-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+              >
+                Book a call
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

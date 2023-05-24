@@ -5,7 +5,7 @@ import { needsCursorField, needsEndCustomerId, needsPrimaryKey, TargetType, targ
 import { useObject } from "src/rpc/data";
 
 const tableHeaderStyle =
-  "tw-sticky tw-top-0 tw-z-0 tw-border-b tw-border-slate-300 tw-py-3.5 tw-px-4 sm:tw-pr-6 lg:tw-pr-8 tw-text-left tw-whitespace-nowrap";
+  "tw-sticky tw-top-0 tw-z-0 tw-py-3.5 tw-px-4 sm:tw-pr-6 lg:tw-pr-8 tw-text-left tw-whitespace-nowrap";
 const tableCellStyle =
   "tw-whitespace-nowrap tw-left tw-overflow-hidden tw-py-4 tw-pl-4 tw-text-sm tw-text-slate-800 tw-hidden sm:tw-table-cell";
 
@@ -68,9 +68,9 @@ export const Object: React.FC = () => {
       </div>
 
       <div className="tw-font-bold tw-text-lg tw-mt-10 tw-mb-2">Object Fields</div>
-      <div className="tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-lg tw-overflow-auto tw-overscroll-contain tw-shadow-md tw-w-1/2 tw-min-w-[400px]">
+      <div className="tw-ring-1 tw-ring-black tw-ring-opacity-5 tw-bg-white tw-rounded-lg tw-overflow-auto tw-overscroll-contain tw-shadow-md tw-w-1/2 tw-min-w-[400px]">
         <table className="tw-min-w-full tw-border-spacing-0 tw-divide-y tw-divide-slate-200">
-          <thead className="tw-bg-slate-600 tw-text-white">
+          <thead className="tw-bg-slate-100 tw-text-slate-900">
             <tr>
               <th scope="col" className={tableHeaderStyle}>
                 Name

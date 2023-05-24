@@ -9,8 +9,7 @@ import { NewObject } from "src/pages/objects/NewObject";
 import { useObjects } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
 
-const tableHeaderStyle =
-  "tw-sticky tw-top-0 tw-z-0 tw-border-b tw-border-slate-300 tw-py-3.5 tw-pr-4 tw-pl-3 sm:tw-pr-6 lg:tw-pr-8 tw-text-left";
+const tableHeaderStyle = "tw-sticky tw-top-0 tw-z-0 tw-py-3.5 tw-pr-4 tw-pl-3 sm:tw-pr-6 lg:tw-pr-8 tw-text-left";
 const tableCellStyle = "tw-whitespace-nowrap tw-px-3 tw-h-16 tw-text-sm tw-text-slate-800 tw-hidden sm:tw-table-cell";
 
 enum Step {
@@ -53,10 +52,10 @@ const ObjectList: React.FC<{ setStep: (step: Step) => void }> = ({ setStep }) =>
           <div className="tw-flex tw-flex-col tw-justify-center tw-mr-0.5">Add Object</div>
         </Button>
       </div>
-      <div className="tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-lg tw-overflow-x-auto tw-overscroll-contain tw-shadow-md">
+      <div className="tw-ring-1 tw-ring-black tw-ring-opacity-5 tw-bg-white tw-rounded-lg tw-overflow-x-auto tw-overscroll-contain tw-shadow-md">
         {objects ? (
-          <table className="tw-min-w-full tw-border-spacing-0">
-            <thead className="tw-bg-slate-600 tw-text-white">
+          <table className="tw-min-w-full tw-border-spacing-0 tw-divide-y tw-divide-slate-200">
+            <thead className="tw-bg-slate-100 tw-text-slate-900">
               <tr>
                 <th scope="col" className={tableHeaderStyle}>
                   Name
@@ -64,12 +63,12 @@ const ObjectList: React.FC<{ setStep: (step: Step) => void }> = ({ setStep }) =>
                 <th scope="col" className={classNames(tableHeaderStyle, "tw-w-5")}></th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="tw-divide-y tw-divide-slate-200">
               {objects!.length > 0 ? (
                 objects!.map((object, index) => (
                   <tr
                     key={index}
-                    className="tw-border-b tw-border-solid tw-border-slate-200 last:tw-border-0 tw-cursor-pointer hover:tw-bg-slate-50"
+                    className="tw-cursor-pointer hover:tw-bg-slate-50"
                     onClick={() => navigate(`/object/${object.id}`)}
                   >
                     <td className={tableCellStyle}>{object.display_name}</td>

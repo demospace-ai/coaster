@@ -1,4 +1,4 @@
-import { CheckCircleIcon, ChevronRightIcon, XCircleIcon } from "@heroicons/react/24/outline";
+import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import { useNavigate, useParams } from "react-router-dom";
 import { DotsLoading, Loading } from "src/components/loading/Loading";
@@ -118,7 +118,6 @@ const SyncRunsList: React.FC<{ linkToken: string }> = ({ linkToken }) => {
                 <th scope="col" className={tableHeaderStyle}>
                   Error
                 </th>
-                <th scope="col" className={classNames(tableHeaderStyle, "tw-w-5")}></th>
               </tr>
             </thead>
             <tbody className="tw-divide-y tw-divide-slate-200 tw-bg-white">
@@ -153,9 +152,6 @@ const SyncRunsList: React.FC<{ linkToken: string }> = ({ linkToken }) => {
                       >
                         <div className="tw-overflow-hidden tw-text-ellipsis tw-max-w-[240px]">{syncRun.error}</div>
                       </Tooltip>
-                    </td>
-                    <td className={mergeClasses(tableCellStyle, "tw-pr-5")}>
-                      <ChevronRightIcon className="tw-ml-auto tw-h-4 tw-w-4 tw-text-slate-400" aria-hidden="true" />
                     </td>
                   </tr>
                 ))

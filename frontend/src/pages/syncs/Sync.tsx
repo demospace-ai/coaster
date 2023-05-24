@@ -1,4 +1,4 @@
-import { CheckCircleIcon, ChevronRightIcon, XCircleIcon } from "@heroicons/react/24/outline";
+import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import { useNavigate, useParams } from "react-router-dom";
 import { BackButton } from "src/components/button/Button";
 import { DotsLoading, Loading } from "src/components/loading/Loading";
@@ -12,7 +12,7 @@ import { useMutation } from "src/utils/queryHelpers";
 import { mergeClasses } from "src/utils/twmerge";
 
 const tableHeaderStyle =
-  "tw-sticky tw-top-0 tw-z-0 tw-border-b tw-border-slate-300 tw-py-3.5 tw-px-4 sm:tw-pr-6 lg:tw-pr-8 tw-text-left tw-whitespace-nowrap";
+  "tw-sticky tw-top-0 tw-z-0 tw-py-3.5 tw-px-4 sm:tw-pr-6 lg:tw-pr-8 tw-text-left tw-whitespace-nowrap";
 const tableCellStyle =
   "tw-whitespace-nowrap tw-left tw-overflow-hidden tw-py-4 tw-pl-4 tw-text-sm tw-text-slate-800 tw-hidden sm:tw-table-cell";
 
@@ -90,10 +90,10 @@ export const Sync: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-lg tw-overflow-auto tw-overscroll-contain tw-shadow-md tw-w-full">
+      <div className="tw-ring-1 tw-ring-black tw-ring-opacity-5 tw-bg-white tw-rounded-lg tw-overflow-auto tw-shadow-md tw-w-full">
         {sync ? (
           <table className="tw-min-w-full tw-border-spacing-0 tw-divide-y tw-divide-slate-200">
-            <thead className="tw-bg-slate-600 tw-text-white">
+            <thead className="tw-bg-slate-100 tw-text-slate-900">
               <tr>
                 <th scope="col" className={tableHeaderStyle}>
                   Status
@@ -107,7 +107,6 @@ export const Sync: React.FC = () => {
                 <th scope="col" className={tableHeaderStyle}>
                   Error
                 </th>
-                <th scope="col" className={mergeClasses(tableHeaderStyle, "tw-w-5")}></th>
               </tr>
             </thead>
             <tbody className="tw-divide-y tw-divide-slate-200 tw-bg-white">
@@ -117,7 +116,7 @@ export const Sync: React.FC = () => {
                     <td className={tableCellStyle}>
                       <div
                         className={mergeClasses(
-                          "tw-flex tw-justify-center tw-items-center tw-py-1 tw-px-2 tw-rounded tw-text-center tw-w-[110px] tw-border tw-text-xs tw-font-medium",
+                          "tw-flex tw-justify-center tw-items-center tw-py-1 tw-px-2 tw-rounded tw-text-center tw-w-[110px] tw-text-xs tw-font-medium",
                           getStatusStyle(syncRun.status),
                         )}
                       >
@@ -143,9 +142,6 @@ export const Sync: React.FC = () => {
                         <div className="tw-overflow-hidden tw-text-ellipsis tw-max-w-[450px]">{syncRun.error}</div>
                       </Tooltip>
                     </td>
-                    <td className={mergeClasses(tableCellStyle, "tw-pr-5")}>
-                      <ChevronRightIcon className="tw-ml-auto tw-h-4 tw-w-4 tw-text-slate-400" aria-hidden="true" />
-                    </td>
                   </tr>
                 ))
               ) : (
@@ -166,12 +162,12 @@ export const Sync: React.FC = () => {
 const getStatusStyle = (status: SyncRunStatus): string => {
   switch (status) {
     case SyncRunStatus.Running:
-      return "tw-bg-sky-100 tw-border-sky-600 tw-text-sky-600";
+      return "tw-bg-sky-100 tw-border tw-border-solid tw-border-sky-500 tw-text-sky-600";
     case SyncRunStatus.Completed:
-      return "tw-bg-green-100 tw-border-green-600 tw-text-green-600";
+      return "tw-bg-green-100 tw-border tw-border-solid tw-border-green-500 tw-text-green-600";
     case SyncRunStatus.Failed:
-      return "tw-bg-red-100 tw-border-red-500 tw-text-red-500";
+      return "tw-bg-red-100 tw-border tw-border-solid tw-border-red-500 tw-text-red-500";
     default:
-      return "tw-bg-gray-100 tw-border-gray-500 tw-text-gray-500";
+      return "tw-bg-gray-100 tw-border tw-border-solid tw-border-gray-500 tw-text-gray-500";
   }
 };
