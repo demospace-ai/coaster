@@ -104,10 +104,10 @@ export const ColorPicker: React.FC<InputProps> = (props) => {
   ];
 
   return (
-    <div className={mergeClasses("tw-flex tw-items-center", wrapperClass)}>
+    <div className={mergeClasses("tw-flex tw-items-center tw-relative", wrapperClass)}>
       <input className={mergeClasses(classes)} value={value} onChange={(e) => setValue(e.target.value)} {...other} />
       <input
-        className="tw-w-6 tw-relative tw-right-8"
+        className="tw-w-6 tw-absolute tw-right-3"
         value={value}
         onChange={(e) => setValue(e.target.value)}
         type="color"

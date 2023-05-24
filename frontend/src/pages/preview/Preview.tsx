@@ -83,13 +83,16 @@ export const Preview: React.FC = () => {
   };
 
   return (
-    <div className="tw-py-5 tw-px-10 tw-flex tw-w-full tw-h-full">
-      <div className="tw-w-1/4">
+    <div className="tw-py-5 tw-px-10 tw-flex tw-w-full tw-h-full tw-flex-col xl:tw-flex-row">
+      <div className="xl:tw-w-1/4 tw-mb-4 xl:tw-mb-0 xl:tw-mr-4">
         <div className="tw-flex tw-w-full tw-mt-2 tw-mb-3">
-          <div className="tw-flex tw-flex-col tw-justify-end tw-font-bold tw-text-lg">Preview Fabra Connect</div>
+          <h2 className="tw-flex tw-flex-col tw-justify-end tw-font-bold tw-text-lg">Fabra Connect</h2>
+        </div>
+        <div>
+          See what Fabra Connect looks like for your end customers. Enter a test end customer ID and click Preview.
         </div>
         <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1 tw-font-medium">
-          <span>Test End Customer ID</span>
+          <span>End Customer ID</span>
           <Tooltip
             placement="right"
             label="This can be any string. If you use an actual ID for one of your users, you can see what that user will see."
@@ -99,43 +102,28 @@ export const Preview: React.FC = () => {
         </div>
         <form onSubmit={handleSubmit}>
           <Input
-            className="tw-h-10"
-            wrapperClass="tw-mr-6"
+            className="tw-flex-1"
+            // wrapperClass="tw-mr-6"
             value={endCustomerID}
             setValue={setEndCustomerID}
-            placeholder="Test End Customer ID"
+            placeholder="143"
           />
           {validationErrors.endCustomerID && <div className="tw-text-red-500">{validationErrors.endCustomerID}</div>}
           <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1 tw-font-medium">
             <span>Base Color</span>
           </div>
-          <ColorPicker
-            className="tw-h-10"
-            value={baseColor}
-            setValue={setBaseColor}
-            placeholder="Base Color (optional)"
-          />
+          <ColorPicker value={baseColor} setValue={setBaseColor} placeholder="Base Color (optional)" />
           <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1 tw-font-medium">
             <span>Hover Color</span>
           </div>
-          <ColorPicker
-            className="tw-h-10"
-            value={hoverColor}
-            setValue={setHoverColor}
-            placeholder="Hover Color (optional)"
-          />
+          <ColorPicker value={hoverColor} setValue={setHoverColor} placeholder="Hover Color (optional)" />
           <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1 tw-font-medium">
             <span>Text Color</span>
           </div>
-          <ColorPicker
-            className="tw-h-10"
-            value={textColor}
-            setValue={setTextColor}
-            placeholder="Text Color (optional)"
-          />
+          <ColorPicker value={textColor} setValue={setTextColor} placeholder="Text Color (optional)" />
           <div>
-            <Button className="tw-px-4 tw-h-10 tw-mt-6" type="submit">
-              Open Fabra Connect
+            <Button className="tw-px-4 tw-mt-6 tw-py-2" type="submit">
+              Preview
             </Button>
             <ErrorDisplay error={openPreviewMutation.error} className="tw-text-red-500" />
           </div>
