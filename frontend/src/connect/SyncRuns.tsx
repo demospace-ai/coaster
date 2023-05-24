@@ -209,9 +209,9 @@ const Footer: React.FC = () => {
 const getStatusStyle = (status: SyncRunStatus): string => {
   switch (status) {
     case SyncRunStatus.Running:
-      return "tw-bg-sky-100 tw-border-sky-600 tw-text-sky-600";
+      return "tw-bg-sky-100 tw-border-sky-500 tw-text-sky-600";
     case SyncRunStatus.Completed:
-      return "tw-bg-green-100 tw-border-green-600 tw-text-green-600";
+      return "tw-bg-green-100 tw-border-green-500 tw-text-green-600";
     case SyncRunStatus.Failed:
       return "tw-bg-red-100 tw-border-red-500 tw-text-red-500";
     default:
