@@ -11,7 +11,8 @@ import { useMutation } from "../../utils/queryHelpers";
 import { ErrorDisplay } from "../../components/error/Error";
 
 export const Preview: React.FC = () => {
-  const [endCustomerID, setEndCustomerID] = useState<string>("");
+  const [formEndCustomerID, setFormEndCustomerID] = useState<string>("");
+  const [currCustomerId, setCurrCustomerId] = useState<string>("");
   const [baseColor, setBaseColor] = useState<string>("#475569");
   const [hoverColor, setHoverColor] = useState<string>("#1e293b");
   const [textColor, setTextColor] = useState<string>("#ffffff");
@@ -21,6 +22,7 @@ export const Preview: React.FC = () => {
     hoverColor?: string;
     textColor?: string;
   }>({});
+  const [linkToken, setLinkToken] = useState<string | undefined>(undefined);
 
   // Hack to update the colors of the active iFrame
   useEffect(() => {
@@ -51,7 +53,7 @@ export const Preview: React.FC = () => {
   const openPreviewMutation = useMutation(
     async () => {
       const payload: CreateLinkTokenRequest = {
-        end_customer_id: endCustomerID,
+        end_customer_id: formEndCustomerID,
       };
       // throw new Error("Failed to open preview.");
       const response = await sendRequest(CreateLinkToken, payload);
@@ -59,6 +61,8 @@ export const Preview: React.FC = () => {
     },
     {
       onSuccess: (link_token) => {
+        setLinkToken(link_token);
+        setCurrCustomerId(formEndCustomerID);
         open(link_token);
       },
     },
@@ -66,7 +70,7 @@ export const Preview: React.FC = () => {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (!endCustomerID) {
+    if (!formEndCustomerID) {
       setValidationErrors({
         ...validationErrors,
         endCustomerID: "End Customer ID is required",
@@ -101,13 +105,7 @@ export const Preview: React.FC = () => {
           </Tooltip>
         </div>
         <form onSubmit={handleSubmit}>
-          <Input
-            className="tw-flex-1"
-            // wrapperClass="tw-mr-6"
-            value={endCustomerID}
-            setValue={setEndCustomerID}
-            placeholder="143"
-          />
+          <Input className="tw-flex-1" value={formEndCustomerID} setValue={setFormEndCustomerID} placeholder="143" />
           {validationErrors.endCustomerID && <div className="tw-text-red-500">{validationErrors.endCustomerID}</div>}
           <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1 tw-font-medium">
             <span>Base Color</span>
@@ -122,8 +120,10 @@ export const Preview: React.FC = () => {
           </div>
           <ColorPicker value={textColor} setValue={setTextColor} placeholder="Text Color (optional)" />
           <div>
-            <Button className="tw-px-4 tw-mt-6 tw-py-2" type="submit">
-              Preview
+            <Button className="tw-px-4 tw-mt-6 tw-py-2 tw-w-full" type="submit">
+              {currCustomerId !== formEndCustomerID && formEndCustomerID.length > 0 && linkToken
+                ? "Change Test ID"
+                : "Preview"}
             </Button>
             <ErrorDisplay error={openPreviewMutation.error} className="tw-text-red-500" />
           </div>
