@@ -27,7 +27,11 @@ export const Home: React.FC = () => {
           that your customers can send.
           <br />
           <br />
-          Then, you can preview what it all looks like to your end customer.
+          Then, you can preview what it all looks like to your end customer with{" "}
+          <NavLink to="/preview" className="tw-font-medium tw-text-slate-800">
+            our Preview page
+          </NavLink>
+          .
         </div>
         <div className="tw-flex tw-flex-col tw-mt-8 tw-mb-5 tw-justify-end tw-font-bold tw-text-lg">
           <div className="tw-flex tw-flex-row tw-items-center">
