@@ -9,42 +9,53 @@ import { CreateLinkToken, CreateLinkTokenRequest } from "src/rpc/api";
 import { consumeError } from "../../utils/errors";
 import { useMutation } from "../../utils/queryHelpers";
 import { ErrorDisplay } from "../../components/error/Error";
+import { useForm } from "../../utils/formHelpers";
 
 export const Preview: React.FC = () => {
-  const [formEndCustomerID, setFormEndCustomerID] = useState<string>("");
   const [currCustomerId, setCurrCustomerId] = useState<string>("");
-  const [baseColor, setBaseColor] = useState<string>("#475569");
-  const [hoverColor, setHoverColor] = useState<string>("#1e293b");
-  const [textColor, setTextColor] = useState<string>("#ffffff");
-  const [validationErrors, setValidationErrors] = useState<{
-    endCustomerID?: string;
-    baseColor?: string;
-    hoverColor?: string;
-    textColor?: string;
-  }>({});
   const [linkToken, setLinkToken] = useState<string | undefined>(undefined);
+
+  const previewForm = useForm(
+    {
+      endCustomerID: "",
+      baseColor: "#475569",
+      hoverColor: "#1e293b",
+      textColor: "#ffffff",
+    },
+    {
+      validate: (values) => {
+        const errors: Record<string, string> = {};
+        for (const [key, value] of Object.entries(values)) {
+          if (value === "") {
+            errors[key] = "This field is required";
+          }
+        }
+        return errors;
+      },
+    },
+  );
 
   // Hack to update the colors of the active iFrame
   useEffect(() => {
     updateTheme({
       colors: {
         primary: {
-          base: baseColor,
-          hover: hoverColor,
-          text: textColor,
+          base: previewForm.state.baseColor,
+          hover: previewForm.state.hoverColor,
+          text: previewForm.state.textColor,
         },
       },
     });
-  }, [baseColor, hoverColor, textColor]);
+  }, [previewForm.state.baseColor, previewForm.state.hoverColor, previewForm.state.textColor]);
 
   useFabraConnect({
     containerID: "fabra-container",
     customTheme: {
       colors: {
         primary: {
-          base: baseColor,
-          hover: hoverColor,
-          text: textColor,
+          base: previewForm.state.baseColor,
+          hover: previewForm.state.hoverColor,
+          text: previewForm.state.textColor,
         },
       },
     },
@@ -53,38 +64,23 @@ export const Preview: React.FC = () => {
   const openPreviewMutation = useMutation(
     async () => {
       const payload: CreateLinkTokenRequest = {
-        end_customer_id: formEndCustomerID,
+        end_customer_id: previewForm.state.endCustomerID,
       };
-      // throw new Error("Failed to open preview.");
       const response = await sendRequest(CreateLinkToken, payload);
       return response.link_token;
     },
     {
       onSuccess: (link_token) => {
         setLinkToken(link_token);
-        setCurrCustomerId(formEndCustomerID);
+        setCurrCustomerId(previewForm.state.endCustomerID);
         open(link_token);
       },
     },
   );
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (!formEndCustomerID) {
-      setValidationErrors({
-        ...validationErrors,
-        endCustomerID: "End Customer ID is required",
-      });
-      return;
-    }
-
-    setValidationErrors({
-      ...validationErrors,
-      endCustomerID: undefined,
-    });
-
+  const onSubmit = previewForm.handleSubmit(() => {
     openPreviewMutation.mutate();
-  };
+  });
 
   return (
     <div className="tw-py-5 tw-px-10 tw-flex tw-w-full tw-h-full tw-flex-col xl:tw-flex-row">
@@ -104,24 +100,53 @@ export const Preview: React.FC = () => {
             <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
           </Tooltip>
         </div>
-        <form onSubmit={handleSubmit}>
-          <Input className="tw-flex-1" value={formEndCustomerID} setValue={setFormEndCustomerID} placeholder="143" />
-          {validationErrors.endCustomerID && <div className="tw-text-red-500">{validationErrors.endCustomerID}</div>}
+        <form onSubmit={onSubmit}>
+          <Input
+            className="tw-flex-1"
+            value={previewForm.state.endCustomerID}
+            setValue={(v) => {
+              previewForm.setState((s) => ({ ...s, endCustomerID: v }));
+            }}
+            placeholder="143"
+          />
+          {previewForm.errors.endCustomerID && (
+            <div className="tw-text-red-500">{previewForm.errors.endCustomerID}</div>
+          )}
           <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1 tw-font-medium">
             <span>Base Color</span>
           </div>
-          <ColorPicker value={baseColor} setValue={setBaseColor} placeholder="Base Color (optional)" />
+          <ColorPicker
+            value={previewForm.state.baseColor}
+            setValue={(v) => {
+              previewForm.setState((s) => ({ ...s, baseColor: v }));
+            }}
+            placeholder="Base Color (optional)"
+          />
           <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1 tw-font-medium">
             <span>Hover Color</span>
           </div>
-          <ColorPicker value={hoverColor} setValue={setHoverColor} placeholder="Hover Color (optional)" />
+          <ColorPicker
+            value={previewForm.state.hoverColor}
+            setValue={(v) => {
+              previewForm.setState((s) => ({ ...s, hoverColor: v }));
+            }}
+            placeholder="Hover Color (optional)"
+          />
           <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1 tw-font-medium">
             <span>Text Color</span>
           </div>
-          <ColorPicker value={textColor} setValue={setTextColor} placeholder="Text Color (optional)" />
+          <ColorPicker
+            value={previewForm.state.textColor}
+            setValue={(v) => {
+              previewForm.setState((s) => ({ ...s, textColor: v }));
+            }}
+            placeholder="Text Color (optional)"
+          />
           <div>
             <Button className="tw-px-4 tw-mt-6 tw-py-2 tw-w-full" type="submit">
-              {currCustomerId !== formEndCustomerID && formEndCustomerID.length > 0 && linkToken
+              {currCustomerId !== previewForm.state.endCustomerID &&
+              previewForm.state.endCustomerID.length > 0 &&
+              linkToken
                 ? "Change Test ID"
                 : "Preview"}
             </Button>

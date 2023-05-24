@@ -33,6 +33,7 @@ type TestDataConnectionRequest struct {
 	SynapseConfig   *input.SynapseConfig   `json:"synapse_config,omitempty"`
 	PostgresConfig  *input.PostgresConfig  `json:"postgres_config,omitempty"`
 	MongoDbConfig   *input.MongoDbConfig   `json:"mongodb_config,omitempty"`
+	WebhookConfig   *input.WebhookConfig   `json:"webhook_config,omitempty"`
 }
 
 func (s ApiService) TestDataConnection(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
@@ -65,6 +66,8 @@ func (s ApiService) TestDataConnection(auth auth.Authentication, w http.Response
 		err = testSynapseConnection(*testDataConnectionRequest.SynapseConfig)
 	case models.ConnectionTypePostgres:
 		err = testPostgresConnection(*testDataConnectionRequest.PostgresConfig)
+	case models.ConnectionTypeWebhook:
+		err = testWebhookConnection(*testDataConnectionRequest.WebhookConfig)
 	default:
 		err = errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", testDataConnectionRequest.ConnectionType))
 	}
@@ -299,6 +302,24 @@ func testPostgresConnection(postgresConfig input.PostgresConfig) error {
 	return nil
 }
 
+func testWebhookConnection(webhookConfig input.WebhookConfig) error {
+	_, err := url.ParseRequestURI(webhookConfig.URL)
+	if err != nil {
+		return errors.Wrap(err, "(api.testWebhookConnection)")
+	}
+	resp, err := http.Head(webhookConfig.URL)
+	if err != nil {
+		return errors.Wrap(err, "(api.testWebhookConnection)")
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("(api.testWebhookConnection) unexpected status code: %d", resp.StatusCode)
+	}
+
+	return nil
+}
+
 func validateTestDataConnectionRequest(request TestDataConnectionRequest) error {
 	switch request.ConnectionType {
 	case models.ConnectionTypeBigQuery:
@@ -313,6 +334,8 @@ func validateTestDataConnectionRequest(request TestDataConnectionRequest) error 
 		return validateTestSynapseConnection(request)
 	case models.ConnectionTypePostgres:
 		return validateTestPostgresConnection(request)
+	case models.ConnectionTypeWebhook:
+		return validateTestWebhookConnection(request)
 	default:
 		return errors.Wrap(errors.NewBadRequestf("unknown connection type: %s", request.ConnectionType), "(api.validateTestDataConnectionRequest)")
 	}
@@ -380,6 +403,16 @@ func validateTestPostgresConnection(request TestDataConnectionRequest) error {
 	}
 
 	// TODO: validate the fields all exist in the credentials object
+
+	return nil
+}
+
+func validateTestWebhookConnection(request TestDataConnectionRequest) error {
+	if request.WebhookConfig == nil {
+		return errors.Wrap(errors.NewBadRequest("missing Webhook configuration"), "(api.validateTestWebhookConnection)")
+	}
+
+	// TODO: validate the fields all exist
 
 	return nil
 }
