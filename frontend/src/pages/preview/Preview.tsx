@@ -12,11 +12,7 @@ import { ErrorDisplay } from "../../components/error/Error";
 import { useForm } from "../../utils/formHelpers";
 
 export const Preview: React.FC = () => {
-  // const [formEndCustomerID, setFormEndCustomerID] = useState<string>("");
   const [currCustomerId, setCurrCustomerId] = useState<string>("");
-  // const [hoverColor, setHoverColor] = useState<string>("#1e293b");
-  // const [textColor, setTextColor] = useState<string>("#ffffff");
-
   const [linkToken, setLinkToken] = useState<string | undefined>(undefined);
 
   const previewForm = useForm(
@@ -70,7 +66,6 @@ export const Preview: React.FC = () => {
       const payload: CreateLinkTokenRequest = {
         end_customer_id: previewForm.state.endCustomerID,
       };
-      // throw new Error("Failed to open preview.");
       const response = await sendRequest(CreateLinkToken, payload);
       return response.link_token;
     },
