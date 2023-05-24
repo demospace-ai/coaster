@@ -12,7 +12,6 @@ import {
   ConnectionType,
   CreateDestination,
   CreateDestinationRequest,
-  getConnectionType,
   GetDestinations,
   MongoDbConfig,
   PostgresConfig,
@@ -22,12 +21,12 @@ import {
   TestDataConnection,
   TestDataConnectionRequest,
   WebhookConfig,
+  getConnectionType,
 } from "src/rpc/api";
-import { consumeError, forceError, HttpError } from "src/utils/errors";
-import { mergeClasses } from "src/utils/twmerge";
+import { forceError } from "src/utils/errors";
 import { mutate } from "swr";
-import { useMutation } from "../../utils/queryHelpers";
 import { ErrorDisplay } from "../../components/error/Error";
+import { useMutation } from "../../utils/queryHelpers";
 
 export const NewDestination: React.FC<{ onComplete: () => void }> = (props) => {
   const [connectionType, setConnectionType] = useState<ConnectionType | null>(null);
