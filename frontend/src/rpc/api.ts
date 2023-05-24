@@ -712,7 +712,7 @@ export const needsEndCustomerId = (targetType: TargetType): boolean => {
 
 export const shouldCreateFields = (destinationType: ConnectionType, targetType: TargetType): boolean => {
   // no default so it isn"t possible to add a new mode without updating
-  if (destinationType === ConnectionType.Webhook) {
+  if (destinationType === ConnectionType.Webhook || destinationType === ConnectionType.DemoDestination) {
     return true;
   }
 

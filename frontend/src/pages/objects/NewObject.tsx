@@ -148,7 +148,10 @@ const validateDestination = (
     return false;
   }
 
-  if (state.destination.connection.connection_type !== ConnectionType.Webhook) {
+  if (
+    state.destination.connection.connection_type !== ConnectionType.Webhook &&
+    state.destination.connection.connection_type !== ConnectionType.DemoDestination
+  ) {
     if (state.targetType === undefined) {
       setState((state) => {
         return {
@@ -461,6 +464,16 @@ export const DestinationSetup: React.FC<ObjectStepProps> = (props) => {
                 endCustomerIdField: { name: "end_customer_id", type: FieldType.Integer },
                 objectFields: [],
               });
+            } else if (value.connection.connection_type === ConnectionType.DemoDestination) {
+              setState({
+                ...state,
+                destination: value,
+                namespace: undefined,
+                tableName: undefined,
+                targetType: TargetType.Webhook,
+                endCustomerIdField: { name: "demo_destination_dummy_customer_id", type: FieldType.Integer },
+                objectFields: [],
+              });
             } else {
               setState({
                 ...state,
@@ -550,7 +563,10 @@ const ExistingObjectFields: React.FC<ObjectStepProps> = (props) => {
             </div>
           ))
         ) : (
-          <Loading />
+          <>
+            asdfasdf
+            <Loading />
+          </>
         )}
       </div>
       <Button onClick={advance} className="tw-mt-6 tw-w-100 tw-h-10">
@@ -694,7 +710,10 @@ const NewObjectFields: React.FC<ObjectStepProps> = (props) => {
             </Button>
           </div>
         ) : (
-          <Loading className="tw-mt-5" />
+          <>
+            adsfadsf
+            <Loading className="tw-mt-5" />
+          </>
         )}
       </div>
       <Button onClick={advance} className="tw-mt-16 tw-w-100 tw-h-10">
@@ -856,26 +875,27 @@ const Finalize: React.FC<ObjectStepProps & { onComplete: () => void }> = (props)
       )}
       {state.syncMode !== undefined && (
         <>
-          {state.destination?.connection.connection_type !== ConnectionType.Webhook && (
-            <>
-              <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5 tw-mb-3">
-                <span className="tw-font-medium">End Customer ID</span>
-              </div>
-              <FieldSelector
-                className="tw-mt-0 tw-w-100"
-                field={state.endCustomerIdField}
-                setField={(value: Field) => {
-                  setState({ ...state, endCustomerIdField: value });
-                }}
-                placeholder="End Customer ID Field"
-                noOptionsString="No Fields Available!"
-                validated={true}
-                connection={state.destination?.connection}
-                namespace={state.namespace}
-                tableName={state.tableName}
-              />
-            </>
-          )}
+          {state.destination?.connection.connection_type !== ConnectionType.Webhook &&
+            state.destination?.connection.connection_type !== ConnectionType.DemoDestination && (
+              <>
+                <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5 tw-mb-3">
+                  <span className="tw-font-medium">End Customer ID</span>
+                </div>
+                <FieldSelector
+                  className="tw-mt-0 tw-w-100"
+                  field={state.endCustomerIdField}
+                  setField={(value: Field) => {
+                    setState({ ...state, endCustomerIdField: value });
+                  }}
+                  placeholder="End Customer ID Field"
+                  noOptionsString="No Fields Available!"
+                  validated={true}
+                  connection={state.destination?.connection}
+                  namespace={state.namespace}
+                  tableName={state.tableName}
+                />
+              </>
+            )}
           <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5 tw-mb-3">
             <span className="tw-font-medium">Frequency</span>
           </div>
@@ -936,7 +956,11 @@ const DestinationTarget: React.FC<ObjectStepProps> = ({ state, setState }) => {
     // },
   ];
 
-  if (!state.destination || state.destination.connection.connection_type === ConnectionType.Webhook) {
+  if (
+    !state.destination ||
+    state.destination.connection.connection_type === ConnectionType.Webhook ||
+    state.destination.connection.connection_type === ConnectionType.DemoDestination
+  ) {
     return <></>;
   }
 
