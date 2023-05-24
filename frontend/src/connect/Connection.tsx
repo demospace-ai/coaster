@@ -10,8 +10,9 @@ import { FabraDisplayOptions } from "src/connect/ConnectApp";
 import { NewSourceState, SetupSyncProps, SyncSetupStep, validateConnectionSetup } from "src/connect/state";
 import { sendRequest } from "src/rpc/ajax";
 import { ConnectionType, getConnectionType, TestDataConnection, TestDataConnectionRequest } from "src/rpc/api";
-import { consumeError, HttpError } from "src/utils/errors";
+import { consumeError, forceError, HttpError } from "src/utils/errors";
 import { mergeClasses } from "src/utils/twmerge";
+import { useMutation } from "../utils/queryHelpers";
 
 export const NewSourceConfiguration: React.FC<SetupSyncProps & FabraDisplayOptions> = (props) => {
   const state = props.state.newSourceState;
@@ -121,83 +122,79 @@ const TestConnectionButton: React.FC<{
   setState: React.Dispatch<(state: NewSourceState) => NewSourceState>;
   connectionType: ConnectionType;
 }> = (props) => {
-  const [testLoading, setTestLoading] = useState(false);
-  const [testConnectionSuccess, setTestConnectionSuccess] = useState<boolean | null>(null);
   const { state, setState } = props;
 
-  const testConnection = async () => {
-    setTestLoading(true);
+  const onClick = () => {
+    testConnectionMutation.reset();
     if (!validateConnectionSetup(props.connectionType, state)) {
-      setTestLoading(false);
-      setTestConnectionSuccess(false);
       setState((state) => {
         return { ...state, error: "Must fill out all required fields" };
       });
       return;
-    }
-
-    const payload: TestDataConnectionRequest = {
-      display_name: state.displayName,
-      connection_type: props.connectionType,
-    };
-
-    switch (props.connectionType) {
-      case ConnectionType.BigQuery:
-        payload.bigquery_config = {
-          location: state.bigqueryConfig.location!.code,
-          credentials: state.bigqueryConfig.credentials,
-        };
-        break;
-      case ConnectionType.Snowflake:
-        payload.snowflake_config = state.snowflakeConfig;
-        break;
-      case ConnectionType.MongoDb:
-        payload.mongodb_config = state.mongodbConfig;
-        break;
-      case ConnectionType.Redshift:
-        payload.redshift_config = state.redshiftConfig;
-        break;
-      case ConnectionType.Synapse:
-        payload.synapse_config = state.synapseConfig;
-        break;
-      case ConnectionType.Postgres:
-        payload.postgres_config = state.postgresConfig;
-        break;
-      case ConnectionType.Webhook:
-        // TODO: throw error
-        return;
-    }
-
-    try {
-      await sendRequest(TestDataConnection, payload);
-      setTestConnectionSuccess(true);
+    } else {
       setState((state) => {
         return { ...state, error: undefined };
       });
-    } catch (e) {
-      setTestConnectionSuccess(false);
-      if (e instanceof HttpError) {
-        const errorMessage = e.message;
-        setState((state) => {
-          return { ...state, error: errorMessage };
-        });
-      }
-      consumeError(e);
     }
-
-    setTestLoading(false);
+    testConnectionMutation.mutate();
   };
 
-  const testColor = testConnectionSuccess ? "tw-bg-green-700 hover:tw-bg-green-800" : null;
+  const testConnectionMutation = useMutation(
+    async () => {
+      const payload: TestDataConnectionRequest = {
+        display_name: state.displayName,
+        connection_type: props.connectionType,
+      };
+
+      switch (props.connectionType) {
+        case ConnectionType.BigQuery:
+          payload.bigquery_config = {
+            location: state.bigqueryConfig.location!.code,
+            credentials: state.bigqueryConfig.credentials,
+          };
+          break;
+        case ConnectionType.Snowflake:
+          payload.snowflake_config = state.snowflakeConfig;
+          break;
+        case ConnectionType.MongoDb:
+          payload.mongodb_config = state.mongodbConfig;
+          break;
+        case ConnectionType.Redshift:
+          payload.redshift_config = state.redshiftConfig;
+          break;
+        case ConnectionType.Synapse:
+          payload.synapse_config = state.synapseConfig;
+          break;
+        case ConnectionType.Postgres:
+          payload.postgres_config = state.postgresConfig;
+          break;
+        case ConnectionType.Webhook:
+          // TODO: throw error
+          return;
+      }
+
+      return await sendRequest(TestDataConnection, payload);
+    },
+    {
+      onError: (err) => {
+        const error = forceError(err);
+        setState((state) => {
+          return {
+            ...state,
+            error: error?.message ?? "Failed",
+          };
+        });
+      },
+    },
+  );
+
+  const testColor = testConnectionMutation.isSuccess ? "tw-bg-green-700 hover:tw-bg-green-800" : null;
   return (
     <>
-      <Button
-        className={mergeClasses("tw-mt-8 tw-border-slate-200 tw-w-48 tw-h-10", testColor)}
-        onClick={testConnection}
-      >
-        {testLoading ? <Loading /> : "Test"}
+      <Button className={mergeClasses("tw-mt-8 tw-border-slate-200 tw-w-48 tw-h-10", testColor)} onClick={onClick}>
+        {testConnectionMutation.isLoading ? <Loading /> : "Test"}
       </Button>
-      {testConnectionSuccess && (
+      {testConnectionMutation.isSuccess && (
         <div className="tw-mt-4 tw-w-48 tw-text-green-700 tw-p-2 tw-text-center tw-bg-green-50 tw-border tw-border-green-600 tw-rounded">
           Success!
         </div>

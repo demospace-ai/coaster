@@ -74,11 +74,6 @@ export const Preview: React.FC = () => {
       return;
     }
 
-    const hasValidationErrors = Object.values(validationErrors).filter((v) => v).length > 0;
-    if (hasValidationErrors) {
-      return;
-    }
-
     setValidationErrors({
       ...validationErrors,
       endCustomerID: undefined,
