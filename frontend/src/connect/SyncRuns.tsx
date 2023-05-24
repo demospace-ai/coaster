@@ -81,7 +81,7 @@ const SyncRunsList: React.FC<{ linkToken: string }> = ({ linkToken }) => {
     <div className="tw-mt-2 tw-pb-16 tw-px-20 tw-flex tw-flex-col tw-overflow-auto">
       <div className="tw-flex tw-w-full tw-mb-8">
         <div className="tw-pointer-events-none tw-fixed tw-w-full tw-h-full">
-          <Toast content={renderButtonStatus()} show={!!renderButtonStatus} setShow={() => setRunSyncResult(null)} />
+          <Toast content={renderButtonStatus()} show={!!runSyncResult} setShow={() => setRunSyncResult(null)} />
         </div>
         <div className="tw-flex tw-flex-row tw-w-full tw-items-center tw-font-bold tw-text-xl tw-justify-between">
           Sync Runs • {sync?.sync.display_name}
@@ -99,7 +99,7 @@ const SyncRunsList: React.FC<{ linkToken: string }> = ({ linkToken }) => {
               className="tw-ml-auto tw-px-4 tw-py-1 tw-rounded-md tw-font-medium tw-text-base tw-bg-blue-600 hover:tw-bg-blue-500 tw-text-white tw-mr-2 tw-relative disabled:tw-bg-gray-500 disabled:tw-border-2"
               onClick={handleRunSync}
             >
-              {isLoading ? "Run sync" : <Loading light className="tw-w-4 tw-h-4" />}
+              {isLoading ? <Loading light className="tw-w-4 tw-h-4" /> : "Run Sync"}
             </button>
           </div>
         </div>
