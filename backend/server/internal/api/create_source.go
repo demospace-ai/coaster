@@ -24,6 +24,7 @@ type CreateSourceRequest struct {
 	MongoDbConfig   *input.MongoDbConfig   `json:"mongodb_config,omitempty"`
 	SynapseConfig   *input.SynapseConfig   `json:"synapse_config,omitempty"`
 	PostgresConfig  *input.PostgresConfig  `json:"postgres_config,omitempty"`
+	MySqlConfig     *input.MySqlConfig     `json:"mysql_config,omitempty"`
 	EndCustomerID   *string                `json:"end_customer_id,omitempty"`
 }
 
@@ -117,6 +118,14 @@ func (s ApiService) createSource(auth auth.Authentication, createSourceRequest C
 		}
 		connection, err = connections.CreatePostgresConnection(
 			s.db, auth.Organization.ID, *createSourceRequest.PostgresConfig, *encryptedCredentials,
+		)
+	case models.ConnectionTypeMySQL:
+		encryptedCredentials, err = s.cryptoService.EncryptConnectionCredentials(createSourceRequest.MySqlConfig.Password)
+		if err != nil {
+			return nil, nil, errors.Wrap(err, "(api.createSource)")
+		}
+		connection, err = connections.CreateMySqlConnection(
+			s.db, auth.Organization.ID, *createSourceRequest.MySqlConfig, *encryptedCredentials,
 		)
 	default:
 		return nil, nil, errors.Wrap(errors.Newf("unsupported connection type: %s", createSourceRequest.ConnectionType), "(api.createSource)")

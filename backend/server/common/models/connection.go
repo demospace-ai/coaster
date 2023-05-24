@@ -11,6 +11,7 @@ const (
 	ConnectionTypeRedshift  ConnectionType = "redshift"
 	ConnectionTypeSnowflake ConnectionType = "snowflake"
 	ConnectionTypePostgres  ConnectionType = "postgres"
+	ConnectionTypeMySQL     ConnectionType = "mysql"
 	ConnectionTypeWebhook   ConnectionType = "webhook"
 )
 

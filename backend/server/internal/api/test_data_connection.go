@@ -18,6 +18,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"cloud.google.com/go/bigquery"
+	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/microsoft/go-mssqldb"
 	"github.com/snowflakedb/gosnowflake"
 	"google.golang.org/api/iterator"
@@ -32,6 +33,7 @@ type TestDataConnectionRequest struct {
 	RedshiftConfig  *input.RedshiftConfig  `json:"redshift_config,omitempty"`
 	SynapseConfig   *input.SynapseConfig   `json:"synapse_config,omitempty"`
 	PostgresConfig  *input.PostgresConfig  `json:"postgres_config,omitempty"`
+	MySqlConfig     *input.MySqlConfig     `json:"mysql_config,omitempty"`
 	MongoDbConfig   *input.MongoDbConfig   `json:"mongodb_config,omitempty"`
 	WebhookConfig   *input.WebhookConfig   `json:"webhook_config,omitempty"`
 }
@@ -50,7 +52,7 @@ func (s ApiService) TestDataConnection(auth auth.Authentication, w http.Response
 
 	err = validateTestDataConnectionRequest(testDataConnectionRequest)
 	if err != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.TestDataConnection)")
+		return errors.Wrap(err, "(api.TestDataConnection)")
 	}
 
 	switch testDataConnectionRequest.ConnectionType {
@@ -66,6 +68,8 @@ func (s ApiService) TestDataConnection(auth auth.Authentication, w http.Response
 		err = testSynapseConnection(*testDataConnectionRequest.SynapseConfig)
 	case models.ConnectionTypePostgres:
 		err = testPostgresConnection(*testDataConnectionRequest.PostgresConfig)
+	case models.ConnectionTypeMySQL:
+		err = testMySqlConnection(*testDataConnectionRequest.MySqlConfig)
 	case models.ConnectionTypeWebhook:
 		err = testWebhookConnection(*testDataConnectionRequest.WebhookConfig)
 	default:
@@ -73,7 +77,7 @@ func (s ApiService) TestDataConnection(auth auth.Authentication, w http.Response
 	}
 
 	if err != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.TestDataConnection)")
+		return errors.Wrap(err, "(api.TestDataConnection)")
 	}
 
 	return nil
@@ -83,7 +87,7 @@ func testBigQueryConnection(bigqueryConfig input.BigQueryConfig) error {
 	var bigQueryCredentials models.BigQueryCredentials
 	err := json.Unmarshal([]byte(bigqueryConfig.Credentials), &bigQueryCredentials)
 	if err != nil {
-		return errors.Wrap(err, "(api.testBigQueryConnection)")
+		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testBigQueryConnection)")
 	}
 
 	credentialOption := option.WithCredentialsJSON([]byte(bigqueryConfig.Credentials))
@@ -91,7 +95,7 @@ func testBigQueryConnection(bigqueryConfig input.BigQueryConfig) error {
 	ctx := context.Background()
 	client, err := bigquery.NewClient(ctx, bigQueryCredentials.ProjectID, credentialOption)
 	if err != nil {
-		return errors.Wrap(err, "(api.testBigQueryConnection)")
+		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testBigQueryConnection)")
 	}
 	defer client.Close()
 
@@ -99,7 +103,7 @@ func testBigQueryConnection(bigqueryConfig input.BigQueryConfig) error {
 	_, err = it.Next()
 
 	if err != nil && err != iterator.Done {
-		return errors.Wrap(err, "(api.testBigQueryConnection)")
+		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testBigQueryConnection)")
 	}
 
 	return nil
@@ -121,18 +125,18 @@ func testSnowflakeConnection(snowflakeConfig input.SnowflakeConfig) error {
 
 	dsn, err := gosnowflake.DSN(&config)
 	if err != nil {
-		return errors.Wrap(err, "(api.testSnowflakeConnection)")
+		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testSnowflakeConnection)")
 	}
 
 	db, err := sql.Open("snowflake", dsn)
 	if err != nil {
-		return errors.Wrap(err, "(api.testSnowflakeConnection)")
+		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testSnowflakeConnection)")
 	}
 	defer db.Close()
 
 	rows, err := db.Query("SELECT 1")
 	if err != nil {
-		return errors.Wrap(err, "(api.testSnowflakeConnection)")
+		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testSnowflakeConnection)")
 	}
 	defer rows.Close()
 
@@ -140,14 +144,14 @@ func testSnowflakeConnection(snowflakeConfig input.SnowflakeConfig) error {
 	for rows.Next() {
 		err := rows.Scan(&v)
 		if err != nil {
-			return errors.Wrap(err, "(api.testSnowflakeConnection)")
+			return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testSnowflakeConnection)")
 		}
 		if v != 1 {
-			return errors.Wrap(err, "(api.testSnowflakeConnection)")
+			return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testSnowflakeConnection)")
 		}
 	}
 	if rows.Err() != nil {
-		return errors.Wrap(err, "(api.testSnowflakeConnection)")
+		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testSnowflakeConnection)")
 	}
 
 	return nil
@@ -168,13 +172,13 @@ func testRedshiftConnection(redshiftConfig input.RedshiftConfig) error {
 
 	db, err := sql.Open("postgres", dsn.String())
 	if err != nil {
-		return errors.Wrap(err, "(api.testRedshiftConnection)")
+		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testRedshiftConnection)")
 	}
 	defer db.Close()
 
 	rows, err := db.Query("SELECT 1")
 	if err != nil {
-		return errors.Wrap(err, "(api.testRedshiftConnection)")
+		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testRedshiftConnection)")
 	}
 	defer rows.Close()
 
@@ -182,14 +186,14 @@ func testRedshiftConnection(redshiftConfig input.RedshiftConfig) error {
 	for rows.Next() {
 		err := rows.Scan(&v)
 		if err != nil {
-			return errors.Wrap(err, "(api.testRedshiftConnection)")
+			return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testRedshiftConnection)")
 		}
 		if v != 1 {
-			return errors.Wrap(err, "(api.testRedshiftConnection)")
+			return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testRedshiftConnection)")
 		}
 	}
 	if rows.Err() != nil {
-		return errors.Wrap(err, "(api.testRedshiftConnection)")
+		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testRedshiftConnection)")
 	}
 
 	return nil
@@ -211,13 +215,13 @@ func testSynapseConnection(synapseConfig input.SynapseConfig) error {
 
 	db, err := sql.Open("sqlserver", dsn.String())
 	if err != nil {
-		return errors.Wrap(err, "(api.testSynapseConnection)")
+		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testSynapseConnection)")
 	}
 	defer db.Close()
 
 	rows, err := db.Query("SELECT 1")
 	if err != nil {
-		return errors.Wrap(err, "(api.testSynapseConnection)")
+		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testSynapseConnection)")
 	}
 	defer rows.Close()
 
@@ -225,14 +229,14 @@ func testSynapseConnection(synapseConfig input.SynapseConfig) error {
 	for rows.Next() {
 		err := rows.Scan(&v)
 		if err != nil {
-			return errors.Wrap(err, "(api.testSynapseConnection)")
+			return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testSynapseConnection)")
 		}
 		if v != 1 {
-			return errors.Wrap(err, "(api.testSynapseConnection)")
+			return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testSynapseConnection)")
 		}
 	}
 	if rows.Err() != nil {
-		return errors.Wrap(err, "(api.testSynapseConnection)")
+		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testSynapseConnection)")
 	}
 
 	return nil
@@ -257,7 +261,7 @@ func testMongoDbConnection(mongodbConfig input.MongoDbConfig) error {
 		SetConnectTimeout(3 * time.Second).
 		ApplyURI(connectionString) // Apply URI last since this contains connection options from the user
 	_, err := mongo.Connect(context.TODO(), clientOptions)
-	return errors.Wrap(err, "(api.testMongoDbConnection)")
+	return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testMongoDbConnection)")
 }
 
 func testPostgresConnection(postgresConfig input.PostgresConfig) error {
@@ -275,13 +279,13 @@ func testPostgresConnection(postgresConfig input.PostgresConfig) error {
 
 	db, err := sql.Open("postgres", dsn.String())
 	if err != nil {
-		return errors.Wrap(err, "(api.testPostgresConnection)")
+		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testPostgresConnection)")
 	}
 	defer db.Close()
 
 	rows, err := db.Query("SELECT 1")
 	if err != nil {
-		return errors.Wrap(err, "(api.testPostgresConnection)")
+		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testPostgresConnection)")
 	}
 	defer rows.Close()
 
@@ -289,14 +293,51 @@ func testPostgresConnection(postgresConfig input.PostgresConfig) error {
 	for rows.Next() {
 		err := rows.Scan(&v)
 		if err != nil {
-			return errors.Wrap(err, "(api.testPostgresConnection)")
+			return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testPostgresConnection)")
 		}
 		if v != 1 {
-			return errors.Wrap(err, "(api.testPostgresConnection)")
+			return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testPostgresConnection)")
 		}
 	}
 	if rows.Err() != nil {
-		return errors.Wrap(err, "(api.testPostgresConnection)")
+		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testPostgresConnection)")
+	}
+
+	return nil
+}
+
+func testMySqlConnection(mysqlConfig input.MySqlConfig) error {
+	params := url.Values{}
+	params.Add("tls", "true")
+	params.Add("timeout", "5s")
+
+	// Can't use url.Url because mysql does not accept a scheme
+	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?%s", mysqlConfig.Username, mysqlConfig.Password, mysqlConfig.Endpoint, mysqlConfig.DatabaseName, params.Encode())
+
+	db, err := sql.Open("mysql", dsn)
+	if err != nil {
+		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testMySqlConnection)")
+	}
+	defer db.Close()
+
+	rows, err := db.Query("SELECT 1")
+	if err != nil {
+		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testMySqlConnection)")
+	}
+	defer rows.Close()
+
+	var v int
+	for rows.Next() {
+		err := rows.Scan(&v)
+		if err != nil {
+			return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testMySqlConnection)")
+		}
+		if v != 1 {
+			return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testMySqlConnection)")
+		}
+	}
+	if rows.Err() != nil {
+		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testMySqlConnection)")
 	}
 
 	return nil
@@ -305,16 +346,16 @@ func testPostgresConnection(postgresConfig input.PostgresConfig) error {
 func testWebhookConnection(webhookConfig input.WebhookConfig) error {
 	_, err := url.ParseRequestURI(webhookConfig.URL)
 	if err != nil {
-		return errors.Wrap(err, "(api.testWebhookConnection)")
+		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testWebhookConnection)")
 	}
 	resp, err := http.Head(webhookConfig.URL)
 	if err != nil {
-		return errors.Wrap(err, "(api.testWebhookConnection)")
+		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testWebhookConnection)")
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("(api.testWebhookConnection) unexpected status code: %d", resp.StatusCode)
+		return errors.Wrap(errors.NewCustomerVisibleError(fmt.Errorf("unexpected status code: %d", resp.StatusCode)), "(api.testWebhookConnection) ")
 	}
 
 	return nil
@@ -334,6 +375,8 @@ func validateTestDataConnectionRequest(request TestDataConnectionRequest) error 
 		return validateTestSynapseConnection(request)
 	case models.ConnectionTypePostgres:
 		return validateTestPostgresConnection(request)
+	case models.ConnectionTypeMySQL:
+		return validateTestMySqlConnection(request)
 	case models.ConnectionTypeWebhook:
 		return validateTestWebhookConnection(request)
 	default:
@@ -400,6 +443,16 @@ func validateTestSynapseConnection(request TestDataConnectionRequest) error {
 func validateTestPostgresConnection(request TestDataConnectionRequest) error {
 	if request.PostgresConfig == nil {
 		return errors.Wrap(errors.NewBadRequest("missing Postgres configuration"), "(api.validateTestPostgresConnection)")
+	}
+
+	// TODO: validate the fields all exist in the credentials object
+
+	return nil
+}
+
+func validateTestMySqlConnection(request TestDataConnectionRequest) error {
+	if request.MySqlConfig == nil {
+		return errors.Wrap(errors.NewBadRequest("missing MySQL configuration"), "(api.validateTestMySqlConnection)")
 	}
 
 	// TODO: validate the fields all exist in the credentials object

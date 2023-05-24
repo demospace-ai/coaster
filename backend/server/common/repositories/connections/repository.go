@@ -177,6 +177,29 @@ func CreatePostgresConnection(
 	return &connection, nil
 }
 
+func CreateMySqlConnection(
+	db *gorm.DB,
+	organizationID int64,
+	mysqlConfig input.MySqlConfig,
+	encryptedPassword string,
+) (*models.Connection, error) {
+	connection := models.Connection{
+		OrganizationID: organizationID,
+		ConnectionType: models.ConnectionTypeMySQL,
+		Username:       database.NewNullString(mysqlConfig.Username),
+		Password:       database.NewNullString(encryptedPassword),
+		DatabaseName:   database.NewNullString(mysqlConfig.DatabaseName),
+		Host:           database.NewNullString(mysqlConfig.Endpoint), // we just use the host field to store the endpoint
+	}
+
+	result := db.Create(&connection)
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(connections.CreateMySqlConnection)")
+	}
+
+	return &connection, nil
+}
+
 func CreateWebhookConnection(
 	db *gorm.DB,
 	organizationID int64,

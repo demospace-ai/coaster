@@ -49,7 +49,7 @@ const SyncRunsList: React.FC<{ linkToken: string }> = ({ linkToken }) => {
   );
 
   const renderRunSyncResult = () => {
-    if (runSyncMutation.isFailed) {
+    if (runSyncMutation.isSuccess) {
       return (
         <div className="tw-flex tw-flex-row tw-items-center tw-justify-start">
           <CheckCircleIcon className="tw-w-5 tw-h-5 tw-text-green-500 tw-stroke-2" />
@@ -58,7 +58,7 @@ const SyncRunsList: React.FC<{ linkToken: string }> = ({ linkToken }) => {
       );
     }
 
-    if (runSyncMutation.isSuccess) {
+    if (runSyncMutation.isFailed) {
       return (
         <div className="tw-flex tw-flex-row tw-items-center tw-justify-start">
           <XCircleIcon className="tw-w-5 tw-h-5 tw-text-red-500 tw-stroke-2" />
