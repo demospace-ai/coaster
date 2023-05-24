@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"go.fabra.io/server/common/auth"
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/intercom"
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/repositories/organizations"
@@ -34,14 +35,14 @@ func (s ApiService) CheckSession(auth auth.Authentication, w http.ResponseWriter
 
 			suggestedOrganizations, err = organizations.LoadOrganizationsByEmailDomain(s.db, userEmailDomain)
 			if err != nil {
-				return err
+				return errors.Wrap(err, "(api.CheckSession)")
 			}
 		}
 	}
 
 	intercomHash, err := intercom.GenerateIntercomHash(*auth.User)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.CheckSession)")
 	}
 
 	return json.NewEncoder(w).Encode(CheckSessionResponse{

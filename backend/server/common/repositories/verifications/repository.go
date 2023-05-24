@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"time"
 
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/models"
 
 	"gorm.io/gorm"
@@ -26,7 +27,7 @@ func Create(db *gorm.DB, userID int64) (*string, error) {
 
 	result := db.Create(&verification)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(verifications.Create)")
 	}
 
 	return &code, nil
@@ -44,12 +45,12 @@ func VerifyCode(db *gorm.DB, code string, userID int64) (*models.Verification, e
 	var verification models.Verification
 	result := db.Take(&verification, "code = ? AND user_id = ? AND expiration >= ? AND used = ? AND deactivated_at IS NULL", code, userID, time.Now(), false)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(verifications.VerifyCode)")
 	}
 
 	result = db.Model(&verification).Update("used", true)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(verifications.VerifyCode)")
 	}
 
 	return &verification, nil

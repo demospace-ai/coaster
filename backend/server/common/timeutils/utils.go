@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"go.fabra.io/server/common/errors"
 )
 
 func GetTimezoneHeader(r *http.Request) *time.Location {
@@ -32,7 +34,7 @@ func GetDurationString(duration time.Duration) (*string, error) {
 	} else {
 		hours, err := strconv.Atoi(hSplit[0])
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "(timeutils.GetDurationString)")
 		}
 
 		if hours == 1 {
@@ -49,7 +51,7 @@ func GetDurationString(duration time.Duration) (*string, error) {
 	} else {
 		minutes, err := strconv.Atoi(mSplit[0])
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "(timeutils.GetDurationString)")
 		}
 
 		if minutes == 1 {
@@ -65,7 +67,7 @@ func GetDurationString(duration time.Duration) (*string, error) {
 	} else {
 		seconds, err := strconv.Atoi(sSplit[0])
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "(timeutils.GetDurationString)")
 		}
 
 		if seconds == 1 {

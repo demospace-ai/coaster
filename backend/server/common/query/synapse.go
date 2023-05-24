@@ -35,7 +35,7 @@ func (it *synapseIterator) Next(_ context.Context) (data.Row, error) {
 
 		err := it.queryResult.Scan(valuePtrs...)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "(query.synapseIterator.Next)")
 		}
 		return convertSynapseRow(values, it.schema), nil
 	}
@@ -43,7 +43,7 @@ func (it *synapseIterator) Next(_ context.Context) (data.Row, error) {
 	defer it.queryResult.Close()
 	err := it.queryResult.Err()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.synapseIterator.Next) iterating over query results")
 	}
 
 	return nil, data.ErrDone
@@ -74,7 +74,7 @@ func (sc SynapseApiClient) GetTables(ctx context.Context, namespace string) ([]s
 
 	queryResult, err := sc.RunQuery(ctx, queryString)
 	if err != nil {
-		return nil, errors.Wrap(err, "error running query")
+		return nil, errors.Wrap(err, "(query.SynapseApiClient.GetTables)")
 	}
 
 	var tableNames []string
@@ -90,7 +90,7 @@ func (sc SynapseApiClient) GetSchema(ctx context.Context, namespace string, tabl
 
 	queryResult, err := sc.RunQuery(ctx, queryString)
 	if err != nil {
-		return nil, errors.Wrapf(err, "getting schema for %s.%s", namespace, tableName)
+		return nil, errors.Wrapf(err, "(query.SynapseApiClient.GetSchema) getting schema for %s.%s", namespace, tableName)
 	}
 
 	schema := data.Schema{}
@@ -107,7 +107,7 @@ func (sc SynapseApiClient) GetFieldValues(ctx context.Context, namespace string,
 
 	queryResult, err := sc.RunQuery(ctx, queryString)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.SynapseApiClient.GetFieldValues)")
 	}
 
 	values := []any{}
@@ -126,7 +126,7 @@ func (sc SynapseApiClient) GetNamespaces(ctx context.Context) ([]string, error) 
 	queryString := "SELECT TABLE_SCHEMA FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE'"
 	queryResult, err := sc.RunQuery(ctx, queryString)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.SynapseApiClient.GetNamespaces)")
 	}
 
 	var namespaces []string
@@ -144,19 +144,19 @@ func (sc SynapseApiClient) GetNamespaces(ctx context.Context) ([]string, error) 
 func (sc SynapseApiClient) RunQuery(ctx context.Context, queryString string, args ...any) (*data.QueryResults, error) {
 	client, err := sc.openConnection(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.SynapseApiClient.RunQuery) opening connection")
 	}
 	defer client.Close()
 
 	queryResult, err := client.Query(queryString)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.SynapseApiClient.RunQuery) running query")
 	}
 	defer queryResult.Close()
 
 	columns, err := queryResult.ColumnTypes()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.SynapseApiClient.RunQuery) getting column types")
 	}
 	numColumns := len(columns)
 	schema := convertSynapseSchema(columns)
@@ -170,7 +170,7 @@ func (sc SynapseApiClient) RunQuery(ctx context.Context, queryString string, arg
 		}
 		err := queryResult.Scan(valuePtrs...)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "(query.SynapseApiClient.RunQuery) scanning row")
 		}
 
 		rows = append(rows, convertSynapseRow(values, schema))
@@ -185,18 +185,18 @@ func (sc SynapseApiClient) RunQuery(ctx context.Context, queryString string, arg
 func (sc SynapseApiClient) GetQueryIterator(ctx context.Context, queryString string) (data.RowIterator, error) {
 	client, err := sc.openConnection(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.SynapseApiClient.GetQueryIterator) opening connection")
 	}
 	defer client.Close()
 
 	queryResult, err := client.Query(queryString)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.SynapseApiClient.GetQueryIterator) running query")
 	}
 
 	columns, err := queryResult.ColumnTypes()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.SynapseApiClient.GetQueryIterator) getting column types")
 	}
 
 	return &synapseIterator{

@@ -50,7 +50,7 @@ func (bq BigQueryImpl) Read(
 			if err == data.ErrDone {
 				break
 			} else {
-				errC <- err
+				errC <- errors.Wrap(err, "(connectors.BigQueryImpl.Read)")
 				return
 			}
 		}
@@ -169,7 +169,7 @@ func (bq BigQueryImpl) Write(
 		objectName := fmt.Sprintf("%s-%d", objectPrefix, batchNum)
 		err := bq.stageBatch(ctx, rows, fieldMappings, object, sync, destinationOptions, bq.client, objectName)
 		if err != nil {
-			errC <- err
+			errC <- errors.Wrap(err, "(connectors.BigQueryImpl.Write)")
 			return
 		}
 
@@ -247,7 +247,7 @@ func (bq BigQueryImpl) stageBatch(ctx context.Context, rows []data.Row, fieldMap
 					case data.FieldTypeJson:
 						jsonStr, err := getBigQueryJsonString(value)
 						if err != nil {
-							return err
+							return errors.Wrap(err, "(connectors.BigQueryImpl.stageBatch)")
 						}
 						rowTokens[destFieldIdx] = jsonStr
 					case data.FieldTypeString:
@@ -264,7 +264,7 @@ func (bq BigQueryImpl) stageBatch(ctx context.Context, rows []data.Row, fieldMap
 		for key, value := range indexToJsonValueMap {
 			jsonStr, err := getBigQueryJsonString(value)
 			if err != nil {
-				return err
+				return errors.Wrap(err, "(connectors.BigQueryImpl.stageBatch)")
 			}
 
 			rowTokens[key] = jsonStr
@@ -289,7 +289,7 @@ func (bq BigQueryImpl) stageBatch(ctx context.Context, rows []data.Row, fieldMap
 func getBigQueryJsonString(value any) (string, error) {
 	jsonStr, err := json.Marshal(value)
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "(connectors.BigQueryImpl.getBigQueryJsonString)")
 	}
 	return fmt.Sprintf("\"%s\"", strings.ReplaceAll(string(jsonStr), "\"", "\"\"")), nil
 }

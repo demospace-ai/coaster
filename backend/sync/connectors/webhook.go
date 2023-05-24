@@ -161,7 +161,7 @@ func (wh WebhookImpl) sendData(objectName string, endCustomerID string, endCusto
 	}
 	marshalled, err := json.Marshal(webhookData)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(connectors.WebhookImpl.sendData)")
 	}
 
 	request, _ := http.NewRequest("POST", webhookUrl, bytes.NewBuffer(marshalled))
@@ -171,7 +171,7 @@ func (wh WebhookImpl) sendData(objectName string, endCustomerID string, endCusto
 	client := &http.Client{}
 	response, err := client.Do(request)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(connectors.WebhookImpl.sendData)")
 	}
 	response.Body.Close()
 

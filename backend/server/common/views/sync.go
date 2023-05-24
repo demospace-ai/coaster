@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"go.fabra.io/server/common/data"
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/timeutils"
 )
@@ -108,7 +109,7 @@ func ConvertSyncRuns(syncRuns []models.SyncRun, timezone *time.Location) ([]Sync
 		if syncRun.Status != models.SyncRunStatusRunning {
 			duration, err := timeutils.GetDurationString(syncRun.CompletedAt.Sub(syncRun.StartedAt))
 			if err != nil {
-				return nil, err
+				return nil, errors.Wrap(err, "(views.ConvertSyncRuns) getting duration string")
 			}
 			syncRunView.Duration = duration
 		}

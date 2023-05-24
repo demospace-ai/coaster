@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"go.fabra.io/server/common/auth"
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/repositories/destinations"
 	"go.fabra.io/server/common/views"
 )
@@ -17,7 +18,7 @@ func (s ApiService) GetDestinations(auth auth.Authentication, w http.ResponseWri
 
 	destinations, err := destinations.LoadAllDestinations(s.db, auth.Organization.ID)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.GetDestinations)")
 	}
 
 	return json.NewEncoder(w).Encode(GetDestinationsResponse{

@@ -16,12 +16,12 @@ type GetAllUsersResponse struct {
 
 func (s ApiService) GetAllUsers(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.NewBadRequest("cannot request users without organization")
+		return errors.Wrap(errors.NewBadRequest("cannot request users without organization"), "(api.GetAllUsers)")
 	}
 
 	users, err := user_repository.LoadAllByOrganizationID(s.db, auth.Organization.ID)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.GetAllUsers)")
 	}
 
 	return json.NewEncoder(w).Encode(GetAllUsersResponse{

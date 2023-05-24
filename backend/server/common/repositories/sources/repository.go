@@ -1,6 +1,7 @@
 package sources
 
 import (
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/models"
 
 	"gorm.io/gorm"
@@ -23,7 +24,7 @@ func CreateSource(
 
 	result := db.Create(&source)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(sources.CreateSource)")
 	}
 
 	return &source, nil
@@ -41,7 +42,7 @@ func LoadSourceByID(db *gorm.DB, organizationID int64, endCustomerID string, sou
 		Take(&source)
 
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(sources.LoadSourceByID)")
 	}
 
 	return &source, nil
@@ -60,7 +61,7 @@ func LoadSourcesByIDs(db *gorm.DB, organizationID int64, sourceIDs []int64) ([]m
 		Find(&sources)
 
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(sources.LoadSourcesByIDs)")
 	}
 
 	return sources, nil
@@ -80,7 +81,7 @@ func LoadSourcesByIDsForCustomer(db *gorm.DB, organizationID int64, endCustomerI
 		Find(&sources)
 
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(sources.LoadSourcesByIDsForCustomer)")
 	}
 
 	return sources, nil
@@ -103,7 +104,7 @@ func LoadAllSources(
 		Find(&sources)
 
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(sources.LoadAllSources)")
 	}
 
 	return sources, nil

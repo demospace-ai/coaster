@@ -15,11 +15,11 @@ import (
 
 func (s ApiService) LinkRunSync(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.NewBadRequest("must setup organization first")
+		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "(api.LinkRunSync)")
 	}
 
 	if auth.LinkToken == nil {
-		return errors.NewBadRequest("must send link token")
+		return errors.Wrap(errors.NewBadRequest("must send link token"), "(api.LinkRunSync)")
 	}
 
 	vars := mux.Vars(r)

@@ -39,40 +39,40 @@ type CreateSyncLinkRequest struct {
 
 func (s ApiService) LinkCreateSync(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.NewBadRequest("must setup organization first")
+		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "(api.LinkCreateSync)")
 	}
 
 	if auth.LinkToken == nil {
-		return errors.NewBadRequest("must send link token")
+		return errors.Wrap(errors.NewBadRequest("must send link token"), "(api.LinkCreateSync)")
 	}
 
 	decoder := json.NewDecoder(r.Body)
 	var createSyncRequest CreateSyncLinkRequest
 	err := decoder.Decode(&createSyncRequest)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.LinkCreateSync)")
 	}
 
 	// TODO: validate connection parameters
 	validate := validator.New()
 	err = validate.Struct(createSyncRequest)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.LinkCreateSync)")
 	}
 
 	if (createSyncRequest.TableName == nil || createSyncRequest.Namespace == nil) && createSyncRequest.CustomJoin == nil {
-		return errors.NewBadRequest("must have table_name and namespace or custom_join")
+		return errors.Wrap(errors.NewBadRequest("must have table_name and namespace or custom_join"), "(api.LinkCreateSync)")
 	}
 
 	// this also serves to check that this organization owns the object
 	object, err := objects.LoadObjectByID(s.db, auth.Organization.ID, createSyncRequest.ObjectID)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.LinkCreateSync)")
 	}
 
 	objectFields, err := objects.LoadObjectFieldsByID(s.db, createSyncRequest.ObjectID)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.LinkCreateSync)")
 	}
 
 	// default values for the sync come from the object
@@ -121,7 +121,7 @@ func (s ApiService) LinkCreateSync(auth auth.Authentication, w http.ResponseWrit
 		frequencyUnits,
 	)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.LinkCreateSync)")
 	}
 
 	// TODO: validate types are mapped correctly
@@ -129,12 +129,12 @@ func (s ApiService) LinkCreateSync(auth auth.Authentication, w http.ResponseWrit
 		s.db, auth.Organization.ID, sync.ID, createSyncRequest.FieldMappings,
 	)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.LinkCreateSync)")
 	}
 
 	c, err := temporal.CreateClient(CLIENT_PEM_KEY, CLIENT_KEY_KEY)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.LinkCreateSync)")
 	}
 	defer c.Close()
 
@@ -142,7 +142,7 @@ func (s ApiService) LinkCreateSync(auth auth.Authentication, w http.ResponseWrit
 	scheduleClient := c.ScheduleClient()
 	schedule, err := createSchedule(frequency, frequencyUnits)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.LinkCreateSync)")
 	}
 
 	_, err = scheduleClient.Create(ctx, client.ScheduleOptions{
@@ -164,7 +164,7 @@ func (s ApiService) LinkCreateSync(auth auth.Authentication, w http.ResponseWrit
 		},
 	})
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.LinkCreateSync)")
 	}
 
 	return json.NewEncoder(w).Encode(CreateSyncResponse{
@@ -186,6 +186,6 @@ func createSchedule(frequency int64, frequencyUnits models.FrequencyUnits) (time
 		return frequencyDuration * WEEK, nil
 	default:
 		// TODO: this should not happen
-		return WEEK, errors.Newf("unexpected frequency unit: %s", string(frequencyUnits))
+		return WEEK, errors.Newf("(api.createSchedule) unexpected frequency unit: %s", string(frequencyUnits))
 	}
 }

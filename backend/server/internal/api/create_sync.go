@@ -45,36 +45,36 @@ type CreateSyncResponse struct {
 func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 
 	if auth.Organization == nil {
-		return errors.NewBadRequest("must setup organization first")
+		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "(api.CreateSync)")
 	}
 
 	decoder := json.NewDecoder(r.Body)
 	var createSyncRequest CreateSyncRequest
 	err := decoder.Decode(&createSyncRequest)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.CreateSync)")
 	}
 
 	// TODO: validate connection parameters
 	validate := validator.New()
 	err = validate.Struct(createSyncRequest)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.CreateSync)")
 	}
 
 	if (createSyncRequest.TableName == nil || createSyncRequest.Namespace == nil) && createSyncRequest.CustomJoin == nil {
-		return errors.NewBadRequest("must have table_name and namespace or custom_join")
+		return errors.Wrap(errors.NewBadRequest("must have table_name and namespace or custom_join"), "(api.CreateSync)")
 	}
 
 	// this also serves to check that this organization owns the object
 	object, err := objects.LoadObjectByID(s.db, auth.Organization.ID, createSyncRequest.ObjectID)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.CreateSync)")
 	}
 
 	objectFields, err := objects.LoadObjectFieldsByID(s.db, createSyncRequest.ObjectID)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.CreateSync)")
 	}
 
 	// default values for the sync come from the object
@@ -122,26 +122,26 @@ func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, 
 		frequencyUnits,
 	)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.CreateSync)")
 	}
 
 	fieldMappings, err := syncs.CreateFieldMappings(
 		s.db, auth.Organization.ID, sync.ID, createSyncRequest.FieldMappings,
 	)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.CreateSync)")
 	}
 
 	c, err := temporal.CreateClient(CLIENT_PEM_KEY, CLIENT_KEY_KEY)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.CreateSync)")
 	}
 	defer c.Close()
 	ctx := context.TODO()
 	scheduleClient := c.ScheduleClient()
 	schedule, err := createSchedule(frequency, frequencyUnits)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.CreateSync)")
 	}
 
 	_, err = scheduleClient.Create(ctx, client.ScheduleOptions{
@@ -163,7 +163,7 @@ func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, 
 		},
 	})
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.CreateSync)")
 	}
 
 	return json.NewEncoder(w).Encode(CreateSyncResponse{

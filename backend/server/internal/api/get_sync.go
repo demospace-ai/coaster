@@ -22,7 +22,7 @@ type GetSyncResponse struct {
 
 func (s ApiService) GetSync(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.NewBadRequest("must setup organization first")
+		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "(api.GetSync)")
 	}
 
 	timezone := timeutils.GetTimezoneHeader(r)
@@ -30,28 +30,28 @@ func (s ApiService) GetSync(auth auth.Authentication, w http.ResponseWriter, r *
 	vars := mux.Vars(r)
 	strSyncId, ok := vars["syncID"]
 	if !ok {
-		return errors.Newf("missing sync ID from GetSyncDetails request URL: %s", r.URL.RequestURI())
+		return errors.Newf("(api.GetSync) missing sync ID from GetSyncDetails request URL: %s", r.URL.RequestURI())
 	}
 
 	syncId, err := strconv.ParseInt(strSyncId, 10, 64)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.GetSync)")
 	}
 
 	// check the sync belongs to the right organization
 	sync, err := syncs.LoadSyncByID(s.db, auth.Organization.ID, syncId)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.GetSync)")
 	}
 
 	syncRuns, err := sync_runs.LoadAllRunsForSync(s.db, auth.Organization.ID, sync.ID)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.GetSync)")
 	}
 
 	syncRunsView, err := views.ConvertSyncRuns(syncRuns, timezone)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.GetSync)")
 	}
 
 	return json.NewEncoder(w).Encode(GetSyncResponse{

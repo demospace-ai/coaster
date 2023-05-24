@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 
 	"go.fabra.io/server/common/application"
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/secret"
 	"go.temporal.io/sdk/client"
 )
@@ -31,17 +32,17 @@ func CreateClient(certPem string, certKey string) (client.Client, error) {
 	if application.IsProd() {
 		clientPem, err := secret.FetchSecret(context.TODO(), certPem)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "(temporal.CreateClient) failed to load client pem")
 		}
 
 		clientKey, err := secret.FetchSecret(context.TODO(), certKey)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "(temporal.CreateClient) failed to load client key")
 		}
 
 		cert, err := tls.X509KeyPair([]byte(*clientPem), []byte(*clientKey))
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "(temporal.CreateClient) failed to create client key pair")
 		}
 		connectionOptions = client.ConnectionOptions{
 			TLS: &tls.Config{

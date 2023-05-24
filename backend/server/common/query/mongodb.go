@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"go.fabra.io/server/common/data"
+	"go.fabra.io/server/common/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -37,7 +38,7 @@ func (it *mongoDbIterator) Next(ctx context.Context) (data.Row, error) {
 		var row bson.D
 		err := it.cursor.Decode(&row)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "(query.mongoDbIterator.Next) decoding row")
 		}
 
 		return convertMongoDbRow(row, it.schema), nil
@@ -47,7 +48,7 @@ func (it *mongoDbIterator) Next(ctx context.Context) (data.Row, error) {
 	defer it.client.Disconnect(ctx)
 	err := it.cursor.Err()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.mongoDbIterator.Next) cursor error")
 	}
 
 	return nil, data.ErrDone
@@ -75,7 +76,7 @@ func (mc MongoDbApiClient) openConnection(ctx context.Context) (*mongo.Client, e
 func (mc MongoDbApiClient) GetTables(ctx context.Context, namespace string) ([]string, error) {
 	client, err := mc.openConnection(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.MongoDbApiClient.GetTables) opening connection")
 	}
 
 	defer client.Disconnect(ctx)
@@ -87,7 +88,7 @@ func (mc MongoDbApiClient) GetTables(ctx context.Context, namespace string) ([]s
 func (mc MongoDbApiClient) GetSchema(ctx context.Context, namespace string, tableName string) (data.Schema, error) {
 	client, err := mc.openConnection(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.MongoDbApiClient.GetSchema) opening connection")
 	}
 
 	defer client.Disconnect(ctx)
@@ -96,12 +97,12 @@ func (mc MongoDbApiClient) GetSchema(ctx context.Context, namespace string, tabl
 	collection := db.Collection(tableName)
 	fields, err := getFields(collection)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.MongoDbApiClient.GetSchema) getting fields")
 	}
 
 	fieldTypes, err := getFieldTypes(collection, fields)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.MongoDbApiClient.GetSchema) getting field types")
 	}
 
 	return convertMongoDbSchema(fieldTypes), nil
@@ -115,14 +116,14 @@ func (mc MongoDbApiClient) GetFieldValues(ctx context.Context, namespace string,
 func (mc MongoDbApiClient) GetNamespaces(ctx context.Context) ([]string, error) {
 	client, err := mc.openConnection(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.MongoDbApiClient.GetNamespaces) opening connection")
 	}
 
 	defer client.Disconnect(ctx)
 
 	databaseNames, err := client.ListDatabaseNames(ctx, bson.D{})
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.MongoDbApiClient.GetNamespaces) listing database names")
 	}
 
 	return databaseNames, nil
@@ -131,14 +132,14 @@ func (mc MongoDbApiClient) GetNamespaces(ctx context.Context) ([]string, error) 
 func (mc MongoDbApiClient) RunQuery(ctx context.Context, queryString string, args ...any) (*data.QueryResults, error) {
 	client, err := mc.openConnection(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.MongoDbApiClient.RunQuery) opening connection")
 	}
 	defer client.Disconnect(ctx)
 
 	var mongoQuery MongoQuery
 	err = bson.Unmarshal([]byte(queryString), &mongoQuery)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.MongoDbApiClient.RunQuery) unmarshalling query")
 	}
 
 	schemaC := make(chan data.Schema)
@@ -160,20 +161,20 @@ func (mc MongoDbApiClient) RunQuery(ctx context.Context, queryString string, arg
 		mongoQuery.Options,
 	)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.MongoDbApiClient.RunQuery) running query")
 	}
 	defer cursor.Close(ctx)
 
 	var rows bson.A
 	err = cursor.All(ctx, &rows)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.MongoDbApiClient.RunQuery) getting rows")
 	}
 
 	schema := <-schemaC
 	err = <-errC
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.MongoDbApiClient.RunQuery) getting schema")
 	}
 
 	return &data.QueryResults{
@@ -185,13 +186,13 @@ func (mc MongoDbApiClient) RunQuery(ctx context.Context, queryString string, arg
 func (mc MongoDbApiClient) GetQueryIterator(ctx context.Context, queryString string) (data.RowIterator, error) {
 	client, err := mc.openConnection(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.MongoDbApiClient.GetQueryIterator) opening connection")
 	}
 
 	var mongoQuery MongoQuery
 	err = bson.Unmarshal([]byte(queryString), &mongoQuery)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.MongoDbApiClient.GetQueryIterator) unmarshalling query")
 	}
 
 	schemaC := make(chan data.Schema)
@@ -200,7 +201,6 @@ func (mc MongoDbApiClient) GetQueryIterator(ctx context.Context, queryString str
 		schema, err := mc.GetSchema(ctx, mongoQuery.Database, mongoQuery.Collection)
 		schemaC <- schema
 		errC <- err
-
 		close(schemaC)
 		close(errC)
 	}()
@@ -213,13 +213,13 @@ func (mc MongoDbApiClient) GetQueryIterator(ctx context.Context, queryString str
 		mongoQuery.Options,
 	)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.MongoDbApiClient.GetQueryIterator) running query")
 	}
 
 	schema := <-schemaC
 	err = <-errC
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.MongoDbApiClient.GetQueryIterator) getting schema")
 	}
 
 	return &mongoDbIterator{
@@ -250,14 +250,14 @@ func getFields(collection *mongo.Collection) ([]string, error) {
 		},
 	)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.MongoDbApiClient.getFields) running query")
 	}
 
 	defer cursor.Close(ctx)
 
 	var results []bson.M
 	if err = cursor.All(ctx, &results); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.MongoDbApiClient.getFields) decoding results")
 	}
 
 	var fields []string
@@ -293,7 +293,7 @@ func getFieldTypes(collection *mongo.Collection, fields []string) (map[string]st
 			},
 		)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "(query.MongoDbApiClient.getFields) running query")
 		}
 
 		defer cursor.Close(ctx)
@@ -303,7 +303,7 @@ func getFieldTypes(collection *mongo.Collection, fields []string) (map[string]st
 			var result bson.M
 			err = cursor.Decode(&result)
 			if err != nil {
-				return nil, err
+				return nil, errors.Wrap(err, "(query.MongoDbApiClient.getFields) decoding results")
 			}
 
 			// Even if most of the fields are missing/null, we use the most common non-null type if one exists
@@ -321,7 +321,7 @@ func getFieldTypes(collection *mongo.Collection, fields []string) (map[string]st
 		}
 
 		if err = cursor.Err(); err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "(query.MongoDbApiClient.getFields) iterating results")
 		}
 
 		fieldTypes[field] = typesForField[0]

@@ -26,7 +26,7 @@ func createSyncRun(
 
 	result := db.Create(&newSyncRun)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(sync_runs.CreateSyncRun)")
 	}
 
 	return &newSyncRun, nil
@@ -66,7 +66,7 @@ func UpdateSyncRun(db *gorm.DB, syncRun *models.SyncRun, newStatus models.SyncRu
 
 	result := db.Model(syncRun).Updates(updates)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(sync_runs.CompleteSyncRun)")
 	}
 
 	return syncRun, nil
@@ -102,7 +102,7 @@ func LoadAllRunsForSync(db *gorm.DB, organizationID int64, syncID int64) ([]mode
 		Find(&syncRuns)
 
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(sync_runs.LoadAllRunsForSync)")
 	}
 
 	return syncRuns, nil

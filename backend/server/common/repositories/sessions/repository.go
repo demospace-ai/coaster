@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"time"
 
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/models"
 
 	"gorm.io/gorm"
@@ -20,7 +21,7 @@ func generateToken() (*string, error) {
 	b := make([]byte, TOKEN_BITS/8)
 	_, err := rand.Read(b)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(sessions.generateToken)")
 	}
 
 	token := fmt.Sprintf("%x", b)
@@ -36,7 +37,7 @@ func HashToken(token string) string {
 func Create(db *gorm.DB, userID int64) (*string, error) {
 	rawToken, err := generateToken()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(sessions.Create)")
 	}
 
 	// we store hashed tokens in case the DB is leaked
@@ -51,7 +52,7 @@ func Create(db *gorm.DB, userID int64) (*string, error) {
 
 	result := db.Create(&session)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(sessions.Create)")
 	}
 
 	return rawToken, nil
@@ -61,7 +62,7 @@ func Refresh(db *gorm.DB, session *models.Session) (*models.Session, error) {
 	expiration := time.Now().Add(SESSION_EXPIRATION)
 	result := db.Model(session).Update("expiration", expiration)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(sessions.Refresh)")
 	}
 
 	return session, nil
@@ -71,7 +72,7 @@ func Clear(db *gorm.DB, session *models.Session) error {
 	currentTime := time.Now()
 	result := db.Model(session).Update("deactivated_at", currentTime)
 	if result.Error != nil {
-		return result.Error
+		return errors.Wrap(result.Error, "(sessions.Clear)")
 	}
 
 	return nil
@@ -84,7 +85,7 @@ func LoadValidByToken(db *gorm.DB, rawToken string) (*models.Session, error) {
 	var session models.Session
 	result := db.Take(&session, "token = ? AND expiration >= ? AND deactivated_at IS NULL", token, time.Now())
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(sessions.LoadValidByToken)")
 	}
 
 	return &session, nil

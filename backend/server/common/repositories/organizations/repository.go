@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"go.fabra.io/server/common/database"
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/models"
 
 	"gorm.io/gorm"
@@ -21,7 +22,7 @@ func Create(db *gorm.DB, organizationName string, emailDomain string) (*models.O
 
 	result := db.Create(&organization)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(organizations.Create)")
 	}
 
 	return &organization, nil
@@ -35,7 +36,7 @@ func LoadOrganizationByID(db *gorm.DB, organizationID int64) (*models.Organizati
 		Where("organizations.deactivated_at IS NULL").
 		Take(&organization)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(organizations.LoadOrganizationByID)")
 	}
 
 	return &organization, nil
@@ -49,7 +50,7 @@ func LoadOrganizationsByEmailDomain(db *gorm.DB, emailDomain string) ([]models.O
 		Find(&organizations)
 
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(organizations.LoadOrganizationsByEmailDomain)")
 	}
 
 	return organizations, nil
@@ -65,7 +66,7 @@ func LoadOrganizationByApiKey(db *gorm.DB, hashedKey string) (*models.Organizati
 		Where("api_keys.deactivated_at IS NULL").
 		Take(&organization)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(organizations.LoadOrganizationByApiKey)")
 	}
 
 	return &organization, nil

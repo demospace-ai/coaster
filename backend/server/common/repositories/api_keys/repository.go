@@ -1,6 +1,7 @@
 package api_keys
 
 import (
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/models"
 
 	"gorm.io/gorm"
@@ -15,7 +16,7 @@ func CreateApiKey(db *gorm.DB, organizationID int64, encryptedApiKey string, has
 
 	result := db.Create(&apiKey)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(api_keys.CreateApiKey)")
 	}
 
 	return &apiKey, nil
@@ -30,7 +31,7 @@ func LoadApiKeyForOrganization(db *gorm.DB, organizationID int64) (*models.ApiKe
 		Take(&apiKey)
 
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(api_keys.LoadApiKeyForOrganization)")
 	}
 
 	return &apiKey, nil

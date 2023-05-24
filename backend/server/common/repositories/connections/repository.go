@@ -2,6 +2,7 @@ package connections
 
 import (
 	"go.fabra.io/server/common/database"
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/input"
 	"go.fabra.io/server/common/models"
 
@@ -18,7 +19,7 @@ func LoadDataConnections(db *gorm.DB, organizationID int64) ([]models.Connection
 		Find(&connections)
 
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(connections.LoadDataConnections)")
 	}
 
 	return connections, nil
@@ -34,7 +35,7 @@ func LoadConnectionByID(db *gorm.DB, organizationID int64, connectionID int64) (
 		Take(&connection)
 
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(connections.LoadConnectionByID)")
 	}
 
 	return &connection, nil
@@ -50,7 +51,7 @@ func CreateBigQueryConnection(db *gorm.DB, organizationID int64, encryptedCreden
 
 	result := db.Create(&connection)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(connections.CreateBigQueryConnection)")
 	}
 
 	return &connection, nil
@@ -75,7 +76,7 @@ func CreateSnowflakeConnection(
 
 	result := db.Create(&connection)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(connections.CreateSnowflakeConnection)")
 	}
 
 	return &connection, nil
@@ -98,7 +99,7 @@ func CreateRedshiftConnection(
 
 	result := db.Create(&connection)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(connections.CreateRedshiftConnection)")
 	}
 
 	return &connection, nil
@@ -124,7 +125,7 @@ func CreateMongoDbConnection(
 
 	result := db.Create(&connection)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(connections.CreateMongoDbConnection)")
 	}
 
 	return &connection, nil
@@ -147,7 +148,7 @@ func CreateSynapseConnection(
 
 	result := db.Create(&connection)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(connections.CreateSynapseConnection)")
 	}
 
 	return &connection, nil
@@ -170,7 +171,7 @@ func CreatePostgresConnection(
 
 	result := db.Create(&connection)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(connections.CreatePostgresConnection)")
 	}
 
 	return &connection, nil
@@ -191,7 +192,7 @@ func CreateWebhookConnection(
 
 	result := db.Create(&connection)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(connections.CreateWebhookConnection)")
 	}
 
 	return &connection, nil

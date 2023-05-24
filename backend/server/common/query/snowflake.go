@@ -44,7 +44,7 @@ func (it *snowflakeIterator) Next(_ context.Context) (data.Row, error) {
 
 		err := it.queryResult.Scan(valuePtrs...)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "(query.snowflakeIterator.Next)")
 		}
 
 		return convertSnowflakeRow(values, it.schema), nil
@@ -53,7 +53,7 @@ func (it *snowflakeIterator) Next(_ context.Context) (data.Row, error) {
 	defer it.queryResult.Close()
 	err := it.queryResult.Err()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.snowflakeIterator.Next) iterating over query results")
 	}
 
 	return nil, data.ErrDone
@@ -79,7 +79,7 @@ func (sc SnowflakeApiClient) openConnection(ctx context.Context) (*sql.DB, error
 
 	dsn, err := gosnowflake.DSN(&config)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.SnowflakeApiClient.openConnection)")
 	}
 
 	return sql.Open("snowflake", dsn)
@@ -88,7 +88,7 @@ func (sc SnowflakeApiClient) openConnection(ctx context.Context) (*sql.DB, error
 func (sc SnowflakeApiClient) GetTables(ctx context.Context, namespace string) ([]string, error) {
 	client, err := sc.openConnection(ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "opening connection for get table")
+		return nil, errors.Wrap(err, "(query.SnowflakeApiClient.GetTables) opening connection")
 	}
 
 	defer client.Close()
@@ -96,13 +96,13 @@ func (sc SnowflakeApiClient) GetTables(ctx context.Context, namespace string) ([
 	queryString := fmt.Sprintf("SHOW TERSE TABLES IN %s", namespace)
 	queryResult, err := client.Query(queryString)
 	if err != nil {
-		return nil, errors.Wrapf(err, "running query %s", queryString)
+		return nil, errors.Wrap(err, "(query.SnowflakeApiClient.GetTables) running query")
 	}
 	defer queryResult.Close()
 
 	columns, err := queryResult.Columns()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.SnowflakeApiClient.GetTables) getting columns")
 	}
 	numColumns := len(columns)
 
@@ -116,7 +116,7 @@ func (sc SnowflakeApiClient) GetTables(ctx context.Context, namespace string) ([
 		}
 		err := queryResult.Scan(valuePtrs...)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "(query.SnowflakeApiClient.GetTables) scanning row")
 		}
 
 		tableNames = append(tableNames, values[1].(string))
@@ -130,7 +130,7 @@ func (sc SnowflakeApiClient) GetSchema(ctx context.Context, namespace string, ta
 
 	queryResult, err := sc.RunQuery(ctx, queryString)
 	if err != nil {
-		return nil, errors.Wrapf(err, "getting schema for %s.%s", namespace, tableName)
+		return nil, errors.Wrapf(err, "(query.SnowflakeApiClient.GetSchema) getting schema for %s.%s", namespace, tableName)
 	}
 
 	schema := data.Schema{}
@@ -142,7 +142,7 @@ func (sc SnowflakeApiClient) GetSchema(ctx context.Context, namespace string, ta
 		var snowflakeSchema snowflakeSchema
 		err := json.Unmarshal([]byte(row[3].(string)), &snowflakeSchema)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "(query.SnowflakeApiClient.GetSchema) unmarshalling columns")
 		}
 
 		dataType := getSnowflakeFieldType(snowflakeSchema.Type)
@@ -157,7 +157,7 @@ func (sc SnowflakeApiClient) GetFieldValues(ctx context.Context, namespace strin
 
 	queryResult, err := sc.RunQuery(ctx, queryString)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.SnowflakeApiClient.GetFieldValues)")
 	}
 
 	values := []any{}
@@ -176,7 +176,7 @@ func (sc SnowflakeApiClient) GetNamespaces(ctx context.Context) ([]string, error
 	queryString := "SHOW TERSE SCHEMAS"
 	queryResult, err := sc.RunQuery(ctx, queryString)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.SnowflakeApiClient.GetNamespaces)")
 	}
 
 	var namespaces []string
@@ -194,19 +194,19 @@ func (sc SnowflakeApiClient) GetNamespaces(ctx context.Context) ([]string, error
 func (sc SnowflakeApiClient) RunQuery(ctx context.Context, queryString string, args ...any) (*data.QueryResults, error) {
 	client, err := sc.openConnection(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.SnowflakeApiClient.RunQuery) opening connection")
 	}
 	defer client.Close()
 
 	queryResult, err := client.Query(queryString)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.SnowflakeApiClient.RunQuery) running query")
 	}
 	defer queryResult.Close()
 
 	columns, err := queryResult.ColumnTypes()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.SnowflakeApiClient.RunQuery) getting columns")
 	}
 	numColumns := len(columns)
 	schema := convertSnowflakeSchema(columns)
@@ -220,7 +220,7 @@ func (sc SnowflakeApiClient) RunQuery(ctx context.Context, queryString string, a
 		}
 		err := queryResult.Scan(valuePtrs...)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "(query.SnowflakeApiClient.RunQuery) scanning row")
 		}
 
 		rows = append(rows, convertSnowflakeRow(values, schema))
@@ -235,18 +235,18 @@ func (sc SnowflakeApiClient) RunQuery(ctx context.Context, queryString string, a
 func (sc SnowflakeApiClient) GetQueryIterator(ctx context.Context, queryString string) (data.RowIterator, error) {
 	client, err := sc.openConnection(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.SnowflakeApiClient.GetQueryIterator) opening connection")
 	}
 	defer client.Close()
 
 	queryResult, err := client.Query(queryString)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.SnowflakeApiClient.GetQueryIterator) running query")
 	}
 
 	columns, err := queryResult.ColumnTypes()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.SnowflakeApiClient.GetQueryIterator) getting columns")
 	}
 
 	return &snowflakeIterator{

@@ -3,6 +3,7 @@ package link_tokens
 import (
 	"time"
 
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/models"
 	"gorm.io/gorm"
 )
@@ -21,7 +22,7 @@ func CreateLinkToken(db *gorm.DB, organizationID int64, endCustomerID string, ha
 
 	result := db.Create(&linkToken)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(link_tokens.CreateLinkToken)")
 	}
 
 	return &linkToken, nil
@@ -36,7 +37,7 @@ func LoadLinkTokenByHash(db *gorm.DB, hashedToken string) (*models.LinkToken, er
 		Where("link_tokens.expiration >= ?", time.Now()).
 		Take(&linkToken)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(link_tokens.LoadLinkTokenByHash)")
 	}
 
 	return &linkToken, nil

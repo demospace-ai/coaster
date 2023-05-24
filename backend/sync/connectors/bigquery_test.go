@@ -9,6 +9,7 @@ import (
 	"cloud.google.com/go/bigquery"
 	"github.com/golang/mock/gomock"
 	"go.fabra.io/server/common/data"
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/input"
 	mock_query "go.fabra.io/server/common/mocks"
 	"go.fabra.io/server/common/models"
@@ -372,7 +373,7 @@ func waitForWrite(
 		select {
 		case err := <-errC:
 			if err != nil {
-				return nil, err
+				return nil, errors.Wrap(err, "bigquery test waitForWrite")
 			}
 		case writeOutput = <-writeOutputC:
 			return &writeOutput, nil

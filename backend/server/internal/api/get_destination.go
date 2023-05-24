@@ -22,29 +22,29 @@ func (s ApiService) GetDestination(auth auth.Authentication, w http.ResponseWrit
 	vars := mux.Vars(r)
 	strDestinationId, ok := vars["destinationID"]
 	if !ok {
-		return errors.Newf("missing destination ID from GetDestination request URL: %s", r.URL.RequestURI())
+		return errors.Newf("(api.GetDestination) missing destination ID from GetDestination request URL: %s", r.URL.RequestURI())
 	}
 
 	destinationId, err := strconv.ParseInt(strDestinationId, 10, 64)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.GetDestination)")
 	}
 
 	destination, err := destinations.LoadDestinationByID(s.db, auth.Organization.ID, destinationId)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.GetDestination)")
 	}
 
 	connection, err := connections.LoadConnectionByID(s.db, auth.Organization.ID, destination.ConnectionID)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.GetDestination)")
 	}
 
 	var destinationView views.Destination
 	if connection.ConnectionType == models.ConnectionTypeWebhook {
 		webhookSigningKey, err := s.cryptoService.DecryptWebhookSigningKey(connection.Credentials.String)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "(api.GetDestination)")
 		}
 
 		destinationView = views.ConvertWebhook(*destination, *connection, webhookSigningKey)

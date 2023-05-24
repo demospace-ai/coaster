@@ -2,6 +2,7 @@ package destinations
 
 import (
 	"go.fabra.io/server/common/database"
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/models"
 
 	"gorm.io/gorm"
@@ -27,7 +28,7 @@ func CreateDestination(
 
 	result := db.Create(&destination)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(destinations.CreateDestination)")
 	}
 
 	return &destination, nil
@@ -44,7 +45,7 @@ func LoadDestinationByID(db *gorm.DB, organizationID int64, destinationID int64)
 		Take(&destination)
 
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(destinations.LoadDestinationByID)")
 	}
 
 	return &destination, nil
@@ -65,7 +66,7 @@ func LoadAllDestinations(
 		Find(&destinations)
 
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(destinations.LoadAllDestinations)")
 	}
 
 	return destinations, nil

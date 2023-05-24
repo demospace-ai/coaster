@@ -24,39 +24,39 @@ type LinkGetPreviewRequest struct {
 
 func (s ApiService) LinkGetPreview(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.NewBadRequest("must setup organization first")
+		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "(api.LinkGetPreview)")
 	}
 
 	if auth.LinkToken == nil {
-		return errors.NewBadRequest("must send link token")
+		return errors.Wrap(errors.NewBadRequest("must send link token"), "(api.LinkGetPreview)")
 	}
 
 	decoder := json.NewDecoder(r.Body)
 	var getPreviewRequest LinkGetPreviewRequest
 	err := decoder.Decode(&getPreviewRequest)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.LinkGetPreview)")
 	}
 
 	// Needed to ensure end customer ID encoded by the link token owns the source/connection
 	source, err := sources.LoadSourceByID(s.db, auth.Organization.ID, auth.LinkToken.EndCustomerID, getPreviewRequest.SourceID)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.LinkGetPreview)")
 	}
 
 	connection, err := connections.LoadConnectionByID(s.db, auth.Organization.ID, source.ConnectionID)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.LinkGetPreview)")
 	}
 
 	query, err := getPreviewQuery(connection.ConnectionType, getPreviewRequest.Namespace, getPreviewRequest.TableName)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.LinkGetPreview)")
 	}
 
 	queryResults, err := s.queryService.RunQuery(context.TODO(), connection, *query)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.LinkGetPreview)")
 	}
 
 	return json.NewEncoder(w).Encode(queryResults)
@@ -87,6 +87,6 @@ func getPreviewQuery(connectionType models.ConnectionType, namespace string, tab
 		queryStr := fmt.Sprintf("SELECT TOP(100) * FROM %s.%s;", namespace, tableName)
 		return &queryStr, nil
 	default:
-		return nil, errors.Newf("unexpected connection type: %s", connectionType)
+		return nil, errors.Wrap(errors.Newf("unexpected connection type: %s", connectionType), "(api.getPreviewQuery)")
 	}
 }

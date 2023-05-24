@@ -33,11 +33,11 @@ var UNAUTHORIZED_DOMAINS = map[string]bool{
 
 func (s ApiService) OAuthLogin(w http.ResponseWriter, r *http.Request) error {
 	if !r.URL.Query().Has("state") {
-		return errors.Newf("missing state from OAuth Login request URL: %s", r.URL.RequestURI())
+		return errors.Newf("(api.OAuthLogin) missing state from OAuth Login request URL: %s", r.URL.RequestURI())
 	}
 
 	if !r.URL.Query().Has("code") {
-		return errors.Newf("missing code from OAuth Login request URL: %s", r.URL.RequestURI())
+		return errors.Newf("(api.OAuthLogin) missing code from OAuth Login request URL: %s", r.URL.RequestURI())
 	}
 
 	state := r.URL.Query().Get("state")
@@ -45,7 +45,7 @@ func (s ApiService) OAuthLogin(w http.ResponseWriter, r *http.Request) error {
 
 	provider, err := oauth.ValidateState(state)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.OAuthLogin)")
 	}
 
 	var externalUserInfo *oauth.ExternalUserInfo
@@ -55,16 +55,16 @@ func (s ApiService) OAuthLogin(w http.ResponseWriter, r *http.Request) error {
 	case oauth.OauthProviderGithub:
 		externalUserInfo, err = oauth.FetchGithubInfo(code)
 	default:
-		return errors.New("unexpected provider")
+		return errors.Newf("(api.OAuthLogin) unexpected provider %s", *provider)
 	}
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.OAuthLogin)")
 	}
 
 	// separately check for existing user to bypass allowlist for domains
 	user, err := users.LoadByExternalID(s.db, externalUserInfo.ExternalID)
 	if err != nil && !errors.IsRecordNotFound(err) {
-		return err
+		return errors.Wrap(err, "(api.OAuthLogin)")
 	}
 
 	// no user exists yet, so if the domain is not allowed then redirect
@@ -79,13 +79,13 @@ func (s ApiService) OAuthLogin(w http.ResponseWriter, r *http.Request) error {
 
 		user, err = users.CreateUserForExternalInfo(s.db, externalUserInfo)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "(api.OAuthLogin)")
 		}
 	}
 
 	sessionToken, err := sessions.Create(s.db, user.ID)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.OAuthLogin)")
 	}
 
 	auth.AddSessionCookie(w, *sessionToken)

@@ -2,6 +2,7 @@ package objects
 
 import (
 	"go.fabra.io/server/common/database"
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/input"
 	"go.fabra.io/server/common/models"
 
@@ -53,7 +54,7 @@ func CreateObject(
 
 	result := db.Create(&object)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(objects.CreateObject)")
 	}
 
 	return &object, nil
@@ -69,7 +70,7 @@ func LoadObjectByID(db *gorm.DB, organizationID int64, objectID int64) (*models.
 		Take(&object)
 
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(objects.LoadObjectByID)")
 	}
 
 	return &object, nil
@@ -86,7 +87,7 @@ func LoadObjectsByIDs(db *gorm.DB, organizationID int64, objectIDs []int64) ([]m
 		Find(&objects)
 
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(objects.LoadObjectsByIDs)")
 	}
 
 	return objects, nil
@@ -105,7 +106,7 @@ func LoadAllObjects(
 		Find(&objects)
 
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(objects.LoadAllObjects)")
 	}
 
 	return objects, nil
@@ -135,7 +136,7 @@ func CreateObjectFields(
 
 		result := db.Create(&objectFieldModel)
 		if result.Error != nil {
-			return nil, result.Error
+			return nil, errors.Wrap(result.Error, "(objects.CreateObjectFields)")
 		}
 		createdObjectFields = append(createdObjectFields, objectFieldModel)
 	}
@@ -156,7 +157,7 @@ func LoadObjectFieldsByID(
 		Find(&objectFields)
 
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(objects.LoadObjectFieldsByID)")
 	}
 
 	return objectFields, nil

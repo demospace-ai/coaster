@@ -26,46 +26,46 @@ type CreateLinkTokenResponse struct {
 
 func (s ApiService) CreateLinkToken(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.NewBadRequest("cannot request users without organization")
+		return errors.Wrap(errors.NewBadRequest("cannot request users without organization"), "(api.CreateLinkToken)")
 	}
 
 	decoder := json.NewDecoder(r.Body)
 	var createLinkTokenRequest CreateLinkTokenRequest
 	err := decoder.Decode(&createLinkTokenRequest)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.CreateLinkToken)")
 	}
 
 	rawLinkToken := generateLinkToken()
 	_, err = link_tokens.CreateLinkToken(s.db, auth.Organization.ID, createLinkTokenRequest.EndCustomerID, crypto.HashString(rawLinkToken))
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.CreateLinkToken)")
 	}
 
 	if createLinkTokenRequest.WebhookData != nil {
 		if createLinkTokenRequest.WebhookData.EndCustomerApiKey != nil {
 			encryptedEndCustomerApiKey, err := s.cryptoService.EncryptEndCustomerApiKey(*createLinkTokenRequest.WebhookData.EndCustomerApiKey)
 			if err != nil {
-				return err
+				return errors.Wrap(err, "(api.CreateLinkToken)")
 			}
 
 			// this operation always replaces the existing api key
 			err = s.db.Transaction(func(tx *gorm.DB) error {
 				err = webhooks.DeactivateExistingEndCustomerApiKey(tx, auth.Organization.ID, createLinkTokenRequest.EndCustomerID)
 				if err != nil {
-					return err
+					return errors.Wrap(err, "(api.CreateLinkToken)")
 				}
 
 				err = webhooks.CreateEndCustomerApiKey(tx, auth.Organization.ID, createLinkTokenRequest.EndCustomerID, *encryptedEndCustomerApiKey)
 				if err != nil {
-					return err
+					return errors.Wrap(err, "(api.CreateLinkToken)")
 				}
 
 				return nil
 			})
 
 			if err != nil {
-				return err
+				return errors.Wrap(err, "(api.CreateLinkToken)")
 			}
 		}
 	}

@@ -52,5 +52,5 @@ func getSourceCursorFieldType(sourceCursorFieldName string, fieldMappings []view
 		}
 	}
 
-	return nil, errors.Newf("could not find field for cursor field name: %s", sourceCursorFieldName)
+	return nil, errors.Newf("(connectors.getSourceCursorFieldType) could not find field for cursor field name: %s", sourceCursorFieldName)
 }

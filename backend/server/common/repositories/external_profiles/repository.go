@@ -1,6 +1,7 @@
 package external_profiles
 
 import (
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/oauth"
 
@@ -15,7 +16,7 @@ func Create(db *gorm.DB, externalID string, oauthProvider oauth.OauthProvider, u
 	}
 	result := db.Create(&externalProfile)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(external_profiles.Create)")
 	}
 
 	return &externalProfile, nil

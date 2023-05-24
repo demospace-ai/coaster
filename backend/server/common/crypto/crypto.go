@@ -63,7 +63,7 @@ func encrypt(keyName string, plaintextString string) (*string, error) {
 	ctx := context.Background()
 	client, err := kms.NewKeyManagementClient(ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create kms client")
+		return nil, errors.Wrap(err, "(crypto.encrypt) failed to create kms client")
 	}
 	defer client.Close()
 
@@ -83,14 +83,14 @@ func encrypt(keyName string, plaintextString string) (*string, error) {
 
 	result, err := client.Encrypt(ctx, req)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to encrypt")
+		return nil, errors.Wrap(err, "(crypto.encrypt) failed to encrypt")
 	}
 
 	if !result.VerifiedPlaintextCrc32C {
-		return nil, errors.Newf("encrypt: request corrupted in-transit")
+		return nil, errors.Newf("(crypto.encrypt) request corrupted in-transit")
 	}
 	if int64(crc32c(result.Ciphertext)) != result.CiphertextCrc32C.Value {
-		return nil, errors.Newf("encrypt: response corrupted in-transit")
+		return nil, errors.Newf("(crypto.encrypt) response corrupted in-transit")
 	}
 
 	ciphertext := hex.EncodeToString(result.Ciphertext)
@@ -100,7 +100,7 @@ func encrypt(keyName string, plaintextString string) (*string, error) {
 func decrypt(keyName string, ciphertextString string) (*string, error) {
 	ciphertext, err := hex.DecodeString(ciphertextString)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(crypto.decrypt)")
 	}
 
 	// TODO: decrypt with local keys here
@@ -113,7 +113,7 @@ func decrypt(keyName string, ciphertextString string) (*string, error) {
 	ctx := context.Background()
 	client, err := kms.NewKeyManagementClient(ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create kms client")
+		return nil, errors.Wrap(err, "(crypto.decrypt) failed to create kms client")
 	}
 	defer client.Close()
 
@@ -131,11 +131,11 @@ func decrypt(keyName string, ciphertextString string) (*string, error) {
 
 	result, err := client.Decrypt(ctx, req)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to decrypt ciphertext")
+		return nil, errors.Wrap(err, "(crypto.decrypt) failed to decrypt ciphertext")
 	}
 
 	if int64(crc32c(result.Plaintext)) != result.PlaintextCrc32C.Value {
-		return nil, errors.Newf("decrypt: response corrupted in-transit")
+		return nil, errors.Newf("(crypto.decrypt) response corrupted in-transit")
 	}
 
 	plaintext := string(result.Plaintext)
@@ -145,7 +145,7 @@ func decrypt(keyName string, ciphertextString string) (*string, error) {
 func (cs CryptoServiceImpl) DecryptConnectionCredentials(encryptedCredentials string) (*string, error) {
 	credentials, err := decrypt(CONNECTION_KEY, encryptedCredentials)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(crypto.DecryptConnectionCredentials)")
 	}
 
 	return credentials, nil
@@ -154,7 +154,7 @@ func (cs CryptoServiceImpl) DecryptConnectionCredentials(encryptedCredentials st
 func (cs CryptoServiceImpl) EncryptConnectionCredentials(credentials string) (*string, error) {
 	encryptedCredentials, err := encrypt(CONNECTION_KEY, credentials)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(crypto.EncryptConnectionCredentials)")
 	}
 
 	return encryptedCredentials, nil
@@ -163,7 +163,7 @@ func (cs CryptoServiceImpl) EncryptConnectionCredentials(credentials string) (*s
 func (cs CryptoServiceImpl) DecryptApiKey(encryptedApiKey string) (*string, error) {
 	apiKey, err := decrypt(API_KEY_KEY, encryptedApiKey)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(crypto.DecryptApiKey)")
 	}
 
 	return apiKey, nil
@@ -172,7 +172,7 @@ func (cs CryptoServiceImpl) DecryptApiKey(encryptedApiKey string) (*string, erro
 func (cs CryptoServiceImpl) EncryptApiKey(apiKey string) (*string, error) {
 	encryptedApiKey, err := encrypt(API_KEY_KEY, apiKey)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(crypto.EncryptApiKey)")
 	}
 
 	return encryptedApiKey, nil
@@ -181,7 +181,7 @@ func (cs CryptoServiceImpl) EncryptApiKey(apiKey string) (*string, error) {
 func (cs CryptoServiceImpl) DecryptWebhookSigningKey(encryptedWebhookSigningKey string) (*string, error) {
 	webhookSigningKey, err := decrypt(WEBHOOK_SIGNING_KEY_KEY, encryptedWebhookSigningKey)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(crypto.DecryptWebhookSigningKey)")
 	}
 
 	return webhookSigningKey, nil
@@ -190,7 +190,7 @@ func (cs CryptoServiceImpl) DecryptWebhookSigningKey(encryptedWebhookSigningKey 
 func (cs CryptoServiceImpl) EncryptWebhookSigningKey(webhookSigningKey string) (*string, error) {
 	encryptedWebhookSigningKey, err := encrypt(WEBHOOK_SIGNING_KEY_KEY, webhookSigningKey)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(crypto.EncryptWebhookSigningKey)")
 	}
 
 	return encryptedWebhookSigningKey, nil
@@ -199,7 +199,7 @@ func (cs CryptoServiceImpl) EncryptWebhookSigningKey(webhookSigningKey string) (
 func (cs CryptoServiceImpl) DecryptEndCustomerApiKey(encryptedEndCustomerApiKey string) (*string, error) {
 	endCustomerApiKey, err := decrypt(END_CUSTOMER_API_KEY_KEY, encryptedEndCustomerApiKey)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(crypto.DecryptEndCustomerApiKey)")
 	}
 
 	return endCustomerApiKey, nil
@@ -208,7 +208,7 @@ func (cs CryptoServiceImpl) DecryptEndCustomerApiKey(encryptedEndCustomerApiKey 
 func (cs CryptoServiceImpl) EncryptEndCustomerApiKey(endCustomerApi string) (*string, error) {
 	encryptedEndCustomerApiKey, err := encrypt(END_CUSTOMER_API_KEY_KEY, endCustomerApi)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(crypto.EncryptEndCustomerApiKey)")
 	}
 
 	return encryptedEndCustomerApiKey, nil

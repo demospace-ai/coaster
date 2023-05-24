@@ -3,6 +3,7 @@ package webhooks
 import (
 	"time"
 
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/models"
 	"gorm.io/gorm"
 )
@@ -16,7 +17,7 @@ func CreateEndCustomerApiKey(db *gorm.DB, organizationID int64, endCustomerID st
 
 	result := db.Create(&endCustomerApiKey)
 	if result.Error != nil {
-		return result.Error
+		return errors.Wrap(result.Error, "(api_keys.CreateEndCustomerApiKey)")
 	}
 
 	return nil
@@ -32,7 +33,7 @@ func LoadEndCustomerApiKey(db *gorm.DB, organizationID int64, endCustomerID stri
 		Take(&endCustomerApiKey)
 
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(api_keys.LoadEndCustomerApiKey)")
 	}
 
 	return &endCustomerApiKey.EncryptedKey, nil
@@ -45,7 +46,7 @@ func DeactivateExistingEndCustomerApiKey(db *gorm.DB, organizationID int64, endC
 		Update("deactivated_at", time.Now())
 
 	if result.Error != nil {
-		return result.Error
+		return errors.Wrap(result.Error, "(api_keys.DeactivateExistingEndCustomerApiKey)")
 	}
 
 	return nil

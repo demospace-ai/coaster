@@ -84,12 +84,12 @@ func initDatabaseDev() (*gorm.DB, error) {
 		),
 	})
 	if err != nil {
-		return nil, errors.Wrap(err, "sql.Open")
+		return nil, errors.Wrap(err, "(database.initDatabaseDev) sql.Open")
 	}
 
 	sqldb, err := db.DB()
 	if err != nil {
-		return nil, errors.Wrap(err, "error getting raw DB handle")
+		return nil, errors.Wrap(err, "(database.initDatabaseDev) error getting raw DB handle")
 	}
 
 	sqldb.SetMaxOpenConns(10)
@@ -108,7 +108,7 @@ func initDatabaseProd() (*gorm.DB, error) {
 
 	dbPwd, err := secret.FetchSecret(context.TODO(), DB_PASSWORD_KEY)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(database.initDatabaseProd) fetching secret)")
 	}
 
 	// TODO: use client certificates here and enforce SSL verify full on Cloud SQL
@@ -118,7 +118,7 @@ func initDatabaseProd() (*gorm.DB, error) {
 		Logger: logger.Default.LogMode(logger.Silent),
 	})
 	if err != nil {
-		return nil, errors.Wrap(err, "sql.Open")
+		return nil, errors.Wrap(err, "(database.initDatabaseProd) sql.Open")
 	}
 
 	return db, nil

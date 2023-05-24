@@ -67,17 +67,17 @@ func (qs QueryServiceImpl) GetClient(ctx context.Context, connection *models.Con
 	case models.ConnectionTypeBigQuery:
 		bigQueryCredentialsString, err := qs.cryptoService.DecryptConnectionCredentials(connection.Credentials.String)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "(query.QueryServiceImpl.GetClient) decrypting BigQuery credentials")
 		}
 
 		var bigQueryCredentials models.BigQueryCredentials
 		err = json.Unmarshal([]byte(*bigQueryCredentialsString), &bigQueryCredentials)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "(query.QueryServiceImpl.GetClient) unmarshalling BigQuery credentials")
 		}
 
 		if !connection.Location.Valid {
-			return nil, errors.New("bigquery connection must have location defined")
+			return nil, errors.New("(query.QueryServiceImpl.GetClient) BigQuery connection must have location defined")
 		}
 
 		return BigQueryApiClient{
@@ -88,7 +88,7 @@ func (qs QueryServiceImpl) GetClient(ctx context.Context, connection *models.Con
 	case models.ConnectionTypeSnowflake:
 		snowflakePassword, err := qs.cryptoService.DecryptConnectionCredentials(connection.Password.String)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "(query.QueryServiceImpl.GetClient) decrypting Snowflake password")
 		}
 
 		// TODO: validate all connection params
@@ -103,7 +103,7 @@ func (qs QueryServiceImpl) GetClient(ctx context.Context, connection *models.Con
 	case models.ConnectionTypeRedshift:
 		redshiftPassword, err := qs.cryptoService.DecryptConnectionCredentials(connection.Password.String)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "(query.QueryServiceImpl.GetClient) decrypting Redshift password")
 		}
 
 		// TODO: validate all connection params
@@ -116,7 +116,7 @@ func (qs QueryServiceImpl) GetClient(ctx context.Context, connection *models.Con
 	case models.ConnectionTypeSynapse:
 		synapsePassword, err := qs.cryptoService.DecryptConnectionCredentials(connection.Password.String)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "(query.QueryServiceImpl.GetClient) decrypting Synapse password")
 		}
 
 		// TODO: validate all connection params
@@ -129,7 +129,7 @@ func (qs QueryServiceImpl) GetClient(ctx context.Context, connection *models.Con
 	case models.ConnectionTypeMongoDb:
 		mongodbPassword, err := qs.cryptoService.DecryptConnectionCredentials(connection.Password.String)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "(query.QueryServiceImpl.GetClient) decrypting MongoDB password")
 		}
 
 		// TODO: validate all connection params
@@ -142,7 +142,7 @@ func (qs QueryServiceImpl) GetClient(ctx context.Context, connection *models.Con
 	case models.ConnectionTypePostgres:
 		postgresPassword, err := qs.cryptoService.DecryptConnectionCredentials(connection.Password.String)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "(query.QueryServiceImpl.GetClient) decrypting Postgres password")
 		}
 
 		// TODO: validate all connection params
@@ -153,7 +153,7 @@ func (qs QueryServiceImpl) GetClient(ctx context.Context, connection *models.Con
 			Host:         connection.Host.String,
 		}, nil
 	default:
-		return nil, errors.Newf("unrecognized warehouse type %v", connection.ConnectionType)
+		return nil, errors.Newf("(query.QueryServiceImpl.GetClient) unrecognized warehouse type %v", connection.ConnectionType)
 	}
 }
 
@@ -162,17 +162,17 @@ func (qs QueryServiceImpl) GetWarehouseClient(ctx context.Context, connection *m
 	case models.ConnectionTypeBigQuery:
 		bigQueryCredentialsString, err := qs.cryptoService.DecryptConnectionCredentials(connection.Credentials.String)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "(query.QueryServiceImpl.GetWarehouseClient) decrypting BigQuery credentials")
 		}
 
 		var bigQueryCredentials models.BigQueryCredentials
 		err = json.Unmarshal([]byte(*bigQueryCredentialsString), &bigQueryCredentials)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "(query.QueryServiceImpl.GetClient) unmarshalling BigQuery credentials")
 		}
 
 		if !connection.Location.Valid {
-			return nil, errors.New("bigquery connection must have location defined")
+			return nil, errors.New("(query.QueryServiceImpl.GetWarehouseClient) BigQuery connection must have location defined")
 		}
 
 		return BigQueryApiClient{
@@ -181,14 +181,14 @@ func (qs QueryServiceImpl) GetWarehouseClient(ctx context.Context, connection *m
 			Location:    &connection.Location.String,
 		}, nil
 	default:
-		return nil, errors.Newf("unrecognized warehouse type %v", connection.ConnectionType)
+		return nil, errors.Newf("(query.QueryServiceImpl.GetWarehouseClient) unrecognized warehouse type %v", connection.ConnectionType)
 	}
 }
 
 func (qs QueryServiceImpl) RunQuery(ctx context.Context, connection *models.Connection, queryString string) (*data.QueryResults, error) {
 	client, err := qs.GetClient(ctx, connection)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.QueryServiceImpl.RunQuery)")
 	}
 
 	return client.RunQuery(ctx, queryString)
@@ -197,7 +197,7 @@ func (qs QueryServiceImpl) RunQuery(ctx context.Context, connection *models.Conn
 func (qs QueryServiceImpl) GetQueryIterator(ctx context.Context, connection *models.Connection, queryString string) (data.RowIterator, error) {
 	client, err := qs.GetClient(ctx, connection)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.QueryServiceImpl.GetQueryIterator)")
 	}
 
 	return client.GetQueryIterator(ctx, queryString)
@@ -206,7 +206,7 @@ func (qs QueryServiceImpl) GetQueryIterator(ctx context.Context, connection *mod
 func (qs QueryServiceImpl) GetNamespaces(ctx context.Context, connection *models.Connection) ([]string, error) {
 	client, err := qs.GetClient(ctx, connection)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.QueryServiceImpl.GetNamespaces)")
 	}
 
 	return client.GetNamespaces(ctx)
@@ -215,7 +215,7 @@ func (qs QueryServiceImpl) GetNamespaces(ctx context.Context, connection *models
 func (qs QueryServiceImpl) GetTables(ctx context.Context, connection *models.Connection, namespace string) ([]string, error) {
 	client, err := qs.GetClient(ctx, connection)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.QueryServiceImpl.GetTables)")
 	}
 
 	return client.GetTables(ctx, namespace)
@@ -224,7 +224,7 @@ func (qs QueryServiceImpl) GetTables(ctx context.Context, connection *models.Con
 func (qs QueryServiceImpl) GetSchema(ctx context.Context, connection *models.Connection, namespace string, tableName string) ([]data.Field, error) {
 	client, err := qs.GetClient(ctx, connection)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.QueryServiceImpl.GetSchema)")
 	}
 
 	return client.GetSchema(ctx, namespace, tableName)
@@ -233,7 +233,7 @@ func (qs QueryServiceImpl) GetSchema(ctx context.Context, connection *models.Con
 func (qs QueryServiceImpl) GetFieldValues(ctx context.Context, connection *models.Connection, namespace string, tableName string, fieldName string) ([]any, error) {
 	client, err := qs.GetClient(ctx, connection)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(query.QueryServiceImpl.GetFieldValues)")
 	}
 
 	return client.GetFieldValues(ctx, namespace, tableName, fieldName)

@@ -74,7 +74,7 @@ func SyncWorkflow(ctx workflow.Context, input SyncInput) error {
 		UpdateType:     UpdateTypeCreate,
 	}).Get(recordCtx, &syncRun)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(workflow.RecordStatus)")
 	}
 
 	var syncConfig SyncConfig
@@ -84,7 +84,7 @@ func SyncWorkflow(ctx workflow.Context, input SyncInput) error {
 		// Ignore the error returned here. It is logged by Temporal as the activity task
 		// failing, and the reason for the workflow failing is the original error
 		recordFailure(recordCtx, err, syncRun)
-		return err
+		return errors.Wrap(err, "(workflow.FetchConfig)")
 	}
 
 	var replicateOutput ReplicateOutput
@@ -94,7 +94,7 @@ func SyncWorkflow(ctx workflow.Context, input SyncInput) error {
 		// Ignore the error returned here. It is logged by Temporal as the activity task
 		// failing, and the reason for the workflow failing is the original error
 		recordFailure(recordCtx, err, syncRun)
-		return err
+		return errors.Wrap(err, "(workflow.Replicate)")
 	}
 
 	if syncConfig.Sync.SyncMode.UsesCursor() && replicateOutput.CursorPosition != nil {
@@ -107,7 +107,7 @@ func SyncWorkflow(ctx workflow.Context, input SyncInput) error {
 			// Ignore the error returned here. It is logged by Temporal as the activity task
 			// failing, and the reason for the workflow failing is the original error
 			recordFailure(recordCtx, err, syncRun)
-			return err
+			return errors.Wrap(err, "(workflow.UpdateCursor)")
 		}
 	}
 

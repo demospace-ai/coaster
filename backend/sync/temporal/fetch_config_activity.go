@@ -33,48 +33,48 @@ type SyncConfig struct {
 func (a *Activities) FetchConfig(ctx context.Context, input FetchConfigInput) (*SyncConfig, error) {
 	sync, err := syncs.LoadSyncByID(a.Db, input.OrganizationID, input.SyncID)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(temporal.FetchConfig) failed to load sync")
 	}
 
 	source, err := sources.LoadSourceByID(a.Db, input.OrganizationID, sync.EndCustomerID, sync.SourceID)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(temporal.FetchConfig) failed to load source")
 	}
 
 	sourceConnection, err := connections.LoadConnectionByID(a.Db, input.OrganizationID, source.ConnectionID)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(temporal.FetchConfig) failed to load source connection")
 	}
 
 	object, err := objects.LoadObjectByID(a.Db, input.OrganizationID, sync.ObjectID)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(temporal.FetchConfig) failed to load object")
 	}
 
 	destination, err := destinations.LoadDestinationByID(a.Db, input.OrganizationID, object.DestinationID)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(temporal.FetchConfig) failed to load destination")
 	}
 
 	destinationConnection, err := connections.LoadConnectionByID(a.Db, input.OrganizationID, destination.ConnectionID)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(temporal.FetchConfig) failed to load destination connection")
 	}
 
 	fieldMappings, err := syncs.LoadFieldMappingsForSync(a.Db, input.SyncID)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(temporal.FetchConfig) failed to load field mappings")
 	}
 
 	objectFields, err := objects.LoadObjectFieldsByID(a.Db, object.ID)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(temporal.FetchConfig) failed to load object fields")
 	}
 
 	encryptedEndCustomerApiKey, err := webhooks.LoadEndCustomerApiKey(a.Db, input.OrganizationID, sync.EndCustomerID)
 	// This might be missing, but that's ok-- it isn't required
 	if err != nil && !errors.IsRecordNotFound(err) {
-		return nil, err
+		return nil, errors.Wrap(err, "(temporal.FetchConfig) failed to load end customer api key")
 	}
 
 	// TODO: encrypt this value before returning it, even though the credentials are already encrypted

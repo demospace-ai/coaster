@@ -126,7 +126,7 @@ func (md MongoDbImpl) getReadQuery(sourceConnection *models.Connection, sync vie
 		if sync.CursorPosition != nil {
 			sourceCursorFieldType, err := getSourceCursorFieldType(*sync.SourceCursorField, fieldMappings)
 			if err != nil {
-				return nil, err
+				return nil, errors.Wrap(err, "(connectors.MongoDbImpl.getReadQuery) error getting source cursor field type")
 			}
 
 			var comparisonValue any
@@ -134,7 +134,7 @@ func (md MongoDbImpl) getReadQuery(sourceConnection *models.Connection, sync vie
 			case data.FieldTypeDateTimeTz:
 				timeCursor, err := time.Parse(query.FABRA_TIMESTAMP_TZ_FORMAT, *sync.CursorPosition)
 				if err != nil {
-					return nil, err
+					return nil, errors.Wrap(err, "(connectors.MongoDbImpl.getReadQuery) error parsing cursor position")
 				}
 				comparisonValue = primitive.NewDateTimeFromTime(timeCursor)
 			default:

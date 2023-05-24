@@ -27,44 +27,44 @@ func (s ApiService) SetOrganization(auth auth.Authentication, w http.ResponseWri
 	var setOrganizationRequest SetOrganizationRequest
 	err := decoder.Decode(&setOrganizationRequest)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.SetOrganization)")
 	}
 
 	if auth.User.OrganizationID.Valid {
-		return errors.New("user already has an organization")
+		return errors.New("(api.SetOrganization) user already has an organization")
 	}
 
 	var userEmailDomain = strings.Split(auth.User.Email, "@")[1]
 
 	if setOrganizationRequest.OrganizationName == nil && setOrganizationRequest.OrganizationID == nil {
-		return errors.New("must specify either organization name or ID")
+		return errors.New("(api.SetOrganization) must specify either organization name or ID")
 	}
 
 	var organization *models.Organization
 	if setOrganizationRequest.OrganizationName != nil {
 		organization, err = organizations.Create(s.db, *setOrganizationRequest.OrganizationName, userEmailDomain)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "(api.SetOrganization)")
 		}
 
 		_, err = users.SetOrganization(s.db, auth.User, organization.ID)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "(api.SetOrganization)")
 		}
 	} else {
 		organization, err = organizations.LoadOrganizationByID(s.db, *setOrganizationRequest.OrganizationID)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "(api.SetOrganization)")
 		}
 
 		// TODO: additional validation if the user can join this organization beyond the domain matching
 		if organization.EmailDomain != userEmailDomain {
-			return errors.New("cannot join this organization")
+			return errors.New("(api.SetOrganization) cannot join this organization")
 		}
 
 		_, err = users.SetOrganization(s.db, auth.User, organization.ID)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "(api.SetOrganization)")
 		}
 	}
 

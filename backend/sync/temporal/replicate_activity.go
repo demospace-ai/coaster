@@ -41,12 +41,12 @@ func (a *Activities) Replicate(ctx context.Context, input ReplicateInput) (*Repl
 
 	sourceConnector, err := getSourceConnector(ctx, input.SourceConnection, queryService)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(temporal.Replicate) getSourceConnector")
 	}
 
 	destConnector, err := getDestinationConnector(ctx, input.DestinationConnection, queryService, cryptoService, input.EncryptedEndCustomerApiKey)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(temporal.Replicate) getDestinationConnector")
 	}
 
 	go safeCall(func() {
@@ -71,11 +71,11 @@ func (a *Activities) Replicate(ctx context.Context, input ReplicateInput) (*Repl
 		select {
 		case err = <-readErrC:
 			if err != nil {
-				return nil, err
+				return nil, errors.Wrap(err, "(temporal.Replicate) readErrC")
 			}
 		case err = <-writeErrC:
 			if err != nil {
-				return nil, err
+				return nil, errors.Wrap(err, "(temporal.Replicate) writeErrC")
 			}
 		case readOutput = <-readOutputC:
 			readDone = true
@@ -99,7 +99,7 @@ func getSourceConnector(ctx context.Context, connection views.FullConnection, qu
 	case models.ConnectionTypeBigQuery:
 		warehouseClient, err := queryService.GetWarehouseClient(ctx, connectionModel)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "(temporal.getSourceConnector)")
 		}
 		return connectors.NewBigQueryConnector(warehouseClient), nil
 	case models.ConnectionTypeSnowflake:
@@ -113,7 +113,7 @@ func getSourceConnector(ctx context.Context, connection views.FullConnection, qu
 	case models.ConnectionTypePostgres:
 		return connectors.NewPostgresConnector(queryService), nil
 	default:
-		return nil, errors.Newf("source not implemented for %s", connection.ConnectionType)
+		return nil, errors.Newf("(temporal.getSourceConnector) source not implemented for %s", connection.ConnectionType)
 	}
 }
 
@@ -123,14 +123,14 @@ func getDestinationConnector(ctx context.Context, connection views.FullConnectio
 	case models.ConnectionTypeBigQuery:
 		warehouseClient, err := queryService.GetWarehouseClient(ctx, connectionModel)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "(temporal.getDestinationConnector)")
 		}
 		return connectors.NewBigQueryConnector(warehouseClient), nil
 	case models.ConnectionTypeWebhook:
 		// TODO: does end customer api key belong here?
 		return connectors.NewWebhookConnector(queryService, cryptoService, encryptedEndCustomerApiKey), nil
 	default:
-		return nil, errors.Newf("destination not implemented for %s", connection.ConnectionType)
+		return nil, errors.Newf("(temporal.getDestinationConnector) destination not implemented for %s", connection.ConnectionType)
 	}
 }
 

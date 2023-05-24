@@ -53,7 +53,7 @@ func FetchGithubInfo(code string) (*ExternalUserInfo, error) {
 	secretKey := getGithubSecretKey()
 	githubClientSecret, err := secret.FetchSecret(context.TODO(), secretKey)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(oauth.FetchGithubInfo) fetching secret")
 	}
 
 	oauthConf := &oauth2.Config{
@@ -66,19 +66,19 @@ func FetchGithubInfo(code string) (*ExternalUserInfo, error) {
 
 	token, err := oauthConf.Exchange(context.TODO(), code)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(oauth.FetchGithubInfo) exchanging code for token")
 	}
 
 	oauthClient := oauthConf.Client(context.TODO(), token)
 	client := github.NewClient(oauthClient)
 	user, _, err := client.Users.Get(context.TODO(), "") // empty string will get info for authenticated user
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(oauth.FetchGithubInfo) extracting user")
 	}
 
 	emails, _, err := client.Users.ListEmails(context.TODO(), nil)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(oauth.FetchGithubInfo) extracting email")
 	}
 
 	var primaryEmail string
@@ -89,7 +89,7 @@ func FetchGithubInfo(code string) (*ExternalUserInfo, error) {
 	}
 
 	if primaryEmail == "" {
-		return nil, errors.New("could not find primary email")
+		return nil, errors.New("(oauth.FetchGithubInfo) could not find primary email")
 	}
 
 	return &ExternalUserInfo{
@@ -104,7 +104,7 @@ func FetchGoogleInfo(code string) (*ExternalUserInfo, error) {
 	secretKey := getGoogleSecretKey()
 	googleClientSecret, err := secret.FetchSecret(context.TODO(), secretKey)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(oauth.FetchGoogleInfo) fetching secret")
 	}
 
 	clientId := getGoogleClientID()
@@ -118,23 +118,23 @@ func FetchGoogleInfo(code string) (*ExternalUserInfo, error) {
 
 	oauth2Token, err := oauthConf.Exchange(context.TODO(), code)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(oauth.FetchGoogleInfo) exchanging code for token")
 	}
 
 	// Extract the ID Token from OAuth2 token.
 	rawIDToken, ok := oauth2Token.Extra("id_token").(string)
 	if !ok {
-		return nil, errors.Newf("no id_token included in token exchange response: %+v", oauth2Token)
+		return nil, errors.Newf("(oauth.FetchGoogleInfo) no id_token included in token exchange response: %+v", oauth2Token)
 	}
 
 	validator, err := idtoken.NewValidator(context.TODO())
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(oauth.FetchGoogleInfo) creating validator")
 	}
 
 	payload, err := validator.Validate(context.TODO(), rawIDToken, clientId)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(oauth.FetchGoogleInfo) validating token")
 	}
 
 	return &ExternalUserInfo{
@@ -177,7 +177,7 @@ func GetOauthRedirect(strProvider string) (*string, error) {
 
 	signedString, err := token.SignedString(nil)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(oauth.GetOauthRedirect) signing token")
 	}
 
 	url := oauthConf.AuthCodeURL(signedString, oauth2.AccessTypeOnline, oauth2.ApprovalForce)
@@ -191,7 +191,7 @@ func ValidateState(state string) (*OauthProvider, error) {
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(oauth.ValidateState) parsing token")
 	}
 
 	if !token.Valid {

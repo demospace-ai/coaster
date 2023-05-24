@@ -3,6 +3,7 @@ package syncs
 import (
 	"github.com/google/uuid"
 	"go.fabra.io/server/common/database"
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/input"
 	"go.fabra.io/server/common/models"
 
@@ -57,7 +58,7 @@ func CreateSync(
 
 	result := db.Create(&sync)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(syncs.CreateSync)")
 	}
 
 	return &sync, nil
@@ -82,7 +83,7 @@ func CreateFieldMappings(
 
 		result := db.Create(&fieldMappingModel)
 		if result.Error != nil {
-			return nil, result.Error
+			return nil, errors.Wrap(result.Error, "(syncs.CreateFieldMappings)")
 		}
 		createdFieldMappings = append(createdFieldMappings, fieldMappingModel)
 	}
@@ -100,7 +101,7 @@ func LoadSyncByID(db *gorm.DB, organizationID int64, syncID int64) (*models.Sync
 		Take(&sync)
 
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(syncs.LoadSyncByID)")
 	}
 
 	return &sync, nil
@@ -117,7 +118,7 @@ func LoadSyncByIDAndCustomer(db *gorm.DB, organizationID int64, endCustomerID st
 		Take(&sync)
 
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(syncs.LoadSyncByIDAndCustomer)")
 	}
 
 	return &sync, nil
@@ -136,7 +137,7 @@ func LoadAllSyncs(
 		Find(&sync)
 
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(syncs.LoadAllSyncs)")
 	}
 
 	return sync, nil
@@ -157,7 +158,7 @@ func LoadAllSyncsForCustomer(
 		Find(&sync)
 
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(syncs.LoadAllSyncsForCustomer)")
 	}
 
 	return sync, nil
@@ -176,7 +177,7 @@ func LoadFieldMappingsForSync(
 		Find(&fieldMappings)
 
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(syncs.LoadFieldMappingsForSync)")
 	}
 
 	return fieldMappings, nil
@@ -193,7 +194,7 @@ func UpdateCursor(
 
 	result := db.Model(sync).Updates(updates)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(syncs.UpdateCursor)")
 	}
 
 	return sync, nil

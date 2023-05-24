@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"go.fabra.io/server/common/application"
+	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/secret"
 )
@@ -22,14 +23,14 @@ func GenerateIntercomHash(user models.User) (*string, error) {
 
 	hashKey, err := secret.FetchSecret(context.TODO(), INTERCOM_SECRET_KEY_KEY)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(intercom.GenerateIntercomHash) fetching secret")
 	}
 
 	h := hmac.New(sha256.New, []byte(*hashKey))
 
 	_, err = h.Write([]byte(fmt.Sprintf("%d", user.ID)))
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "(intercom.GenerateIntercomHash) writing hash")
 	}
 
 	// Get result and encode as hexadecimal string

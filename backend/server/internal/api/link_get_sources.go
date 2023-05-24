@@ -16,18 +16,18 @@ type GetSourcesResponse struct {
 
 func (s ApiService) LinkGetSources(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.NewBadRequest("must setup organization first")
+		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "(api.LinkGetSources)")
 	}
 
 	if auth.LinkToken == nil {
-		return errors.NewBadRequest("must send link token")
+		return errors.Wrap(errors.NewBadRequest("must send link token"), "(api.LinkGetSources)")
 	}
 
 	// TODO: write test to make sure only authorized users can use the data connection
 	// Needed to ensure end customer ID encoded by the link token owns the source/connection
 	sources, err := sources.LoadAllSources(s.db, auth.Organization.ID, auth.LinkToken.EndCustomerID)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "(api.LinkGetSources)")
 	}
 
 	return json.NewEncoder(w).Encode(GetSourcesResponse{
