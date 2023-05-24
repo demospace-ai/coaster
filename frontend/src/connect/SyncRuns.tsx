@@ -50,7 +50,7 @@ const SyncRunsList: React.FC<{ linkToken: string }> = ({ linkToken }) => {
     },
   );
 
-  const renderButtonStatus = () => {
+  const renderRunSyncResult = () => {
     if (runSyncMutation.isFailed) {
       return (
         <div className="tw-flex tw-flex-row tw-items-center tw-justify-start">
@@ -77,7 +77,7 @@ const SyncRunsList: React.FC<{ linkToken: string }> = ({ linkToken }) => {
       <div className="tw-flex tw-w-full tw-mb-8">
         <div className="tw-pointer-events-none tw-fixed tw-w-full tw-h-full">
           <Toast
-            content={renderButtonStatus()}
+            content={renderRunSyncResult()}
             show={runSyncMutation.isSuccess}
             setShow={() => runSyncMutation.reset()}
           />
@@ -94,7 +94,7 @@ const SyncRunsList: React.FC<{ linkToken: string }> = ({ linkToken }) => {
               Edit
             </button>
             <button
-              className="tw-ml-auto tw-px-4 tw-py-1 tw-rounded-md tw-font-medium tw-text-base tw-bg-blue-600 hover:tw-bg-blue-500 tw-text-white tw-mr-2 tw-relative disabled:tw-bg-gray-500 disabled:tw-border-2"
+              className="tw-ml-auto tw-px-4 tw-py-1 tw-rounded-md tw-font-medium tw-text-base tw-bg-blue-600 hover:tw-bg-blue-500 tw-text-white tw-mr-2 disabled:tw-bg-gray-500 disabled:tw-border-2"
               disabled={runSyncMutation.isLoading}
               onClick={() => runSyncMutation.mutate()}
             >

@@ -38,7 +38,7 @@ export const Sync: React.FC = () => {
     },
   );
 
-  const renderButtonStatus = () => {
+  const renderRunSyncResult = () => {
     if (runSyncMutation.isSuccess) {
       return (
         <div className="tw-flex tw-flex-row tw-items-center tw-justify-start">
@@ -65,7 +65,7 @@ export const Sync: React.FC = () => {
       <BackButton onClick={() => navigate("/syncs")} />
       <div className="tw-pointer-events-none tw-fixed tw-w-full tw-h-full">
         <Toast
-          content={renderButtonStatus()}
+          content={renderRunSyncResult()}
           show={runSyncMutation.isSuccess}
           setShow={() => runSyncMutation.reset()}
         />
@@ -84,7 +84,7 @@ export const Sync: React.FC = () => {
             </button>
             <button
               disabled={runSyncMutation.isLoading}
-              className="tw-ml-auto tw-px-4 tw-py-1 tw-rounded-md tw-font-medium tw-text-base tw-bg-blue-600 hover:tw-bg-blue-500 tw-text-white tw-relative disabled:tw-bg-gray-500"
+              className="tw-ml-auto tw-px-4 tw-py-1 tw-rounded-md tw-font-medium tw-text-base tw-bg-blue-600 hover:tw-bg-blue-500 tw-text-white disabled:tw-bg-gray-500"
               onClick={() => runSyncMutation.mutate()}
             >
               {runSyncMutation.isLoading ? <Loading light className="tw-w-4 tw-h-4" /> : "Run sync"}
