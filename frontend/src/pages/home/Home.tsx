@@ -1,8 +1,9 @@
-import { CheckIcon, ClockIcon } from "@heroicons/react/24/outline";
+import { CalendarDaysIcon, ChatBubbleLeftEllipsisIcon, CheckIcon, ClockIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import React from "react";
 import { NavLink } from "react-router-dom";
 import { useDestinations, useObjects } from "src/rpc/data";
+import { isProd } from "src/utils/env";
 
 export const Home: React.FC = () => {
   const setupStep =
@@ -69,15 +70,25 @@ export const Home: React.FC = () => {
                 test your first sync.
               </p>
             </div>
-            <div className="tw-mt-5">
+            <div className="tw-flex tw-flex-row tw-mt-5 tw-gap-4">
               <a
                 href="https://calendly.com/fabra-io/onboarding"
                 target="_blank"
                 rel="noreferrer"
-                className="tw-inline-flex tw-items-center tw-rounded-md tw-bg-slate-600 tw-px-3 tw-py-2 tw-text-sm tw-font-semibold tw-text-white tw-shadow hover:tw-bg-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                className="tw-inline-flex tw-items-center tw-rounded-md tw-border tw-border-solid tw-border-slate-300 tw-px-3 tw-py-2 tw-text-sm tw-font-medium tw-shadow hover:tw-bg-slate-100"
               >
+                <CalendarDaysIcon className="tw-h-4 tw-mr-2" />
                 Book a call
               </a>
+              <button
+                onClick={() => {
+                  if (isProd()) window.Intercom("showNewMessage", "pre-populated content");
+                }}
+                className="tw-inline-flex tw-items-center tw-rounded-md tw-border tw-border-solid tw-border-slate-300 tw-px-3 tw-py-2 tw-text-sm tw-font-medium tw-shadow hover:tw-bg-slate-100"
+              >
+                <ChatBubbleLeftEllipsisIcon className="tw-h-4 tw-mr-1.5" />
+                Chat now
+              </button>
             </div>
           </div>
         </div>
