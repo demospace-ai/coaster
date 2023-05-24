@@ -20,6 +20,8 @@ import {
 } from "src/connect/state";
 import { WarehouseSelector } from "src/connect/Warehouse";
 import { useObject } from "src/rpc/data";
+import { useMutation } from "../utils/queryHelpers";
+import { ErrorDisplay } from "../components/error/Error";
 
 export const NewSync: React.FC<{ linkToken: string; close: (() => void) | undefined } & FabraDisplayOptions> = ({
   linkToken,
@@ -215,10 +217,18 @@ type FooterProps = {
 };
 
 export const Footer: React.FC<FooterProps> = (props) => {
-  const [loading, setLoading] = useState<boolean>(false);
   let onClick = () => {};
   let continueText: string = "Continue";
   let showContinue = true;
+
+  const createNewSourceMutation = useMutation(async () => {
+    await createNewSource(props.linkToken, props.state, props.setState);
+  });
+
+  const createNewSyncMutation = useMutation(async () => {
+    await createNewSync(props.linkToken, props.state, props.setState);
+  });
+
   switch (props.state.step) {
     case SyncSetupStep.ExistingSources:
       showContinue = false;
@@ -227,10 +237,9 @@ export const Footer: React.FC<FooterProps> = (props) => {
       showContinue = false;
       break;
     case SyncSetupStep.ConnectionDetails:
-      onClick = async () => {
-        setLoading(true);
-        await createNewSource(props.linkToken, props.state, props.setState);
-        setLoading(false);
+      onClick = () => {
+        createNewSourceMutation.reset();
+        createNewSourceMutation.mutate();
       };
       break;
     case SyncSetupStep.ChooseData:
@@ -245,10 +254,9 @@ export const Footer: React.FC<FooterProps> = (props) => {
         showContinue = false;
       } else {
         continueText = "Create Sync";
-        onClick = async () => {
-          setLoading(true);
-          await createNewSync(props.linkToken, props.state, props.setState);
-          setLoading(false);
+        onClick = () => {
+          createNewSyncMutation.reset();
+          createNewSyncMutation.mutate();
         };
       }
       break;
@@ -257,20 +265,30 @@ export const Footer: React.FC<FooterProps> = (props) => {
   const showBack = props.state.step !== SyncSetupStep.Finalize || !props.state.syncCreated;
 
   return (
-    <div className="tw-flex tw-flex-row tw-w-full tw-h-20 tw-min-h-[80px] tw-border-t tw-border-slate-200 tw-mt-auto tw-items-center tw-px-20">
-      {showBack && (
-        <button
-          className="tw-border tw-border-slate-300 tw-font-medium tw-rounded-md tw-w-32 tw-h-10 tw-select-none hover:tw-bg-slate-100"
-          onClick={props.back}
-        >
-          Back
-        </button>
-      )}
-      {showContinue && (
-        <Button onClick={onClick} className="tw-border tw-w-36 tw-h-10 tw-ml-auto tw-select-none">
-          {loading ? <Loading light /> : continueText}
-        </Button>
-      )}
+    <div className="tw-w-full tw-pr-2 tw-min-h-[80px]">
+      <div className="tw-flex tw-flex-row tw-w-full tw-border-t tw-border-slate-200 tw-items-center tw-justify-end tw-gap-x-2 tw-pt-2">
+        {showBack && (
+          <button
+            className="tw-border tw-border-slate-300 tw-font-medium tw-rounded-md tw-w-32 tw-h-10 tw-select-none hover:tw-bg-slate-100"
+            onClick={props.back}
+          >
+            Back
+          </button>
+        )}
+        {showContinue && (
+          <Button onClick={onClick} className="tw-border tw-w-36 tw-h-10 tw-select-none">
+            {createNewSourceMutation.isLoading || createNewSyncMutation.isLoading ? <Loading light /> : continueText}
+          </Button>
+        )}
+      </div>
+      <div className="tw-flex tw-justify-end tw-mt-1">
+        {createNewSourceMutation.error && props.state.step === SyncSetupStep.ConnectionDetails && (
+          <ErrorDisplay error={createNewSourceMutation.error} className="tw-text-red-500" />
+        )}
+        {createNewSyncMutation.error && props.state.step === SyncSetupStep.Finalize && (
+          <ErrorDisplay error={createNewSyncMutation.error} className="tw-text-red-500" />
+        )}
+      </div>
     </div>
   );
 };

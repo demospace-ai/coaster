@@ -4,14 +4,15 @@ import { NavLink, NavLinkProps, useNavigate } from "react-router-dom";
 import { mergeClasses } from "src/utils/twmerge";
 
 type ButtonProps = {
-  onClick: () => void;
+  onClick?: () => void;
   className?: string;
   children: React.ReactNode;
   disabled?: boolean;
+  type?: "button" | "submit" | "reset";
 };
 
 export const Button: React.FC<ButtonProps> = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
-  const { onClick, className, children, ...remaining } = props;
+  const { onClick, type = "button", className, children, ...remaining } = props;
 
   const buttonStyle = mergeClasses(
     "tw-text-primary-text tw-bg-primary hover:tw-bg-primary-hover",
@@ -19,7 +20,7 @@ export const Button: React.FC<ButtonProps> = forwardRef<HTMLButtonElement, Butto
     props.className,
   );
   return (
-    <button className={buttonStyle} type="button" ref={ref} onClick={props.onClick} {...remaining}>
+    <button className={buttonStyle} type={type} ref={ref} onClick={props.onClick} {...remaining}>
       {props.children}
     </button>
   );
@@ -109,7 +110,7 @@ export const DivButton: React.FC<ButtonProps> = (props) => {
       tabIndex={0}
       onClick={props.onClick}
       onKeyDown={(event: React.KeyboardEvent<HTMLDivElement>) => {
-        if (event.key === "Enter") props.onClick();
+        if (event.key === "Enter") props.onClick?.();
       }}
     >
       {props.children}

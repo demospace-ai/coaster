@@ -11,6 +11,7 @@ import { RunSync, SyncRunStatus } from "src/rpc/api";
 import { useSync } from "src/rpc/data";
 import { consumeError } from "src/utils/errors";
 import { mergeClasses } from "src/utils/twmerge";
+import { useMutation } from "../../utils/queryHelpers";
 
 const tableHeaderStyle =
   "tw-sticky tw-top-0 tw-z-0 tw-border-b tw-border-slate-300 tw-py-3.5 tw-px-4 sm:tw-pr-6 lg:tw-pr-8 tw-text-left tw-whitespace-nowrap";
@@ -22,28 +23,23 @@ export const Sync: React.FC = () => {
   const { syncID } = useParams<{ syncID: string }>();
   const { sync, mutate } = useSync(Number(syncID));
   const syncRuns = sync?.sync_runs ? sync.sync_runs : [];
-  const [runSyncResult, setRunSyncResult] = useState<"Success" | "Failure" | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleRunSync = async () => {
-    setIsLoading(true);
-    try {
+  const runSyncMutation = useMutation(
+    async () => {
       await sendRequest(RunSync, { syncID });
-      mutate();
-      setRunSyncResult("Success");
-    } catch (err) {
-      consumeError(err);
-      setRunSyncResult("Failure");
-    } finally {
-      setTimeout(() => {
-        setRunSyncResult(null);
-      }, 2000);
-    }
-    setIsLoading(false);
-  };
+    },
+    {
+      onSuccess: () => {
+        mutate();
+        setTimeout(() => {
+          runSyncMutation.reset();
+        }, 2000);
+      },
+    },
+  );
 
-  const renderButtonStatus = () => {
-    if (runSyncResult === "Success") {
+  const renderRunSyncResult = () => {
+    if (runSyncMutation.isSuccess) {
       return (
         <div className="tw-flex tw-flex-row tw-items-center tw-justify-start">
           <CheckCircleIcon className="tw-w-5 tw-h-5 tw-text-green-500 tw-stroke-2" />
@@ -52,7 +48,7 @@ export const Sync: React.FC = () => {
       );
     }
 
-    if (runSyncResult === "Failure") {
+    if (runSyncMutation.isFailed) {
       return (
         <div className="tw-flex tw-flex-row tw-items-center tw-justify-start">
           <XCircleIcon className="tw-w-5 tw-h-5 tw-text-red-500 tw-stroke-2" />
@@ -68,7 +64,11 @@ export const Sync: React.FC = () => {
     <div className="tw-pt-5 tw-pb-24 tw-px-10 tw-h-full tw-w-full tw-overflow-scroll">
       <BackButton onClick={() => navigate("/syncs")} />
       <div className="tw-pointer-events-none tw-fixed tw-w-full tw-h-full">
-        <Toast content={renderButtonStatus()} show={!!runSyncResult} setShow={() => setRunSyncResult(null)} />
+        <Toast
+          content={renderRunSyncResult()}
+          show={runSyncMutation.isSuccess}
+          setShow={() => runSyncMutation.reset()}
+        />
       </div>
       <div className="tw-flex tw-w-full tw-mb-5 tw-mt-4">
         <div className="tw-flex tw-flex-row tw-w-full tw-items-center tw-font-bold tw-text-lg tw-justify-between">
@@ -83,11 +83,11 @@ export const Sync: React.FC = () => {
               Edit
             </button>
             <button
-              disabled={isLoading}
-              className="tw-ml-auto tw-h-8 tw-w-24 tw-rounded-md tw-font-medium tw-text-base tw-bg-blue-600 hover:tw-bg-blue-500 tw-text-white tw-relative disabled:tw-bg-gray-500"
-              onClick={handleRunSync}
+              disabled={runSyncMutation.isLoading}
+              className="tw-ml-auto tw-px-4 tw-py-1 tw-rounded-md tw-font-medium tw-text-base tw-bg-blue-600 hover:tw-bg-blue-500 tw-text-white disabled:tw-bg-gray-500"
+              onClick={() => runSyncMutation.mutate()}
             >
-              {isLoading ? <Loading light className="tw-w-4 tw-h-4" /> : "Run sync"}
+              {runSyncMutation.isLoading ? <Loading light className="tw-w-4 tw-h-4" /> : "Run sync"}
             </button>
           </div>
         </div>

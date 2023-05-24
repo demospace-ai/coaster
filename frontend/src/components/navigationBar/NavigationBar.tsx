@@ -61,23 +61,19 @@ export const NavigationBar: React.FC = () => {
           </NavLink>
         </div>
         <div className={routeContainer}>
-          <Tooltip label="Coming soon!">
-            <div className={navLink}>
-              <BellIcon className="tw-h-4" strokeWidth="2" />
-              <div className={route}>Notifications</div>
-            </div>
-          </Tooltip>
+          <NavLink
+            className={({ isActive }) => classNames(navLink, isActive && "tw-bg-slate-200")}
+            to={"/notifications"}
+          >
+            <BellIcon className="tw-h-4" strokeWidth="2" />
+            <div className={route}>Notifications</div>
+          </NavLink>
         </div>
+
         <div className="tw-my-5 tw-px-4">
           <div className="tw-border-b tw-border-solid tw-border-slate-300" />
         </div>
         <div className="tw-mx-4 tw-my-2 tw-uppercase tw-text-xs tw-text-slate-500 tw-font-medium">Develop</div>
-        <div className={routeContainer}>
-          <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-slate-200")} to={"/apikey"}>
-            <KeyIcon className="tw-h-4" strokeWidth="2" />
-            <div className={route}>API Keys</div>
-          </NavLink>
-        </div>
         <div className={routeContainer}>
           <NavLink
             className={({ isActive }) => classNames(navLink, isActive && "tw-bg-slate-200")}
@@ -97,6 +93,12 @@ export const NavigationBar: React.FC = () => {
           <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-slate-200")} to={"/preview"}>
             <EyeIcon className="tw-h-4" strokeWidth="2" />
             <div className={route}>Preview</div>
+          </NavLink>
+        </div>
+        <div className={routeContainer}>
+          <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-slate-200")} to={"/apikey"}>
+            <KeyIcon className="tw-h-4" strokeWidth="2" />
+            <div className={route}>API Keys</div>
           </NavLink>
         </div>
         <div className={routeContainer}>
