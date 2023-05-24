@@ -43,7 +43,7 @@ export const Home: React.FC = () => {
           <div className={stepNumber}>
             {destinationCreated ? <CheckIcon className="tw-m-0.5 tw-w-full tw-stroke-2" /> : 1}
           </div>
-          Connect your data warehouse as a destination
+          Configure a destination where Fabra will send data
         </NavLink>
         <NavLink className={classNames(setupStep, objectCreated && "tw-line-through")} to="/objects">
           <div className={stepNumber}>
