@@ -3,6 +3,7 @@ import classNames from "classnames";
 import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "src/components/button/Button";
+import { ErrorDisplay } from "src/components/error/Error";
 import { Loading } from "src/components/loading/Loading";
 import { FabraDisplayOptions } from "src/connect/ConnectApp";
 import { NewSourceConfiguration } from "src/connect/Connection";
@@ -20,8 +21,7 @@ import {
 } from "src/connect/state";
 import { WarehouseSelector } from "src/connect/Warehouse";
 import { useObject } from "src/rpc/data";
-import { useMutation } from "../utils/queryHelpers";
-import { ErrorDisplay } from "../components/error/Error";
+import { useMutation } from "src/utils/queryHelpers";
 
 export const NewSync: React.FC<{ linkToken: string; close: (() => void) | undefined } & FabraDisplayOptions> = ({
   linkToken,
@@ -265,8 +265,8 @@ export const Footer: React.FC<FooterProps> = (props) => {
   const showBack = props.state.step !== SyncSetupStep.Finalize || !props.state.syncCreated;
 
   return (
-    <div className="tw-w-full tw-pr-2 tw-min-h-[80px]">
-      <div className="tw-flex tw-flex-row tw-w-full tw-border-t tw-border-slate-200 tw-items-center tw-justify-end tw-gap-x-2 tw-pt-2">
+    <div className="tw-w-full tw-min-h-[80px]">
+      <div className="tw-flex tw-flex-row tw-w-full tw-h-full tw-px-20 tw-border-t tw-border-slate-200 tw-items-center tw-gap-x-2">
         {showBack && (
           <button
             className="tw-border tw-border-slate-300 tw-font-medium tw-rounded-md tw-w-32 tw-h-10 tw-select-none hover:tw-bg-slate-100"
@@ -276,7 +276,7 @@ export const Footer: React.FC<FooterProps> = (props) => {
           </button>
         )}
         {showContinue && (
-          <Button onClick={onClick} className="tw-border tw-w-36 tw-h-10 tw-select-none">
+          <Button onClick={onClick} className="tw-border tw-w-36 tw-h-10 tw-ml-auto tw-select-none">
             {createNewSourceMutation.isLoading || createNewSyncMutation.isLoading ? <Loading light /> : continueText}
           </Button>
         )}

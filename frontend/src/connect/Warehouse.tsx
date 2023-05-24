@@ -5,7 +5,7 @@ import { ConnectionType } from "src/rpc/api";
 
 export const WarehouseSelector: React.FC<SetupSyncProps> = (props) => {
   const connectionButton =
-    "tw-flex tw-flex-row tw-justify-center tw-items-center tw-py-5 tw-font-bold tw-w-56 tw-rounded-md tw-cursor-pointer tw-bg-white tw-text-slate-800 tw-border tw-border-slate-300 hover:tw-bg-slate-100 tw-tracking-[1px] tw-shadow tw-select-none";
+    "tw-flex tw-flex-row tw-justify-center tw-items-center tw-py-5 tw-font-medium tw-w-64 tw-rounded-md tw-cursor-pointer tw-bg-white tw-text-slate-800 tw-border tw-border-slate-300 hover:tw-bg-slate-100 tw-shadow tw-select-none";
   const onClick = (connectionType: ConnectionType) => {
     // Reset new source state to initial state when user selects a new connection type
     props.setState({
@@ -23,21 +23,21 @@ export const WarehouseSelector: React.FC<SetupSyncProps> = (props) => {
       <div className="tw-text-left tw-mb-10 tw-text-slate-600">
         Choose the data warehouse, database, or data lake to connect.
       </div>
-      <div className="tw-flex tw-flex-row tw-gap-5 tw-flex-wrap tw-justify-center">
+      <div className="tw-flex tw-flex-row tw-gap-5 tw-flex-wrap tw-justify-start">
         <button className={connectionButton} onClick={() => onClick(ConnectionType.Snowflake)}>
           <ConnectionImage connectionType={ConnectionType.Snowflake} className="tw-h-6 tw-mr-1.5" />
           Snowflake
         </button>
         <button className={connectionButton} onClick={() => onClick(ConnectionType.BigQuery)}>
-          <ConnectionImage connectionType={ConnectionType.BigQuery} className="tw-h-6 tw-mr-1.5" />
+          <ConnectionImage connectionType={ConnectionType.BigQuery} className="tw-h-6 tw-mr-2" />
           BigQuery
         </button>
         <button className={connectionButton} onClick={() => onClick(ConnectionType.Redshift)}>
-          <ConnectionImage connectionType={ConnectionType.Redshift} className="tw-h-6 tw-mr-1.5" />
+          <ConnectionImage connectionType={ConnectionType.Redshift} className="tw-h-6 tw-mr-2" />
           Redshift
         </button>
         <button className={connectionButton} onClick={() => onClick(ConnectionType.MongoDb)}>
-          <ConnectionImage connectionType={ConnectionType.MongoDb} className="tw-h-6 tw-mr-1.5" />
+          <ConnectionImage connectionType={ConnectionType.MongoDb} className="tw-h-6 tw-mr-1" />
           MongoDB
         </button>
         <button className={connectionButton} onClick={() => onClick(ConnectionType.Synapse)}>
@@ -45,8 +45,12 @@ export const WarehouseSelector: React.FC<SetupSyncProps> = (props) => {
           Azure Synapse
         </button>
         <button className={connectionButton} onClick={() => onClick(ConnectionType.Postgres)}>
-          <ConnectionImage connectionType={ConnectionType.Postgres} className="tw-h-6 tw-mr-1.5" />
+          <ConnectionImage connectionType={ConnectionType.Postgres} className="tw-h-6 tw-mr-2" />
           Postgres
+        </button>
+        <button className={connectionButton} onClick={() => onClick(ConnectionType.MySQL)}>
+          <ConnectionImage connectionType={ConnectionType.MySQL} className="tw-h-6 tw-mr-2" />
+          MySQL
         </button>
       </div>
     </div>

@@ -142,39 +142,15 @@ const validateAll = (connectionType: ConnectionType, state: NewDestinationState)
         state.bigqueryConfig.location !== undefined &&
         state.bigqueryConfig.credentials.length > 0
       );
-    case ConnectionType.Redshift:
-      return (
-        state.displayName.length > 0 &&
-        state.redshiftConfig.username.length > 0 &&
-        state.redshiftConfig.password.length > 0 &&
-        state.redshiftConfig.database_name.length > 0 &&
-        state.redshiftConfig.endpoint.length > 0
-      );
-    case ConnectionType.Synapse:
-      return (
-        state.displayName.length > 0 &&
-        state.redshiftConfig.username.length > 0 &&
-        state.redshiftConfig.password.length > 0 &&
-        state.redshiftConfig.database_name.length > 0 &&
-        state.redshiftConfig.endpoint.length > 0
-      );
-    case ConnectionType.MongoDb:
-      return (
-        state.displayName.length > 0 &&
-        state.mongodbConfig.username.length > 0 &&
-        state.mongodbConfig.password.length > 0 &&
-        state.mongodbConfig.host.length > 0
-      ); // connection options is optional
-    case ConnectionType.Postgres:
-      return (
-        state.displayName.length > 0 &&
-        state.postgresConfig.username.length > 0 &&
-        state.postgresConfig.password.length > 0 &&
-        state.postgresConfig.database_name.length > 0 &&
-        state.postgresConfig.endpoint.length > 0
-      );
     case ConnectionType.Webhook:
       return state.displayName.length > 0 && state.webhookConfig.url.length > 0;
+    case ConnectionType.Redshift:
+    case ConnectionType.Synapse:
+    case ConnectionType.MongoDb:
+    case ConnectionType.Postgres:
+    case ConnectionType.MySQL:
+      // TODO: throw error
+      return false;
   }
 };
 
@@ -202,20 +178,15 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = (
         case ConnectionType.Snowflake:
           payload.snowflake_config = state.snowflakeConfig;
           break;
-        case ConnectionType.Redshift:
-          payload.redshift_config = state.redshiftConfig;
-          break;
-        case ConnectionType.Synapse:
-          payload.synapse_config = state.synapseConfig;
-          break;
-        case ConnectionType.MongoDb:
-          payload.mongodb_config = state.mongodbConfig;
-          break;
-        case ConnectionType.Postgres:
-          payload.postgres_config = state.postgresConfig;
-          break;
         case ConnectionType.Webhook:
           payload.webhook_config = state.webhookConfig;
+          break;
+        case ConnectionType.Redshift:
+        case ConnectionType.MongoDb:
+        case ConnectionType.Synapse:
+        case ConnectionType.Postgres:
+        case ConnectionType.MySQL:
+          // TODO: throw error
           break;
       }
 
@@ -252,6 +223,7 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = (
     case ConnectionType.MongoDb:
     case ConnectionType.Synapse:
     case ConnectionType.Postgres:
+    case ConnectionType.MySQL:
       inputs = <></>;
       break; // TODO: throw error
   }
@@ -314,20 +286,15 @@ const TestConnectionButton: React.FC<ConnectionConfigurationProps & { connection
         case ConnectionType.Snowflake:
           payload.snowflake_config = state.snowflakeConfig;
           break;
-        case ConnectionType.Redshift:
-          payload.redshift_config = state.redshiftConfig;
-          break;
-        case ConnectionType.MongoDb:
-          payload.mongodb_config = state.mongodbConfig;
-          break;
-        case ConnectionType.Synapse:
-          payload.synapse_config = state.synapseConfig;
-          break;
-        case ConnectionType.Postgres:
-          payload.postgres_config = state.postgresConfig;
-          break;
         case ConnectionType.Webhook:
           payload.webhook_config = state.webhookConfig;
+          break;
+        case ConnectionType.Redshift:
+        case ConnectionType.MongoDb:
+        case ConnectionType.Synapse:
+        case ConnectionType.Postgres:
+        case ConnectionType.MySQL:
+          // TODO: throw error
           break;
       }
 

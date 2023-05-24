@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Button } from "src/components/button/Button";
 import { InfoIcon } from "src/components/icons/Icons";
 import { ConnectionImage } from "src/components/images/Connections";
@@ -10,9 +10,9 @@ import { FabraDisplayOptions } from "src/connect/ConnectApp";
 import { NewSourceState, SetupSyncProps, SyncSetupStep, validateConnectionSetup } from "src/connect/state";
 import { sendRequest } from "src/rpc/ajax";
 import { ConnectionType, getConnectionType, TestDataConnection, TestDataConnectionRequest } from "src/rpc/api";
-import { consumeError, forceError, HttpError } from "src/utils/errors";
+import { forceError } from "src/utils/errors";
+import { useMutation } from "src/utils/queryHelpers";
 import { mergeClasses } from "src/utils/twmerge";
-import { useMutation } from "../utils/queryHelpers";
 
 export const NewSourceConfiguration: React.FC<SetupSyncProps & FabraDisplayOptions> = (props) => {
   const state = props.state.newSourceState;
@@ -55,6 +55,9 @@ export const NewSourceConfiguration: React.FC<SetupSyncProps & FabraDisplayOptio
       break;
     case ConnectionType.Postgres:
       inputs = <PostgresInputs state={state} setState={setNewSourceState} />;
+      break;
+    case ConnectionType.MySQL:
+      inputs = <MySqlInputs state={state} setState={setNewSourceState} />;
       break;
     case ConnectionType.Webhook:
       inputs = <>Unexpected</>;
@@ -167,6 +170,9 @@ const TestConnectionButton: React.FC<{
           break;
         case ConnectionType.Postgres:
           payload.postgres_config = state.postgresConfig;
+          break;
+        case ConnectionType.MySQL:
+          payload.mysql_config = state.mysqlConfig;
           break;
         case ConnectionType.Webhook:
           // TODO: throw error
@@ -627,6 +633,90 @@ const PostgresInputs: React.FC<ConnectionConfigurationProps> = (props) => {
         value={state.postgresConfig.endpoint}
         setValue={(value) => {
           props.setState((state) => ({ ...state, postgresConfig: { ...state.postgresConfig, endpoint: value } }));
+        }}
+        placeholder="Endpoint"
+      />
+    </>
+  );
+};
+
+const MySqlInputs: React.FC<ConnectionConfigurationProps> = (props) => {
+  const state = props.state;
+  return (
+    <>
+      <div className="tw-flex tw-flex-row tw-items-center tw-mt-2 tw-mb-1">
+        <span>Display Name</span>
+        <Tooltip placement="right" label="Pick a name to help you identify this source in the future.">
+          <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+        </Tooltip>
+      </div>
+      <ValidatedInput
+        id="displayName"
+        value={state.displayName}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, displayName: value }));
+        }}
+        placeholder="Display Name"
+      />
+      <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
+        <span>Username</span>
+        <Tooltip placement="right" label="We recommend you create a dedicated user for syncing.">
+          <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+        </Tooltip>
+      </div>
+      <ValidatedInput
+        id="username"
+        value={state.mysqlConfig.username}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, mysqlConfig: { ...state.mysqlConfig, username: value } }));
+        }}
+        placeholder="Username"
+      />
+      <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
+        <span>Password</span>
+        <Tooltip placement="right" label="Password for the user specified above.">
+          <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+        </Tooltip>
+      </div>
+      <ValidatedInput
+        id="password"
+        type="password"
+        value={state.mysqlConfig.password}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, mysqlConfig: { ...state.mysqlConfig, password: value } }));
+        }}
+        placeholder="Password"
+      />
+      <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
+        <span>Database Name</span>
+        <Tooltip placement="right" label="The MySQL database to sync from.">
+          <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+        </Tooltip>
+      </div>
+      <ValidatedInput
+        id="databaseName"
+        value={state.mysqlConfig.database_name}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, mysqlConfig: { ...state.mysqlConfig, database_name: value } }));
+        }}
+        placeholder="Database Name"
+      />
+      <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
+        <span>Endpoint</span>
+        <Tooltip
+          placement="right"
+          label="This is the endpoint for your MySQL database. It must be in the format <host>:<port>, i.e. 127.0.0.1:5432"
+          interactive
+          maxWidth={640}
+        >
+          <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+        </Tooltip>
+      </div>
+      <ValidatedInput
+        id="host"
+        value={state.mysqlConfig.endpoint}
+        setValue={(value) => {
+          props.setState((state) => ({ ...state, mysqlConfig: { ...state.mysqlConfig, endpoint: value } }));
         }}
         placeholder="Endpoint"
       />

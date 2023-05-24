@@ -239,6 +239,7 @@ export interface TestDataConnectionRequest {
   redshift_config?: RedshiftConfig;
   synapse_config?: SynapseConfig;
   postgres_config?: PostgresConfig;
+  mysql_config?: MySqlConfig;
   webhook_config?: WebhookConfig;
 }
 
@@ -264,6 +265,7 @@ export interface LinkCreateSourceRequest {
   synapse_config?: SynapseConfig;
   mongodb_config?: MongoDbConfig;
   postgres_config?: PostgresConfig;
+  mysql_config?: MySqlConfig;
 }
 
 export interface CreateSourceResponse {
@@ -366,6 +368,13 @@ export interface RedshiftConfig {
 }
 
 export interface PostgresConfig {
+  username: string;
+  password: string;
+  database_name: string;
+  endpoint: string;
+}
+
+export interface MySqlConfig {
   username: string;
   password: string;
   database_name: string;
@@ -616,6 +625,7 @@ export enum ConnectionType {
   MongoDb = "mongodb",
   Synapse = "synapse",
   Postgres = "postgres",
+  MySQL = "mysql",
   Webhook = "webhook",
 }
 
@@ -749,6 +759,8 @@ export function getConnectionType(connectionType: ConnectionType): string {
       return "Synapse";
     case ConnectionType.Postgres:
       return "Postgres";
+    case ConnectionType.MySQL:
+      return "MySQL";
     case ConnectionType.Webhook:
       return "Webhook";
   }

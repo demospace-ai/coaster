@@ -14,6 +14,7 @@ import {
   LinkGetSources,
   LinkGetSyncs,
   MongoDbConfig,
+  MySqlConfig,
   PostgresConfig,
   RedshiftConfig,
   SnowflakeConfig,
@@ -46,6 +47,7 @@ export type NewSourceState = {
   redshiftConfig: RedshiftConfig;
   synapseConfig: SynapseConfig;
   postgresConfig: PostgresConfig;
+  mysqlConfig: MySqlConfig;
   mongodbConfig: MongoDbConfig;
 };
 
@@ -85,6 +87,12 @@ export const INITIAL_SOURCE_STATE: NewSourceState = {
     connection_options: "",
   },
   postgresConfig: {
+    username: "",
+    password: "",
+    database_name: "",
+    endpoint: "",
+  },
+  mysqlConfig: {
     username: "",
     password: "",
     database_name: "",
@@ -192,6 +200,14 @@ export const validateConnectionSetup = (connectionType: ConnectionType | undefin
         state.postgresConfig.database_name.length > 0 &&
         state.postgresConfig.endpoint.length > 0
       );
+    case ConnectionType.MySQL:
+      return (
+        state.displayName.length > 0 &&
+        state.mysqlConfig.username.length > 0 &&
+        state.mysqlConfig.password.length > 0 &&
+        state.mysqlConfig.database_name.length > 0 &&
+        state.mysqlConfig.endpoint.length > 0
+      );
     case ConnectionType.Webhook:
       return false; // cannot create a sync with a webhook source
   }
@@ -240,6 +256,9 @@ export const createNewSource = async (
       break;
     case ConnectionType.Postgres:
       payload.postgres_config = state.newSourceState.postgresConfig;
+      break;
+    case ConnectionType.MySQL:
+      payload.mysql_config = state.newSourceState.mysqlConfig;
       break;
     case ConnectionType.Webhook:
       // TODO: throw an error
