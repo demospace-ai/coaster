@@ -24,12 +24,12 @@ func (s ApiService) UpdateObject(auth auth.Authentication, w http.ResponseWriter
 	}
 
 	vars := mux.Vars(r)
-	strObjectId, ok := vars["objectID"]
+	strObjectID, ok := vars["objectID"]
 	if !ok {
 		return errors.Newf("missing object ID request URL: %s", r.URL.RequestURI())
 	}
 
-	objectId, err := strconv.ParseInt(strObjectId, 10, 64)
+	objectID, err := strconv.ParseInt(strObjectID, 10, 64)
 	if err != nil {
 		return err
 	}
@@ -50,7 +50,7 @@ func (s ApiService) UpdateObject(auth auth.Authentication, w http.ResponseWriter
 	object, err := objects.PartialUpdateObject(
 		s.db,
 		auth.Organization.ID,
-		objectId,
+		objectID,
 		updateObjectRequest,
 	)
 	if err != nil {

@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/errors"
@@ -10,6 +11,7 @@ import (
 	"go.fabra.io/server/common/views"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/gorilla/mux"
 )
 
 type UpdateObjectFieldsRequest struct {
@@ -25,6 +27,17 @@ type UpdateObjectFieldsResponse struct {
 func (s ApiService) UpdateObjectFields(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
 		return errors.NewBadRequest("must setup organization first")
+	}
+
+	vars := mux.Vars(r)
+	strObjectID, ok := vars["objectID"]
+	if !ok {
+		return errors.Newf("missing object ID request URL: %s", r.URL.RequestURI())
+	}
+
+	objectID, err := strconv.ParseInt(strObjectID, 10, 64)
+	if err != nil {
+		return err
 	}
 
 	decoder := json.NewDecoder(r.Body)
@@ -47,6 +60,7 @@ func (s ApiService) UpdateObjectFields(auth auth.Authentication, w http.Response
 		updatedObjectField, err := objects.PartialUpdateObjectField(
 			s.db,
 			auth.Organization.ID,
+			objectID,
 			objectField.ID,
 			objectField.PartialUpdateObjectFieldInput,
 		)

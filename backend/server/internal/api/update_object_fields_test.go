@@ -64,10 +64,8 @@ var _ = Describe("Sending an ObjectField batch update request", func() {
 
 	Context("with an object id but no change", func() {
 		It("should return a 200 status code", func() {
-			dest, _ := test.CreateDestination(db, auth.Organization.ID)
-			obj := test.CreateObject(db, auth.Organization.ID, dest.ID, models.SyncModeFullOverwrite)
 			desc := "test description (shouldn't change)"
-			objFields := test.CreateObjectFields(db, obj.ID, []input.ObjectField{
+			objFields := test.CreateObjectFields(db, object.ID, []input.ObjectField{
 				{
 					Name:        "test (shouldn't change)",
 					Description: &desc, // Description will not be updated
@@ -92,10 +90,8 @@ var _ = Describe("Sending an ObjectField batch update request", func() {
 
 	Context("to change an object's properties", func() {
 		It("should return a 200 status code, and update the anme", func() {
-			dest, _ := test.CreateDestination(db, auth.Organization.ID)
-			obj := test.CreateObject(db, auth.Organization.ID, dest.ID, models.SyncModeFullOverwrite)
 			disname := "old display name"
-			objField := test.CreateObjectFields(db, obj.ID, []input.ObjectField{
+			objField := test.CreateObjectFields(db, object.ID, []input.ObjectField{
 				{
 					Name:        "old name",
 					Description: nil,      // description will be updated from null to "new description"

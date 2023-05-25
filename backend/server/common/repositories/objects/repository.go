@@ -115,12 +115,23 @@ func LoadAllObjects(
 	return objects, nil
 }
 
+// OrganizationID is used to check that the object belongs to the organization.
 func CreateObjectField(
 	db *gorm.DB,
 	organizationID int64,
 	objectID int64,
 	objectField input.ObjectField,
 ) (*models.ObjectField, error) {
+	// Verify the object belongs to the organization
+	var object models.Object
+	result := db.Where(&models.Object{
+		OrganizationID: organizationID,
+		BaseModel:      models.BaseModel{ID: objectID},
+	}).First(&object)
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(objects.CreateObjectField)")
+	}
+
 	objectFieldModel := models.ObjectField{
 		ObjectID:    objectID,
 		Name:        objectField.Name,
@@ -130,7 +141,7 @@ func CreateObjectField(
 		DisplayName: database.NewNullStringFromPtr(objectField.DisplayName),
 		Description: database.NewNullStringFromPtr(objectField.Description),
 	}
-	result := db.Create(&objectFieldModel)
+	result = db.Create(&objectFieldModel)
 	if result.Error != nil {
 		return nil, errors.Wrap(result.Error, "(objects.CreateObjectField)")
 	}
@@ -187,6 +198,8 @@ type PartialUpdateObjectInput struct {
 	CursorFieldRaw     json.RawMessage        `json:"cursor_field_raw"`
 }
 
+// PartialUpdateObject updates the object with the given ID. The organizationID
+// is used to ensure that the object belongs to the given organization.
 func PartialUpdateObject(
 	db *gorm.DB,
 	organizationID int64,
@@ -194,7 +207,10 @@ func PartialUpdateObject(
 	input PartialUpdateObjectInput,
 ) (*models.Object, error) {
 	var object models.Object
-	result := db.First(&object, objectID)
+	result := db.Where(&models.Object{
+		OrganizationID: organizationID,
+		BaseModel:      models.BaseModel{ID: objectID},
+	}).First(&object)
 	if result.Error != nil {
 		return nil, errors.Wrap(result.Error, "(objects.PartialUpdateObject)")
 	}
@@ -261,17 +277,34 @@ type PartialUpdateObjectFieldInput struct {
 	DescriptionRaw json.RawMessage `json:"description"`
 }
 
+// Partially updates an object field. OrganizationID and ObjectID are used to
+// ensure the object field belongs to the organization and object.
 func PartialUpdateObjectField(
 	db *gorm.DB,
 	organizationID int64,
+	objectID int64,
 	objectFieldID int64,
 	input PartialUpdateObjectFieldInput,
 ) (*models.ObjectField, error) {
-	var objectField models.ObjectField
-	result := db.First(&objectField, objectFieldID)
+	// Verify the object belongs to the organization
+	var object models.Object
+	result := db.Where(&models.Object{
+		OrganizationID: organizationID,
+		BaseModel:      models.BaseModel{ID: objectID},
+	}).First(&object)
 	if result.Error != nil {
 		return nil, errors.Wrap(result.Error, "(objects.PartialUpdateObjectField)")
 	}
+
+	var objectField models.ObjectField
+	result = db.Where(&models.ObjectField{
+		ObjectID:  objectID,
+		BaseModel: models.BaseModel{ID: objectFieldID},
+	}).First(&objectField)
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(objects.PartialUpdateObjectField)")
+	}
+
 	if input.Name != nil {
 		objectField.Name = *input.Name
 	}
