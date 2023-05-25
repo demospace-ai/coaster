@@ -158,7 +158,7 @@ func CreateObjectFields(
 	for _, objectField := range objectFields {
 		objectFieldModel, err := CreateObjectField(db, organizationID, objectID, objectField)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "(objects.CreateObjectFields)")
 		}
 		createdObjectFields = append(createdObjectFields, *objectFieldModel)
 	}
