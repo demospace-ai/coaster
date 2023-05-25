@@ -204,10 +204,10 @@ export const NewObject: React.FC<NewObjectProps> = (props) => {
   );
 };
 
-type DestinationStepProps = {
+type DestinationSetupProps = {
   isUpdate?: boolean;
 };
-export const DestinationSetup: React.FC<ObjectStepProps & DestinationStepProps> = (props) => {
+export const DestinationSetup: React.FC<ObjectStepProps & DestinationSetupProps> = (props) => {
   const { state, setState } = props;
 
   const advance = () => {

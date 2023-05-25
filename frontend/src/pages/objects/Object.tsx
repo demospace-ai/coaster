@@ -25,7 +25,7 @@ export const Object: React.FC = () => {
         <span className="tw-grow">{object.display_name}</span>
         <Button
           className="tw-text-sm tw-ml-5"
-          onClick={function (): void {
+          onClick={() => {
             navigate("./update");
           }}
         >
