@@ -2,7 +2,6 @@ package objects
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"go.fabra.io/server/common/data"
 	"go.fabra.io/server/common/database"
@@ -238,7 +237,6 @@ func PartialUpdateObject(
 // { input: "" } sets stringVal to ""
 // { } leaves the stringVal unchanged
 func setNullStringFromRaw(input json.RawMessage, stringVal *database.NullString) error {
-	fmt.Println("input", string(input))
 	if len(input) > 0 { // if key exists in JSON input
 		if string(input) == "null" { // value is null
 			*stringVal = database.NullString{}

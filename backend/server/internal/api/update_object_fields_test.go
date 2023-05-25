@@ -3,8 +3,9 @@ package api_test
 import (
 	"bytes"
 	"encoding/json"
-	"io"
+	"fmt"
 	"math"
+	"net/http"
 	"net/http/httptest"
 
 	"go.fabra.io/server/common/auth"
@@ -13,6 +14,7 @@ import (
 	"go.fabra.io/server/common/views"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/gorilla/mux"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"go.fabra.io/server/common/test"
@@ -21,20 +23,26 @@ import (
 
 var _ = Describe("Sending an ObjectField batch update request", func() {
 	var auth auth.Authentication
-
-	makeRequestBody := func(body interface{}) io.Reader {
-		jsonBody, _ := json.Marshal(body)
-		return bytes.NewReader(jsonBody)
-	}
+	var object *models.Object
+	var makeRequest func(body interface{}) *http.Request
 
 	BeforeEach(func() {
 		auth = getAuth(db)
+		destination, _ := test.CreateDestination(db, auth.Organization.ID)
+		object = test.CreateObject(db, auth.Organization.ID, destination.ID, models.SyncModeFullOverwrite)
+		makeRequest = func(body interface{}) *http.Request {
+			jsonBody, _ := json.Marshal(body)
+			request := httptest.NewRequest("POST", fmt.Sprintf("/object/%d/object_fields", object.ID), bytes.NewReader(jsonBody))
+			return mux.SetURLVars(request, map[string]string{
+				"objectID": fmt.Sprintf("%d", object.ID),
+			})
+		}
 	})
 
 	Context("with an empty list", func() {
 		It("should return a 200 status code", func() {
 			response := httptest.NewRecorder()
-			request := httptest.NewRequest("PATCH", "/object_field", makeRequestBody([]map[string]interface{}{}))
+			request := makeRequest([]map[string]interface{}{})
 			err := service.UpdateObjectFields(auth, response, request)
 			Expect(err).To(BeNil(), "no error should be returned, got %s", err)
 			Expect(response.Code).To(Equal(200))
@@ -44,9 +52,9 @@ var _ = Describe("Sending an ObjectField batch update request", func() {
 	Context("with an object body that's missing ID", func() {
 		It("should fail validation", func() {
 			response := httptest.NewRecorder()
-			request := httptest.NewRequest("PATCH", "/object_field", makeRequestBody([]map[string]interface{}{
+			request := makeRequest([]map[string]interface{}{
 				{},
-			}))
+			})
 			err := service.UpdateObjectFields(auth, response, request)
 			Expect(err).To(BeAssignableToTypeOf(validator.ValidationErrors{}))
 			fieldError := err.(validator.ValidationErrors)[0]
@@ -66,12 +74,12 @@ var _ = Describe("Sending an ObjectField batch update request", func() {
 				},
 			})
 			response := httptest.NewRecorder()
-			request := httptest.NewRequest("PATCH", "/object_field", makeRequestBody([]map[string]interface{}{
+			request := makeRequest([]map[string]interface{}{
 				{
 					"id": objFields[0].ID,
 					// Do not provide Description (This tests partial update)
 				},
-			}))
+			})
 			err := service.UpdateObjectFields(auth, response, request)
 			Expect(err).To(BeNil(), "no error should be returned, got %s", err)
 			Expect(response.Code).To(Equal(200))
@@ -96,14 +104,14 @@ var _ = Describe("Sending an ObjectField batch update request", func() {
 			})[0]
 			response := httptest.NewRecorder()
 			desc := "new description"
-			request := httptest.NewRequest("PATCH", "/object_field", makeRequestBody([]map[string]interface{}{
+			request := makeRequest([]map[string]interface{}{
 				{
 					"id":           objField.ID,
 					"name":         "new name",
 					"description":  desc,
 					"display_name": nil, // This will set {"display_name": null}
 				},
-			}))
+			})
 			err := service.UpdateObjectFields(auth, response, request)
 			Expect(err).To(BeNil(), "no error should be returned, got %s", err)
 			Expect(response.Code).To(Equal(200))
@@ -125,11 +133,11 @@ var _ = Describe("Sending an ObjectField batch update request", func() {
 	Context("with an object id that doesn't exist", func() {
 		It("should return a 200 status code, include the id in failures", func() {
 			response := httptest.NewRecorder()
-			request := httptest.NewRequest("PATCH", "/object_field", makeRequestBody([]map[string]interface{}{
+			request := makeRequest([]map[string]interface{}{
 				{
 					"id": math.MaxInt64,
 				},
-			}))
+			})
 			err := service.UpdateObjectFields(auth, response, request)
 			Expect(err).To(BeNil(), "no error should be returned, got %s", err)
 			Expect(response.Code).To(Equal(200))
