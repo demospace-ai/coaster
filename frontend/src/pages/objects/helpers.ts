@@ -294,3 +294,10 @@ export const initalizeFromExisting = (
     frequencyUnits: existingObject.frequency_units,
   };
 };
+
+export const initializeFromDestination = (destination: Destination) => {
+  return {
+    ...INITIAL_OBJECT_STATE,
+    destination,
+  };
+};

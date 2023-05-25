@@ -47,10 +47,11 @@ export const GetSources: IEndpoint<undefined, GetSourcesResponse> = {
   path: "/sources",
 };
 
-export const GetObjects: IEndpoint<undefined, GetObjectsResponse> = {
+export const GetObjects: IEndpoint<{ destinationID?: number }, GetObjectsResponse> = {
   name: "Objects Fetched",
   method: "GET",
   path: "/objects",
+  queryParams: ["destinationID"],
 };
 
 export const GetObject: IEndpoint<{ objectID: number }, GetObjectResponse> = {

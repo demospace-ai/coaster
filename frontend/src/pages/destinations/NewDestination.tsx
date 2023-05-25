@@ -29,13 +29,14 @@ import { forceError } from "src/utils/errors";
 import { useMutation } from "src/utils/queryHelpers";
 import { mutate } from "swr";
 
-export const NewDestination: React.FC<{ onComplete: () => void }> = (props) => {
+export const NewDestination: React.FC = () => {
   const [connectionType, setConnectionType] = useState<ConnectionType | null>(null);
+  const navigate = useNavigate();
   const onBack = () => {
     if (connectionType) {
       setConnectionType(null);
     } else {
-      props.onComplete();
+      navigate("/destinations");
     }
   };
 
@@ -45,11 +46,7 @@ export const NewDestination: React.FC<{ onComplete: () => void }> = (props) => {
       <div className="tw-flex tw-flex-col tw-mt-8 tw-mb-24 tw-py-12 tw-px-10 tw-bg-white tw-rounded-lg tw-shadow-md tw-items-center">
         <div className="tw-text-center tw-mb-5 tw-font-bold tw-text-lg">New Destination</div>
         {connectionType ? (
-          <NewDestinationConfiguration
-            connectionType={connectionType}
-            setConnectionType={setConnectionType}
-            onComplete={props.onComplete}
-          />
+          <NewDestinationConfiguration connectionType={connectionType} setConnectionType={setConnectionType} />
         ) : (
           <ConnectionTypeSelector setConnectionType={setConnectionType} />
         )}
@@ -61,7 +58,6 @@ export const NewDestination: React.FC<{ onComplete: () => void }> = (props) => {
 type NewConnectionConfigurationProps = {
   connectionType: ConnectionType;
   setConnectionType: (connectionType: ConnectionType | null) => void;
-  onComplete: () => void;
 };
 
 type NewDestinationState = {
@@ -196,12 +192,8 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = (
     },
     {
       onSuccess: (destination) => {
-        mutate({ GetDestinations }); // Tell SWRs to refetch destinations
-        navigate("/objects/new", {
-          state: {
-            destination: destination.destination,
-          },
-        });
+        mutate({ GetDestinations });
+        navigate(`/destinations/${destination.destination.id}`);
       },
     },
   );
@@ -233,19 +225,6 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = (
     case ConnectionType.MySQL:
       inputs = <></>;
       break; // TODO: throw error
-  }
-
-  if (newDestinationMutation.isSuccess) {
-    return (
-      <div>
-        <div className="tw-mt-10 tw-text-center tw-font-bold tw-text-lg">
-          🎉 Congratulations! Your destination is set up. 🎉
-        </div>
-        <Button className="tw-block tw-mt-8 tw-mx-auto tw-mb-10 tw-w-32" onClick={props.onComplete}>
-          Done
-        </Button>
-      </div>
-    );
   }
 
   return (

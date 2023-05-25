@@ -1,12 +1,10 @@
 import { PlusCircleIcon } from "@heroicons/react/20/solid";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
-import { ReactElement, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "src/components/button/Button";
 import { ConnectionImage } from "src/components/images/Connections";
 import { EmptyTable } from "src/components/table/Table";
-import { NewDestination } from "src/pages/destinations/NewDestination";
 import { getConnectionType } from "src/rpc/api";
 import { useDestinations } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
@@ -14,29 +12,15 @@ import { mergeClasses } from "src/utils/twmerge";
 const tableHeaderStyle = "tw-sticky tw-top-0 tw-z-0 tw-py-3.5 tw-pr-4 tw-pl-3 sm:tw-pr-6 lg:tw-pr-8 tw-text-left";
 const tableCellStyle = "tw-whitespace-nowrap tw-px-3 tw-h-16 tw-text-sm tw-text-slate-800 tw-hidden sm:tw-table-cell";
 
-enum Step {
-  Initial,
-  NewDestination,
-}
-
 export const Destinations: React.FC = () => {
-  const [step, setStep] = useState<Step>(Step.Initial);
-
-  let content: ReactElement;
-  switch (step) {
-    case Step.Initial:
-      content = <DestinationList setStep={setStep} />;
-      break;
-    case Step.NewDestination:
-      content = <NewDestination onComplete={() => setStep(Step.Initial)} />;
-      break;
-    default:
-      content = <></>;
-  }
-  return <div className="tw-py-5 tw-px-10 tw-h-full tw-overflow-scroll">{content}</div>;
+  return (
+    <div className="tw-py-5 tw-px-10 tw-h-full tw-overflow-scroll">
+      <DestinationList />
+    </div>
+  );
 };
 
-const DestinationList: React.FC<{ setStep: (step: Step) => void }> = ({ setStep }) => {
+const DestinationList: React.FC = () => {
   const { destinations } = useDestinations();
   const navigate = useNavigate();
   return (
@@ -45,7 +29,7 @@ const DestinationList: React.FC<{ setStep: (step: Step) => void }> = ({ setStep 
         <div className="tw-flex tw-flex-col tw-justify-end tw-font-bold tw-text-lg">Destinations</div>
         <Button
           className="tw-ml-auto tw-flex tw-justify-center tw-items-center"
-          onClick={() => setStep(Step.NewDestination)}
+          onClick={() => navigate("/destinations/new")}
         >
           <div className="tw-flex tw-flex-col tw-justify-center tw-h-full">
             <PlusCircleIcon className="tw-h-4 tw-inline-block tw-mr-2" />
@@ -73,7 +57,7 @@ const DestinationList: React.FC<{ setStep: (step: Step) => void }> = ({ setStep 
                   <tr
                     key={index}
                     className="tw-cursor-pointer hover:tw-bg-slate-50"
-                    onClick={() => navigate(`/destination/${destination.id}`)}
+                    onClick={() => navigate(`/destinations/${destination.id}`)}
                   >
                     <td className={tableCellStyle}>{destination.display_name}</td>
                     <td className={tableCellStyle}>

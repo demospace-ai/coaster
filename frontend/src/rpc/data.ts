@@ -80,16 +80,17 @@ export function useDestination(destinationID: number | undefined) {
   return { destination: data?.destination, mutate, error, loading: isLoading || isValidating };
 }
 
-export function useObjects(linkToken?: string) {
+export function useObjects(opts: { linkToken?: string; destinationID?: number } = {}) {
+  const { linkToken, destinationID } = opts;
   let fetchFn;
   if (linkToken) {
     fetchFn = () => sendLinkTokenRequest(GetObjects, linkToken);
   } else {
-    fetchFn = () => sendRequest(GetObjects);
+    fetchFn = () => sendRequest(GetObjects, { destinationID });
   }
 
   const fetcher: Fetcher<GetObjectsResponse, {}> = fetchFn;
-  const { data, mutate, error, isLoading, isValidating } = useSWR({ GetObjects }, fetcher);
+  const { data, mutate, error, isLoading, isValidating } = useSWR({ GetObjects, destinationID }, fetcher);
   return { objects: data?.objects, mutate, error, loading: isLoading || isValidating };
 }
 

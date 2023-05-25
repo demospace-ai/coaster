@@ -1,6 +1,6 @@
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { BackButton, Button, DeleteButton } from "src/components/button/Button";
 import { Checkbox } from "src/components/checkbox/Checkbox";
 import { InfoIcon } from "src/components/icons/Icons";
@@ -18,6 +18,7 @@ import { Tooltip } from "src/components/tooltip/Tooltip";
 import {
   initalizeFromExisting,
   INITIAL_OBJECT_STATE,
+  initializeFromDestination,
   NewObjectState,
   Step,
   validateAll,
@@ -48,7 +49,8 @@ import {
   UpdateObjectResponse,
 } from "src/rpc/api";
 import { useSchema } from "src/rpc/data";
-import { consumeError, HttpError } from "src/utils/errors";
+import { consumeError, forceError, HttpError } from "src/utils/errors";
+import { useMutation } from "src/utils/queryHelpers";
 import { mergeClasses } from "src/utils/twmerge";
 import { mutate } from "swr";
 
@@ -66,9 +68,13 @@ export type NewObjectProps = {
 
 export const NewObject: React.FC<NewObjectProps> = (props) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const maybeDestination = location.state?.destination as Destination | undefined;
   const [state, setState] = useState<NewObjectState>(
     props.existingObject && props.existingDestination
       ? initalizeFromExisting(props.existingObject, props.existingDestination)
+      : maybeDestination
+      ? initializeFromDestination(maybeDestination)
       : INITIAL_OBJECT_STATE,
   );
 
@@ -544,23 +550,23 @@ type FinalizeStepProps = {
 
 const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) => {
   const { state, setState } = props;
-  const [loading, setLoading] = useState<boolean>(false);
   const showToast = useShowToast();
 
-  const createNewObject = async (state: NewObjectState) => {
+  const createNewObject = async (formValues: NewObjectState) => {
     const payload: CreateObjectRequest = {
-      display_name: state.displayName!,
-      destination_id: state.destination!.id,
-      target_type: state.targetType!,
-      namespace: state.namespace!,
-      table_name: state.tableName!,
-      sync_mode: state.syncMode!,
-      cursor_field: state.cursorField && state.cursorField.name,
-      primary_key: state.primaryKey && state.primaryKey.name,
-      end_customer_id_field: state.endCustomerIdField!.name,
-      frequency: state.frequency!,
-      frequency_units: state.frequencyUnits!,
-      object_fields: state.objectFields!,
+      display_name: formValues.displayName!,
+      destination_id: formValues.destination!.id,
+      target_type: formValues.targetType!,
+      namespace: formValues.namespace ?? "",
+      table_name: formValues.tableName ?? "",
+      sync_mode: formValues.syncMode!,
+      cursor_field: formValues.cursorField && formValues.cursorField.name,
+      primary_key: formValues.primaryKey && formValues.primaryKey.name,
+      // @ts-ignore Need to fix this soon.
+      end_customer_id_field: formValues.endCustomerIdField && formValues.endCustomerIdField.name,
+      frequency: formValues.frequency!,
+      frequency_units: formValues.frequencyUnits!,
+      object_fields: formValues.objectFields,
     };
     await sendRequest(CreateObject, payload);
     mutate({ GetObjects: GetObjects }); // Tell SWRs to refetch event sets
@@ -599,30 +605,33 @@ const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) => {
     ]);
   };
 
-  const saveConfiguration = async () => {
-    setLoading(true);
+  const saveConfigurationMutation = useMutation(
+    async () => {
+      if (props.existingObject) {
+        await updateObject(state);
+      } else {
+        await createNewObject(state);
+      }
+    },
+    {
+      onSuccess: () => {
+        showToast("success", props.isUpdate ? "Successfully updated object!" : "Successfully created object!", 4000);
+      },
+      onError: (e) => {
+        showToast("error", props.isUpdate ? "Failed to update object." : "Failed to create object.", 4000);
+        const err = forceError(e);
+        setState((state) => ({ ...state, createError: err?.message ?? "Failed to save object" }));
+      },
+    },
+  );
+
+  const saveConfiguration = () => {
     if (!validateAll(state, setState)) {
-      setLoading(false);
       console.error("Validation failed");
       return;
     }
 
-    try {
-      props.existingObject ? await updateObject(state) : await createNewObject(state);
-      showToast("success", props.isUpdate ? "Successfully updated object!" : "Successfully created object!", 4000);
-      props.onComplete();
-    } catch (e) {
-      showToast("error", props.isUpdate ? "Failed to update object." : "Failed to create object.", 4000);
-      if (e instanceof HttpError) {
-        const createError = e.message;
-        setState((state) => {
-          return { ...state, createError };
-        });
-      }
-      consumeError(e);
-    } finally {
-      setLoading(false);
-    }
+    saveConfigurationMutation.mutate();
   };
 
   const fields: Field[] = state.objectFields
@@ -633,6 +642,18 @@ const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) => {
         })
     : [];
 
+  if (saveConfigurationMutation.isSuccess) {
+    return (
+      <div>
+        <div className="tw-mt-10 tw-text-center tw-font-bold tw-text-lg">
+          {props.existingObject ? "Your object is updated!" : "🎉 Congratulations! Your object is set up. 🎉"}
+        </div>
+        <Button className="tw-block tw-mt-8 tw-mx-auto tw-mb-10 tw-w-32" onClick={() => props.onComplete?.()}>
+          Done
+        </Button>
+      </div>
+    );
+  }
   let recommendedCursor = <></>;
   switch (state.syncMode!) {
     case SyncMode.IncrementalAppend:
@@ -771,7 +792,7 @@ const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) => {
         </>
       )}
       <Button onClick={saveConfiguration} className="tw-mt-10 tw-w-full tw-h-10">
-        {loading ? <Loading /> : props.existingObject ? "Update Object" : "Create Object"}
+        {saveConfigurationMutation.isLoading ? <Loading /> : props.existingObject ? "Update Object" : "Create Object"}
       </Button>
     </div>
   );
