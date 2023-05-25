@@ -26,7 +26,7 @@ export const Object: React.FC = () => {
         <Button
           className="tw-text-sm tw-ml-5"
           onClick={function (): void {
-            navigate(`/object/${object.id}/update`);
+            navigate("./update");
           }}
         >
           Configure

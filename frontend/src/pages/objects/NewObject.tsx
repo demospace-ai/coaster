@@ -57,7 +57,7 @@ export type NewObjectProps = {
   initialObject?: NewObjectState;
   onComplete: () => void;
 };
-export const NewObject: React.FC = (props: NewObjectProps) => {
+export const NewObject: React.FC<NewObjectProps> = (props) => {
   const location = useLocation();
   const destination: Destination | undefined = location.state?.destination;
   const navigate = useNavigate();

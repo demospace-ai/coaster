@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { INITIAL_OBJECT_STATE, NewObject } from "src/pages/objects/NewObject";
+import { NewObject } from "src/pages/objects/NewObject";
+import { INITIAL_OBJECT_STATE } from "src/pages/objects/helpers";
 import { sendRequest } from "src/rpc/ajax";
 import {
   FieldType,
@@ -11,11 +12,6 @@ import {
   UpdateObjectResponse,
 } from "src/rpc/api";
 import { useDestination, useObject } from "src/rpc/data";
-
-const tableHeaderStyle =
-  "tw-sticky tw-top-0 tw-z-0 tw-border-b tw-border-slate-300 tw-py-3.5 tw-px-4 sm:tw-pr-6 lg:tw-pr-8 tw-text-left tw-whitespace-nowrap";
-const tableCellStyle =
-  "tw-whitespace-nowrap tw-left tw-overflow-hidden tw-py-4 tw-pl-4 tw-text-sm tw-text-slate-800 tw-hidden sm:tw-table-cell";
 
 export const UpdateObject: React.FC = () => {
   const navigate = useNavigate();
@@ -88,7 +84,7 @@ export const UpdateObject: React.FC = () => {
           frequencyUnits: initObj?.frequency_units,
         }}
         onComplete={() => {
-          navigate(`/object/${objectID}`);
+          navigate(`/objects/${objectID}`);
         }}
       ></NewObject>
     </div>
