@@ -1,4 +1,5 @@
 import React, { FormEvent, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { BackButton, Button, FormButton } from "src/components/button/Button";
 import { ErrorDisplay } from "src/components/error/Error";
 import { InfoIcon } from "src/components/icons/Icons";
@@ -7,6 +8,7 @@ import { ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { GoogleLocationSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
+import { shouldGoToCreateObject } from "src/pages/destinations/NewDestination/helpers";
 import { sendRequest } from "src/rpc/ajax";
 import {
   BigQueryConfigState,
@@ -156,6 +158,7 @@ const validateAll = (connectionType: ConnectionType, state: NewDestinationState)
 
 const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = (props) => {
   const [state, setState] = useState<NewDestinationState>(INITIAL_DESTINATION_STATE);
+  const navigate = useNavigate();
 
   const newDestinationMutation = useMutation(
     async () => {
@@ -190,11 +193,14 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = (
           break;
       }
 
-      await sendRequest(CreateDestination, payload);
+      return await sendRequest(CreateDestination, payload);
     },
     {
-      onSuccess: () => {
+      onSuccess: (destination) => {
         mutate({ GetDestinations }); // Tell SWRs to refetch destinations
+        if (shouldGoToCreateObject(destination.destination)) {
+          navigate(`/destinations/${destination.destination.uuid}/create`);
+        }
       },
     },
   );

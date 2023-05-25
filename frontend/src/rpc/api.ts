@@ -167,7 +167,7 @@ export const GetFieldValues: IEndpoint<GetFieldValuesRequest, GetFieldValuesResp
   track: true,
 };
 
-export const CreateDestination: IEndpoint<CreateDestinationRequest, undefined> = {
+export const CreateDestination: IEndpoint<CreateDestinationRequest, CreateDestinationResponse> = {
   name: "Destination Created",
   method: "POST",
   path: "/destination",
@@ -254,6 +254,10 @@ export interface CreateDestinationRequest {
   synapse_config?: SynapseConfig;
   webhook_config?: WebhookConfig;
   postgres_config?: PostgresConfig;
+}
+
+export interface CreateDestinationResponse {
+  destination: Destination;
 }
 
 export interface LinkCreateSourceRequest {
