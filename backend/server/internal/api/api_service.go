@@ -118,12 +118,6 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.UpdateObjectFields,
 		},
 		{
-			Name:        "Create fields on an object for sync",
-			Method:      router.POST,
-			Pattern:     "/object/{objectID}/object_fields",
-			HandlerFunc: s.CreateObjectFields,
-		},
-		{
 			Name:        "Create sync",
 			Method:      router.POST,
 			Pattern:     "/sync",
