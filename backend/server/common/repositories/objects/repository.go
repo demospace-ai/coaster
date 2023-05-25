@@ -133,7 +133,7 @@ func CreateObjectField(
 	}
 	result := db.Create(&objectFieldModel)
 	if result.Error != nil {
-		return nil, errors.Wrap(result.Error, "(objects.CreateObjectFields)")
+		return nil, errors.Wrap(result.Error, "(objects.CreateObjectField)")
 	}
 	return &objectFieldModel, nil
 }
@@ -195,8 +195,10 @@ func PartialUpdateObject(
 	input PartialUpdateObjectInput,
 ) (*models.Object, error) {
 	var object models.Object
-	db.First(&object, objectID)
-
+	result := db.First(&object, objectID)
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(objects.PartialUpdateObject)")
+	}
 	if input.DisplayName != nil {
 		object.DisplayName = *input.DisplayName
 	}
@@ -222,9 +224,9 @@ func PartialUpdateObject(
 	setNullStringFromRaw(input.TableNameRaw, &object.TableName)
 	setNullStringFromRaw(input.PrimaryKeyRaw, &object.PrimaryKey)
 	setNullStringFromRaw(input.CursorFieldRaw, &object.CursorField)
-	result := db.Save(&object)
+	result = db.Save(&object)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(objects.PartialUpdateObject)")
 	}
 
 	return &object, nil
@@ -270,7 +272,7 @@ func PartialUpdateObjectField(
 	var objectField models.ObjectField
 	result := db.First(&objectField, objectFieldID)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.Wrap(result.Error, "(objects.PartialUpdateObjectField)")
 	}
 	if input.Name != nil {
 		objectField.Name = *input.Name
@@ -286,6 +288,9 @@ func PartialUpdateObjectField(
 	}
 	setNullStringFromRaw(input.DisplayNameRaw, &objectField.DisplayName)
 	setNullStringFromRaw(input.DescriptionRaw, &objectField.Description)
-	db.Save(&objectField)
+	result = db.Save(&objectField)
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(objects.PartialUpdateObjectField)")
+	}
 	return &objectField, nil
 }
