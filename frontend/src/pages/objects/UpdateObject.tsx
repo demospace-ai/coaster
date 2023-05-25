@@ -44,16 +44,12 @@ export const UpdateObject: React.FC = () => {
           saveObjectConfigurations: async (newObj) => {
             // For object field update, we need to compute the change sets. New fields are added, existing fields are updated.
             // Removing fields is not supported as of 2023 May 24.
-            const newFields = newObj.objectFields.filter(
-              (field) => !initObj?.object_fields?.find((initField) => initField.name === field.name),
-            );
             const updatedFields = newObj.objectFields.filter((field) =>
               initObj?.object_fields?.find((initField) => initField.name === field.name),
             );
-            sendRequestWith<UpdateObjectRequest, UpdateObjectResponse>({
-              endpoint: UpdateObjectAPI,
-              queryParams: { objectID: `${objectID}` },
-              payload: {
+            await Promise.all([
+              sendRequest<UpdateObjectRequest, UpdateObjectResponse>(UpdateObjectAPI, {
+                objectID: Number(objectID),
                 display_name: newObj.displayName,
                 destination_id: newObj.destination?.id,
                 target_type: newObj.targetType,
@@ -64,19 +60,12 @@ export const UpdateObject: React.FC = () => {
                 end_customer_id_field: newObj.endCustomerIdField?.name,
                 frequency: newObj.frequency,
                 frequency_units: newObj.frequencyUnits,
-              },
-            });
-            sendRequestWith<CreateObjectFieldsRequest, CreateObjectFieldsResponse>({
-              endpoint: CreateObjectFields,
-              payload: newFields as ObjectField[],
-              queryParams: { objectID: `${objectID}` },
-            });
-            sendRequestWith<UpdateObjectFieldsRequest, UpdateObjectFieldsResponse>({
-              endpoint: UpdateObjectFields,
-              payload: updatedFields as ObjectField[],
-              queryParams: { objectID: `${objectID}` },
-            });
-            await Promise.all([]);
+              }),
+              sendRequest<UpdateObjectFieldsRequest, UpdateObjectFieldsResponse>(UpdateObjectFields, {
+                objectID: Number(objectID),
+                object_fields: updatedFields as UpdateObjectFieldsRequest["object_fields"],
+              }),
+            ]);
           },
         }}
         initialObject={{

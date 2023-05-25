@@ -35,24 +35,18 @@ export function getEndpointUrl<RequestType extends Record<string, any>, Response
   return url.toString();
 }
 
-export async function sendRequestWith<RequestType extends Record<string, any>, ResponseType>({
-  endpoint,
-  payload,
-  extraHeaders,
-  queryParams,
-}: {
-  endpoint: IEndpoint<RequestType, ResponseType>;
-  payload?: RequestType;
-  extraHeaders?: [string, string][];
-  queryParams?: { [key: string]: string };
-}): Promise<ResponseType> {
+export async function sendRequest<RequestType extends Record<string, any>, ResponseType>(
+  endpoint: IEndpoint<RequestType, ResponseType>,
+  payload?: RequestType,
+  extraHeaders?: [string, string][],
+): Promise<ResponseType> {
   const toPath = compile(endpoint.path);
-  const path = toPath({ ...payload, ...queryParams });
+  const path = toPath(payload);
 
   const url = new URL(ROOT_DOMAIN + path);
-  if (endpoint.queryParams && queryParams) {
+  if (endpoint.queryParams && payload) {
     endpoint.queryParams.forEach((queryParam) => {
-      const queryParamValue = queryParams[queryParam];
+      const queryParamValue = payload[queryParam];
       if (queryParamValue) {
         url.searchParams.append(queryParam, queryParamValue);
       }
@@ -94,15 +88,4 @@ export async function sendRequestWith<RequestType extends Record<string, any>, R
     return response.text() as ResponseType;
   }
   return response.json().catch(() => null);
-}
-
-// TODO: Depreciate this? Use sendRequestWith instead. To support batch
-// requests, I need to use Array as the body. You can no longer read the
-// queryParams from the payload. I need to pass it in separately.
-export async function sendRequest<RequestType extends Record<string, any>, ResponseType>(
-  endpoint: IEndpoint<RequestType, ResponseType>,
-  payload?: RequestType,
-  extraHeaders?: [string, string][],
-): Promise<ResponseType> {
-  return sendRequestWith({ endpoint, payload, extraHeaders, queryParams: payload });
 }

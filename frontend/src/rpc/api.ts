@@ -65,12 +65,6 @@ export const UpdateObject: IEndpoint<UpdateObjectRequest, UpdateObjectResponse> 
   path: "/object/:objectID",
 };
 
-export const CreateObjectFields: IEndpoint<CreateObjectFieldsRequest, CreateObjectFieldsResponse> = {
-  name: "ObjectField Created",
-  method: "POST",
-  path: "/object/:objectID/object_fields",
-};
-
 export const UpdateObjectFields: IEndpoint<UpdateObjectFieldsRequest, UpdateObjectFieldsResponse> = {
   name: "ObjectField Updated",
   method: "PATCH",
@@ -295,6 +289,7 @@ export interface CreateSourceResponse {
 }
 
 export interface CreateObjectRequest {
+  objectID: number;
   display_name: string;
   destination_id: number;
   target_type: TargetType;
@@ -309,7 +304,9 @@ export interface CreateObjectRequest {
   primary_key?: string; // required  for incremental update: need primary key to match up rows
 }
 
-export type UpdateObjectRequest = Partial<Omit<CreateObjectRequest, "object_fields">>;
+export type UpdateObjectRequest = Partial<Omit<CreateObjectRequest, "object_fields">> & {
+  objectID: number;
+};
 
 export interface CreateLinkTokenRequest {
   end_customer_id: string;
@@ -558,7 +555,10 @@ export interface GetObjectResponse {
   object: FabraObject;
 }
 
-export type UpdateObjectFieldsRequest = (Partial<ObjectField> & { id: number })[];
+export type UpdateObjectFieldsRequest = {
+  objectID: number;
+  object_fields: (ObjectFieldInput & { id: number })[];
+};
 
 export interface UpdateObjectFieldsResponse {
   object_fields: FabraObject;
