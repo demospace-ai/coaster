@@ -22,6 +22,7 @@ import { useStart } from "src/app/actions";
 import { LogoLoading } from "src/components/loading/LogoLoading";
 import { ObjectsLayout } from "src/pages/objects/ObjectsLayout";
 import { NewObject } from "src/pages/objects/NewObject";
+import { UpgradeBanner } from "src/components/header/UpgradeBanner";
 
 type AuthenticationProps = {
   element: ReactNode;
@@ -61,13 +62,16 @@ const AppLayout: React.FC = () => {
   }
 
   return (
-    <div className="tw-flex tw-flex-row tw-w-full tw-h-full">
-      <NavigationBar />
-      <div className="tw-flex tw-flex-col tw-h-full tw-w-full tw-bg-gray-10 tw-overflow-hidden">
-        <Header />
-        <Outlet />
+    <>
+      <UpgradeBanner />
+      <div className="tw-flex tw-flex-row tw-w-full tw-h-full">
+        <NavigationBar />
+        <div className="tw-flex tw-flex-col tw-h-full tw-w-full tw-bg-gray-10 tw-overflow-hidden">
+          <Header />
+          <Outlet />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
