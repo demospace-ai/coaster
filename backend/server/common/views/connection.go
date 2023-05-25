@@ -153,25 +153,30 @@ func ConvertSourceConnections(sourceConnections []models.SourceConnection) []Sou
 	return sources
 }
 
+func ConvertObjectField(objectField *models.ObjectField) ObjectField {
+	viewObjectField := ObjectField{
+		ID:       objectField.ID,
+		Name:     objectField.Name,
+		Type:     objectField.Type,
+		Omit:     objectField.Omit,
+		Optional: objectField.Optional,
+	}
+	if objectField.DisplayName.Valid {
+		displayName := objectField.DisplayName.String
+		viewObjectField.DisplayName = &displayName
+	}
+	if objectField.Description.Valid {
+		description := objectField.Description.String
+		viewObjectField.Description = &description
+	}
+
+	return viewObjectField
+}
+
 func ConvertObject(object *models.Object, objectFields []models.ObjectField) Object {
 	viewObjectFields := []ObjectField{}
 	for _, objectField := range objectFields {
-		viewObjectField := ObjectField{
-			ID:       objectField.ID,
-			Name:     objectField.Name,
-			Type:     objectField.Type,
-			Omit:     objectField.Omit,
-			Optional: objectField.Optional,
-		}
-		if objectField.DisplayName.Valid {
-			displayName := objectField.DisplayName.String
-			viewObjectField.DisplayName = &displayName
-		}
-		if objectField.Description.Valid {
-			description := objectField.Description.String
-			viewObjectField.Description = &description
-		}
-		viewObjectFields = append(viewObjectFields, viewObjectField)
+		viewObjectFields = append(viewObjectFields, ConvertObjectField(&objectField))
 	}
 
 	viewObject := Object{

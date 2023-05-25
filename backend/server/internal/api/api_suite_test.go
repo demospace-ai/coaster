@@ -3,6 +3,7 @@ package api_test
 import (
 	"testing"
 
+	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/test"
 	"go.fabra.io/server/internal/api"
 
@@ -20,6 +21,13 @@ var cleanup func()
 func TestHandlers(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Handlers Suite")
+}
+
+func getAuth(db *gorm.DB) auth.Authentication {
+	org := test.CreateOrganization(db)
+	return auth.Authentication{
+		Organization: org,
+	}
 }
 
 var _ = BeforeSuite(func() {

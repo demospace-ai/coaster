@@ -106,6 +106,24 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.CreateObject,
 		},
 		{
+			Name:        "Update an object for sync",
+			Method:      router.PATCH,
+			Pattern:     "/object/{objectID}",
+			HandlerFunc: s.UpdateObject,
+		},
+		{
+			Name:        "Batch update object fields for sync",
+			Method:      router.PATCH,
+			Pattern:     "/object_field",
+			HandlerFunc: s.BatchUpdateObjectField,
+		},
+		{
+			Name:        "Batch create fields on an object for sync",
+			Method:      router.POST,
+			Pattern:     "/object/{objectID}/object_fields",
+			HandlerFunc: s.BatchCreateObjectField,
+		},
+		{
 			Name:        "Create sync",
 			Method:      router.POST,
 			Pattern:     "/sync",

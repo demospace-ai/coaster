@@ -33,6 +33,14 @@ func NewNullString(s string) NullString {
 	return NullString{sql.NullString{String: s, Valid: true}}
 }
 
+func NewNullStringFromPtr(s *string) NullString {
+	if s == nil {
+		return NullString{}
+	} else {
+		return NullString{sql.NullString{String: *s, Valid: true}}
+	}
+}
+
 type NullInt64 struct{ sql.NullInt64 }
 
 func (i NullInt64) MarshalJSON() ([]byte, error) {

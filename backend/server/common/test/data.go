@@ -104,21 +104,26 @@ func CreateObject(db *gorm.DB, organizationID int64, destinationID int64, syncMo
 	return &object
 }
 
+func CreateObjectField(db *gorm.DB, objectID int64, field input.ObjectField) *models.ObjectField {
+	fieldModel := models.ObjectField{
+		ObjectID:    objectID,
+		Name:        field.Name,
+		Type:        field.Type,
+		Optional:    field.Optional,
+		Omit:        field.Omit,
+		Description: database.NewNullStringFromPtr(field.Description),
+		DisplayName: database.NewNullStringFromPtr(field.DisplayName),
+	}
+	db.Create(&fieldModel)
+	return &fieldModel
+}
+
 func CreateObjectFields(db *gorm.DB, objectID int64, fields []input.ObjectField) []models.ObjectField {
 	var fieldModels []models.ObjectField
 	for _, field := range fields {
-		fieldModel := models.ObjectField{
-			ObjectID: objectID,
-			Name:     field.Name,
-			Type:     field.Type,
-			Optional: field.Optional,
-			Omit:     field.Omit,
-		}
-
-		db.Create(&fieldModel)
-		fieldModels = append(fieldModels, fieldModel)
+		fieldModel := CreateObjectField(db, objectID, field)
+		fieldModels = append(fieldModels, *fieldModel)
 	}
-
 	return fieldModels
 }
 
