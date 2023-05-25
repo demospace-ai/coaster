@@ -3,7 +3,6 @@ package objects
 import (
 	"encoding/json"
 
-	"go.fabra.io/server/common/data"
 	"go.fabra.io/server/common/database"
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/input"
@@ -268,15 +267,6 @@ func setNullStringFromRaw(input json.RawMessage, stringVal *database.NullString)
 	return nil
 }
 
-type PartialUpdateObjectFieldInput struct {
-	Name           *string         `json:"name"`
-	Type           *data.FieldType `json:"type"`
-	Omit           *bool           `json:"omit"`
-	Optional       *bool           `json:"optional"`
-	DisplayNameRaw json.RawMessage `json:"display_name"`
-	DescriptionRaw json.RawMessage `json:"description"`
-}
-
 // Partially updates an object field. OrganizationID and ObjectID are used to
 // ensure the object field belongs to the organization and object.
 func PartialUpdateObjectField(
@@ -284,7 +274,7 @@ func PartialUpdateObjectField(
 	organizationID int64,
 	objectID int64,
 	objectFieldID int64,
-	input PartialUpdateObjectFieldInput,
+	input input.PartialUpdateObjectField,
 ) (*models.ObjectField, error) {
 	// Verify the object belongs to the organization
 	var object models.Object

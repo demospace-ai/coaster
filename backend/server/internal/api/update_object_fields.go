@@ -7,6 +7,7 @@ import (
 
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/errors"
+	"go.fabra.io/server/common/input"
 	"go.fabra.io/server/common/repositories/objects"
 	"go.fabra.io/server/common/views"
 
@@ -16,7 +17,7 @@ import (
 
 type UpdateObjectFieldsRequest struct {
 	ID int64 `json:"id" validate:"required"`
-	objects.PartialUpdateObjectFieldInput
+	input.PartialUpdateObjectField
 }
 
 type UpdateObjectFieldsResponse struct {
@@ -62,7 +63,7 @@ func (s ApiService) UpdateObjectFields(auth auth.Authentication, w http.Response
 			auth.Organization.ID,
 			objectID,
 			objectField.ID,
-			objectField.PartialUpdateObjectFieldInput,
+			objectField.PartialUpdateObjectField,
 		)
 		if err == nil {
 			updated := views.ConvertObjectField(updatedObjectField)
