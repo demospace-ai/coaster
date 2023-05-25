@@ -5,7 +5,7 @@ import {
   ValidatedDropdownInput,
   ValidatedDropdownInputProps,
 } from "src/components/input/Input";
-import { Connection, Destination, FabraObject as DataObject, Field, FieldType, GCPLocation, Source } from "src/rpc/api";
+import { Connection, FabraObject as DataObject, Destination, Field, FieldType, GCPLocation, Source } from "src/rpc/api";
 import {
   useDestinations,
   useFieldValues,
@@ -26,6 +26,7 @@ type DestinationSelectorProps = Omit<
   destination: Destination | undefined;
   setDestination: (destination: Destination) => void;
   showLabel?: boolean;
+  disabled?: boolean;
 };
 
 export const DestinationSelector: React.FC<DestinationSelectorProps> = (props) => {

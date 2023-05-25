@@ -13,6 +13,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   textarea?: boolean;
   type?: HTMLInputTypeAttribute;
   label?: string;
+  disabled?: boolean;
 }
 
 export const Input: React.FC<InputProps> = (props) => {
@@ -22,6 +23,7 @@ export const Input: React.FC<InputProps> = (props) => {
   let classes = [
     "tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border focus:tw-border-slate-700 tw-outline-none",
     !disabled && "hover:tw-border-slate-400",
+    disabled && "tw-bg-slate-100 tw-text-slate-500 tw-cursor-not-allowed",
     className,
   ];
 
@@ -69,6 +71,7 @@ export const Input: React.FC<InputProps> = (props) => {
             setFocused(false);
           }}
           value={value ? value : ""}
+          disabled={disabled}
         />
       ) : (
         <input
@@ -89,6 +92,7 @@ export const Input: React.FC<InputProps> = (props) => {
             setFocused(false);
           }}
           value={value ? value : ""}
+          disabled={disabled}
           {...other}
         />
       )}
@@ -228,6 +232,7 @@ export type ValidatedDropdownInputProps = {
   label?: string;
   dropdownHeight?: string;
   valid?: boolean;
+  disabled?: boolean;
 };
 
 export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = (props) => {
@@ -259,6 +264,7 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = (pr
   return (
     <Listbox
       value={value}
+      disabled={props.disabled}
       onChange={(value) => {
         props.setSelected(value);
         setComputedValid(true);
@@ -284,7 +290,9 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = (pr
         <Listbox.Button
           ref={setReferenceElement}
           className={mergeClasses(
-            "tw-flex tw-justify-center tw-items-center tw-w-96 tw-mt-5 tw-rounded-md tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 hover:tw-border-primary-hover aria-expanded:tw-border-primary",
+            "tw-flex tw-justify-center tw-items-center tw-w-96 tw-mt-5 tw-rounded-md tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 aria-expanded:tw-border-primary",
+            !props.disabled && "hover:tw-border-primary-hover",
+            props.disabled && "tw-bg-slate-100 tw-text-slate-400 tw-cursor-not-allowed",
             props.className,
             props.validated && !valid && "tw-border-red-600",
           )}
@@ -406,6 +414,7 @@ export type ValidatedComboInputProps = {
   dropdownHeight?: string;
   nullable?: boolean;
   valid?: boolean;
+  disabled?: boolean;
 };
 
 export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = (props) => {
@@ -457,6 +466,7 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = (props) =
   return (
     <Combobox
       value={value}
+      disabled={props.disabled}
       onChange={(value: number) => {
         props.setSelected(value);
         setComputedValid(true);
@@ -482,15 +492,18 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = (props) =
         <div
           ref={setReferenceElement}
           className={mergeClasses(
-            "tw-flex tw-w-96 tw-mt-5 tw-rounded-md tw-bg-white tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 hover:tw-border-primary-hover focus-within:!tw-border-primary tw-transition tw-duration-100",
+            "tw-flex tw-w-96 tw-mt-5 tw-rounded-md tw-bg-white tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 focus-within:!tw-border-primary tw-transition tw-duration-100",
+            !props.disabled && "hover:tw-border-primary-hover",
+            props.disabled && "tw-bg-slate-100 tw-cursor-not-allowed",
             props.className,
             props.validated && !valid && "tw-border-red-600",
           )}
         >
           <Combobox.Input
-            className={
-              "tw-inline tw-bg-transparent tw-w-[calc(100%-20px)] tw-border-none tw-text-sm tw-leading-5 tw-text-slate-900 tw-outline-none tw-text-ellipsis tw-cursor-pointer focus:tw-cursor-text"
-            }
+            className={mergeClasses(
+              "tw-inline tw-bg-transparent tw-w-[calc(100%-20px)] tw-border-none tw-text-sm tw-leading-5 tw-text-slate-900 tw-outline-none tw-text-ellipsis tw-cursor-pointer focus:tw-cursor-text",
+              props.disabled && "tw-bg-slate-100 tw-text-slate-400 tw-cursor-not-allowed",
+            )}
             displayValue={(selected) => (selected ? getElementForDisplay(selected) : "")}
             onChange={(event) => setQuery(event.target.value)}
             placeholder={props.placeholder}

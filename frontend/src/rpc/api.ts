@@ -59,6 +59,18 @@ export const GetObject: IEndpoint<{ objectID: number }, GetObjectResponse> = {
   path: "/object/:objectID",
 };
 
+export const UpdateObject: IEndpoint<UpdateObjectRequest, UpdateObjectResponse> = {
+  name: "Object Updated",
+  method: "PATCH",
+  path: "/object/:objectID",
+};
+
+export const UpdateObjectFields: IEndpoint<UpdateObjectFieldsRequest, UpdateObjectFieldsResponse> = {
+  name: "ObjectField Updated",
+  method: "PATCH",
+  path: "/object/:objectID/object_fields",
+};
+
 export const GetSyncs: IEndpoint<undefined, GetSyncsResponse> = {
   name: "Syncs Fetched",
   method: "GET",
@@ -291,6 +303,10 @@ export interface CreateObjectRequest {
   primary_key?: string; // required  for incremental update: need primary key to match up rows
 }
 
+export type UpdateObjectRequest = Partial<Omit<CreateObjectRequest, "object_fields">> & {
+  objectID: number;
+};
+
 export interface CreateLinkTokenRequest {
   end_customer_id: string;
 }
@@ -310,6 +326,7 @@ export interface ObjectField {
 }
 
 export interface ObjectFieldInput {
+  id?: number;
   name?: string;
   type?: FieldType;
   omit?: boolean;
@@ -534,6 +551,27 @@ export interface GetObjectsResponse {
 }
 
 export interface GetObjectResponse {
+  object: FabraObject;
+}
+
+export type UpdateObjectFieldsRequest = {
+  objectID: number;
+  object_fields: (ObjectFieldInput & { id: number })[];
+};
+
+export interface UpdateObjectFieldsResponse {
+  object_fields: FabraObject;
+  failures: FabraObject[];
+}
+
+export type CreateObjectFieldsRequest = ObjectField[];
+
+export interface CreateObjectFieldsResponse {
+  object_fields: FabraObject;
+  failures: FabraObject[];
+}
+
+export interface UpdateObjectResponse {
   object: FabraObject;
 }
 

@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { BackButton } from "src/components/button/Button";
+import { BackButton, Button } from "src/components/button/Button";
 import { Loading } from "src/components/loading/Loading";
 import { needsCursorField, needsEndCustomerId, needsPrimaryKey, TargetType, targetTypeToString } from "src/rpc/api";
 import { useObject } from "src/rpc/data";
@@ -19,10 +19,20 @@ export const Object: React.FC = () => {
   }
 
   return (
-    <div className="tw-pt-5 tw-pb-24 tw-px-10 tw-h-full tw-w-full tw-overflow-scroll">
+    <div className="xl:tw-w-3/5 md:tw-w-full tw-flex tw-flex-col tw-mb-10">
       <BackButton onClick={() => navigate("/objects")} />
-      <div className="tw-flex tw-flex-row tw-items-center tw-font-bold tw-text-2xl tw-my-4">{object.display_name}</div>
-      <div className="tw-flex tw-flex-col tw-flex-wrap tw-items-start tw-w-1/2 tw-min-w-[400px] tw-p-4 tw-mb-5 tw-bg-white tw-border tw-border-slate-200 tw-rounded-md">
+      <div className="tw-flex tw-flex-row tw-items-center tw-font-bold tw-text-2xl tw-my-4">
+        <span className="tw-grow">{object.display_name}</span>
+        <Button
+          className="tw-text-sm tw-ml-5"
+          onClick={() => {
+            navigate("./update");
+          }}
+        >
+          Configure
+        </Button>
+      </div>
+      <div className="tw-flex tw-flex-col tw-flex-wrap tw-items-start tw-p-4 tw-mb-5 tw-bg-white tw-border tw-border-slate-200 tw-rounded-md">
         <div className="tw-flex tw-flex-row tw-items-center tw-text-base tw-mt-1">
           <span className="tw-font-medium tw-whitespace-pre">Destination ID: </span>
           {object.destination_id}
@@ -68,7 +78,7 @@ export const Object: React.FC = () => {
       </div>
 
       <div className="tw-font-bold tw-text-lg tw-mt-10 tw-mb-2">Object Fields</div>
-      <div className="tw-ring-1 tw-ring-black tw-ring-opacity-5 tw-bg-white tw-rounded-lg tw-overflow-auto tw-overscroll-contain tw-shadow-md tw-w-1/2 tw-min-w-[400px]">
+      <div className="tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-lg tw-overflow-auto tw-overscroll-contain tw-shadow-md">
         <table className="tw-min-w-full tw-border-spacing-0 tw-divide-y tw-divide-slate-200">
           <thead className="tw-bg-slate-100 tw-text-slate-900">
             <tr>

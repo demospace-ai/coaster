@@ -1,3 +1,4 @@
+import { TrashIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import React, { forwardRef } from "react";
 import { NavLink, NavLinkProps, useNavigate } from "react-router-dom";
@@ -117,3 +118,38 @@ export const DivButton: React.FC<ButtonProps> = (props) => {
     </div>
   );
 };
+
+type IconButtonProps = {
+  onClick: () => void;
+  icon: React.ReactNode;
+  className?: string;
+  children?: React.ReactNode;
+  disabled?: boolean;
+};
+export const IconButton: React.FC<IconButtonProps> = forwardRef<HTMLButtonElement, IconButtonProps>((props, ref) => {
+  const { onClick, className, children, ...remaining } = props;
+  const buttonStyle = mergeClasses(
+    "tw-font-semibold tw-flex ",
+    "tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition tw-select-none",
+    !props.disabled && "hover:tw-bg-slate-100",
+    props.disabled && "tw-text-slate-400 tw-cursor-not-allowed",
+    props.className,
+  );
+  return (
+    <button
+      className={buttonStyle}
+      type="button"
+      ref={ref}
+      disabled={props.disabled}
+      onClick={props.onClick}
+      {...remaining}
+    >
+      {props.icon}
+      {props.children}
+    </button>
+  );
+});
+
+export const DeleteButton = (props: Omit<IconButtonProps, "icon">) => (
+  <IconButton {...props} icon={<TrashIcon className="tw-w-5 tw-h-5" />} />
+);
