@@ -1,3 +1,4 @@
+import { ConnectionImage } from "src/components/images/Connections";
 import {
   ValidatedComboInput,
   ValidatedComboInputProps,
@@ -47,7 +48,14 @@ export const DestinationSelector: React.FC<DestinationSelectorProps> = (props) =
       className={className}
       selected={destination}
       setSelected={setDestination}
-      getElementForDisplay={(destination: Destination) => destination.display_name}
+      getElementForDisplay={(destination: Destination) => (
+        <div className="tw-flex tw-items-center tw-gap-x-2">
+          <div>
+            <ConnectionImage connectionType={destination.connection.connection_type} className="tw-h-4 tw-w-4" />
+          </div>
+          <div>{destination.display_name}</div>
+        </div>
+      )}
       options={destinations}
       loading={loading}
       noOptionsString={noOptionsString ? noOptionsString : "No destinations available!"}

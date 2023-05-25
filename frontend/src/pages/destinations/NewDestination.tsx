@@ -8,7 +8,6 @@ import { ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { GoogleLocationSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
-import { shouldGoToCreateObject } from "src/pages/destinations/NewDestination/helpers";
 import { sendRequest } from "src/rpc/ajax";
 import {
   BigQueryConfigState,
@@ -198,9 +197,11 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = (
     {
       onSuccess: (destination) => {
         mutate({ GetDestinations }); // Tell SWRs to refetch destinations
-        if (shouldGoToCreateObject(destination.destination)) {
-          navigate("/objects/new");
-        }
+        navigate("/objects/new", {
+          state: {
+            destination: destination.destination,
+          },
+        });
       },
     },
   );

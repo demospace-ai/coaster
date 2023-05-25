@@ -42,6 +42,42 @@ export type NewObjectState = {
   createError: string | undefined;
 };
 
+export const INITIAL_OBJECT_STATE: NewObjectState = {
+  step: Step.Initial,
+  displayName: undefined,
+  destination: undefined,
+  namespace: undefined,
+  targetType: undefined,
+  tableName: undefined,
+  syncMode: undefined,
+  cursorField: undefined,
+  primaryKey: undefined,
+  endCustomerIdField: undefined,
+  frequency: undefined,
+  frequencyUnits: undefined,
+  objectFields: [],
+  displayNameError: undefined,
+  destinationError: undefined,
+  fieldsError: undefined,
+  cursorFieldError: undefined,
+  endCustomerIdError: undefined,
+  frequencyError: undefined,
+  createError: undefined,
+};
+
+export const initializeState = ({ destination }: { destination: Destination | undefined }): NewObjectState => {
+  if (!destination) {
+    return INITIAL_OBJECT_STATE;
+  }
+
+  const state: NewObjectState = {
+    ...INITIAL_OBJECT_STATE,
+    destination,
+  };
+
+  return state;
+};
+
 export const validateAll = (
   state: NewObjectState,
   setState: React.Dispatch<React.SetStateAction<NewObjectState>>,

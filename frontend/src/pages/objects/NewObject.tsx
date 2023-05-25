@@ -15,16 +15,19 @@ import {
 } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import {
+  INITIAL_OBJECT_STATE,
   NewObjectState,
   Step,
+  initializeState,
   validateAll,
   validateDestination,
   validateDisplayName,
   validateFields,
-} from "src/pages/objects/NewObject/helpers";
+} from "src/pages/objects/helpers";
 import { sendRequest } from "src/rpc/ajax";
 import {
   ConnectionType,
+  CreateDestinationResponse,
   CreateObject,
   CreateObjectRequest,
   Destination,
@@ -43,39 +46,17 @@ import { HttpError, consumeError } from "src/utils/errors";
 import { mergeClasses } from "src/utils/twmerge";
 import { mutate } from "swr";
 
-const INITIAL_OBJECT_STATE: NewObjectState = {
-  step: Step.Initial,
-  displayName: undefined,
-  destination: undefined,
-  namespace: undefined,
-  targetType: undefined,
-  tableName: undefined,
-  syncMode: undefined,
-  cursorField: undefined,
-  primaryKey: undefined,
-  endCustomerIdField: undefined,
-  frequency: undefined,
-  frequencyUnits: undefined,
-  objectFields: [],
-  displayNameError: undefined,
-  destinationError: undefined,
-  fieldsError: undefined,
-  cursorFieldError: undefined,
-  endCustomerIdError: undefined,
-  frequencyError: undefined,
-  createError: undefined,
-};
-
 type ObjectStepProps = {
   state: NewObjectState;
   setState: React.Dispatch<React.SetStateAction<NewObjectState>>;
 };
 
 export const NewObject: React.FC = () => {
-  const [state, setState] = useState<NewObjectState>(INITIAL_OBJECT_STATE);
-  const [prevSchema, setPrevSchema] = useState<Schema | undefined>(undefined);
-  const navigate = useNavigate();
   const location = useLocation();
+  const destination: Destination | undefined = location.state?.destination;
+  const navigate = useNavigate();
+  const [state, setState] = useState<NewObjectState>(initializeState({ destination }));
+  const [prevSchema, setPrevSchema] = useState<Schema | undefined>(undefined);
   const { schema } = useSchema(state.destination?.connection.id, state.namespace, state.tableName);
   const onComplete = () => {
     navigate("/objects");
@@ -817,6 +798,7 @@ export const DestinationSetup: React.FC<ObjectStepProps> = (props) => {
         </Tooltip>
       </div>
       <ValidatedInput
+        autoFocus
         className="tw-w-100"
         value={state.displayName}
         setValue={(value) => {

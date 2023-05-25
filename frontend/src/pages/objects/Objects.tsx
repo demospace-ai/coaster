@@ -17,23 +17,6 @@ enum Step {
   NewObject,
 }
 
-// export const Objects: React.FC = () => {
-//   const [step, setStep] = useState<Step>(Step.Initial);
-
-//   let content: ReactElement;
-//   switch (step) {
-//     case Step.Initial:
-//       content = <ObjectList setStep={setStep} />;
-//       break;
-//     case Step.NewObject:
-//       content = <NewObject onComplete={() => setStep(Step.Initial)} />;
-//       break;
-//     default:
-//       content = <></>;
-//   }
-//   return <div className="tw-py-5 tw-px-10 tw-h-full tw-overflow-scroll">{content}</div>;
-// };
-
 export const ObjectsList: React.FC = () => {
   const navigate = useNavigate();
   const { objects } = useObjects();
@@ -56,7 +39,7 @@ export const ObjectsList: React.FC = () => {
                 <tr
                   key={index}
                   className="tw-cursor-pointer hover:tw-bg-slate-50"
-                  onClick={() => navigate(`/object/${object.id}`)}
+                  onClick={() => navigate(`/objects/${object.id}`)}
                 >
                   <td className={tableCellStyle}>{object.display_name}</td>
                   <td className={mergeClasses(tableCellStyle, "tw-pr-5")}>
