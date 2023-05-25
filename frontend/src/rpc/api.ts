@@ -65,16 +65,16 @@ export const UpdateObject: IEndpoint<UpdateObjectRequest, UpdateObjectResponse> 
   path: "/object/:objectID",
 };
 
-export const BatchCreateObjectField: IEndpoint<BatchCreateObjectFieldRequest, BatchCreateObjectFieldResponse> = {
+export const CreateObjectFields: IEndpoint<CreateObjectFieldsRequest, CreateObjectFieldsResponse> = {
   name: "ObjectField Created",
   method: "POST",
   path: "/object/:objectID/object_fields",
 };
 
-export const BatchUpdateObjectField: IEndpoint<BatchUpdateObjectFieldRequest, BatchUpdateObjectFieldResponse> = {
+export const UpdateObjectFields: IEndpoint<UpdateObjectFieldsRequest, UpdateObjectFieldsResponse> = {
   name: "ObjectField Updated",
   method: "PATCH",
-  path: "/object_field",
+  path: "/object/:objectID/object_fields",
 };
 
 export const GetSyncs: IEndpoint<undefined, GetSyncsResponse> = {
@@ -558,16 +558,16 @@ export interface GetObjectResponse {
   object: FabraObject;
 }
 
-export type BatchUpdateObjectFieldRequest = (Partial<ObjectField> & { id: number })[];
+export type UpdateObjectFieldsRequest = (Partial<ObjectField> & { id: number })[];
 
-export interface BatchUpdateObjectFieldResponse {
+export interface UpdateObjectFieldsResponse {
   object_fields: FabraObject;
   failures: FabraObject[];
 }
 
-export type BatchCreateObjectFieldRequest = ObjectField[];
+export type CreateObjectFieldsRequest = ObjectField[];
 
-export interface BatchCreateObjectFieldResponse {
+export interface CreateObjectFieldsResponse {
   object_fields: FabraObject;
   failures: FabraObject[];
 }

@@ -2,15 +2,15 @@ import { useNavigate, useParams } from "react-router-dom";
 import { INITIAL_OBJECT_STATE, NewObject } from "src/pages/objects/NewObject";
 import { sendRequestWith } from "src/rpc/ajax";
 import {
-  BatchCreateObjectField,
-  BatchCreateObjectFieldRequest,
-  BatchCreateObjectFieldResponse,
-  BatchUpdateObjectField,
-  BatchUpdateObjectFieldRequest,
-  BatchUpdateObjectFieldResponse,
+  CreateObjectFields,
+  CreateObjectFieldsRequest,
+  CreateObjectFieldsResponse,
   FieldType,
   ObjectField,
   UpdateObject as UpdateObjectAPI,
+  UpdateObjectFields,
+  UpdateObjectFieldsRequest,
+  UpdateObjectFieldsResponse,
   UpdateObjectRequest,
   UpdateObjectResponse,
 } from "src/rpc/api";
@@ -69,14 +69,15 @@ export const UpdateObject: React.FC = () => {
                 frequency_units: newObj.frequencyUnits,
               },
             });
-            sendRequestWith<BatchCreateObjectFieldRequest, BatchCreateObjectFieldResponse>({
-              endpoint: BatchCreateObjectField,
+            sendRequestWith<CreateObjectFieldsRequest, CreateObjectFieldsResponse>({
+              endpoint: CreateObjectFields,
               payload: newFields as ObjectField[],
               queryParams: { objectID: `${objectID}` },
             });
-            sendRequestWith<BatchUpdateObjectFieldRequest, BatchUpdateObjectFieldResponse>({
-              endpoint: BatchUpdateObjectField,
+            sendRequestWith<UpdateObjectFieldsRequest, UpdateObjectFieldsResponse>({
+              endpoint: UpdateObjectFields,
               payload: updatedFields as ObjectField[],
+              queryParams: { objectID: `${objectID}` },
             });
             await Promise.all([]);
           },
