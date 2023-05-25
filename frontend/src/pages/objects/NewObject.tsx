@@ -1,7 +1,7 @@
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { BackButton, Button } from "src/components/button/Button";
+import { BackButton, Button, DeleteButton } from "src/components/button/Button";
 import { Checkbox } from "src/components/checkbox/Checkbox";
 import { InfoIcon } from "src/components/icons/Icons";
 import { Input, ValidatedDropdownInput, ValidatedInput } from "src/components/input/Input";
@@ -414,6 +414,13 @@ const NewObjectFields: React.FC<ObjectStepProps & NewObjectFieldsStepProps> = (p
     });
   };
 
+  const removeObjectField = (index: number) => {
+    setState({
+      ...state,
+      objectFields: state.objectFields.filter((_, i) => i !== index),
+    });
+  };
+
   const advance = () => {
     if (validateFields(state, setState)) {
       setState((state) => {
@@ -435,6 +442,11 @@ const NewObjectFields: React.FC<ObjectStepProps & NewObjectFieldsStepProps> = (p
               <div key={i} className="tw-mt-5 tw-mb-7 tw-text-left tw-p-4 tw-border tw-rounded-lg">
                 <div className="tw-flex tw-items-center">
                   <span className="tw-font-semibold tw-text-lg tw-grow">Field {i + 1}</span>
+                  <DeleteButton
+                    className="tw-ml-auto tw-stroke-red-400 tw-p-2"
+                    onClick={() => removeObjectField(i)}
+                    disabled={props.isUpdate}
+                  />
                 </div>
                 <div className="tw-flex tw-items-center tw-mt-3">
                   <span>Optional?</span>

@@ -151,5 +151,5 @@ export const IconButton: React.FC<IconButtonProps> = forwardRef<HTMLButtonElemen
 });
 
 export const DeleteButton = (props: Omit<IconButtonProps, "icon">) => (
-  <IconButton {...props} icon={<TrashIcon className="tw-w-5 tw-h-5 tw-mr-2" />} />
+  <IconButton {...props} icon={<TrashIcon className="tw-w-5 tw-h-5" />} />
 );
