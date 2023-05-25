@@ -12,23 +12,23 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-type BatchUpdateObjectFieldRequest struct {
+type UpdateObjectFieldsRequest struct {
 	ID int64 `json:"id" validate:"required"`
 	objects.PartialUpdateObjectFieldInput
 }
 
-type BatchUpdateObjectFieldResponse struct {
+type UpdateObjectFieldsResponse struct {
 	ObjectFields []views.ObjectField `json:"object_fields"`
 	Failures     []int64             `json:"failures"`
 }
 
-func (s ApiService) BatchUpdateObjectField(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) UpdateObjectFields(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
 		return errors.NewBadRequest("must setup organization first")
 	}
 
 	decoder := json.NewDecoder(r.Body)
-	var requestBody []BatchUpdateObjectFieldRequest
+	var requestBody []UpdateObjectFieldsRequest
 	if err := decoder.Decode(&requestBody); err != nil {
 		return err
 	}
@@ -58,7 +58,7 @@ func (s ApiService) BatchUpdateObjectField(auth auth.Authentication, w http.Resp
 		}
 	}
 
-	return json.NewEncoder(w).Encode(BatchUpdateObjectFieldResponse{
+	return json.NewEncoder(w).Encode(UpdateObjectFieldsResponse{
 		ObjectFields: responseViews,
 		Failures:     failures,
 	})

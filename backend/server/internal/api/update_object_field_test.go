@@ -35,7 +35,7 @@ var _ = Describe("Sending an ObjectField batch update request", func() {
 		It("should return a 200 status code", func() {
 			response := httptest.NewRecorder()
 			request := httptest.NewRequest("PATCH", "/object_field", makeRequestBody([]map[string]interface{}{}))
-			err := service.BatchUpdateObjectField(auth, response, request)
+			err := service.UpdateObjectFields(auth, response, request)
 			Expect(err).To(BeNil(), "no error should be returned, got %s", err)
 			Expect(response.Code).To(Equal(200))
 		})
@@ -47,7 +47,7 @@ var _ = Describe("Sending an ObjectField batch update request", func() {
 			request := httptest.NewRequest("PATCH", "/object_field", makeRequestBody([]map[string]interface{}{
 				{},
 			}))
-			err := service.BatchUpdateObjectField(auth, response, request)
+			err := service.UpdateObjectFields(auth, response, request)
 			Expect(err).To(BeAssignableToTypeOf(validator.ValidationErrors{}))
 			fieldError := err.(validator.ValidationErrors)[0]
 			Expect(fieldError.Field()).To(Equal("ID"))
@@ -72,10 +72,10 @@ var _ = Describe("Sending an ObjectField batch update request", func() {
 					// Do not provide Description (This tests partial update)
 				},
 			}))
-			err := service.BatchUpdateObjectField(auth, response, request)
+			err := service.UpdateObjectFields(auth, response, request)
 			Expect(err).To(BeNil(), "no error should be returned, got %s", err)
 			Expect(response.Code).To(Equal(200))
-			var actual api.BatchCreateObjectFieldResponse
+			var actual api.CreateObjectFieldsResponse
 			json.Unmarshal(response.Body.Bytes(), &actual)
 			Expect(*actual.ObjectFields[0].Description).To(Equal("test description (shouldn't change)"))
 			Expect(actual.ObjectFields[0].Name).To(Equal("test (shouldn't change)"))
@@ -104,10 +104,10 @@ var _ = Describe("Sending an ObjectField batch update request", func() {
 					"display_name": nil, // This will set {"display_name": null}
 				},
 			}))
-			err := service.BatchUpdateObjectField(auth, response, request)
+			err := service.UpdateObjectFields(auth, response, request)
 			Expect(err).To(BeNil(), "no error should be returned, got %s", err)
 			Expect(response.Code).To(Equal(200))
-			expect, _ := json.Marshal(api.BatchUpdateObjectFieldResponse{
+			expect, _ := json.Marshal(api.UpdateObjectFieldsResponse{
 				ObjectFields: []views.ObjectField{
 					{
 						ID:          objField.ID,
@@ -130,10 +130,10 @@ var _ = Describe("Sending an ObjectField batch update request", func() {
 					"id": math.MaxInt64,
 				},
 			}))
-			err := service.BatchUpdateObjectField(auth, response, request)
+			err := service.UpdateObjectFields(auth, response, request)
 			Expect(err).To(BeNil(), "no error should be returned, got %s", err)
 			Expect(response.Code).To(Equal(200))
-			expect, _ := json.Marshal(api.BatchUpdateObjectFieldResponse{
+			expect, _ := json.Marshal(api.UpdateObjectFieldsResponse{
 				ObjectFields: []views.ObjectField{},
 				Failures: []int64{
 					math.MaxInt64,

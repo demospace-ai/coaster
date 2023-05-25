@@ -15,16 +15,16 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type BatchCreateObjectFieldRequest = []struct {
+type CreateObjectFieldsRequest = []struct {
 	input.ObjectField
 }
 
-type BatchCreateObjectFieldResponse struct {
+type CreateObjectFieldsResponse struct {
 	ObjectFields []views.ObjectField `json:"object_fields"`
 	Failures     []input.ObjectField `json:"failures"`
 }
 
-func (s ApiService) BatchCreateObjectField(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) CreateObjectFields(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
 		return errors.NewBadRequest("must setup organization first")
 	}
@@ -41,7 +41,7 @@ func (s ApiService) BatchCreateObjectField(auth auth.Authentication, w http.Resp
 	}
 
 	decoder := json.NewDecoder(r.Body)
-	var requestBody BatchCreateObjectFieldRequest
+	var requestBody CreateObjectFieldsRequest
 	if err := decoder.Decode(&requestBody); err != nil {
 		return err
 	}
@@ -70,7 +70,7 @@ func (s ApiService) BatchCreateObjectField(auth auth.Authentication, w http.Resp
 		}
 	}
 
-	return json.NewEncoder(w).Encode(BatchCreateObjectFieldResponse{
+	return json.NewEncoder(w).Encode(CreateObjectFieldsResponse{
 		ObjectFields: objectFieldsView,
 		Failures:     failures,
 	})

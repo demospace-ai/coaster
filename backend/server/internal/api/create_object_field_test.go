@@ -40,7 +40,7 @@ var _ = Describe("Sending an ObjectField creation request", func() {
 	Context("with an empty list", func() {
 		It("should return a 200 status code", func() {
 			response := httptest.NewRecorder()
-			err := service.BatchCreateObjectField(auth, response, makeRequest([]map[string]interface{}{}))
+			err := service.CreateObjectFields(auth, response, makeRequest([]map[string]interface{}{}))
 			Expect(err).To(BeNil(), "no error should be returned, got %s", err)
 			Expect(response.Code).To(Equal(200))
 		})
@@ -49,7 +49,7 @@ var _ = Describe("Sending an ObjectField creation request", func() {
 	Context("with an object that is {}", func() {
 		It("should fail validation", func() {
 			response := httptest.NewRecorder()
-			err := service.BatchCreateObjectField(auth, response, makeRequest([]map[string]interface{}{
+			err := service.CreateObjectFields(auth, response, makeRequest([]map[string]interface{}{
 				{},
 			}))
 			Expect(err).To(BeAssignableToTypeOf(validator.ValidationErrors{}))
@@ -61,7 +61,7 @@ var _ = Describe("Sending an ObjectField creation request", func() {
 	Context("with an object", func() {
 		It("should succeed", func() {
 			response := httptest.NewRecorder()
-			err := service.BatchCreateObjectField(auth, response, makeRequest([]map[string]interface{}{
+			err := service.CreateObjectFields(auth, response, makeRequest([]map[string]interface{}{
 				{
 					"Name": "test",
 					"Type": "STRING",
@@ -69,7 +69,7 @@ var _ = Describe("Sending an ObjectField creation request", func() {
 			}))
 			Expect(err).To(BeNil(), "no error should be returned, got %s", err)
 			Expect(response.Code).To(Equal(200))
-			var actual api.BatchCreateObjectFieldResponse
+			var actual api.CreateObjectFieldsResponse
 			err = json.Unmarshal(response.Body.Bytes(), &actual)
 			Expect(err).To(BeNil(), "no error should be returned, got %s", err)
 			Expect(actual.ObjectFields).To(HaveLen(1))
