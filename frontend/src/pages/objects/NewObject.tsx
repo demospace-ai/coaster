@@ -289,6 +289,7 @@ type NewObjectFieldsStepProps = {
   readonlyFieldsCount?: number;
   fieldKeyHelpMessage?: string;
   fieldKeyTypeHelpMessage?: string;
+  disableAddNewFields?: boolean;
 };
 
 const NewObjectFields: React.FC<ObjectStepProps & NewObjectFieldsStepProps> = (props) => {
@@ -356,9 +357,11 @@ const NewObjectFields: React.FC<ObjectStepProps & NewObjectFieldsStepProps> = (p
               <div key={i} className="tw-mt-5 tw-mb-7 tw-text-left tw-p-4 tw-border tw-rounded-lg">
                 <div className="tw-flex tw-items-center">
                   <span className="tw-font-semibold tw-text-lg tw-grow">Field {i + 1}</span>
-                  <DeleteButton onClick={() => removeObjectField(i)} disabled={i < (props.readonlyFieldsCount ?? 0)}>
-                    Delete
-                  </DeleteButton>
+                  {i >= (props.readonlyFieldsCount ?? 0) && (
+                    <DeleteButton onClick={() => removeObjectField(i)} disabled={i < (props.readonlyFieldsCount ?? 0)}>
+                      Delete
+                    </DeleteButton>
+                  )}
                 </div>
                 <div className="tw-flex tw-items-center tw-mt-3">
                   <span>Optional?</span>
@@ -439,16 +442,18 @@ const NewObjectFields: React.FC<ObjectStepProps & NewObjectFieldsStepProps> = (p
                 />
               </div>
             ))}
-            <Button className="tw-mt-7 tw-mx-auto tw-flex tw-items-center" onClick={addObjectField}>
-              <PlusCircleIcon className="tw-h-5 tw-mr-1.5 tw-stroke-2" />
-              Add Object Field
-            </Button>
+            {!props.disableAddNewFields && (
+              <Button className="tw-mt-7 tw-mx-auto tw-flex tw-items-center tw-mb-8" onClick={addObjectField}>
+                <PlusCircleIcon className="tw-h-5 tw-mr-1.5 tw-stroke-2" />
+                Add Object Field
+              </Button>
+            )}
           </div>
         ) : (
           <Loading className="tw-mt-5" />
         )}
       </div>
-      <Button onClick={advance} className="tw-mt-16 tw-w-100 tw-h-10">
+      <Button onClick={advance} className="tw-mt-8 tw-w-100 tw-h-10">
         Continue
       </Button>
     </div>

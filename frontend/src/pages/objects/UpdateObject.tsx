@@ -1,12 +1,8 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { INITIAL_OBJECT_STATE, NewObject } from "src/pages/objects/NewObject";
-import { sendRequestWith } from "src/rpc/ajax";
+import { sendRequest } from "src/rpc/ajax";
 import {
-  CreateObjectFields,
-  CreateObjectFieldsRequest,
-  CreateObjectFieldsResponse,
   FieldType,
-  ObjectField,
   UpdateObject as UpdateObjectAPI,
   UpdateObjectFields,
   UpdateObjectFieldsRequest,
@@ -37,6 +33,7 @@ export const UpdateObject: React.FC = () => {
         newObjectFieldsStepProps={{
           readonlyFieldKey: true,
           readonlyFieldType: true,
+          disableAddNewFields: true,
           fieldKeyHelpMessage: "Changing the field key is currently not supported.",
           fieldKeyTypeHelpMessage: "Changing the field key type is currently not supported.",
         }}
