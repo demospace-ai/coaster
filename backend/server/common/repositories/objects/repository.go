@@ -112,6 +112,39 @@ func LoadAllObjects(
 	return objects, nil
 }
 
+// OrganizationID is used to check that the object belongs to the organization.
+func CreateObjectField(
+	db *gorm.DB,
+	organizationID int64,
+	objectID int64,
+	objectField input.ObjectField,
+) (*models.ObjectField, error) {
+	// Verify the object belongs to the organization
+	var object models.Object
+	result := db.Where(&models.Object{
+		OrganizationID: organizationID,
+		BaseModel:      models.BaseModel{ID: objectID},
+	}).First(&object)
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(objects.CreateObjectField)")
+	}
+
+	objectFieldModel := models.ObjectField{
+		ObjectID:    objectID,
+		Name:        objectField.Name,
+		Type:        objectField.Type,
+		Omit:        objectField.Omit,
+		Optional:    objectField.Optional,
+		DisplayName: database.NewNullStringFromPtr(objectField.DisplayName),
+		Description: database.NewNullStringFromPtr(objectField.Description),
+	}
+	result = db.Create(&objectFieldModel)
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(objects.CreateObjectField)")
+	}
+	return &objectFieldModel, nil
+}
+
 func CreateObjectFields(
 	db *gorm.DB,
 	organizationID int64,
@@ -120,27 +153,12 @@ func CreateObjectFields(
 ) ([]models.ObjectField, error) {
 	var createdObjectFields []models.ObjectField
 	for _, objectField := range objectFields {
-		objectFieldModel := models.ObjectField{
-			ObjectID: objectID,
-			Name:     objectField.Name,
-			Type:     objectField.Type,
-			Omit:     objectField.Omit,
-			Optional: objectField.Optional,
+		objectFieldModel, err := CreateObjectField(db, organizationID, objectID, objectField)
+		if err != nil {
+			return nil, errors.Wrap(err, "(objects.CreateObjectFields)")
 		}
-		if objectField.DisplayName != nil {
-			objectFieldModel.DisplayName = database.NewNullString(*objectField.DisplayName)
-		}
-		if objectField.Description != nil {
-			objectFieldModel.Description = database.NewNullString(*objectField.Description)
-		}
-
-		result := db.Create(&objectFieldModel)
-		if result.Error != nil {
-			return nil, errors.Wrap(result.Error, "(objects.CreateObjectFields)")
-		}
-		createdObjectFields = append(createdObjectFields, objectFieldModel)
+		createdObjectFields = append(createdObjectFields, *objectFieldModel)
 	}
-
 	return createdObjectFields, nil
 }
 
@@ -161,4 +179,83 @@ func LoadObjectFieldsByID(
 	}
 
 	return objectFields, nil
+}
+
+// PartialUpdateObject updates the object with the given ID. The organizationID
+// is used to ensure that the object belongs to the given organization.
+func PartialUpdateObject(
+	db *gorm.DB,
+	organizationID int64,
+	objectID int64,
+	objectUpdates input.PartialUpdateObjectInput,
+) (*models.Object, error) {
+	var object models.Object
+	result := db.Where(&models.Object{
+		OrganizationID: organizationID,
+		BaseModel:      models.BaseModel{ID: objectID},
+	}).First(&object)
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(objects.PartialUpdateObject)")
+	}
+	if objectUpdates.DisplayName != nil {
+		object.DisplayName = *objectUpdates.DisplayName
+	}
+	if objectUpdates.Frequency != nil {
+		object.Frequency = *objectUpdates.Frequency
+	}
+	if objectUpdates.FrequencyUnits != nil {
+		object.FrequencyUnits = *objectUpdates.FrequencyUnits
+	}
+
+	// Explicitly do not allow updating the destination, sync mode, primary key, or cursor field
+	// since that may affect running syncs. TODO: do this safely
+	result = db.Save(&object)
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(objects.PartialUpdateObject)")
+	}
+
+	return &object, nil
+}
+
+// Partially updates an object field. OrganizationID and ObjectID are used to
+// ensure the object field belongs to the organization and object.
+func PartialUpdateObjectField(
+	db *gorm.DB,
+	organizationID int64,
+	objectID int64,
+	objectFieldUpdates input.PartialUpdateObjectField,
+) (*models.ObjectField, error) {
+	// Verify the object belongs to the organization
+	var object models.Object
+	result := db.Where(&models.Object{
+		OrganizationID: organizationID,
+		BaseModel:      models.BaseModel{ID: objectID},
+	}).First(&object)
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(objects.PartialUpdateObjectField)")
+	}
+
+	var objectField models.ObjectField
+	result = db.Where(&models.ObjectField{
+		ObjectID:  objectID,
+		BaseModel: models.BaseModel{ID: objectFieldUpdates.ID},
+	}).First(&objectField)
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(objects.PartialUpdateObjectField)")
+	}
+
+	// Explicitly do not allow updating the name or type since that may affect running syncs. TODO: do this safely
+	if objectFieldUpdates.Omit != nil {
+		objectField.Omit = *objectFieldUpdates.Omit
+	}
+	if objectFieldUpdates.Optional != nil {
+		objectField.Optional = *objectFieldUpdates.Optional
+	}
+	database.SetNullStringFromRaw(objectFieldUpdates.DisplayNameRaw, &objectField.DisplayName)
+	database.SetNullStringFromRaw(objectFieldUpdates.DescriptionRaw, &objectField.Description)
+	result = db.Save(&objectField)
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(objects.PartialUpdateObjectField)")
+	}
+	return &objectField, nil
 }
