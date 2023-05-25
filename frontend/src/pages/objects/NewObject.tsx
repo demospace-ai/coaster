@@ -470,7 +470,7 @@ export const DestinationSetup: React.FC<ObjectStepProps> = (props) => {
                 destination: value,
                 namespace: undefined,
                 tableName: undefined,
-                targetType: TargetType.Webhook,
+                targetType: TargetType.DemoDestination,
                 endCustomerIdField: { name: "demo_destination_dummy_customer_id", type: FieldType.Integer },
                 objectFields: [],
               });

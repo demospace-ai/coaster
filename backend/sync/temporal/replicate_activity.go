@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"gorm.io/gorm"
+
 	"go.fabra.io/server/common/crypto"
 	"go.fabra.io/server/common/data"
 	"go.fabra.io/server/common/errors"
@@ -44,7 +46,7 @@ func (a *Activities) Replicate(ctx context.Context, input ReplicateInput) (*Repl
 		return nil, errors.Wrap(err, "(temporal.Replicate) getSourceConnector")
 	}
 
-	destConnector, err := getDestinationConnector(ctx, input.DestinationConnection, queryService, cryptoService, input.EncryptedEndCustomerApiKey)
+	destConnector, err := getDestinationConnector(ctx, input.DestinationConnection, queryService, cryptoService, input.EncryptedEndCustomerApiKey, a.Db)
 	if err != nil {
 		return nil, errors.Wrap(err, "(temporal.Replicate) getDestinationConnector")
 	}
@@ -117,7 +119,7 @@ func getSourceConnector(ctx context.Context, connection views.FullConnection, qu
 	}
 }
 
-func getDestinationConnector(ctx context.Context, connection views.FullConnection, queryService query.QueryService, cryptoService crypto.CryptoService, encryptedEndCustomerApiKey *string) (connectors.Connector, error) {
+func getDestinationConnector(ctx context.Context, connection views.FullConnection, queryService query.QueryService, cryptoService crypto.CryptoService, encryptedEndCustomerApiKey *string, db *gorm.DB) (connectors.Connector, error) {
 	connectionModel := views.ConvertConnectionView(connection)
 	switch connection.ConnectionType {
 	case models.ConnectionTypeBigQuery:
@@ -130,7 +132,7 @@ func getDestinationConnector(ctx context.Context, connection views.FullConnectio
 		// TODO: does end customer api key belong here?
 		return connectors.NewWebhookConnector(queryService, cryptoService, encryptedEndCustomerApiKey), nil
 	case models.ConnectionTypeDemoDestination:
-		return connectors.NewWebhookConnector(queryService, cryptoService, encryptedEndCustomerApiKey), nil
+		return connectors.NewDemoDestinationConnector(db), nil
 	default:
 		return nil, errors.Newf("(temporal.getDestinationConnector) destination not implemented for %s", connection.ConnectionType)
 	}

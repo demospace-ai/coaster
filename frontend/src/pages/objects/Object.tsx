@@ -31,7 +31,7 @@ export const Object: React.FC = () => {
           <span className="tw-font-medium tw-whitespace-pre">Target Type: </span>
           {targetTypeToString(object.target_type)}
         </div>
-        {object.target_type !== TargetType.Webhook && (
+        {object.target_type !== TargetType.Webhook && object.target_type !== TargetType.DemoDestination && (
           <>
             <div className="tw-flex tw-flex-row tw-items-center tw-text-base tw-mt-1">
               <span className="tw-font-medium tw-whitespace-pre">Namespace: </span>

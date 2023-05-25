@@ -701,6 +701,7 @@ export const needsPrimaryKey = (syncMode: SyncMode): boolean => {
 export const needsEndCustomerId = (targetType: TargetType): boolean => {
   // no default so it isn"t possible to add a new mode without updating
   switch (targetType) {
+    case TargetType.DemoDestination:
     case TargetType.Webhook:
       return false;
     case TargetType.SingleExisting:
@@ -727,6 +728,7 @@ export enum TargetType {
   SingleExisting = "single_existing",
   SingleNew = "single_new",
   TablePerCustomer = "table_per_customer",
+  DemoDestination = "demo_destination",
   Webhook = "webhook",
 }
 
@@ -738,6 +740,8 @@ export function targetTypeToString(targetType: TargetType) {
       return "Single New Table";
     case TargetType.TablePerCustomer:
       return "Table Per Customer";
+    case TargetType.DemoDestination:
+      return "Demo Destination";
     case TargetType.Webhook:
       return "Webhook";
   }
@@ -753,7 +757,7 @@ export enum FrequencyUnits {
 export function getConnectionType(connectionType: ConnectionType): string {
   switch (connectionType) {
     case ConnectionType.DemoDestination:
-      return "DemoDestination";
+      return "Demo";
     case ConnectionType.BigQuery:
       return "BigQuery";
     case ConnectionType.Snowflake:
