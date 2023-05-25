@@ -1,5 +1,6 @@
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import { ChangeEvent, useState } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { BackButton, Button } from "src/components/button/Button";
 import { Checkbox } from "src/components/checkbox/Checkbox";
 import { InfoIcon } from "src/components/icons/Icons";
@@ -13,9 +14,20 @@ import {
   TableSelector,
 } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
+import {
+  INITIAL_OBJECT_STATE,
+  NewObjectState,
+  Step,
+  initializeState,
+  validateAll,
+  validateDestination,
+  validateDisplayName,
+  validateFields,
+} from "src/pages/objects/helpers";
 import { sendRequest } from "src/rpc/ajax";
 import {
   ConnectionType,
+  CreateDestinationResponse,
   CreateObject,
   CreateObjectRequest,
   Destination,
@@ -23,275 +35,32 @@ import {
   FieldType,
   FrequencyUnits,
   GetObjects,
-  needsCursorField,
-  needsEndCustomerId,
-  needsPrimaryKey,
   ObjectFieldInput,
   Schema,
-  shouldCreateFields,
   SyncMode,
   TargetType,
+  shouldCreateFields,
 } from "src/rpc/api";
 import { useSchema } from "src/rpc/data";
 import { HttpError, consumeError } from "src/utils/errors";
 import { mergeClasses } from "src/utils/twmerge";
 import { mutate } from "swr";
 
-enum Step {
-  Initial,
-  FieldMapping,
-  CreateFields,
-  Finalize,
-}
-
-type NewObjectState = {
-  step: Step;
-  displayName: string | undefined;
-  destination: Destination | undefined;
-  namespace: string | undefined;
-  targetType: TargetType | undefined;
-  tableName: string | undefined;
-  syncMode: SyncMode | undefined;
-  cursorField: Field | undefined;
-  primaryKey: Field | undefined;
-  endCustomerIdField: Field | undefined;
-  frequency: number | undefined;
-  frequencyUnits: FrequencyUnits | undefined;
-  objectFields: ObjectFieldInput[];
-  displayNameError: string | undefined;
-  destinationError: string | undefined;
-  fieldsError: string | undefined;
-  cursorFieldError: string | undefined;
-  endCustomerIdError: string | undefined;
-  frequencyError: string | undefined;
-  createError: string | undefined;
-};
-
-const INITIAL_OBJECT_STATE: NewObjectState = {
-  step: Step.Initial,
-  displayName: undefined,
-  destination: undefined,
-  namespace: undefined,
-  targetType: undefined,
-  tableName: undefined,
-  syncMode: undefined,
-  cursorField: undefined,
-  primaryKey: undefined,
-  endCustomerIdField: undefined,
-  frequency: undefined,
-  frequencyUnits: undefined,
-  objectFields: [],
-  displayNameError: undefined,
-  destinationError: undefined,
-  fieldsError: undefined,
-  cursorFieldError: undefined,
-  endCustomerIdError: undefined,
-  frequencyError: undefined,
-  createError: undefined,
-};
-
 type ObjectStepProps = {
   state: NewObjectState;
   setState: React.Dispatch<React.SetStateAction<NewObjectState>>;
 };
 
-const validateAll = (
-  state: NewObjectState,
-  setState: React.Dispatch<React.SetStateAction<NewObjectState>>,
-): boolean => {
-  return (
-    validateDisplayName(state, setState) &&
-    validateDestination(state, setState) &&
-    validateFields(state, setState) &&
-    state.syncMode !== undefined &&
-    (!needsCursorField(state.syncMode) || validateCursorField(state, setState)) &&
-    (!needsPrimaryKey(state.syncMode) || state.primaryKey !== undefined) &&
-    (!needsEndCustomerId(state.targetType!) || state.endCustomerIdField !== undefined) &&
-    validateFrequency(state, setState)
-  );
-};
-
-const validateDisplayName = (
-  state: NewObjectState,
-  setState: React.Dispatch<React.SetStateAction<NewObjectState>>,
-): boolean => {
-  if (state.displayName === undefined || state.displayName.length <= 0) {
-    setState((state) => {
-      return {
-        ...state,
-        displayNameError: "Must set a display name",
-      };
-    });
-    return false;
-  }
-
-  setState((state) => {
-    return {
-      ...state,
-      displayNameError: undefined,
-    };
-  });
-  return true;
-};
-
-const validateDestination = (
-  state: NewObjectState,
-  setState: React.Dispatch<React.SetStateAction<NewObjectState>>,
-): boolean => {
-  if (state.destination === undefined) {
-    setState((state) => {
-      return {
-        ...state,
-        destinationError: "Must select a destination",
-      };
-    });
-    return false;
-  }
-
-  if (state.destination.connection.connection_type !== ConnectionType.Webhook) {
-    if (state.targetType === undefined) {
-      setState((state) => {
-        return {
-          ...state,
-          destinationError: "Must select a target",
-        };
-      });
-      return false;
-    }
-
-    if (state.targetType === TargetType.SingleExisting) {
-      if (state.namespace === undefined || state.namespace.length <= 0) {
-        setState((state) => {
-          return {
-            ...state,
-            destinationError: "Must select a namespace",
-          };
-        });
-        return false;
-      }
-
-      if (state.tableName === undefined || state.tableName.length <= 0) {
-        setState((state) => {
-          return {
-            ...state,
-            destinationError: "Must select a table name",
-          };
-        });
-        return false;
-      }
-    }
-  }
-
-  setState((state) => {
-    return {
-      ...state,
-      destinationError: undefined,
-    };
-  });
-  return true;
-};
-
-const validateFields = (
-  state: NewObjectState,
-  setState: React.Dispatch<React.SetStateAction<NewObjectState>>,
-): boolean => {
-  if (state.objectFields === undefined || state.objectFields.length <= 0) {
-    setState((state) => {
-      return {
-        ...state,
-        fieldsError: "Must create at least one object field",
-      };
-    });
-    return false;
-  }
-
-  for (const objectField of state.objectFields) {
-    if (!objectField.name || objectField.name.length <= 0 || !objectField.type || objectField.type.length <= 0) {
-      setState((state) => {
-        return {
-          ...state,
-          fieldsError: "Must provide name and type for each object field",
-        };
-      });
-      return false;
-    }
-  }
-
-  setState((state) => {
-    return {
-      ...state,
-      fieldsError: undefined,
-    };
-  });
-  return true;
-};
-
-const validateCursorField = (
-  state: NewObjectState,
-  setState: React.Dispatch<React.SetStateAction<NewObjectState>>,
-): boolean => {
-  // TODO: allow using other types
-  if (state.cursorField === undefined) {
-    setState((state) => {
-      return {
-        ...state,
-        cursorFieldError: "Must set cursor field",
-      };
-    });
-    return false;
-  }
-
-  if (
-    state.cursorField.type !== FieldType.Timestamp &&
-    state.cursorField.type !== FieldType.DatetimeTz &&
-    state.cursorField.type !== FieldType.DatetimeNtz &&
-    state.cursorField.type !== FieldType.Date &&
-    state.cursorField.type !== FieldType.Integer &&
-    state.cursorField.type !== FieldType.Number
-  ) {
-    setState((state) => {
-      return {
-        ...state,
-        cursorFieldError: "Cursor field must be an integer, number, timestamp, date, or datetime type.",
-      };
-    });
-    return false;
-  }
-
-  setState((state) => {
-    return {
-      ...state,
-      cursorFieldError: undefined,
-    };
-  });
-  return true;
-};
-
-const validateFrequency = (
-  state: NewObjectState,
-  setState: React.Dispatch<React.SetStateAction<NewObjectState>>,
-): boolean => {
-  if (state.frequency === undefined) {
-    setState((state) => {
-      return { ...state, frequencyError: "Must set frequency" };
-    });
-    return false;
-  }
-
-  if (state.frequencyUnits === undefined) {
-    setState((state) => {
-      return { ...state, frequencyError: "Must set frequency units" };
-    });
-    return false;
-  }
-
-  return true;
-};
-
-export const NewObject: React.FC<{ onComplete: () => void }> = (props) => {
-  const [state, setState] = useState<NewObjectState>(INITIAL_OBJECT_STATE);
+export const NewObject: React.FC = () => {
+  const location = useLocation();
+  const destination: Destination | undefined = location.state?.destination;
+  const navigate = useNavigate();
+  const [state, setState] = useState<NewObjectState>(initializeState({ destination }));
   const [prevSchema, setPrevSchema] = useState<Schema | undefined>(undefined);
   const { schema } = useSchema(state.destination?.connection.id, state.namespace, state.tableName);
+  const onComplete = () => {
+    navigate("/objects");
+  };
 
   // Initialize object fields from schema
   if (schema && schema !== prevSchema) {
@@ -319,7 +88,7 @@ export const NewObject: React.FC<{ onComplete: () => void }> = (props) => {
     case Step.Initial:
       content = <DestinationSetup state={state} setState={setState} />;
       // TODO: prompt if they want to exit here
-      back = props.onComplete;
+      back = onComplete;
       break;
     case Step.FieldMapping:
       content = <ExistingObjectFields state={state} setState={setState} />;
@@ -346,7 +115,7 @@ export const NewObject: React.FC<{ onComplete: () => void }> = (props) => {
         });
       break;
     case Step.Finalize:
-      content = <Finalize state={state} setState={setState} onComplete={props.onComplete} />;
+      content = <Finalize state={state} setState={setState} onComplete={onComplete} />;
       let prevStep: Step;
       if (shouldCreateFields(state.destination!.connection.connection_type, state.targetType!)) {
         prevStep = Step.CreateFields;
@@ -403,82 +172,6 @@ export const NewObject: React.FC<{ onComplete: () => void }> = (props) => {
         )}
       </div>
     </>
-  );
-};
-
-export const DestinationSetup: React.FC<ObjectStepProps> = (props) => {
-  const { state, setState } = props;
-
-  const advance = () => {
-    if (validateDisplayName(state, setState) && validateDestination(state, setState)) {
-      if (shouldCreateFields(state.destination!.connection.connection_type, state.targetType!)) {
-        setState((state) => {
-          return { ...state, step: Step.CreateFields };
-        });
-      } else {
-        setState((state) => {
-          return { ...state, step: Step.FieldMapping };
-        });
-      }
-    }
-  };
-
-  return (
-    <div className="tw-flex tw-flex-col tw-w-100">
-      <div className="tw-mb-1 tw-font-bold tw-text-xl tw-text-center">New Object</div>
-      <div className="tw-text-center tw-mb-3">Enter your object configuration.</div>
-      <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-2 tw-mb-2">
-        <span className="tw-font-medium">Display Name</span>
-        <Tooltip placement="right" label="Pick a name for this object that your customers will see.">
-          <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
-        </Tooltip>
-      </div>
-      <ValidatedInput
-        className="tw-w-100"
-        value={state.displayName}
-        setValue={(value) => {
-          setState({ ...state, displayName: value });
-        }}
-        placeholder="Display Name"
-      />
-      <div className="tw-w-full  tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-3">
-        <span className="tw-font-medium">Destination</span>
-      </div>
-      <DestinationSelector
-        className="tw-mt-0 tw-w-100"
-        validated={true}
-        destination={state.destination}
-        setDestination={(value: Destination) => {
-          if (!state.destination || value.id !== state.destination.id) {
-            if (value.connection.connection_type === ConnectionType.Webhook) {
-              // Just hardcode EndCustomerIDField and TargetType for webhooks— they don"t matter anyway
-              setState({
-                ...state,
-                destination: value,
-                namespace: undefined,
-                tableName: undefined,
-                targetType: TargetType.Webhook,
-                endCustomerIdField: { name: "end_customer_id", type: FieldType.Integer },
-                objectFields: [],
-              });
-            } else {
-              setState({
-                ...state,
-                destination: value,
-                namespace: undefined,
-                tableName: undefined,
-                endCustomerIdField: undefined,
-                objectFields: [],
-              });
-            }
-          }
-        }}
-      />
-      <DestinationTarget state={state} setState={setState} />
-      <Button onClick={advance} className="tw-mt-10 tw-w-full tw-h-10">
-        Continue
-      </Button>
-    </div>
   );
 };
 
@@ -1073,6 +766,83 @@ const SyncModeSelector: React.FC<ObjectStepProps> = ({ state, setState }) => {
           ))}
         </div>
       </fieldset>
+    </div>
+  );
+};
+
+export const DestinationSetup: React.FC<ObjectStepProps> = (props) => {
+  const { state, setState } = props;
+
+  const advance = () => {
+    if (validateDisplayName(state, setState) && validateDestination(state, setState)) {
+      if (shouldCreateFields(state.destination!.connection.connection_type, state.targetType!)) {
+        setState((state) => {
+          return { ...state, step: Step.CreateFields };
+        });
+      } else {
+        setState((state) => {
+          return { ...state, step: Step.FieldMapping };
+        });
+      }
+    }
+  };
+
+  return (
+    <div className="tw-flex tw-flex-col tw-w-100">
+      <div className="tw-mb-1 tw-font-bold tw-text-xl tw-text-center">New Object</div>
+      <div className="tw-text-center tw-mb-3">Enter your object configuration.</div>
+      <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-2 tw-mb-2">
+        <span className="tw-font-medium">Display Name</span>
+        <Tooltip placement="right" label="Pick a name for this object that your customers will see.">
+          <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+        </Tooltip>
+      </div>
+      <ValidatedInput
+        autoFocus
+        className="tw-w-100"
+        value={state.displayName}
+        setValue={(value) => {
+          setState({ ...state, displayName: value });
+        }}
+        placeholder="Display Name"
+      />
+      <div className="tw-w-full  tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-3">
+        <span className="tw-font-medium">Destination</span>
+      </div>
+      <DestinationSelector
+        className="tw-mt-0 tw-w-100"
+        validated={true}
+        destination={state.destination}
+        setDestination={(value: Destination) => {
+          if (!state.destination || value.id !== state.destination.id) {
+            if (value.connection.connection_type === ConnectionType.Webhook) {
+              // Just hardcode EndCustomerIDField and TargetType for webhooks— they don"t matter anyway
+              setState({
+                ...state,
+                destination: value,
+                namespace: undefined,
+                tableName: undefined,
+                targetType: TargetType.Webhook,
+                endCustomerIdField: { name: "end_customer_id", type: FieldType.Integer },
+                objectFields: [],
+              });
+            } else {
+              setState({
+                ...state,
+                destination: value,
+                namespace: undefined,
+                tableName: undefined,
+                endCustomerIdField: undefined,
+                objectFields: [],
+              });
+            }
+          }
+        }}
+      />
+      <DestinationTarget state={state} setState={setState} />
+      <Button onClick={advance} className="tw-mt-10 tw-w-full tw-h-10">
+        Continue
+      </Button>
     </div>
   );
 };

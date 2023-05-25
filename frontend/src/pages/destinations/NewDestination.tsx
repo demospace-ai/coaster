@@ -1,4 +1,5 @@
 import React, { FormEvent, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { BackButton, Button, FormButton } from "src/components/button/Button";
 import { ErrorDisplay } from "src/components/error/Error";
 import { InfoIcon } from "src/components/icons/Icons";
@@ -156,6 +157,7 @@ const validateAll = (connectionType: ConnectionType, state: NewDestinationState)
 
 const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = (props) => {
   const [state, setState] = useState<NewDestinationState>(INITIAL_DESTINATION_STATE);
+  const navigate = useNavigate();
 
   const newDestinationMutation = useMutation(
     async () => {
@@ -190,11 +192,16 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = (
           break;
       }
 
-      await sendRequest(CreateDestination, payload);
+      return await sendRequest(CreateDestination, payload);
     },
     {
-      onSuccess: () => {
+      onSuccess: (destination) => {
         mutate({ GetDestinations }); // Tell SWRs to refetch destinations
+        navigate("/objects/new", {
+          state: {
+            destination: destination.destination,
+          },
+        });
       },
     },
   );

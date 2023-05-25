@@ -2,7 +2,7 @@ import { PlusCircleIcon } from "@heroicons/react/20/solid";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import { ReactElement, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { Button } from "src/components/button/Button";
 import { EmptyTable } from "src/components/table/Table";
 import { NewObject } from "src/pages/objects/NewObject";
@@ -17,77 +17,46 @@ enum Step {
   NewObject,
 }
 
-export const Objects: React.FC = () => {
-  const [step, setStep] = useState<Step>(Step.Initial);
-
-  let content: ReactElement;
-  switch (step) {
-    case Step.Initial:
-      content = <ObjectList setStep={setStep} />;
-      break;
-    case Step.NewObject:
-      content = <NewObject onComplete={() => setStep(Step.Initial)} />;
-      break;
-    default:
-      content = <></>;
-  }
-  return <div className="tw-py-5 tw-px-10 tw-h-full tw-overflow-scroll">{content}</div>;
-};
-
-const ObjectList: React.FC<{ setStep: (step: Step) => void }> = ({ setStep }) => {
+export const ObjectsList: React.FC = () => {
   const navigate = useNavigate();
   const { objects } = useObjects();
 
   return (
-    <>
-      <div className="tw-flex tw-w-full tw-mb-5 tw-mt-2">
-        <div className="tw-flex tw-flex-col tw-justify-end tw-font-bold tw-text-lg">Objects</div>
-        <Button
-          className="tw-ml-auto tw-flex tw-justify-center tw-items-center"
-          onClick={() => setStep(Step.NewObject)}
-        >
-          <div className="tw-flex tw-flex-col tw-justify-center tw-h-full">
-            <PlusCircleIcon className="tw-h-4 tw-inline-block tw-mr-2" />
-          </div>
-          <div className="tw-flex tw-flex-col tw-justify-center tw-mr-0.5">Add Object</div>
-        </Button>
-      </div>
-      <div className="tw-ring-1 tw-ring-black tw-ring-opacity-5 tw-bg-white tw-rounded-lg tw-overflow-x-auto tw-overscroll-contain tw-shadow-md">
-        {objects ? (
-          <table className="tw-min-w-full tw-border-spacing-0 tw-divide-y tw-divide-slate-200">
-            <thead className="tw-bg-slate-100 tw-text-slate-900">
-              <tr>
-                <th scope="col" className={tableHeaderStyle}>
-                  Name
-                </th>
-                <th scope="col" className={classNames(tableHeaderStyle, "tw-w-5")}></th>
-              </tr>
-            </thead>
-            <tbody className="tw-divide-y tw-divide-slate-200">
-              {objects!.length > 0 ? (
-                objects!.map((object, index) => (
-                  <tr
-                    key={index}
-                    className="tw-cursor-pointer hover:tw-bg-slate-50"
-                    onClick={() => navigate(`/object/${object.id}`)}
-                  >
-                    <td className={tableCellStyle}>{object.display_name}</td>
-                    <td className={mergeClasses(tableCellStyle, "tw-pr-5")}>
-                      <ChevronRightIcon className="tw-ml-auto tw-h-4 tw-w-4 tw-text-slate-400" aria-hidden="true" />
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td className={tableCellStyle}>No objects yet!</td>
+    <div className="tw-ring-1 tw-ring-black tw-ring-opacity-5 tw-bg-white tw-rounded-lg tw-overflow-x-auto tw-overscroll-contain tw-shadow-md">
+      {objects ? (
+        <table className="tw-min-w-full tw-border-spacing-0 tw-divide-y tw-divide-slate-200">
+          <thead className="tw-bg-slate-100 tw-text-slate-900">
+            <tr>
+              <th scope="col" className={tableHeaderStyle}>
+                Name
+              </th>
+              <th scope="col" className={classNames(tableHeaderStyle, "tw-w-5")}></th>
+            </tr>
+          </thead>
+          <tbody className="tw-divide-y tw-divide-slate-200">
+            {objects!.length > 0 ? (
+              objects!.map((object, index) => (
+                <tr
+                  key={index}
+                  className="tw-cursor-pointer hover:tw-bg-slate-50"
+                  onClick={() => navigate(`/objects/${object.id}`)}
+                >
+                  <td className={tableCellStyle}>{object.display_name}</td>
+                  <td className={mergeClasses(tableCellStyle, "tw-pr-5")}>
+                    <ChevronRightIcon className="tw-ml-auto tw-h-4 tw-w-4 tw-text-slate-400" aria-hidden="true" />
+                  </td>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        ) : (
-          <EmptyTable />
-        )}
-      </div>
-    </>
+              ))
+            ) : (
+              <tr>
+                <td className={tableCellStyle}>No objects yet!</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      ) : (
+        <EmptyTable />
+      )}
+    </div>
   );
 };
