@@ -1,20 +1,20 @@
 import {
-  needsCursorField,
-  needsPrimaryKey,
-  needsEndCustomerId,
   ConnectionType,
-  TargetType,
-  FieldType,
   Destination,
   Field,
+  FieldType,
   FrequencyUnits,
+  needsCursorField,
+  needsEndCustomerId,
+  needsPrimaryKey,
   ObjectFieldInput,
   SyncMode,
+  TargetType,
 } from "src/rpc/api";
 
 export enum Step {
   Initial,
-  FieldMapping,
+  ExistingFields,
   CreateFields,
   Finalize,
 }

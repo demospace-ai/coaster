@@ -1,9 +1,10 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { NewObject } from "src/pages/objects/NewObject";
 import { INITIAL_OBJECT_STATE } from "src/pages/objects/helpers";
+import { NewObject } from "src/pages/objects/NewObject";
 import { sendRequest } from "src/rpc/ajax";
 import {
-  FieldType,
+  Field,
+  ObjectFieldInput,
   UpdateObject as UpdateObjectAPI,
   UpdateObjectFields,
   UpdateObjectFieldsRequest,
@@ -73,12 +74,11 @@ export const UpdateObject: React.FC = () => {
           tableName: initObj?.table_name,
           objectFields: initObj?.object_fields ?? [],
           syncMode: initObj?.sync_mode,
+          cursorField: initObj?.cursor_field
+            ? getFieldFromName(initObj?.object_fields, initObj.cursor_field)
+            : undefined,
           endCustomerIdField: initObj?.end_customer_id_field
-            ? {
-                name: initObj?.end_customer_id_field,
-                type: initObj?.object_fields.find((predicate) => predicate.name === initObj?.end_customer_id_field)
-                  ?.type as FieldType,
-              }
+            ? getFieldFromName(initObj?.object_fields, initObj.end_customer_id_field)
             : undefined,
           frequency: initObj?.frequency,
           frequencyUnits: initObj?.frequency_units,
@@ -89,4 +89,16 @@ export const UpdateObject: React.FC = () => {
       ></NewObject>
     </div>
   );
+};
+
+const getFieldFromName = (objectFields: ObjectFieldInput[], fieldName: string): Field | undefined => {
+  const matchingField = objectFields.find((predicate) => predicate.name === fieldName);
+  if (!matchingField) {
+    return undefined;
+  }
+
+  return {
+    name: fieldName,
+    type: matchingField.type!,
+  };
 };

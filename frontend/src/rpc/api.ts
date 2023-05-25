@@ -289,7 +289,6 @@ export interface CreateSourceResponse {
 }
 
 export interface CreateObjectRequest {
-  objectID: number;
   display_name: string;
   destination_id: number;
   target_type: TargetType;

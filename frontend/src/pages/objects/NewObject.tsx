@@ -34,13 +34,12 @@ import {
   FrequencyUnits,
   GetObjects,
   ObjectFieldInput,
-  Schema,
+  shouldCreateFields,
   SyncMode,
   TargetType,
-  shouldCreateFields,
 } from "src/rpc/api";
 import { useSchema } from "src/rpc/data";
-import { HttpError, consumeError } from "src/utils/errors";
+import { consumeError, HttpError } from "src/utils/errors";
 import { mergeClasses } from "src/utils/twmerge";
 import { mutate } from "swr";
 
@@ -57,6 +56,7 @@ export type NewObjectProps = {
   initialObject?: NewObjectState;
   onComplete: () => void;
 };
+
 export const NewObject: React.FC<NewObjectProps> = (props) => {
   const location = useLocation();
   const destination: Destination | undefined = location.state?.destination;
@@ -64,7 +64,7 @@ export const NewObject: React.FC<NewObjectProps> = (props) => {
   const [state, setState] = useState<NewObjectState>(
     props.initialObject ?? { ...{ destination }, ...INITIAL_OBJECT_STATE },
   );
-  const [prevSchema, setPrevSchema] = useState<Schema | undefined>(undefined);
+
   const { schema } = useSchema(state.destination?.connection.id, state.namespace, state.tableName);
   const onComplete = () => {
     navigate("/objects");
@@ -76,6 +76,11 @@ export const NewObject: React.FC<NewObjectProps> = (props) => {
   }, [props.initialObject]);
 
   useEffect(() => {
+    // No need to initialize object fields from the schema if we're updating an existing object
+    if (props.initialObject) {
+      return;
+    }
+
     if (schema) {
       const objectFields = schema.map((field) => {
         // automatically omit end customer ID field
@@ -93,7 +98,7 @@ export const NewObject: React.FC<NewObjectProps> = (props) => {
         };
       });
     }
-  }, [schema]);
+  }, [schema, props.initialObject]);
 
   let content: React.ReactElement;
   let back: () => void;
@@ -103,7 +108,7 @@ export const NewObject: React.FC<NewObjectProps> = (props) => {
       // TODO: prompt if they want to exit here
       back = onComplete;
       break;
-    case Step.FieldMapping:
+    case Step.ExistingFields:
       content = <ExistingObjectFields {...props.existingObjectFieldsStepProps} state={state} setState={setState} />;
       back = () =>
         setState({
@@ -149,7 +154,7 @@ export const NewObject: React.FC<NewObjectProps> = (props) => {
       if (shouldCreateFields(state.destination!.connection.connection_type, state.targetType!)) {
         prevStep = Step.CreateFields;
       } else {
-        prevStep = Step.FieldMapping;
+        prevStep = Step.ExistingFields;
       }
 
       back = () =>
@@ -679,7 +684,6 @@ const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) => {
 type DestinationStepProps = {
   title?: string;
   subtitle?: string;
-  readonlyDisplayName?: boolean;
   readonlyDestination?: boolean;
 };
 type DestinationTargetProps = {
@@ -869,7 +873,7 @@ export const DestinationSetup: React.FC<ObjectStepProps> = (props) => {
         });
       } else {
         setState((state) => {
-          return { ...state, step: Step.FieldMapping };
+          return { ...state, step: Step.ExistingFields };
         });
       }
     }
