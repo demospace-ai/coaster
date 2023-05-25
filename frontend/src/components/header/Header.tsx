@@ -66,10 +66,14 @@ const SyncBreadcrumbs: React.FC<{ id: string; pathname: string }> = (props) => {
 const ObjectBreadcrumbs: React.FC<{ id: string; pathname: string }> = (props) => {
   const { object } = useObject(Number(props.id)); // This is deduped by SWR so don"t worry about the extra fetch
   const title = object?.display_name;
+  const pathnameSegments = props.pathname.split("/");
   const crumbs: Breadcrumb[] = [
     { title: "Objects", path: "/objects" },
-    { title, path: props.pathname },
+    { title, path: pathnameSegments.slice(0, 3).join("/") },
   ];
+  if (props.pathname.split("/").at(3) === "update") {
+    crumbs.push({ title: "Update", path: pathnameSegments.slice(0, 4).join("/") });
+  }
   document.title = title + " | Fabra";
 
   return <BreadcrumbsLayout crumbs={crumbs} />;

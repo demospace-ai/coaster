@@ -1,28 +1,27 @@
 import { ReactNode, useEffect } from "react";
-import { useSelector } from "src/root/model";
-import { Navigate, Outlet, createBrowserRouter, createRoutesFromElements, Route, useLocation } from "react-router-dom";
+import { Navigate, Outlet, Route, createBrowserRouter, createRoutesFromElements, useLocation } from "react-router-dom";
+import { useStart } from "src/app/actions";
 import { Header } from "src/components/header/Header";
+import { UpgradeBanner } from "src/components/header/UpgradeBanner";
+import { LogoLoading } from "src/components/loading/LogoLoading";
 import { NavigationBar } from "src/components/navigationBar/NavigationBar";
 import { ApiKey } from "src/pages/apikey/ApiKey";
 import { Destination } from "src/pages/destinations/Destination";
 import { Destinations } from "src/pages/destinations/Destinations";
 import { Home } from "src/pages/home/Home";
-import { Unauthorized } from "src/pages/login/Login";
+import { Login, Unauthorized } from "src/pages/login/Login";
 import { NotFound } from "src/pages/notfound/NotFound";
 import { Notifications } from "src/pages/notifications/Notifications";
+import { NewObject } from "src/pages/objects/NewObject";
+import { Object } from "src/pages/objects/Object";
 import { ObjectsList } from "src/pages/objects/Objects";
+import { ObjectsLayout } from "src/pages/objects/ObjectsLayout";
+import { UpdateObject } from "src/pages/objects/UpdateObject";
 import { Preview } from "src/pages/preview/Preview";
 import { Sync } from "src/pages/syncs/Sync";
-import { Team } from "src/pages/team/Team";
-import { Login } from "src/pages/login/Login";
-import { CreateObject } from "src/pages/objects/CreateObject";
-import { Object } from "src/pages/objects/Object";
 import { Syncs } from "src/pages/syncs/Syncs";
-import { useStart } from "src/app/actions";
-import { LogoLoading } from "src/components/loading/LogoLoading";
-import { ObjectsLayout } from "src/pages/objects/ObjectsLayout";
-import { NewObject } from "src/pages/objects/NewObject";
-import { UpgradeBanner } from "src/components/header/UpgradeBanner";
+import { Team } from "src/pages/team/Team";
+import { useSelector } from "src/root/model";
 
 type AuthenticationProps = {
   element: ReactNode;
@@ -94,6 +93,7 @@ export const router = createBrowserRouter(
           {/* <Route path="destination" element={<DestinationSetup />} /> */}
         </Route>
         <Route path=":objectID" element={<Object />} />
+        <Route path=":objectID/update" element={<UpdateObject />} />
       </Route>
       <Route path="/syncs" element={<RequireAuth element={<Syncs />} />} />
       <Route path="/sync/:syncID" element={<RequireAuth element={<Sync />} />} />

@@ -65,19 +65,6 @@ export const INITIAL_OBJECT_STATE: NewObjectState = {
   createError: undefined,
 };
 
-export const initializeState = ({ destination }: { destination: Destination | undefined }): NewObjectState => {
-  if (!destination) {
-    return INITIAL_OBJECT_STATE;
-  }
-
-  const state: NewObjectState = {
-    ...INITIAL_OBJECT_STATE,
-    destination,
-  };
-
-  return state;
-};
-
 export const validateAll = (
   state: NewObjectState,
   setState: React.Dispatch<React.SetStateAction<NewObjectState>>,

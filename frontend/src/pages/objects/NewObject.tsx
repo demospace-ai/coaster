@@ -1,7 +1,7 @@
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
-import { ChangeEvent, useState } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { BackButton, Button } from "src/components/button/Button";
+import React, { ChangeEvent, useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { BackButton, Button, DeleteButton } from "src/components/button/Button";
 import { Checkbox } from "src/components/checkbox/Checkbox";
 import { InfoIcon } from "src/components/icons/Icons";
 import { Input, ValidatedDropdownInput, ValidatedInput } from "src/components/input/Input";
@@ -18,7 +18,6 @@ import {
   INITIAL_OBJECT_STATE,
   NewObjectState,
   Step,
-  initializeState,
   validateAll,
   validateDestination,
   validateDisplayName,
@@ -27,7 +26,6 @@ import {
 import { sendRequest } from "src/rpc/ajax";
 import {
   ConnectionType,
-  CreateDestinationResponse,
   CreateObject,
   CreateObjectRequest,
   Destination,
@@ -51,47 +49,62 @@ type ObjectStepProps = {
   setState: React.Dispatch<React.SetStateAction<NewObjectState>>;
 };
 
-export const NewObject: React.FC = () => {
+export type NewObjectProps = {
+  destinationStepProps?: DestinationStepProps;
+  newObjectFieldsStepProps?: NewObjectFieldsStepProps;
+  existingObjectFieldsStepProps?: ExistingObjectFieldsStepProps;
+  finalStepProps?: FinalizeStepProps;
+  initialObject?: NewObjectState;
+  onComplete: () => void;
+};
+export const NewObject: React.FC = (props: NewObjectProps) => {
   const location = useLocation();
   const destination: Destination | undefined = location.state?.destination;
   const navigate = useNavigate();
-  const [state, setState] = useState<NewObjectState>(initializeState({ destination }));
+  const [state, setState] = useState<NewObjectState>(
+    props.initialObject ?? { ...{ destination }, ...INITIAL_OBJECT_STATE },
+  );
   const [prevSchema, setPrevSchema] = useState<Schema | undefined>(undefined);
   const { schema } = useSchema(state.destination?.connection.id, state.namespace, state.tableName);
   const onComplete = () => {
     navigate("/objects");
   };
 
-  // Initialize object fields from schema
-  if (schema && schema !== prevSchema) {
-    setPrevSchema(schema);
-    const objectFields = schema.map((field) => {
-      // automatically omit end customer ID field
-      return {
-        name: field.name,
-        type: field.type,
-        omit: false,
-        optional: false,
-      };
-    });
-    setState((state) => {
-      return {
-        ...state,
-        objectFields: objectFields,
-      };
-    });
-  }
+  useEffect(() => {
+    setState(props.initialObject ?? INITIAL_OBJECT_STATE);
+    return () => {};
+  }, [props.initialObject]);
+
+  useEffect(() => {
+    if (schema) {
+      const objectFields = schema.map((field) => {
+        // automatically omit end customer ID field
+        return {
+          name: field.name,
+          type: field.type,
+          omit: false,
+          optional: false,
+        };
+      });
+      setState((state) => {
+        return {
+          ...state,
+          objectFields: objectFields,
+        };
+      });
+    }
+  }, [schema]);
 
   let content: React.ReactElement;
   let back: () => void;
   switch (state.step) {
     case Step.Initial:
-      content = <DestinationSetup state={state} setState={setState} />;
+      content = <DestinationSetup {...props.destinationStepProps} state={state} setState={setState} />;
       // TODO: prompt if they want to exit here
       back = onComplete;
       break;
     case Step.FieldMapping:
-      content = <ExistingObjectFields state={state} setState={setState} />;
+      content = <ExistingObjectFields {...props.existingObjectFieldsStepProps} state={state} setState={setState} />;
       back = () =>
         setState({
           ...state,
@@ -103,7 +116,14 @@ export const NewObject: React.FC = () => {
         });
       break;
     case Step.CreateFields:
-      content = <NewObjectFields state={state} setState={setState} />;
+      content = (
+        <NewObjectFields
+          {...props.newObjectFieldsStepProps}
+          readonlyFieldsCount={props.initialObject?.objectFields.length ?? 0}
+          state={state}
+          setState={setState}
+        />
+      );
       back = () =>
         setState({
           ...state,
@@ -115,7 +135,16 @@ export const NewObject: React.FC = () => {
         });
       break;
     case Step.Finalize:
-      content = <Finalize state={state} setState={setState} onComplete={onComplete} />;
+      content = (
+        <Finalize
+          {...props.finalStepProps}
+          state={state}
+          setState={setState}
+          onComplete={() => {
+            props.onComplete ? props.onComplete() : onComplete();
+          }}
+        />
+      );
       let prevStep: Step;
       if (shouldCreateFields(state.destination!.connection.connection_type, state.targetType!)) {
         prevStep = Step.CreateFields;
@@ -175,7 +204,8 @@ export const NewObject: React.FC = () => {
   );
 };
 
-const ExistingObjectFields: React.FC<ObjectStepProps> = (props) => {
+type ExistingObjectFieldsStepProps = {};
+const ExistingObjectFields: React.FC<ObjectStepProps & ExistingObjectFieldsStepProps> = (props) => {
   const { state, setState } = props;
   const updateObjectField = (newObject: ObjectFieldInput, index: number) => {
     if (!state.objectFields) {
@@ -253,7 +283,15 @@ const ExistingObjectFields: React.FC<ObjectStepProps> = (props) => {
   );
 };
 
-const NewObjectFields: React.FC<ObjectStepProps> = (props) => {
+type NewObjectFieldsStepProps = {
+  readonlyFieldType?: boolean;
+  readonlyFieldKey?: boolean;
+  readonlyFieldsCount?: number;
+  fieldKeyHelpMessage?: string;
+  fieldKeyTypeHelpMessage?: string;
+};
+
+const NewObjectFields: React.FC<ObjectStepProps & NewObjectFieldsStepProps> = (props) => {
   const { state, setState } = props;
   const updateObjectField = (newObject: ObjectFieldInput, index: number) => {
     if (!state.objectFields) {
@@ -300,6 +338,13 @@ const NewObjectFields: React.FC<ObjectStepProps> = (props) => {
     }
   };
 
+  const removeObjectField = (index: number) => {
+    setState({
+      ...state,
+      objectFields: state.objectFields.filter((_, i) => i !== index),
+    });
+  };
+
   return (
     <div className="tw-h-full tw-w-full tw-text-center">
       <div className="tw-w-full tw-text-center tw-mb-2 tw-font-bold tw-text-lg">Object Fields</div>
@@ -309,7 +354,12 @@ const NewObjectFields: React.FC<ObjectStepProps> = (props) => {
           <div>
             {state.objectFields.map((objectField, i) => (
               <div key={i} className="tw-mt-5 tw-mb-7 tw-text-left tw-p-4 tw-border tw-rounded-lg">
-                <span className="tw-font-semibold tw-text-lg">Field {i + 1}</span>
+                <div className="tw-flex tw-items-center">
+                  <span className="tw-font-semibold tw-text-lg tw-grow">Field {i + 1}</span>
+                  <DeleteButton onClick={() => removeObjectField(i)} disabled={i < (props.readonlyFieldsCount ?? 0)}>
+                    Delete
+                  </DeleteButton>
+                </div>
                 <div className="tw-flex tw-items-center tw-mt-3">
                   <span>Optional?</span>
                   <Checkbox
@@ -324,13 +374,17 @@ const NewObjectFields: React.FC<ObjectStepProps> = (props) => {
                       <span>Field Key</span>
                       <Tooltip
                         placement="right"
-                        label="Choose a valid JSON key that will be used when sending this field to your webhook."
+                        label={
+                          props.fieldKeyHelpMessage ??
+                          "Choose a valid JSON key that will be used when sending this field to your webhook."
+                        }
                       >
                         <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
                       </Tooltip>
                     </div>
                     <Input
                       value={objectField.name}
+                      disabled={props.readonlyFieldKey && i < (props.readonlyFieldsCount ?? 0)}
                       setValue={(value) => updateObjectField({ ...objectField, name: value }, i)}
                       placeholder="Field Key"
                     />
@@ -338,12 +392,16 @@ const NewObjectFields: React.FC<ObjectStepProps> = (props) => {
                   <div>
                     <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
                       <span>Field Type</span>
-                      <Tooltip placement="right" label="Choose the type for this field.">
+                      <Tooltip
+                        placement="right"
+                        label={props.fieldKeyTypeHelpMessage ?? "Choose the type for this field."}
+                      >
                         <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
                       </Tooltip>
                     </div>
                     <FieldTypeSelector
                       className="tw-w-48 tw-m-0"
+                      disabled={props.readonlyFieldType && i < (props.readonlyFieldsCount ?? 0)}
                       type={objectField.type}
                       setFieldType={(value) => updateObjectField({ ...objectField, type: value }, i)}
                     />
@@ -397,18 +455,19 @@ const NewObjectFields: React.FC<ObjectStepProps> = (props) => {
   );
 };
 
-const Finalize: React.FC<ObjectStepProps & { onComplete: () => void }> = (props) => {
+type FinalizeStepProps = {
+  successTitle?: string;
+  saveButtonText?: string;
+  saveObjectConfigurations?: (config: NewObjectState) => Promise<void>;
+  onComplete?: () => void;
+};
+
+const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) => {
   const { state, setState } = props;
   const [loading, setLoading] = useState<boolean>(false);
-  const [createObjectSuccess, setCreateObjectSuccess] = useState<boolean | null>(null);
-  const createNewObject = async () => {
-    setLoading(true);
+  const [showSuccessMessage, setShowSuccessMessage] = useState<boolean | null>(null);
 
-    if (!validateAll(state, setState)) {
-      setLoading(false);
-      return;
-    }
-
+  const createNewObject = async (state: NewObjectState) => {
     const payload: CreateObjectRequest = {
       display_name: state.displayName!,
       destination_id: state.destination!.id,
@@ -423,13 +482,22 @@ const Finalize: React.FC<ObjectStepProps & { onComplete: () => void }> = (props)
       frequency_units: state.frequencyUnits!,
       object_fields: state.objectFields!,
     };
+    await sendRequest(CreateObject, payload);
+    mutate({ GetObjects: GetObjects }); // Tell SWRs to refetch event sets
+  };
 
+  const saveConfiguration = async () => {
+    setLoading(true);
+    if (!validateAll(state, setState)) {
+      setLoading(false);
+      console.error("Validation failed");
+      return;
+    }
     try {
-      await sendRequest(CreateObject, payload);
-      mutate({ GetObjects: GetObjects }); // Tell SWRs to refetch event sets
-      setCreateObjectSuccess(true);
+      props.saveObjectConfigurations ? await props.saveObjectConfigurations(state) : await createNewObject(state);
+      setShowSuccessMessage(true);
     } catch (e) {
-      setCreateObjectSuccess(false);
+      setShowSuccessMessage(false);
       if (e instanceof HttpError) {
         const createError = e.message;
         setState((state) => {
@@ -437,9 +505,9 @@ const Finalize: React.FC<ObjectStepProps & { onComplete: () => void }> = (props)
         });
       }
       consumeError(e);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   const fields: Field[] = state.objectFields
@@ -450,13 +518,13 @@ const Finalize: React.FC<ObjectStepProps & { onComplete: () => void }> = (props)
         })
     : [];
 
-  if (createObjectSuccess) {
+  if (showSuccessMessage) {
     return (
       <div>
         <div className="tw-mt-10 tw-text-center tw-font-bold tw-text-lg">
-          🎉 Congratulations! Your object is set up. 🎉
+          {props.successTitle ?? "🎉 Congratulations! Your object is set up. 🎉"}
         </div>
-        <Button className="tw-block tw-mt-8 tw-mx-auto tw-mb-10 tw-w-32" onClick={props.onComplete}>
+        <Button className="tw-block tw-mt-8 tw-mx-auto tw-mb-10 tw-w-32" onClick={() => props.onComplete?.()}>
           Done
         </Button>
       </div>
@@ -596,14 +664,23 @@ const Finalize: React.FC<ObjectStepProps & { onComplete: () => void }> = (props)
           />
         </>
       )}
-      <Button onClick={() => createNewObject()} className="tw-mt-10 tw-w-full tw-h-10">
-        {loading ? <Loading /> : "Create Object"}
+      <Button onClick={saveConfiguration} className="tw-mt-10 tw-w-full tw-h-10">
+        {loading ? <Loading /> : props.saveButtonText ?? "Create Object"}
       </Button>
     </div>
   );
 };
 
-const DestinationTarget: React.FC<ObjectStepProps> = ({ state, setState }) => {
+type DestinationStepProps = {
+  title?: string;
+  subtitle?: string;
+  readonlyDisplayName?: boolean;
+  readonlyDestination?: boolean;
+};
+type DestinationTargetProps = {
+  disabled?: boolean;
+};
+const DestinationTarget: React.FC<ObjectStepProps & DestinationTargetProps> = ({ state, setState, ...props }) => {
   type TargetOption = {
     type: TargetType;
     title: string;
@@ -651,7 +728,11 @@ const DestinationTarget: React.FC<ObjectStepProps> = ({ state, setState }) => {
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setState({ ...state, targetType: e.target.value as TargetType })
                 }
-                className="tw-h-4 tw-w-4 tw-border-slate-300 tw-text-indigo-600 focus:tw-ring-indigo-600 tw-cursor-pointer"
+                disabled={props.disabled}
+                className={mergeClasses(
+                  "tw-h-4 tw-w-4 tw-border-slate-300 tw-text-indigo-600 focus:tw-ring-indigo-600 tw-cursor-pointer",
+                  props.disabled ? "tw-cursor-not-allowed" : "tw-cursor-pointer",
+                )}
               />
               <div className="tw-flex tw-flex-row tw-items-center tw-ml-3 tw-leading-6">
                 <label htmlFor={String(target.type)} className="tw-text-sm tw-cursor-pointer">
@@ -675,6 +756,7 @@ const DestinationTarget: React.FC<ObjectStepProps> = ({ state, setState }) => {
             validated={true}
             connection={state.destination?.connection}
             namespace={state.namespace}
+            disabled={props.disabled}
             setNamespace={(value: string) => {
               if (value !== state.namespace) {
                 setState({
@@ -696,6 +778,7 @@ const DestinationTarget: React.FC<ObjectStepProps> = ({ state, setState }) => {
             connection={state.destination?.connection}
             namespace={state.namespace}
             tableName={state.tableName}
+            disabled={props.disabled}
             setTableName={(value: string) => {
               if (value !== state.tableName) {
                 setState({ ...state, tableName: value, endCustomerIdField: undefined, objectFields: [] });
