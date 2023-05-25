@@ -24,14 +24,14 @@ func (s ApiService) LinkCreateSource(auth auth.Authentication, w http.ResponseWr
 	var createSourceRequest CreateSourceRequest
 	err := decoder.Decode(&createSourceRequest)
 	if err != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.LinkCreateSource)")
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.LinkCreateSource)")
 	}
 
 	// TODO: validate connection parameters
 	validate := validator.New()
 	err = validate.Struct(createSourceRequest)
 	if err != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.LinkCreateSource)")
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.LinkCreateSource)")
 	}
 
 	// Ignore end customer ID from request, use the one from the link token

@@ -41,14 +41,14 @@ func (s ApiService) CreateSource(auth auth.Authentication, w http.ResponseWriter
 	var createSourceRequest CreateSourceRequest
 	err := decoder.Decode(&createSourceRequest)
 	if err != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.CreateSource)")
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.CreateSource)")
 	}
 
 	// TODO: validate connection parameters
 	validate := validator.New()
 	err = validate.Struct(createSourceRequest)
 	if err != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.CreateSource)")
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.CreateSource)")
 	}
 
 	if createSourceRequest.EndCustomerID == nil {

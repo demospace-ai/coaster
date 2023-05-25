@@ -37,7 +37,7 @@ func (bq BigQueryImpl) Read(
 	readQuery := bq.getReadQuery(sourceConnection, sync, fieldMappings)
 	iterator, err := bq.client.GetQueryIterator(ctx, readQuery)
 	if err != nil {
-		errC <- errors.NewCustomerVisibleError(err)
+		errC <- err
 		return
 	}
 
@@ -188,7 +188,7 @@ func (bq BigQueryImpl) Write(
 			WriteMode:      writeMode,
 		})
 		if err != nil {
-			errC <- errors.NewCustomerVisibleError(err)
+			errC <- err
 			return
 		}
 	}
@@ -277,7 +277,7 @@ func (bq BigQueryImpl) stageBatch(ctx context.Context, rows []data.Row, fieldMap
 	stagingOptions := query.StagingOptions{Bucket: destinationOptions.StagingBucket, Object: objectName}
 	err := destClient.StageData(ctx, strings.Join(rowStrings, "\n"), stagingOptions)
 	if err != nil {
-		return errors.NewCustomerVisibleError(err)
+		return err
 	}
 
 	return nil

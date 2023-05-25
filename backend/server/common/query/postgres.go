@@ -38,7 +38,7 @@ func (it *postgresIterator) Next(_ context.Context) (data.Row, error) {
 
 		err := it.queryResult.Scan(valuePtrs...)
 		if err != nil {
-			return nil, errors.Wrap(err, "(query.postgresIterator.Next)")
+			return nil, errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.postgresIterator.Next)")
 		}
 
 		return convertPostgresRow(values, it.schema), nil
@@ -47,7 +47,7 @@ func (it *postgresIterator) Next(_ context.Context) (data.Row, error) {
 	defer it.queryResult.Close()
 	err := it.queryResult.Err()
 	if err != nil {
-		return nil, errors.Wrap(err, "(query.postgresIterator.Next) iterating over query results")
+		return nil, errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.postgresIterator.Next) iterating over query results")
 	}
 
 	return nil, data.ErrDone
@@ -77,7 +77,7 @@ func (pc PostgresApiClient) GetTables(ctx context.Context, namespace string) ([]
 
 	queryResult, err := pc.RunQuery(ctx, queryString)
 	if err != nil {
-		return nil, errors.Wrap(err, "(query.PostgresApiClient.GetTables) error running query")
+		return nil, errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.PostgresApiClient.GetTables) error running query")
 	}
 
 	var tableNames []string
@@ -93,7 +93,7 @@ func (pc PostgresApiClient) GetSchema(ctx context.Context, namespace string, tab
 
 	queryResult, err := pc.RunQuery(ctx, queryString)
 	if err != nil {
-		return nil, errors.Wrapf(err, "(query.PostgresApiClient.GetTables) getting schema for %s.%s", namespace, tableName)
+		return nil, errors.Wrapf(errors.WrapCustomerVisibleError(err), "(query.PostgresApiClient.GetTables) getting schema for %s.%s", namespace, tableName)
 	}
 
 	schema := data.Schema{}
@@ -110,7 +110,7 @@ func (pc PostgresApiClient) GetFieldValues(ctx context.Context, namespace string
 
 	queryResult, err := pc.RunQuery(ctx, queryString)
 	if err != nil {
-		return nil, errors.Wrap(err, "(query.PostgresApiClient.GetFieldValues) error running query")
+		return nil, errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.PostgresApiClient.GetFieldValues) error running query")
 	}
 
 	values := []any{}
@@ -125,7 +125,7 @@ func (pc PostgresApiClient) GetNamespaces(ctx context.Context) ([]string, error)
 	queryString := "SELECT nspname FROM pg_catalog.pg_namespace	WHERE nspname NOT IN ('pg_toast', 'pg_internal', 'catalog_history', 'pg_automv', 'pg_temp_1', 'pg_catalog', 'information_schema')"
 	queryResult, err := pc.RunQuery(ctx, queryString)
 	if err != nil {
-		return nil, errors.Wrap(err, "(query.PostgresApiClient.GetNamespaces) error running query")
+		return nil, errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.PostgresApiClient.GetNamespaces) error running query")
 	}
 
 	var namespaces []string
@@ -139,19 +139,19 @@ func (pc PostgresApiClient) GetNamespaces(ctx context.Context) ([]string, error)
 func (pc PostgresApiClient) RunQuery(ctx context.Context, queryString string, args ...any) (*data.QueryResults, error) {
 	client, err := pc.openConnection(ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "(query.PostgresApiClient.RunQuery) opening connection")
+		return nil, errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.PostgresApiClient.RunQuery) opening connection")
 	}
 	defer client.Close()
 
 	queryResult, err := client.Query(queryString)
 	if err != nil {
-		return nil, errors.Wrap(err, "(query.PostgresApiClient.RunQuery) running query")
+		return nil, errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.PostgresApiClient.RunQuery) running query")
 	}
 	defer queryResult.Close()
 
 	columns, err := queryResult.ColumnTypes()
 	if err != nil {
-		return nil, errors.Wrap(err, "(query.PostgresApiClient.RunQuery) getting column types")
+		return nil, errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.PostgresApiClient.RunQuery) getting column types")
 	}
 	numColumns := len(columns)
 	schema := convertPostgresSchema(columns)
@@ -165,7 +165,7 @@ func (pc PostgresApiClient) RunQuery(ctx context.Context, queryString string, ar
 		}
 		err := queryResult.Scan(valuePtrs...)
 		if err != nil {
-			return nil, errors.Wrap(err, "(query.PostgresApiClient.RunQuery) scanning row")
+			return nil, errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.PostgresApiClient.RunQuery) scanning row")
 		}
 
 		rows = append(rows, convertPostgresRow(values, schema))
@@ -180,18 +180,18 @@ func (pc PostgresApiClient) RunQuery(ctx context.Context, queryString string, ar
 func (pc PostgresApiClient) GetQueryIterator(ctx context.Context, queryString string) (data.RowIterator, error) {
 	client, err := pc.openConnection(ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "(query.PostgresApiClient.GetQueryIterator) opening connection")
+		return nil, errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.PostgresApiClient.GetQueryIterator) opening connection")
 	}
 	defer client.Close()
 
 	queryResult, err := client.Query(queryString)
 	if err != nil {
-		return nil, errors.Wrap(err, "(query.PostgresApiClient.GetQueryIterator) running query")
+		return nil, errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.PostgresApiClient.GetQueryIterator) running query")
 	}
 
 	columns, err := queryResult.ColumnTypes()
 	if err != nil {
-		return nil, errors.Wrap(err, "(query.PostgresApiClient.GetQueryIterator) getting column types")
+		return nil, errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.PostgresApiClient.GetQueryIterator) getting column types")
 	}
 
 	return &postgresIterator{

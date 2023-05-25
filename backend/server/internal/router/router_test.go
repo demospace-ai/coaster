@@ -75,7 +75,7 @@ func (s FakeService) LinkAuthenticated(_ auth.Authentication, w http.ResponseWri
 }
 
 func (s FakeService) Error(w http.ResponseWriter, r *http.Request) error {
-	return errors.Wrap(errors.NewCustomerVisibleError(errors.Wrap(errors.New("error"), "should be visible")), "should not be visible")
+	return errors.Wrap(errors.WrapCustomerVisibleError(errors.Wrap(errors.New("error"), "should be visible")), "should not be visible")
 }
 
 func (s FakeService) HttpError(w http.ResponseWriter, r *http.Request) error {

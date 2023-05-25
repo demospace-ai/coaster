@@ -43,7 +43,7 @@ func (sf SnowflakeImpl) Read(
 
 	iterator, err := sourceClient.GetQueryIterator(ctx, readQuery)
 	if err != nil {
-		errC <- errors.NewCustomerVisibleError(err)
+		errC <- err
 		return
 	}
 

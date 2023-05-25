@@ -38,7 +38,7 @@ func (it *redshiftIterator) Next(_ context.Context) (data.Row, error) {
 
 		err := it.queryResult.Scan(valuePtrs...)
 		if err != nil {
-			return nil, errors.Wrap(err, "(query.redshiftIterator.Next)")
+			return nil, errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.redshiftIterator.Next)")
 		}
 
 		return convertRedshiftRow(values, it.schema), nil
@@ -47,7 +47,7 @@ func (it *redshiftIterator) Next(_ context.Context) (data.Row, error) {
 	defer it.queryResult.Close()
 	err := it.queryResult.Err()
 	if err != nil {
-		return nil, errors.Wrap(err, "(query.redshiftIterator.Next) iterating over query results")
+		return nil, errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.redshiftIterator.Next) iterating over query results")
 	}
 
 	return nil, data.ErrDone
@@ -77,7 +77,7 @@ func (rc RedshiftApiClient) GetTables(ctx context.Context, namespace string) ([]
 
 	queryResult, err := rc.RunQuery(ctx, queryString)
 	if err != nil {
-		return nil, errors.Wrap(err, "(query.RedshiftApiClient.GetTables) running query")
+		return nil, errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.RedshiftApiClient.GetTables) running query")
 	}
 
 	var tableNames []string
@@ -93,7 +93,7 @@ func (rc RedshiftApiClient) GetSchema(ctx context.Context, namespace string, tab
 
 	queryResult, err := rc.RunQuery(ctx, queryString)
 	if err != nil {
-		return nil, errors.Wrapf(err, "(query.RedshiftApiClient.GetSchema) getting schema for %s.%s", namespace, tableName)
+		return nil, errors.Wrapf(errors.WrapCustomerVisibleError(err), "(query.RedshiftApiClient.GetSchema) getting schema for %s.%s", namespace, tableName)
 	}
 
 	schema := data.Schema{}
@@ -110,7 +110,7 @@ func (rc RedshiftApiClient) GetFieldValues(ctx context.Context, namespace string
 
 	queryResult, err := rc.RunQuery(ctx, queryString)
 	if err != nil {
-		return nil, errors.Wrap(err, "(query.RedshiftApiClient.GetFieldValues) running query")
+		return nil, errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.RedshiftApiClient.GetFieldValues) running query")
 	}
 
 	values := []any{}
@@ -125,7 +125,7 @@ func (rc RedshiftApiClient) GetNamespaces(ctx context.Context) ([]string, error)
 	queryString := "SELECT nspname FROM pg_namespace WHERE nspname NOT IN ('pg_toast', 'pg_internal', 'catalog_history', 'pg_automv', 'pg_temp_1', 'pg_catalog', 'information_schema')"
 	queryResult, err := rc.RunQuery(ctx, queryString)
 	if err != nil {
-		return nil, errors.Wrap(err, "(query.RedshiftApiClient.GetNamespaces) running query")
+		return nil, errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.RedshiftApiClient.GetNamespaces) running query")
 	}
 
 	var namespaces []string
@@ -139,19 +139,19 @@ func (rc RedshiftApiClient) GetNamespaces(ctx context.Context) ([]string, error)
 func (rc RedshiftApiClient) RunQuery(ctx context.Context, queryString string, args ...any) (*data.QueryResults, error) {
 	client, err := rc.openConnection(ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "(query.RedshiftApiClient.RunQuery) opening connection")
+		return nil, errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.RedshiftApiClient.RunQuery) opening connection")
 	}
 	defer client.Close()
 
 	queryResult, err := client.Query(queryString)
 	if err != nil {
-		return nil, errors.Wrap(err, "(query.RedshiftApiClient.RunQuery) running query")
+		return nil, errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.RedshiftApiClient.RunQuery) running query")
 	}
 	defer queryResult.Close()
 
 	columns, err := queryResult.ColumnTypes()
 	if err != nil {
-		return nil, errors.Wrap(err, "(query.RedshiftApiClient.RunQuery) getting column types")
+		return nil, errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.RedshiftApiClient.RunQuery) getting column types")
 	}
 	numColumns := len(columns)
 	schema := convertRedshiftSchema(columns)
@@ -165,7 +165,7 @@ func (rc RedshiftApiClient) RunQuery(ctx context.Context, queryString string, ar
 		}
 		err := queryResult.Scan(valuePtrs...)
 		if err != nil {
-			return nil, errors.Wrap(err, "(query.RedshiftApiClient.RunQuery) scanning row")
+			return nil, errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.RedshiftApiClient.RunQuery) scanning row")
 		}
 
 		rows = append(rows, convertRedshiftRow(values, schema))
@@ -180,18 +180,18 @@ func (rc RedshiftApiClient) RunQuery(ctx context.Context, queryString string, ar
 func (rc RedshiftApiClient) GetQueryIterator(ctx context.Context, queryString string) (data.RowIterator, error) {
 	client, err := rc.openConnection(ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "(query.RedshiftApiClient.GetQueryIterator) opening connection")
+		return nil, errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.RedshiftApiClient.GetQueryIterator) opening connection")
 	}
 	defer client.Close()
 
 	queryResult, err := client.Query(queryString)
 	if err != nil {
-		return nil, errors.Wrap(err, "(query.RedshiftApiClient.GetQueryIterator) running query")
+		return nil, errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.RedshiftApiClient.GetQueryIterator) running query")
 	}
 
 	columns, err := queryResult.ColumnTypes()
 	if err != nil {
-		return nil, errors.Wrap(err, "(query.RedshiftApiClient.GetQueryIterator) getting column types")
+		return nil, errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.RedshiftApiClient.GetQueryIterator) getting column types")
 	}
 
 	return &redshiftIterator{

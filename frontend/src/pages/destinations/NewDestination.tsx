@@ -574,6 +574,7 @@ const BigQueryInputs: React.FC<ConnectionConfigurationProps> = (props) => {
         <span>Staging Bucket</span>
         <Tooltip
           placement="right"
+          interactive
           label={
             <div>
               The Google Cloud Storage (GCS) bucket Fabra will use for temporarily staging data during syncs. Learn more{" "}

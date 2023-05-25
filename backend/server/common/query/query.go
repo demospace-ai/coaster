@@ -77,7 +77,7 @@ func (qs QueryServiceImpl) GetClient(ctx context.Context, connection *models.Con
 		}
 
 		if !connection.Location.Valid {
-			return nil, errors.New("(query.QueryServiceImpl.GetClient) BigQuery connection must have location defined")
+			return nil, errors.NewCustomerVisibleError("BigQuery connection must have location defined")
 		}
 
 		return BigQueryApiClient{
@@ -152,6 +152,19 @@ func (qs QueryServiceImpl) GetClient(ctx context.Context, connection *models.Con
 			DatabaseName: connection.DatabaseName.String,
 			Host:         connection.Host.String,
 		}, nil
+	case models.ConnectionTypeMySQL:
+		mysqlPassword, err := qs.cryptoService.DecryptConnectionCredentials(connection.Password.String)
+		if err != nil {
+			return nil, errors.Wrap(err, "(query.QueryServiceImpl.GetClient) decrypting MySQL password")
+		}
+
+		// TODO: validate all connection params
+		return MySqlApiClient{
+			Username:     connection.Username.String,
+			Password:     *mysqlPassword,
+			DatabaseName: connection.DatabaseName.String,
+			Host:         connection.Host.String,
+		}, nil
 	default:
 		return nil, errors.Newf("(query.QueryServiceImpl.GetClient) unrecognized warehouse type %v", connection.ConnectionType)
 	}
@@ -172,7 +185,7 @@ func (qs QueryServiceImpl) GetWarehouseClient(ctx context.Context, connection *m
 		}
 
 		if !connection.Location.Valid {
-			return nil, errors.New("(query.QueryServiceImpl.GetWarehouseClient) BigQuery connection must have location defined")
+			return nil, errors.NewCustomerVisibleError("BigQuery connection must have location defined")
 		}
 
 		return BigQueryApiClient{

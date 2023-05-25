@@ -52,7 +52,7 @@ func (md MongoDbImpl) Read(
 
 	iterator, err := sourceClient.GetQueryIterator(ctx, queryString)
 	if err != nil {
-		errC <- errors.NewCustomerVisibleError(err)
+		errC <- err
 		return
 	}
 

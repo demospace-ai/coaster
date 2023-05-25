@@ -53,7 +53,16 @@ var Forbidden = &HttpError{
 	},
 }
 
-func NewCustomerVisibleError(err error) error {
+func NewCustomerVisibleError(message string) error {
+	return &CustomerVisibleError{
+		message: message,
+	}
+}
+
+// Be very careful with this! Customer visible errors should be wrapped at the lowest level,
+// to avoid including our entire stack trace.
+// TODO: when wrapping, include the stack in a separate field
+func WrapCustomerVisibleError(err error) error {
 	return &CustomerVisibleError{
 		message: err.Error(),
 	}

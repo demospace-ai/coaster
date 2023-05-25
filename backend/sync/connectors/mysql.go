@@ -12,17 +12,17 @@ import (
 	"go.fabra.io/server/common/views"
 )
 
-type RedshiftImpl struct {
+type MySqlImpl struct {
 	queryService query.QueryService
 }
 
-func NewRedshiftConnector(queryService query.QueryService) Connector {
-	return RedshiftImpl{
+func NewMySqlConnector(queryService query.QueryService) Connector {
+	return MySqlImpl{
 		queryService: queryService,
 	}
 }
 
-func (rs RedshiftImpl) Read(
+func (ms MySqlImpl) Read(
 	ctx context.Context,
 	sourceConnection views.FullConnection,
 	sync views.Sync,
@@ -33,13 +33,13 @@ func (rs RedshiftImpl) Read(
 ) {
 	connectionModel := views.ConvertConnectionView(sourceConnection)
 
-	sourceClient, err := rs.queryService.GetClient(ctx, connectionModel)
+	sourceClient, err := ms.queryService.GetClient(ctx, connectionModel)
 	if err != nil {
 		errC <- err
 		return
 	}
 
-	readQuery := rs.getReadQuery(connectionModel, sync, fieldMappings)
+	readQuery := ms.getReadQuery(connectionModel, sync, fieldMappings)
 
 	iterator, err := sourceClient.GetQueryIterator(ctx, readQuery)
 	if err != nil {
@@ -76,7 +76,7 @@ func (rs RedshiftImpl) Read(
 		rowsC <- rowBatch
 	}
 
-	newCursorPosition := rs.getNewCursorPosition(lastRow, iterator.Schema(), sync)
+	newCursorPosition := ms.getNewCursorPosition(lastRow, iterator.Schema(), sync)
 	readOutputC <- ReadOutput{
 		CursorPosition: newCursorPosition,
 	}
@@ -85,13 +85,12 @@ func (rs RedshiftImpl) Read(
 	close(errC)
 }
 
-// TODO: only read 10,000 rows at once or something
-func (rs RedshiftImpl) getReadQuery(sourceConnection *models.Connection, sync views.Sync, fieldMappings []views.FieldMapping) string {
+func (ms MySqlImpl) getReadQuery(sourceConnection *models.Connection, sync views.Sync, fieldMappings []views.FieldMapping) string {
 	var queryString string
 	if sync.CustomJoin != nil {
 		queryString = *sync.CustomJoin
 	} else {
-		selectString := rs.getSelectString(fieldMappings)
+		selectString := ms.getSelectString(fieldMappings)
 		queryString = fmt.Sprintf("SELECT %s FROM %s.%s", selectString, *sync.Namespace, *sync.TableName)
 	}
 
@@ -108,7 +107,7 @@ func (rs RedshiftImpl) getReadQuery(sourceConnection *models.Connection, sync vi
 	}
 }
 
-func (rs RedshiftImpl) getSelectString(fieldMappings []views.FieldMapping) string {
+func (ms MySqlImpl) getSelectString(fieldMappings []views.FieldMapping) string {
 	fields := []string{}
 	for _, fieldMapping := range fieldMappings {
 		fields = append(fields, fieldMapping.SourceFieldName)
@@ -117,7 +116,7 @@ func (rs RedshiftImpl) getSelectString(fieldMappings []views.FieldMapping) strin
 	return strings.Join(fields, ",")
 }
 
-func (rs RedshiftImpl) getNewCursorPosition(lastRow data.Row, schema data.Schema, sync views.Sync) *string {
+func (ms MySqlImpl) getNewCursorPosition(lastRow data.Row, schema data.Schema, sync views.Sync) *string {
 	if sync.SourceCursorField == nil {
 		return nil
 	}
@@ -148,7 +147,7 @@ func (rs RedshiftImpl) getNewCursorPosition(lastRow data.Row, schema data.Schema
 	return &newCursorPos
 }
 
-func (rs RedshiftImpl) Write(
+func (ms MySqlImpl) Write(
 	ctx context.Context,
 	destinationConnection views.FullConnection,
 	destinationOptions DestinationOptions,
@@ -159,5 +158,5 @@ func (rs RedshiftImpl) Write(
 	writeOutputC chan<- WriteOutput,
 	errC chan<- error,
 ) {
-	errC <- errors.New("redshift destination not implemented")
+	errC <- errors.New("mysql destination not implemented")
 }

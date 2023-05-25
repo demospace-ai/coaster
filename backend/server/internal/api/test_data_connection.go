@@ -19,6 +19,7 @@ import (
 
 	"cloud.google.com/go/bigquery"
 	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 	_ "github.com/microsoft/go-mssqldb"
 	"github.com/snowflakedb/gosnowflake"
 	"google.golang.org/api/iterator"
@@ -47,7 +48,7 @@ func (s ApiService) TestDataConnection(auth auth.Authentication, w http.Response
 	var testDataConnectionRequest TestDataConnectionRequest
 	err := decoder.Decode(&testDataConnectionRequest)
 	if err != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.TestDataConnection)")
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.TestDataConnection)")
 	}
 
 	err = validateTestDataConnectionRequest(testDataConnectionRequest)
@@ -87,7 +88,7 @@ func testBigQueryConnection(bigqueryConfig input.BigQueryConfig) error {
 	var bigQueryCredentials models.BigQueryCredentials
 	err := json.Unmarshal([]byte(bigqueryConfig.Credentials), &bigQueryCredentials)
 	if err != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testBigQueryConnection)")
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testBigQueryConnection)")
 	}
 
 	credentialOption := option.WithCredentialsJSON([]byte(bigqueryConfig.Credentials))
@@ -95,7 +96,7 @@ func testBigQueryConnection(bigqueryConfig input.BigQueryConfig) error {
 	ctx := context.Background()
 	client, err := bigquery.NewClient(ctx, bigQueryCredentials.ProjectID, credentialOption)
 	if err != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testBigQueryConnection)")
+		return errors.Wrap(err, "(api.testBigQueryConnection)")
 	}
 	defer client.Close()
 
@@ -103,7 +104,7 @@ func testBigQueryConnection(bigqueryConfig input.BigQueryConfig) error {
 	_, err = it.Next()
 
 	if err != nil && err != iterator.Done {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testBigQueryConnection)")
+		return errors.Wrap(err, "(api.testBigQueryConnection)")
 	}
 
 	return nil
@@ -125,18 +126,18 @@ func testSnowflakeConnection(snowflakeConfig input.SnowflakeConfig) error {
 
 	dsn, err := gosnowflake.DSN(&config)
 	if err != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testSnowflakeConnection)")
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testSnowflakeConnection)")
 	}
 
 	db, err := sql.Open("snowflake", dsn)
 	if err != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testSnowflakeConnection)")
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testSnowflakeConnection)")
 	}
 	defer db.Close()
 
 	rows, err := db.Query("SELECT 1")
 	if err != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testSnowflakeConnection)")
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testSnowflakeConnection)")
 	}
 	defer rows.Close()
 
@@ -144,14 +145,14 @@ func testSnowflakeConnection(snowflakeConfig input.SnowflakeConfig) error {
 	for rows.Next() {
 		err := rows.Scan(&v)
 		if err != nil {
-			return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testSnowflakeConnection)")
+			return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testSnowflakeConnection)")
 		}
 		if v != 1 {
-			return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testSnowflakeConnection)")
+			return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testSnowflakeConnection)")
 		}
 	}
 	if rows.Err() != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testSnowflakeConnection)")
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testSnowflakeConnection)")
 	}
 
 	return nil
@@ -172,13 +173,13 @@ func testRedshiftConnection(redshiftConfig input.RedshiftConfig) error {
 
 	db, err := sql.Open("postgres", dsn.String())
 	if err != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testRedshiftConnection)")
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testRedshiftConnection)")
 	}
 	defer db.Close()
 
 	rows, err := db.Query("SELECT 1")
 	if err != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testRedshiftConnection)")
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testRedshiftConnection)")
 	}
 	defer rows.Close()
 
@@ -186,14 +187,14 @@ func testRedshiftConnection(redshiftConfig input.RedshiftConfig) error {
 	for rows.Next() {
 		err := rows.Scan(&v)
 		if err != nil {
-			return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testRedshiftConnection)")
+			return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testRedshiftConnection)")
 		}
 		if v != 1 {
-			return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testRedshiftConnection)")
+			return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testRedshiftConnection)")
 		}
 	}
 	if rows.Err() != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testRedshiftConnection)")
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testRedshiftConnection)")
 	}
 
 	return nil
@@ -215,13 +216,13 @@ func testSynapseConnection(synapseConfig input.SynapseConfig) error {
 
 	db, err := sql.Open("sqlserver", dsn.String())
 	if err != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testSynapseConnection)")
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testSynapseConnection)")
 	}
 	defer db.Close()
 
 	rows, err := db.Query("SELECT 1")
 	if err != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testSynapseConnection)")
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testSynapseConnection)")
 	}
 	defer rows.Close()
 
@@ -229,14 +230,14 @@ func testSynapseConnection(synapseConfig input.SynapseConfig) error {
 	for rows.Next() {
 		err := rows.Scan(&v)
 		if err != nil {
-			return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testSynapseConnection)")
+			return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testSynapseConnection)")
 		}
 		if v != 1 {
-			return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testSynapseConnection)")
+			return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testSynapseConnection)")
 		}
 	}
 	if rows.Err() != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testSynapseConnection)")
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testSynapseConnection)")
 	}
 
 	return nil
@@ -261,7 +262,7 @@ func testMongoDbConnection(mongodbConfig input.MongoDbConfig) error {
 		SetConnectTimeout(3 * time.Second).
 		ApplyURI(connectionString) // Apply URI last since this contains connection options from the user
 	_, err := mongo.Connect(context.TODO(), clientOptions)
-	return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testMongoDbConnection)")
+	return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testMongoDbConnection)")
 }
 
 func testPostgresConnection(postgresConfig input.PostgresConfig) error {
@@ -279,13 +280,13 @@ func testPostgresConnection(postgresConfig input.PostgresConfig) error {
 
 	db, err := sql.Open("postgres", dsn.String())
 	if err != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testPostgresConnection)")
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testPostgresConnection)")
 	}
 	defer db.Close()
 
 	rows, err := db.Query("SELECT 1")
 	if err != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testPostgresConnection)")
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testPostgresConnection)")
 	}
 	defer rows.Close()
 
@@ -293,14 +294,14 @@ func testPostgresConnection(postgresConfig input.PostgresConfig) error {
 	for rows.Next() {
 		err := rows.Scan(&v)
 		if err != nil {
-			return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testPostgresConnection)")
+			return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testPostgresConnection)")
 		}
 		if v != 1 {
-			return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testPostgresConnection)")
+			return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testPostgresConnection)")
 		}
 	}
 	if rows.Err() != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testPostgresConnection)")
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testPostgresConnection)")
 	}
 
 	return nil
@@ -316,13 +317,13 @@ func testMySqlConnection(mysqlConfig input.MySqlConfig) error {
 
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testMySqlConnection)")
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testMySqlConnection)")
 	}
 	defer db.Close()
 
 	rows, err := db.Query("SELECT 1")
 	if err != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testMySqlConnection)")
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testMySqlConnection)")
 	}
 	defer rows.Close()
 
@@ -330,14 +331,14 @@ func testMySqlConnection(mysqlConfig input.MySqlConfig) error {
 	for rows.Next() {
 		err := rows.Scan(&v)
 		if err != nil {
-			return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testMySqlConnection)")
+			return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testMySqlConnection)")
 		}
 		if v != 1 {
-			return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testMySqlConnection)")
+			return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testMySqlConnection)")
 		}
 	}
 	if rows.Err() != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testMySqlConnection)")
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testMySqlConnection)")
 	}
 
 	return nil
@@ -346,16 +347,16 @@ func testMySqlConnection(mysqlConfig input.MySqlConfig) error {
 func testWebhookConnection(webhookConfig input.WebhookConfig) error {
 	_, err := url.ParseRequestURI(webhookConfig.URL)
 	if err != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testWebhookConnection)")
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testWebhookConnection)")
 	}
 	resp, err := http.Head(webhookConfig.URL)
 	if err != nil {
-		return errors.Wrap(errors.NewCustomerVisibleError(err), "(api.testWebhookConnection)")
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testWebhookConnection)")
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return errors.Wrap(errors.NewCustomerVisibleError(fmt.Errorf("unexpected status code: %d", resp.StatusCode)), "(api.testWebhookConnection) ")
+		return errors.Wrap(errors.WrapCustomerVisibleError(fmt.Errorf("unexpected status code: %d", resp.StatusCode)), "(api.testWebhookConnection) ")
 	}
 
 	return nil

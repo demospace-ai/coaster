@@ -20,5 +20,9 @@ func (a *Activities) UpdateCursor(ctx context.Context, input UpdateCursorInput) 
 	}
 
 	_, err = syncs.UpdateCursor(a.Db, sync, input.CursorPosition)
-	return errors.Wrap(err, "(temporal.UpdateCursorActivity) updating cursor")
+	if err != nil {
+		return errors.Wrap(err, "(temporal.UpdateCursorActivity) updating cursor")
+	}
+
+	return nil
 }
