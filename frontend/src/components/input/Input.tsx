@@ -465,8 +465,6 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = (props) =
 
   return (
     <Combobox
-      as="div"
-      className="tw-flex tw-w-fit combo-box"
       value={value}
       disabled={props.disabled}
       onChange={(value: number) => {

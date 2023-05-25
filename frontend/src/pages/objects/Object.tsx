@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { BackButton, Button } from "src/components/button/Button";
 import { Loading } from "src/components/loading/Loading";
-import { TargetType, needsCursorField, needsEndCustomerId, needsPrimaryKey, targetTypeToString } from "src/rpc/api";
+import { needsCursorField, needsEndCustomerId, needsPrimaryKey, TargetType, targetTypeToString } from "src/rpc/api";
 import { useObject } from "src/rpc/data";
 
 const tableHeaderStyle =
@@ -19,7 +19,7 @@ export const Object: React.FC = () => {
   }
 
   return (
-    <div className="tw-pt-5 tw-pb-24 tw-px-10 tw-h-full xl:tw-w-2/3 2xl:tw-w-1/2 md:tw-w-full tw-overflow-scroll">
+    <div className="xl:tw-w-3/5 md:tw-w-full tw-flex tw-flex-col tw-mb-10">
       <BackButton onClick={() => navigate("/objects")} />
       <div className="tw-flex tw-flex-row tw-items-center tw-font-bold tw-text-2xl tw-my-4">
         <span className="tw-grow">{object.display_name}</span>
@@ -32,7 +32,7 @@ export const Object: React.FC = () => {
           Configure
         </Button>
       </div>
-      <div className="tw-flex tw-flex-col tw-flex-wrap tw-items-start tw-h-32 tw-p-4 tw-mb-5 tw-bg-white tw-border tw-border-slate-200 tw-rounded-md">
+      <div className="tw-flex tw-flex-col tw-flex-wrap tw-items-start tw-p-4 tw-mb-5 tw-bg-white tw-border tw-border-slate-200 tw-rounded-md">
         <div className="tw-flex tw-flex-row tw-items-center tw-text-base tw-mt-1">
           <span className="tw-font-medium tw-whitespace-pre">Destination ID: </span>
           {object.destination_id}

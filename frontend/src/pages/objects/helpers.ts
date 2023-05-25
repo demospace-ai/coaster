@@ -1,6 +1,7 @@
 import {
   ConnectionType,
   Destination,
+  FabraObject,
   Field,
   FieldType,
   FrequencyUnits,
@@ -256,4 +257,37 @@ export const validateFrequency = (
   }
 
   return true;
+};
+
+export const getFieldFromName = (objectFields: ObjectFieldInput[], fieldName: string): Field | undefined => {
+  const matchingField = objectFields.find((predicate) => predicate.name === fieldName);
+  if (!matchingField) {
+    return undefined;
+  }
+
+  return {
+    name: fieldName,
+    type: matchingField.type!,
+  };
+};
+
+export const initalizeFromExisting = (initialObject: FabraObject, destination: Destination) => {
+  return {
+    ...INITIAL_OBJECT_STATE,
+    displayName: initialObject.display_name,
+    destination,
+    targetType: initialObject.target_type,
+    namespace: initialObject.namespace,
+    tableName: initialObject.table_name,
+    objectFields: initialObject.object_fields ?? [],
+    syncMode: initialObject.sync_mode,
+    cursorField: initialObject.cursor_field
+      ? getFieldFromName(initialObject.object_fields, initialObject.cursor_field)
+      : undefined,
+    endCustomerIdField: initialObject.end_customer_id_field
+      ? getFieldFromName(initialObject.object_fields, initialObject.end_customer_id_field)
+      : undefined,
+    frequency: initialObject.frequency,
+    frequencyUnits: initialObject.frequency_units,
+  };
 };
