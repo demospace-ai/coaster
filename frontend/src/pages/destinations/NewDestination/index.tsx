@@ -199,7 +199,7 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = (
       onSuccess: (destination) => {
         mutate({ GetDestinations }); // Tell SWRs to refetch destinations
         if (shouldGoToCreateObject(destination.destination)) {
-          navigate(`/destinations/${destination.destination.uuid}/create`);
+          navigate("/objects/new");
         }
       },
     },

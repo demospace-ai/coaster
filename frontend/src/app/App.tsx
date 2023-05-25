@@ -10,7 +10,7 @@ import { Home } from "src/pages/home/Home";
 import { Unauthorized } from "src/pages/login/Login";
 import { NotFound } from "src/pages/notfound/NotFound";
 import { Notifications } from "src/pages/notifications/Notifications";
-import { ObjectsList, Objects } from "src/pages/objects/Objects";
+import { ObjectsList } from "src/pages/objects/Objects";
 import { Preview } from "src/pages/preview/Preview";
 import { Sync } from "src/pages/syncs/Sync";
 import { Team } from "src/pages/team/Team";
@@ -21,6 +21,7 @@ import { Syncs } from "src/pages/syncs/Syncs";
 import { useStart } from "src/app/actions";
 import { LogoLoading } from "src/components/loading/LogoLoading";
 import { ObjectsLayout } from "src/pages/objects/ObjectsLayout";
+import { NewObject } from "src/pages/objects/NewObject";
 
 type AuthenticationProps = {
   element: ReactNode;
@@ -85,8 +86,10 @@ export const router = createBrowserRouter(
       <Route path="/destination/:destinationID" element={<RequireAuth element={<Destination />} />} />
       <Route path="/objects" element={<RequireAuth element={<ObjectsLayout />} />}>
         <Route index element={<ObjectsList />} />
-        <Route path="new" element={<CreateObject />} />
-        <Route path=":objectID" element={<RequireAuth element={<Object />} />} />
+        <Route path="new" element={<NewObject />}>
+          {/* <Route path="destination" element={<DestinationSetup />} /> */}
+        </Route>
+        <Route path=":objectID" element={<Object />} />
       </Route>
       <Route path="/syncs" element={<RequireAuth element={<Syncs />} />} />
       <Route path="/sync/:syncID" element={<RequireAuth element={<Sync />} />} />
