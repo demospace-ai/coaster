@@ -15,9 +15,11 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type UpdateObjectFieldsRequest struct {
-	ID int64 `json:"id" validate:"required"`
-	input.PartialUpdateObjectField
+type UpdateObjectFieldsRequest = struct {
+	ObjectFields []struct {
+		ID int64 `json:"id" validate:"required"`
+		input.PartialUpdateObjectField
+	} `json:"object_fields" validate:"required"`
 }
 
 type UpdateObjectFieldsResponse struct {
@@ -42,12 +44,12 @@ func (s ApiService) UpdateObjectFields(auth auth.Authentication, w http.Response
 	}
 
 	decoder := json.NewDecoder(r.Body)
-	var requestBody []UpdateObjectFieldsRequest
+	var requestBody UpdateObjectFieldsRequest
 	if err := decoder.Decode(&requestBody); err != nil {
 		return err
 	}
 
-	for _, requestItem := range requestBody {
+	for _, requestItem := range requestBody.ObjectFields {
 		validate := validator.New()
 		err := validate.Struct(requestItem)
 		if err != nil {
@@ -57,7 +59,7 @@ func (s ApiService) UpdateObjectFields(auth auth.Authentication, w http.Response
 
 	responseViews := []views.ObjectField{}
 	failures := []int64{}
-	for _, objectField := range requestBody {
+	for _, objectField := range requestBody.ObjectFields {
 		updatedObjectField, err := objects.PartialUpdateObjectField(
 			s.db,
 			auth.Organization.ID,

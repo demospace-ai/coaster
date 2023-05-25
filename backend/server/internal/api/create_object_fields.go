@@ -15,8 +15,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type CreateObjectFieldsRequest = []struct {
-	input.ObjectField
+type CreateObjectFieldsRequest = struct {
+	ObjectFields []input.ObjectField `json:"object_fields" validate:"required"`
 }
 
 type CreateObjectFieldsResponse struct {
@@ -47,8 +47,8 @@ func (s ApiService) CreateObjectFields(auth auth.Authentication, w http.Response
 	}
 
 	validate := validator.New()
-	for _, input := range requestBody {
-		err = validate.Struct(input.ObjectField)
+	for _, objectField := range requestBody.ObjectFields {
+		err = validate.Struct(objectField)
 		if err != nil {
 			return err
 		}
@@ -56,17 +56,17 @@ func (s ApiService) CreateObjectFields(auth auth.Authentication, w http.Response
 
 	objectFieldsView := []views.ObjectField{}
 	failures := []input.ObjectField{}
-	for _, input := range requestBody {
+	for _, objectField := range requestBody.ObjectFields {
 		field, err := objects.CreateObjectField(
 			s.db,
 			auth.Organization.ID,
 			objectId,
-			input.ObjectField,
+			objectField,
 		)
 		if err == nil {
 			objectFieldsView = append(objectFieldsView, views.ConvertObjectField(field))
 		} else {
-			failures = append(failures, input.ObjectField)
+			failures = append(failures, objectField)
 		}
 	}
 

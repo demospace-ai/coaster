@@ -42,7 +42,9 @@ var _ = Describe("Sending an ObjectField batch update request", func() {
 	Context("with an empty list", func() {
 		It("should return a 200 status code", func() {
 			response := httptest.NewRecorder()
-			request := makeRequest([]map[string]interface{}{})
+			request := makeRequest(map[string]interface{}{
+				"object_fields": []interface{}{},
+			})
 			err := service.UpdateObjectFields(auth, response, request)
 			Expect(err).To(BeNil(), "no error should be returned, got %s", err)
 			Expect(response.Code).To(Equal(200))
@@ -52,8 +54,10 @@ var _ = Describe("Sending an ObjectField batch update request", func() {
 	Context("with an object body that's missing ID", func() {
 		It("should fail validation", func() {
 			response := httptest.NewRecorder()
-			request := makeRequest([]map[string]interface{}{
-				{},
+			request := makeRequest(map[string]interface{}{
+				"object_fields": []map[string]interface{}{
+					{}, // Missing ID
+				},
 			})
 			err := service.UpdateObjectFields(auth, response, request)
 			Expect(err).To(BeAssignableToTypeOf(validator.ValidationErrors{}))
@@ -72,10 +76,12 @@ var _ = Describe("Sending an ObjectField batch update request", func() {
 				},
 			})
 			response := httptest.NewRecorder()
-			request := makeRequest([]map[string]interface{}{
-				{
-					"id": objFields[0].ID,
-					// Do not provide Description (This tests partial update)
+			request := makeRequest(map[string]interface{}{
+				"object_fields": []map[string]interface{}{
+					{
+						"id": objFields[0].ID,
+						// Do not provide Description (This tests partial update)
+					},
 				},
 			})
 			err := service.UpdateObjectFields(auth, response, request)
@@ -100,12 +106,14 @@ var _ = Describe("Sending an ObjectField batch update request", func() {
 			})[0]
 			response := httptest.NewRecorder()
 			desc := "new description"
-			request := makeRequest([]map[string]interface{}{
-				{
-					"id":           objField.ID,
-					"name":         "new name",
-					"description":  desc,
-					"display_name": nil, // This will set {"display_name": null}
+			request := makeRequest(map[string]interface{}{
+				"object_fields": []map[string]interface{}{
+					{
+						"id":           objField.ID,
+						"name":         "new name",
+						"description":  desc,
+						"display_name": nil, // This will set {"display_name": null}
+					},
 				},
 			})
 			err := service.UpdateObjectFields(auth, response, request)
@@ -129,9 +137,11 @@ var _ = Describe("Sending an ObjectField batch update request", func() {
 	Context("with an object id that doesn't exist", func() {
 		It("should return a 200 status code, include the id in failures", func() {
 			response := httptest.NewRecorder()
-			request := makeRequest([]map[string]interface{}{
-				{
-					"id": math.MaxInt64,
+			request := makeRequest(map[string]interface{}{
+				"object_fields": []map[string]interface{}{
+					{
+						"id": math.MaxInt64,
+					},
 				},
 			})
 			err := service.UpdateObjectFields(auth, response, request)
