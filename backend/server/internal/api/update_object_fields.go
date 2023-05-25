@@ -16,10 +16,7 @@ import (
 )
 
 type UpdateObjectFieldsRequest = struct {
-	ObjectFields []struct {
-		ID int64 `json:"id" validate:"required"`
-		input.PartialUpdateObjectField
-	} `json:"object_fields" validate:"required"`
+	ObjectFields []input.PartialUpdateObjectField `json:"object_fields" validate:"required"`
 }
 
 type UpdateObjectFieldsResponse struct {
@@ -64,8 +61,7 @@ func (s ApiService) UpdateObjectFields(auth auth.Authentication, w http.Response
 			s.db,
 			auth.Organization.ID,
 			objectID,
-			objectField.ID,
-			objectField.PartialUpdateObjectField,
+			objectField,
 		)
 		if err == nil {
 			updated := views.ConvertObjectField(updatedObjectField)

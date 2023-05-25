@@ -7,6 +7,7 @@ import (
 
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/errors"
+	"go.fabra.io/server/common/input"
 	"go.fabra.io/server/common/repositories/objects"
 	"go.fabra.io/server/common/views"
 
@@ -35,7 +36,7 @@ func (s ApiService) UpdateObject(auth auth.Authentication, w http.ResponseWriter
 	}
 
 	decoder := json.NewDecoder(r.Body)
-	var updateObjectRequest objects.PartialUpdateObjectInput
+	var updateObjectRequest input.PartialUpdateObjectInput
 
 	if err := decoder.Decode(&updateObjectRequest); err != nil {
 		return err

@@ -1,8 +1,6 @@
 package objects
 
 import (
-	"encoding/json"
-
 	"go.fabra.io/server/common/database"
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/input"
@@ -183,27 +181,13 @@ func LoadObjectFieldsByID(
 	return objectFields, nil
 }
 
-type PartialUpdateObjectInput struct {
-	DisplayName        *string                `json:"display_name"`
-	DestinationID      *int64                 `json:"destination_id"`
-	TargetType         *models.TargetType     `json:"target_type"`
-	SyncMode           *models.SyncMode       `json:"sync_mode"`
-	EndCustomerIDField *string                `json:"end_customer_id_field"`
-	Frequency          *int64                 `json:"frequency"`
-	FrequencyUnits     *models.FrequencyUnits `json:"frequency_units"`
-	NamespaceRaw       json.RawMessage        `json:"namespace_raw"`
-	TableNameRaw       json.RawMessage        `json:"table_name_raw"`
-	PrimaryKeyRaw      json.RawMessage        `json:"primary_key_raw"`
-	CursorFieldRaw     json.RawMessage        `json:"cursor_field_raw"`
-}
-
 // PartialUpdateObject updates the object with the given ID. The organizationID
 // is used to ensure that the object belongs to the given organization.
 func PartialUpdateObject(
 	db *gorm.DB,
 	organizationID int64,
 	objectID int64,
-	input PartialUpdateObjectInput,
+	objectUpdates input.PartialUpdateObjectInput,
 ) (*models.Object, error) {
 	var object models.Object
 	result := db.Where(&models.Object{
@@ -213,31 +197,18 @@ func PartialUpdateObject(
 	if result.Error != nil {
 		return nil, errors.Wrap(result.Error, "(objects.PartialUpdateObject)")
 	}
-	if input.DisplayName != nil {
-		object.DisplayName = *input.DisplayName
+	if objectUpdates.DisplayName != nil {
+		object.DisplayName = *objectUpdates.DisplayName
 	}
-	if input.DestinationID != nil {
-		object.DestinationID = *input.DestinationID
+	if objectUpdates.Frequency != nil {
+		object.Frequency = *objectUpdates.Frequency
 	}
-	if input.TargetType != nil {
-		object.TargetType = *input.TargetType
+	if objectUpdates.FrequencyUnits != nil {
+		object.FrequencyUnits = *objectUpdates.FrequencyUnits
 	}
-	if input.SyncMode != nil {
-		object.SyncMode = *input.SyncMode
-	}
-	if input.EndCustomerIDField != nil {
-		object.EndCustomerIDField = *input.EndCustomerIDField
-	}
-	if input.Frequency != nil {
-		object.Frequency = *input.Frequency
-	}
-	if input.FrequencyUnits != nil {
-		object.FrequencyUnits = *input.FrequencyUnits
-	}
-	setNullStringFromRaw(input.NamespaceRaw, &object.Namespace)
-	setNullStringFromRaw(input.TableNameRaw, &object.TableName)
-	setNullStringFromRaw(input.PrimaryKeyRaw, &object.PrimaryKey)
-	setNullStringFromRaw(input.CursorFieldRaw, &object.CursorField)
+
+	// Explicitly do not allow updating the destination, sync mode, primary key, or cursor field
+	// since that may affect running syncs. TODO: do this safely
 	result = db.Save(&object)
 	if result.Error != nil {
 		return nil, errors.Wrap(result.Error, "(objects.PartialUpdateObject)")
@@ -246,35 +217,13 @@ func PartialUpdateObject(
 	return &object, nil
 }
 
-// Assigns the database.NullString based on the key is null, "", or does not exist.
-// For example:
-// { input: null } sets stringVal to null
-// { input: "" } sets stringVal to ""
-// { } leaves the stringVal unchanged
-func setNullStringFromRaw(input json.RawMessage, stringVal *database.NullString) error {
-	if len(input) > 0 { // if key exists in JSON input
-		if string(input) == "null" { // value is null
-			*stringVal = database.NullString{}
-		} else {
-			var nativeString string
-			err := json.Unmarshal(input, &nativeString)
-			if err != nil {
-				return err
-			}
-			*stringVal = database.NewNullString(nativeString)
-		}
-	}
-	return nil
-}
-
 // Partially updates an object field. OrganizationID and ObjectID are used to
 // ensure the object field belongs to the organization and object.
 func PartialUpdateObjectField(
 	db *gorm.DB,
 	organizationID int64,
 	objectID int64,
-	objectFieldID int64,
-	input input.PartialUpdateObjectField,
+	objectFieldUpdates input.PartialUpdateObjectField,
 ) (*models.ObjectField, error) {
 	// Verify the object belongs to the organization
 	var object models.Object
@@ -289,26 +238,21 @@ func PartialUpdateObjectField(
 	var objectField models.ObjectField
 	result = db.Where(&models.ObjectField{
 		ObjectID:  objectID,
-		BaseModel: models.BaseModel{ID: objectFieldID},
+		BaseModel: models.BaseModel{ID: objectFieldUpdates.ID},
 	}).First(&objectField)
 	if result.Error != nil {
 		return nil, errors.Wrap(result.Error, "(objects.PartialUpdateObjectField)")
 	}
 
-	if input.Name != nil {
-		objectField.Name = *input.Name
+	// Explicitly do not allow updating the name or type since that may affect running syncs. TODO: do this safely
+	if objectFieldUpdates.Omit != nil {
+		objectField.Omit = *objectFieldUpdates.Omit
 	}
-	if input.Type != nil {
-		objectField.Type = *input.Type
+	if objectFieldUpdates.Optional != nil {
+		objectField.Optional = *objectFieldUpdates.Optional
 	}
-	if input.Omit != nil {
-		objectField.Omit = *input.Omit
-	}
-	if input.Optional != nil {
-		objectField.Optional = *input.Optional
-	}
-	setNullStringFromRaw(input.DisplayNameRaw, &objectField.DisplayName)
-	setNullStringFromRaw(input.DescriptionRaw, &objectField.Description)
+	database.SetNullStringFromRaw(objectFieldUpdates.DisplayNameRaw, &objectField.DisplayName)
+	database.SetNullStringFromRaw(objectFieldUpdates.DescriptionRaw, &objectField.Description)
 	result = db.Save(&objectField)
 	if result.Error != nil {
 		return nil, errors.Wrap(result.Error, "(objects.PartialUpdateObjectField)")
