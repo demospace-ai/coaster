@@ -6,6 +6,7 @@ import { Checkbox } from "src/components/checkbox/Checkbox";
 import { InfoIcon } from "src/components/icons/Icons";
 import { Input, ValidatedDropdownInput, ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
+import { useShowToast } from "src/components/notifications/Notifications";
 import {
   DestinationSelector,
   FieldSelector,
@@ -52,6 +53,7 @@ import { mergeClasses } from "src/utils/twmerge";
 import { mutate } from "swr";
 
 type ObjectStepProps = {
+  isUpdate: boolean;
   state: NewObjectState;
   setState: React.Dispatch<React.SetStateAction<NewObjectState>>;
 };
@@ -111,7 +113,7 @@ export const NewObject: React.FC<NewObjectProps> = (props) => {
       back = onComplete;
       break;
     case Step.ExistingFields:
-      content = <ExistingObjectFields state={state} setState={setState} />;
+      content = <ExistingObjectFields isUpdate={!!props.existingObject} state={state} setState={setState} />;
       back = () =>
         setState({
           ...state,
@@ -137,6 +139,7 @@ export const NewObject: React.FC<NewObjectProps> = (props) => {
     case Step.Finalize:
       content = (
         <Finalize
+          isUpdate={!!props.existingObject}
           existingObject={props.existingObject}
           state={state}
           setState={setState}
@@ -204,10 +207,7 @@ export const NewObject: React.FC<NewObjectProps> = (props) => {
   );
 };
 
-type DestinationSetupProps = {
-  isUpdate?: boolean;
-};
-export const DestinationSetup: React.FC<ObjectStepProps & DestinationSetupProps> = (props) => {
+export const DestinationSetup: React.FC<ObjectStepProps> = (props) => {
   const { state, setState } = props;
 
   const advance = () => {
@@ -281,7 +281,7 @@ export const DestinationSetup: React.FC<ObjectStepProps & DestinationSetupProps>
           }
         }}
       />
-      <DestinationTarget state={state} setState={setState} disabled={props.isUpdate} />
+      <DestinationTarget isUpdate={props.isUpdate} state={state} setState={setState} />
       <Button onClick={advance} className="tw-mt-10 tw-w-full tw-h-10">
         Continue
       </Button>
@@ -289,10 +289,7 @@ export const DestinationSetup: React.FC<ObjectStepProps & DestinationSetupProps>
   );
 };
 
-type ExistingObjectFieldsStepProps = {
-  isUpdate?: boolean;
-};
-const ExistingObjectFields: React.FC<ObjectStepProps & ExistingObjectFieldsStepProps> = (props) => {
+const ExistingObjectFields: React.FC<ObjectStepProps> = (props) => {
   const { state, setState } = props;
   const updateObjectField = (newObject: ObjectFieldInput, index: number) => {
     if (!state.objectFields) {
@@ -337,6 +334,7 @@ const ExistingObjectFields: React.FC<ObjectStepProps & ExistingObjectFieldsStepP
                   className="tw-ml-2 tw-h-4 tw-w-4 tw-"
                   checked={Boolean(objectField.omit)}
                   onCheckedChange={() => updateObjectField({ ...objectField, omit: !objectField.omit }, i)}
+                  disabled={props.isUpdate}
                 />
                 <span className="tw-ml-4">Optional?</span>
                 <Checkbox
@@ -372,10 +370,7 @@ const ExistingObjectFields: React.FC<ObjectStepProps & ExistingObjectFieldsStepP
   );
 };
 
-type NewObjectFieldsStepProps = {
-  isUpdate?: boolean;
-};
-const NewObjectFields: React.FC<ObjectStepProps & NewObjectFieldsStepProps> = (props) => {
+const NewObjectFields: React.FC<ObjectStepProps> = (props) => {
   const { state, setState } = props;
   const updateObjectField = (newObject: ObjectFieldInput, index: number) => {
     if (!state.objectFields) {
@@ -542,13 +537,13 @@ const NewObjectFields: React.FC<ObjectStepProps & NewObjectFieldsStepProps> = (p
 
 type FinalizeStepProps = {
   existingObject?: FabraObject;
-  onComplete?: () => void;
+  onComplete: () => void;
 };
 
 const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) => {
   const { state, setState } = props;
   const [loading, setLoading] = useState<boolean>(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState<boolean | null>(null);
+  const showToast = useShowToast();
 
   const createNewObject = async (state: NewObjectState) => {
     const payload: CreateObjectRequest = {
@@ -612,9 +607,10 @@ const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) => {
 
     try {
       props.existingObject ? await updateObject(state) : await createNewObject(state);
-      setShowSuccessMessage(true);
+      showToast("success", props.isUpdate ? "Successfully updated object!" : "Successfully created object!", 2000);
+      props.onComplete();
     } catch (e) {
-      setShowSuccessMessage(false);
+      showToast("error", props.isUpdate ? "Failed to update object." : "Failed to create object.", 2000);
       if (e instanceof HttpError) {
         const createError = e.message;
         setState((state) => {
@@ -635,18 +631,6 @@ const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) => {
         })
     : [];
 
-  if (showSuccessMessage) {
-    return (
-      <div>
-        <div className="tw-mt-10 tw-text-center tw-font-bold tw-text-lg">
-          {props.existingObject ? "Your object is updated!" : "🎉 Congratulations! Your object is set up. 🎉"}
-        </div>
-        <Button className="tw-block tw-mt-8 tw-mx-auto tw-mb-10 tw-w-32" onClick={() => props.onComplete?.()}>
-          Done
-        </Button>
-      </div>
-    );
-  }
   let recommendedCursor = <></>;
   switch (state.syncMode!) {
     case SyncMode.IncrementalAppend:
@@ -673,7 +657,7 @@ const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) => {
     <div className="tw-flex tw-flex-col tw-w-100">
       <div className="tw-w-full tw-text-center tw-mb-2 tw-font-bold tw-text-lg">Object Settings</div>
       <div className="tw-text-center tw-mb-3">Enter default settings for object syncs.</div>
-      <SyncModeSelector state={state} setState={setState} disabled={!!props.existingObject} />
+      <SyncModeSelector state={state} setState={setState} isUpdate={props.isUpdate} />
       {[SyncMode.IncrementalAppend, SyncMode.IncrementalUpdate].includes(state.syncMode!) && (
         <>
           <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5 tw-mb-3">
@@ -791,10 +775,7 @@ const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) => {
   );
 };
 
-type DestinationTargetProps = {
-  disabled?: boolean;
-};
-const DestinationTarget: React.FC<ObjectStepProps & DestinationTargetProps> = ({ state, setState, ...props }) => {
+const DestinationTarget: React.FC<ObjectStepProps> = ({ state, setState, ...props }) => {
   type TargetOption = {
     type: TargetType;
     title: string;
@@ -842,10 +823,10 @@ const DestinationTarget: React.FC<ObjectStepProps & DestinationTargetProps> = ({
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setState({ ...state, targetType: e.target.value as TargetType })
                 }
-                disabled={props.disabled}
+                disabled={props.isUpdate}
                 className={mergeClasses(
                   "tw-h-4 tw-w-4 tw-border-slate-300 tw-text-indigo-600 focus:tw-ring-indigo-600 tw-cursor-pointer",
-                  props.disabled ? "tw-cursor-not-allowed" : "tw-cursor-pointer",
+                  props.isUpdate ? "tw-cursor-not-allowed" : "tw-cursor-pointer",
                 )}
               />
               <div className="tw-flex tw-flex-row tw-items-center tw-ml-3 tw-leading-6">
@@ -870,7 +851,7 @@ const DestinationTarget: React.FC<ObjectStepProps & DestinationTargetProps> = ({
             validated={true}
             connection={state.destination?.connection}
             namespace={state.namespace}
-            disabled={props.disabled}
+            disabled={props.isUpdate}
             setNamespace={(value: string) => {
               if (value !== state.namespace) {
                 setState({
@@ -892,7 +873,7 @@ const DestinationTarget: React.FC<ObjectStepProps & DestinationTargetProps> = ({
             connection={state.destination?.connection}
             namespace={state.namespace}
             tableName={state.tableName}
-            disabled={props.disabled}
+            disabled={props.isUpdate}
             setTableName={(value: string) => {
               if (value !== state.tableName) {
                 setState({ ...state, tableName: value, endCustomerIdField: undefined, objectFields: [] });
@@ -907,7 +888,7 @@ const DestinationTarget: React.FC<ObjectStepProps & DestinationTargetProps> = ({
   );
 };
 
-const SyncModeSelector: React.FC<ObjectStepProps & { disabled?: boolean }> = ({ state, setState, disabled }) => {
+const SyncModeSelector: React.FC<ObjectStepProps> = ({ state, setState, isUpdate }) => {
   type SyncModeOption = {
     mode: SyncMode;
     title: string;
@@ -944,7 +925,7 @@ const SyncModeSelector: React.FC<ObjectStepProps & { disabled?: boolean }> = ({ 
                 id={String(syncMode.mode)}
                 name="syncmode"
                 type="radio"
-                disabled={disabled}
+                disabled={isUpdate}
                 checked={state.syncMode === syncMode.mode}
                 value={syncMode.mode}
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>

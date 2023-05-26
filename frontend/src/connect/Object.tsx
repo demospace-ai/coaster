@@ -10,7 +10,7 @@ import { Tooltip } from "src/components/tooltip/Tooltip";
 import { SetupSyncProps } from "src/connect/state";
 import { sendLinkTokenRequest } from "src/rpc/ajax";
 import { FabraObject, LinkGetPreview, LinkGetPreviewRequest } from "src/rpc/api";
-import { useMutation } from "../utils/queryHelpers";
+import { useMutation } from "src/utils/queryHelpers";
 
 export const ObjectSetup: React.FC<SetupSyncProps> = (props) => {
   const setObject = (object: FabraObject) =>

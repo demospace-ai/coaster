@@ -1,14 +1,27 @@
 import { Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Fragment } from "react";
+import { useDispatch } from "src/root/model";
 
 type ToastProps = {
   content: React.ReactNode;
   show: boolean;
-  setShow: (show: boolean) => void;
+  close: () => void;
+  duration?: number;
 };
 
-export const Toast: React.FC<ToastProps> = ({ content, show, setShow }) => {
+export const useShowToast = () => {
+  const dispatch = useDispatch();
+  return (type: "success" | "error" | "info", content: string, duration?: number) => {
+    dispatch({ type: "toast", toast: { content, type, duration } });
+  };
+};
+
+export const Toast: React.FC<ToastProps> = ({ content, show, duration, close }) => {
+  setTimeout(() => {
+    close();
+  }, duration);
+
   return (
     <>
       {/* Global notification live region, render this permanently at the end of the document */}
@@ -37,7 +50,7 @@ export const Toast: React.FC<ToastProps> = ({ content, show, setShow }) => {
                       type="button"
                       className="tw-inline-flex tw-rounded-md tw-bg-white tw-text-gray-400 hover:tw-text-gray-500 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-indigo-500 focus:tw-ring-offset-2"
                       onClick={() => {
-                        setShow(false);
+                        close();
                       }}
                     >
                       <span className="tw-sr-only">Close</span>

@@ -78,7 +78,7 @@ export const Object: React.FC = () => {
       </div>
 
       <div className="tw-font-bold tw-text-lg tw-mt-10 tw-mb-2">Object Fields</div>
-      <div className="tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-lg tw-overflow-auto tw-overscroll-contain tw-shadow-md">
+      <div className="tw-border tw-border-solid tw-border-slate-200 tw-bg-white tw-rounded-lg tw-overflow-auto tw-overscroll-contain tw-shadow-md">
         <table className="tw-min-w-full tw-border-spacing-0 tw-divide-y tw-divide-slate-200">
           <thead className="tw-bg-slate-100 tw-text-slate-900">
             <tr>
