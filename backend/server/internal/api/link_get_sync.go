@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/errors"
+	"go.fabra.io/server/common/repositories/objects"
 	"go.fabra.io/server/common/repositories/sync_runs"
 	"go.fabra.io/server/common/repositories/syncs"
 	"go.fabra.io/server/common/timeutils"
@@ -42,6 +43,16 @@ func (s ApiService) LinkGetSync(auth auth.Authentication, w http.ResponseWriter,
 		return errors.Wrap(err, "(api.LinkGetSync)")
 	}
 
+	fieldMappings, err := syncs.LoadFieldMappingsForSync(s.db, sync.ID)
+	if err != nil {
+		return errors.Wrap(err, "(api.GetSync)")
+	}
+
+	objectFields, err := objects.LoadObjectFieldsByID(s.db, sync.ObjectID)
+	if err != nil {
+		return errors.Wrap(err, "(api.GetSync)")
+	}
+
 	syncRuns, err := sync_runs.LoadAllRunsForSync(s.db, auth.Organization.ID, sync.ID)
 	if err != nil {
 		return errors.Wrap(err, "(api.LinkGetSync)")
@@ -53,8 +64,9 @@ func (s ApiService) LinkGetSync(auth auth.Authentication, w http.ResponseWriter,
 	}
 
 	return json.NewEncoder(w).Encode(GetSyncResponse{
-		Sync:        views.ConvertSync(sync),
-		NextRunTime: "",
-		SyncRuns:    syncRunsView,
+		Sync:          views.ConvertSync(sync),
+		FieldMappings: views.ConvertFieldMappings(fieldMappings, objectFields),
+		NextRunTime:   "",
+		SyncRuns:      syncRunsView,
 	})
 }

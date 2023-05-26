@@ -3,18 +3,12 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-	"time"
 
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/errors"
-	"go.fabra.io/server/common/models"
-	"go.fabra.io/server/common/views"
 
 	"github.com/go-playground/validator/v10"
 )
-
-const DAY = time.Hour * 24
-const WEEK = DAY * 7
 
 func (s ApiService) LinkCreateSync(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
@@ -47,24 +41,7 @@ func (s ApiService) LinkCreateSync(auth auth.Authentication, w http.ResponseWrit
 	}
 
 	return json.NewEncoder(w).Encode(CreateSyncResponse{
-		Sync:          views.ConvertSync(sync),
-		FieldMappings: views.ConvertFieldMappings(fieldMappings),
+		Sync:          *sync,
+		FieldMappings: fieldMappings,
 	})
-}
-
-func createSchedule(frequency int64, frequencyUnits models.FrequencyUnits) (time.Duration, error) {
-	frequencyDuration := time.Duration(frequency)
-	switch frequencyUnits {
-	case models.FrequencyUnitsMinutes:
-		return frequencyDuration * time.Minute, nil
-	case models.FrequencyUnitsHours:
-		return frequencyDuration * time.Hour, nil
-	case models.FrequencyUnitsDays:
-		return frequencyDuration * DAY, nil
-	case models.FrequencyUnitsWeeks:
-		return frequencyDuration * WEEK, nil
-	default:
-		// TODO: this should not happen
-		return WEEK, errors.Newf("(api.createSchedule) unexpected frequency unit: %s", string(frequencyUnits))
-	}
 }

@@ -57,7 +57,7 @@ var _ = Describe("BigQueryConnector", func() {
 			{SourceFieldName: "source_datetime_tz", SourceFieldType: data.FieldTypeDateTimeTz, DestinationFieldId: objectFields[3].ID},
 			{SourceFieldName: "source_datetime_ntz", SourceFieldType: data.FieldTypeDateTimeNtz, DestinationFieldId: objectFields[4].ID},
 			{SourceFieldName: "source_json", SourceFieldType: data.FieldTypeJson, DestinationFieldId: objectFields[5].ID},
-		}))
+		}), objectFields)
 	})
 
 	Describe("Read", func() {

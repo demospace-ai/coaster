@@ -342,6 +342,14 @@ export interface FieldMappingInput {
   is_json_field: boolean;
 }
 
+export interface FieldMapping {
+  source_field_name: string;
+  source_field_type: FieldType;
+  destination_field_name: string;
+  destination_field_type: FieldType;
+  is_json_field: boolean;
+}
+
 export enum FieldType {
   String = "STRING",
   Integer = "INTEGER",
@@ -460,6 +468,7 @@ export interface GetSyncsResponse {
 
 export interface GetSyncResponse {
   sync: Sync;
+  field_mappings: FieldMapping[];
   next_run_time: string;
   sync_runs: SyncRun[];
 }

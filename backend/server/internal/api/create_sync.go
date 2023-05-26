@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/errors"
@@ -12,6 +13,7 @@ import (
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/repositories/objects"
 	"go.fabra.io/server/common/repositories/syncs"
+	"go.fabra.io/server/common/timeutils"
 	"go.fabra.io/server/common/views"
 	"go.fabra.io/sync/temporal"
 	"go.temporal.io/sdk/client"
@@ -69,12 +71,12 @@ func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, 
 	}
 
 	return json.NewEncoder(w).Encode(CreateSyncResponse{
-		Sync:          views.ConvertSync(sync),
-		FieldMappings: views.ConvertFieldMappings(fieldMappings),
+		Sync:          *sync,
+		FieldMappings: fieldMappings,
 	})
 }
 
-func (s ApiService) createSync(auth auth.Authentication, createSyncRequest CreateSyncRequest, endCustomerID string) (*models.Sync, []models.FieldMapping, error) {
+func (s ApiService) createSync(auth auth.Authentication, createSyncRequest CreateSyncRequest, endCustomerID string) (*views.Sync, []views.FieldMapping, error) {
 	if (createSyncRequest.TableName == nil || createSyncRequest.Namespace == nil) && createSyncRequest.CustomJoin == nil {
 		return nil, nil, errors.Wrap(errors.NewBadRequest("must have table_name and namespace or custom_join"), "(api.createSync)")
 	}
@@ -184,7 +186,25 @@ func (s ApiService) createSync(auth auth.Authentication, createSyncRequest Creat
 		return nil, nil, errors.Wrap(err, "(api.createSync)")
 	}
 
-	return sync, fieldMappings, nil
+	syncView := views.ConvertSync(sync)
+	return &syncView, views.ConvertFieldMappings(fieldMappings, objectFields), nil
+}
+
+func createSchedule(frequency int64, frequencyUnits models.FrequencyUnits) (time.Duration, error) {
+	frequencyDuration := time.Duration(frequency)
+	switch frequencyUnits {
+	case models.FrequencyUnitsMinutes:
+		return frequencyDuration * time.Minute, nil
+	case models.FrequencyUnitsHours:
+		return frequencyDuration * time.Hour, nil
+	case models.FrequencyUnitsDays:
+		return frequencyDuration * timeutils.DAY, nil
+	case models.FrequencyUnitsWeeks:
+		return frequencyDuration * timeutils.WEEK, nil
+	default:
+		// TODO: this should not happen
+		return timeutils.WEEK, errors.Newf("(api.createSchedule) unexpected frequency unit: %s", string(frequencyUnits))
+	}
 }
 
 func getSourcePrimaryKey(object *models.Object, objectFields []models.ObjectField, fieldMappings []input.FieldMapping) *string {

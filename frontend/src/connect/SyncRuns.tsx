@@ -1,9 +1,12 @@
+import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { DotsLoading, Loading } from "src/components/loading/Loading";
 import { useConnectShowToast } from "src/components/notifications/Notifications";
 import { EmptyTable } from "src/components/table/Table";
 import { Tooltip } from "src/components/tooltip/Tooltip";
+import { SyncDetails } from "src/pages/syncs/Sync";
 import { sendLinkTokenRequest } from "src/rpc/ajax";
 import { LinkRunSync, SyncRunStatus } from "src/rpc/api";
 import { useLinkSync } from "src/rpc/data";
@@ -31,8 +34,8 @@ const tableCellStyle =
 const SyncRunsList: React.FC<{ linkToken: string }> = ({ linkToken }) => {
   const { syncID } = useParams<{ syncID: string }>();
   const { sync, mutate } = useLinkSync(Number(syncID), linkToken);
-  const syncRuns = sync?.sync_runs ?? [];
   const showToast = useConnectShowToast();
+  const [showDetails, setShowDetails] = useState<boolean>(false);
 
   const runSyncMutation = useMutation(
     async () => {
@@ -52,11 +55,17 @@ const SyncRunsList: React.FC<{ linkToken: string }> = ({ linkToken }) => {
     },
   );
 
+  if (!sync) {
+    return <Loading />;
+  }
+
+  const syncRuns = sync.sync_runs ?? [];
+
   return (
     <div className="tw-mt-2 tw-pb-16 tw-px-20 tw-flex tw-flex-col tw-overflow-auto">
-      <div className="tw-flex tw-w-full tw-mb-8">
+      <div className="tw-flex tw-w-full tw-mb-2">
         <div className="tw-flex tw-flex-row tw-w-full tw-items-center tw-font-bold tw-text-xl tw-justify-between">
-          Sync Runs • {sync?.sync.display_name}
+          Sync Runs • {sync.sync.display_name}
           <div className="tw-flex">
             <button
               className="tw-ml-auto tw-px-3 tw-py-1 tw-rounded-md tw-font-medium tw-text-base hover:tw-bg-slate-100 tw-text-blue-600 tw-mr-2"
@@ -76,6 +85,21 @@ const SyncRunsList: React.FC<{ linkToken: string }> = ({ linkToken }) => {
           </div>
         </div>
       </div>
+      <div
+        className="tw-flex tw-w-fit tw-items-center tw-mb-5 tw-cursor-pointer tw-text-blue-500 tw-select-none"
+        onClick={() => setShowDetails(!showDetails)}
+      >
+        {showDetails ? (
+          <>
+            Collapse details <ChevronUpIcon className="tw-h-3" />
+          </>
+        ) : (
+          <>
+            Expand details <ChevronDownIcon className="tw-h-3" />
+          </>
+        )}
+      </div>
+      {showDetails && <SyncDetails sync={sync.sync} mappings={sync.field_mappings} />}
       <div className="tw-shadow tw-ring-1 tw-ring-black tw-ring-opacity-5 tw-rounded-md tw-overflow-auto tw-overscroll-contain tw-w-full">
         {sync ? (
           <table className="tw-min-w-full tw-border-spacing-0 tw-divide-y tw-divide-slate-200">
