@@ -1,12 +1,12 @@
-import { PencilIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
 import { useNavigate, useParams } from "react-router-dom";
-import { ObjectsListTable } from "src/components/ObjectsListTable";
-import { AddObjectButton } from "src/components/ObjectsListTable/AddObjectsButton";
-import { SectionLayout } from "src/components/SectionLayout";
+import { BackButton } from "src/components/button/Button";
 import { InfoIcon } from "src/components/icons/Icons";
 import { ConnectionImage } from "src/components/images/Connections";
 import { Loading } from "src/components/loading/Loading";
+import { ObjectsListTable } from "src/components/ObjectsListTable";
+import { AddObjectButton } from "src/components/ObjectsListTable/AddObjectsButton";
 import { PrivateKey } from "src/components/privateKey/PrivateKey";
+import { SectionLayout } from "src/components/SectionLayout";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { ConnectionType, getConnectionType } from "src/rpc/api";
 import { useDestination, useObjects } from "src/rpc/data";
@@ -28,22 +28,21 @@ export const Destination: React.FC = () => {
 
   return (
     <div className="tw-py-5 tw-px-10 tw-h-full tw-overflow-scroll">
-      <div className="tw-flex tw-w-full tw-mb-1 tw-mt-2">
-        <div className="tw-flex tw-flex-row tw-items-center tw-font-bold tw-text-lg">
-          {destination.display_name}
-          <div className="hover:tw-bg-slate-200 tw-p-1 tw-rounded tw-ml-1 tw-cursor-pointer">
-            <PencilIcon className="tw-h-4" />
-          </div>
+      <BackButton onClick={() => navigate("/destinations")} />
+      <div className="tw-flex tw-w-full tw-mb-2 tw-mt-4">
+        <div className="tw-flex tw-flex-row tw-items-center tw-font-bold tw-text-xl">{destination.display_name}</div>
+      </div>
+      <div className="tw-flex tw-flex-col tw-w-fit tw-flex-wrap tw-items-start tw-px-3 tw-pt-1 tw-pb-2 tw-mt-3 tw-mb-5 tw-bg-white tw-border tw-border-slate-200 tw-rounded-md">
+        <div className="tw-flex tw-flex-row tw-items-center tw-mt-1">
+          <span className="tw-font-medium tw-whitespace-pre">Destination Type: </span>
+          {getConnectionType(destination.connection.connection_type)}
+          <ConnectionImage connectionType={destination.connection.connection_type} className="tw-h-5 tw-ml-1" />
         </div>
       </div>
-      <div className="tw-flex tw-items-center">
-        <ConnectionImage connectionType={destination.connection.connection_type} className="tw-h-6 -tw-ml-1 tw-mr-1" />
-        {getConnectionType(destination.connection.connection_type)}
-      </div>
-      <div className="tw-font-bold tw-text-lg tw-mt-8">Configuration</div>
+      <div className="tw-font-bold tw-text-base">Configuration</div>
       {destination.connection.connection_type === ConnectionType.Webhook && (
         <>
-          <div className="tw-flex tw-flex-row tw-items-center tw-mt-5 tw-mb-2">
+          <div className="tw-flex tw-flex-row tw-items-center tw-mt-3 tw-mb-2">
             <span>Webhook Signing Key</span>
             <Tooltip
               placement="right"
@@ -58,7 +57,7 @@ export const Destination: React.FC = () => {
         </>
       )}
       <section className="tw-flex tw-items-center tw-justify-between tw-mt-8">
-        <div className="tw-text-lg tw-font-bold">Objects</div>
+        <div className="tw-text-base tw-font-bold">Objects</div>
         <AddObjectButton onClick={onAddObjectClick} />
       </section>
       <SectionLayout className="tw-mt-4">

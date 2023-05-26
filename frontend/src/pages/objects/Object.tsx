@@ -21,7 +21,7 @@ export const Object: React.FC = () => {
   return (
     <div className="xl:tw-w-3/5 md:tw-w-full tw-flex tw-flex-col tw-mb-10">
       <BackButton onClick={() => navigate("/objects")} />
-      <div className="tw-flex tw-flex-row tw-items-center tw-font-bold tw-text-2xl tw-my-4">
+      <div className="tw-flex tw-flex-row tw-items-center tw-font-bold tw-text-xl tw-my-4">
         <span className="tw-grow">{object.display_name}</span>
         <Button
           className="tw-ml-auto tw-px-3 tw-py-1 tw-rounded-md tw-font-medium tw-text-base tw-bg-transparent hover:tw-bg-slate-100 tw-text-blue-600 tw-mr-2"
@@ -76,7 +76,7 @@ export const Object: React.FC = () => {
           {object.frequency} {object.frequency_units}
         </div>
       </div>
-      <div className="tw-font-bold tw-text-lg tw-mt-10 tw-mb-2">Object Fields</div>
+      <div className="tw-font-bold tw-text-base tw-mt-4 tw-mb-2">Object Fields</div>
       <div className="tw-border tw-border-solid tw-border-slate-200 tw-bg-white tw-rounded-lg tw-overflow-auto tw-overscroll-contain tw-shadow-md">
         <table className="tw-min-w-full tw-border-spacing-0 tw-divide-y tw-divide-slate-200">
           <thead className="tw-bg-slate-100 tw-text-slate-900">
