@@ -9,6 +9,7 @@ import (
 	"net/http/httptest"
 
 	"go.fabra.io/server/common/auth"
+	"go.fabra.io/server/common/data"
 	"go.fabra.io/server/common/input"
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/views"
@@ -100,6 +101,7 @@ var _ = Describe("Sending an ObjectField batch update request", func() {
 			objField := test.CreateObjectFields(db, object.ID, []input.ObjectField{
 				{
 					Name:        "old name",
+					Type:        data.FieldTypeString,
 					Description: nil,      // description will be updated from null to "new description"
 					DisplayName: &disname, // display name will be updated from "old display name" to null
 				},
@@ -110,7 +112,8 @@ var _ = Describe("Sending an ObjectField batch update request", func() {
 				"object_fields": []map[string]interface{}{
 					{
 						"id":           objField.ID,
-						"name":         "new name",
+						"name":         "new name", // This should be ignored because we don't allow updating the name
+						"type":         "integer",  // This should be ignored because we don't allow updating the type
 						"description":  desc,
 						"display_name": nil, // This will set {"display_name": null}
 					},
@@ -119,18 +122,19 @@ var _ = Describe("Sending an ObjectField batch update request", func() {
 			err := service.UpdateObjectFields(auth, response, request)
 			Expect(err).To(BeNil(), "no error should be returned, got %s", err)
 			Expect(response.Code).To(Equal(200))
-			expect, _ := json.Marshal(api.UpdateObjectFieldsResponse{
+			expected, _ := json.Marshal(api.UpdateObjectFieldsResponse{
 				ObjectFields: []views.ObjectField{
 					{
 						ID:          objField.ID,
-						Name:        "new name",
+						Name:        "old name",
+						Type:        data.FieldTypeString,
 						Description: &desc,
 						DisplayName: nil, // Expects {"display_name": null} (or no display_name key)
 					},
 				},
 				Failures: []int64{},
 			})
-			Expect(response.Body).To(MatchJSON(expect))
+			Expect(response.Body).To(MatchJSON(expected))
 		})
 	})
 

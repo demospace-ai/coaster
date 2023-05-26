@@ -54,7 +54,7 @@ func (s ApiService) UpdateObjectFields(auth auth.Authentication, w http.Response
 		}
 	}
 
-	responseViews := []views.ObjectField{}
+	objectFieldViews := []views.ObjectField{}
 	failures := []int64{}
 	for _, objectField := range requestBody.ObjectFields {
 		updatedObjectField, err := objects.PartialUpdateObjectField(
@@ -65,14 +65,14 @@ func (s ApiService) UpdateObjectFields(auth auth.Authentication, w http.Response
 		)
 		if err == nil {
 			updated := views.ConvertObjectField(updatedObjectField)
-			responseViews = append(responseViews, updated)
+			objectFieldViews = append(objectFieldViews, updated)
 		} else {
 			failures = append(failures, objectField.ID)
 		}
 	}
 
 	return json.NewEncoder(w).Encode(UpdateObjectFieldsResponse{
-		ObjectFields: responseViews,
+		ObjectFields: objectFieldViews,
 		Failures:     failures,
 	})
 }
