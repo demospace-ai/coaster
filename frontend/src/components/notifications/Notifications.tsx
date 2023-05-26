@@ -51,6 +51,8 @@ export const getToastContentFromDetails = (toast?: ToastDetails) => {
   return toastContent;
 };
 
+export type ShowToastFunction = (type: "success" | "error" | "info", content: string, duration?: number) => void;
+
 export const useShowToast = () => {
   const dispatch = useDispatch();
   return (type: "success" | "error" | "info", content: string, duration?: number) => {

@@ -23,7 +23,11 @@ func (s ApiService) GetApiKey(auth auth.Authentication, w http.ResponseWriter, r
 	}
 
 	_, err = fmt.Fprintf(w, *apiKey)
-	return errors.Wrap(err, "(api.GetApiKey)")
+	if err != nil {
+		return errors.Wrap(err, "(api.GetApiKey)")
+	}
+
+	return nil
 }
 
 func (s ApiService) getOrCreateApiKey(organizationID int64) (*string, error) {

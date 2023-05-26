@@ -12,11 +12,11 @@ import { ObjectSetup } from "src/connect/Object";
 import { Sources } from "src/connect/Sources";
 import {
   createNewSource,
-  createNewSync,
   FieldMappingState,
   INITIAL_SETUP_STATE,
   SetupSyncState,
   SyncSetupStep,
+  useCreateNewSync,
   validateObjectSetup,
 } from "src/connect/state";
 import { WarehouseSelector } from "src/connect/Warehouse";
@@ -43,7 +43,7 @@ export const NewSync: React.FC<{ linkToken: string; close: (() => void) | undefi
           .map((objectField) => {
             return {
               sourceField: undefined,
-              destinationFieldId: objectField.id,
+              destinationField: objectField,
               expandedJson: false,
               jsonFields: [undefined],
             };
@@ -220,13 +220,14 @@ export const Footer: React.FC<FooterProps> = (props) => {
   let onClick = () => {};
   let continueText: string = "Continue";
   let showContinue = true;
+  const createSync = useCreateNewSync();
 
   const createNewSourceMutation = useMutation(async () => {
     await createNewSource(props.linkToken, props.state, props.setState);
   });
 
   const createNewSyncMutation = useMutation(async () => {
-    await createNewSync(props.linkToken, props.state, props.setState);
+    await createSync(props.linkToken, props.state, props.setState);
   });
 
   switch (props.state.step) {
@@ -250,31 +251,23 @@ export const Footer: React.FC<FooterProps> = (props) => {
       };
       break;
     case SyncSetupStep.Finalize:
-      if (props.state.syncCreated) {
-        showContinue = false;
-      } else {
-        continueText = "Create Sync";
-        onClick = () => {
-          createNewSyncMutation.reset();
-          createNewSyncMutation.mutate();
-        };
-      }
+      continueText = "Create Sync";
+      onClick = () => {
+        createNewSyncMutation.reset();
+        createNewSyncMutation.mutate();
+      };
       break;
   }
-
-  const showBack = props.state.step !== SyncSetupStep.Finalize || !props.state.syncCreated;
 
   return (
     <div className="tw-w-full tw-min-h-[80px]">
       <div className="tw-flex tw-flex-row tw-w-full tw-h-full tw-px-20 tw-border-t tw-border-slate-200 tw-items-center tw-gap-x-2">
-        {showBack && (
-          <button
-            className="tw-border tw-border-slate-300 tw-font-medium tw-rounded-md tw-w-32 tw-h-10 tw-select-none hover:tw-bg-slate-100"
-            onClick={props.back}
-          >
-            Back
-          </button>
-        )}
+        <button
+          className="tw-border tw-border-slate-300 tw-font-medium tw-rounded-md tw-w-32 tw-h-10 tw-select-none hover:tw-bg-slate-100"
+          onClick={props.back}
+        >
+          Back
+        </button>
         {showContinue && (
           <Button onClick={onClick} className="tw-border tw-w-36 tw-h-10 tw-ml-auto tw-select-none">
             {createNewSourceMutation.isLoading || createNewSyncMutation.isLoading ? <Loading light /> : continueText}

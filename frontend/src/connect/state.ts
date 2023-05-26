@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+import { ShowToastFunction, useConnectShowToast } from "src/components/notifications/Notifications";
 import { sendLinkTokenRequest } from "src/rpc/ajax";
 import {
   BigQueryConfigState,
@@ -15,6 +17,7 @@ import {
   LinkGetSyncs,
   MongoDbConfig,
   MySqlConfig,
+  ObjectField,
   PostgresConfig,
   RedshiftConfig,
   SnowflakeConfig,
@@ -108,14 +111,13 @@ export const resetState = (setState: React.Dispatch<React.SetStateAction<SetupSy
 
 export interface FieldMappingState {
   sourceField: Field | undefined;
-  destinationFieldId: number;
+  destinationField: ObjectField;
   expandedJson: boolean;
   jsonFields: (Field | undefined)[];
 }
 
 export type SetupSyncState = {
   step: SyncSetupStep;
-  syncCreated: boolean;
   error: string | undefined;
   skippedSourceSetup: boolean;
   skippedSourceSelection: boolean;
@@ -134,7 +136,6 @@ export type SetupSyncState = {
 
 export const INITIAL_SETUP_STATE: SetupSyncState = {
   step: SyncSetupStep.ExistingSources,
-  syncCreated: false,
   error: undefined,
   skippedSourceSetup: false,
   skippedSourceSelection: false,
@@ -291,87 +292,126 @@ export const validateObjectSetup = (state: SetupSyncState): boolean => {
   return state.object !== undefined && state.namespace !== undefined && state.tableName !== undefined;
 };
 
-export const validateSyncSetup = (state: SetupSyncState): boolean => {
-  return (
-    state.displayName !== undefined &&
-    state.displayName.length > 0 &&
-    state.source !== undefined &&
-    state.object !== undefined &&
-    ((state.namespace !== undefined && state.namespace !== undefined) || state.customJoin !== undefined) &&
-    // && state.frequency !== undefined
-    // && state.frequencyUnits !== undefined
-    state.fieldMappings !== undefined &&
-    validateFieldMappings(state.fieldMappings)
-  );
+export const validateSyncSetup = (state: SetupSyncState, showToast: ShowToastFunction): boolean => {
+  if (state.displayName === undefined || state.displayName.length <= 0) {
+    showToast("error", "Must set a display name.");
+    return false;
+  }
+  if (state.source === undefined) {
+    showToast("error", "Must choose a source.");
+    return false;
+  }
+  if (state.object === undefined) {
+    showToast("error", "Must choose a destination object.");
+    return false;
+  }
+  if (state.namespace === undefined && state.tableName === undefined && state.customJoin === undefined) {
+    showToast("error", "Must configure the source namespace and table.");
+    return false;
+  }
+  // TODO: validate frequency once we allow end customers to customize this
+  //if (state.frequency === undefined) return false;
+  //if (state.frequencyUnits === undefined) return false;
+  if (!validateFieldMappings(state.fieldMappings)) {
+    showToast("error", "Field mappings are invalid.");
+    return false;
+  }
+
+  return true;
 };
 
-const validateFieldMappings = (fieldMapppings: FieldMappingState[]): boolean => {
-  return fieldMapppings.every((fieldMapping) => {
+const validateFieldMappings = (fieldMappings: FieldMappingState[] | undefined): boolean => {
+  if (fieldMappings === undefined) {
+    return false;
+  }
+
+  return fieldMappings.every((fieldMapping) => {
     if (fieldMapping.expandedJson) {
       return fieldMapping.jsonFields.every((jsonField) => jsonField !== undefined);
     } else {
-      return fieldMapping.sourceField !== undefined;
+      return fieldMapping.destinationField.optional || fieldMapping.sourceField !== undefined;
     }
   });
 };
 
-export const createNewSync = async (
-  linkToken: string,
-  state: SetupSyncState,
-  setState: React.Dispatch<React.SetStateAction<SetupSyncState>>,
-) => {
-  if (!validateSyncSetup(state)) {
-    // show alert and make all input boxes red
-    return;
-  }
+export const useCreateNewSync = () => {
+  const navigate = useNavigate();
+  const showToast = useConnectShowToast();
+  return async (
+    linkToken: string,
+    state: SetupSyncState,
+    setState: React.Dispatch<React.SetStateAction<SetupSyncState>>,
+  ) => {
+    if (!validateSyncSetup(state, showToast)) {
+      // TODO: show alert and make all input boxes red
+      return;
+    }
 
-  const convertFieldMappings = (fieldMapping: FieldMappingState): FieldMappingInput[] => {
-    if (fieldMapping.expandedJson) {
-      return fieldMapping.jsonFields.map((jsonMapping) => {
-        return {
-          source_field_name: jsonMapping!.name,
-          source_field_type: jsonMapping!.type,
-          destination_field_id: fieldMapping.destinationFieldId,
-          is_json_field: true,
-        };
-      });
-    } else {
-      return [
-        {
-          source_field_name: fieldMapping.sourceField!.name,
-          source_field_type: fieldMapping.sourceField!.type,
-          destination_field_id: fieldMapping.destinationFieldId,
-          is_json_field: false,
-        },
-      ];
+    const convertFieldMappings = (fieldMapping: FieldMappingState): FieldMappingInput[] => {
+      if (fieldMapping.expandedJson) {
+        return fieldMapping.jsonFields.flatMap((jsonMapping) => {
+          if (jsonMapping === undefined) {
+            consumeError(new Error("JSON mapping is undefined"));
+            return [];
+          }
+          return [
+            {
+              source_field_name: jsonMapping.name,
+              source_field_type: jsonMapping.type,
+              destination_field_id: fieldMapping.destinationField.id,
+              is_json_field: true,
+            },
+          ];
+        });
+      } else {
+        if (fieldMapping.sourceField === undefined) {
+          consumeError(new Error("Field mapping source field is undefined"));
+          return [];
+        }
+
+        return [
+          {
+            source_field_name: fieldMapping.sourceField.name,
+            source_field_type: fieldMapping.sourceField.type,
+            destination_field_id: fieldMapping.destinationField.id,
+            is_json_field: false,
+          },
+        ];
+      }
+    };
+
+    if (state.fieldMappings === undefined) {
+      consumeError(new Error("Field mappings are undefined"));
+      return;
+    }
+
+    const fieldMappings: FieldMappingInput[] = state.fieldMappings.flatMap(convertFieldMappings);
+    const payload: LinkCreateSyncRequest = {
+      display_name: state.displayName!,
+      source_id: state.source!.id,
+      object_id: state.object!.id,
+      namespace: state.namespace,
+      table_name: state.tableName,
+      frequency: state.frequency!,
+      frequency_units: state.frequencyUnits!,
+      field_mappings: fieldMappings,
+    };
+
+    try {
+      await sendLinkTokenRequest(LinkCreateSync, linkToken, payload);
+      // Tell SWRs to refetch syncs
+      mutate({ LinkGetSyncs });
+      showToast("success", "Success! Your sync has been created.", 4000);
+
+      // Reset state so a new sync can be created
+      resetState(setState);
+      navigate("/");
+    } catch (e) {
+      if (e instanceof HttpError) {
+        const errorMessage = e.message;
+        setState((state) => ({ ...state, error: errorMessage }));
+      }
+      consumeError(e);
     }
   };
-
-  const fieldMappings: FieldMappingInput[] = state.fieldMappings!.flatMap(convertFieldMappings);
-  const payload: LinkCreateSyncRequest = {
-    display_name: state.displayName!,
-    source_id: state.source!.id,
-    object_id: state.object!.id,
-    namespace: state.namespace,
-    table_name: state.tableName,
-    frequency: state.frequency!,
-    frequency_units: state.frequencyUnits!,
-    field_mappings: fieldMappings,
-  };
-
-  try {
-    await sendLinkTokenRequest(LinkCreateSync, linkToken, payload);
-    // Tell SWRs to refetch syncs
-    mutate({ LinkGetSyncs });
-    setState((state) => ({
-      ...state,
-      syncCreated: true,
-    }));
-  } catch (e) {
-    if (e instanceof HttpError) {
-      const errorMessage = e.message;
-      setState((state) => ({ ...state, error: errorMessage }));
-    }
-    consumeError(e);
-  }
 };
