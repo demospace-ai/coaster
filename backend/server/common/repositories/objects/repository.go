@@ -244,13 +244,7 @@ func PartialUpdateObjectField(
 		return nil, errors.Wrap(result.Error, "(objects.PartialUpdateObjectField)")
 	}
 
-	// Explicitly do not allow updating the name or type since that may affect running syncs. TODO: do this safely
-	if objectFieldUpdates.Omit != nil {
-		objectField.Omit = *objectFieldUpdates.Omit
-	}
-	if objectFieldUpdates.Optional != nil {
-		objectField.Optional = *objectFieldUpdates.Optional
-	}
+	// Explicitly do not allow updating the name, type, omit, or optional since that may affect running syncs. TODO: do this safely
 	database.SetNullStringFromRaw(objectFieldUpdates.DisplayNameRaw, &objectField.DisplayName)
 	database.SetNullStringFromRaw(objectFieldUpdates.DescriptionRaw, &objectField.Description)
 	result = db.Save(&objectField)

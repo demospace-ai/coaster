@@ -341,6 +341,7 @@ const ExistingObjectFields: React.FC<ObjectStepProps> = (props) => {
                   className="tw-ml-2 tw-h-4 tw-w-4"
                   checked={Boolean(objectField.optional)}
                   onCheckedChange={() => updateObjectField({ ...objectField, optional: !objectField.optional }, i)}
+                  disabled={props.isUpdate}
                 />
               </div>
               <Input

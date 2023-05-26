@@ -17,8 +17,6 @@ type PartialUpdateObjectInput struct {
 type PartialUpdateObjectField struct {
 	// Don't include name or type since we don't have a way to safely update these
 	ID             int64           `json:"id" validate:"required"`
-	Omit           *bool           `json:"omit"`
-	Optional       *bool           `json:"optional"`
 	DisplayNameRaw json.RawMessage `json:"display_name"`
 	DescriptionRaw json.RawMessage `json:"description"`
 }
