@@ -4,7 +4,7 @@ import { Fragment } from "react";
 import { useConnectDispatch } from "src/connect/model";
 import { useDispatch } from "src/root/model";
 
-export interface ToastDetails {
+export interface ToastOptions {
   type: "error" | "success" | "info";
   duration?: number;
   content: React.ReactNode;
@@ -17,7 +17,9 @@ type ToastProps = {
   duration?: number;
 };
 
-export const getToastContentFromDetails = (toast?: ToastDetails) => {
+export type ShowToastFunction = (type: "success" | "error" | "info", content: string, duration?: number) => void;
+
+export const getToastContentFromDetails = (toast?: ToastOptions) => {
   var toastContent = undefined;
   if (toast) {
     switch (toast.type) {
@@ -51,16 +53,14 @@ export const getToastContentFromDetails = (toast?: ToastDetails) => {
   return toastContent;
 };
 
-export type ShowToastFunction = (type: "success" | "error" | "info", content: string, duration?: number) => void;
-
-export const useShowToast = () => {
+export const useShowToast = (): ShowToastFunction => {
   const dispatch = useDispatch();
   return (type: "success" | "error" | "info", content: string, duration?: number) => {
     dispatch({ type: "toast", toast: { content, type, duration } });
   };
 };
 
-export const useConnectShowToast = () => {
+export const useConnectShowToast = (): ShowToastFunction => {
   const dispatch = useConnectDispatch();
   return (type: "success" | "error" | "info", content: string, duration?: number) => {
     dispatch({ type: "toast", toast: { content, type, duration } });
