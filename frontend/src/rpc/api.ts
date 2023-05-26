@@ -305,7 +305,7 @@ export interface CreateObjectRequest {
 }
 
 export interface CreateObjectResponse {
-  model: FabraObject;
+  object: FabraObject;
 }
 
 export type UpdateObjectRequest = Partial<Omit<CreateObjectRequest, "object_fields">> & {

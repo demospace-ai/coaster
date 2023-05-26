@@ -558,8 +558,8 @@ const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) => {
       display_name: state.displayName!,
       destination_id: state.destination!.id,
       target_type: state.targetType!,
-      namespace: state.namespace ?? "",
-      table_name: state.tableName ?? "",
+      namespace: state.namespace!,
+      table_name: state.tableName!,
       sync_mode: state.syncMode!,
       cursor_field: state.cursorField && state.cursorField.name,
       primary_key: state.primaryKey && state.primaryKey.name,
@@ -570,7 +570,7 @@ const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) => {
       object_fields: state.objectFields,
     };
     const object = await sendRequest(CreateObject, payload);
-    return object.model;
+    return object.object;
   };
 
   const updateObject = async (newObj: NewObjectState) => {

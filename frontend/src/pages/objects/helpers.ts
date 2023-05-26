@@ -299,5 +299,8 @@ export const initializeFromDestination = (destination: Destination) => {
   return {
     ...INITIAL_OBJECT_STATE,
     destination,
+    ...(destination.connection.connection_type === ConnectionType.Webhook
+      ? { targetType: TargetType.Webhook, endCustomerIdField: { name: "end_customer_id", type: FieldType.Integer } }
+      : {}),
   };
 };
