@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "src/components/button/Button";
 import { ErrorDisplay } from "src/components/error/Error";
 import { Loading } from "src/components/loading/Loading";
+import { useConnectShowToast } from "src/components/notifications/Notifications";
 import { FabraDisplayOptions } from "src/connect/ConnectApp";
 import { NewSourceConfiguration } from "src/connect/Connection";
 import { FinalizeSync } from "src/connect/Finalize";
@@ -221,6 +222,7 @@ export const Footer: React.FC<FooterProps> = (props) => {
   let continueText: string = "Continue";
   let showContinue = true;
   const createSync = useCreateNewSync();
+  const showToast = useConnectShowToast();
 
   const createNewSourceMutation = useMutation(async () => {
     await createNewSource(props.linkToken, props.state, props.setState);
@@ -245,7 +247,7 @@ export const Footer: React.FC<FooterProps> = (props) => {
       break;
     case SyncSetupStep.ChooseData:
       onClick = () => {
-        if (validateObjectSetup(props.state)) {
+        if (validateObjectSetup(props.state, showToast)) {
           props.setState((state) => ({ ...state, step: props.state.step + 1 }));
         }
       };

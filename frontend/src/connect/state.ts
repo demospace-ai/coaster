@@ -154,6 +154,7 @@ export const INITIAL_SETUP_STATE: SetupSyncState = {
 
 export const validateConnectionSetup = (connectionType: ConnectionType | undefined, state: NewSourceState): boolean => {
   if (!connectionType) {
+    consumeError(new Error("Connection type not set for source setup"));
     return false;
   }
 
@@ -220,7 +221,10 @@ export const createNewSource = async (
   setState: React.Dispatch<React.SetStateAction<SetupSyncState>>,
 ) => {
   if (!validateConnectionSetup(state.connectionType, state.newSourceState)) {
-    // show alert and make all input boxes red
+    // TODO: make each required input field red if it's not filled out
+    setState((state) => {
+      return { ...state, newSourceState: { ...state.newSourceState, error: "Must fill out all required fields" } };
+    });
     return;
   }
 
@@ -288,32 +292,47 @@ export const createNewSource = async (
   }
 };
 
-export const validateObjectSetup = (state: SetupSyncState): boolean => {
-  return state.object !== undefined && state.namespace !== undefined && state.tableName !== undefined;
+export const validateObjectSetup = (state: SetupSyncState, showToast: ShowToastFunction): boolean => {
+  if (state.object === undefined) {
+    showToast("error", "Must choose an object to sync.", 5000);
+    return false;
+  }
+
+  if (state.namespace === undefined) {
+    showToast("error", "Must choose a source namespace.", 5000);
+    return false;
+  }
+
+  if (state.tableName === undefined) {
+    showToast("error", "Must choose a source table.", 5000);
+    return false;
+  }
+
+  return true;
 };
 
 export const validateSyncSetup = (state: SetupSyncState, showToast: ShowToastFunction): boolean => {
   if (state.displayName === undefined || state.displayName.length <= 0) {
-    showToast("error", "Must set a display name.");
+    showToast("error", "Must set a display name.", 5000);
     return false;
   }
   if (state.source === undefined) {
-    showToast("error", "Must choose a source.");
+    showToast("error", "Must choose a source.", 5000);
     return false;
   }
   if (state.object === undefined) {
-    showToast("error", "Must choose a destination object.");
+    showToast("error", "Must choose a destination object.", 5000);
     return false;
   }
   if (state.namespace === undefined && state.tableName === undefined && state.customJoin === undefined) {
-    showToast("error", "Must configure the source namespace and table.");
+    showToast("error", "Must configure the source namespace and table.", 5000);
     return false;
   }
   // TODO: validate frequency once we allow end customers to customize this
   //if (state.frequency === undefined) return false;
   //if (state.frequencyUnits === undefined) return false;
   if (!validateFieldMappings(state.fieldMappings)) {
-    showToast("error", "Field mappings are invalid.");
+    showToast("error", "Field mappings are invalid.", 5000);
     return false;
   }
 
@@ -343,7 +362,7 @@ export const useCreateNewSync = () => {
     setState: React.Dispatch<React.SetStateAction<SetupSyncState>>,
   ) => {
     if (!validateSyncSetup(state, showToast)) {
-      // TODO: show alert and make all input boxes red
+      setState((state) => ({ ...state, error: "Please fill out all required fields." }));
       return;
     }
 
