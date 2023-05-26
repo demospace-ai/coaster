@@ -40,8 +40,8 @@ const Breadcrumbs: React.FC<{ pathname: string }> = (props) => {
   switch (pathTokens[1]) {
     case "apikey":
       return <PageBreadcrumbs title={"API Keys"} pathname={props.pathname} />;
-    case "sync":
-      return <SyncBreadcrumbs id={pathTokens[2]} pathname={props.pathname} />;
+    case "syncs":
+      return <SyncBreadcrumbs pathname={props.pathname} />;
     case "objects":
       return <ObjectBreadcrumbs pathname={props.pathname} />;
     case "destinations":
@@ -51,13 +51,19 @@ const Breadcrumbs: React.FC<{ pathname: string }> = (props) => {
   }
 };
 
-const SyncBreadcrumbs: React.FC<{ id: string; pathname: string }> = (props) => {
-  const { sync } = useSync(Number(props.id)); // This is deduped by SWR so don"t worry about the extra fetch
-  const title = sync?.sync.display_name;
-  const crumbs: Breadcrumb[] = [
-    { title: "Syncs", path: "/syncs" },
-    { title, path: props.pathname },
-  ];
+const SyncBreadcrumbs: React.FC<{ pathname: string }> = ({ pathname }) => {
+  const syncId = pathname.split("/")[2];
+  const { sync } = useSync(Number(syncId)); // This is deduped by SWR so don"t worry about the extra fetch
+
+  const crumbs: Breadcrumb[] = [{ title: "Syncs", path: "/syncs" }];
+  if (sync) {
+    crumbs.push({
+      title: sync.sync.display_name,
+      path: `/syncs/${syncId}`,
+    });
+  }
+
+  const title = sync?.sync.display_name ?? "Syncs";
   document.title = title + " | Fabra";
 
   return <BreadcrumbsLayout crumbs={crumbs} />;

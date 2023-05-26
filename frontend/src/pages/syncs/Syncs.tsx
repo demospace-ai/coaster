@@ -50,7 +50,7 @@ export const Syncs: React.FC = () => {
                     <tr
                       key={index}
                       className="tw-cursor-pointer hover:tw-bg-slate-50"
-                      onClick={() => navigate(`/sync/${sync.id}`)}
+                      onClick={() => navigate(`/syncs/${sync.id}`)}
                     >
                       <td className={tableCellStyle}>{sync.display_name}</td>
                       <td className={tableCellStyle}>{sync.end_customer_id}</td>

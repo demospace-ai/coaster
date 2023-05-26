@@ -1,11 +1,14 @@
+import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { BackButton } from "src/components/button/Button";
+import { LongRightArrow } from "src/components/icons/Icons";
 import { DotsLoading, Loading } from "src/components/loading/Loading";
 import { useShowToast } from "src/components/notifications/Notifications";
 import { EmptyTable } from "src/components/table/Table";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { sendRequest } from "src/rpc/ajax";
-import { RunSync, SyncRunStatus } from "src/rpc/api";
+import { FieldMapping, FieldType, RunSync, Sync as SyncConfig, SyncRunStatus } from "src/rpc/api";
 import { useSync } from "src/rpc/data";
 import { useMutation } from "src/utils/queryHelpers";
 import { mergeClasses } from "src/utils/twmerge";
@@ -20,7 +23,7 @@ export const Sync: React.FC = () => {
   const showToast = useShowToast();
   const { syncID } = useParams<{ syncID: string }>();
   const { sync, mutate } = useSync(Number(syncID));
-  const syncRuns = sync?.sync_runs ? sync.sync_runs : [];
+  const [showDetails, setShowDetails] = useState<boolean>(false);
 
   const runSyncMutation = useMutation(
     async () => {
@@ -40,12 +43,18 @@ export const Sync: React.FC = () => {
     },
   );
 
+  if (!sync) {
+    return <Loading />;
+  }
+
+  const syncRuns = sync.sync_runs ? sync.sync_runs : [];
+
   return (
     <div className="tw-pt-5 tw-pb-24 tw-px-10 tw-h-full tw-w-full tw-overflow-scroll">
       <BackButton onClick={() => navigate("/syncs")} />
-      <div className="tw-flex tw-w-full tw-mb-5 tw-mt-4">
-        <div className="tw-flex tw-flex-row tw-w-full tw-items-center tw-font-bold tw-text-lg tw-justify-between">
-          <div>{sync?.sync.display_name}</div>
+      <div className="tw-flex tw-w-full tw-mb-2 tw-mt-4">
+        <div className="tw-flex tw-flex-row tw-w-full tw-items-center tw-justify-between">
+          <div className="tw-font-bold tw-text-2xl">{sync.sync.display_name}</div>
           <div className="tw-flex">
             <button
               className="tw-ml-auto tw-px-3 tw-py-1 tw-rounded-md tw-font-medium tw-text-base hover:tw-bg-slate-100 tw-text-blue-600 tw-mr-2"
@@ -65,6 +74,21 @@ export const Sync: React.FC = () => {
           </div>
         </div>
       </div>
+      <div
+        className="tw-flex tw-w-fit tw-items-center tw-mb-5 tw-cursor-pointer tw-text-blue-500 tw-select-none"
+        onClick={() => setShowDetails(!showDetails)}
+      >
+        {showDetails ? (
+          <>
+            Collapse details <ChevronUpIcon className="tw-h-3" />
+          </>
+        ) : (
+          <>
+            Expand details <ChevronDownIcon className="tw-h-3" />
+          </>
+        )}
+      </div>
+      {showDetails && <SyncDetails sync={sync.sync} mappings={sync.field_mappings} />}
       <div className="tw-ring-1 tw-ring-black tw-ring-opacity-5 tw-bg-white tw-rounded-lg tw-overflow-auto tw-shadow-md tw-w-full">
         {sync ? (
           <table className="tw-min-w-full tw-border-spacing-0 tw-divide-y tw-divide-slate-200">
@@ -145,4 +169,55 @@ const getStatusStyle = (status: SyncRunStatus): string => {
     default:
       return "tw-bg-gray-100 tw-border tw-border-solid tw-border-gray-500 tw-text-gray-500";
   }
+};
+
+export const SyncDetails: React.FC<{ sync: SyncConfig; mappings: FieldMapping[] }> = ({ sync, mappings }) => {
+  return (
+    <>
+      <div className="tw-flex tw-flex-col tw-w-fit tw-flex-wrap tw-items-start tw-px-3 tw-pt-1 tw-pb-2 tw-mb-5 tw-bg-white tw-border tw-border-slate-200 tw-rounded-md">
+        <div className="tw-flex tw-flex-row tw-items-center tw-mt-1">
+          <span className="tw-font-medium tw-whitespace-pre">Source ID: </span>
+          {sync.source_id}
+        </div>
+        <div className="tw-flex tw-flex-row tw-items-center tw-mt-1">
+          <span className="tw-font-medium tw-whitespace-pre">Namespace: </span>
+          {sync.namespace}
+        </div>
+        <div className="tw-flex tw-flex-row tw-items-center tw-mt-1">
+          <span className="tw-font-medium tw-whitespace-pre">Table: </span>
+          {sync.table_name}
+        </div>
+      </div>
+      <div className="tw-font-semibold tw-text-base tw-mb-2">Field Mappings</div>
+      <div className="tw-border tw-border-slate-200 tw-bg-white tw-w-fit tw-rounded-lg tw-divide-y tw-mb-8">
+        {mappings.map((mapping) => (
+          <div key={mapping.source_field_name} className="tw-flex tw-flex-row tw-p-3 tw-items-center">
+            <span className="tw-w-32 tw-mr-4 tw-max-w-[128px] tw-font-medium tw-overflow-clip tw-text-ellipsis">
+              {mapping.source_field_name}
+            </span>
+            <LongRightArrow className="tw-fill-slate-300 tw-h-2" />
+            <MappedField name={mapping.destination_field_name} type={mapping.destination_field_type} />
+          </div>
+        ))}
+      </div>
+    </>
+  );
+};
+
+const MappedField: React.FC<{
+  name: string;
+  type: FieldType;
+}> = ({ name, type }) => {
+  return (
+    <div className="tw-ml-12 tw-mr-2">
+      <div className="tw-flex tw-h-fit">
+        <div className="tw-h-fit tw-border tw-border-slate-200 tw-rounded-md tw-px-2 tw-box-border tw-bg-slate-100 tw-flex tw-flex-row tw-items-center tw-text-slate-700 tw-font-mono tw-select-none">
+          <div className="tw-w-fit">{name}</div>
+        </div>
+        <div className="tw-h-fit tw-ml-3 tw-lowercase tw-select-none tw-font-mono tw-text-slate-500 tw-flex">
+          {type}
+        </div>
+      </div>
+    </div>
+  );
 };

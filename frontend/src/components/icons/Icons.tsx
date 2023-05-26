@@ -155,7 +155,7 @@ export const InfoIcon: React.FC<IconProps> = React.forwardRef<SVGSVGElement, Ico
 
 export const LongRightArrow: React.FC<IconProps> = ({ className }) => {
   return (
-    <svg viewBox="0 0 47 4" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 47 4" className={className} xmlns="http://www.w3.org/2000/svg">
       <path d="M47 2 44.5.557v2.886L47 2ZM0 2.25h44.75v-.5H0v.5Z" />
     </svg>
   );

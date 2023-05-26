@@ -1,41 +1,16 @@
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "src/components/button/Button";
 import { InfoIcon } from "src/components/icons/Icons";
-import rocket from "src/components/images/rocket.svg";
 import { ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { LinkFieldSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
-import { FieldMappingState, resetState, SetupSyncProps } from "src/connect/state";
+import { FieldMappingState, SetupSyncProps } from "src/connect/state";
 import { Field, FieldType, ObjectField } from "src/rpc/api";
 import { useObject } from "src/rpc/data";
 
 export const FinalizeSync: React.FC<SetupSyncProps> = (props) => {
-  const navigate = useNavigate();
-  if (props.state.syncCreated) {
-    return (
-      <div className="tw-flex tw-flex-col tw-items-center tw-mt-6">
-        <span className=" tw-text-2xl tw-font-semibold tw-text-slate-800">Sync Created!</span>
-        <span className="tw-mb-6 tw-mt-2 tw-text-base tw-text-slate-500">
-          Your data should start syncing over shortly.
-        </span>
-        <img className="tw-h-56" src={rocket} alt="rocket success" />
-        <Button
-          className="tw-border tw-w-36 tw-h-10 tw-mt-10 tw-select-none"
-          onClick={() => {
-            // just reset state and return to the original page on done
-            resetState(props.setState);
-            navigate("/");
-          }}
-        >
-          Done
-        </Button>
-      </div>
-    );
-  }
-
   return (
     <div className="tw-w-full tw-pl-20 tw-pr-[72px] tw-flex tw-flex-col">
       <div className="tw-text-left tw-mb-5 tw-text-2xl tw-font-bold tw-text-slate-900">
@@ -63,7 +38,7 @@ export const FinalizeSync: React.FC<SetupSyncProps> = (props) => {
         <ValidatedDropdownInput className="tw-w-96" options={Object.values(FrequencyUnits)} selected={props.state.frequencyUnits} setSelected={value => props.setState({ ...props.state, frequencyUnits: value })} loading={false} placeholder="Frequency Units" noOptionsString="nil" label="Frequency Unit" getElementForDisplay={(value) => value.charAt(0).toUpperCase() + value.slice(1)} />
         */}
         {props.state.error && (
-          <div className="tw-mt-4 tw-text-red-700 tw-p-2 tw-text-center tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">
+          <div className="tw-mt-4 tw-text-red-700 tw-p-2 tw-text-center tw-bg-red-50 tw-border tw-border-red-600 tw-rounded tw-max-w-3xl ">
             {props.state.error}
           </div>
         )}
@@ -125,7 +100,7 @@ const FieldMappings: React.FC<SetupSyncProps> = (props) => {
     <div className="tw-border tw-border-slate-200 tw-rounded-lg tw-max-w-3xl tw-divide-y tw-overflow-hidden">
       {object.object_fields.map((objectField) => {
         let fieldMappingIdx = props.state.fieldMappings?.findIndex(
-          (fieldMapping) => fieldMapping.destinationFieldId === objectField.id,
+          (fieldMapping) => fieldMapping.destinationField.id === objectField.id,
         );
         const fieldMapping = props.state.fieldMappings![fieldMappingIdx!];
         if (objectField.omit) {
@@ -224,8 +199,9 @@ const MappedField: React.FC<{
             </Tooltip>
           )}
         </div>
-        <div className="tw-h-fit tw-ml-3 tw-lowercase tw-select-none tw-font-mono tw-text-slate-500">
+        <div className="tw-h-fit tw-ml-3 tw-lowercase tw-select-none tw-font-mono tw-text-slate-500 tw-flex">
           {objectField.type}
+          {!objectField.optional && <span className="tw-text-red-500">&nbsp;*</span>}
         </div>
       </div>
       {objectField.type === FieldType.Json &&

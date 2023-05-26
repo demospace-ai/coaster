@@ -39,10 +39,12 @@ type SyncRun struct {
 }
 
 type FieldMapping struct {
-	SourceFieldName    string         `json:"source_field_name"`
-	SourceFieldType    data.FieldType `json:"source_field_type"`
-	DestinationFieldId int64          `json:"destination_field_id"`
-	IsJsonField        bool           `json:"is_json_field"`
+	SourceFieldName      string         `json:"source_field_name"`
+	SourceFieldType      data.FieldType `json:"source_field_type"`
+	DestinationFieldId   int64          `json:"destination_field_id"`
+	DestinationFieldName string         `json:"destination_field_name"`
+	DestinationFieldType data.FieldType `json:"destination_field_type"`
+	IsJsonField          bool           `json:"is_json_field"`
 }
 
 func ConvertSync(sync *models.Sync) Sync {
@@ -79,14 +81,23 @@ func ConvertSync(sync *models.Sync) Sync {
 	return syncView
 }
 
-func ConvertFieldMappings(fieldMappings []models.FieldMapping) []FieldMapping {
+func ConvertFieldMappings(fieldMappings []models.FieldMapping, objectFields []models.ObjectField) []FieldMapping {
+	// Create a map of object fields by id
+	objectFieldsById := make(map[int64]models.ObjectField)
+	for _, objectField := range objectFields {
+		objectFieldsById[objectField.ID] = objectField
+	}
+
 	var fieldMappingsView []FieldMapping
 	for _, fieldMapping := range fieldMappings {
+		destinationField := objectFieldsById[fieldMapping.DestinationFieldId]
 		fieldMappingsView = append(fieldMappingsView, FieldMapping{
-			SourceFieldName:    fieldMapping.SourceFieldName,
-			SourceFieldType:    fieldMapping.SourceFieldType,
-			DestinationFieldId: fieldMapping.DestinationFieldId,
-			IsJsonField:        fieldMapping.IsJsonField,
+			SourceFieldName:      fieldMapping.SourceFieldName,
+			SourceFieldType:      fieldMapping.SourceFieldType,
+			DestinationFieldId:   fieldMapping.DestinationFieldId,
+			DestinationFieldName: destinationField.Name,
+			DestinationFieldType: destinationField.Type,
+			IsJsonField:          fieldMapping.IsJsonField,
 		})
 	}
 

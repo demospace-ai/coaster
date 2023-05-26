@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/errors"
+	"go.fabra.io/server/common/repositories/objects"
 	"go.fabra.io/server/common/repositories/sync_runs"
 	"go.fabra.io/server/common/repositories/syncs"
 	"go.fabra.io/server/common/timeutils"
@@ -15,9 +16,10 @@ import (
 )
 
 type GetSyncResponse struct {
-	Sync        views.Sync      `json:"sync"`
-	NextRunTime string          `json:"next_run_time"`
-	SyncRuns    []views.SyncRun `json:"sync_runs"`
+	Sync          views.Sync           `json:"sync"`
+	FieldMappings []views.FieldMapping `json:"field_mappings"`
+	NextRunTime   string               `json:"next_run_time"`
+	SyncRuns      []views.SyncRun      `json:"sync_runs"`
 }
 
 func (s ApiService) GetSync(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
@@ -44,6 +46,16 @@ func (s ApiService) GetSync(auth auth.Authentication, w http.ResponseWriter, r *
 		return errors.Wrap(err, "(api.GetSync)")
 	}
 
+	fieldMappings, err := syncs.LoadFieldMappingsForSync(s.db, sync.ID)
+	if err != nil {
+		return errors.Wrap(err, "(api.GetSync)")
+	}
+
+	objectFields, err := objects.LoadObjectFieldsByID(s.db, sync.ObjectID)
+	if err != nil {
+		return errors.Wrap(err, "(api.GetSync)")
+	}
+
 	syncRuns, err := sync_runs.LoadAllRunsForSync(s.db, auth.Organization.ID, sync.ID)
 	if err != nil {
 		return errors.Wrap(err, "(api.GetSync)")
@@ -55,8 +67,9 @@ func (s ApiService) GetSync(auth auth.Authentication, w http.ResponseWriter, r *
 	}
 
 	return json.NewEncoder(w).Encode(GetSyncResponse{
-		Sync:        views.ConvertSync(sync),
-		NextRunTime: "",
-		SyncRuns:    syncRunsView,
+		Sync:          views.ConvertSync(sync),
+		FieldMappings: views.ConvertFieldMappings(fieldMappings, objectFields),
+		NextRunTime:   "",
+		SyncRuns:      syncRunsView,
 	})
 }

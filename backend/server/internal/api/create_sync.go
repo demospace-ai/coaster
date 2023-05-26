@@ -3,7 +3,9 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"time"
 
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/errors"
@@ -11,6 +13,7 @@ import (
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/repositories/objects"
 	"go.fabra.io/server/common/repositories/syncs"
+	"go.fabra.io/server/common/timeutils"
 	"go.fabra.io/server/common/views"
 	"go.fabra.io/sync/temporal"
 	"go.temporal.io/sdk/client"
@@ -23,7 +26,7 @@ const CLIENT_KEY_KEY = "projects/932264813910/secrets/temporal-client-key/versio
 
 type CreateSyncRequest struct {
 	DisplayName       string                 `json:"display_name"`
-	EndCustomerID     string                 `json:"end_customer_id"`
+	EndCustomerID     *string                `json:"end_customer_id,omitempty"`
 	SourceID          int64                  `json:"source_id"`
 	ObjectID          int64                  `json:"object_id"`
 	Namespace         *string                `json:"namespace,omitempty"`
@@ -62,19 +65,31 @@ func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, 
 		return errors.Wrap(err, "(api.CreateSync)")
 	}
 
+	sync, fieldMappings, err := s.createSync(auth, createSyncRequest, *createSyncRequest.EndCustomerID)
+	if err != nil {
+		return errors.Wrap(err, "(api.CreateSync)")
+	}
+
+	return json.NewEncoder(w).Encode(CreateSyncResponse{
+		Sync:          *sync,
+		FieldMappings: fieldMappings,
+	})
+}
+
+func (s ApiService) createSync(auth auth.Authentication, createSyncRequest CreateSyncRequest, endCustomerID string) (*views.Sync, []views.FieldMapping, error) {
 	if (createSyncRequest.TableName == nil || createSyncRequest.Namespace == nil) && createSyncRequest.CustomJoin == nil {
-		return errors.Wrap(errors.NewBadRequest("must have table_name and namespace or custom_join"), "(api.CreateSync)")
+		return nil, nil, errors.Wrap(errors.NewBadRequest("must have table_name and namespace or custom_join"), "(api.createSync)")
 	}
 
 	// this also serves to check that this organization owns the object
 	object, err := objects.LoadObjectByID(s.db, auth.Organization.ID, createSyncRequest.ObjectID)
 	if err != nil {
-		return errors.Wrap(err, "(api.CreateSync)")
+		return nil, nil, errors.Wrap(err, "(api.createSync)")
 	}
 
 	objectFields, err := objects.LoadObjectFieldsByID(s.db, createSyncRequest.ObjectID)
 	if err != nil {
-		return errors.Wrap(err, "(api.CreateSync)")
+		return nil, nil, errors.Wrap(err, "(api.createSync)")
 	}
 
 	// default values for the sync come from the object
@@ -103,13 +118,18 @@ func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, 
 		}
 	}
 
+	err = validateFieldsMapped(objectFields, createSyncRequest.FieldMappings)
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "(api.createSync)")
+	}
+
 	// TODO: create via schedule in Temporal once GA
 	// TODO: create field mappings in DB using transaction
 	sync, err := syncs.CreateSync(
 		s.db,
 		auth.Organization.ID,
 		createSyncRequest.DisplayName,
-		createSyncRequest.EndCustomerID,
+		endCustomerID,
 		createSyncRequest.SourceID,
 		createSyncRequest.ObjectID,
 		createSyncRequest.Namespace,
@@ -122,26 +142,26 @@ func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, 
 		frequencyUnits,
 	)
 	if err != nil {
-		return errors.Wrap(err, "(api.CreateSync)")
+		return nil, nil, errors.Wrap(err, "(api.createSync)")
 	}
 
 	fieldMappings, err := syncs.CreateFieldMappings(
 		s.db, auth.Organization.ID, sync.ID, createSyncRequest.FieldMappings,
 	)
 	if err != nil {
-		return errors.Wrap(err, "(api.CreateSync)")
+		return nil, nil, errors.Wrap(err, "(api.createSync)")
 	}
 
 	c, err := temporal.CreateClient(CLIENT_PEM_KEY, CLIENT_KEY_KEY)
 	if err != nil {
-		return errors.Wrap(err, "(api.CreateSync)")
+		return nil, nil, errors.Wrap(err, "(api.createSync)")
 	}
 	defer c.Close()
 	ctx := context.TODO()
 	scheduleClient := c.ScheduleClient()
 	schedule, err := createSchedule(frequency, frequencyUnits)
 	if err != nil {
-		return errors.Wrap(err, "(api.CreateSync)")
+		return nil, nil, errors.Wrap(err, "(api.createSync)")
 	}
 
 	_, err = scheduleClient.Create(ctx, client.ScheduleOptions{
@@ -163,13 +183,28 @@ func (s ApiService) CreateSync(auth auth.Authentication, w http.ResponseWriter, 
 		},
 	})
 	if err != nil {
-		return errors.Wrap(err, "(api.CreateSync)")
+		return nil, nil, errors.Wrap(err, "(api.createSync)")
 	}
 
-	return json.NewEncoder(w).Encode(CreateSyncResponse{
-		Sync:          views.ConvertSync(sync),
-		FieldMappings: views.ConvertFieldMappings(fieldMappings),
-	})
+	syncView := views.ConvertSync(sync)
+	return &syncView, views.ConvertFieldMappings(fieldMappings, objectFields), nil
+}
+
+func createSchedule(frequency int64, frequencyUnits models.FrequencyUnits) (time.Duration, error) {
+	frequencyDuration := time.Duration(frequency)
+	switch frequencyUnits {
+	case models.FrequencyUnitsMinutes:
+		return frequencyDuration * time.Minute, nil
+	case models.FrequencyUnitsHours:
+		return frequencyDuration * time.Hour, nil
+	case models.FrequencyUnitsDays:
+		return frequencyDuration * timeutils.DAY, nil
+	case models.FrequencyUnitsWeeks:
+		return frequencyDuration * timeutils.WEEK, nil
+	default:
+		// TODO: this should not happen
+		return timeutils.WEEK, errors.Newf("(api.createSchedule) unexpected frequency unit: %s", string(frequencyUnits))
+	}
 }
 
 func getSourcePrimaryKey(object *models.Object, objectFields []models.ObjectField, fieldMappings []input.FieldMapping) *string {
@@ -204,6 +239,21 @@ func getSourceCursorField(object *models.Object, objectFields []models.ObjectFie
 			if fieldMapping.DestinationFieldId == destinationCursorField.ID {
 				return &fieldMapping.SourceFieldName
 			}
+		}
+	}
+
+	return nil
+}
+
+func validateFieldsMapped(objectFields []models.ObjectField, fieldMappings []input.FieldMapping) error {
+	mappedObjectFieldIDs := make(map[int64]bool)
+	for _, fieldMapping := range fieldMappings {
+		mappedObjectFieldIDs[fieldMapping.DestinationFieldId] = true
+	}
+
+	for _, objectField := range objectFields {
+		if !objectField.Optional && !mappedObjectFieldIDs[objectField.ID] {
+			return errors.NewBadRequest(fmt.Sprintf("object field %s is not mapped", objectField.Name))
 		}
 	}
 

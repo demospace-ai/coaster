@@ -1,10 +1,10 @@
 import { configureStore, Dispatch } from "@reduxjs/toolkit";
 import { createSelectorHook, useDispatch as useReactDispatch } from "react-redux";
-import { ToastDetails } from "src/components/notifications/Notifications";
+import { ToastOptions } from "src/components/notifications/Notifications";
 
 export type ConnectAction = {
   type: "toast";
-  toast?: ToastDetails;
+  toast?: ToastOptions;
 };
 
 const INITIAL_CONNECT_STATE: ConnectState = {
@@ -12,7 +12,7 @@ const INITIAL_CONNECT_STATE: ConnectState = {
 };
 
 export interface ConnectState {
-  toast?: ToastDetails;
+  toast?: ToastOptions;
 }
 
 export const useConnectDispatch = () => useReactDispatch<Dispatch<ConnectAction>>();

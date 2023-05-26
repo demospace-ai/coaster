@@ -84,7 +84,7 @@ func (a *Activities) FetchConfig(ctx context.Context, input FetchConfigInput) (*
 		DestinationConnection:      views.ConvertFullConnection(destinationConnection),
 		DestinationOptions:         connectors.DestinationOptions{},
 		Object:                     views.ConvertObject(object, objectFields),
-		FieldMappings:              views.ConvertFieldMappings(fieldMappings),
+		FieldMappings:              views.ConvertFieldMappings(fieldMappings, objectFields),
 		EncryptedEndCustomerApiKey: encryptedEndCustomerApiKey,
 	}
 

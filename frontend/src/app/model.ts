@@ -1,4 +1,4 @@
-import { ToastDetails } from "src/components/notifications/Notifications";
+import { ToastOptions } from "src/components/notifications/Notifications";
 
 export type AppAction =
   | {
@@ -12,7 +12,7 @@ export type AppAction =
     }
   | {
       type: "toast";
-      toast?: ToastDetails;
+      toast?: ToastOptions;
     };
 
 const INITIAL_APP_STATE: AppState = {
@@ -24,7 +24,7 @@ const INITIAL_APP_STATE: AppState = {
 export interface AppState {
   loading: boolean;
   forbidden: boolean;
-  toast?: ToastDetails;
+  toast?: ToastOptions;
 }
 
 export function appReducer(state: AppState = INITIAL_APP_STATE, action: AppAction): AppState {

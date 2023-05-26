@@ -23,6 +23,7 @@ import { UpdateObject } from "src/pages/objects/UpdateObject";
 import { Preview } from "src/pages/preview/Preview";
 import { Sync } from "src/pages/syncs/Sync";
 import { Syncs } from "src/pages/syncs/Syncs";
+import { SyncsLayout } from "src/pages/syncs/SyncsLayout";
 import { Team } from "src/pages/team/Team";
 import { useDispatch, useSelector } from "src/root/model";
 
@@ -112,8 +113,10 @@ export const router = createBrowserRouter(
         <Route path=":objectID" element={<Object />} />
         <Route path=":objectID/update" element={<UpdateObject />} />
       </Route>
-      <Route path="/syncs" element={<RequireAuth element={<Syncs />} />} />
-      <Route path="/sync/:syncID" element={<RequireAuth element={<Sync />} />} />
+      <Route path="/syncs" element={<RequireAuth element={<SyncsLayout />} />}>
+        <Route index element={<Syncs />} />
+        <Route path=":syncID" element={<Sync />} />
+      </Route>
       <Route path="*" element={<NotFound />} />
     </Route>,
   ),

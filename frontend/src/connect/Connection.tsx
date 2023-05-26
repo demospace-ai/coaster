@@ -8,7 +8,7 @@ import { GoogleLocationSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { FabraDisplayOptions } from "src/connect/ConnectApp";
 import { NewSourceState, SetupSyncProps, SyncSetupStep, validateConnectionSetup } from "src/connect/state";
-import { sendRequest } from "src/rpc/ajax";
+import { sendLinkTokenRequest } from "src/rpc/ajax";
 import { ConnectionType, getConnectionType, TestDataConnection, TestDataConnectionRequest } from "src/rpc/api";
 import { forceError } from "src/utils/errors";
 import { useMutation } from "src/utils/queryHelpers";
@@ -74,7 +74,12 @@ export const NewSourceConfiguration: React.FC<SetupSyncProps & FabraDisplayOptio
         <div className="tw-pb-16 tw-w-[500px] tw-mr-10">
           <div className="tw-mb-4 tw-text-slate-600">Provide the settings and credentials for your data source.</div>
           {inputs}
-          <TestConnectionButton state={state} setState={setNewSourceState} connectionType={connectionType} />
+          <TestConnectionButton
+            linkToken={props.linkToken}
+            state={state}
+            setState={setNewSourceState}
+            connectionType={connectionType}
+          />
           {state.error && (
             <div className="tw-mt-4 tw-text-red-700 tw-p-2 tw-text-center tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">
               {state.error}
@@ -121,15 +126,14 @@ export const NewSourceConfiguration: React.FC<SetupSyncProps & FabraDisplayOptio
 };
 
 const TestConnectionButton: React.FC<{
+  linkToken: string;
   state: NewSourceState;
   setState: React.Dispatch<(state: NewSourceState) => NewSourceState>;
   connectionType: ConnectionType;
-}> = (props) => {
-  const { state, setState } = props;
-
+}> = ({ linkToken, state, setState, connectionType }) => {
   const onClick = () => {
     testConnectionMutation.reset();
-    if (!validateConnectionSetup(props.connectionType, state)) {
+    if (!validateConnectionSetup(connectionType, state)) {
       setState((state) => {
         return { ...state, error: "Must fill out all required fields" };
       });
@@ -146,10 +150,10 @@ const TestConnectionButton: React.FC<{
     async () => {
       const payload: TestDataConnectionRequest = {
         display_name: state.displayName,
-        connection_type: props.connectionType,
+        connection_type: connectionType,
       };
 
-      switch (props.connectionType) {
+      switch (connectionType) {
         case ConnectionType.BigQuery:
           payload.bigquery_config = {
             location: state.bigqueryConfig.location!.code,
@@ -179,7 +183,7 @@ const TestConnectionButton: React.FC<{
           return;
       }
 
-      return await sendRequest(TestDataConnection, payload);
+      return await sendLinkTokenRequest(TestDataConnection, linkToken, payload);
     },
     {
       onError: (err) => {

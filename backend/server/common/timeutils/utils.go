@@ -10,6 +10,9 @@ import (
 	"go.fabra.io/server/common/errors"
 )
 
+const DAY = time.Hour * 24
+const WEEK = DAY * 7
+
 func GetTimezoneHeader(r *http.Request) *time.Location {
 	timezone := r.Header.Get("X-TIME-ZONE")
 	if timezone == "" {
