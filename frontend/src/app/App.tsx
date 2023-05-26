@@ -1,5 +1,5 @@
 import { ReactNode, useEffect } from "react";
-import { createBrowserRouter, createRoutesFromElements, Navigate, Outlet, Route, useLocation } from "react-router-dom";
+import { Navigate, Outlet, Route, createBrowserRouter, createRoutesFromElements, useLocation } from "react-router-dom";
 import { useStart } from "src/app/actions";
 import { Header } from "src/components/header/Header";
 import { UpgradeBanner } from "src/components/header/UpgradeBanner";
@@ -9,6 +9,8 @@ import { getToastContentFromDetails, Toast } from "src/components/notifications/
 import { ApiKey } from "src/pages/apikey/ApiKey";
 import { Destination } from "src/pages/destinations/Destination";
 import { Destinations } from "src/pages/destinations/Destinations";
+import { DestinationsLayout } from "src/pages/destinations/DestinationsLayout";
+import { NewDestination } from "src/pages/destinations/NewDestination";
 import { Home } from "src/pages/home/Home";
 import { Login, Unauthorized } from "src/pages/login/Login";
 import { NotFound } from "src/pages/notfound/NotFound";
@@ -98,8 +100,11 @@ export const router = createBrowserRouter(
       <Route path="/apikey" element={<RequireAuth element={<ApiKey />} />} />
       <Route path="/preview" element={<RequireAuth element={<Preview />} />} />
       <Route path="/team" element={<RequireAuth element={<Team />} />} />
-      <Route path="/destinations" element={<RequireAuth element={<Destinations />} />} />
-      <Route path="/destination/:destinationID" element={<RequireAuth element={<Destination />} />} />
+      <Route path="/destinations" element={<RequireAuth element={<DestinationsLayout />} />}>
+        <Route index element={<Destinations />} />
+        <Route path=":destinationID" element={<Destination />} />
+        <Route path="new" element={<NewDestination />} />
+      </Route>
       <Route path="/objects" element={<RequireAuth element={<ObjectsLayout />} />}>
         <Route index element={<ObjectsList />} />
         <Route path="new" element={<NewObject />}>

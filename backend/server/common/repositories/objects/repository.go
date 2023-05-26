@@ -145,6 +145,27 @@ func CreateObjectField(
 	return &objectFieldModel, nil
 }
 
+func LoadObjectsByDestination(
+	db *gorm.DB,
+	organizationID int64,
+	destinationID int64,
+) ([]models.Object, error) {
+	var objects []models.Object
+	result := db.Table("objects").
+		Select("objects.*").
+		Where("objects.organization_id = ?", organizationID).
+		Where("objects.deactivated_at IS NULL").
+		Where("objects.destination_id = ?", destinationID).
+		Order("objects.created_at ASC").
+		Find(&objects)
+
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(objects.LoadObjectsByDestination)")
+	}
+
+	return objects, nil
+}
+
 func CreateObjectFields(
 	db *gorm.DB,
 	organizationID int64,

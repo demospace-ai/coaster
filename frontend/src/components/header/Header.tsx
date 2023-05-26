@@ -42,10 +42,10 @@ const Breadcrumbs: React.FC<{ pathname: string }> = (props) => {
       return <PageBreadcrumbs title={"API Keys"} pathname={props.pathname} />;
     case "syncs":
       return <SyncBreadcrumbs pathname={props.pathname} />;
-    case "object":
-      return <ObjectBreadcrumbs id={pathTokens[2]} pathname={props.pathname} />;
-    case "destination":
-      return <DestinationBreadcrumbs id={pathTokens[2]} pathname={props.pathname} />;
+    case "objects":
+      return <ObjectBreadcrumbs pathname={props.pathname} />;
+    case "destinations":
+      return <DestinationBreadcrumbs pathname={props.pathname} />;
     default:
       return <PageBreadcrumbs title={toTitleCase(pathTokens[1])} pathname={props.pathname} />;
   }
@@ -69,29 +69,40 @@ const SyncBreadcrumbs: React.FC<{ pathname: string }> = ({ pathname }) => {
   return <BreadcrumbsLayout crumbs={crumbs} />;
 };
 
-const ObjectBreadcrumbs: React.FC<{ id: string; pathname: string }> = (props) => {
-  const { object } = useObject(Number(props.id)); // This is deduped by SWR so don"t worry about the extra fetch
-  const title = object?.display_name;
-  const pathnameSegments = props.pathname.split("/");
-  const crumbs: Breadcrumb[] = [
-    { title: "Objects", path: "/objects" },
-    { title, path: pathnameSegments.slice(0, 3).join("/") },
-  ];
-  if (props.pathname.split("/").at(3) === "update") {
-    crumbs.push({ title: "Update", path: pathnameSegments.slice(0, 4).join("/") });
+const ObjectBreadcrumbs: React.FC<{ pathname: string }> = ({ pathname }) => {
+  const objectId = pathname.split("/")[2];
+  const { object } = useObject(Number(objectId)); // This is deduped by SWR so don"t worry about the extra fetch
+  const crumbs: Breadcrumb[] = [{ title: "Objects", path: "/objects" }];
+  if (object) {
+    crumbs.push({
+      title: object?.display_name,
+      path: `/objects/${objectId}`,
+    });
+    if (pathname.includes("update")) {
+      crumbs.push({
+        title: "Update",
+        path: `/objects/${objectId}/update`,
+      });
+    }
   }
+
+  const title = object?.display_name ?? "Objects";
   document.title = title + " | Fabra";
 
   return <BreadcrumbsLayout crumbs={crumbs} />;
 };
 
-const DestinationBreadcrumbs: React.FC<{ id: string; pathname: string }> = (props) => {
-  const { destination } = useDestination(Number(props.id)); // This is deduped by SWR so don"t worry about the extra fetch
-  const title = destination?.display_name;
-  const crumbs: Breadcrumb[] = [
-    { title: "Destinations", path: "/destinations" },
-    { title, path: props.pathname },
-  ];
+const DestinationBreadcrumbs: React.FC<{ pathname: string }> = ({ pathname }) => {
+  const destinationId = pathname.split("/")[2];
+  const { destination } = useDestination(Number(destinationId)); // This is deduped by SWR so don"t worry about the extra fetch
+  const title = destination?.display_name ?? "Destinations";
+  const crumbs: Breadcrumb[] = [{ title: "Destinations", path: "/destinations" }];
+  if (destination) {
+    crumbs.push({
+      title: destination.display_name,
+      path: `/destinations/${destinationId}`,
+    });
+  }
   document.title = title + " | Fabra";
 
   return <BreadcrumbsLayout crumbs={crumbs} />;

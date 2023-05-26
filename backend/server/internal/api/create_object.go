@@ -40,7 +40,7 @@ type CreateObjectRequest struct {
 }
 
 type CreateObjectResponse struct {
-	Object views.Object `json:"model"`
+	Object views.Object `json:"object"`
 }
 
 func (s ApiService) CreateObject(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {

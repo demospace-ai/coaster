@@ -47,10 +47,11 @@ export const GetSources: IEndpoint<undefined, GetSourcesResponse> = {
   path: "/sources",
 };
 
-export const GetObjects: IEndpoint<undefined, GetObjectsResponse> = {
+export const GetObjects: IEndpoint<{ destinationID?: number }, GetObjectsResponse> = {
   name: "Objects Fetched",
   method: "GET",
   path: "/objects",
+  queryParams: ["destinationID"],
 };
 
 export const GetObject: IEndpoint<{ objectID: number }, GetObjectResponse> = {
@@ -228,7 +229,7 @@ export const LinkRunSync: IEndpoint<{ syncID: string }, RunSyncResponse> = {
   track: true,
 };
 
-export const CreateObject: IEndpoint<CreateObjectRequest, undefined> = {
+export const CreateObject: IEndpoint<CreateObjectRequest, CreateObjectResponse> = {
   name: "Object Created",
   method: "POST",
   path: "/object",
@@ -301,6 +302,10 @@ export interface CreateObjectRequest {
   object_fields: ObjectFieldInput[];
   cursor_field?: string; // required for incremental append: need cursor field to detect new data
   primary_key?: string; // required  for incremental update: need primary key to match up rows
+}
+
+export interface CreateObjectResponse {
+  object: FabraObject;
 }
 
 export type UpdateObjectRequest = Partial<Omit<CreateObjectRequest, "object_fields">> & {

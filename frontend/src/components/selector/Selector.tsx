@@ -306,7 +306,7 @@ export const ObjectSelector: React.FC<ObjectSelectorProps> = (props) => {
     label,
     ...other
   } = props;
-  const { objects, loading } = useObjects(linkToken);
+  const { objects, loading } = useObjects({ linkToken });
 
   return (
     <ValidatedDropdownInput

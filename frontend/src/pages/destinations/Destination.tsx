@@ -1,20 +1,30 @@
-import { PencilIcon } from "@heroicons/react/24/outline";
-import { useParams } from "react-router-dom";
+import { PencilIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
+import { useNavigate, useParams } from "react-router-dom";
+import { ObjectsListTable } from "src/components/ObjectsListTable";
+import { AddObjectButton } from "src/components/ObjectsListTable/AddObjectsButton";
+import { SectionLayout } from "src/components/SectionLayout";
 import { InfoIcon } from "src/components/icons/Icons";
 import { ConnectionImage } from "src/components/images/Connections";
 import { Loading } from "src/components/loading/Loading";
 import { PrivateKey } from "src/components/privateKey/PrivateKey";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { ConnectionType, getConnectionType } from "src/rpc/api";
-import { useDestination } from "src/rpc/data";
+import { useDestination, useObjects } from "src/rpc/data";
 
 export const Destination: React.FC = () => {
   const { destinationID } = useParams<{ destinationID: string }>();
   const { destination } = useDestination(Number(destinationID));
+  const objectsQuery = useObjects({ destinationID: Number(destinationID) });
+  const navigate = useNavigate();
+  const objects = objectsQuery.objects ?? [];
 
   if (!destination) {
     return <Loading />;
   }
+
+  const onAddObjectClick = () => {
+    navigate("/objects/new", { state: { destination } });
+  };
 
   return (
     <div className="tw-py-5 tw-px-10 tw-h-full tw-overflow-scroll">
@@ -47,6 +57,13 @@ export const Destination: React.FC = () => {
           <PrivateKey keyValue={destination.webhook_signing_key} />
         </>
       )}
+      <section className="tw-flex tw-items-center tw-justify-between tw-mt-8">
+        <div className="tw-text-lg tw-font-bold">Objects</div>
+        <AddObjectButton onClick={onAddObjectClick} />
+      </section>
+      <SectionLayout className="tw-mt-4">
+        <ObjectsListTable objects={objects} />
+      </SectionLayout>
     </div>
   );
 };
