@@ -41,7 +41,7 @@ export const NewDestination: React.FC = () => {
   };
 
   return (
-    <div className="tw-max-w-4xl tw-mx-auto">
+    <div className="tw-max-w-4xl tw-mx-auto tw-overflow-scroll">
       <BackButton className="tw-mt-3" onClick={onBack} />
       <div className="tw-flex tw-flex-col tw-mt-8 tw-mb-24 tw-py-12 tw-px-10 tw-bg-white tw-rounded-lg tw-shadow-md tw-items-center">
         <div className="tw-text-center tw-mb-5 tw-font-bold tw-text-lg">New Destination</div>
