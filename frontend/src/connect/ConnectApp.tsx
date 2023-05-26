@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import { Loading } from "src/components/loading/Loading";
+import { getToastContentFromDetails, Toast } from "src/components/notifications/Notifications";
+import { useConnectDispatch, useConnectSelector } from "src/connect/model";
 import { NewSync } from "src/connect/NewSync";
 import { SyncRuns } from "src/connect/SyncRuns";
 import { Syncs } from "src/connect/Syncs";
@@ -15,11 +17,14 @@ export type FabraDisplayOptions = {
 };
 
 export const ConnectApp: React.FC = () => {
-  // TODO: figure out how to prevent Redux from being used in this app
+  // TODO: figure out how to prevent the wrong Redux from being used in this app
+  const dispatch = useConnectDispatch();
   const [linkToken, setLinkToken] = useState<string | undefined>(undefined);
   const [useContainer, setUseContainer] = useState<boolean>(false); // whether the iFrame is nested in a container element
   const [supportEmail, setSupportEmail] = useState<string | undefined>(undefined);
   const [docsLink, setDocsLink] = useState<string | undefined>(undefined);
+  const toast = useConnectSelector((state) => state.toast);
+  const toastContent = getToastContentFromDetails(toast);
 
   const handleInitTheme = (theme: CustomTheme) => {
     const root = document.querySelector<HTMLElement>(":root");
@@ -75,6 +80,14 @@ export const ConnectApp: React.FC = () => {
   // TODO: pull all child state out to a reducer or redux store here so state isn"t lost on navigation
   return (
     <div className="tw-fixed tw-bg-[rgb(0,0,0,0.2)] tw-w-full tw-h-full">
+      <div className="tw-pointer-events-none tw-fixed tw-w-full tw-h-full tw-z-10">
+        <Toast
+          content={toastContent}
+          show={!!toast}
+          close={() => dispatch({ type: "toast", toast: undefined })}
+          duration={toast?.duration}
+        />
+      </div>
       {useContainer ? (
         <div className="tw-fixed tw-bg-white tw-flex tw-flex-col tw-w-full tw-h-full tw-items-center">
           <Routes>

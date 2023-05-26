@@ -1,8 +1,7 @@
-import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import { useNavigate, useParams } from "react-router-dom";
 import { DotsLoading, Loading } from "src/components/loading/Loading";
-import { Toast } from "src/components/notifications/Notifications";
+import { useConnectShowToast } from "src/components/notifications/Notifications";
 import { EmptyTable } from "src/components/table/Table";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { sendLinkTokenRequest } from "src/rpc/ajax";
@@ -33,6 +32,7 @@ const SyncRunsList: React.FC<{ linkToken: string }> = ({ linkToken }) => {
   const { syncID } = useParams<{ syncID: string }>();
   const { sync, mutate } = useLinkSync(Number(syncID), linkToken);
   const syncRuns = sync?.sync_runs ?? [];
+  const showToast = useConnectShowToast();
 
   const runSyncMutation = useMutation(
     async () => {
@@ -40,46 +40,21 @@ const SyncRunsList: React.FC<{ linkToken: string }> = ({ linkToken }) => {
     },
     {
       onSuccess: () => {
+        showToast("success", "Success! Sync will start shortly.", 2000);
         mutate();
         setTimeout(() => {
           runSyncMutation.reset();
         }, 2000);
       },
+      onError: () => {
+        showToast("error", "Failed to run sync.", 2000);
+      },
     },
   );
-
-  const renderRunSyncResult = () => {
-    if (runSyncMutation.isSuccess) {
-      return (
-        <div className="tw-flex tw-flex-row tw-items-center tw-justify-start">
-          <CheckCircleIcon className="tw-w-5 tw-h-5 tw-text-green-500 tw-stroke-2" />
-          <p className="tw-ml-2 tw-text-base tw-text-gray-900">Success! Sync will start shortly.</p>
-        </div>
-      );
-    }
-
-    if (runSyncMutation.isFailed) {
-      return (
-        <div className="tw-flex tw-flex-row tw-items-center tw-justify-start">
-          <XCircleIcon className="tw-w-5 tw-h-5 tw-text-red-500 tw-stroke-2" />
-          <p className="tw-ml-2 tw-text-sm tw-text-gray-900">Failed!</p>
-        </div>
-      );
-    }
-
-    return null;
-  };
 
   return (
     <div className="tw-mt-2 tw-pb-16 tw-px-20 tw-flex tw-flex-col tw-overflow-auto">
       <div className="tw-flex tw-w-full tw-mb-8">
-        <div className="tw-pointer-events-none tw-fixed tw-w-full tw-h-full">
-          <Toast
-            content={renderRunSyncResult()}
-            show={runSyncMutation.isSuccess}
-            setShow={() => runSyncMutation.reset()}
-          />
-        </div>
         <div className="tw-flex tw-flex-row tw-w-full tw-items-center tw-font-bold tw-text-xl tw-justify-between">
           Sync Runs • {sync?.sync.display_name}
           <div className="tw-flex">

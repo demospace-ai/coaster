@@ -1,3 +1,5 @@
+import { ToastDetails } from "src/components/notifications/Notifications";
+
 export type AppAction =
   | {
       type: "loading";
@@ -18,12 +20,6 @@ const INITIAL_APP_STATE: AppState = {
   forbidden: false,
   toast: undefined,
 };
-
-export interface ToastDetails {
-  type: "error" | "success" | "info";
-  duration?: number;
-  content: React.ReactNode;
-}
 
 export interface AppState {
   loading: boolean;

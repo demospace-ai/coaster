@@ -1,13 +1,54 @@
 import { Transition } from "@headlessui/react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import { CheckCircleIcon, InformationCircleIcon, XCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Fragment } from "react";
+import { useConnectDispatch } from "src/connect/model";
 import { useDispatch } from "src/root/model";
+
+export interface ToastDetails {
+  type: "error" | "success" | "info";
+  duration?: number;
+  content: React.ReactNode;
+}
 
 type ToastProps = {
   content: React.ReactNode;
   show: boolean;
   close: () => void;
   duration?: number;
+};
+
+export const getToastContentFromDetails = (toast?: ToastDetails) => {
+  var toastContent = undefined;
+  if (toast) {
+    switch (toast.type) {
+      case "error":
+        toastContent = (
+          <div className="tw-flex tw-flex-row tw-items-center tw-justify-start">
+            <XCircleIcon className="tw-w-5 tw-h-5 tw-text-red-500 tw-stroke-2" />
+            <p className="tw-ml-2 tw-text-sm tw-text-gray-900">{toast.content}</p>
+          </div>
+        );
+        break;
+      case "success":
+        toastContent = (
+          <div className="tw-flex tw-flex-row tw-items-center tw-justify-start">
+            <CheckCircleIcon className="tw-w-5 tw-h-5 tw-text-green-500 tw-stroke-2" />
+            <p className="tw-ml-2 tw-text-base tw-text-gray-900">{toast.content}</p>
+          </div>
+        );
+        break;
+      case "info":
+        toastContent = (
+          <div className="tw-flex tw-flex-row tw-items-center tw-justify-start">
+            <InformationCircleIcon className="tw-w-5 tw-h-5 tw-text-yellow-500 tw-stroke-2" />
+            <p className="tw-ml-2 tw-text-base tw-text-gray-900">{toast.content}</p>
+          </div>
+        );
+        break;
+    }
+  }
+
+  return toastContent;
 };
 
 export const useShowToast = () => {
@@ -17,10 +58,19 @@ export const useShowToast = () => {
   };
 };
 
+export const useConnectShowToast = () => {
+  const dispatch = useConnectDispatch();
+  return (type: "success" | "error" | "info", content: string, duration?: number) => {
+    dispatch({ type: "toast", toast: { content, type, duration } });
+  };
+};
+
 export const Toast: React.FC<ToastProps> = ({ content, show, duration, close }) => {
-  setTimeout(() => {
-    close();
-  }, duration);
+  if (duration) {
+    setTimeout(() => {
+      close();
+    }, duration);
+  }
 
   return (
     <>

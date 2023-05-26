@@ -1,4 +1,3 @@
-import { CheckCircleIcon, InformationCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import { ReactNode, useEffect } from "react";
 import { createBrowserRouter, createRoutesFromElements, Navigate, Outlet, Route, useLocation } from "react-router-dom";
 import { useStart } from "src/app/actions";
@@ -6,7 +5,7 @@ import { Header } from "src/components/header/Header";
 import { UpgradeBanner } from "src/components/header/UpgradeBanner";
 import { LogoLoading } from "src/components/loading/LogoLoading";
 import { NavigationBar } from "src/components/navigationBar/NavigationBar";
-import { Toast } from "src/components/notifications/Notifications";
+import { getToastContentFromDetails, Toast } from "src/components/notifications/Notifications";
 import { ApiKey } from "src/pages/apikey/ApiKey";
 import { Destination } from "src/pages/destinations/Destination";
 import { Destinations } from "src/pages/destinations/Destinations";
@@ -37,12 +36,13 @@ const RequireAuth: React.FC<AuthenticationProps> = (props) => {
 let needsInit = true;
 
 const AppLayout: React.FC = () => {
+  const start = useStart();
+  const dispatch = useDispatch();
   const location = useLocation();
   const loading = useSelector((state) => state.app.loading);
   const forbidden = useSelector((state) => state.app.forbidden);
   const toast = useSelector((state) => state.app.toast);
-  const dispatch = useDispatch();
-  const start = useStart();
+  const toastContent = getToastContentFromDetails(toast);
 
   useEffect(() => {
     window.Intercom("update");
@@ -55,36 +55,6 @@ const AppLayout: React.FC = () => {
       needsInit = false;
     }
   }, [start]);
-
-  var toastContent = undefined;
-  if (toast) {
-    switch (toast.type) {
-      case "error":
-        toastContent = (
-          <div className="tw-flex tw-flex-row tw-items-center tw-justify-start">
-            <XCircleIcon className="tw-w-5 tw-h-5 tw-text-red-500 tw-stroke-2" />
-            <p className="tw-ml-2 tw-text-sm tw-text-gray-900">{toast.content}</p>
-          </div>
-        );
-        break;
-      case "success":
-        toastContent = (
-          <div className="tw-flex tw-flex-row tw-items-center tw-justify-start">
-            <CheckCircleIcon className="tw-w-5 tw-h-5 tw-text-green-500 tw-stroke-2" />
-            <p className="tw-ml-2 tw-text-base tw-text-gray-900">{toast.content}</p>
-          </div>
-        );
-        break;
-      case "info":
-        toastContent = (
-          <div className="tw-flex tw-flex-row tw-items-center tw-justify-start">
-            <InformationCircleIcon className="tw-w-5 tw-h-5 tw-text-yellow-500 tw-stroke-2" />
-            <p className="tw-ml-2 tw-text-base tw-text-gray-900">{toast.content}</p>
-          </div>
-        );
-        break;
-    }
-  }
 
   if (loading) {
     return <LogoLoading />;

@@ -5,10 +5,9 @@ import { H } from "highlight.run";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
-import { BrowserRouter, RouterProvider } from "react-router-dom";
+import { RouterProvider } from "react-router-dom";
 import { router } from "src/app/App";
 import { rudderanalytics } from "src/app/rudder";
-import { UpgradeBanner } from "src/components/header/UpgradeBanner";
 import { createStore } from "src/root/model";
 import { isProd } from "src/utils/env";
 

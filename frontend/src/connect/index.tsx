@@ -1,13 +1,17 @@
-import "./index.css";
+import "src/index.css";
 
 import { ErrorBoundary } from "@highlight-run/react";
 import { H } from "highlight.run";
 import React from "react";
 import { createRoot } from "react-dom/client";
+import { Provider } from "react-redux";
 import { BrowserRouter } from "react-router-dom";
 import { rudderanalytics } from "src/app/rudder";
 import { ConnectApp } from "src/connect/ConnectApp";
+import { createConnectStore } from "src/connect/model";
 import { isProd } from "src/utils/env";
+
+const store = createConnectStore();
 
 // Initialize Highlight tracking for production
 if (isProd()) {
@@ -29,9 +33,11 @@ const root = createRoot(container!);
 root.render(
   <React.StrictMode>
     <ErrorBoundary showDialog>
-      <BrowserRouter>
-        <ConnectApp />
-      </BrowserRouter>
+      <Provider store={store}>
+        <BrowserRouter>
+          <ConnectApp />
+        </BrowserRouter>
+      </Provider>
     </ErrorBoundary>
   </React.StrictMode>,
 );
