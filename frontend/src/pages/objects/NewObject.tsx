@@ -642,18 +642,6 @@ const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) => {
         })
     : [];
 
-  if (saveConfigurationMutation.isSuccess) {
-    return (
-      <div>
-        <div className="tw-mt-10 tw-text-center tw-font-bold tw-text-lg">
-          {props.existingObject ? "Your object is updated!" : "🎉 Congratulations! Your object is set up. 🎉"}
-        </div>
-        <Button className="tw-block tw-mt-8 tw-mx-auto tw-mb-10 tw-w-32" onClick={() => props.onComplete?.()}>
-          Done
-        </Button>
-      </div>
-    );
-  }
   let recommendedCursor = <></>;
   switch (state.syncMode!) {
     case SyncMode.IncrementalAppend:
