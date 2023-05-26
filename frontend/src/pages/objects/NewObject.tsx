@@ -551,6 +551,7 @@ type FinalizeStepProps = {
 const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) => {
   const { state, setState } = props;
   const showToast = useShowToast();
+  const navigate = useNavigate();
 
   const createNewObject = async (state: NewObjectState) => {
     const payload: CreateObjectRequest = {
@@ -568,14 +569,13 @@ const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) => {
       frequency_units: state.frequencyUnits!,
       object_fields: state.objectFields,
     };
-    await sendRequest(CreateObject, payload);
-    mutate({ GetObjects: GetObjects }); // Tell SWRs to refetch event sets
+    const object = await sendRequest(CreateObject, payload);
+    return object.model;
   };
 
   const updateObject = async (newObj: NewObjectState) => {
     if (!props.existingObject) {
-      consumeError(new Error("Cannot update object without existing object"));
-      return;
+      throw new Error("Cannot update object without existing object");
     }
 
     // For object field update, we need to compute the change sets. New fields are added, existing fields are updated.
@@ -584,7 +584,7 @@ const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) => {
       props.existingObject?.object_fields?.find((existingField) => existingField.name === field.name),
     );
 
-    await Promise.all([
+    const [updateObjectResponse, _] = await Promise.all([
       sendRequest<UpdateObjectRequest, UpdateObjectResponse>(UpdateObject, {
         objectID: Number(props.existingObject?.id),
         display_name: newObj.displayName,
@@ -603,19 +603,23 @@ const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) => {
         object_fields: updatedFields as UpdateObjectFieldsRequest["object_fields"],
       }),
     ]);
+
+    return updateObjectResponse.object;
   };
 
   const saveConfigurationMutation = useMutation(
     async () => {
       if (props.existingObject) {
-        await updateObject(state);
+        return await updateObject(state);
       } else {
-        await createNewObject(state);
+        return await createNewObject(state);
       }
     },
     {
-      onSuccess: () => {
+      onSuccess: (object) => {
         showToast("success", props.isUpdate ? "Successfully updated object!" : "Successfully created object!", 4000);
+        navigate(`/objects/${object.id}`);
+        mutate({ GetObjects: GetObjects });
       },
       onError: (e) => {
         showToast("error", props.isUpdate ? "Failed to update object." : "Failed to create object.", 4000);
