@@ -192,7 +192,9 @@ export const SyncDetails: React.FC<{ sync: SyncConfig; mappings: FieldMapping[] 
       <div className="tw-border tw-border-slate-200 tw-bg-white tw-w-fit tw-rounded-lg tw-divide-y tw-mb-8">
         {mappings.map((mapping) => (
           <div key={mapping.source_field_name} className="tw-flex tw-flex-row tw-p-3 tw-items-center">
-            <span className="tw-w-32 tw-font-medium">{mapping.source_field_name}</span>
+            <span className="tw-w-32 tw-mr-4 tw-max-w-[128px] tw-font-medium tw-overflow-clip tw-text-ellipsis">
+              {mapping.source_field_name}
+            </span>
             <LongRightArrow className="tw-fill-slate-300 tw-h-2" />
             <MappedField name={mapping.destination_field_name} type={mapping.destination_field_type} />
           </div>
@@ -207,7 +209,7 @@ const MappedField: React.FC<{
   type: FieldType;
 }> = ({ name, type }) => {
   return (
-    <div className="tw-ml-20 tw-mr-5">
+    <div className="tw-ml-12 tw-mr-2">
       <div className="tw-flex tw-h-fit">
         <div className="tw-h-fit tw-border tw-border-slate-200 tw-rounded-md tw-px-2 tw-box-border tw-bg-slate-100 tw-flex tw-flex-row tw-items-center tw-text-slate-700 tw-font-mono tw-select-none">
           <div className="tw-w-fit">{name}</div>
