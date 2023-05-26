@@ -449,6 +449,7 @@ const NewObjectFields: React.FC<ObjectStepProps> = (props) => {
                   <Checkbox
                     className="tw-ml-2 tw-h-4 tw-w-4"
                     checked={Boolean(objectField.optional)}
+                    disabled={props.isUpdate}
                     onCheckedChange={() => updateObjectField({ ...objectField, optional: !objectField.optional }, i)}
                   />
                 </div>
