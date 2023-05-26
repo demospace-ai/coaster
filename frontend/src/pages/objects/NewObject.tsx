@@ -552,21 +552,21 @@ const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) => {
   const { state, setState } = props;
   const showToast = useShowToast();
 
-  const createNewObject = async (formValues: NewObjectState) => {
+  const createNewObject = async (state: NewObjectState) => {
     const payload: CreateObjectRequest = {
-      display_name: formValues.displayName!,
-      destination_id: formValues.destination!.id,
-      target_type: formValues.targetType!,
-      namespace: formValues.namespace ?? "",
-      table_name: formValues.tableName ?? "",
-      sync_mode: formValues.syncMode!,
-      cursor_field: formValues.cursorField && formValues.cursorField.name,
-      primary_key: formValues.primaryKey && formValues.primaryKey.name,
+      display_name: state.displayName!,
+      destination_id: state.destination!.id,
+      target_type: state.targetType!,
+      namespace: state.namespace ?? "",
+      table_name: state.tableName ?? "",
+      sync_mode: state.syncMode!,
+      cursor_field: state.cursorField && state.cursorField.name,
+      primary_key: state.primaryKey && state.primaryKey.name,
       // @ts-ignore Need to fix this soon.
-      end_customer_id_field: formValues.endCustomerIdField && formValues.endCustomerIdField.name,
-      frequency: formValues.frequency!,
-      frequency_units: formValues.frequencyUnits!,
-      object_fields: formValues.objectFields,
+      end_customer_id_field: state.endCustomerIdField && state.endCustomerIdField.name,
+      frequency: state.frequency!,
+      frequency_units: state.frequencyUnits!,
+      object_fields: state.objectFields,
     };
     await sendRequest(CreateObject, payload);
     mutate({ GetObjects: GetObjects }); // Tell SWRs to refetch event sets
