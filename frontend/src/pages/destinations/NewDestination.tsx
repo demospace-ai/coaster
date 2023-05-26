@@ -6,6 +6,7 @@ import { InfoIcon } from "src/components/icons/Icons";
 import { ConnectionImage } from "src/components/images/Connections";
 import { ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
+import { useShowToast } from "src/components/notifications/Notifications";
 import { GoogleLocationSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { sendRequest } from "src/rpc/ajax";
@@ -154,6 +155,7 @@ const validateAll = (connectionType: ConnectionType, state: NewDestinationState)
 const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = (props) => {
   const [state, setState] = useState<NewDestinationState>(INITIAL_DESTINATION_STATE);
   const navigate = useNavigate();
+  const showToast = useShowToast();
 
   const newDestinationMutation = useMutation(
     async () => {
@@ -193,7 +195,11 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = (
     {
       onSuccess: (destination) => {
         mutate({ GetDestinations });
+        showToast("success", "Created destination!", 5000);
         navigate(`/destinations/${destination.destination.id}`);
+      },
+      onError: (err) => {
+        showToast("error", err?.message, 5000);
       },
     },
   );
@@ -294,7 +300,6 @@ const TestConnectionButton: React.FC<ConnectionConfigurationProps & { connection
       },
       onError: (e) => {
         const err = forceError(e);
-        console.log(err?.message);
         props.setState((state) => ({
           ...state,
           error: err?.message,
