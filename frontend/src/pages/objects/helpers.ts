@@ -271,23 +271,26 @@ export const getFieldFromName = (objectFields: ObjectFieldInput[], fieldName: st
   };
 };
 
-export const initalizeFromExisting = (initialObject: FabraObject, destination: Destination) => {
+export const initalizeFromExisting = (
+  existingObject: FabraObject,
+  existingDestination: Destination,
+): NewObjectState => {
   return {
     ...INITIAL_OBJECT_STATE,
-    displayName: initialObject.display_name,
-    destination,
-    targetType: initialObject.target_type,
-    namespace: initialObject.namespace,
-    tableName: initialObject.table_name,
-    objectFields: initialObject.object_fields ?? [],
-    syncMode: initialObject.sync_mode,
-    cursorField: initialObject.cursor_field
-      ? getFieldFromName(initialObject.object_fields, initialObject.cursor_field)
+    displayName: existingObject.display_name,
+    destination: existingDestination,
+    targetType: existingObject.target_type,
+    namespace: existingObject.namespace,
+    tableName: existingObject.table_name,
+    objectFields: existingObject.object_fields ?? [],
+    syncMode: existingObject.sync_mode,
+    cursorField: existingObject.cursor_field
+      ? getFieldFromName(existingObject.object_fields, existingObject.cursor_field)
       : undefined,
-    endCustomerIdField: initialObject.end_customer_id_field
-      ? getFieldFromName(initialObject.object_fields, initialObject.end_customer_id_field)
+    endCustomerIdField: existingObject.end_customer_id_field
+      ? getFieldFromName(existingObject.object_fields, existingObject.end_customer_id_field)
       : undefined,
-    frequency: initialObject.frequency,
-    frequencyUnits: initialObject.frequency_units,
+    frequency: existingObject.frequency,
+    frequencyUnits: existingObject.frequency_units,
   };
 };
