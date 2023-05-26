@@ -24,12 +24,12 @@ export const Object: React.FC = () => {
       <div className="tw-flex tw-flex-row tw-items-center tw-font-bold tw-text-2xl tw-my-4">
         <span className="tw-grow">{object.display_name}</span>
         <Button
-          className="tw-text-sm tw-ml-5"
+          className="tw-ml-auto tw-px-3 tw-py-1 tw-rounded-md tw-font-medium tw-text-base tw-bg-transparent hover:tw-bg-slate-100 tw-text-blue-600 tw-mr-2"
           onClick={() => {
             navigate("./update");
           }}
         >
-          Configure
+          Edit
         </Button>
       </div>
       <div className="tw-flex tw-flex-col tw-flex-wrap tw-items-start tw-p-4 tw-mb-5 tw-bg-white tw-border tw-border-slate-200 tw-rounded-md">

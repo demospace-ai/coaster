@@ -607,10 +607,10 @@ const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) => {
 
     try {
       props.existingObject ? await updateObject(state) : await createNewObject(state);
-      showToast("success", props.isUpdate ? "Successfully updated object!" : "Successfully created object!", 2000);
+      showToast("success", props.isUpdate ? "Successfully updated object!" : "Successfully created object!", 4000);
       props.onComplete();
     } catch (e) {
-      showToast("error", props.isUpdate ? "Failed to update object." : "Failed to create object.", 2000);
+      showToast("error", props.isUpdate ? "Failed to update object." : "Failed to create object.", 4000);
       if (e instanceof HttpError) {
         const createError = e.message;
         setState((state) => {
