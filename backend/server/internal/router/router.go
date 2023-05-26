@@ -96,7 +96,7 @@ func (r Router) wrapWithAuth(handler AuthenticatedHandlerFunc) ErrorHandlerFunc 
 		}
 
 		if !auth.IsAuthenticated {
-			w.WriteHeader(http.StatusUnauthorized)
+			http.Error(w, errors.Unauthorized.Error(), errors.Unauthorized.Code())
 			return nil
 		}
 
@@ -112,7 +112,7 @@ func (r Router) wrapWithLinkAuth(handler AuthenticatedHandlerFunc) ErrorHandlerF
 		}
 
 		if !auth.IsAuthenticated {
-			w.WriteHeader(http.StatusUnauthorized)
+			http.Error(w, errors.Unauthorized.Error(), errors.Unauthorized.Code())
 			return nil
 		}
 
