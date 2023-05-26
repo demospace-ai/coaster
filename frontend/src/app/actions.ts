@@ -3,7 +3,7 @@ import { useOnLoginSuccess } from "src/pages/login/actions";
 import { useDispatch } from "src/root/model";
 import { sendRequest } from "src/rpc/ajax";
 import { CheckSession } from "src/rpc/api";
-import { HttpError, consumeError } from "src/utils/errors";
+import { consumeError, HttpError } from "src/utils/errors";
 
 export function useStart() {
   const dispatch = useDispatch();
@@ -25,9 +25,15 @@ export function useStart() {
       if (e instanceof HttpError) {
         if (e.code === 403) {
           dispatch({ type: "forbidden" });
+          return;
+        } else if (e.code === 401) {
+          // This just means the user is not logged in.
+          dispatch({ type: "done" });
+          return;
         }
       }
-      dispatch({ type: "login.error", error: e?.toString() ?? JSON.stringify(e) });
+
+      // This is an unexpected error, so report it
       consumeError(e);
     }
 

@@ -1,5 +1,5 @@
 import { ReactNode, useEffect } from "react";
-import { Navigate, Outlet, Route, createBrowserRouter, createRoutesFromElements, useLocation } from "react-router-dom";
+import { createBrowserRouter, createRoutesFromElements, Navigate, Outlet, Route, useLocation } from "react-router-dom";
 import { useStart } from "src/app/actions";
 import { Header } from "src/components/header/Header";
 import { UpgradeBanner } from "src/components/header/UpgradeBanner";
