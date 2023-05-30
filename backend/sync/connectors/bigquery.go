@@ -37,7 +37,7 @@ func (bq BigQueryImpl) Read(
 	readQuery := bq.getReadQuery(sourceConnection, sync, fieldMappings)
 	iterator, err := bq.client.GetQueryIterator(ctx, readQuery)
 	if err != nil {
-		errC <- err
+		errC <- errors.Wrap(err, "(connectors.BigQueryImpl.Read) getting iterator")
 		return
 	}
 
@@ -50,7 +50,7 @@ func (bq BigQueryImpl) Read(
 			if err == data.ErrDone {
 				break
 			} else {
-				errC <- errors.Wrap(err, "(connectors.BigQueryImpl.Read)")
+				errC <- errors.Wrap(err, "(connectors.BigQueryImpl.Read) iterating data")
 				return
 			}
 		}
@@ -169,7 +169,7 @@ func (bq BigQueryImpl) Write(
 		objectName := fmt.Sprintf("%s-%d", objectPrefix, batchNum)
 		err := bq.stageBatch(ctx, rows, fieldMappings, object, sync, destinationOptions, bq.client, objectName)
 		if err != nil {
-			errC <- errors.Wrap(err, "(connectors.BigQueryImpl.Write)")
+			errC <- errors.Wrap(err, "(connectors.BigQueryImpl.Write) staging batch")
 			return
 		}
 
@@ -188,7 +188,7 @@ func (bq BigQueryImpl) Write(
 			WriteMode:      writeMode,
 		})
 		if err != nil {
-			errC <- err
+			errC <- errors.Wrap(err, "(connectors.BigQueryImpl.Write) loading data from staging")
 			return
 		}
 	}

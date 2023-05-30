@@ -272,7 +272,7 @@ func (ac BigQueryApiClient) StageData(ctx context.Context, csvData string, stagi
 func (ac BigQueryApiClient) LoadFromStaging(ctx context.Context, namespace string, tableName string, loadOptions LoadOptions) error {
 	client, err := ac.openConnection(ctx)
 	if err != nil {
-		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.BigQueryApiClient.LoadFromStaging)")
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.BigQueryApiClient.LoadFromStaging) opening connection")
 	}
 	defer client.Close()
 
@@ -285,14 +285,18 @@ func (ac BigQueryApiClient) LoadFromStaging(ctx context.Context, namespace strin
 
 	job, err := loader.Run(ctx)
 	if err != nil {
-		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.BigQueryApiClient.LoadFromStaging)")
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.BigQueryApiClient.LoadFromStaging) running job")
 	}
 	status, err := job.Wait(ctx)
 	if err != nil {
-		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.BigQueryApiClient.LoadFromStaging)")
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.BigQueryApiClient.LoadFromStaging) waiting for job")
 	}
 
-	return status.Err()
+	if status.Err() != nil {
+		errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.BigQueryApiClient.LoadFromStaging) status error")
+	}
+
+	return nil
 }
 
 func (ac BigQueryApiClient) CleanUpStagingData(ctx context.Context, stagingOptions StagingOptions) error {
@@ -310,7 +314,13 @@ func (ac BigQueryApiClient) CleanUpStagingData(ctx context.Context, stagingOptio
 	object := gcsClient.Bucket(stagingOptions.Bucket).Object(stagingOptions.Object).Retryer(
 		storage.WithPolicy(storage.RetryAlways),
 	)
-	return object.Delete(ctx)
+
+	err = object.Delete(ctx)
+	if err != nil {
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.BigQueryApiClient.CleanUpStagingData) deleting object")
+	}
+
+	return nil
 }
 
 func convertBigQueryRow(bigQueryRow []bigquery.Value, schema bigquery.Schema) data.Row {
