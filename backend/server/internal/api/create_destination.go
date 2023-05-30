@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/crypto"
@@ -192,6 +193,14 @@ func validateCreateMongoDbDestination(request CreateDestinationRequest) error {
 func validateCreateWebhookDestination(request CreateDestinationRequest) error {
 	if request.WebhookConfig == nil {
 		return errors.Wrap(errors.NewBadRequest("missing Webhook configuration"), "(api.validateCreateWebhookDestination)")
+	}
+
+	if request.WebhookConfig.URL == "" {
+		return errors.Wrap(errors.NewBadRequest("missing Webhook URL"), "(api.validateCreateWebhookDestination)")
+	}
+
+	if !strings.Contains(request.WebhookConfig.URL, "https") {
+		return errors.Wrap(errors.NewBadRequest("Webhook must be HTTPS"), "(api.validateCreateWebhookDestination)")
 	}
 
 	// TODO: validate the fields all exist in the credentials object

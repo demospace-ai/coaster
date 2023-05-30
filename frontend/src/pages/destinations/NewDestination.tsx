@@ -42,7 +42,7 @@ export const NewDestination: React.FC = () => {
   };
 
   return (
-    <div className="tw-max-w-4xl tw-mx-auto tw-overflow-scroll">
+    <div className="tw-py-5 tw-px-10 tw-overflow-scroll">
       <BackButton className="tw-mt-3" onClick={onBack} />
       <div className="tw-flex tw-flex-col tw-mt-8 tw-mb-24 tw-py-12 tw-px-10 tw-bg-white tw-rounded-lg tw-shadow-md tw-items-center">
         <div className="tw-text-center tw-mb-5 tw-font-bold tw-text-lg">New Destination</div>
@@ -121,7 +121,11 @@ const INITIAL_DESTINATION_STATE: NewDestinationState = {
   error: undefined,
 };
 
-const validateAll = (connectionType: ConnectionType, state: NewDestinationState): boolean => {
+const validateAll = (
+  connectionType: ConnectionType,
+  state: NewDestinationState,
+  setState: React.Dispatch<React.SetStateAction<NewDestinationState>>,
+): boolean => {
   switch (connectionType) {
     case ConnectionType.Snowflake:
       return (
@@ -141,7 +145,22 @@ const validateAll = (connectionType: ConnectionType, state: NewDestinationState)
         state.bigqueryConfig.credentials.length > 0
       );
     case ConnectionType.Webhook:
-      return state.displayName.length > 0 && state.webhookConfig.url.length > 0;
+      if (state.displayName.length <= 0) {
+        setState((state) => ({ ...state, error: "Must set a display name." }));
+        return false;
+      }
+
+      if (state.webhookConfig.url.length <= 0) {
+        setState((state) => ({ ...state, error: "Must specify Webhook URL" }));
+        return false;
+      }
+
+      if (!state.webhookConfig.url.includes("https")) {
+        setState((state) => ({ ...state, error: "Webhook URL must use HTTPS" }));
+        return false;
+      }
+
+      return true;
     case ConnectionType.Redshift:
     case ConnectionType.Synapse:
     case ConnectionType.MongoDb:
@@ -206,7 +225,7 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = (
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (!validateAll(props.connectionType, state)) {
+    if (!validateAll(props.connectionType, state, setState)) {
       return;
     }
 
@@ -241,7 +260,12 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = (
       </div>
       <form onSubmit={handleSubmit}>
         {inputs}
-        <div className="tw-flex tw-flex-row tw-justify-start tw-w-100 tw-gap-5 tw-mt-16">
+        {state.error && (
+          <div className="tw-mt-4 tw-text-red-700 tw-p-2 tw-text-center tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">
+            {state.error}
+          </div>
+        )}
+        <div className="tw-flex tw-flex-row tw-justify-start tw-w-100 tw-gap-5 tw-mt-12">
           <TestConnectionButton state={state} setState={setState} connectionType={props.connectionType} />
           <FormButton className="tw-w-full tw-h-10">
             {newDestinationMutation.isLoading ? <Loading /> : "Save"}
@@ -258,17 +282,19 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = (
   );
 };
 
-const TestConnectionButton: React.FC<ConnectionConfigurationProps & { connectionType: ConnectionType }> = (props) => {
-  const state = props.state;
-
+const TestConnectionButton: React.FC<ConnectionConfigurationProps & { connectionType: ConnectionType }> = ({
+  state,
+  setState,
+  connectionType,
+}) => {
   const testConnectionMutation = useMutation(
     async () => {
       const payload: TestDataConnectionRequest = {
         display_name: state.displayName,
-        connection_type: props.connectionType,
+        connection_type: connectionType,
       };
 
-      switch (props.connectionType) {
+      switch (connectionType) {
         case ConnectionType.BigQuery:
           payload.bigquery_config = {
             location: state.bigqueryConfig.location!.code,
@@ -294,13 +320,13 @@ const TestConnectionButton: React.FC<ConnectionConfigurationProps & { connection
     },
     {
       onSuccess: () => {
-        props.setState((state) => {
+        setState((state) => {
           return { ...state, error: undefined };
         });
       },
       onError: (e) => {
         const err = forceError(e);
-        props.setState((state) => ({
+        setState((state) => ({
           ...state,
           error: err?.message,
         }));
@@ -309,8 +335,8 @@ const TestConnectionButton: React.FC<ConnectionConfigurationProps & { connection
   );
 
   const handleTestConnection = () => {
-    if (!validateAll(props.connectionType, state)) {
-      props.setState((state) => ({
+    if (!validateAll(connectionType, state, setState)) {
+      setState((state) => ({
         ...state,
         error: "Please fill out all required fields.",
       }));

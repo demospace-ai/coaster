@@ -23,6 +23,7 @@ const REFILL_RATE = 100
 const MAX_BURST = 100
 
 type WebhookData struct {
+	ObjectID          int64            `json:"object_id"`
 	ObjectName        string           `json:"object_name"`
 	EndCustomerID     string           `json:"end_customer_id"`
 	EndCustomerApiKey *string          `json:"end_customer_api_key,omitempty"`
@@ -124,7 +125,7 @@ func (wh WebhookImpl) Write(
 			if currentBatchSize == MAX_WEBHOOK_BATCH_SIZE {
 				// TODO: add retry
 				limiter.Wait(ctx)
-				err := wh.sendData(object.DisplayName, sync.EndCustomerID, decryptedEndCustomerApiKey, outputDataList, destinationConnection.Host, *decryptedSigningKey)
+				err := wh.sendData(object, sync.EndCustomerID, decryptedEndCustomerApiKey, outputDataList, destinationConnection.Host, *decryptedSigningKey)
 				if err != nil {
 					errC <- err
 					return
@@ -136,7 +137,7 @@ func (wh WebhookImpl) Write(
 		}
 
 		if currentBatchSize > 0 {
-			err := wh.sendData(object.DisplayName, sync.EndCustomerID, decryptedEndCustomerApiKey, outputDataList, destinationConnection.Host, *decryptedSigningKey)
+			err := wh.sendData(object, sync.EndCustomerID, decryptedEndCustomerApiKey, outputDataList, destinationConnection.Host, *decryptedSigningKey)
 			if err != nil {
 				errC <- err
 				return
@@ -151,9 +152,10 @@ func (wh WebhookImpl) Write(
 	close(errC)
 }
 
-func (wh WebhookImpl) sendData(objectName string, endCustomerID string, endCustomerApiKey *string, outputDataList []map[string]any, webhookUrl string, decryptedSigningKey string) error {
+func (wh WebhookImpl) sendData(object views.Object, endCustomerID string, endCustomerApiKey *string, outputDataList []map[string]any, webhookUrl string, decryptedSigningKey string) error {
 	webhookData := WebhookData{
-		ObjectName:        objectName,
+		ObjectID:          object.ID,
+		ObjectName:        object.DisplayName,
 		EndCustomerID:     endCustomerID,
 		EndCustomerApiKey: endCustomerApiKey,
 		FabraTimestamp:    time.Now().Unix(),

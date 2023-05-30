@@ -57,14 +57,6 @@ export const Sync: React.FC = () => {
           <div className="tw-font-bold tw-text-2xl">{sync.sync.display_name}</div>
           <div className="tw-flex">
             <button
-              className="tw-ml-auto tw-px-3 tw-py-1 tw-rounded-md tw-font-medium tw-text-base hover:tw-bg-slate-100 tw-text-blue-600 tw-mr-2"
-              onClick={() => {
-                throw new Error("Edit sync not implemented");
-              }}
-            >
-              Edit
-            </button>
-            <button
               disabled={runSyncMutation.isLoading}
               className="tw-ml-auto tw-px-4 tw-py-1 tw-rounded-md tw-font-medium tw-text-base tw-bg-blue-600 hover:tw-bg-blue-500 tw-text-white disabled:tw-bg-gray-500"
               onClick={() => runSyncMutation.mutate()}
