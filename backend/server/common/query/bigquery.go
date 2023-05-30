@@ -293,7 +293,7 @@ func (ac BigQueryApiClient) LoadFromStaging(ctx context.Context, namespace strin
 	}
 
 	if status.Err() != nil {
-		errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.BigQueryApiClient.LoadFromStaging) status error")
+		errors.Wrap(errors.WrapCustomerVisibleError(status.Err()), "(query.BigQueryApiClient.LoadFromStaging) status error")
 	}
 
 	return nil
