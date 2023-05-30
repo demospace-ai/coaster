@@ -82,7 +82,12 @@ func (mc MongoDbApiClient) GetTables(ctx context.Context, namespace string) ([]s
 	defer client.Disconnect(ctx)
 
 	db := client.Database(namespace)
-	return db.ListCollectionNames(ctx, bson.D{})
+	tables, err := db.ListCollectionNames(ctx, bson.D{})
+	if err != nil {
+		return nil, errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.MongoDbApiClient.GetTables) getting tables")
+	}
+
+	return tables, nil
 }
 
 func (mc MongoDbApiClient) GetSchema(ctx context.Context, namespace string, tableName string) (data.Schema, error) {
