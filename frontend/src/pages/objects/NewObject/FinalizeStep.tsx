@@ -42,11 +42,11 @@ export const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) =
 
   const createNewObject = async (state: NewObjectState) => {
     const payload: CreateObjectRequest = {
-      display_name: state.displayName!,
-      destination_id: state.destination!.id,
-      target_type: state.targetType!,
-      namespace: state.namespace!,
-      table_name: state.tableName!,
+      display_name: state.destinationSetupData.displayName!,
+      destination_id: state.destinationSetupData.destination!.id,
+      target_type: state.destinationSetupData.targetType!,
+      namespace: state.destinationSetupData.namespace!,
+      table_name: state.destinationSetupData.tableName!,
       sync_mode: state.syncMode!,
       cursor_field: state.cursorField && state.cursorField.name,
       primary_key: state.primaryKey && state.primaryKey.name,
@@ -74,11 +74,11 @@ export const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) =
     const [updateObjectResponse, _] = await Promise.all([
       sendRequest<UpdateObjectRequest, UpdateObjectResponse>(UpdateObject, {
         objectID: Number(props.existingObject?.id),
-        display_name: newObj.displayName,
-        destination_id: newObj.destination?.id,
-        target_type: newObj.targetType,
-        namespace: newObj.namespace,
-        table_name: newObj.tableName,
+        display_name: newObj.destinationSetupData.displayName,
+        destination_id: newObj.destinationSetupData.destination?.id,
+        target_type: newObj.destinationSetupData.targetType,
+        namespace: newObj.destinationSetupData.namespace,
+        table_name: newObj.destinationSetupData.tableName,
         sync_mode: newObj.syncMode,
         cursor_field: newObj.cursorField?.name,
         end_customer_id_field: newObj.endCustomerIdField?.name,
@@ -222,7 +222,7 @@ export const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) =
       )}
       {state.syncMode !== undefined && (
         <>
-          {state.destination?.connection.connection_type !== ConnectionType.Webhook && (
+          {state.destinationSetupData.destination?.connection.connection_type !== ConnectionType.Webhook && (
             <>
               <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5 tw-mb-3">
                 <span className="tw-font-medium">End Customer ID</span>
@@ -236,9 +236,9 @@ export const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) =
                 placeholder="End Customer ID Field"
                 noOptionsString="No Fields Available!"
                 validated={true}
-                connection={state.destination?.connection}
-                namespace={state.namespace}
-                tableName={state.tableName}
+                connection={state.destinationSetupData.destination?.connection}
+                namespace={state.destinationSetupData.namespace}
+                tableName={state.destinationSetupData.tableName}
                 disabled={!!props.existingObject}
               />
             </>

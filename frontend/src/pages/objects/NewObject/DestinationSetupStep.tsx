@@ -8,29 +8,19 @@ import { InfoIcon } from "src/components/icons/Icons";
 import { InputStyle } from "src/components/input/Input";
 import { DestinationSelector, NamespaceSelector, TableSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
-import { ObjectStepProps } from "src/pages/objects/NewObject/state";
-import { Step, validateDestination, validateDisplayName } from "src/pages/objects/helpers";
-import {
-  ConnectionType,
-  Destination,
-  DestinationSchema,
-  Field,
-  FieldSchema,
-  FieldType,
-  TargetType,
-  shouldCreateFields,
-} from "src/rpc/api";
+import { ConnectionType, Destination, DestinationSchema, Field, FieldSchema, FieldType, TargetType } from "src/rpc/api";
 import { mergeClasses } from "src/utils/twmerge";
 
-interface DestinationSetupProps extends ObjectStepProps {
+interface DestinationSetupProps {
   initialFormState?: {
     displayName?: string;
     destination?: Destination | undefined;
     targetType?: TargetType | undefined;
     namespace?: string | undefined;
     tableName?: string | undefined;
-    endCustomerIdField?: Field | undefined;
   };
+  handleNextStep: (values: z.infer<typeof FormSchema>) => void;
+  isUpdate?: boolean;
 }
 
 const FormSchema = z
@@ -40,12 +30,11 @@ const FormSchema = z
     targetType: z.nativeEnum(TargetType),
     tableName: z.string().optional(),
     namespace: z.string().optional(),
-    endCustomerIdField: FieldSchema.optional(),
     // Used to display form-level errors.
     formLevel: z.never().optional(),
   })
   .superRefine((data, ctx) => {
-    const { targetType, namespace, tableName, endCustomerIdField } = data;
+    const { targetType, namespace, tableName } = data;
     if (targetType === TargetType.SingleExisting) {
       if (!tableName) {
         ctx.addIssue({
@@ -61,14 +50,6 @@ const FormSchema = z
           path: ["namespace"],
         });
       }
-    } else if (targetType === TargetType.Webhook) {
-      if (!endCustomerIdField) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Please enter an end customer ID",
-          path: ["formLevel"],
-        });
-      }
     }
   });
 
@@ -76,46 +57,26 @@ type UseFormReturn = ReturnType<typeof useForm<z.infer<typeof FormSchema>>>;
 type Control = UseFormReturn["control"];
 type Errors = UseFormReturn["formState"]["errors"];
 
-export const DestinationSetup: React.FC<DestinationSetupProps> = (props) => {
-  const { state, setState } = props;
+export const DestinationSetup: React.FC<DestinationSetupProps> = ({ isUpdate, handleNextStep, initialFormState }) => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: async (data, context, options) => {
-      // you can debug your validation schema here
-      console.log("formData", data);
-      console.log("validation result", await zodResolver(FormSchema)(data, context, options));
+      console.log("data", data);
+      const errors = await zodResolver(FormSchema)(data, context, options);
+      console.log("errors", errors);
       return zodResolver(FormSchema)(data, context, options);
     },
-    defaultValues: props.initialFormState,
+    defaultValues: initialFormState,
   });
   const {
     handleSubmit,
     register,
-    formState: { errors, isValid },
+    formState: { errors },
     control,
     watch,
   } = form;
 
-  console.log("isvalid", isValid);
-  console.log("errors", errors);
-
   const onSubmit = handleSubmit((values) => {
-    if (shouldCreateFields(values.destination.connection.connection_type, values.targetType!)) {
-      setState((state) => {
-        return {
-          ...state,
-          step: Step.CreateFields,
-          ...values,
-        };
-      });
-    } else {
-      setState((state) => {
-        return {
-          ...state,
-          ...values,
-          step: Step.ExistingFields,
-        };
-      });
-    }
+    handleNextStep(values);
   });
 
   const watchTargetType = watch("targetType");
@@ -124,11 +85,9 @@ export const DestinationSetup: React.FC<DestinationSetupProps> = (props) => {
 
   return (
     <div>
-      <h2 className="tw-mb-1 tw-font-bold tw-text-xl tw-text-center">
-        {props.isUpdate ? "Update Object" : "New Object"}
-      </h2>
+      <h2 className="tw-mb-1 tw-font-bold tw-text-xl tw-text-center">{isUpdate ? "Update Object" : "New Object"}</h2>
       <p className="tw-text-center tw-mb-3">
-        {props.isUpdate ? "Change your object's configuration." : "Enter your object configuration."}
+        {isUpdate ? "Change your object's configuration." : "Enter your object configuration."}
       </p>
       <form onSubmit={onSubmit} className="tw-space-y-4">
         <div>
@@ -153,11 +112,9 @@ export const DestinationSetup: React.FC<DestinationSetupProps> = (props) => {
                   className="tw-mt-0"
                   destination={field.value}
                   setDestination={(d) => {
-                    console.log("Setting destination");
                     field.onChange(d);
                     if (d.connection.connection_type === ConnectionType.Webhook) {
                       form.setValue("targetType", TargetType.Webhook);
-                      form.setValue("endCustomerIdField", { name: "end_customer_id", type: FieldType.Integer });
                     } else {
                       form.setValue("targetType", TargetType.SingleExisting);
                     }
@@ -170,9 +127,7 @@ export const DestinationSetup: React.FC<DestinationSetupProps> = (props) => {
         {watchTargetType && watchTargetType !== TargetType.Webhook && (
           <DestinationTarget
             errors={errors}
-            isUpdate={props.isUpdate}
-            state={state}
-            setState={setState}
+            isUpdate={isUpdate}
             control={control}
             destination={watchDestination}
             namespace={watchNamespace}
@@ -188,12 +143,13 @@ export const DestinationSetup: React.FC<DestinationSetupProps> = (props) => {
   );
 };
 
-interface DestinationTargetProps extends ObjectStepProps {
+interface DestinationTargetProps {
   control: Control;
   targetType: TargetType | null;
   namespace: string | undefined;
   destination: Destination | null;
   errors: Errors;
+  isUpdate?: boolean;
 }
 
 const DestinationTarget: React.FC<DestinationTargetProps> = ({
@@ -202,6 +158,7 @@ const DestinationTarget: React.FC<DestinationTargetProps> = ({
   targetType,
   destination,
   errors,
+  isUpdate,
   ...props
 }) => {
   type TargetOption = {
@@ -253,10 +210,10 @@ const DestinationTarget: React.FC<DestinationTargetProps> = ({
                       onChange={(e: ChangeEvent<HTMLInputElement>) => {
                         field.onChange(target.type);
                       }}
-                      disabled={props.isUpdate}
+                      disabled={isUpdate}
                       className={mergeClasses(
                         "tw-h-4 tw-w-4 tw-border-slate-300 tw-text-indigo-600 focus:tw-ring-indigo-600 tw-cursor-pointer",
-                        props.isUpdate ? "tw-cursor-not-allowed" : "tw-cursor-pointer",
+                        isUpdate ? "tw-cursor-not-allowed" : "tw-cursor-pointer",
                       )}
                     />
                     <div className="tw-flex tw-flex-row tw-items-center tw-ml-3 tw-leading-6">
@@ -289,7 +246,7 @@ const DestinationTarget: React.FC<DestinationTargetProps> = ({
                     validated={true}
                     connection={destination?.connection}
                     namespace={field.value}
-                    disabled={props.isUpdate}
+                    disabled={isUpdate}
                     setNamespace={field.onChange}
                     noOptionsString="No Namespaces Available! (Choose a data source)"
                   />
@@ -311,7 +268,7 @@ const DestinationTarget: React.FC<DestinationTargetProps> = ({
                     connection={destination?.connection}
                     namespace={namespace}
                     tableName={field.value}
-                    disabled={props.isUpdate}
+                    disabled={isUpdate}
                     setTableName={field.onChange}
                     noOptionsString="No Tables Available! (Choose a namespace)"
                     validated={true}
