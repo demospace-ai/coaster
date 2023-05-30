@@ -1,4 +1,48 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { z } from "zod";
+
+export enum FrequencyUnits {
+  Minutes = "minutes",
+  Hours = "hours",
+  Days = "days",
+  Weeks = "weeks",
+}
+
+export enum SyncMode {
+  FullOverwrite = "full_overwrite",
+  IncrementalAppend = "incremental_append",
+  IncrementalUpdate = "incremental_update",
+}
+
+export enum TargetType {
+  SingleExisting = "single_existing",
+  SingleNew = "single_new",
+  TablePerCustomer = "table_per_customer",
+  Webhook = "webhook",
+}
+
+export enum FieldType {
+  String = "STRING",
+  Integer = "INTEGER",
+  Number = "NUMBER",
+  Timestamp = "TIMESTAMP",
+  TimeTz = "TIME_TZ",
+  TimeNtz = "TIME_NTZ",
+  DatetimeTz = "DATETIME_TZ",
+  DatetimeNtz = "DATETIME_NTZ",
+  Date = "DATE",
+  Boolean = "BOOLEAN",
+  Array = "ARRAY",
+  Json = "JSON",
+}
+
+export const FieldSchema = z.object({
+  name: z.string(),
+  type: z.nativeEnum(FieldType),
+});
+
+export type Field = z.infer<typeof FieldSchema>;
+
 export interface IEndpoint<RequestType, ResponseType> {
   name: string;
   method: "GET" | "POST" | "DELETE" | "PUT" | "PATCH";
@@ -355,21 +399,6 @@ export interface FieldMapping {
   is_json_field: boolean;
 }
 
-export enum FieldType {
-  String = "STRING",
-  Integer = "INTEGER",
-  Number = "NUMBER",
-  Timestamp = "TIMESTAMP",
-  TimeTz = "TIME_TZ",
-  TimeNtz = "TIME_NTZ",
-  DatetimeTz = "DATETIME_TZ",
-  DatetimeNtz = "DATETIME_NTZ",
-  Date = "DATE",
-  Boolean = "BOOLEAN",
-  Array = "ARRAY",
-  Json = "JSON",
-}
-
 export type GCPLocation = {
   name: string;
   code: string;
@@ -487,11 +516,6 @@ export interface JSONObject {
 export interface JSONArray extends Array<JSONValue> {}
 
 export interface ResultRow extends Array<string | number> {}
-
-export interface Field {
-  name: string;
-  type: FieldType;
-}
 
 export interface Schema extends Array<Field> {}
 
@@ -655,25 +679,6 @@ export interface CheckSessionResponse {
   suggested_organizations?: Organization[];
 }
 
-export interface Destination {
-  id: number;
-  display_name: string;
-  connection: Connection;
-  webhook_signing_key?: string;
-}
-
-export interface Source {
-  id: number;
-  display_name: string;
-  connection: Connection;
-  end_customer_id: string;
-}
-
-export interface Connection {
-  id: number;
-  connection_type: ConnectionType;
-}
-
 export enum ConnectionType {
   BigQuery = "bigquery",
   Snowflake = "snowflake",
@@ -683,6 +688,77 @@ export enum ConnectionType {
   Postgres = "postgres",
   MySQL = "mysql",
   Webhook = "webhook",
+}
+
+export const ConnectionSchema = z.object({
+  id: z.number(),
+  connection_type: z.nativeEnum(ConnectionType),
+});
+
+export type Connection = z.infer<typeof ConnectionSchema>;
+
+export const DestinationSchema = z.object({
+  id: z.number(),
+  display_name: z.string(),
+  connection: ConnectionSchema,
+  webhook_signing_key: z.string().optional(),
+});
+
+export type Destination = z.infer<typeof DestinationSchema>;
+
+export const CreateWarehouseObjectSchema = z.object({
+  displayName: z.string(),
+  destination: DestinationSchema,
+  targetType: z.enum([TargetType.SingleExisting, TargetType.SingleNew, TargetType.TablePerCustomer]),
+  namespace: z.string(),
+  tableName: z.string(),
+  endCustomerIdField: FieldSchema,
+  syncMode: z.nativeEnum(SyncMode),
+  frequency: z.number(),
+  frequencyUnits: z.nativeEnum(FrequencyUnits),
+  objectFields: z.array(
+    z.object({
+      name: z.string(),
+      type: z.nativeEnum(FieldType),
+      omit: z.boolean(),
+      optional: z.boolean(),
+      displayName: z.string().optional(),
+      description: z.string().optional(),
+    }),
+  ),
+  cursorField: FieldSchema.optional(),
+  primaryKey: FieldSchema.optional(),
+});
+
+export const CreateWebhookObjectSchema = z.object({
+  targetType: z.enum([TargetType.Webhook]),
+  namespace: z.string().optional(),
+  tableName: z.string().optional(),
+  cursorField: FieldSchema.optional(),
+  primaryKey: FieldSchema.optional(),
+  endCustomerIdField: z.object({
+    name: z.string(),
+    type: z.nativeEnum(FieldType),
+  }),
+  objectFields: z.array(z.any()),
+  destination: DestinationSchema,
+  displayName: z.string(),
+  syncMode: z.nativeEnum(SyncMode),
+  frequency: z.number(),
+  frequencyUnits: z.nativeEnum(FrequencyUnits),
+});
+
+export const CreateObjectSchema = z.discriminatedUnion("targetType", [
+  CreateWarehouseObjectSchema,
+  CreateWebhookObjectSchema,
+]);
+
+export type CreateObjectSchemaType = z.infer<typeof CreateObjectSchema>;
+export interface Source {
+  id: number;
+  display_name: string;
+  connection: Connection;
+  end_customer_id: string;
 }
 
 export interface Sync {
@@ -717,12 +793,6 @@ export enum SyncRunStatus {
   Running = "running",
   Failed = "failed",
   Completed = "completed",
-}
-
-export enum SyncMode {
-  FullOverwrite = "full_overwrite",
-  IncrementalAppend = "incremental_append",
-  IncrementalUpdate = "incremental_update",
 }
 
 export const needsCursorField = (syncMode: SyncMode): boolean => {
@@ -774,13 +844,6 @@ export const shouldCreateFields = (destinationType: ConnectionType, targetType: 
   return false;
 };
 
-export enum TargetType {
-  SingleExisting = "single_existing",
-  SingleNew = "single_new",
-  TablePerCustomer = "table_per_customer",
-  Webhook = "webhook",
-}
-
 export function targetTypeToString(targetType: TargetType) {
   switch (targetType) {
     case TargetType.SingleExisting:
@@ -792,13 +855,6 @@ export function targetTypeToString(targetType: TargetType) {
     case TargetType.Webhook:
       return "Webhook";
   }
-}
-
-export enum FrequencyUnits {
-  Minutes = "minutes",
-  Hours = "hours",
-  Days = "days",
-  Weeks = "weeks",
 }
 
 export function getConnectionType(connectionType: ConnectionType): string {

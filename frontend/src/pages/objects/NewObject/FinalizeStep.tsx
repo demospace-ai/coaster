@@ -1,30 +1,30 @@
+import { ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "src/components/button/Button";
 import { InfoIcon } from "src/components/icons/Icons";
-import { ValidatedInput, ValidatedDropdownInput } from "src/components/input/Input";
+import { ValidatedDropdownInput, ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { useShowToast } from "src/components/notifications/Notifications";
 import { FieldSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
-import { SyncModeSelector } from "src/pages/objects/NewObject/DestinationSetupStep";
 import { ObjectStepProps } from "src/pages/objects/NewObject/state";
 import { NewObjectState, validateAll } from "src/pages/objects/helpers";
 import { sendRequest } from "src/rpc/ajax";
 import {
-  FabraObject,
-  CreateObjectRequest,
+  ConnectionType,
   CreateObject,
-  UpdateObjectRequest,
-  UpdateObjectResponse,
+  CreateObjectRequest,
+  FabraObject,
+  Field,
+  FrequencyUnits,
+  GetObjects,
+  SyncMode,
   UpdateObject,
+  UpdateObjectFields,
   UpdateObjectFieldsRequest,
   UpdateObjectFieldsResponse,
-  UpdateObjectFields,
-  GetObjects,
-  Field,
-  SyncMode,
-  ConnectionType,
-  FrequencyUnits,
+  UpdateObjectRequest,
+  UpdateObjectResponse,
 } from "src/rpc/api";
 import { forceError } from "src/utils/errors";
 import { useMutation } from "src/utils/queryHelpers";
@@ -273,6 +273,67 @@ export const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) =
       <Button onClick={saveConfiguration} className="tw-mt-10 tw-w-full tw-h-10">
         {saveConfigurationMutation.isLoading ? <Loading /> : props.existingObject ? "Update Object" : "Create Object"}
       </Button>
+    </div>
+  );
+};
+
+export const SyncModeSelector: React.FC<ObjectStepProps> = ({ state, setState, isUpdate }) => {
+  type SyncModeOption = {
+    mode: SyncMode;
+    title: string;
+    description: string;
+  };
+  const syncModes: SyncModeOption[] = [
+    {
+      mode: SyncMode.FullOverwrite,
+      title: "Full Overwrite",
+      description: "Fabra will overwrite the entire target table on every sync.",
+    },
+    {
+      mode: SyncMode.IncrementalAppend,
+      title: "Incremental Append",
+      description: "Fabra will append any new rows since the last sync to the existing target table.",
+    },
+    // TODO
+    // {
+    //   mode: SyncMode.IncrementalUpdate,
+    //   title: "Incremental Update",
+    //   description: "Fabra will add new rows and update any modified rows since the last sync."
+    // },
+  ];
+  return (
+    <div className="tw-mt-5">
+      <label className="tw-font-medium">Sync Mode</label>
+      <p className="tw-text-slate-600">How should Fabra load the data in your destination?</p>
+      <fieldset className="tw-mt-4">
+        <legend className="tw-sr-only">Sync Mode</legend>
+        <div className="tw-space-y-4 tw-flex tw-flex-col">
+          {syncModes.map((syncMode) => (
+            <div key={String(syncMode.mode)} className="tw-flex tw-items-center">
+              <input
+                id={String(syncMode.mode)}
+                name="syncmode"
+                type="radio"
+                disabled={isUpdate}
+                checked={state.syncMode === syncMode.mode}
+                value={syncMode.mode}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setState({ ...state, syncMode: e.target.value as SyncMode })
+                }
+                className="tw-h-4 tw-w-4 tw-border-slate-300 tw-text-indigo-600 focus:tw-ring-indigo-600 tw-cursor-pointer"
+              />
+              <div className="tw-flex tw-flex-row tw-items-center tw-ml-3 tw-leading-6">
+                <label htmlFor={String(syncMode.mode)} className="tw-text-sm tw-cursor-pointer">
+                  {syncMode.title}
+                </label>
+                <Tooltip label={syncMode.description} placement="top-start">
+                  <InfoIcon className="tw-ml-1.5 tw-h-3 tw-fill-slate-400" />
+                </Tooltip>
+              </div>
+            </div>
+          ))}
+        </div>
+      </fieldset>
     </div>
   );
 };
