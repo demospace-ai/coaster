@@ -43,6 +43,14 @@ export type NewObjectState = {
   createError: string | undefined;
 };
 
+export type DestinationSetupFormState = {
+  displayName: string;
+  destination: Destination | null;
+  targetType: TargetType | null;
+  tableName: string | null;
+  namespace: string | null;
+};
+
 export const INITIAL_OBJECT_STATE: NewObjectState = {
   step: Step.Initial,
   displayName: undefined,

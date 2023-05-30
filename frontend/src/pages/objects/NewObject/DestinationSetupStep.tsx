@@ -1,16 +1,37 @@
 import { ChangeEvent } from "react";
+import { useForm } from "react-hook-form";
 import { Button } from "src/components/button/Button";
 import { InfoIcon } from "src/components/icons/Icons";
-import { ValidatedInput } from "src/components/input/Input";
+import { InputStyle, ValidatedInput } from "src/components/input/Input";
 import { DestinationSelector, NamespaceSelector, TableSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { ObjectStepProps } from "src/pages/objects/NewObject/state";
-import { validateDisplayName, validateDestination, Step } from "src/pages/objects/helpers";
+import { validateDisplayName, validateDestination, Step, DestinationSetupFormState } from "src/pages/objects/helpers";
 import { shouldCreateFields, Destination, ConnectionType, TargetType, FieldType, SyncMode } from "src/rpc/api";
 import { mergeClasses } from "src/utils/twmerge";
+import { twMerge } from "tailwind-merge";
 
-export const DestinationSetup: React.FC<ObjectStepProps> = (props) => {
-  const { state, setState } = props;
+interface DestinationSetupProps extends ObjectStepProps {
+  initialFormState?: {
+    displayName?: string;
+    destination?: Destination | null;
+    targetType?: TargetType | null;
+    namespace?: string | null;
+    tableName?: string | null;
+  };
+}
+
+export const DestinationSetup: React.FC<DestinationSetupProps> = (props) => {
+  const { state, setState, initialFormState } = props;
+  const form = useForm<DestinationSetupFormState>({
+    defaultValues: {
+      displayName: initialFormState?.displayName ?? "",
+      destination: initialFormState?.destination ?? null,
+      targetType: initialFormState?.targetType ?? null,
+      namespace: initialFormState?.namespace ?? null,
+      tableName: initialFormState?.tableName ?? null,
+    },
+  });
 
   const advance = () => {
     if (validateDisplayName(state, setState) && validateDestination(state, setState)) {
@@ -40,15 +61,12 @@ export const DestinationSetup: React.FC<ObjectStepProps> = (props) => {
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
-      <ValidatedInput
+      <input
         autoFocus
-        className="tw-w-100"
-        value={state.displayName}
-        setValue={(value) => {
-          setState({ ...state, displayName: value });
-        }}
-        placeholder="Display Name"
-      />
+        className={mergeClasses(InputStyle, "tw-w-100")}
+        {...form.register("displayName")}
+        placeholder="My Destination"
+      ></input>
       <div className="tw-w-full  tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-3">
         <span className="tw-font-medium">Destination</span>
       </div>

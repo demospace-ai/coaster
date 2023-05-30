@@ -5,6 +5,7 @@ import { DestinationSetup } from "src/pages/objects/NewObject/DestinationSetupSt
 import { ExistingObjectFields } from "src/pages/objects/NewObject/ExistingObjectFieldsStep";
 import { Finalize } from "src/pages/objects/NewObject/FinalizeStep";
 import { NewObjectFields } from "src/pages/objects/NewObject/NewObjectFieldsStep";
+import { useForm } from "react-hook-form";
 import {
   INITIAL_OBJECT_STATE,
   NewObjectState,

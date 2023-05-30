@@ -120,6 +120,9 @@ export const ColorPicker: React.FC<InputProps> = (props) => {
   );
 };
 
+export const InputStyle =
+  "tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border hover:tw-border-primary-hover focus:tw-border-primary tw-outline-none";
+
 export const ValidatedInput: React.FC<InputProps> = (props) => {
   const { id, value, placeholder, setValue, className, textarea, type, label, ...other } = props;
   const [isValid, setIsValid] = useState(true);
