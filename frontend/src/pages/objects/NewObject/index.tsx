@@ -23,7 +23,6 @@ export type NewObjectProps = {
 };
 
 export const NewObject: React.FC<NewObjectProps> = (props) => {
-  const { existingObject } = props;
   const navigate = useNavigate();
   const location = useLocation();
   const maybeDestination = location.state?.destination as Destination | undefined;
@@ -77,7 +76,8 @@ export const NewObject: React.FC<NewObjectProps> = (props) => {
     case Step.Initial:
       content = (
         <DestinationSetup
-          initialFormState={props.existingObject ?? state.destinationSetupData}
+          isUpdate={!!props.existingObject}
+          initialFormState={state.destinationSetupData}
           handleNextStep={(values) => {
             let maybeEndCustomerIdDummy: { endCustomerIdField?: Field } = {};
             if (values.targetType === TargetType.Webhook) {

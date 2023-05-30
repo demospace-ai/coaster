@@ -305,12 +305,16 @@ export const initalizeFromExisting = (
   };
 };
 
-export const initializeFromDestination = (destination: Destination) => {
-  return {
+export const initializeFromDestination = (destination: Destination): NewObjectState => {
+  const state = {
     ...INITIAL_OBJECT_STATE,
-    destination,
-    ...(destination.connection.connection_type === ConnectionType.Webhook
-      ? { targetType: TargetType.Webhook, endCustomerIdField: { name: "end_customer_id", type: FieldType.Integer } }
-      : {}),
   };
+  state.destinationSetupData.destination = destination;
+  if (destination.connection.connection_type === ConnectionType.Webhook) {
+    state.destinationSetupData.targetType = TargetType.Webhook;
+    state.endCustomerIdField = { name: "end_customer_id", type: FieldType.Integer };
+  } else {
+    state.destinationSetupData.targetType = TargetType.SingleExisting;
+  }
+  return state;
 };

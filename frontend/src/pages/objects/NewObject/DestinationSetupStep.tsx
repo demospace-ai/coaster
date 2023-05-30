@@ -60,10 +60,8 @@ type Errors = UseFormReturn["formState"]["errors"];
 export const DestinationSetup: React.FC<DestinationSetupProps> = ({ isUpdate, handleNextStep, initialFormState }) => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: async (data, context, options) => {
-      console.log("data", data);
       const errors = await zodResolver(FormSchema)(data, context, options);
-      console.log("errors", errors);
-      return zodResolver(FormSchema)(data, context, options);
+      return errors;
     },
     defaultValues: initialFormState,
   });
