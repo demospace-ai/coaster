@@ -1,14 +1,11 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Checkbox } from "@radix-ui/react-checkbox";
-import { z } from "zod";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { Button } from "src/components/button/Button";
 import { Input } from "src/components/input/Input";
-import { Loading } from "src/components/loading/Loading";
-import { ObjectStepProps } from "src/pages/objects/NewObject/state";
-import { validateFields, Step } from "src/pages/objects/helpers";
-import { ObjectField, ObjectFieldInput, ObjectFieldSchema } from "src/rpc/api";
+import { ObjectFieldInput, ObjectFieldSchema } from "src/rpc/api";
 import { mergeClasses } from "src/utils/twmerge";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
 const FormSchema = z.object({
   objectFields: z.array(ObjectFieldSchema),
@@ -38,7 +35,7 @@ export const ExistingObjectFields: React.FC<ExistingObjectFieldsProps> = ({
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields } = useFieldArray({
     name: "objectFields",
     control,
   });
@@ -58,7 +55,7 @@ export const ExistingObjectFields: React.FC<ExistingObjectFieldsProps> = ({
           return (
             <li key={objectField.id}>
               <div className={mergeClasses("tw-mt-5 tw-mb-7 tw-text-left")}>
-                <label className="tw-text-base tw-font-semibold">{objectField.name}</label>
+                <h3 className="tw-text-base tw-font-semibold">{objectField.name}</h3>
                 <div className="tw-flex tw-items-center tw-mt-2 tw-pb-1.5">
                   <span className="">Omit?</span>
                   <Controller

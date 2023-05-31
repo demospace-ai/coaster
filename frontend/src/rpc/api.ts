@@ -378,27 +378,8 @@ export const ObjectFieldSchema = z.object({
 });
 
 export type ObjectField = z.infer<typeof ObjectFieldSchema>;
-// export interface ObjectField {
-//   id: number;
-//   name: string;
-//   type: FieldType;
-//   omit: boolean;
-//   optional: boolean;
-//   display_name?: string;
-//   description?: string;
-// }
 
 export type ObjectFieldInput = Partial<ObjectField>;
-
-// export interface ObjectFieldInput {
-//   id?: number;
-//   name?: string;
-//   type?: FieldType;
-//   omit?: boolean;
-//   optional?: boolean;
-//   display_name?: string;
-//   description?: string;
-// }
 
 export interface FieldMappingInput {
   source_field_name: string;
