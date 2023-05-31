@@ -1,30 +1,30 @@
+import { ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "src/components/button/Button";
 import { InfoIcon } from "src/components/icons/Icons";
-import { ValidatedInput, ValidatedDropdownInput } from "src/components/input/Input";
+import { ValidatedDropdownInput, ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { useShowToast } from "src/components/notifications/Notifications";
 import { FieldSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
-import { SyncModeSelector } from "src/pages/objects/NewObject/DestinationSetupStep";
 import { ObjectStepProps } from "src/pages/objects/NewObject/state";
 import { NewObjectState, validateAll } from "src/pages/objects/helpers";
 import { sendRequest } from "src/rpc/ajax";
 import {
-  FabraObject,
-  CreateObjectRequest,
+  ConnectionType,
   CreateObject,
-  UpdateObjectRequest,
-  UpdateObjectResponse,
+  CreateObjectRequest,
+  FabraObject,
+  Field,
+  FrequencyUnits,
+  GetObjects,
+  SyncMode,
   UpdateObject,
+  UpdateObjectFields,
   UpdateObjectFieldsRequest,
   UpdateObjectFieldsResponse,
-  UpdateObjectFields,
-  GetObjects,
-  Field,
-  SyncMode,
-  ConnectionType,
-  FrequencyUnits,
+  UpdateObjectRequest,
+  UpdateObjectResponse,
 } from "src/rpc/api";
 import { forceError } from "src/utils/errors";
 import { useMutation } from "src/utils/queryHelpers";
@@ -42,11 +42,11 @@ export const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) =
 
   const createNewObject = async (state: NewObjectState) => {
     const payload: CreateObjectRequest = {
-      display_name: state.displayName!,
-      destination_id: state.destination!.id,
-      target_type: state.targetType!,
-      namespace: state.namespace!,
-      table_name: state.tableName!,
+      display_name: state.destinationSetupData.displayName!,
+      destination_id: state.destinationSetupData.destination!.id,
+      target_type: state.destinationSetupData.targetType!,
+      namespace: state.destinationSetupData.namespace!,
+      table_name: state.destinationSetupData.tableName!,
       sync_mode: state.syncMode!,
       cursor_field: state.cursorField && state.cursorField.name,
       primary_key: state.primaryKey && state.primaryKey.name,
@@ -74,11 +74,11 @@ export const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) =
     const [updateObjectResponse, _] = await Promise.all([
       sendRequest<UpdateObjectRequest, UpdateObjectResponse>(UpdateObject, {
         objectID: Number(props.existingObject?.id),
-        display_name: newObj.displayName,
-        destination_id: newObj.destination?.id,
-        target_type: newObj.targetType,
-        namespace: newObj.namespace,
-        table_name: newObj.tableName,
+        display_name: newObj.destinationSetupData.displayName,
+        destination_id: newObj.destinationSetupData.destination?.id,
+        target_type: newObj.destinationSetupData.targetType,
+        namespace: newObj.destinationSetupData.namespace,
+        table_name: newObj.destinationSetupData.tableName,
         sync_mode: newObj.syncMode,
         cursor_field: newObj.cursorField?.name,
         end_customer_id_field: newObj.endCustomerIdField?.name,
@@ -222,7 +222,7 @@ export const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) =
       )}
       {state.syncMode !== undefined && (
         <>
-          {state.destination?.connection.connection_type !== ConnectionType.Webhook && (
+          {state.destinationSetupData.destination?.connection.connection_type !== ConnectionType.Webhook && (
             <>
               <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5 tw-mb-3">
                 <span className="tw-font-medium">End Customer ID</span>
@@ -236,9 +236,9 @@ export const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) =
                 placeholder="End Customer ID Field"
                 noOptionsString="No Fields Available!"
                 validated={true}
-                connection={state.destination?.connection}
-                namespace={state.namespace}
-                tableName={state.tableName}
+                connection={state.destinationSetupData.destination?.connection}
+                namespace={state.destinationSetupData.namespace}
+                tableName={state.destinationSetupData.tableName}
                 disabled={!!props.existingObject}
               />
             </>
@@ -273,6 +273,67 @@ export const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) =
       <Button onClick={saveConfiguration} className="tw-mt-10 tw-w-full tw-h-10">
         {saveConfigurationMutation.isLoading ? <Loading /> : props.existingObject ? "Update Object" : "Create Object"}
       </Button>
+    </div>
+  );
+};
+
+export const SyncModeSelector: React.FC<ObjectStepProps> = ({ state, setState, isUpdate }) => {
+  type SyncModeOption = {
+    mode: SyncMode;
+    title: string;
+    description: string;
+  };
+  const syncModes: SyncModeOption[] = [
+    {
+      mode: SyncMode.FullOverwrite,
+      title: "Full Overwrite",
+      description: "Fabra will overwrite the entire target table on every sync.",
+    },
+    {
+      mode: SyncMode.IncrementalAppend,
+      title: "Incremental Append",
+      description: "Fabra will append any new rows since the last sync to the existing target table.",
+    },
+    // TODO
+    // {
+    //   mode: SyncMode.IncrementalUpdate,
+    //   title: "Incremental Update",
+    //   description: "Fabra will add new rows and update any modified rows since the last sync."
+    // },
+  ];
+  return (
+    <div className="tw-mt-5">
+      <label className="tw-font-medium">Sync Mode</label>
+      <p className="tw-text-slate-600">How should Fabra load the data in your destination?</p>
+      <fieldset className="tw-mt-4">
+        <legend className="tw-sr-only">Sync Mode</legend>
+        <div className="tw-space-y-4 tw-flex tw-flex-col">
+          {syncModes.map((syncMode) => (
+            <div key={String(syncMode.mode)} className="tw-flex tw-items-center">
+              <input
+                id={String(syncMode.mode)}
+                name="syncmode"
+                type="radio"
+                disabled={isUpdate}
+                checked={state.syncMode === syncMode.mode}
+                value={syncMode.mode}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setState({ ...state, syncMode: e.target.value as SyncMode })
+                }
+                className="tw-h-4 tw-w-4 tw-border-slate-300 tw-text-indigo-600 focus:tw-ring-indigo-600 tw-cursor-pointer"
+              />
+              <div className="tw-flex tw-flex-row tw-items-center tw-ml-3 tw-leading-6">
+                <label htmlFor={String(syncMode.mode)} className="tw-text-sm tw-cursor-pointer">
+                  {syncMode.title}
+                </label>
+                <Tooltip label={syncMode.description} placement="top-start">
+                  <InfoIcon className="tw-ml-1.5 tw-h-3 tw-fill-slate-400" />
+                </Tooltip>
+              </div>
+            </div>
+          ))}
+        </div>
+      </fieldset>
     </div>
   );
 };

@@ -5,6 +5,7 @@ import { DestinationSetup } from "src/pages/objects/NewObject/DestinationSetupSt
 import { ExistingObjectFields } from "src/pages/objects/NewObject/ExistingObjectFieldsStep";
 import { Finalize } from "src/pages/objects/NewObject/FinalizeStep";
 import { NewObjectFields } from "src/pages/objects/NewObject/NewObjectFieldsStep";
+import { useForm } from "react-hook-form";
 import {
   INITIAL_OBJECT_STATE,
   NewObjectState,
@@ -12,7 +13,7 @@ import {
   initalizeFromExisting,
   initializeFromDestination,
 } from "src/pages/objects/helpers";
-import { Destination, FabraObject, shouldCreateFields } from "src/rpc/api";
+import { Destination, FabraObject, Field, FieldType, TargetType, shouldCreateFields } from "src/rpc/api";
 import { useSchema } from "src/rpc/data";
 
 export type NewObjectProps = {
@@ -33,7 +34,11 @@ export const NewObject: React.FC<NewObjectProps> = (props) => {
       : INITIAL_OBJECT_STATE,
   );
 
-  const { schema } = useSchema(state.destination?.connection.id, state.namespace, state.tableName);
+  const { schema } = useSchema(
+    state.destinationSetupData.destination?.connection.id,
+    state.destinationSetupData.namespace,
+    state.destinationSetupData.tableName,
+  );
   const onComplete = props.onComplete
     ? props.onComplete
     : () => {
@@ -69,7 +74,41 @@ export const NewObject: React.FC<NewObjectProps> = (props) => {
   let back: () => void;
   switch (state.step) {
     case Step.Initial:
-      content = <DestinationSetup isUpdate={!!props.existingObject} state={state} setState={setState} />;
+      content = (
+        <DestinationSetup
+          isUpdate={!!props.existingObject}
+          initialFormState={state.destinationSetupData}
+          handleNextStep={(values) => {
+            let maybeEndCustomerIdDummy: { endCustomerIdField?: Field } = {};
+            if (values.targetType === TargetType.Webhook) {
+              maybeEndCustomerIdDummy = {
+                endCustomerIdField: { name: "dummy-end-customer-id", type: FieldType.Integer },
+              };
+            }
+            if (shouldCreateFields(values.destination.connection.connection_type, values.targetType!)) {
+              setState({
+                ...state,
+                ...maybeEndCustomerIdDummy,
+                destinationSetupData: {
+                  ...state.destinationSetupData,
+                  ...values,
+                },
+                step: Step.CreateFields,
+              });
+            } else {
+              setState({
+                ...state,
+                ...maybeEndCustomerIdDummy,
+                destinationSetupData: {
+                  ...state.destinationSetupData,
+                  ...values,
+                },
+                step: Step.ExistingFields,
+              });
+            }
+          }}
+        />
+      );
       // TODO: prompt if they want to exit here
       back = onComplete;
       break;
@@ -79,8 +118,6 @@ export const NewObject: React.FC<NewObjectProps> = (props) => {
         setState({
           ...state,
           step: Step.Initial,
-          displayNameError: undefined,
-          destinationError: undefined,
           fieldsError: undefined,
           cursorFieldError: undefined,
         });
@@ -91,8 +128,6 @@ export const NewObject: React.FC<NewObjectProps> = (props) => {
         setState({
           ...state,
           step: Step.Initial,
-          displayNameError: undefined,
-          destinationError: undefined,
           fieldsError: undefined,
           cursorFieldError: undefined,
         });
@@ -110,7 +145,12 @@ export const NewObject: React.FC<NewObjectProps> = (props) => {
         />
       );
       let prevStep: Step;
-      if (shouldCreateFields(state.destination!.connection.connection_type, state.targetType!)) {
+      if (
+        shouldCreateFields(
+          state.destinationSetupData.destination!.connection.connection_type,
+          state.destinationSetupData.targetType!,
+        )
+      ) {
         prevStep = Step.CreateFields;
       } else {
         prevStep = Step.ExistingFields;
@@ -120,8 +160,6 @@ export const NewObject: React.FC<NewObjectProps> = (props) => {
         setState({
           ...state,
           step: prevStep,
-          displayNameError: undefined,
-          destinationError: undefined,
           fieldsError: undefined,
           cursorFieldError: undefined,
         });
@@ -133,16 +171,6 @@ export const NewObject: React.FC<NewObjectProps> = (props) => {
       <BackButton onClick={back} />
       <div className="tw-flex tw-flex-col tw-w-[900px] tw-mt-8 tw-mb-24 tw-py-12 tw-px-10 tw-mx-auto tw-bg-white tw-rounded-lg tw-shadow-md tw-items-center">
         {content}
-        {state.displayNameError && (
-          <div className="tw-mt-4 tw-text-red-700 tw-py-2 tw-px-10 tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">
-            {state.displayNameError}
-          </div>
-        )}
-        {state.destinationError && (
-          <div className="tw-mt-4 tw-text-red-700 tw-py-2 tw-px-10 tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">
-            {state.destinationError}
-          </div>
-        )}
         {state.fieldsError && (
           <div className="tw-mt-4 tw-text-red-700 tw-py-2 tw-px-10 tw-bg-red-50 tw-border tw-border-red-600 tw-rounded">
             {state.fieldsError}

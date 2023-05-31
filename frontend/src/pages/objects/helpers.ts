@@ -22,11 +22,13 @@ export enum Step {
 
 export type NewObjectState = {
   step: Step;
-  displayName: string | undefined;
-  destination: Destination | undefined;
-  namespace: string | undefined;
-  targetType: TargetType | undefined;
-  tableName: string | undefined;
+  destinationSetupData: {
+    displayName: string | undefined;
+    destination: Destination | undefined;
+    namespace: string | undefined;
+    targetType: TargetType | undefined;
+    tableName: string | undefined;
+  };
   syncMode: SyncMode | undefined;
   cursorField: Field | undefined;
   primaryKey: Field | undefined;
@@ -34,8 +36,6 @@ export type NewObjectState = {
   frequency: number | undefined;
   frequencyUnits: FrequencyUnits | undefined;
   objectFields: ObjectFieldInput[];
-  displayNameError: string | undefined;
-  destinationError: string | undefined;
   fieldsError: string | undefined;
   cursorFieldError: string | undefined;
   endCustomerIdError: string | undefined;
@@ -43,13 +43,23 @@ export type NewObjectState = {
   createError: string | undefined;
 };
 
+export type DestinationSetupFormState = {
+  displayName: string;
+  destination: Destination | null;
+  targetType: TargetType | null;
+  tableName: string | null;
+  namespace: string | null;
+};
+
 export const INITIAL_OBJECT_STATE: NewObjectState = {
   step: Step.Initial,
-  displayName: undefined,
-  destination: undefined,
-  namespace: undefined,
-  targetType: undefined,
-  tableName: undefined,
+  destinationSetupData: {
+    displayName: undefined,
+    destination: undefined,
+    namespace: undefined,
+    targetType: undefined,
+    tableName: undefined,
+  },
   syncMode: undefined,
   cursorField: undefined,
   primaryKey: undefined,
@@ -57,8 +67,6 @@ export const INITIAL_OBJECT_STATE: NewObjectState = {
   frequency: undefined,
   frequencyUnits: undefined,
   objectFields: [],
-  displayNameError: undefined,
-  destinationError: undefined,
   fieldsError: undefined,
   cursorFieldError: undefined,
   endCustomerIdError: undefined,
@@ -77,7 +85,7 @@ export const validateAll = (
     state.syncMode !== undefined &&
     (!needsCursorField(state.syncMode) || validateCursorField(state, setState)) &&
     (!needsPrimaryKey(state.syncMode) || state.primaryKey !== undefined) &&
-    (!needsEndCustomerId(state.targetType!) || state.endCustomerIdField !== undefined) &&
+    (!needsEndCustomerId(state.destinationSetupData.targetType!) || state.endCustomerIdField !== undefined) &&
     validateFrequency(state, setState)
   );
 };
@@ -86,7 +94,7 @@ export const validateDisplayName = (
   state: NewObjectState,
   setState: React.Dispatch<React.SetStateAction<NewObjectState>>,
 ): boolean => {
-  if (state.displayName === undefined || state.displayName.length <= 0) {
+  if (state.destinationSetupData.displayName === undefined || state.destinationSetupData.displayName.length <= 0) {
     setState((state) => {
       return {
         ...state,
@@ -109,7 +117,7 @@ export const validateDestination = (
   state: NewObjectState,
   setState: React.Dispatch<React.SetStateAction<NewObjectState>>,
 ): boolean => {
-  if (state.destination === undefined) {
+  if (state.destinationSetupData.destination === undefined) {
     setState((state) => {
       return {
         ...state,
@@ -119,8 +127,8 @@ export const validateDestination = (
     return false;
   }
 
-  if (state.destination.connection.connection_type !== ConnectionType.Webhook) {
-    if (state.targetType === undefined) {
+  if (state.destinationSetupData.destination.connection.connection_type !== ConnectionType.Webhook) {
+    if (state.destinationSetupData.targetType === undefined) {
       setState((state) => {
         return {
           ...state,
@@ -130,8 +138,8 @@ export const validateDestination = (
       return false;
     }
 
-    if (state.targetType === TargetType.SingleExisting) {
-      if (state.namespace === undefined || state.namespace.length <= 0) {
+    if (state.destinationSetupData.targetType === TargetType.SingleExisting) {
+      if (state.destinationSetupData.namespace === undefined || state.destinationSetupData.namespace.length <= 0) {
         setState((state) => {
           return {
             ...state,
@@ -141,7 +149,7 @@ export const validateDestination = (
         return false;
       }
 
-      if (state.tableName === undefined || state.tableName.length <= 0) {
+      if (state.destinationSetupData.tableName === undefined || state.destinationSetupData.tableName.length <= 0) {
         setState((state) => {
           return {
             ...state,
@@ -277,11 +285,13 @@ export const initalizeFromExisting = (
 ): NewObjectState => {
   return {
     ...INITIAL_OBJECT_STATE,
-    displayName: existingObject.display_name,
-    destination: existingDestination,
-    targetType: existingObject.target_type,
-    namespace: existingObject.namespace,
-    tableName: existingObject.table_name,
+    destinationSetupData: {
+      displayName: existingObject.display_name,
+      destination: existingDestination,
+      targetType: existingObject.target_type,
+      namespace: existingObject.namespace,
+      tableName: existingObject.table_name,
+    },
     objectFields: existingObject.object_fields ?? [],
     syncMode: existingObject.sync_mode,
     cursorField: existingObject.cursor_field
@@ -295,12 +305,16 @@ export const initalizeFromExisting = (
   };
 };
 
-export const initializeFromDestination = (destination: Destination) => {
-  return {
+export const initializeFromDestination = (destination: Destination): NewObjectState => {
+  const state = {
     ...INITIAL_OBJECT_STATE,
-    destination,
-    ...(destination.connection.connection_type === ConnectionType.Webhook
-      ? { targetType: TargetType.Webhook, endCustomerIdField: { name: "end_customer_id", type: FieldType.Integer } }
-      : {}),
   };
+  state.destinationSetupData.destination = destination;
+  if (destination.connection.connection_type === ConnectionType.Webhook) {
+    state.destinationSetupData.targetType = TargetType.Webhook;
+    state.endCustomerIdField = { name: "end_customer_id", type: FieldType.Integer };
+  } else {
+    state.destinationSetupData.targetType = TargetType.SingleExisting;
+  }
+  return state;
 };
