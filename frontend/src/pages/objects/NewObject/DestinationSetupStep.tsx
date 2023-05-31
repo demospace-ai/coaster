@@ -11,18 +11,6 @@ import { Tooltip } from "src/components/tooltip/Tooltip";
 import { ConnectionType, Destination, DestinationSchema, Field, FieldSchema, FieldType, TargetType } from "src/rpc/api";
 import { mergeClasses } from "src/utils/twmerge";
 
-interface DestinationSetupProps {
-  initialFormState?: {
-    displayName?: string;
-    destination?: Destination | undefined;
-    targetType?: TargetType | undefined;
-    namespace?: string | undefined;
-    tableName?: string | undefined;
-  };
-  handleNextStep: (values: z.infer<typeof FormSchema>) => void;
-  isUpdate?: boolean;
-}
-
 const FormSchema = z
   .object({
     displayName: z.string().min(1, { message: "Required" }),
@@ -53,12 +41,25 @@ const FormSchema = z
     }
   });
 
+type FormType = z.infer<typeof FormSchema>;
+interface DestinationSetupProps {
+  initialFormState?: {
+    displayName?: string;
+    destination?: Destination | undefined;
+    targetType?: TargetType | undefined;
+    namespace?: string | undefined;
+    tableName?: string | undefined;
+  };
+  handleNextStep: (values: FormType) => void;
+  isUpdate?: boolean;
+}
+
 type UseFormReturn = ReturnType<typeof useForm<z.infer<typeof FormSchema>>>;
 type Control = UseFormReturn["control"];
 type Errors = UseFormReturn["formState"]["errors"];
 
 export const DestinationSetup: React.FC<DestinationSetupProps> = ({ isUpdate, handleNextStep, initialFormState }) => {
-  const form = useForm<z.infer<typeof FormSchema>>({
+  const form = useForm<FormType>({
     resolver: async (data, context, options) => {
       const errors = await zodResolver(FormSchema)(data, context, options);
       return errors;
