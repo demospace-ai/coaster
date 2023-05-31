@@ -57,6 +57,23 @@ func CreateBigQueryConnection(db *gorm.DB, organizationID int64, encryptedCreden
 	return &connection, nil
 }
 
+func CreateDynamoDbConnection(db *gorm.DB, organizationID int64, accessKey string, encryptedCredentials string, location string) (*models.Connection, error) {
+	connection := models.Connection{
+		OrganizationID: organizationID,
+		ConnectionType: models.ConnectionTypeDynamoDb,
+		Username:       database.NewNullString(accessKey),
+		Password:       database.NewNullString(encryptedCredentials),
+		Location:       database.NewNullString(location),
+	}
+
+	result := db.Create(&connection)
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(connections.CreateDynamoDbConnection)")
+	}
+
+	return &connection, nil
+}
+
 func CreateSnowflakeConnection(
 	db *gorm.DB,
 	organizationID int64,

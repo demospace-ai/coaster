@@ -51,6 +51,12 @@ type WebhookConfig struct {
 	Headers []Header `json:"headers,omitempty"`
 }
 
+type DynamoDbConfig struct {
+	AccessKey string `json:"access_key,omitempty"`
+	SecretKey string `json:"secret_Key,omitempty"`
+	Region    string `json:"region,omitempty"`
+}
+
 type Header struct {
 	Name  string `json:"name"`
 	Value string `json:"value"`

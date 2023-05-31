@@ -18,6 +18,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"cloud.google.com/go/bigquery"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 	_ "github.com/microsoft/go-mssqldb"
@@ -37,6 +41,7 @@ type TestDataConnectionRequest struct {
 	MySqlConfig     *input.MySqlConfig     `json:"mysql_config,omitempty"`
 	MongoDbConfig   *input.MongoDbConfig   `json:"mongodb_config,omitempty"`
 	WebhookConfig   *input.WebhookConfig   `json:"webhook_config,omitempty"`
+	DynamoDbConfig  *input.DynamoDbConfig  `json:"dynamodb_config,omitempty"`
 }
 
 func (s ApiService) TestDataConnection(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
@@ -73,6 +78,8 @@ func (s ApiService) TestDataConnection(auth auth.Authentication, w http.Response
 		err = testMySqlConnection(*testDataConnectionRequest.MySqlConfig)
 	case models.ConnectionTypeWebhook:
 		err = testWebhookConnection(*testDataConnectionRequest.WebhookConfig)
+	case models.ConnectionTypeDynamoDb:
+		err = testDynamoDbConnection(*testDataConnectionRequest.DynamoDbConfig)
 	default:
 		err = errors.NewBadRequest(fmt.Sprintf("unknown connection type: %s", testDataConnectionRequest.ConnectionType))
 	}
@@ -362,6 +369,34 @@ func testWebhookConnection(webhookConfig input.WebhookConfig) error {
 	return nil
 }
 
+func testDynamoDbConnection(dynamoDbConfig input.DynamoDbConfig) error {
+	fmt.Print("testDynamoDbConnection", dynamoDbConfig)
+	// region := config.WithRegion(dynamoDbConfig.Region)
+	creds := credentials.NewStaticCredentialsProvider(
+		dynamoDbConfig.AccessKey,
+		dynamoDbConfig.SecretKey,
+		"",
+	)
+	credProvider := config.WithCredentialsProvider(creds)
+	cfg, err := config.LoadDefaultConfig(context.TODO(), credProvider)
+	if err != nil {
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testDynamoDbConnection)")
+	}
+
+	svc := dynamodb.NewFromConfig(cfg)
+	// Build the request with its input parameters
+	_, err = svc.ListTables(context.TODO(), &dynamodb.ListTablesInput{
+		Limit: aws.Int32(5),
+	})
+
+	if err != nil {
+		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.testDynamoDbConnection)")
+	}
+
+	return nil
+
+}
+
 func validateTestDataConnectionRequest(request TestDataConnectionRequest) error {
 	switch request.ConnectionType {
 	case models.ConnectionTypeBigQuery:
@@ -380,6 +415,8 @@ func validateTestDataConnectionRequest(request TestDataConnectionRequest) error 
 		return validateTestMySqlConnection(request)
 	case models.ConnectionTypeWebhook:
 		return validateTestWebhookConnection(request)
+	case models.ConnectionTypeDynamoDb:
+		return validateTestDynamoDbConnection(request)
 	default:
 		return errors.Wrap(errors.NewBadRequestf("unknown connection type: %s", request.ConnectionType), "(api.validateTestDataConnectionRequest)")
 	}
@@ -464,6 +501,16 @@ func validateTestMySqlConnection(request TestDataConnectionRequest) error {
 func validateTestWebhookConnection(request TestDataConnectionRequest) error {
 	if request.WebhookConfig == nil {
 		return errors.Wrap(errors.NewBadRequest("missing Webhook configuration"), "(api.validateTestWebhookConnection)")
+	}
+
+	// TODO: validate the fields all exist
+
+	return nil
+}
+
+func validateTestDynamoDbConnection(request TestDataConnectionRequest) error {
+	if request.DynamoDbConfig == nil {
+		return errors.Wrap(errors.NewBadRequest("missing DynamoDB configuration"), "(api.validateTestDynamoDBConnection)")
 	}
 
 	// TODO: validate the fields all exist

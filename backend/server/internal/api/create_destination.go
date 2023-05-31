@@ -24,6 +24,7 @@ type CreateDestinationRequest struct {
 	RedshiftConfig  *input.RedshiftConfig  `json:"redshift_config,omitempty"`
 	MongoDbConfig   *input.MongoDbConfig   `json:"mongodb_config,omitempty"`
 	WebhookConfig   *input.WebhookConfig   `json:"webhook_config,omitempty"`
+	DynamoDbConfig  *input.DynamoDbConfig  `json:"dynamodb_config,omitempty"`
 }
 
 type CreateDestinationResponse struct {
@@ -83,6 +84,15 @@ func (s ApiService) CreateDestination(auth auth.Authentication, w http.ResponseW
 		connection, err = connections.CreateMongoDbConnection(
 			s.db, auth.Organization.ID, *createDestinationRequest.MongoDbConfig, *encryptedCredentials,
 		)
+	case models.ConnectionTypeDynamoDb:
+		encryptedCredentials, encryptionErr := s.cryptoService.EncryptConnectionCredentials(createDestinationRequest.DynamoDbConfig.SecretKey)
+		if encryptionErr != nil {
+			return errors.Wrap(encryptionErr, "(api.CreateDestination)")
+		}
+		connection, err = connections.CreateDynamoDbConnection(
+			s.db, auth.Organization.ID, createDestinationRequest.DynamoDbConfig.AccessKey, *encryptedCredentials,
+			createDestinationRequest.DynamoDbConfig.Region,
+		)
 	case models.ConnectionTypeWebhook:
 		webhookSigningKey = crypto.GenerateSigningKey()
 		encryptedSigningKey, encryptionErr := s.cryptoService.EncryptWebhookSigningKey(webhookSigningKey)
@@ -139,6 +149,8 @@ func validateCreateDestinationRequest(request CreateDestinationRequest) error {
 		return validateCreateMongoDbDestination(request)
 	case models.ConnectionTypeWebhook:
 		return validateCreateWebhookDestination(request)
+	case models.ConnectionTypeDynamoDb:
+		return validateCreateDynamoDbDestination(request)
 	default:
 		return errors.Wrap(errors.NewBadRequestf("unknown connection type: %s", request.ConnectionType), "(api.validateCreateDestinationRequest)")
 	}
@@ -201,6 +213,16 @@ func validateCreateWebhookDestination(request CreateDestinationRequest) error {
 
 	if !strings.Contains(request.WebhookConfig.URL, "https") {
 		return errors.Wrap(errors.NewBadRequest("Webhook must be HTTPS"), "(api.validateCreateWebhookDestination)")
+	}
+
+	// TODO: validate the fields all exist in the credentials object
+
+	return nil
+}
+
+func validateCreateDynamoDbDestination(request CreateDestinationRequest) error {
+	if request.DynamoDbConfig == nil {
+		return errors.Wrap(errors.NewBadRequest("missing DynamoDB configuration"), "(api.validateCreateDynamoDbDestination)")
 	}
 
 	// TODO: validate the fields all exist in the credentials object
