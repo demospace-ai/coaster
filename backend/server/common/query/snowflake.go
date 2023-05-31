@@ -29,7 +29,7 @@ type snowflakeSchema struct {
 }
 
 type snowflakeIterator struct {
-	queryResult sql.Rows
+	queryResult *sql.Rows
 	schema      data.Schema
 }
 
@@ -250,7 +250,7 @@ func (sc SnowflakeApiClient) GetQueryIterator(ctx context.Context, queryString s
 	}
 
 	return &snowflakeIterator{
-		queryResult: *queryResult,
+		queryResult: queryResult,
 		schema:      convertSnowflakeSchema(columns),
 	}, nil
 }

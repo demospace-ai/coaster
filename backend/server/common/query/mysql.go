@@ -23,7 +23,7 @@ type MySqlApiClient struct {
 }
 
 type mysqlIterator struct {
-	queryResult sql.Rows
+	queryResult *sql.Rows
 	schema      data.Schema
 }
 
@@ -191,7 +191,7 @@ func (mc MySqlApiClient) GetQueryIterator(ctx context.Context, queryString strin
 	}
 
 	return &mysqlIterator{
-		queryResult: *queryResult,
+		queryResult: queryResult,
 		schema:      convertMySqlSchema(columns),
 	}, nil
 }

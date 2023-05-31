@@ -23,7 +23,7 @@ type RedshiftApiClient struct {
 }
 
 type redshiftIterator struct {
-	queryResult sql.Rows
+	queryResult *sql.Rows
 	schema      data.Schema
 }
 
@@ -195,7 +195,7 @@ func (rc RedshiftApiClient) GetQueryIterator(ctx context.Context, queryString st
 	}
 
 	return &redshiftIterator{
-		queryResult: *queryResult,
+		queryResult: queryResult,
 		schema:      convertRedshiftSchema(columns),
 	}, nil
 }

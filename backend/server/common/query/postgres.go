@@ -23,7 +23,7 @@ type PostgresApiClient struct {
 }
 
 type postgresIterator struct {
-	queryResult sql.Rows
+	queryResult *sql.Rows
 	schema      data.Schema
 }
 
@@ -195,7 +195,7 @@ func (pc PostgresApiClient) GetQueryIterator(ctx context.Context, queryString st
 	}
 
 	return &postgresIterator{
-		queryResult: *queryResult,
+		queryResult: queryResult,
 		schema:      convertPostgresSchema(columns),
 	}, nil
 }

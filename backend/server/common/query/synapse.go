@@ -20,7 +20,7 @@ type SynapseApiClient struct {
 }
 
 type synapseIterator struct {
-	queryResult sql.Rows
+	queryResult *sql.Rows
 	schema      data.Schema
 }
 
@@ -200,7 +200,7 @@ func (sc SynapseApiClient) GetQueryIterator(ctx context.Context, queryString str
 	}
 
 	return &synapseIterator{
-		queryResult: *queryResult,
+		queryResult: queryResult,
 		schema:      convertSynapseSchema(columns),
 	}, nil
 }

@@ -62,6 +62,11 @@ type WarehouseClient interface {
 	CleanUpStagingData(ctx context.Context, stagingOptions StagingOptions) error
 }
 
+type DatabaseClient interface {
+	ConnectorClient
+	LoadData(ctx context.Context, namespace string, tableName string, rows []data.Row) error
+}
+
 func (qs QueryServiceImpl) GetClient(ctx context.Context, connection *models.Connection) (ConnectorClient, error) {
 	switch connection.ConnectionType {
 	case models.ConnectionTypeBigQuery:
@@ -195,6 +200,28 @@ func (qs QueryServiceImpl) GetWarehouseClient(ctx context.Context, connection *m
 		}, nil
 	default:
 		return nil, errors.Newf("(query.QueryServiceImpl.GetWarehouseClient) unrecognized warehouse type %v", connection.ConnectionType)
+	}
+}
+
+func (qs QueryServiceImpl) GetDatabaseClient(ctx context.Context, connection *models.Connection) (DatabaseClient, error) {
+	switch connection.ConnectionType {
+	case models.ConnectionTypeDynamoDb:
+		dynamoDbAccessKey, err := qs.cryptoService.DecryptConnectionCredentials(connection.Password.String)
+		if err != nil {
+			return nil, errors.Wrap(err, "(query.QueryServiceImpl.GetDatabaseClient) decrypting DynamoDB credentials")
+		}
+
+		if !connection.Location.Valid {
+			return nil, errors.NewCustomerVisibleError("DynamoDB connection must have location defined")
+		}
+
+		return DynamoDbClient{
+			KeyID:     connection.Username.String,
+			AccessKey: *dynamoDbAccessKey,
+			Location:  connection.Location.String,
+		}, nil
+	default:
+		return nil, errors.Newf("(query.QueryServiceImpl.GetDatabaseClient) unrecognized database type %v", connection.ConnectionType)
 	}
 }
 
