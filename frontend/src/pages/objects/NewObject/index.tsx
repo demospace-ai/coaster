@@ -1,19 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BackButton } from "src/components/button/Button";
+import {
+  initalizeFromExisting,
+  initializeFromDestination,
+  INITIAL_OBJECT_STATE,
+  NewObjectState,
+  Step,
+} from "src/pages/objects/helpers";
 import { DestinationSetup } from "src/pages/objects/NewObject/DestinationSetupStep";
 import { ExistingObjectFields } from "src/pages/objects/NewObject/ExistingObjectFieldsStep";
 import { Finalize } from "src/pages/objects/NewObject/FinalizeStep";
 import { NewObjectFields } from "src/pages/objects/NewObject/NewObjectFieldsStep";
-import { useForm } from "react-hook-form";
-import {
-  INITIAL_OBJECT_STATE,
-  NewObjectState,
-  Step,
-  initalizeFromExisting,
-  initializeFromDestination,
-} from "src/pages/objects/helpers";
-import { Destination, FabraObject, Field, FieldType, TargetType, shouldCreateFields } from "src/rpc/api";
+import { Destination, FabraObject, Field, FieldType, shouldCreateFields, TargetType } from "src/rpc/api";
 import { useSchema } from "src/rpc/data";
 
 export type NewObjectProps = {

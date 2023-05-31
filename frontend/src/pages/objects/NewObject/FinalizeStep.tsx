@@ -7,8 +7,8 @@ import { Loading } from "src/components/loading/Loading";
 import { useShowToast } from "src/components/notifications/Notifications";
 import { FieldSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
-import { ObjectStepProps } from "src/pages/objects/NewObject/state";
 import { NewObjectState, validateAll } from "src/pages/objects/helpers";
+import { ObjectStepProps } from "src/pages/objects/NewObject/state";
 import { sendRequest } from "src/rpc/ajax";
 import {
   ConnectionType,

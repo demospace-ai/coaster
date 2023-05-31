@@ -1,13 +1,13 @@
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import { Checkbox } from "@radix-ui/react-checkbox";
-import { DeleteButton, Button } from "src/components/button/Button";
+import { Button, DeleteButton } from "src/components/button/Button";
 import { InfoIcon } from "src/components/icons/Icons";
 import { Input } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { FieldTypeSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
+import { Step, validateFields } from "src/pages/objects/helpers";
 import { ObjectStepProps } from "src/pages/objects/NewObject/state";
-import { validateFields, Step } from "src/pages/objects/helpers";
 import { ObjectFieldInput } from "src/rpc/api";
 
 export const NewObjectFields: React.FC<ObjectStepProps> = (props) => {

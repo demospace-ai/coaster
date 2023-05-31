@@ -1,15 +1,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChangeEvent } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { z } from "zod";
-
 import { Button } from "src/components/button/Button";
 import { InfoIcon } from "src/components/icons/Icons";
 import { InputStyle } from "src/components/input/Input";
 import { DestinationSelector, NamespaceSelector, TableSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
-import { ConnectionType, Destination, DestinationSchema, Field, FieldSchema, FieldType, TargetType } from "src/rpc/api";
+import { ConnectionType, Destination, DestinationSchema, TargetType } from "src/rpc/api";
 import { mergeClasses } from "src/utils/twmerge";
+import { z } from "zod";
 
 const FormSchema = z
   .object({
