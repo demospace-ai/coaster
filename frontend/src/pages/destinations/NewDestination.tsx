@@ -9,22 +9,18 @@ import { Loading } from "src/components/loading/Loading";
 import { useShowToast } from "src/components/notifications/Notifications";
 import { GoogleLocationSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
+import { DynamoDbInputs } from "src/pages/destinations/DynamoDbInputs";
+import { NewDestinationState } from "src/pages/destinations/helpers";
 import { sendRequest } from "src/rpc/ajax";
 import {
-  BigQueryConfigState,
   ConnectionType,
   CreateDestination,
   CreateDestinationRequest,
-  getConnectionType,
+  DynamoDbConfigSchema,
   GetDestinations,
-  MongoDbConfig,
-  PostgresConfig,
-  RedshiftConfig,
-  SnowflakeConfig,
-  SynapseConfig,
   TestDataConnection,
   TestDataConnectionRequest,
-  WebhookConfig,
+  getConnectionType,
 } from "src/rpc/api";
 import { forceError } from "src/utils/errors";
 import { useMutation } from "src/utils/queryHelpers";
@@ -59,19 +55,6 @@ export const NewDestination: React.FC = () => {
 type NewConnectionConfigurationProps = {
   connectionType: ConnectionType;
   setConnectionType: (connectionType: ConnectionType | null) => void;
-};
-
-type NewDestinationState = {
-  displayName: string;
-  staging_bucket: string;
-  bigqueryConfig: BigQueryConfigState;
-  snowflakeConfig: SnowflakeConfig;
-  redshiftConfig: RedshiftConfig;
-  synapseConfig: SynapseConfig;
-  mongodbConfig: MongoDbConfig;
-  webhookConfig: WebhookConfig;
-  postgresConfig: PostgresConfig;
-  error: string | undefined;
 };
 
 // Values must be empty strings otherwise the input will be uncontrolled
@@ -118,6 +101,11 @@ const INITIAL_DESTINATION_STATE: NewDestinationState = {
     database_name: "",
     endpoint: "",
   },
+  dynamoDbConfig: {
+    username: "",
+    accessKey: "",
+    location: undefined,
+  },
   error: undefined,
 };
 
@@ -161,6 +149,11 @@ const validateAll = (
       }
 
       return true;
+    case ConnectionType.DynamoDb: {
+      const result = DynamoDbConfigSchema.safeParse(state.dynamoDbConfig);
+      console.log("result", result);
+      return result.success;
+    }
     case ConnectionType.Redshift:
     case ConnectionType.Synapse:
     case ConnectionType.MongoDb:
@@ -199,6 +192,9 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = (
           break;
         case ConnectionType.Webhook:
           payload.webhook_config = state.webhookConfig;
+          break;
+        case ConnectionType.DynamoDb:
+          payload.dynamodb_config = DynamoDbConfigSchema.parse(state.dynamoDbConfig);
           break;
         case ConnectionType.Redshift:
         case ConnectionType.MongoDb:
@@ -242,6 +238,9 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = (
       break;
     case ConnectionType.Webhook:
       inputs = <WebhookInputs state={state} setState={setState} />;
+      break;
+    case ConnectionType.DynamoDb:
+      inputs = <DynamoDbInputs state={state} setState={setState} />;
       break;
     case ConnectionType.Redshift:
     case ConnectionType.MongoDb:
@@ -306,6 +305,9 @@ const TestConnectionButton: React.FC<ConnectionConfigurationProps & { connection
           break;
         case ConnectionType.Webhook:
           payload.webhook_config = state.webhookConfig;
+          break;
+        case ConnectionType.DynamoDb:
+          payload.dynamodb_config = DynamoDbConfigSchema.parse(state.dynamoDbConfig);
           break;
         case ConnectionType.Redshift:
         case ConnectionType.MongoDb:
@@ -661,6 +663,10 @@ const ConnectionTypeSelector: React.FC<ConnectionTypeSelectorProps> = (props) =>
         <button className={connectionButton} onClick={() => props.setConnectionType(ConnectionType.Webhook)}>
           <ConnectionImage connectionType={ConnectionType.Webhook} className="tw-h-6 tw-mr-1.5" />
           Webhook
+        </button>
+        <button className={connectionButton} onClick={() => props.setConnectionType(ConnectionType.DynamoDb)}>
+          <ConnectionImage connectionType={ConnectionType.DynamoDb} className="tw-h-6 tw-mr-1.5" />
+          DynamoDB
         </button>
       </div>
     </>

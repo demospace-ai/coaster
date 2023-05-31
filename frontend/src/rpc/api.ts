@@ -298,6 +298,7 @@ export interface TestDataConnectionRequest {
   postgres_config?: PostgresConfig;
   mysql_config?: MySqlConfig;
   webhook_config?: WebhookConfig;
+  dynamodb_config?: DynamoDbConfig;
 }
 
 export interface CreateDestinationRequest {
@@ -311,6 +312,7 @@ export interface CreateDestinationRequest {
   synapse_config?: SynapseConfig;
   webhook_config?: WebhookConfig;
   postgres_config?: PostgresConfig;
+  dynamodb_config?: DynamoDbConfig;
 }
 
 export interface CreateDestinationResponse {
@@ -408,6 +410,21 @@ export interface BigQueryConfigState {
   credentials: string;
   location: GCPLocation | undefined;
 }
+
+export const AwsLocationSchema = z.object({
+  name: z.string(),
+  code: z.string(),
+});
+
+export type AwsLocation = z.infer<typeof AwsLocationSchema>;
+
+export const DynamoDbConfigSchema = z.object({
+  username: z.string(),
+  accessKey: z.string(),
+  location: AwsLocationSchema,
+});
+
+export type DynamoDbConfig = z.infer<typeof DynamoDbConfigSchema>;
 
 export interface BigQueryConfig {
   credentials: string;
@@ -688,6 +705,7 @@ export enum ConnectionType {
   Postgres = "postgres",
   MySQL = "mysql",
   Webhook = "webhook",
+  DynamoDb = "dynamodb",
 }
 
 export const ConnectionSchema = z.object({
@@ -859,6 +877,8 @@ export function targetTypeToString(targetType: TargetType) {
 
 export function getConnectionType(connectionType: ConnectionType): string {
   switch (connectionType) {
+    case ConnectionType.DynamoDb:
+      return "DynamoDB";
     case ConnectionType.BigQuery:
       return "BigQuery";
     case ConnectionType.Snowflake:

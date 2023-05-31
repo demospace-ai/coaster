@@ -6,12 +6,15 @@ import redshift from "src/components/images/redshift.svg";
 import snowflake from "src/components/images/snowflake.svg";
 import synapse from "src/components/images/synapse.svg";
 import webhook from "src/components/images/webhook.svg";
+import dynamodb from "src/components/images/dynamodb.svg";
 import { ConnectionType } from "src/rpc/api";
 
 function getConnectionTypeImg(connectionType: ConnectionType): string {
   switch (connectionType) {
     case ConnectionType.BigQuery:
       return bigquery;
+    case ConnectionType.DynamoDb:
+      return dynamodb;
     case ConnectionType.Snowflake:
       return snowflake;
     case ConnectionType.Redshift:

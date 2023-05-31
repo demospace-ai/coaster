@@ -5,7 +5,16 @@ import {
   ValidatedDropdownInput,
   ValidatedDropdownInputProps,
 } from "src/components/input/Input";
-import { Connection, FabraObject as DataObject, Destination, Field, FieldType, GCPLocation, Source } from "src/rpc/api";
+import {
+  AwsLocation,
+  Connection,
+  FabraObject as DataObject,
+  Destination,
+  Field,
+  FieldType,
+  GCPLocation,
+  Source,
+} from "src/rpc/api";
 import {
   useDestinations,
   useFieldValues,
@@ -18,6 +27,7 @@ import {
   useSchema,
   useTables,
 } from "src/rpc/data";
+import { z } from "zod";
 
 type DestinationSelectorProps = Omit<
   Partial<ValidatedDropdownInputProps>,
@@ -562,6 +572,46 @@ export const GoogleLocationSelector: React.FC<GoogleLocationSelectorProps> = (pr
       setSelected={setLocation}
       options={locations}
       getElementForDisplay={(location: GCPLocation) => location.name}
+      loading={false}
+      noOptionsString=""
+      placeholder={placeholder ? placeholder : "Choose date range"}
+      validated={validated}
+      {...other}
+    />
+  );
+};
+
+type AwsLocationSelectorProps = Omit<
+  Partial<ValidatedDropdownInputProps>,
+  "selected" | "setSelected" | "getElementForDisplay" | "loading"
+> & {
+  location: AwsLocation | undefined;
+  setLocation: (location: AwsLocation) => void;
+};
+
+export const AwsLocationSelector: React.FC<AwsLocationSelectorProps> = (props) => {
+  const { location, setLocation, className, noOptionsString, placeholder, validated, label, ...other } = props;
+  const locations: AwsLocation[] = [
+    { name: "US East (N. Virginia)", code: "us-east-1" },
+    { name: "US East (Ohio)", code: "us-east-2" },
+    { name: "US West (N. California)", code: "us-west-1" },
+    { name: "US West (Oregon)", code: "us-west-2" },
+    { name: "Africa (Cape Town)", code: "af-south-1" },
+    { name: "Asia Pacific (Hong Kong)", code: "ap-east-1" },
+    { name: "Asia Pacific (Mumbai)", code: "ap-south-1" },
+    { name: "Asia Pacific (Osaka-Local)", code: "ap-northeast-3" },
+    { name: "Asia Pacific (Seoul)", code: "ap-northeast-2" },
+    { name: "Asia Pacific (Singapore)", code: "ap-southeast-1" },
+    { name: "Asia Pacific (Sydney)", code: "ap-southeast-2" },
+  ];
+
+  return (
+    <ValidatedDropdownInput
+      className={className}
+      selected={location}
+      setSelected={setLocation}
+      options={locations}
+      getElementForDisplay={(location: AwsLocation) => location.name}
       loading={false}
       noOptionsString=""
       placeholder={placeholder ? placeholder : "Choose date range"}
