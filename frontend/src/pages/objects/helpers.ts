@@ -22,6 +22,8 @@ export enum Step {
 
 export type NewObjectState = {
   step: Step;
+
+  // Destination setup step.
   destinationSetupData: {
     displayName: string | undefined;
     destination: Destination | undefined;
@@ -29,6 +31,10 @@ export type NewObjectState = {
     targetType: TargetType | undefined;
     tableName: string | undefined;
   };
+
+  // Object fields step.
+  objectFields: ObjectFieldInput[];
+
   syncMode: SyncMode | undefined;
   cursorField: Field | undefined;
   primaryKey: Field | undefined;
@@ -36,7 +42,6 @@ export type NewObjectState = {
   recurring: boolean;
   frequency: number | undefined;
   frequencyUnits: FrequencyUnits | undefined;
-  objectFields: ObjectFieldInput[];
   fieldsError: string | undefined;
   cursorFieldError: string | undefined;
   endCustomerIdError: string | undefined;
