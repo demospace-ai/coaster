@@ -118,7 +118,7 @@ func (s ApiService) createSync(auth auth.Authentication, createSyncRequest Creat
 		}
 	}
 
-	err = validateFieldsMapped(objectFields, createSyncRequest.FieldMappings)
+	err = validateFieldsMapped(objectFields, createSyncRequest.FieldMappings, object.EndCustomerIDField)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "(api.createSync)")
 	}
@@ -245,14 +245,14 @@ func getSourceCursorField(object *models.Object, objectFields []models.ObjectFie
 	return nil
 }
 
-func validateFieldsMapped(objectFields []models.ObjectField, fieldMappings []input.FieldMapping) error {
+func validateFieldsMapped(objectFields []models.ObjectField, fieldMappings []input.FieldMapping, endCustomerIdField string) error {
 	mappedObjectFieldIDs := make(map[int64]bool)
 	for _, fieldMapping := range fieldMappings {
 		mappedObjectFieldIDs[fieldMapping.DestinationFieldId] = true
 	}
 
 	for _, objectField := range objectFields {
-		if !objectField.Optional && !mappedObjectFieldIDs[objectField.ID] {
+		if !objectField.Optional && !mappedObjectFieldIDs[objectField.ID] && objectField.Name != endCustomerIdField {
 			return errors.NewBadRequest(fmt.Sprintf("object field %s is not mapped", objectField.Name))
 		}
 	}
