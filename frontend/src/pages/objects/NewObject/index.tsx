@@ -112,7 +112,19 @@ export const NewObject: React.FC<NewObjectProps> = (props) => {
       back = onComplete;
       break;
     case Step.ExistingFields:
-      content = <ExistingObjectFields isUpdate={!!props.existingObject} state={state} setState={setState} />;
+      content = (
+        <ExistingObjectFields
+          isUpdate={!!props.existingObject}
+          initialFormState={{ objectFields: state.objectFields }}
+          onComplete={(values) => {
+            setState((state) => ({
+              ...state,
+              objectFields: values.objectFields,
+              step: Step.Finalize,
+            }));
+          }}
+        />
+      );
       back = () =>
         setState({
           ...state,

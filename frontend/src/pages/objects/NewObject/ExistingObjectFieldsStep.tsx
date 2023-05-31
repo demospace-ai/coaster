@@ -14,23 +14,27 @@ const FormSchema = z.object({
   objectFields: z.array(ObjectFieldSchema),
 });
 
+type InitialFormState = {
+  objectFields: ObjectFieldInput[];
+};
+
 type FormSchemaType = z.infer<typeof FormSchema>;
 
 interface ExistingObjectFieldsProps {
   isUpdate?: boolean;
+  initialFormState: InitialFormState;
   onComplete: (values: FormSchemaType) => void;
 }
 
-export const ExistingObjectFields: React.FC<ExistingObjectFieldsProps> = ({ isUpdate, onComplete }) => {
-  // const { state, setState } = props;
+export const ExistingObjectFields: React.FC<ExistingObjectFieldsProps> = ({
+  initialFormState,
+  isUpdate,
+  onComplete,
+}) => {
   const { control, handleSubmit } = useForm<FormSchemaType>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      objectFields: [
-        { name: "", description: "", omit: false, optional: false },
-        { name: "", description: "", omit: false, optional: false },
-        { name: "", description: "", omit: false, optional: false },
-      ],
+      objectFields: initialFormState.objectFields || [],
     },
   });
 
@@ -42,31 +46,6 @@ export const ExistingObjectFields: React.FC<ExistingObjectFieldsProps> = ({ isUp
   const onSubmit = handleSubmit((values) => {
     onComplete(values);
   });
-  // const updateObjectField = (newObject: ObjectFieldInput, index: number) => {
-  //   if (!state.objectFields) {
-  //     // TODO: should not happen
-  //     return;
-  //   }
-
-  //   setState({
-  //     ...state,
-  //     objectFields: state.objectFields.map((original, i) => {
-  //       if (i === index) {
-  //         return newObject;
-  //       } else {
-  //         return original;
-  //       }
-  //     }),
-  //   });
-  // };
-
-  // const advance = () => {
-  //   if (validateFields(state, setState)) {
-  //     setState((state) => {
-  //       return { ...state, step: Step.Finalize };
-  //     });
-  //   }
-  // };
 
   return (
     <form className="tw-h-full tw-w-full tw-text-center" onSubmit={onSubmit}>
@@ -79,7 +58,7 @@ export const ExistingObjectFields: React.FC<ExistingObjectFieldsProps> = ({ isUp
           return (
             <li key={objectField.id}>
               <div className={mergeClasses("tw-mt-5 tw-mb-7 tw-text-left")}>
-                <span className="tw-text-base tw-font-semibold">{objectField.name}</span>
+                <label className="tw-text-base tw-font-semibold">{objectField.name}</label>
                 <div className="tw-flex tw-items-center tw-mt-2 tw-pb-1.5">
                   <span className="">Omit?</span>
                   <Controller
@@ -87,12 +66,9 @@ export const ExistingObjectFields: React.FC<ExistingObjectFieldsProps> = ({ isUp
                     control={control}
                     render={({ field }) => (
                       <Checkbox
-                        className="tw-ml-2 tw-h-4 tw-w-4 tw-"
-                        checked={Boolean(objectField.omit)}
-                        onCheckedChange={(value) => {
-                          field.onChange(value);
-                          // updateObjectField({ ...objectField, omit: value }, i);
-                        }}
+                        className="tw-ml-2 tw-h-4 tw-w-4"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
                         disabled={isUpdate}
                       />
                     )}
@@ -104,40 +80,37 @@ export const ExistingObjectFields: React.FC<ExistingObjectFieldsProps> = ({ isUp
                     render={({ field }) => (
                       <Checkbox
                         className="tw-ml-2 tw-h-4 tw-w-4"
-                        checked={Boolean(objectField.optional)}
-                        onCheckedChange={(value) => {
-                          field.onChange(value);
-                          // updateObjectField({ ...objectField, optional: value }, i);
-                        }}
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
                         disabled={isUpdate}
                       />
                     )}
                   />
                 </div>
-                <div className="tw-mt-2">
-                  <Controller
-                    name={`objectFields.${i}.name`}
-                    control={control}
-                    rules={{ required: true }}
-                    render={({ field }) => (
-                      <input type="text" {...field} placeholder="Name" className="tw-w-full tw-py-2 tw-px-3" />
-                    )}
-                  />
-                </div>
-                <div className="tw-mt-2">
-                  <Controller
-                    name={`objectFields.${i}.description`}
-                    control={control}
-                    rules={{ required: true }}
-                    render={({ field }) => (
-                      <textarea
-                        {...field}
-                        placeholder="Description"
-                        className="tw-w-full tw-py-2 tw-px-3 tw-h-20 tw-resize-none"
-                      />
-                    )}
-                  />
-                </div>
+                <Controller
+                  name={`objectFields.${i}.display_name`}
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      value={field.value}
+                      setValue={field.onChange}
+                      placeholder="Display name (optional)"
+                      className="tw-mb-2"
+                    />
+                  )}
+                />
+                <Controller
+                  name={`objectFields.${i}.description`}
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      value={field.value}
+                      setValue={field.onChange}
+                      placeholder="Description (optional)"
+                      className="tw-mb-2"
+                    />
+                  )}
+                />
               </div>
             </li>
           );
