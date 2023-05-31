@@ -114,6 +114,7 @@ export const NewObject: React.FC<NewObjectProps> = (props) => {
     case Step.ExistingFields:
       content = (
         <ExistingObjectFields
+          destinationSetupData={state.destinationSetupData}
           isUpdate={!!props.existingObject}
           initialFormState={{ objectFields: state.objectFields }}
           onComplete={(values) => {

@@ -3,12 +3,19 @@ import { Checkbox } from "@radix-ui/react-checkbox";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { Button } from "src/components/button/Button";
 import { Input } from "src/components/input/Input";
-import { ObjectFieldInput, ObjectFieldSchema } from "src/rpc/api";
+import { Loading } from "src/components/loading/Loading";
+import { NewObjectState } from "src/pages/objects/helpers";
+import { ObjectField, ObjectFieldInput, ObjectFieldSchema } from "src/rpc/api";
+import { useSchema } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
 import { z } from "zod";
 
 const FormSchema = z.object({
-  objectFields: z.array(ObjectFieldSchema),
+  objectFields: z.array(
+    ObjectFieldSchema.partial({
+      id: true,
+    }),
+  ),
 });
 
 type InitialFormState = {
@@ -19,19 +26,71 @@ type FormSchemaType = z.infer<typeof FormSchema>;
 
 interface ExistingObjectFieldsProps {
   isUpdate?: boolean;
+  destinationSetupData: NewObjectState["destinationSetupData"];
   initialFormState: InitialFormState;
   onComplete: (values: FormSchemaType) => void;
 }
 
 export const ExistingObjectFields: React.FC<ExistingObjectFieldsProps> = ({
-  initialFormState,
+  destinationSetupData,
   isUpdate,
   onComplete,
 }) => {
+  console.log("destinationSetupData", destinationSetupData);
+  const schemaQuery = useSchema(
+    destinationSetupData.destination?.connection.id,
+    destinationSetupData.namespace,
+    destinationSetupData.tableName,
+  );
+
+  // if (schemaQuery.loading) {
+
+  // }
+  return (
+    <div>
+      <div className="tw-w-full tw-text-center tw-mb-2 tw-font-bold tw-text-lg">
+        {isUpdate ? "Update Object Fields" : "Object Fields"}
+      </div>
+      <div className="tw-text-center tw-mb-3">Provide customer-facing names and descriptions for each field.</div>
+      {schemaQuery.loading && !schemaQuery.schema ? (
+        <div className="tw-text-center">
+          <h2 className="tw-mb-2">Loading fields...</h2>
+          <Loading />
+        </div>
+      ) : schemaQuery.error ? (
+        <div className="tw-text-center">
+          <h2 className="tw-mb-2">Something went wrong</h2>
+        </div>
+      ) : (
+        <ExistingObjectFieldsForm
+          isUpdate={!!isUpdate}
+          objectFields={
+            schemaQuery.schema?.map((field) => {
+              return {
+                name: field.name,
+                type: field.type,
+                omit: false,
+                optional: false,
+                id: undefined,
+              };
+            }) || []
+          }
+          onComplete={onComplete}
+        />
+      )}
+    </div>
+  );
+};
+
+const ExistingObjectFieldsForm: React.FC<{
+  objectFields: ObjectFieldInput[];
+  onComplete: (values: FormSchemaType) => void;
+  isUpdate: boolean;
+}> = ({ objectFields, isUpdate, onComplete }) => {
   const { control, handleSubmit } = useForm<FormSchemaType>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      objectFields: initialFormState.objectFields || [],
+      objectFields,
     },
   });
 
@@ -45,12 +104,8 @@ export const ExistingObjectFields: React.FC<ExistingObjectFieldsProps> = ({
   });
 
   return (
-    <form className="tw-h-full tw-w-full tw-text-center" onSubmit={onSubmit}>
-      <div className="tw-w-full tw-text-center tw-mb-2 tw-font-bold tw-text-lg">
-        {isUpdate ? "Update Object Fields" : "Object Fields"}
-      </div>
-      <div className="tw-text-center tw-mb-3">Provide customer-facing names and descriptions for each field.</div>
-      <ul className="tw-w-full tw-px-24">
+    <form onSubmit={onSubmit} className="tw-w-full">
+      <ul>
         {fields.map((objectField, i) => {
           return (
             <li key={objectField.id}>
