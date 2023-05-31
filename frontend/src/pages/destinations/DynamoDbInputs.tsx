@@ -28,37 +28,23 @@ export function DynamoDbInputs({
         placeholder="Display Name"
       />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
-        <span>Location</span>
+        <span>Region</span>
         <Tooltip placement="right" label="The geographic location of your BigQuery dataset(s).">
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
       <AwsLocationSelector
         id="location"
-        location={state.dynamoDbConfig.location}
+        location={state.dynamoDbConfig.region}
         setLocation={(value) => {
-          setState({ ...state, dynamoDbConfig: { ...state.dynamoDbConfig, location: value } });
+          setState({ ...state, dynamoDbConfig: { ...state.dynamoDbConfig, region: value } });
         }}
         placeholder="Location"
         className="tw-mt-0 tw-w-full"
       />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
-        <span>Username</span>
-        <Tooltip placement="right" interactive label={<div>Username which can be found in AWS.</div>}>
-          <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
-        </Tooltip>
-      </div>
-      <ValidatedInput
-        id="username"
-        value={state.dynamoDbConfig.username}
-        setValue={(value) => {
-          setState({ ...state, dynamoDbConfig: { ...state.dynamoDbConfig, username: value } });
-        }}
-        placeholder="Username"
-      />
-      <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
         <span>Access Key</span>
-        <Tooltip placement="right" label="This can be obtained in the AWS console." interactive maxWidth={500}>
+        <Tooltip placement="right" interactive label={<div>Access key which can be found in AWS.</div>}>
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
@@ -68,7 +54,21 @@ export function DynamoDbInputs({
         setValue={(value) => {
           setState({ ...state, dynamoDbConfig: { ...state.dynamoDbConfig, accessKey: value } });
         }}
-        placeholder="Access key"
+        placeholder="Access Key"
+      />
+      <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
+        <span>Access Key</span>
+        <Tooltip placement="right" label="This can be obtained in the AWS console." interactive maxWidth={500}>
+          <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
+        </Tooltip>
+      </div>
+      <ValidatedInput
+        id="secretKey"
+        value={state.dynamoDbConfig.secretKey}
+        setValue={(value) => {
+          setState({ ...state, dynamoDbConfig: { ...state.dynamoDbConfig, secretKey: value } });
+        }}
+        placeholder="Secret key"
         type="password"
       />
     </>

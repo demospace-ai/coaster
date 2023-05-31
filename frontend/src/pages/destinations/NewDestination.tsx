@@ -16,6 +16,7 @@ import {
   ConnectionType,
   CreateDestination,
   CreateDestinationRequest,
+  CreateDynamoDbConfigSchema,
   DynamoDbConfigSchema,
   GetDestinations,
   TestDataConnection,
@@ -102,9 +103,9 @@ const INITIAL_DESTINATION_STATE: NewDestinationState = {
     endpoint: "",
   },
   dynamoDbConfig: {
-    username: "",
+    secretKey: "",
     accessKey: "",
-    location: undefined,
+    region: undefined,
   },
   error: undefined,
 };
@@ -193,9 +194,15 @@ const NewDestinationConfiguration: React.FC<NewConnectionConfigurationProps> = (
         case ConnectionType.Webhook:
           payload.webhook_config = state.webhookConfig;
           break;
-        case ConnectionType.DynamoDb:
-          payload.dynamodb_config = DynamoDbConfigSchema.parse(state.dynamoDbConfig);
+        case ConnectionType.DynamoDb: {
+          const config = DynamoDbConfigSchema.parse(state.dynamoDbConfig);
+          payload.dynamodb_config = CreateDynamoDbConfigSchema.parse({
+            access_key: config.accessKey,
+            secret_key: config.secretKey,
+            region: config.region.code,
+          });
           break;
+        }
         case ConnectionType.Redshift:
         case ConnectionType.MongoDb:
         case ConnectionType.Synapse:
@@ -306,9 +313,15 @@ const TestConnectionButton: React.FC<ConnectionConfigurationProps & { connection
         case ConnectionType.Webhook:
           payload.webhook_config = state.webhookConfig;
           break;
-        case ConnectionType.DynamoDb:
-          payload.dynamodb_config = DynamoDbConfigSchema.parse(state.dynamoDbConfig);
+        case ConnectionType.DynamoDb: {
+          const config = DynamoDbConfigSchema.parse(state.dynamoDbConfig);
+          payload.dynamodb_config = CreateDynamoDbConfigSchema.parse({
+            access_key: config.accessKey,
+            secret_key: config.secretKey,
+            region: config.region.code,
+          });
           break;
+        }
         case ConnectionType.Redshift:
         case ConnectionType.MongoDb:
         case ConnectionType.Synapse:

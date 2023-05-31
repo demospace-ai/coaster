@@ -13,6 +13,7 @@ const (
 	ConnectionTypePostgres  ConnectionType = "postgres"
 	ConnectionTypeMySQL     ConnectionType = "mysql"
 	ConnectionTypeWebhook   ConnectionType = "webhook"
+	ConnectionTypeDynamoDb  ConnectionType = "dynamodb"
 )
 
 type BigQueryCredentials struct {

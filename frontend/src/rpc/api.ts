@@ -298,7 +298,7 @@ export interface TestDataConnectionRequest {
   postgres_config?: PostgresConfig;
   mysql_config?: MySqlConfig;
   webhook_config?: WebhookConfig;
-  dynamodb_config?: DynamoDbConfig;
+  dynamodb_config?: CreateDynamoDbConfig;
 }
 
 export interface CreateDestinationRequest {
@@ -312,7 +312,7 @@ export interface CreateDestinationRequest {
   synapse_config?: SynapseConfig;
   webhook_config?: WebhookConfig;
   postgres_config?: PostgresConfig;
-  dynamodb_config?: DynamoDbConfig;
+  dynamodb_config?: CreateDynamoDbConfig;
 }
 
 export interface CreateDestinationResponse {
@@ -419,10 +419,18 @@ export const AwsLocationSchema = z.object({
 export type AwsLocation = z.infer<typeof AwsLocationSchema>;
 
 export const DynamoDbConfigSchema = z.object({
-  username: z.string(),
   accessKey: z.string(),
-  location: AwsLocationSchema,
+  secretKey: z.string(),
+  region: AwsLocationSchema,
 });
+
+export const CreateDynamoDbConfigSchema = z.object({
+  access_key: z.string(),
+  secret_key: z.string(),
+  region: z.string(),
+});
+
+export type CreateDynamoDbConfig = z.infer<typeof CreateDynamoDbConfigSchema>;
 
 export type DynamoDbConfig = z.infer<typeof DynamoDbConfigSchema>;
 
