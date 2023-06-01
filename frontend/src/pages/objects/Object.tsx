@@ -1,7 +1,14 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { BackButton, Button } from "src/components/button/Button";
 import { Loading } from "src/components/loading/Loading";
-import { needsCursorField, needsEndCustomerId, needsPrimaryKey, TargetType, targetTypeToString } from "src/rpc/api";
+import {
+  needsCursorField,
+  needsEndCustomerId,
+  needsPrimaryKey,
+  syncModeToString,
+  TargetType,
+  targetTypeToString,
+} from "src/rpc/api";
 import { useObject } from "src/rpc/data";
 
 const tableHeaderStyle =
@@ -53,6 +60,10 @@ export const Object: React.FC = () => {
             </div>
           </>
         )}
+        <div className="tw-flex tw-flex-row tw-items-center tw-text-base tw-mt-1">
+          <span className="tw-font-medium tw-whitespace-pre">Sync Mode: </span>
+          {syncModeToString(object.sync_mode)}
+        </div>
         {needsCursorField(object.sync_mode) && (
           <div className="tw-flex tw-flex-row tw-items-center tw-text-base tw-mt-1">
             <span className="tw-font-medium tw-whitespace-pre">Cursor Field: </span>

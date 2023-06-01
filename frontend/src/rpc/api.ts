@@ -882,6 +882,17 @@ export function targetTypeToString(targetType: TargetType) {
   }
 }
 
+export function syncModeToString(syncMode: SyncMode) {
+  switch (syncMode) {
+    case SyncMode.FullOverwrite:
+      return "Full Overwrite";
+    case SyncMode.IncrementalAppend:
+      return "Incremental Append";
+    case SyncMode.IncrementalUpdate:
+      return "Incremental Update";
+  }
+}
+
 export function getConnectionType(connectionType: ConnectionType): string {
   switch (connectionType) {
     case ConnectionType.DynamoDb:
