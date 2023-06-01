@@ -141,6 +141,7 @@ export const DestinationSetup: React.FC<DestinationSetupProps> = ({ isUpdate, ha
                 <DestinationSelector
                   className="tw-mt-0"
                   destination={field.value}
+                  disabled={isUpdate}
                   setDestination={(d) => {
                     const connectionType = d.connection.connection_type;
                     field.onChange(d);
