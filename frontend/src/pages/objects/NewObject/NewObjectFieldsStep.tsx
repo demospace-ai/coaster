@@ -15,11 +15,13 @@ import { z } from "zod";
 import { Controller } from "react-hook-form";
 
 const FormSchema = z.object({
-  objectFields: z.array(
-    ObjectFieldSchema.partial({
-      id: true,
-    }),
-  ),
+  objectFields: z
+    .array(
+      ObjectFieldSchema.partial({
+        id: true,
+      }),
+    )
+    .min(1, { message: "Must have at least one field" }),
 });
 
 interface NewObjectFieldsProps {
@@ -35,7 +37,11 @@ type InitialFormState = {
 type FormSchemaType = z.infer<typeof FormSchema>;
 
 export function NewObjectFields({ initialFormState, onComplete, isUpdate }: NewObjectFieldsProps) {
-  const { control, handleSubmit } = useForm<FormSchemaType>({
+  const {
+    formState: { errors },
+    control,
+    handleSubmit,
+  } = useForm<FormSchemaType>({
     resolver: zodResolver(FormSchema),
     defaultValues: initialFormState,
   });
@@ -129,6 +135,9 @@ export function NewObjectFields({ initialFormState, onComplete, isUpdate }: NewO
                   />
                 </div>
               </div>
+              {errors.objectFields?.[i]?.name && (
+                <div className="tw-text-red-500">{errors.objectFields?.[i]?.name?.message}</div>
+              )}
               <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
                 <span>Display Name</span>
                 <Tooltip
@@ -197,6 +206,7 @@ export function NewObjectFields({ initialFormState, onComplete, isUpdate }: NewO
       <Button type="submit" className="tw-mt-8 tw-w-100 tw-h-10">
         Continue
       </Button>
+      {errors.objectFields && <div className="tw-text-red-500">{errors.objectFields.message}</div>}
     </form>
   );
 }

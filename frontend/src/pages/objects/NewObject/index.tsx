@@ -159,6 +159,7 @@ export const NewObject: React.FC<NewObjectProps> = (props) => {
       break;
   }
 
+  console.log(state);
   return (
     <div className="tw-flex tw-flex-col tw-mb-10">
       <BackButton onClick={back} />

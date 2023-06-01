@@ -11,11 +11,13 @@ import { mergeClasses } from "src/utils/twmerge";
 import { z } from "zod";
 
 const FormSchema = z.object({
-  objectFields: z.array(
-    ObjectFieldSchema.partial({
-      id: true,
-    }),
-  ),
+  objectFields: z
+    .array(
+      ObjectFieldSchema.partial({
+        id: true,
+      }),
+    )
+    .min(1, { message: "Must have at least one field" }),
 });
 
 type InitialFormState = {
