@@ -90,6 +90,18 @@ func (qs QueryServiceImpl) GetClient(ctx context.Context, connection *models.Con
 			Credentials: bigQueryCredentialsString,
 			Location:    &connection.Location.String,
 		}, nil
+	case models.ConnectionTypeDynamoDb:
+		password, err := qs.cryptoService.DecryptConnectionCredentials(connection.Password.String)
+		if err != nil {
+			return nil, errors.Wrap(err, "(query.QueryServiceImpl.GetClient) decrypting DynamoDB credentials")
+		}
+
+		return DynamoDbClient{
+			KeyID:     connection.Username.String,
+			AccessKey: *password,
+			Location:  connection.Location.String,
+		}, nil
+
 	case models.ConnectionTypeSnowflake:
 		snowflakePassword, err := qs.cryptoService.DecryptConnectionCredentials(connection.Password.String)
 		if err != nil {

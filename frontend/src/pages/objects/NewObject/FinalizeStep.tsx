@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "src/components/button/Button";
 import { Checkbox } from "src/components/checkbox/Checkbox";
 import { InfoIcon } from "src/components/icons/Icons";
-import { ValidatedDropdownInput, ValidatedInput } from "src/components/input/Input";
+import { ValidatedComboInput, ValidatedDropdownInput, ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { useShowToast } from "src/components/notifications/Notifications";
 import { FieldSelector } from "src/components/selector/Selector";
@@ -40,6 +40,7 @@ export const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) =
   const { state, setState } = props;
   const showToast = useShowToast();
   const navigate = useNavigate();
+  const connectionType = props.state.destinationSetupData.destination?.connection.connection_type;
 
   const createNewObject = async (state: NewObjectState) => {
     const payload: CreateObjectRequest = {
@@ -225,9 +226,31 @@ export const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) =
       )}
       {state.syncMode !== undefined && (
         <>
-          {state.destinationSetupData.destination?.connection.connection_type !== ConnectionType.Webhook && (
+          {connectionType === ConnectionType.DynamoDb && (
             <>
-              <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5 tw-mb-3">
+              <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5">
+                <span className="tw-font-medium">End Customer ID</span>
+              </div>
+              <ValidatedComboInput
+                className="tw-mt-3"
+                loading={false}
+                validated={true}
+                disabled={!!props.existingObject}
+                options={fields}
+                selected={state.endCustomerIdField}
+                setSelected={(value: Field) => {
+                  console.log("field", value);
+                  setState({ ...state, endCustomerIdField: value });
+                }}
+                getElementForDisplay={(value: Field) => value.name}
+                noOptionsString={"No field available!"}
+                placeholder={"Choose field"}
+              />
+            </>
+          )}
+          {connectionType !== ConnectionType.Webhook && connectionType !== ConnectionType.DynamoDb && (
+            <>
+              <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5">
                 <span className="tw-font-medium">End Customer ID</span>
               </div>
               <FieldSelector

@@ -45,7 +45,7 @@ func (dc DynamoDbClient) openConnection(ctx context.Context) (*dynamodb.Client, 
 	return dynamodb.NewFromConfig(awsConfig), nil
 }
 
-func (dc DynamoDbClient) GetTables(ctx context.Context, namespace string) ([]string, error) {
+func (dc DynamoDbClient) GetTables(ctx context.Context, _namespace string) ([]string, error) {
 	client, err := dc.openConnection(ctx)
 	if err != nil {
 		return nil, errors.Wrap(errors.WrapCustomerVisibleError(err), "(query.DynamoDbClient.GetTables) opening connection")

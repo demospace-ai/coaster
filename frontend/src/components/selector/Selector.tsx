@@ -124,8 +124,8 @@ type TableSelectorProps = Omit<
   Partial<ValidatedComboInputProps>,
   "selected" | "setSelected" | "getElementForDisplay" | "loading"
 > & {
-  connection: Connection | undefined;
-  namespace: string | undefined;
+  connection: Connection;
+  namespace?: string | undefined;
   tableName: string | undefined;
   setTableName: (tableName: string) => void;
   showLabel?: boolean;
@@ -145,7 +145,11 @@ export const TableSelector: React.FC<TableSelectorProps> = (props) => {
     label,
     ...other
   } = props;
-  const { tables, loading } = useTables(connection?.id, namespace);
+  const { tables, loading } = useTables({
+    connectionID: connection.id,
+    namespace,
+    connectionType: connection.connection_type,
+  });
   const defaultLabel = label ? label : "Table";
 
   return (
@@ -592,17 +596,17 @@ type AwsLocationSelectorProps = Omit<
 export const AwsLocationSelector: React.FC<AwsLocationSelectorProps> = (props) => {
   const { location, setLocation, className, noOptionsString, placeholder, validated, label, ...other } = props;
   const locations: AwsLocation[] = [
-    { name: "US East (N. Virginia)", code: "us-east-1" },
-    { name: "US East (Ohio)", code: "us-east-2" },
-    { name: "US West (N. California)", code: "us-west-1" },
-    { name: "US West (Oregon)", code: "us-west-2" },
-    { name: "Africa (Cape Town)", code: "af-south-1" },
-    { name: "Asia Pacific (Hong Kong)", code: "ap-east-1" },
-    { name: "Asia Pacific (Mumbai)", code: "ap-south-1" },
-    { name: "Asia Pacific (Osaka-Local)", code: "ap-northeast-3" },
-    { name: "Asia Pacific (Seoul)", code: "ap-northeast-2" },
-    { name: "Asia Pacific (Singapore)", code: "ap-southeast-1" },
-    { name: "Asia Pacific (Sydney)", code: "ap-southeast-2" },
+    { name: "US East 1 (N. Virginia)", code: "us-east-1" },
+    { name: "US East 2 (Ohio)", code: "us-east-2" },
+    { name: "US West 1 (N. California)", code: "us-west-1" },
+    { name: "US West 2 (Oregon)", code: "us-west-2" },
+    { name: "Africa South 1 (Cape Town)", code: "af-south-1" },
+    { name: "Asia Pacific East 1 (Hong Kong)", code: "ap-east-1" },
+    { name: "Asia Pacific South 1(Mumbai)", code: "ap-south-1" },
+    { name: "Asia Pacific Northeast 3 (Osaka-Local)", code: "ap-northeast-3" },
+    { name: "Asia Pacific Northeast 2 (Seoul)", code: "ap-northeast-2" },
+    { name: "Asia Pacific Southeast 1 (Singapore)", code: "ap-southeast-1" },
+    { name: "Asia Pacific Southeast 2 (Sydney)", code: "ap-southeast-2" },
   ];
 
   return (
