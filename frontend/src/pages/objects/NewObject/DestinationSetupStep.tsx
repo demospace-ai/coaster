@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { connect } from "http2";
 import { ChangeEvent } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Button } from "src/components/button/Button";
@@ -6,39 +7,35 @@ import { InfoIcon } from "src/components/icons/Icons";
 import { InputStyle } from "src/components/input/Input";
 import { DestinationSelector, NamespaceSelector, TableSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
-import { ConnectionType, Destination, DestinationSchema, TargetType } from "src/rpc/api";
+import { objectTargetOptions } from "src/pages/objects/helpers";
+import { Connection, ConnectionType, Destination, DestinationSchema, TargetType } from "src/rpc/api";
 import { mergeClasses } from "src/utils/twmerge";
 import { z } from "zod";
 
-const FormSchema = z
-  .object({
-    displayName: z.string().min(1, { message: "Required" }),
-    destination: DestinationSchema,
-    targetType: z.nativeEnum(TargetType),
-    tableName: z.string().optional(),
-    namespace: z.string().optional(),
-    // Used to display form-level errors.
-    formLevel: z.never().optional(),
-  })
-  .superRefine((data, ctx) => {
-    const { targetType, namespace, tableName } = data;
-    if (targetType === TargetType.SingleExisting) {
-      if (!tableName) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Please select a table",
-          path: ["tableName"],
-        });
-      }
-      if (!namespace) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Please select a namespace",
-          path: ["namespace"],
-        });
-      }
-    }
-  });
+const BaseSchema = z.object({
+  displayName: z.string().min(1, { message: "Please enter a display name" }),
+  destination: DestinationSchema,
+});
+
+const WebhookSchema = BaseSchema.extend({
+  connectionType: z.literal(ConnectionType.Webhook),
+  targetType: z.literal(TargetType.Webhook),
+});
+
+const BigQuerySchema = BaseSchema.extend({
+  connectionType: z.literal(ConnectionType.BigQuery),
+  targetType: z.enum([TargetType.SingleExisting]),
+  namespace: z.string(),
+  tableName: z.string(),
+});
+
+const DynamoDbSchema = BaseSchema.extend({
+  connectionType: z.literal(ConnectionType.DynamoDb),
+  region: z.string(),
+  tableName: z.string(),
+});
+
+const FormSchema = z.discriminatedUnion("connectionType", [WebhookSchema, BigQuerySchema, DynamoDbSchema]);
 
 type FormType = z.infer<typeof FormSchema>;
 interface DestinationSetupProps {
@@ -57,13 +54,47 @@ type UseFormReturn = ReturnType<typeof useForm<z.infer<typeof FormSchema>>>;
 type Control = UseFormReturn["control"];
 type Errors = UseFormReturn["formState"]["errors"];
 
+const allowedConnectionTypes = [ConnectionType.BigQuery, ConnectionType.DynamoDb, ConnectionType.Webhook] as const;
+type AllowedConnectionType = (typeof allowedConnectionTypes)[number];
+
+function initializeFormState(initial: DestinationSetupProps["initialFormState"]): Partial<FormType> {
+  const connectionType = initial?.destination?.connection?.connection_type;
+  if (connectionType && !allowedConnectionTypes.includes(connectionType as AllowedConnectionType)) {
+    return {};
+  }
+
+  if (connectionType === ConnectionType.BigQuery) {
+    return {
+      displayName: initial?.displayName,
+      destination: initial?.destination,
+      connectionType: connectionType as ConnectionType.BigQuery | undefined,
+      targetType: TargetType.SingleExisting,
+      namespace: initial?.namespace,
+      tableName: initial?.tableName,
+    };
+  } else if (connectionType === ConnectionType.DynamoDb) {
+    return {
+      displayName: initial?.displayName,
+      destination: initial?.destination,
+      connectionType: connectionType as ConnectionType.DynamoDb | undefined,
+    };
+  } else {
+    return {
+      displayName: initial?.displayName,
+      destination: initial?.destination,
+      connectionType: connectionType as ConnectionType.Webhook | undefined,
+      targetType: TargetType.Webhook,
+    };
+  }
+}
+
 export const DestinationSetup: React.FC<DestinationSetupProps> = ({ isUpdate, handleNextStep, initialFormState }) => {
   const form = useForm<FormType>({
     resolver: async (data, context, options) => {
       const errors = await zodResolver(FormSchema)(data, context, options);
       return errors;
     },
-    defaultValues: initialFormState,
+    defaultValues: initializeFormState(initialFormState),
   });
   const {
     handleSubmit,
@@ -77,6 +108,7 @@ export const DestinationSetup: React.FC<DestinationSetupProps> = ({ isUpdate, ha
     handleNextStep(values);
   });
 
+  const connectionType = watch("connectionType");
   const watchTargetType = watch("targetType");
   const watchDestination = watch("destination");
   const watchNamespace = watch("namespace");
@@ -116,168 +148,173 @@ export const DestinationSetup: React.FC<DestinationSetupProps> = ({ isUpdate, ha
                     } else {
                       form.setValue("targetType", TargetType.SingleExisting);
                     }
+                    const connectionType = d.connection.connection_type;
+                    if (connectionType && !allowedConnectionTypes.includes(connectionType as AllowedConnectionType)) {
+                      form.setError("destination", {
+                        message: "This destination is not supported.",
+                      });
+                      return;
+                    } else {
+                      form.clearErrors("destination");
+                    }
+                    form.setValue("connectionType", connectionType as AllowedConnectionType);
                   }}
                 />
               );
             }}
           />
+          {errors.destination && <div className="tw-text-red-500 tw-mt-1">{errors.destination.message}</div>}
         </div>
-        {watchTargetType && watchTargetType !== TargetType.Webhook && (
-          <DestinationTarget
+        {connectionType === ConnectionType.BigQuery && (
+          <ObjectTargetFieldset control={control} errors={errors} disabled={isUpdate} />
+        )}
+        {connectionType === ConnectionType.BigQuery && (
+          <NamespaceField control={control} destination={watchDestination} errors={errors} isUpdate={isUpdate} />
+        )}
+        {connectionType === ConnectionType.BigQuery && (
+          <TableField
+            control={control}
+            connection={watchDestination.connection}
             errors={errors}
             isUpdate={isUpdate}
-            control={control}
-            destination={watchDestination}
             namespace={watchNamespace}
-            targetType={watchTargetType}
           />
         )}
+
         <Button type="submit" className="tw-w-full tw-py-2">
           Continue
         </Button>
-        {errors.formLevel && <div className="tw-text-red-500 tw-mt-1">{errors.formLevel.message}</div>}
       </form>
     </div>
   );
 };
 
-interface DestinationTargetProps {
-  control: Control;
-  targetType: TargetType | null;
-  namespace: string | undefined;
-  destination: Destination | null;
-  errors: Errors;
-  isUpdate?: boolean;
-}
-
-const DestinationTarget: React.FC<DestinationTargetProps> = ({
-  namespace,
+export function NamespaceField({
   control,
-  targetType,
   destination,
   errors,
   isUpdate,
-  ...props
-}) => {
-  type TargetOption = {
-    type: TargetType;
-    title: string;
-    description: string;
-  };
-  const targets: TargetOption[] = [
-    {
-      type: TargetType.SingleExisting,
-      title: "Single Existing Table",
-      description:
-        "Data from all of your customers will be stored in a single existing table, with an extra ID column to distinguish between customers.",
-    },
-    // TODO
-    // {
-    //   type: TargetType.SingleNew,
-    //   title: "Single New Table",
-    //   description: "Data from all of your customers will be stored in a single new table, with an extra ID column to distinguish between customers."
-    // },
-    // {
-    //   type: TargetType.TablePerCustomer,
-    //   title: "Table Per Customer",
-    //   description: "Data from each of your customers will be stored in a separate table in your destination. The name of the table will include the customer's ID as a suffix."
-    // },
-  ];
-
+}: {
+  control: Control;
+  destination: Destination;
+  errors: Errors;
+  isUpdate?: boolean;
+}) {
   return (
-    <>
-      <fieldset className="tw-my-4">
-        <label className="tw-font-medium">Target</label>
-        <p className="tw-text-slate-600">Where should Fabra load the data in your destination?</p>
-        <legend className="tw-sr-only">Target</legend>
-        <div className="tw-space-y-4 tw-mt-2">
-          {targets.map((target) => (
-            <Controller
-              key={target.type}
-              name="targetType"
-              control={control}
-              render={({ field }) => {
-                return (
-                  <div key={String(target.type)} className="tw-flex tw-items-center">
-                    <input
-                      id={String(target.type)}
-                      name="target"
-                      type="radio"
-                      value={target.type}
-                      checked={field.value === target.type}
-                      onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                        field.onChange(target.type);
-                      }}
-                      disabled={isUpdate}
-                      className={mergeClasses(
-                        "tw-h-4 tw-w-4 tw-border-slate-300 tw-text-indigo-600 focus:tw-ring-indigo-600 tw-cursor-pointer",
-                        isUpdate ? "tw-cursor-not-allowed" : "tw-cursor-pointer",
-                      )}
-                    />
-                    <div className="tw-flex tw-flex-row tw-items-center tw-ml-3 tw-leading-6">
-                      <label htmlFor={String(target.type)} className="tw-text-sm tw-cursor-pointer">
-                        {target.title}
-                      </label>
-                      <Tooltip label={target.description} placement="top-start">
-                        <InfoIcon className="tw-ml-1.5 tw-h-3 tw-fill-slate-400" />
-                      </Tooltip>
-                    </div>
-                  </div>
-                );
-              }}
+    <div>
+      <label className="tw-font-medium">Namespace</label>
+      <Controller
+        name="namespace"
+        control={control}
+        render={({ field }) => {
+          return (
+            <NamespaceSelector
+              className="tw-mt-0"
+              validated={true}
+              connection={destination.connection}
+              namespace={field.value}
+              disabled={isUpdate}
+              setNamespace={field.onChange}
+              noOptionsString="No Namespaces Available! (Choose a data source)"
             />
-          ))}
-        </div>
-        {errors.targetType && <div className="tw-text-red-500 tw-mt-1">{errors.targetType.message}</div>}
-      </fieldset>
-      {targetType === TargetType.SingleExisting && (
-        <div className="tw-space-y-4">
-          <div>
-            <label className="tw-font-medium">Namespace</label>
-            <Controller
-              name="namespace"
-              control={control}
-              render={({ field }) => {
-                return (
-                  <NamespaceSelector
-                    className="tw-mt-0"
-                    validated={true}
-                    connection={destination?.connection}
-                    namespace={field.value}
-                    disabled={isUpdate}
-                    setNamespace={field.onChange}
-                    noOptionsString="No Namespaces Available! (Choose a data source)"
-                  />
-                );
-              }}
-            />
-            {errors.namespace && <div className="tw-text-red-500 tw-mt-1">{errors.namespace.message}</div>}
-          </div>
-
-          <div>
-            <label className="tw-font-medium">Table</label>
-            <Controller
-              name="tableName"
-              control={control}
-              render={({ field }) => {
-                return (
-                  <TableSelector
-                    className="tw-mt-0"
-                    connection={destination?.connection}
-                    namespace={namespace}
-                    tableName={field.value}
-                    disabled={isUpdate}
-                    setTableName={field.onChange}
-                    noOptionsString="No Tables Available! (Choose a namespace)"
-                    validated={true}
-                  />
-                );
-              }}
-            />
-            {errors.tableName && <div className="tw-text-red-500 tw-mt-1">{errors.tableName.message}</div>}
-          </div>
-        </div>
+          );
+        }}
+      />
+      {"namespace" in errors && errors.namespace && (
+        <div className="tw-text-red-500 tw-mt-1">{errors.namespace.message}</div>
       )}
-    </>
+    </div>
   );
-};
+}
+
+function TableField({
+  namespace,
+  control,
+  connection,
+  errors,
+  isUpdate,
+}: {
+  namespace: string | undefined;
+  control: Control;
+  connection: Connection;
+  errors: Errors;
+  isUpdate?: boolean;
+}) {
+  return (
+    <div>
+      <label className="tw-font-medium">Table</label>
+      <Controller
+        name="tableName"
+        control={control}
+        render={({ field }) => {
+          return (
+            <TableSelector
+              className="tw-mt-0"
+              connection={connection}
+              namespace={namespace}
+              tableName={field.value}
+              disabled={isUpdate}
+              setTableName={field.onChange}
+              noOptionsString="No Tables Available! (Choose a namespace)"
+              validated={true}
+            />
+          );
+        }}
+      />
+      {"tableName" in errors && errors.tableName && (
+        <div className="tw-text-red-500 tw-mt-1">{errors.tableName.message}</div>
+      )}
+    </div>
+  );
+}
+
+function ObjectTargetFieldset({ control, errors, disabled }: { control: Control; errors: Errors; disabled?: boolean }) {
+  return (
+    <fieldset className="tw-my-4">
+      <label className="tw-font-medium">Target</label>
+      <p className="tw-text-slate-600">Where should Fabra load the data in your destination?</p>
+      <legend className="tw-sr-only">Target</legend>
+      <div className="tw-space-y-4 tw-mt-2">
+        {objectTargetOptions.map((target) => (
+          <Controller
+            key={target.type}
+            name="targetType"
+            control={control}
+            render={({ field }) => {
+              return (
+                <div key={String(target.type)} className="tw-flex tw-items-center">
+                  <input
+                    id={String(target.type)}
+                    name="target"
+                    type="radio"
+                    value={target.type}
+                    checked={field.value === target.type}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                      field.onChange(target.type);
+                    }}
+                    disabled={disabled}
+                    className={mergeClasses(
+                      "tw-h-4 tw-w-4 tw-border-slate-300 tw-text-indigo-600 focus:tw-ring-indigo-600 tw-cursor-pointer",
+                      disabled ? "tw-cursor-not-allowed" : "tw-cursor-pointer",
+                    )}
+                  />
+                  <div className="tw-flex tw-flex-row tw-items-center tw-ml-3 tw-leading-6">
+                    <label htmlFor={String(target.type)} className="tw-text-sm tw-cursor-pointer">
+                      {target.title}
+                    </label>
+                    <Tooltip label={target.description} placement="top-start">
+                      <InfoIcon className="tw-ml-1.5 tw-h-3 tw-fill-slate-400" />
+                    </Tooltip>
+                  </div>
+                </div>
+              );
+            }}
+          />
+        ))}
+      </div>
+      {"targetType" in errors && errors.targetType && (
+        <div className="tw-text-red-500 tw-mt-1">{errors.targetType.message}</div>
+      )}
+    </fieldset>
+  );
+}

@@ -325,3 +325,28 @@ export const initializeFromDestination = (destination: Destination): NewObjectSt
   }
   return state;
 };
+
+export type ObjectTargetOption = {
+  type: TargetType;
+  title: string;
+  description: string;
+};
+export const objectTargetOptions: ObjectTargetOption[] = [
+  {
+    type: TargetType.SingleExisting,
+    title: "Single Existing Table",
+    description:
+      "Data from all of your customers will be stored in a single existing table, with an extra ID column to distinguish between customers.",
+  },
+  // TODO
+  // {
+  //   type: TargetType.SingleNew,
+  //   title: "Single New Table",
+  //   description: "Data from all of your customers will be stored in a single new table, with an extra ID column to distinguish between customers."
+  // },
+  // {
+  //   type: TargetType.TablePerCustomer,
+  //   title: "Table Per Customer",
+  //   description: "Data from each of your customers will be stored in a separate table in your destination. The name of the table will include the customer's ID as a suffix."
+  // },
+];
