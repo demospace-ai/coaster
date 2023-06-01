@@ -12,21 +12,22 @@ import (
 const CUSTOMER_VISIBLE_TIME_FORMAT = "01/02/06 at 03:04 PM MST"
 
 type Sync struct {
-	ID                int64                 `json:"id"`
-	OrganizationID    int64                 `json:"organization_id"`
-	EndCustomerID     string                `json:"end_customer_id"`
-	DisplayName       string                `json:"display_name"`
-	SourceID          int64                 `json:"source_id"`
-	ObjectID          int64                 `json:"object_id"`
-	Namespace         *string               `json:"namespace,omitempty"`
-	TableName         *string               `json:"table_name,omitempty"`
-	CustomJoin        *string               `json:"custom_join,omitempty"`
-	CursorPosition    *string               `json:"cursor_position,omitempty"`
-	SourceCursorField *string               `json:"source_cursor_field,omitempty"`
-	SourcePrimaryKey  *string               `json:"source_primary_key,omitempty"`
-	SyncMode          models.SyncMode       `json:"sync_mode"`
-	Frequency         int64                 `json:"frequency"`
-	FrequencyUnits    models.FrequencyUnits `json:"frequency_units"`
+	ID                int64                  `json:"id"`
+	OrganizationID    int64                  `json:"organization_id"`
+	EndCustomerID     string                 `json:"end_customer_id"`
+	DisplayName       string                 `json:"display_name"`
+	SourceID          int64                  `json:"source_id"`
+	ObjectID          int64                  `json:"object_id"`
+	Namespace         *string                `json:"namespace,omitempty"`
+	TableName         *string                `json:"table_name,omitempty"`
+	CustomJoin        *string                `json:"custom_join,omitempty"`
+	CursorPosition    *string                `json:"cursor_position,omitempty"`
+	SourceCursorField *string                `json:"source_cursor_field,omitempty"`
+	SourcePrimaryKey  *string                `json:"source_primary_key,omitempty"`
+	SyncMode          models.SyncMode        `json:"sync_mode"`
+	Recurring         bool                   `json:"recurring"`
+	Frequency         *int64                 `json:"frequency,omitempty"`
+	FrequencyUnits    *models.FrequencyUnits `json:"frequency_units,omitempty"`
 }
 
 type SyncRun struct {

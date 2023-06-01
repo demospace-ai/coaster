@@ -5,9 +5,9 @@ import "go.fabra.io/server/common/database"
 type TargetType string
 
 const (
-	TargetTypeSingleExisting   SyncMode = "single_existing"
-	TargetTypeTablePerCustomer SyncMode = "table_per_customer"
-	TargetTypeWebhook          SyncMode = "webhook"
+	TargetTypeSingleExisting   TargetType = "single_existing"
+	TargetTypeTablePerCustomer TargetType = "table_per_customer"
+	TargetTypeWebhook          TargetType = "webhook"
 )
 
 type Object struct {
@@ -21,8 +21,9 @@ type Object struct {
 	CursorField        database.NullString `json:"cursor_field"` // used to determine rows to sync based on whether they changed e.g. updated_at
 	PrimaryKey         database.NullString `json:"primary_key"`  // used to map updated rows to the row in the destination (only needed for updates)
 	EndCustomerIDField string              `json:"end_customer_id_field"`
-	Frequency          int64               `json:"frequency"`
-	FrequencyUnits     FrequencyUnits      `json:"frequency_units"`
+	Recurring          bool                `json:"recurring"`
+	Frequency          *int64              `json:"frequency"`
+	FrequencyUnits     *FrequencyUnits     `json:"frequency_units"`
 
 	BaseModel
 }

@@ -23,8 +23,9 @@ func CreateSync(
 	sourceCursorField *string,
 	sourcePrimaryKey *string,
 	syncMode models.SyncMode,
-	frequency int64,
-	frequencyUnits models.FrequencyUnits,
+	recurring bool,
+	frequency *int64,
+	frequencyUnits *models.FrequencyUnits,
 ) (*models.Sync, error) {
 
 	sync := models.Sync{

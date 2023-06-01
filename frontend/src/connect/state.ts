@@ -212,6 +212,8 @@ export const validateConnectionSetup = (connectionType: ConnectionType | undefin
       );
     case ConnectionType.Webhook:
       return false; // cannot create a sync with a webhook source
+    case ConnectionType.DynamoDb:
+      return false; // TODO: DynamoDB not supported as a source yet
   }
 };
 

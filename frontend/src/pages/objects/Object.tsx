@@ -72,9 +72,15 @@ export const Object: React.FC = () => {
           </div>
         )}
         <div className="tw-flex tw-flex-row tw-items-center tw-text-base tw-mt-1">
-          <span className="tw-font-medium tw-whitespace-pre">Frequency: </span>
-          {object.frequency} {object.frequency_units}
+          <span className="tw-font-medium tw-whitespace-pre">Recurring: </span>
+          {object.recurring ? "Yes" : "No"}
         </div>
+        {object.recurring && (
+          <div className="tw-flex tw-flex-row tw-items-center tw-text-base tw-mt-1">
+            <span className="tw-font-medium tw-whitespace-pre">Frequency: </span>
+            {object.frequency} {object.frequency_units}
+          </div>
+        )}
       </div>
       <div className="tw-font-bold tw-text-base tw-mt-4 tw-mb-2">Object Fields</div>
       <div className="tw-border tw-border-solid tw-border-slate-200 tw-bg-white tw-rounded-lg tw-overflow-auto tw-overscroll-contain tw-shadow-md">

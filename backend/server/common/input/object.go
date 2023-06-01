@@ -9,9 +9,10 @@ import (
 type PartialUpdateObjectInput struct {
 	// Don't include destination, sync mode, cursor field, primary key, or end customer ID
 	// field since we don't have a way to safely update these
-	DisplayName    *string                `json:"display_name"`
-	Frequency      *int64                 `json:"frequency"`
-	FrequencyUnits *models.FrequencyUnits `json:"frequency_units"`
+	DisplayName    *string                `json:"display_name,omitempty"`
+	Recurring      *bool                  `json:"recurring,omitempty"`
+	Frequency      *int64                 `json:"frequency,omitempty"`
+	FrequencyUnits *models.FrequencyUnits `json:"frequency_units,omitempty"`
 }
 
 type PartialUpdateObjectField struct {

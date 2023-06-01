@@ -21,19 +21,20 @@ func CreateObject(
 	cursorField *string,
 	primaryKey *string,
 	endCustomerIDColumn string,
-	frequency int64,
-	frequencyUnits models.FrequencyUnits,
+	recurring bool,
+	frequency *int64,
+	frequencyUnits *models.FrequencyUnits,
 ) (*models.Object, error) {
 
 	object := models.Object{
-		OrganizationID:     organizationID,
-		DisplayName:        displayName,
-		DestinationID:      destinationID,
-		TargetType:         targetType,
-		SyncMode:           syncMode,
-		EndCustomerIDField: endCustomerIDColumn,
-		Frequency:          frequency,
-		FrequencyUnits:     frequencyUnits,
+		OrganizationID: organizationID,
+		DisplayName:    displayName,
+		DestinationID:  destinationID,
+		TargetType:     targetType,
+		SyncMode:       syncMode,
+		Recurring:      recurring,
+		Frequency:      frequency,
+		FrequencyUnits: frequencyUnits,
 	}
 
 	if namespace != nil {
@@ -221,11 +222,21 @@ func PartialUpdateObject(
 	if objectUpdates.DisplayName != nil {
 		object.DisplayName = *objectUpdates.DisplayName
 	}
-	if objectUpdates.Frequency != nil {
-		object.Frequency = *objectUpdates.Frequency
+	if objectUpdates.Recurring != nil {
+		object.Recurring = *objectUpdates.Recurring
 	}
-	if objectUpdates.FrequencyUnits != nil {
-		object.FrequencyUnits = *objectUpdates.FrequencyUnits
+
+	// Only set frequency and units if the object is recurring, otherwise clear them
+	if object.Recurring {
+		if objectUpdates.Frequency != nil {
+			object.Frequency = objectUpdates.Frequency
+		}
+		if objectUpdates.FrequencyUnits != nil {
+			object.FrequencyUnits = objectUpdates.FrequencyUnits
+		}
+	} else {
+		object.Frequency = nil
+		object.FrequencyUnits = nil
 	}
 
 	// Explicitly do not allow updating the destination, sync mode, primary key, or cursor field

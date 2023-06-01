@@ -1,6 +1,7 @@
 import { ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "src/components/button/Button";
+import { Checkbox } from "src/components/checkbox/Checkbox";
 import { InfoIcon } from "src/components/icons/Icons";
 import { ValidatedDropdownInput, ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
@@ -52,6 +53,7 @@ export const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) =
       primary_key: state.primaryKey && state.primaryKey.name,
       // @ts-ignore Need to fix this soon.
       end_customer_id_field: state.endCustomerIdField && state.endCustomerIdField.name,
+      recurring: state.recurring,
       frequency: state.frequency!,
       frequency_units: state.frequencyUnits!,
       object_fields: state.objectFields,
@@ -65,8 +67,8 @@ export const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) =
       throw new Error("Cannot update object without existing object");
     }
 
-    // For object field update, we need to compute the change sets. New fields are added, existing fields are updated.
-    // Removing fields is not supported as of 2023 May 24.
+    // For object field updates, we need to compute the change sets.
+    // TODO: support adding and removing fields when updating objects
     const updatedFields = newObj.objectFields.filter((field) =>
       props.existingObject?.object_fields?.find((existingField) => existingField.name === field.name),
     );
@@ -82,6 +84,7 @@ export const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) =
         sync_mode: newObj.syncMode,
         cursor_field: newObj.cursorField?.name,
         end_customer_id_field: newObj.endCustomerIdField?.name,
+        recurring: newObj.recurring,
         frequency: newObj.frequency,
         frequency_units: newObj.frequencyUnits,
       }),
@@ -243,31 +246,43 @@ export const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) =
               />
             </>
           )}
-          <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5 tw-mb-3">
-            <span className="tw-font-medium">Frequency</span>
+          <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-6">
+            <span className="tw-font-medium">Recurring?</span>
+            <Checkbox
+              className="tw-ml-2 tw-h-4 tw-w-4"
+              checked={Boolean(state.recurring)}
+              onCheckedChange={() => setState((state) => ({ ...state, recurring: !state.recurring }))}
+            />
           </div>
-          <ValidatedInput
-            id="frequency"
-            className="tw-w-100"
-            min={props.state.frequencyUnits === FrequencyUnits.Minutes ? 30 : 1}
-            type="number"
-            value={props.state.frequency}
-            setValue={(value) => props.setState({ ...props.state, frequency: value })}
-            placeholder="Sync Frequency"
-          />
-          <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5 tw-mb-3">
-            <span className="tw-font-medium">Frequency Units</span>
-          </div>
-          <ValidatedDropdownInput
-            className="tw-mt-0 tw-w-100"
-            options={Object.values(FrequencyUnits)}
-            selected={props.state.frequencyUnits}
-            setSelected={(value) => props.setState({ ...props.state, frequencyUnits: value })}
-            loading={false}
-            placeholder="Frequency Units"
-            noOptionsString="nil"
-            getElementForDisplay={(value) => value.charAt(0).toUpperCase() + value.slice(1)}
-          />
+          {state.recurring && (
+            <>
+              <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5 tw-mb-3">
+                <span className="tw-font-medium">Frequency</span>
+              </div>
+              <ValidatedInput
+                id="frequency"
+                className="tw-w-100"
+                min={props.state.frequencyUnits === FrequencyUnits.Minutes ? 30 : 1}
+                type="number"
+                value={props.state.frequency}
+                setValue={(value) => setState({ ...props.state, frequency: value })}
+                placeholder="Sync Frequency"
+              />
+              <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5 tw-mb-3">
+                <span className="tw-font-medium">Frequency Units</span>
+              </div>
+              <ValidatedDropdownInput
+                className="tw-mt-0 tw-w-100"
+                options={Object.values(FrequencyUnits)}
+                selected={props.state.frequencyUnits}
+                setSelected={(value) => setState({ ...props.state, frequencyUnits: value })}
+                loading={false}
+                placeholder="Frequency Units"
+                noOptionsString="nil"
+                getElementForDisplay={(value) => value.charAt(0).toUpperCase() + value.slice(1)}
+              />
+            </>
+          )}
         </>
       )}
       <Button onClick={saveConfiguration} className="tw-mt-10 tw-w-full tw-h-10">

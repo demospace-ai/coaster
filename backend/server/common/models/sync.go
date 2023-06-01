@@ -39,8 +39,9 @@ type Sync struct {
 
 	// These values are used to override the object settings, but default to the same values
 	SyncMode          SyncMode            `json:"sync_mode"`
-	Frequency         int64               `json:"frequency"`
-	FrequencyUnits    FrequencyUnits      `json:"frequency_units"`
+	Recurring         bool                `json:"recurring"`
+	Frequency         *int64              `json:"frequency,omitempty"`
+	FrequencyUnits    *FrequencyUnits     `json:"frequency_units,omitempty"`
 	SourceCursorField database.NullString `json:"source_cursor_field,omitempty"`
 	SourcePrimaryKey  database.NullString `json:"source_primary_key,omitempty"`
 	CursorPosition    database.NullString `json:"cursor_position"` // current value of the cursor to determine where to start a sync from

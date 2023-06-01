@@ -44,19 +44,20 @@ type FullConnection struct {
 }
 
 type Object struct {
-	ID                 int64                 `json:"id"`
-	DisplayName        string                `json:"display_name"`
-	DestinationID      int64                 `json:"destination_id"`
-	TargetType         models.TargetType     `json:"target_type"`
-	Namespace          *string               `json:"namespace,omitempty"`
-	TableName          *string               `json:"table_name,omitempty"`
-	SyncMode           models.SyncMode       `json:"sync_mode"`
-	CursorField        *string               `json:"cursor_field,omitempty"`
-	PrimaryKey         *string               `json:"primary_key,omitempty"`
-	EndCustomerIDField string                `json:"end_customer_id_field"`
-	Frequency          int64                 `json:"frequency"`
-	FrequencyUnits     models.FrequencyUnits `json:"frequency_units"`
-	ObjectFields       []ObjectField         `json:"object_fields"`
+	ID                 int64                  `json:"id"`
+	DisplayName        string                 `json:"display_name"`
+	DestinationID      int64                  `json:"destination_id"`
+	TargetType         models.TargetType      `json:"target_type"`
+	Namespace          *string                `json:"namespace,omitempty"`
+	TableName          *string                `json:"table_name,omitempty"`
+	SyncMode           models.SyncMode        `json:"sync_mode"`
+	CursorField        *string                `json:"cursor_field,omitempty"`
+	PrimaryKey         *string                `json:"primary_key,omitempty"`
+	EndCustomerIDField string                 `json:"end_customer_id_field"`
+	Recurring          bool                   `json:"recurring"`
+	Frequency          *int64                 `json:"frequency,omitempty"`
+	FrequencyUnits     *models.FrequencyUnits `json:"frequency_units,omitempty"`
+	ObjectFields       []ObjectField          `json:"object_fields"`
 }
 
 type ObjectField struct {
@@ -186,6 +187,7 @@ func ConvertObject(object *models.Object, objectFields []models.ObjectField) Obj
 		TargetType:         object.TargetType,
 		SyncMode:           object.SyncMode,
 		EndCustomerIDField: object.EndCustomerIDField,
+		Recurring:          object.Recurring,
 		Frequency:          object.Frequency,
 		FrequencyUnits:     object.FrequencyUnits,
 		ObjectFields:       viewObjectFields,

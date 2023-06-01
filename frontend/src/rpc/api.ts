@@ -343,8 +343,9 @@ export interface CreateObjectRequest {
   table_name: string;
   end_customer_id_field: string;
   sync_mode: SyncMode;
-  frequency: number;
-  frequency_units: FrequencyUnits;
+  recurring: boolean;
+  frequency?: number;
+  frequency_units?: FrequencyUnits;
   object_fields: ObjectFieldInput[];
   cursor_field?: string; // required for incremental append: need cursor field to detect new data
   primary_key?: string; // required  for incremental update: need primary key to match up rows
@@ -511,6 +512,7 @@ export interface LinkCreateSyncRequest {
   source_cursor_field?: string;
   source_primary_key?: string;
   sync_mode?: SyncMode;
+  recurring?: boolean;
   frequency?: number;
   frequency_units?: FrequencyUnits;
 }
@@ -649,6 +651,7 @@ export interface FabraObject {
   object_fields: ObjectField[];
   end_customer_id_field: string;
   sync_mode: SyncMode;
+  recurring: boolean;
   frequency: number;
   frequency_units: FrequencyUnits;
   cursor_field?: string;

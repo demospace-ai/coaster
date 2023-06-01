@@ -35,6 +35,7 @@ type CreateSyncRequest struct {
 	SourceCursorField *string                `json:"source_cursor_field,omitempty"`
 	SourcePrimaryKey  *string                `json:"source_primary_key,omitempty"`
 	SyncMode          *models.SyncMode       `json:"sync_mode,omitempty"`
+	Recurring         *bool                  `json:"recurring,omitempty"`
 	Frequency         *int64                 `json:"frequency,omitempty"`
 	FrequencyUnits    *models.FrequencyUnits `json:"frequency_units,omitempty"`
 	FieldMappings     []input.FieldMapping   `json:"field_mappings"`
@@ -96,6 +97,7 @@ func (s ApiService) createSync(auth auth.Authentication, createSyncRequest Creat
 	sourceCursorField := getSourceCursorField(object, objectFields, createSyncRequest.FieldMappings)
 	sourcePrimaryKey := getSourcePrimaryKey(object, objectFields, createSyncRequest.FieldMappings)
 	syncMode := object.SyncMode
+	recurring := object.Recurring
 	frequency := object.Frequency
 	frequencyUnits := object.FrequencyUnits
 
@@ -110,11 +112,20 @@ func (s ApiService) createSync(auth auth.Authentication, createSyncRequest Creat
 		if createSyncRequest.SyncMode != nil {
 			syncMode = *createSyncRequest.SyncMode
 		}
+		if createSyncRequest.Recurring != nil {
+			recurring = *createSyncRequest.Recurring
+		}
 		if createSyncRequest.Frequency != nil {
-			frequency = *createSyncRequest.Frequency
+			frequency = createSyncRequest.Frequency
 		}
 		if createSyncRequest.FrequencyUnits != nil {
-			frequencyUnits = *createSyncRequest.FrequencyUnits
+			frequencyUnits = createSyncRequest.FrequencyUnits
+		}
+	}
+
+	if recurring {
+		if *frequency <= 0 || (*frequency < 30 && *frequencyUnits == models.FrequencyUnitsMinutes) {
+			return nil, nil, errors.NewBadRequest("Frequency must be greater than 30 minutes")
 		}
 	}
 
@@ -138,6 +149,7 @@ func (s ApiService) createSync(auth auth.Authentication, createSyncRequest Creat
 		sourceCursorField,
 		sourcePrimaryKey,
 		syncMode,
+		recurring,
 		frequency,
 		frequencyUnits,
 	)
@@ -152,42 +164,57 @@ func (s ApiService) createSync(auth auth.Authentication, createSyncRequest Creat
 		return nil, nil, errors.Wrap(err, "(api.createSync)")
 	}
 
-	c, err := temporal.CreateClient(CLIENT_PEM_KEY, CLIENT_KEY_KEY)
-	if err != nil {
-		return nil, nil, errors.Wrap(err, "(api.createSync)")
-	}
-	defer c.Close()
-	ctx := context.TODO()
-	scheduleClient := c.ScheduleClient()
-	schedule, err := createSchedule(frequency, frequencyUnits)
-	if err != nil {
-		return nil, nil, errors.Wrap(err, "(api.createSync)")
-	}
-
-	_, err = scheduleClient.Create(ctx, client.ScheduleOptions{
-		ID:                 sync.WorkflowID,
-		TriggerImmediately: true,
-		Action: &client.ScheduleWorkflowAction{
-			TaskQueue: temporal.SyncTaskQueue,
-			Workflow:  temporal.SyncWorkflow,
-			Args: []interface{}{temporal.SyncInput{
-				SyncID: sync.ID, OrganizationID: auth.Organization.ID,
-			}},
-		},
-		Spec: client.ScheduleSpec{
-			Intervals: []client.ScheduleIntervalSpec{
-				{
-					Every: schedule,
-				},
-			},
-		},
-	})
+	err = createTemporalWorkflow(sync.ID, auth.Organization.ID, recurring, sync.WorkflowID, frequency, frequencyUnits)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "(api.createSync)")
 	}
 
 	syncView := views.ConvertSync(sync)
 	return &syncView, views.ConvertFieldMappings(fieldMappings, objectFields), nil
+}
+
+func createTemporalWorkflow(syncID int64, organizationID int64, recurring bool, workflowID string, frequency *int64, frequencyUnits *models.FrequencyUnits) error {
+	c, err := temporal.CreateClient(CLIENT_PEM_KEY, CLIENT_KEY_KEY)
+	if err != nil {
+		return errors.Wrap(err, "(api.createTemporalWorkflow)")
+	}
+	defer c.Close()
+	ctx := context.TODO()
+	scheduleClient := c.ScheduleClient()
+
+	scheduleOptions := client.ScheduleOptions{
+		ID:                 workflowID,
+		TriggerImmediately: recurring,
+		Action: &client.ScheduleWorkflowAction{
+			TaskQueue: temporal.SyncTaskQueue,
+			Workflow:  temporal.SyncWorkflow,
+			Args: []interface{}{temporal.SyncInput{
+				SyncID: syncID, OrganizationID: organizationID,
+			}},
+		},
+	}
+
+	if recurring {
+		schedule, err := createSchedule(*frequency, *frequencyUnits)
+		if err != nil {
+			return errors.Wrap(err, "(api.createTemporalWorkflow)")
+		}
+
+		scheduleOptions.Spec = client.ScheduleSpec{
+			Intervals: []client.ScheduleIntervalSpec{
+				{
+					Every: schedule,
+				},
+			},
+		}
+	}
+
+	_, err = scheduleClient.Create(ctx, scheduleOptions)
+	if err != nil {
+		return errors.Wrap(err, "(api.createTemporalWorkflow)")
+	}
+
+	return nil
 }
 
 func createSchedule(frequency int64, frequencyUnits models.FrequencyUnits) (time.Duration, error) {

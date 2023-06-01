@@ -394,7 +394,6 @@ func testDynamoDbConnection(dynamoDbConfig input.DynamoDbConfig) error {
 	}
 
 	return nil
-
 }
 
 func validateTestDataConnectionRequest(request TestDataConnectionRequest) error {

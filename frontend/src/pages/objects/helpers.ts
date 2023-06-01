@@ -33,6 +33,7 @@ export type NewObjectState = {
   cursorField: Field | undefined;
   primaryKey: Field | undefined;
   endCustomerIdField: Field | undefined;
+  recurring: boolean;
   frequency: number | undefined;
   frequencyUnits: FrequencyUnits | undefined;
   objectFields: ObjectFieldInput[];
@@ -64,6 +65,7 @@ export const INITIAL_OBJECT_STATE: NewObjectState = {
   cursorField: undefined,
   primaryKey: undefined,
   endCustomerIdField: undefined,
+  recurring: false,
   frequency: undefined,
   frequencyUnits: undefined,
   objectFields: [],
@@ -250,6 +252,10 @@ export const validateFrequency = (
   state: NewObjectState,
   setState: React.Dispatch<React.SetStateAction<NewObjectState>>,
 ): boolean => {
+  if (state.recurring === false) {
+    return true;
+  }
+
   if (state.frequency === undefined) {
     setState((state) => {
       return { ...state, frequencyError: "Must set frequency" };
@@ -300,6 +306,7 @@ export const initalizeFromExisting = (
     endCustomerIdField: existingObject.end_customer_id_field
       ? getFieldFromName(existingObject.object_fields, existingObject.end_customer_id_field)
       : undefined,
+    recurring: existingObject.recurring,
     frequency: existingObject.frequency,
     frequencyUnits: existingObject.frequency_units,
   };

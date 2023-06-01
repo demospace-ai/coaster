@@ -25,18 +25,19 @@ var VALID_CURSOR_TYPES = map[data.FieldType]bool{
 }
 
 type CreateObjectRequest struct {
-	DisplayName        string                `json:"display_name" validate:"required"`
-	DestinationID      int64                 `json:"destination_id" validate:"required"`
-	TargetType         models.TargetType     `json:"target_type" validate:"required"`
-	Namespace          *string               `json:"namespace,omitempty"`
-	TableName          *string               `json:"table_name,omitempty"`
-	SyncMode           models.SyncMode       `json:"sync_mode" validate:"required"`
-	CursorField        *string               `json:"cursor_field,omitempty"`
-	PrimaryKey         *string               `json:"primary_key,omitempty"`
-	EndCustomerIDField string                `json:"end_customer_id_field" validate:"required"`
-	Frequency          int64                 `json:"frequency" validate:"required"`
-	FrequencyUnits     models.FrequencyUnits `json:"frequency_units" validate:"required"`
-	ObjectFields       []input.ObjectField   `json:"object_fields"`
+	DisplayName        string                 `json:"display_name" validate:"required"`
+	DestinationID      int64                  `json:"destination_id" validate:"required"`
+	TargetType         models.TargetType      `json:"target_type" validate:"required"`
+	Namespace          *string                `json:"namespace,omitempty"`
+	TableName          *string                `json:"table_name,omitempty"`
+	SyncMode           models.SyncMode        `json:"sync_mode" validate:"required"`
+	CursorField        *string                `json:"cursor_field,omitempty"`
+	PrimaryKey         *string                `json:"primary_key,omitempty"`
+	EndCustomerIDField string                 `json:"end_customer_id_field" validate:"required"`
+	Recurring          *bool                  `json:"recurring,omitempty" validate:"required"`
+	Frequency          *int64                 `json:"frequency,omitempty"`
+	FrequencyUnits     *models.FrequencyUnits `json:"frequency_units,omitempty"`
+	ObjectFields       []input.ObjectField    `json:"object_fields"`
 }
 
 type CreateObjectResponse struct {
@@ -59,6 +60,12 @@ func (s ApiService) CreateObject(auth auth.Authentication, w http.ResponseWriter
 	err = validate.Struct(createObjectRequest)
 	if err != nil {
 		return errors.Wrap(err, "(api.CreateObject) validating request")
+	}
+
+	if *createObjectRequest.Recurring {
+		if createObjectRequest.Frequency == nil || createObjectRequest.FrequencyUnits == nil {
+			return errors.Wrap(errors.NewBadRequest("must specify frequency and frequency units for recurring sync"), "(api.CreateObject)")
+		}
 	}
 
 	if createObjectRequest.CursorField != nil {
@@ -87,6 +94,7 @@ func (s ApiService) CreateObject(auth auth.Authentication, w http.ResponseWriter
 		createObjectRequest.CursorField,
 		createObjectRequest.PrimaryKey,
 		createObjectRequest.EndCustomerIDField,
+		*createObjectRequest.Recurring,
 		createObjectRequest.Frequency,
 		createObjectRequest.FrequencyUnits,
 	)
