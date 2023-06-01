@@ -245,9 +245,6 @@ export const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) =
                 getElementForDisplay={(value: Field) => value.name}
                 noOptionsString={"No field available!"}
                 placeholder={"Choose field"}
-                // label={showLabel ? defaultLabel : undefined}
-                // loading={loading}
-                // validated={validated}
               />
             </>
           )}
