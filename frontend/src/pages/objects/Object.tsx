@@ -8,6 +8,7 @@ import {
   syncModeToString,
   TargetType,
   targetTypeToString,
+  toReadableFrequency,
 } from "src/rpc/api";
 import { useObject } from "src/rpc/data";
 
@@ -89,7 +90,7 @@ export const Object: React.FC = () => {
         {object.recurring && (
           <div className="tw-flex tw-flex-row tw-items-center tw-text-base tw-mt-1">
             <span className="tw-font-medium tw-whitespace-pre">Frequency: </span>
-            {object.frequency} {object.frequency_units}
+            {toReadableFrequency(object.frequency, object.frequency_units)}
           </div>
         )}
       </div>

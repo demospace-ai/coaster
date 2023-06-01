@@ -893,6 +893,27 @@ export function syncModeToString(syncMode: SyncMode) {
   }
 }
 
+export function toReadableFrequency(frequency: number, frequencyUnits: FrequencyUnits): string {
+  if (frequency === 1) {
+    return `Every ${toSingularTime(frequencyUnits).toLowerCase()}`;
+  }
+
+  return `Every ${frequency} ${frequencyUnits.toLowerCase()}`;
+}
+
+export function toSingularTime(frequencyUnits: FrequencyUnits): string {
+  switch (frequencyUnits) {
+    case FrequencyUnits.Minutes:
+      return "Minute";
+    case FrequencyUnits.Hours:
+      return "Hour";
+    case FrequencyUnits.Days:
+      return "Day";
+    case FrequencyUnits.Weeks:
+      return "Week";
+  }
+}
+
 export function getConnectionType(connectionType: ConnectionType): string {
   switch (connectionType) {
     case ConnectionType.DynamoDb:
