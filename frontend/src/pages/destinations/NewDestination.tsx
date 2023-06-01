@@ -18,10 +18,10 @@ import {
   CreateDestinationRequest,
   CreateDynamoDbConfigSchema,
   DynamoDbConfigSchema,
+  getConnectionType,
   GetDestinations,
   TestDataConnection,
   TestDataConnectionRequest,
-  getConnectionType,
 } from "src/rpc/api";
 import { forceError } from "src/utils/errors";
 import { useMutation } from "src/utils/queryHelpers";
@@ -678,7 +678,7 @@ const ConnectionTypeSelector: React.FC<ConnectionTypeSelectorProps> = (props) =>
           Webhook
         </button>
         <button className={connectionButton} onClick={() => props.setConnectionType(ConnectionType.DynamoDb)}>
-          <ConnectionImage connectionType={ConnectionType.DynamoDb} className="tw-h-6 tw-mr-1.5" />
+          <ConnectionImage connectionType={ConnectionType.DynamoDb} className="tw-h-5 tw-mr-2" />
           DynamoDB
         </button>
       </div>
