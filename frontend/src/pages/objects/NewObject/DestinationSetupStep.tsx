@@ -33,6 +33,7 @@ const DynamoDbSchema = BaseSchema.extend({
   connectionType: z.literal(ConnectionType.DynamoDb),
   region: z.string(),
   tableName: z.string(),
+  targetType: z.enum([TargetType.SingleExisting]),
 });
 
 const FormSchema = z.discriminatedUnion("connectionType", [WebhookSchema, BigQuerySchema, DynamoDbSchema]);
@@ -77,6 +78,7 @@ function initializeFormState(initial: DestinationSetupProps["initialFormState"])
       displayName: initial?.displayName,
       destination: initial?.destination,
       connectionType: connectionType as ConnectionType.DynamoDb | undefined,
+      targetType: TargetType.SingleExisting,
     };
   } else {
     return {
@@ -109,7 +111,6 @@ export const DestinationSetup: React.FC<DestinationSetupProps> = ({ isUpdate, ha
   });
 
   const connectionType = watch("connectionType");
-  const watchTargetType = watch("targetType");
   const watchDestination = watch("destination");
   const watchNamespace = watch("namespace");
 
