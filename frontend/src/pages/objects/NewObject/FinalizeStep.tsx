@@ -239,7 +239,6 @@ export const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) =
                 options={fields}
                 selected={state.endCustomerIdField}
                 setSelected={(value: Field) => {
-                  console.log("field", value);
                   setState({ ...state, endCustomerIdField: value });
                 }}
                 getElementForDisplay={(value: Field) => value.name}

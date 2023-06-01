@@ -22,6 +22,8 @@ export enum Step {
 
 export type NewObjectState = {
   step: Step;
+
+  // Destination setup step.
   destinationSetupData: {
     displayName: string | undefined;
     destination: Destination | undefined;
@@ -29,6 +31,10 @@ export type NewObjectState = {
     targetType: TargetType | undefined;
     tableName: string | undefined;
   };
+
+  // Object fields step.
+  objectFields: ObjectFieldInput[];
+
   syncMode: SyncMode | undefined;
   cursorField: Field | undefined;
   primaryKey: Field | undefined;
@@ -36,7 +42,6 @@ export type NewObjectState = {
   recurring: boolean;
   frequency: number | undefined;
   frequencyUnits: FrequencyUnits | undefined;
-  objectFields: ObjectFieldInput[];
   fieldsError: string | undefined;
   cursorFieldError: string | undefined;
   endCustomerIdError: string | undefined;
@@ -87,12 +92,32 @@ export const validateAll = (
     frequency: validateFrequency(state, setState),
   };
   const optionalErrors: Record<string, boolean | undefined> = {};
-  if (state.syncMode !== undefined) {
-    optionalErrors.cursorField = !needsCursorField(state.syncMode) ? undefined : validateCursorField(state, setState);
-    optionalErrors.primaryKey = !needsPrimaryKey(state.syncMode) ? undefined : !!state.primaryKey;
-    optionalErrors.endCustomerIdField = !needsEndCustomerId(state.destinationSetupData.targetType!)
-      ? undefined
-      : !!state.endCustomerIdField;
+  if (!state.syncMode) {
+    optionalErrors.syncMode = false;
+    setState((state) => ({
+      ...state,
+      createError: "Must select a sync mode",
+    }));
+    return false;
+  }
+  optionalErrors.cursorField = !needsCursorField(state.syncMode) ? undefined : validateCursorField(state, setState);
+  optionalErrors.primaryKey = !needsPrimaryKey(state.syncMode) ? undefined : !!state.primaryKey;
+  optionalErrors.endCustomerIdField = !needsEndCustomerId(state.destinationSetupData.targetType!)
+    ? undefined
+    : !!state.endCustomerIdField;
+
+  if (optionalErrors.primaryKey === false) {
+    setState((state) => ({
+      ...state,
+      createError: "Must select a primary key",
+    }));
+  }
+
+  if (optionalErrors.endCustomerIdError === false) {
+    setState((state) => ({
+      ...state,
+      createError: "Must set an end customer ID",
+    }));
   }
 
   const isValid =

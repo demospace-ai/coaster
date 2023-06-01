@@ -152,7 +152,6 @@ const validateAll = (
       return true;
     case ConnectionType.DynamoDb: {
       const result = DynamoDbConfigSchema.safeParse(state.dynamoDbConfig);
-      console.log("result", result);
       return result.success;
     }
     case ConnectionType.Redshift:
