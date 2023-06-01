@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { connect } from "http2";
 import { ChangeEvent } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Button } from "src/components/button/Button";
@@ -94,7 +93,6 @@ export const DestinationSetup: React.FC<DestinationSetupProps> = ({ isUpdate, ha
   const form = useForm<FormType>({
     resolver: async (data, context, options) => {
       const errors = await zodResolver(FormSchema)(data, context, options);
-      console.log("errors", errors);
       return errors;
     },
     defaultValues: initializeFormState(initialFormState),
@@ -114,7 +112,6 @@ export const DestinationSetup: React.FC<DestinationSetupProps> = ({ isUpdate, ha
   const connectionType = watch("connectionType");
   const watchDestination = watch("destination");
   const watchNamespace = watch("namespace");
-  const watchTotal = watch();
 
   return (
     <div>
