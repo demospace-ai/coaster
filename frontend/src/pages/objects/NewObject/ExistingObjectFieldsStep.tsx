@@ -85,7 +85,11 @@ const ExistingObjectFieldsForm: React.FC<{
   onComplete: (values: FormSchemaType) => void;
   isUpdate: boolean;
 }> = ({ objectFields, isUpdate, onComplete }) => {
-  const { control, handleSubmit } = useForm<FormSchemaType>({
+  const {
+    control,
+    formState: { errors },
+    handleSubmit,
+  } = useForm<FormSchemaType>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       objectFields,
@@ -169,6 +173,7 @@ const ExistingObjectFieldsForm: React.FC<{
       <Button type="submit" className="tw-mt-6 tw-w-100 tw-h-10">
         Continue
       </Button>
+      {errors.objectFields && <div className="tw-text-red-500">{errors.objectFields.message}</div>}
     </form>
   );
 };
