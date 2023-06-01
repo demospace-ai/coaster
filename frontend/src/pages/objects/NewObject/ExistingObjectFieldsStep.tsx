@@ -5,7 +5,7 @@ import { Button } from "src/components/button/Button";
 import { Input } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { NewObjectState } from "src/pages/objects/helpers";
-import { ObjectField, ObjectFieldInput, ObjectFieldSchema } from "src/rpc/api";
+import { ObjectFieldInput, ObjectFieldSchema } from "src/rpc/api";
 import { useSchema } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
 import { z } from "zod";
@@ -43,9 +43,6 @@ export const ExistingObjectFields: React.FC<ExistingObjectFieldsProps> = ({
     destinationSetupData.tableName,
   );
 
-  // if (schemaQuery.loading) {
-
-  // }
   return (
     <div>
       <div className="tw-w-full tw-text-center tw-mb-2 tw-font-bold tw-text-lg">
