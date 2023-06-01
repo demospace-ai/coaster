@@ -43,8 +43,26 @@ export function DynamoDbInputs({
         className="tw-mt-0 tw-w-full"
       />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
-        <span>Access Key</span>
-        <Tooltip placement="right" interactive label={<div>Access key which can be found in AWS.</div>}>
+        <span>Access Key ID</span>
+        <Tooltip
+          placement="right"
+          interactive
+          label={
+            <div>
+              You can create an access key for a particular user in the AWS console. Fabra requires Read and Write
+              permissions to the DynamoDB table. Find more information{" "}
+              <a
+                className="tw-text-blue-300"
+                href="https://docs.aws.amazon.com/IAM/latest/UserGuide/security-creds.html#access-keys-and-secret-access-keys"
+                target="_blank"
+                rel="noreferrer"
+              >
+                here
+              </a>
+              .
+            </div>
+          }
+        >
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
@@ -57,8 +75,13 @@ export function DynamoDbInputs({
         placeholder="Access Key"
       />
       <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
-        <span>Access Key</span>
-        <Tooltip placement="right" label="This can be obtained in the AWS console." interactive maxWidth={500}>
+        <span>Secret Access Key</span>
+        <Tooltip
+          placement="right"
+          label="This can be obtained in the AWS console after creating your access key."
+          interactive
+          maxWidth={500}
+        >
           <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
         </Tooltip>
       </div>
