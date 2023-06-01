@@ -80,16 +80,38 @@ export const validateAll = (
   state: NewObjectState,
   setState: React.Dispatch<React.SetStateAction<NewObjectState>>,
 ): boolean => {
-  return (
-    validateDisplayName(state, setState) &&
-    validateDestination(state, setState) &&
-    validateFields(state, setState) &&
-    state.syncMode !== undefined &&
-    (!needsCursorField(state.syncMode) || validateCursorField(state, setState)) &&
-    (!needsPrimaryKey(state.syncMode) || state.primaryKey !== undefined) &&
-    (!needsEndCustomerId(state.destinationSetupData.targetType!) || state.endCustomerIdField !== undefined) &&
-    validateFrequency(state, setState)
-  );
+  const errors = {
+    displayName: validateDisplayName(state, setState),
+    destination: validateDestination(state, setState),
+    fields: validateFields(state, setState),
+    frequency: validateFrequency(state, setState),
+  };
+  const optionalErrors: Record<string, boolean | undefined> = {};
+  if (state.syncMode !== undefined) {
+    console.log("endCustomerIdField", state);
+    optionalErrors.cursorField = !needsCursorField(state.syncMode) ? undefined : validateCursorField(state, setState);
+    optionalErrors.primaryKey = !needsPrimaryKey(state.syncMode) ? undefined : !!state.primaryKey;
+    optionalErrors.endCustomerIdField = needsEndCustomerId(state.destinationSetupData.targetType!)
+      ? !!state.endCustomerIdField
+      : undefined;
+  }
+
+  console.log(errors, optionalErrors);
+  const isValid =
+    Object.values(errors).every((value) => value === true) &&
+    Object.values(optionalErrors).every((value) => value === true || value === undefined);
+
+  return isValid;
+  // return (
+  //   validateDisplayName(state, setState) &&
+  //   validateDestination(state, setState) &&
+  //   validateFields(state, setState) &&
+  //   state.syncMode !== undefined &&
+  //   (!needsCursorField(state.syncMode) || validateCursorField(state, setState)) &&
+  //   (!needsPrimaryKey(state.syncMode) || state.primaryKey !== undefined) &&
+  //   (!needsEndCustomerId(state.destinationSetupData.targetType!) || state.endCustomerIdField !== undefined) &&
+  //   validateFrequency(state, setState)
+  // );
 };
 
 export const validateDisplayName = (
@@ -119,7 +141,7 @@ export const validateDestination = (
   state: NewObjectState,
   setState: React.Dispatch<React.SetStateAction<NewObjectState>>,
 ): boolean => {
-  if (state.destinationSetupData.destination === undefined) {
+  if (!state.destinationSetupData.destination) {
     setState((state) => {
       return {
         ...state,
@@ -129,8 +151,9 @@ export const validateDestination = (
     return false;
   }
 
-  if (state.destinationSetupData.destination.connection.connection_type !== ConnectionType.Webhook) {
-    if (state.destinationSetupData.targetType === undefined) {
+  const connectionType = state.destinationSetupData.destination.connection.connection_type;
+  if (connectionType !== ConnectionType.Webhook) {
+    if (!state.destinationSetupData.targetType) {
       setState((state) => {
         return {
           ...state,
@@ -141,7 +164,7 @@ export const validateDestination = (
     }
 
     if (state.destinationSetupData.targetType === TargetType.SingleExisting) {
-      if (state.destinationSetupData.namespace === undefined || state.destinationSetupData.namespace.length <= 0) {
+      if (connectionType !== ConnectionType.DynamoDb && !state.destinationSetupData.namespace) {
         setState((state) => {
           return {
             ...state,
@@ -151,7 +174,7 @@ export const validateDestination = (
         return false;
       }
 
-      if (state.destinationSetupData.tableName === undefined || state.destinationSetupData.tableName.length <= 0) {
+      if (!state.destinationSetupData.tableName) {
         setState((state) => {
           return {
             ...state,

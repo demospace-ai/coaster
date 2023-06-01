@@ -31,7 +31,6 @@ const BigQuerySchema = BaseSchema.extend({
 
 const DynamoDbSchema = BaseSchema.extend({
   connectionType: z.literal(ConnectionType.DynamoDb),
-  region: z.string(),
   tableName: z.string(),
   targetType: z.enum([TargetType.SingleExisting]),
 });
@@ -77,6 +76,7 @@ function initializeFormState(initial: DestinationSetupProps["initialFormState"])
     return {
       displayName: initial?.displayName,
       destination: initial?.destination,
+      tableName: initial?.tableName,
       connectionType: connectionType as ConnectionType.DynamoDb | undefined,
       targetType: TargetType.SingleExisting,
     };
@@ -94,6 +94,7 @@ export const DestinationSetup: React.FC<DestinationSetupProps> = ({ isUpdate, ha
   const form = useForm<FormType>({
     resolver: async (data, context, options) => {
       const errors = await zodResolver(FormSchema)(data, context, options);
+      console.log("errors", errors);
       return errors;
     },
     defaultValues: initializeFormState(initialFormState),
@@ -113,6 +114,7 @@ export const DestinationSetup: React.FC<DestinationSetupProps> = ({ isUpdate, ha
   const connectionType = watch("connectionType");
   const watchDestination = watch("destination");
   const watchNamespace = watch("namespace");
+  const watchTotal = watch();
 
   return (
     <div>
@@ -167,23 +169,21 @@ export const DestinationSetup: React.FC<DestinationSetupProps> = ({ isUpdate, ha
           />
           {errors.destination && <div className="tw-text-red-500 tw-mt-1">{errors.destination.message}</div>}
         </div>
-        {connectionType === ConnectionType.BigQuery ||
-          (connectionType === ConnectionType.DynamoDb && (
-            <ObjectTargetFieldset control={control} errors={errors} disabled={isUpdate} />
-          ))}
+        {(connectionType === ConnectionType.BigQuery || connectionType === ConnectionType.DynamoDb) && (
+          <ObjectTargetFieldset control={control} errors={errors} disabled={isUpdate} />
+        )}
         {connectionType === ConnectionType.BigQuery && (
           <NamespaceField control={control} destination={watchDestination} errors={errors} isUpdate={isUpdate} />
         )}
-        {connectionType === ConnectionType.BigQuery ||
-          (connectionType === ConnectionType.DynamoDb && (
-            <TableField
-              control={control}
-              connection={watchDestination.connection}
-              errors={errors}
-              isUpdate={isUpdate}
-              namespace={watchNamespace}
-            />
-          ))}
+        {(connectionType === ConnectionType.BigQuery || connectionType === ConnectionType.DynamoDb) && (
+          <TableField
+            control={control}
+            connection={watchDestination.connection}
+            errors={errors}
+            isUpdate={isUpdate}
+            namespace={watchNamespace}
+          />
+        )}
 
         <Button type="submit" className="tw-w-full tw-py-2">
           Continue
