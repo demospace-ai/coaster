@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BackButton } from "src/components/button/Button";
 import {
   initalizeFromExisting,
-  initializeFromDestination,
   INITIAL_OBJECT_STATE,
+  initializeFromDestination,
   NewObjectState,
   Step,
 } from "src/pages/objects/helpers";
@@ -13,7 +13,6 @@ import { ExistingObjectFields } from "src/pages/objects/NewObject/ExistingObject
 import { Finalize } from "src/pages/objects/NewObject/FinalizeStep";
 import { NewObjectFields } from "src/pages/objects/NewObject/NewObjectFieldsStep";
 import { Destination, FabraObject, Field, FieldType, shouldCreateFields, TargetType } from "src/rpc/api";
-import { useSchema } from "src/rpc/data";
 
 export type NewObjectProps = {
   existingObject?: FabraObject;
@@ -33,41 +32,11 @@ export const NewObject: React.FC<NewObjectProps> = (props) => {
       : INITIAL_OBJECT_STATE,
   );
 
-  // const { schema } = useSchema(
-  //   state.destinationSetupData.destination?.connection.id,
-  //   state.destinationSetupData.namespace,
-  //   state.destinationSetupData.tableName,
-  // );
   const onComplete = props.onComplete
     ? props.onComplete
     : () => {
         navigate("/objects");
       };
-
-  // useEffect(() => {
-  //   // No need to initialize object fields from the schema if we're updating an existing object
-  //   if (props.existingObject) {
-  //     return;
-  //   }
-
-  //   if (schema) {
-  //     const objectFields = schema.map((field) => {
-  //       // automatically omit end customer ID field
-  //       return {
-  //         name: field.name,
-  //         type: field.type,
-  //         omit: false,
-  //         optional: false,
-  //       };
-  //     });
-  //     setState((state) => {
-  //       return {
-  //         ...state,
-  //         objectFields: objectFields,
-  //       };
-  //     });
-  //   }
-  // }, [schema, props.existingObject]);
 
   let content: React.ReactElement;
   let back: () => void;
