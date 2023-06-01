@@ -33,41 +33,41 @@ export const NewObject: React.FC<NewObjectProps> = (props) => {
       : INITIAL_OBJECT_STATE,
   );
 
-  const { schema } = useSchema(
-    state.destinationSetupData.destination?.connection.id,
-    state.destinationSetupData.namespace,
-    state.destinationSetupData.tableName,
-  );
+  // const { schema } = useSchema(
+  //   state.destinationSetupData.destination?.connection.id,
+  //   state.destinationSetupData.namespace,
+  //   state.destinationSetupData.tableName,
+  // );
   const onComplete = props.onComplete
     ? props.onComplete
     : () => {
         navigate("/objects");
       };
 
-  useEffect(() => {
-    // No need to initialize object fields from the schema if we're updating an existing object
-    if (props.existingObject) {
-      return;
-    }
+  // useEffect(() => {
+  //   // No need to initialize object fields from the schema if we're updating an existing object
+  //   if (props.existingObject) {
+  //     return;
+  //   }
 
-    if (schema) {
-      const objectFields = schema.map((field) => {
-        // automatically omit end customer ID field
-        return {
-          name: field.name,
-          type: field.type,
-          omit: false,
-          optional: false,
-        };
-      });
-      setState((state) => {
-        return {
-          ...state,
-          objectFields: objectFields,
-        };
-      });
-    }
-  }, [schema, props.existingObject]);
+  //   if (schema) {
+  //     const objectFields = schema.map((field) => {
+  //       // automatically omit end customer ID field
+  //       return {
+  //         name: field.name,
+  //         type: field.type,
+  //         omit: false,
+  //         optional: false,
+  //       };
+  //     });
+  //     setState((state) => {
+  //       return {
+  //         ...state,
+  //         objectFields: objectFields,
+  //       };
+  //     });
+  //   }
+  // }, [schema, props.existingObject]);
 
   let content: React.ReactElement;
   let back: () => void;

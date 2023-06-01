@@ -24,7 +24,6 @@ const FormSchema = z.object({
 
 interface NewObjectFieldsProps {
   isUpdate?: boolean;
-  // destinationSetupData: NewObjectState["destinationSetupData"];
   initialFormState: InitialFormState;
   onComplete: (values: FormSchemaType) => void;
 }

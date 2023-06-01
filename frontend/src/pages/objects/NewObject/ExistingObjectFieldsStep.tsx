@@ -36,7 +36,6 @@ export const ExistingObjectFields: React.FC<ExistingObjectFieldsProps> = ({
   isUpdate,
   onComplete,
 }) => {
-  console.log("destinationSetupData", destinationSetupData);
   const schemaQuery = useSchema(
     destinationSetupData.destination?.connection.id,
     destinationSetupData.namespace,
