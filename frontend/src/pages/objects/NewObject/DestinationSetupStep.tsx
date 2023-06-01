@@ -142,14 +142,15 @@ export const DestinationSetup: React.FC<DestinationSetupProps> = ({ isUpdate, ha
                   className="tw-mt-0"
                   destination={field.value}
                   setDestination={(d) => {
+                    const connectionType = d.connection.connection_type;
                     field.onChange(d);
-                    if (d.connection.connection_type === ConnectionType.Webhook) {
+                    if (connectionType === ConnectionType.Webhook) {
                       form.setValue("targetType", TargetType.Webhook);
                     } else {
                       form.setValue("targetType", TargetType.SingleExisting);
                     }
-                    const connectionType = d.connection.connection_type;
-                    if (connectionType && !allowedConnectionTypes.includes(connectionType as AllowedConnectionType)) {
+
+                    if (!allowedConnectionTypes.includes(connectionType as AllowedConnectionType)) {
                       form.setError("destination", {
                         message: "This destination is not supported.",
                       });
@@ -165,21 +166,23 @@ export const DestinationSetup: React.FC<DestinationSetupProps> = ({ isUpdate, ha
           />
           {errors.destination && <div className="tw-text-red-500 tw-mt-1">{errors.destination.message}</div>}
         </div>
-        {connectionType === ConnectionType.BigQuery && (
-          <ObjectTargetFieldset control={control} errors={errors} disabled={isUpdate} />
-        )}
+        {connectionType === ConnectionType.BigQuery ||
+          (connectionType === ConnectionType.DynamoDb && (
+            <ObjectTargetFieldset control={control} errors={errors} disabled={isUpdate} />
+          ))}
         {connectionType === ConnectionType.BigQuery && (
           <NamespaceField control={control} destination={watchDestination} errors={errors} isUpdate={isUpdate} />
         )}
-        {connectionType === ConnectionType.BigQuery && (
-          <TableField
-            control={control}
-            connection={watchDestination.connection}
-            errors={errors}
-            isUpdate={isUpdate}
-            namespace={watchNamespace}
-          />
-        )}
+        {connectionType === ConnectionType.BigQuery ||
+          (connectionType === ConnectionType.DynamoDb && (
+            <TableField
+              control={control}
+              connection={watchDestination.connection}
+              errors={errors}
+              isUpdate={isUpdate}
+              namespace={watchNamespace}
+            />
+          ))}
 
         <Button type="submit" className="tw-w-full tw-py-2">
           Continue
@@ -234,7 +237,7 @@ function TableField({
   errors,
   isUpdate,
 }: {
-  namespace: string | undefined;
+  namespace?: string | undefined;
   control: Control;
   connection: Connection;
   errors: Errors;

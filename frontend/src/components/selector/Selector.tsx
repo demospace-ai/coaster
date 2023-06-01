@@ -124,8 +124,8 @@ type TableSelectorProps = Omit<
   Partial<ValidatedComboInputProps>,
   "selected" | "setSelected" | "getElementForDisplay" | "loading"
 > & {
-  connection: Connection | undefined;
-  namespace: string | undefined;
+  connection: Connection;
+  namespace?: string | undefined;
   tableName: string | undefined;
   setTableName: (tableName: string) => void;
   showLabel?: boolean;
@@ -145,7 +145,11 @@ export const TableSelector: React.FC<TableSelectorProps> = (props) => {
     label,
     ...other
   } = props;
-  const { tables, loading } = useTables(connection?.id, namespace);
+  const { tables, loading } = useTables({
+    connectionID: connection.id,
+    namespace,
+    connectionType: connection.connection_type,
+  });
   const defaultLabel = label ? label : "Table";
 
   return (
@@ -163,6 +167,36 @@ export const TableSelector: React.FC<TableSelectorProps> = (props) => {
     />
   );
 };
+
+// type DynamoDbSelectorProps = Omit<
+//   Partial<ValidatedComboInputProps>,
+//   "selected" | "setSelected" | "getElementForDisplay" | "loading"
+// > & {
+//   connection: Connection;
+//   tableName: string | undefined;
+//   setTableName: (tableName: string) => void;
+//   showLabel?: boolean;
+// };
+
+// export const DynamoDbTableSelector: React.FC<DynamoDbSelectorProps> = (props) => {
+//   const { connection, tableName, setTableName, showLabel, className, validated, label, ...other } = props;
+//   const { tables, loading } = useDynamoDbTables(connection.id);
+
+//   return (
+//     <ValidatedComboInput
+//       className={className}
+//       selected={tableName}
+//       setSelected={setTableName}
+//       options={[]}
+//       loading={false}
+//       noOptionsString={"No tables available!"}
+//       placeholder={"Choose table"}
+//       label={showLabel ? label : undefined}
+//       validated={validated}
+//       {...other}
+//     />
+//   );
+// };
 
 type SourceSelectorProps = Omit<
   Partial<ValidatedDropdownInputProps>,

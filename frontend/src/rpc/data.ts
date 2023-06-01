@@ -1,5 +1,6 @@
 import { sendLinkTokenRequest, sendRequest } from "src/rpc/ajax";
 import {
+  ConnectionType,
   GetAllUsers,
   GetAllUsersResponse,
   GetApiKey,
@@ -122,19 +123,32 @@ export function useNamespaces(connectionID: number | undefined) {
   return { namespaces: data?.namespaces, mutate, error, loading: isLoading || isValidating };
 }
 
-export function useTables(connectionID: number | undefined, namespace: string | undefined) {
+export function useTables({
+  connectionID,
+  connectionType,
+  namespace,
+}: {
+  connectionID: number | undefined;
+  connectionType: ConnectionType;
+  namespace?: string | undefined;
+}) {
   const fetcher: Fetcher<GetTablesResponse, { connectionID: number; namespace: string }> = (payload: {
     connectionID: number;
     namespace: string;
   }) => sendRequest(GetTables, payload);
-  const shouldFetch = connectionID && namespace;
+  let shouldFetch = false;
+  if (connectionType === ConnectionType.DynamoDb) {
+    shouldFetch = !!connectionID;
+  } else {
+    shouldFetch = !!(connectionID && namespace);
+  }
+
   const { data, mutate, error, isLoading, isValidating } = useSWR(
     shouldFetch ? { GetTables, connectionID, namespace } : null,
     fetcher,
   );
   return { tables: data?.tables, mutate, error, loading: isLoading || isValidating };
 }
-
 export function useSyncs() {
   const fetcher: Fetcher<GetSyncsResponse, {}> = () => sendRequest(GetSyncs);
   const { data, mutate, error, isLoading, isValidating } = useSWR({ GetSyncs }, fetcher);

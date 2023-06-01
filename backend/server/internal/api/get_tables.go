@@ -8,6 +8,7 @@ import (
 
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/errors"
+	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/repositories/connections"
 )
 
@@ -31,15 +32,16 @@ func (s ApiService) GetTables(auth auth.Authentication, w http.ResponseWriter, r
 		return errors.Wrap(err, "(api.GetTables)")
 	}
 
-	namespace := r.URL.Query().Get("namespace")
-	if len(namespace) == 0 {
-		return errors.Newf("(api.GetTables) missing namespace from GetTables request URL: %s", r.URL.RequestURI())
-	}
-
 	// TODO: write test to make sure only authorized users can use the data connection
 	connection, err := connections.LoadConnectionByID(s.db, auth.Organization.ID, connectionID)
 	if err != nil {
 		return errors.Wrap(err, "(api.GetTables)")
+	}
+
+	namespace := r.URL.Query().Get("namespace")
+
+	if connection.ConnectionType != models.ConnectionTypeDynamoDb && len(namespace) == 0 {
+		return errors.Newf("(api.GetTables) missing namespace from GetTables request URL: %s", r.URL.RequestURI())
 	}
 
 	tables, err := s.queryService.GetTables(ctx, connection, namespace)
