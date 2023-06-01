@@ -825,7 +825,6 @@ export enum SyncRunStatus {
 }
 
 export const needsCursorField = (syncMode: SyncMode): boolean => {
-  // no default so it isn"t possible to add a new mode without updating
   switch (syncMode) {
     case SyncMode.FullOverwrite:
       return false;
@@ -837,7 +836,6 @@ export const needsCursorField = (syncMode: SyncMode): boolean => {
 };
 
 export const needsPrimaryKey = (syncMode: SyncMode): boolean => {
-  // no default so it isn"t possible to add a new mode without updating
   switch (syncMode) {
     case SyncMode.FullOverwrite:
       return false;
@@ -849,7 +847,6 @@ export const needsPrimaryKey = (syncMode: SyncMode): boolean => {
 };
 
 export const needsEndCustomerId = (targetType: TargetType): boolean => {
-  // no default so it isn"t possible to add a new mode without updating
   switch (targetType) {
     case TargetType.Webhook:
       return false;
@@ -861,7 +858,6 @@ export const needsEndCustomerId = (targetType: TargetType): boolean => {
 };
 
 export const shouldCreateFields = (connectionType: ConnectionType, targetType: TargetType): boolean => {
-  // no default so it isn"t possible to add a new mode without updating
   if (connectionType === ConnectionType.Webhook || connectionType === ConnectionType.DynamoDb) {
     return true;
   }

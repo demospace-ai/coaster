@@ -88,30 +88,18 @@ export const validateAll = (
   };
   const optionalErrors: Record<string, boolean | undefined> = {};
   if (state.syncMode !== undefined) {
-    console.log("endCustomerIdField", state);
     optionalErrors.cursorField = !needsCursorField(state.syncMode) ? undefined : validateCursorField(state, setState);
     optionalErrors.primaryKey = !needsPrimaryKey(state.syncMode) ? undefined : !!state.primaryKey;
-    optionalErrors.endCustomerIdField = needsEndCustomerId(state.destinationSetupData.targetType!)
-      ? !!state.endCustomerIdField
-      : undefined;
+    optionalErrors.endCustomerIdField = !needsEndCustomerId(state.destinationSetupData.targetType!)
+      ? undefined
+      : !!state.endCustomerIdField;
   }
 
-  console.log(errors, optionalErrors);
   const isValid =
     Object.values(errors).every((value) => value === true) &&
     Object.values(optionalErrors).every((value) => value === true || value === undefined);
 
   return isValid;
-  // return (
-  //   validateDisplayName(state, setState) &&
-  //   validateDestination(state, setState) &&
-  //   validateFields(state, setState) &&
-  //   state.syncMode !== undefined &&
-  //   (!needsCursorField(state.syncMode) || validateCursorField(state, setState)) &&
-  //   (!needsPrimaryKey(state.syncMode) || state.primaryKey !== undefined) &&
-  //   (!needsEndCustomerId(state.destinationSetupData.targetType!) || state.endCustomerIdField !== undefined) &&
-  //   validateFrequency(state, setState)
-  // );
 };
 
 export const validateDisplayName = (
