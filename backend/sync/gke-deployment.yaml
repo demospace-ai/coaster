@@ -23,8 +23,8 @@ spec:
         image: "us-docker.pkg.dev/fabra-344902/fabra-sync/sync:latest"
         resources:
           requests:
-            cpu: "4"
-            memory: "16Gi"
+            cpu: "1"
+            memory: "2Gi"
             ephemeral-storage: "1Gi"
         env:
         - name: IS_PROD
