@@ -27,14 +27,15 @@ func CreateObject(
 ) (*models.Object, error) {
 
 	object := models.Object{
-		OrganizationID: organizationID,
-		DisplayName:    displayName,
-		DestinationID:  destinationID,
-		TargetType:     targetType,
-		SyncMode:       syncMode,
-		Recurring:      recurring,
-		Frequency:      frequency,
-		FrequencyUnits: frequencyUnits,
+		OrganizationID:     organizationID,
+		DisplayName:        displayName,
+		DestinationID:      destinationID,
+		TargetType:         targetType,
+		SyncMode:           syncMode,
+		EndCustomerIDField: endCustomerIDColumn,
+		Recurring:          recurring,
+		Frequency:          frequency,
+		FrequencyUnits:     frequencyUnits,
 	}
 
 	if namespace != nil {

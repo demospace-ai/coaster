@@ -1,5 +1,8 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { ChangeEvent } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { FormError } from "src/components/FormError";
 import { Button } from "src/components/button/Button";
 import { Checkbox } from "src/components/checkbox/Checkbox";
 import { InfoIcon } from "src/components/icons/Icons";
@@ -8,137 +11,90 @@ import { Loading } from "src/components/loading/Loading";
 import { useShowToast } from "src/components/notifications/Notifications";
 import { FieldSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
-import { NewObjectState, validateAll } from "src/pages/objects/helpers";
-import { ObjectStepProps } from "src/pages/objects/NewObject/state";
-import { sendRequest } from "src/rpc/ajax";
 import {
-  ConnectionType,
-  CreateObject,
-  CreateObjectRequest,
-  FabraObject,
-  Field,
-  FrequencyUnits,
-  GetObjects,
-  SyncMode,
-  UpdateObject,
-  UpdateObjectFields,
-  UpdateObjectFieldsRequest,
-  UpdateObjectFieldsResponse,
-  UpdateObjectRequest,
-  UpdateObjectResponse,
-} from "src/rpc/api";
-import { forceError } from "src/utils/errors";
+  DestinationSetupFormType,
+  FinalizeObjectFormSchema,
+  FinalizeObjectFormType,
+  ObjectFieldsFormType,
+  createDummyWebhookCustomerIdField,
+  createNewObject,
+  updateObject,
+} from "src/pages/objects/helpers";
+import { ConnectionType, FabraObject, Field, FieldType, FrequencyUnits, GetObjects, SyncMode } from "src/rpc/api";
 import { useMutation } from "src/utils/queryHelpers";
 import { mutate } from "swr";
 
 type FinalizeStepProps = {
   existingObject?: FabraObject;
+  objectFields: ObjectFieldsFormType;
+  destinationSetup: DestinationSetupFormType;
+  isUpdate: boolean;
+  initialFormState?: FinalizeObjectFormType;
   onComplete: () => void;
 };
 
-export const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) => {
-  const { state, setState } = props;
+export const Finalize: React.FC<FinalizeStepProps> = ({
+  objectFields,
+  existingObject,
+  isUpdate,
+  destinationSetup,
+  initialFormState,
+}) => {
+  const {
+    control,
+    formState: { errors },
+    watch,
+    setValue,
+    setError,
+    clearErrors,
+    handleSubmit,
+  } = useForm<FinalizeObjectFormType>({
+    resolver: zodResolver(FinalizeObjectFormSchema),
+    defaultValues: {
+      ...initialFormState,
+      endCustomerIdField: initialFormState?.endCustomerIdField
+        ? initialFormState.endCustomerIdField
+        : destinationSetup.connectionType === ConnectionType.Webhook
+        ? createDummyWebhookCustomerIdField()
+        : undefined,
+    },
+  });
   const showToast = useShowToast();
   const navigate = useNavigate();
-  const connectionType = props.state.destinationSetupData.destination?.connection.connection_type;
-
-  const createNewObject = async (state: NewObjectState) => {
-    const payload: CreateObjectRequest = {
-      display_name: state.destinationSetupData.displayName!,
-      destination_id: state.destinationSetupData.destination!.id,
-      target_type: state.destinationSetupData.targetType!,
-      namespace: state.destinationSetupData.namespace!,
-      table_name: state.destinationSetupData.tableName!,
-      sync_mode: state.syncMode!,
-      cursor_field: state.cursorField && state.cursorField.name,
-      primary_key: state.primaryKey && state.primaryKey.name,
-      // @ts-ignore Need to fix this soon.
-      end_customer_id_field: state.endCustomerIdField && state.endCustomerIdField.name,
-      recurring: state.recurring,
-      frequency: state.frequency!,
-      frequency_units: state.frequencyUnits!,
-      object_fields: state.objectFields,
-    };
-    const object = await sendRequest(CreateObject, payload);
-    return object.object;
-  };
-
-  const updateObject = async (newObj: NewObjectState) => {
-    if (!props.existingObject) {
-      throw new Error("Cannot update object without existing object");
-    }
-
-    // For object field updates, we need to compute the change sets.
-    // TODO: support adding and removing fields when updating objects
-    const updatedFields = newObj.objectFields.filter((field) =>
-      props.existingObject?.object_fields?.find((existingField) => existingField.name === field.name),
-    );
-
-    const [updateObjectResponse, _] = await Promise.all([
-      sendRequest<UpdateObjectRequest, UpdateObjectResponse>(UpdateObject, {
-        objectID: Number(props.existingObject?.id),
-        display_name: newObj.destinationSetupData.displayName,
-        destination_id: newObj.destinationSetupData.destination?.id,
-        target_type: newObj.destinationSetupData.targetType,
-        namespace: newObj.destinationSetupData.namespace,
-        table_name: newObj.destinationSetupData.tableName,
-        sync_mode: newObj.syncMode,
-        cursor_field: newObj.cursorField?.name,
-        end_customer_id_field: newObj.endCustomerIdField?.name,
-        recurring: newObj.recurring,
-        frequency: newObj.frequency,
-        frequency_units: newObj.frequencyUnits,
-      }),
-      sendRequest<UpdateObjectFieldsRequest, UpdateObjectFieldsResponse>(UpdateObjectFields, {
-        objectID: Number(props.existingObject?.id),
-        object_fields: updatedFields as UpdateObjectFieldsRequest["object_fields"],
-      }),
-    ]);
-
-    return updateObjectResponse.object;
-  };
+  const connectionType = destinationSetup.destination.connection.connection_type;
 
   const saveConfigurationMutation = useMutation(
-    async () => {
-      if (props.existingObject) {
-        return await updateObject(state);
+    async (values) => {
+      if (existingObject) {
+        return await updateObject({ existingObject, objectFields, destinationSetup, finalizeValues: values });
       } else {
-        return await createNewObject(state);
+        return await createNewObject({ objectFields, destinationSetup, finalizeValues: values });
       }
     },
     {
       onSuccess: (object) => {
-        showToast("success", props.isUpdate ? "Successfully updated object!" : "Successfully created object!", 4000);
+        showToast("success", isUpdate ? "Successfully updated object!" : "Successfully created object!", 4000);
         navigate(`/objects/${object.id}`);
         mutate({ GetObjects: GetObjects });
       },
       onError: (e) => {
-        showToast("error", props.isUpdate ? "Failed to update object." : "Failed to create object.", 4000);
-        const err = forceError(e);
-        setState((state) => ({ ...state, createError: err?.message ?? "Failed to save object" }));
+        showToast("error", isUpdate ? "Failed to update object." : "Failed to create object.", 4000);
+        // Sets the form-level error message.
+        setError("root.createObject", { message: e.message });
       },
     },
   );
 
-  const saveConfiguration = () => {
-    if (!validateAll(state, setState)) {
-      console.error("Validation failed");
-      return;
-    }
+  const fields: Field[] = objectFields.objectFields
+    .filter((field) => field.name && field.type && !field.omit && !field.optional)
+    .map((field) => {
+      return { name: field.name, type: field.type };
+    });
 
-    saveConfigurationMutation.mutate();
-  };
-
-  const fields: Field[] = state.objectFields
-    ? state.objectFields
-        .filter((field) => field.name && field.type && !field.omit && !field.optional)
-        .map((field) => {
-          return { name: field.name!, type: field.type! };
-        })
-    : [];
-
+  const syncMode = watch("syncMode");
+  const recurring = watch("recurring");
   let recommendedCursor = <></>;
-  switch (state.syncMode!) {
+  switch (syncMode) {
     case SyncMode.IncrementalAppend:
       recommendedCursor = (
         <>
@@ -160,11 +116,36 @@ export const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) =
   }
 
   return (
-    <div className="tw-flex tw-flex-col tw-w-100">
+    <form
+      className="tw-flex tw-flex-col tw-w-100"
+      onSubmit={handleSubmit((values) => {
+        clearErrors("root.createObject");
+        saveConfigurationMutation.mutate(values);
+      })}
+    >
       <div className="tw-w-full tw-text-center tw-mb-2 tw-font-bold tw-text-lg">Object Settings</div>
       <div className="tw-text-center tw-mb-3">Enter default settings for object syncs.</div>
-      <SyncModeSelector state={state} setState={setState} isUpdate={props.isUpdate} />
-      {[SyncMode.IncrementalAppend, SyncMode.IncrementalUpdate].includes(state.syncMode!) && (
+      <Controller
+        control={control}
+        name="syncMode"
+        render={({ field }) => (
+          <>
+            <SyncModeSelector
+              value={field.value}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === SyncMode.FullOverwrite) {
+                  setValue("cursorField", undefined);
+                }
+                field.onChange(value);
+              }}
+              disabled={isUpdate}
+            />
+          </>
+        )}
+      />
+      <FormError message={errors.syncMode?.message} />
+      {[SyncMode.IncrementalAppend, SyncMode.IncrementalUpdate].includes(syncMode) && (
         <>
           <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5 tw-mb-3">
             <span className="tw-font-medium">Cursor Field</span>
@@ -182,23 +163,28 @@ export const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) =
               <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
             </Tooltip>
           </div>
-          <FieldSelector
-            className="tw-mt-0 tw-w-100"
-            field={state.cursorField}
-            setField={(value: Field) => {
-              setState({ ...state, cursorField: value });
-            }}
-            placeholder="Cursor Field"
-            label="Cursor Field"
-            noOptionsString="No Fields Available!"
-            predefinedFields={fields}
-            validated={true}
-            valid={state.cursorFieldError !== undefined ? false : undefined}
-            disabled={!!props.existingObject}
+          <Controller
+            control={control}
+            name="cursorField"
+            render={({ field }) => (
+              <FieldSelector
+                className="tw-mt-0 tw-w-100"
+                field={field.value}
+                setField={field.onChange}
+                placeholder="Cursor Field"
+                label="Cursor Field"
+                noOptionsString="No Fields Available!"
+                predefinedFields={fields}
+                validated={true}
+                valid={!errors.cursorField}
+                disabled={!!existingObject}
+              />
+            )}
           />
+          <FormError message={errors.cursorField?.message} />
         </>
       )}
-      {[SyncMode.IncrementalUpdate].includes(state.syncMode!) && (
+      {[SyncMode.IncrementalUpdate].includes(syncMode) && (
         <>
           <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5 tw-mb-3">
             <span className="tw-font-medium">Primary Key</span>
@@ -210,41 +196,53 @@ export const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) =
               <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
             </Tooltip>
           </div>
-          <FieldSelector
-            className="tw-mt-0 tw-w-100"
-            field={state.primaryKey}
-            setField={(value: Field) => {
-              setState({ ...state, primaryKey: value });
-            }}
-            placeholder="Primary Key"
-            noOptionsString="No Fields Available!"
-            validated={true}
-            predefinedFields={fields}
-            disabled={!!props.existingObject}
+          <Controller
+            name="primaryKey"
+            control={control}
+            render={({ field }) => (
+              <>
+                <FieldSelector
+                  className="tw-mt-0 tw-w-100"
+                  field={field.value}
+                  setField={field.onChange}
+                  placeholder="Primary Key"
+                  noOptionsString="No Fields Available!"
+                  validated={true}
+                  predefinedFields={fields}
+                  disabled={!!existingObject}
+                />
+              </>
+            )}
           />
+          <FormError message={errors.primaryKey?.message} />
         </>
       )}
-      {state.syncMode !== undefined && (
+      {syncMode && (
         <>
           {connectionType === ConnectionType.DynamoDb && (
             <>
               <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5">
                 <span className="tw-font-medium">End Customer ID</span>
               </div>
-              <ValidatedComboInput
-                className="tw-mt-3"
-                loading={false}
-                validated={true}
-                disabled={!!props.existingObject}
-                options={fields}
-                selected={state.endCustomerIdField}
-                setSelected={(value: Field) => {
-                  setState({ ...state, endCustomerIdField: value });
-                }}
-                getElementForDisplay={(value: Field) => value.name}
-                noOptionsString={"No field available!"}
-                placeholder={"Choose field"}
+              <Controller
+                name="endCustomerIdField"
+                control={control}
+                render={({ field }) => (
+                  <ValidatedComboInput
+                    className="tw-mt-3"
+                    loading={false}
+                    validated={true}
+                    disabled={!!existingObject}
+                    options={fields}
+                    selected={field.value}
+                    setSelected={field.onChange}
+                    getElementForDisplay={(value: Field) => value.name}
+                    noOptionsString={"No field available!"}
+                    placeholder={"Choose field"}
+                  />
+                )}
               />
+              <FormError message={errors.endCustomerIdField?.message} />
             </>
           )}
           {connectionType !== ConnectionType.Webhook && connectionType !== ConnectionType.DynamoDb && (
@@ -252,69 +250,102 @@ export const Finalize: React.FC<ObjectStepProps & FinalizeStepProps> = (props) =
               <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5">
                 <span className="tw-font-medium">End Customer ID</span>
               </div>
-              <FieldSelector
-                className="tw-mt-0 tw-w-100"
-                field={state.endCustomerIdField}
-                setField={(value: Field) => {
-                  setState({ ...state, endCustomerIdField: value });
-                }}
-                placeholder="End Customer ID Field"
-                noOptionsString="No Fields Available!"
-                validated={true}
-                connection={state.destinationSetupData.destination?.connection}
-                namespace={state.destinationSetupData.namespace}
-                tableName={state.destinationSetupData.tableName}
-                disabled={!!props.existingObject}
+              <Controller
+                control={control}
+                name="endCustomerIdField"
+                render={({ field }) => (
+                  <FieldSelector
+                    className="tw-mt-0 tw-w-100"
+                    field={field.value}
+                    setField={field.onChange}
+                    placeholder="End Customer ID Field"
+                    noOptionsString="No Fields Available!"
+                    validated={true}
+                    connection={destinationSetup.destination.connection}
+                    namespace={"namespace" in destinationSetup ? destinationSetup.namespace : undefined}
+                    tableName={"tableName" in destinationSetup ? destinationSetup.tableName : undefined}
+                    disabled={!!existingObject}
+                  />
+                )}
               />
+              <FormError message={errors.endCustomerIdField?.message} />
             </>
           )}
           <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-6">
             <span className="tw-font-medium">Recurring?</span>
-            <Checkbox
-              className="tw-ml-2 tw-h-4 tw-w-4"
-              checked={Boolean(state.recurring)}
-              onCheckedChange={() => setState((state) => ({ ...state, recurring: !state.recurring }))}
+            <Controller
+              control={control}
+              name="recurring"
+              defaultValue={false}
+              render={({ field }) => (
+                <Checkbox
+                  className="tw-ml-2 tw-h-4 tw-w-4"
+                  checked={field.value}
+                  onCheckedChange={() => field.onChange(!field.value)}
+                />
+              )}
             />
           </div>
-          {state.recurring && (
+          {recurring && (
             <>
               <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5 tw-mb-3">
                 <span className="tw-font-medium">Frequency</span>
               </div>
-              <ValidatedInput
-                id="frequency"
-                className="tw-w-100"
-                min={props.state.frequencyUnits === FrequencyUnits.Minutes ? 30 : 1}
-                type="number"
-                value={props.state.frequency}
-                setValue={(value) => setState({ ...props.state, frequency: value })}
-                placeholder="Sync Frequency"
+              <Controller
+                control={control}
+                name="frequency"
+                render={({ field }) => (
+                  <ValidatedInput
+                    id="frequency"
+                    className="tw-w-100"
+                    type="number"
+                    value={field.value}
+                    setValue={field.onChange}
+                    placeholder="Sync Frequency"
+                  />
+                )}
               />
+              <FormError message={errors.frequency?.message} />
+
               <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5 tw-mb-3">
                 <span className="tw-font-medium">Frequency Units</span>
               </div>
-              <ValidatedDropdownInput
-                className="tw-mt-0 tw-w-100"
-                options={Object.values(FrequencyUnits)}
-                selected={props.state.frequencyUnits}
-                setSelected={(value) => setState({ ...props.state, frequencyUnits: value })}
-                loading={false}
-                placeholder="Frequency Units"
-                noOptionsString="nil"
-                getElementForDisplay={(value) => value.charAt(0).toUpperCase() + value.slice(1)}
+              <Controller
+                control={control}
+                name="frequencyUnits"
+                render={({ field }) => (
+                  <ValidatedDropdownInput
+                    className="tw-mt-0 tw-w-100"
+                    options={Object.values(FrequencyUnits)}
+                    selected={field.value}
+                    setSelected={field.onChange}
+                    loading={false}
+                    placeholder="Frequency Units"
+                    noOptionsString="nil"
+                    getElementForDisplay={(value) => {
+                      return value.charAt(0).toUpperCase() + value.slice(1);
+                    }}
+                  />
+                )}
               />
+              <FormError message={errors.frequencyUnits?.message} />
             </>
           )}
         </>
       )}
-      <Button onClick={saveConfiguration} className="tw-mt-10 tw-w-full tw-h-10">
-        {saveConfigurationMutation.isLoading ? <Loading /> : props.existingObject ? "Update Object" : "Create Object"}
+      <Button type="submit" className="tw-mt-10 tw-w-full tw-h-10">
+        {saveConfigurationMutation.isLoading ? <Loading /> : existingObject ? "Update Object" : "Create Object"}
       </Button>
-    </div>
+      <FormError message={errors.root?.createObject?.message} />
+    </form>
   );
 };
 
-export const SyncModeSelector: React.FC<ObjectStepProps> = ({ state, setState, isUpdate }) => {
+export const SyncModeSelector: React.FC<{
+  value: SyncMode;
+  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  disabled?: boolean;
+}> = ({ value, onChange, disabled = false }) => {
   type SyncModeOption = {
     mode: SyncMode;
     title: string;
@@ -351,12 +382,10 @@ export const SyncModeSelector: React.FC<ObjectStepProps> = ({ state, setState, i
                 id={String(syncMode.mode)}
                 name="syncmode"
                 type="radio"
-                disabled={isUpdate}
-                checked={state.syncMode === syncMode.mode}
+                disabled={disabled}
+                checked={value === syncMode.mode}
                 value={syncMode.mode}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setState({ ...state, syncMode: e.target.value as SyncMode })
-                }
+                onChange={onChange}
                 className="tw-h-4 tw-w-4 tw-border-slate-300 tw-text-indigo-600 focus:tw-ring-indigo-600 tw-cursor-pointer"
               />
               <div className="tw-flex tw-flex-row tw-items-center tw-ml-3 tw-leading-6">

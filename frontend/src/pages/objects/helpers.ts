@@ -1,366 +1,203 @@
+import { sendRequest } from "src/rpc/ajax";
 import {
   ConnectionType,
-  Destination,
+  CreateObject,
+  CreateObjectRequest,
+  DestinationSchema,
   FabraObject,
   Field,
+  FieldSchema,
   FieldType,
   FrequencyUnits,
-  needsCursorField,
-  needsEndCustomerId,
-  needsPrimaryKey,
-  ObjectFieldInput,
+  ObjectFieldSchema,
   SyncMode,
   TargetType,
+  UpdateObject,
+  UpdateObjectFields,
+  UpdateObjectFieldsRequest,
+  UpdateObjectFieldsResponse,
+  UpdateObjectRequest,
+  UpdateObjectResponse,
 } from "src/rpc/api";
+import { z } from "zod";
 
 export enum Step {
-  Initial,
-  ExistingFields,
-  CreateFields,
-  Finalize,
+  Initial = "Initial",
+  ExistingFields = "ExistingFields",
+  CreateFields = "CreateFields",
+  Finalize = "Finalize",
+  UnsupportedConnectionType = "UnsupportedConnectionType",
 }
 
-export type NewObjectState = {
-  step: Step;
+/** Destination setup form. */
+export const DestinationSetupBaseSchema = z.object({
+  displayName: z.string().min(1, { message: "Please enter a display name" }),
+  destination: DestinationSchema,
+});
 
-  // Destination setup step.
-  destinationSetupData: {
-    displayName: string | undefined;
-    destination: Destination | undefined;
-    namespace: string | undefined;
-    targetType: TargetType | undefined;
-    tableName: string | undefined;
-  };
+export const DestinationSetupWebhookSchema = DestinationSetupBaseSchema.extend({
+  connectionType: z.literal(ConnectionType.Webhook),
+  targetType: z.literal(TargetType.Webhook),
+  namespace: z.string().optional(),
+  tableName: z.string().optional(),
+});
+export type DestinationSetupWebhookFormType = z.infer<typeof DestinationSetupWebhookSchema>;
 
-  // Object fields step.
-  objectFields: ObjectFieldInput[];
+export const DestinationSetupBigQuerySchema = DestinationSetupBaseSchema.extend({
+  connectionType: z.literal(ConnectionType.BigQuery),
+  targetType: z.enum([TargetType.SingleExisting]),
+  namespace: z.string(),
+  tableName: z.string(),
+});
+export type DestinationSetupBigQueryFormType = z.infer<typeof DestinationSetupBigQuerySchema>;
 
-  syncMode: SyncMode | undefined;
-  cursorField: Field | undefined;
-  primaryKey: Field | undefined;
-  endCustomerIdField: Field | undefined;
-  recurring: boolean;
-  frequency: number | undefined;
-  frequencyUnits: FrequencyUnits | undefined;
-  fieldsError: string | undefined;
-  cursorFieldError: string | undefined;
-  endCustomerIdError: string | undefined;
-  frequencyError: string | undefined;
-  createError: string | undefined;
-};
+export const DestinationSetupDynamoDbSchema = DestinationSetupBaseSchema.extend({
+  connectionType: z.literal(ConnectionType.DynamoDb),
+  tableName: z.string(),
+  targetType: z.enum([TargetType.SingleExisting]),
+  namespace: z.string().optional(),
+});
+export type DestinationSetupDynamoDbFormType = z.infer<typeof DestinationSetupDynamoDbSchema>;
 
-export type DestinationSetupFormState = {
-  displayName: string;
-  destination: Destination | null;
-  targetType: TargetType | null;
-  tableName: string | null;
-  namespace: string | null;
-};
+export const DestinationSetupUnsupportedSchema = DestinationSetupBaseSchema.extend({
+  connectionType: z.enum([
+    ConnectionType.MongoDb,
+    ConnectionType.Postgres,
+    ConnectionType.Redshift,
+    ConnectionType.Snowflake,
+    ConnectionType.Synapse,
+  ]),
+  tableName: z.string().optional(),
+  targetType: z
+    .enum([TargetType.SingleExisting, TargetType.SingleNew, TargetType.TablePerCustomer])
+    .default(TargetType.SingleExisting),
+  namespace: z.string().optional(),
+});
+export type DestinationSetupUnsupportedFormType = z.infer<typeof DestinationSetupUnsupportedSchema>;
 
-export const INITIAL_OBJECT_STATE: NewObjectState = {
-  step: Step.Initial,
-  destinationSetupData: {
-    displayName: undefined,
-    destination: undefined,
-    namespace: undefined,
-    targetType: undefined,
-    tableName: undefined,
-  },
-  syncMode: undefined,
-  cursorField: undefined,
-  primaryKey: undefined,
-  endCustomerIdField: undefined,
-  recurring: false,
-  frequency: undefined,
-  frequencyUnits: undefined,
-  objectFields: [],
-  fieldsError: undefined,
-  cursorFieldError: undefined,
-  endCustomerIdError: undefined,
-  frequencyError: undefined,
-  createError: undefined,
-};
-
-export const validateAll = (
-  state: NewObjectState,
-  setState: React.Dispatch<React.SetStateAction<NewObjectState>>,
-): boolean => {
-  const errors = {
-    displayName: validateDisplayName(state, setState),
-    destination: validateDestination(state, setState),
-    fields: validateFields(state, setState),
-    frequency: validateFrequency(state, setState),
-  };
-  const optionalErrors: Record<string, boolean | undefined> = {};
-  if (!state.syncMode) {
-    optionalErrors.syncMode = false;
-    setState((state) => ({
-      ...state,
-      createError: "Must select a sync mode",
-    }));
-    return false;
-  }
-  optionalErrors.cursorField = !needsCursorField(state.syncMode) ? undefined : validateCursorField(state, setState);
-  optionalErrors.primaryKey = !needsPrimaryKey(state.syncMode) ? undefined : !!state.primaryKey;
-  optionalErrors.endCustomerIdField = !needsEndCustomerId(state.destinationSetupData.targetType!)
-    ? undefined
-    : !!state.endCustomerIdField;
-
-  if (optionalErrors.primaryKey === false) {
-    setState((state) => ({
-      ...state,
-      createError: "Must select a primary key",
-    }));
-  }
-
-  if (optionalErrors.endCustomerIdError === false) {
-    setState((state) => ({
-      ...state,
-      createError: "Must set an end customer ID",
-    }));
-  }
-
-  const isValid =
-    Object.values(errors).every((value) => value === true) &&
-    Object.values(optionalErrors).every((value) => value === true || value === undefined);
-
-  return isValid;
-};
-
-export const validateDisplayName = (
-  state: NewObjectState,
-  setState: React.Dispatch<React.SetStateAction<NewObjectState>>,
-): boolean => {
-  if (state.destinationSetupData.displayName === undefined || state.destinationSetupData.displayName.length <= 0) {
-    setState((state) => {
-      return {
-        ...state,
-        displayNameError: "Must set a display name",
-      };
-    });
-    return false;
-  }
-
-  setState((state) => {
-    return {
-      ...state,
-      displayNameError: undefined,
-    };
-  });
-  return true;
-};
-
-export const validateDestination = (
-  state: NewObjectState,
-  setState: React.Dispatch<React.SetStateAction<NewObjectState>>,
-): boolean => {
-  if (!state.destinationSetupData.destination) {
-    setState((state) => {
-      return {
-        ...state,
-        destinationError: "Must select a destination",
-      };
-    });
-    return false;
-  }
-
-  const connectionType = state.destinationSetupData.destination.connection.connection_type;
-  if (connectionType !== ConnectionType.Webhook) {
-    if (!state.destinationSetupData.targetType) {
-      setState((state) => {
-        return {
-          ...state,
-          destinationError: "Must select a target",
-        };
+export const DestinationSetupFormSchema = z
+  .discriminatedUnion("connectionType", [
+    DestinationSetupWebhookSchema,
+    DestinationSetupBigQuerySchema,
+    DestinationSetupDynamoDbSchema,
+    DestinationSetupUnsupportedSchema,
+  ])
+  .superRefine((values, ctx) => {
+    if (!SUPPORTED_CONNECTION_TYPES.includes(values.connectionType as SupportedConnectionType)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Unsupported connection type",
+        path: ["connectionType"],
       });
-      return false;
     }
+  });
 
-    if (state.destinationSetupData.targetType === TargetType.SingleExisting) {
-      if (connectionType !== ConnectionType.DynamoDb && !state.destinationSetupData.namespace) {
-        setState((state) => {
-          return {
-            ...state,
-            destinationError: "Must select a namespace",
-          };
+export type DestinationSetupFormType = z.infer<typeof DestinationSetupFormSchema>;
+
+/** Object fields form. */
+export const ObjectFieldsSchema = z.object({
+  objectFields: z
+    .array(
+      ObjectFieldSchema.partial({
+        id: true,
+      }),
+    )
+    .min(1, { message: "Must have at least one field" }),
+});
+
+export type ObjectFieldsFormType = z.infer<typeof ObjectFieldsSchema>;
+
+export const SUPPORTED_CONNECTION_TYPES = [
+  ConnectionType.BigQuery,
+  ConnectionType.DynamoDb,
+  ConnectionType.Webhook,
+] as const;
+export type SupportedConnectionType = (typeof SUPPORTED_CONNECTION_TYPES)[number];
+
+/** Finalize object form. */
+export const FinalizeObjectFormSchema = z
+  .object({
+    recurring: z.boolean(),
+    cursorField: FieldSchema.optional(),
+    primaryKey: FieldSchema.optional(),
+    frequency: z
+      .number({
+        errorMap: (issue) => {
+          if (issue.message === "Expected number, received nan") {
+            return { message: "Please enter a valid number" };
+          }
+          return { message: issue.message ?? "Please enter a valid number" };
+        },
+      })
+      .min(1)
+      .optional(),
+    frequencyUnits: z.nativeEnum(FrequencyUnits).optional(),
+    syncMode: z.nativeEnum(SyncMode),
+    endCustomerIdField: FieldSchema,
+  })
+  .superRefine((values, ctx) => {
+    if (values.recurring) {
+      if (!values.frequency) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Please enter a frequency",
+          path: ["frequency"],
         });
-        return false;
+      }
+      if (!values.frequencyUnits) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Please select a frequency unit",
+          path: ["frequencyUnits"],
+        });
       }
 
-      if (!state.destinationSetupData.tableName) {
-        setState((state) => {
-          return {
-            ...state,
-            destinationError: "Must select a table name",
-          };
+      if (values.frequencyUnits === FrequencyUnits.Minutes && values.frequency && values.frequency < 30) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Minimum frequency is 30 minutes",
+          path: ["frequency"],
         });
-        return false;
       }
     }
-  }
 
-  setState((state) => {
-    return {
-      ...state,
-      destinationError: undefined,
-    };
-  });
-  return true;
-};
-
-export const validateFields = (
-  state: NewObjectState,
-  setState: React.Dispatch<React.SetStateAction<NewObjectState>>,
-): boolean => {
-  if (state.objectFields === undefined || state.objectFields.length <= 0) {
-    setState((state) => {
-      return {
-        ...state,
-        fieldsError: "Must create at least one object field",
-      };
-    });
-    return false;
-  }
-
-  for (const objectField of state.objectFields) {
-    if (!objectField.name || objectField.name.length <= 0 || !objectField.type || objectField.type.length <= 0) {
-      setState((state) => {
-        return {
-          ...state,
-          fieldsError: "Must provide name and type for each object field",
-        };
-      });
-      return false;
+    if ([SyncMode.IncrementalAppend, SyncMode.IncrementalUpdate].includes(values.syncMode)) {
+      if (!values.cursorField) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Please select a cursor field",
+          path: ["cursorField"],
+        });
+      } else if (
+        ![
+          FieldType.Timestamp,
+          FieldType.DatetimeTz,
+          FieldType.DatetimeNtz,
+          FieldType.Date,
+          FieldType.Integer,
+          FieldType.Number,
+        ].includes(values.cursorField.type as FieldType)
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Cursor field must be a timestamp, date, integer, or number",
+          path: ["cursorField"],
+        });
+      }
     }
-  }
 
-  setState((state) => {
-    return {
-      ...state,
-      fieldsError: undefined,
-    };
+    if ([SyncMode.IncrementalUpdate].includes(values.syncMode)) {
+      if (!values.primaryKey) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Please select a primary key",
+          path: ["primaryKey"],
+        });
+      }
+    }
   });
-  return true;
-};
 
-export const validateCursorField = (
-  state: NewObjectState,
-  setState: React.Dispatch<React.SetStateAction<NewObjectState>>,
-): boolean => {
-  // TODO: allow using other types
-  if (state.cursorField === undefined) {
-    setState((state) => {
-      return {
-        ...state,
-        cursorFieldError: "Must set cursor field",
-      };
-    });
-    return false;
-  }
-
-  if (
-    state.cursorField.type !== FieldType.Timestamp &&
-    state.cursorField.type !== FieldType.DatetimeTz &&
-    state.cursorField.type !== FieldType.DatetimeNtz &&
-    state.cursorField.type !== FieldType.Date &&
-    state.cursorField.type !== FieldType.Integer &&
-    state.cursorField.type !== FieldType.Number
-  ) {
-    setState((state) => {
-      return {
-        ...state,
-        cursorFieldError: "Cursor field must be an integer, number, timestamp, date, or datetime type.",
-      };
-    });
-    return false;
-  }
-
-  setState((state) => {
-    return {
-      ...state,
-      cursorFieldError: undefined,
-    };
-  });
-  return true;
-};
-
-export const validateFrequency = (
-  state: NewObjectState,
-  setState: React.Dispatch<React.SetStateAction<NewObjectState>>,
-): boolean => {
-  if (state.recurring === false) {
-    return true;
-  }
-
-  if (state.frequency === undefined) {
-    setState((state) => {
-      return { ...state, frequencyError: "Must set frequency" };
-    });
-    return false;
-  }
-
-  if (state.frequencyUnits === undefined) {
-    setState((state) => {
-      return { ...state, frequencyError: "Must set frequency units" };
-    });
-    return false;
-  }
-
-  return true;
-};
-
-export const getFieldFromName = (objectFields: ObjectFieldInput[], fieldName: string): Field | undefined => {
-  const matchingField = objectFields.find((predicate) => predicate.name === fieldName);
-  if (!matchingField) {
-    return undefined;
-  }
-
-  return {
-    name: fieldName,
-    type: matchingField.type!,
-  };
-};
-
-export const initalizeFromExisting = (
-  existingObject: FabraObject,
-  existingDestination: Destination,
-): NewObjectState => {
-  return {
-    ...INITIAL_OBJECT_STATE,
-    destinationSetupData: {
-      displayName: existingObject.display_name,
-      destination: existingDestination,
-      targetType: existingObject.target_type,
-      namespace: existingObject.namespace,
-      tableName: existingObject.table_name,
-    },
-    objectFields: existingObject.object_fields ?? [],
-    syncMode: existingObject.sync_mode,
-    cursorField: existingObject.cursor_field
-      ? getFieldFromName(existingObject.object_fields, existingObject.cursor_field)
-      : undefined,
-    endCustomerIdField: existingObject.end_customer_id_field
-      ? getFieldFromName(existingObject.object_fields, existingObject.end_customer_id_field)
-      : undefined,
-    recurring: existingObject.recurring,
-    frequency: existingObject.frequency,
-    frequencyUnits: existingObject.frequency_units,
-  };
-};
-
-export const initializeFromDestination = (destination: Destination): NewObjectState => {
-  const state = {
-    ...INITIAL_OBJECT_STATE,
-  };
-  state.destinationSetupData.destination = destination;
-  if (destination.connection.connection_type === ConnectionType.Webhook) {
-    state.destinationSetupData.targetType = TargetType.Webhook;
-    state.endCustomerIdField = { name: "end_customer_id", type: FieldType.Integer };
-  } else {
-    state.destinationSetupData.targetType = TargetType.SingleExisting;
-  }
-  return state;
-};
+export type FinalizeObjectFormType = z.infer<typeof FinalizeObjectFormSchema>;
 
 export type ObjectTargetOption = {
   type: TargetType;
@@ -386,3 +223,80 @@ export const objectTargetOptions: ObjectTargetOption[] = [
   //   description: "Data from each of your customers will be stored in a separate table in your destination. The name of the table will include the customer's ID as a suffix."
   // },
 ];
+
+export const createNewObject = async (args: {
+  destinationSetup: DestinationSetupFormType;
+  objectFields: ObjectFieldsFormType;
+  finalizeValues: FinalizeObjectFormType;
+}) => {
+  const { destinationSetup, objectFields, finalizeValues } = args;
+  if (!finalizeValues.endCustomerIdField) {
+    throw new Error("endCustomerIdField is required");
+  }
+  const payload: CreateObjectRequest = {
+    display_name: destinationSetup.displayName,
+    destination_id: destinationSetup.destination.id,
+    target_type: destinationSetup.targetType,
+    namespace: destinationSetup.namespace ?? "",
+    table_name: destinationSetup.tableName ?? "",
+    sync_mode: finalizeValues.syncMode,
+    cursor_field: finalizeValues.cursorField?.name,
+    primary_key: finalizeValues.primaryKey?.name,
+    end_customer_id_field: finalizeValues.endCustomerIdField.name,
+    recurring: finalizeValues.recurring,
+    frequency: finalizeValues.frequency,
+    frequency_units: finalizeValues.frequencyUnits,
+    object_fields: objectFields.objectFields,
+  };
+  const object = await sendRequest(CreateObject, payload);
+  return object.object;
+};
+
+export const updateObject = async (args: {
+  existingObject: FabraObject;
+  destinationSetup: DestinationSetupFormType;
+  objectFields: ObjectFieldsFormType;
+  finalizeValues: FinalizeObjectFormType;
+}) => {
+  const { objectFields, destinationSetup, existingObject, finalizeValues } = args;
+  if (!existingObject) {
+    throw new Error("Cannot update object without existing object");
+  }
+
+  // For object field updates, we need to compute the change sets.
+  // TODO: support adding and removing fields when updating objects
+  const updatedFields = objectFields.objectFields.filter((field) =>
+    existingObject.object_fields.find((existingField) => existingField.name === field.name),
+  );
+
+  const [updateObjectResponse, _] = await Promise.all([
+    sendRequest<UpdateObjectRequest, UpdateObjectResponse>(UpdateObject, {
+      objectID: Number(existingObject.id),
+      display_name: destinationSetup.displayName,
+      destination_id: destinationSetup.destination?.id,
+      target_type: destinationSetup.targetType,
+      namespace: destinationSetup.namespace,
+      table_name: destinationSetup.tableName,
+      sync_mode: finalizeValues.syncMode,
+      cursor_field: finalizeValues.cursorField?.name,
+      end_customer_id_field: finalizeValues.endCustomerIdField?.name,
+      recurring: finalizeValues.recurring,
+      frequency: finalizeValues.frequency,
+      frequency_units: finalizeValues.frequencyUnits,
+    }),
+    sendRequest<UpdateObjectFieldsRequest, UpdateObjectFieldsResponse>(UpdateObjectFields, {
+      objectID: Number(existingObject.id),
+      object_fields: updatedFields as UpdateObjectFieldsRequest["object_fields"],
+    }),
+  ]);
+
+  return updateObjectResponse.object;
+};
+
+/** Do this in a shared method so it's searchable within the codebase. */
+export function createDummyWebhookCustomerIdField(name?: string, type?: FieldType): Field {
+  return {
+    name: name ?? "dummy_customer_id",
+    type: FieldType.String,
+  };
+}

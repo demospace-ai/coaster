@@ -1,51 +1,32 @@
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Checkbox } from "@radix-ui/react-checkbox";
-import { useFieldArray, useForm } from "react-hook-form";
+import { Checkbox } from "src/components/checkbox/Checkbox";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { FormError } from "src/components/FormError";
 import { Button, DeleteButton } from "src/components/button/Button";
 import { InfoIcon } from "src/components/icons/Icons";
 import { Input } from "src/components/input/Input";
-import { Loading } from "src/components/loading/Loading";
 import { FieldTypeSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
-import { NewObjectState, Step, validateFields } from "src/pages/objects/helpers";
-import { ObjectStepProps } from "src/pages/objects/NewObject/state";
-import { FieldType, ObjectFieldInput, ObjectFieldSchema } from "src/rpc/api";
-import { z } from "zod";
-import { Controller } from "react-hook-form";
-
-const FormSchema = z.object({
-  objectFields: z
-    .array(
-      ObjectFieldSchema.partial({
-        id: true,
-      }),
-    )
-    .min(1, { message: "Must have at least one field" }),
-});
+import { ObjectFieldsFormType, ObjectFieldsSchema } from "src/pages/objects/helpers";
+import { FieldType } from "src/rpc/api";
 
 interface NewObjectFieldsProps {
   isUpdate?: boolean;
-  initialFormState: InitialFormState;
-  onComplete: (values: FormSchemaType) => void;
+  initialFormState?: ObjectFieldsFormType;
+  onComplete: (values: ObjectFieldsFormType) => void;
 }
 
-type InitialFormState = {
-  objectFields: ObjectFieldInput[];
-};
-
-type FormSchemaType = z.infer<typeof FormSchema>;
-
-export function NewObjectFields({ initialFormState, onComplete, isUpdate }: NewObjectFieldsProps) {
+export function NewObjectFields({ initialFormState, onComplete, isUpdate = false }: NewObjectFieldsProps) {
   const {
     formState: { errors },
     control,
     handleSubmit,
-  } = useForm<FormSchemaType>({
-    resolver: zodResolver(FormSchema),
+  } = useForm<ObjectFieldsFormType>({
+    resolver: zodResolver(ObjectFieldsSchema),
     defaultValues: initialFormState,
   });
-  const { fields, append, remove, update } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     name: "objectFields",
     control,
   });
@@ -135,9 +116,7 @@ export function NewObjectFields({ initialFormState, onComplete, isUpdate }: NewO
                   />
                 </div>
               </div>
-              {errors.objectFields?.[i]?.name && (
-                <div className="tw-text-red-500">{errors.objectFields?.[i]?.name?.message}</div>
-              )}
+              <FormError message={errors.objectFields?.[i]?.name?.message} />
               <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
                 <span>Display Name</span>
                 <Tooltip
@@ -206,7 +185,7 @@ export function NewObjectFields({ initialFormState, onComplete, isUpdate }: NewO
       <Button type="submit" className="tw-mt-8 tw-w-100 tw-h-10">
         Continue
       </Button>
-      {errors.objectFields && <div className="tw-text-red-500">{errors.objectFields.message}</div>}
+      <FormError message={errors.objectFields?.message} />
     </form>
   );
 }

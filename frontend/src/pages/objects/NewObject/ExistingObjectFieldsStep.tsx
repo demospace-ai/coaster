@@ -1,48 +1,34 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Checkbox } from "@radix-ui/react-checkbox";
+import { Checkbox } from "src/components/checkbox/Checkbox";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { FormError } from "src/components/FormError";
 import { Button } from "src/components/button/Button";
 import { Input } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
-import { NewObjectState } from "src/pages/objects/helpers";
-import { ObjectFieldInput, ObjectFieldSchema } from "src/rpc/api";
+import { DestinationSetupFormType, ObjectFieldsFormType, ObjectFieldsSchema } from "src/pages/objects/helpers";
+import { ObjectFieldInput } from "src/rpc/api";
 import { useSchema } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
-import { z } from "zod";
-
-const FormSchema = z.object({
-  objectFields: z
-    .array(
-      ObjectFieldSchema.partial({
-        id: true,
-      }),
-    )
-    .min(1, { message: "Must have at least one field" }),
-});
-
-type InitialFormState = {
-  objectFields: ObjectFieldInput[];
-};
-
-type FormSchemaType = z.infer<typeof FormSchema>;
 
 interface ExistingObjectFieldsProps {
   isUpdate?: boolean;
-  destinationSetupData: NewObjectState["destinationSetupData"];
-  initialFormState: InitialFormState;
-  onComplete: (values: FormSchemaType) => void;
+  destinationSetupData: DestinationSetupFormType;
+  initialFormState?: ObjectFieldsFormType;
+  onComplete: (values: ObjectFieldsFormType) => void;
 }
 
 export const ExistingObjectFields: React.FC<ExistingObjectFieldsProps> = ({
   destinationSetupData,
-  isUpdate,
+  isUpdate = false,
   onComplete,
+  initialFormState,
 }) => {
   const schemaQuery = useSchema(
-    destinationSetupData.destination?.connection.id,
-    destinationSetupData.namespace,
-    destinationSetupData.tableName,
+    destinationSetupData.destination.connection.id,
+    "namespace" in destinationSetupData ? destinationSetupData.namespace : undefined,
+    "tableName" in destinationSetupData ? destinationSetupData.tableName : undefined,
   );
+  const initialObjectFields = initialFormState?.objectFields ?? [];
 
   return (
     <div>
@@ -61,17 +47,19 @@ export const ExistingObjectFields: React.FC<ExistingObjectFieldsProps> = ({
         </div>
       ) : (
         <ExistingObjectFieldsForm
-          isUpdate={!!isUpdate}
+          isUpdate={isUpdate}
           objectFields={
-            schemaQuery.schema?.map((field) => {
-              return {
-                name: field.name,
-                type: field.type,
-                omit: false,
-                optional: false,
-                id: undefined,
-              };
-            }) || []
+            initialObjectFields.length > 0
+              ? initialObjectFields
+              : schemaQuery.schema?.map((field) => {
+                  return {
+                    name: field.name,
+                    type: field.type,
+                    omit: false,
+                    optional: false,
+                    id: undefined,
+                  };
+                }) || []
           }
           onComplete={onComplete}
         />
@@ -82,15 +70,15 @@ export const ExistingObjectFields: React.FC<ExistingObjectFieldsProps> = ({
 
 const ExistingObjectFieldsForm: React.FC<{
   objectFields: ObjectFieldInput[];
-  onComplete: (values: FormSchemaType) => void;
+  onComplete: (values: ObjectFieldsFormType) => void;
   isUpdate: boolean;
 }> = ({ objectFields, isUpdate, onComplete }) => {
   const {
     control,
     formState: { errors },
     handleSubmit,
-  } = useForm<FormSchemaType>({
-    resolver: zodResolver(FormSchema),
+  } = useForm<ObjectFieldsFormType>({
+    resolver: zodResolver(ObjectFieldsSchema),
     defaultValues: {
       objectFields,
     },
@@ -173,7 +161,7 @@ const ExistingObjectFieldsForm: React.FC<{
       <Button type="submit" className="tw-mt-6 tw-w-100 tw-h-10">
         Continue
       </Button>
-      {errors.objectFields && <div className="tw-text-red-500">{errors.objectFields.message}</div>}
+      <FormError message={errors.objectFields?.message} />
     </form>
   );
 };
