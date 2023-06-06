@@ -3,14 +3,11 @@ import {
   ConnectionType,
   CreateObject,
   CreateObjectRequest,
-  Destination,
   DestinationSchema,
   FabraObject,
-  Field,
   FieldSchema,
   FieldType,
   FrequencyUnits,
-  ObjectFieldInput,
   ObjectFieldSchema,
   SyncMode,
   TargetType,
@@ -31,6 +28,7 @@ export enum Step {
   UnsupportedConnectionType = "UnsupportedConnectionType",
 }
 
+/** Destination setup form. */
 export const DestinationSetupBaseSchema = z.object({
   displayName: z.string().min(1, { message: "Please enter a display name" }),
   destination: DestinationSchema,
@@ -95,6 +93,7 @@ export const DestinationSetupFormSchema = z
 
 export type DestinationSetupFormType = z.infer<typeof DestinationSetupFormSchema>;
 
+/** Object fields form. */
 export const ObjectFieldsSchema = z.object({
   objectFields: z
     .array(
@@ -114,6 +113,7 @@ export const SUPPORTED_CONNECTION_TYPES = [
 ] as const;
 export type SupportedConnectionType = (typeof SUPPORTED_CONNECTION_TYPES)[number];
 
+/** Finalize object form. */
 export const FinalizeObjectFormSchema = z
   .object({
     recurring: z.boolean(),
@@ -189,80 +189,6 @@ export const FinalizeObjectFormSchema = z
   });
 
 export type FinalizeObjectFormType = z.infer<typeof FinalizeObjectFormSchema>;
-
-export type NewObjectState = {
-  step: Step;
-
-  // Destination setup step.
-  destinationSetupData: {
-    displayName: string | undefined;
-    destination: Destination | undefined;
-    namespace: string | undefined;
-    targetType: TargetType | undefined;
-    tableName: string | undefined;
-  };
-
-  // Object fields step.
-  objectFields: ObjectFieldInput[];
-
-  syncMode: SyncMode | undefined;
-  cursorField: Field | undefined;
-  primaryKey: Field | undefined;
-  endCustomerIdField: Field | undefined;
-  recurring: boolean;
-  frequency: number | undefined;
-  frequencyUnits: FrequencyUnits | undefined;
-
-  fieldsError: string | undefined;
-  cursorFieldError: string | undefined;
-  endCustomerIdError: string | undefined;
-  frequencyError: string | undefined;
-  createError: string | undefined;
-};
-
-export type DestinationSetupFormState = {
-  displayName: string;
-  destination: Destination | null;
-  targetType: TargetType | null;
-  tableName: string | null;
-  namespace: string | null;
-};
-
-export const INITIAL_OBJECT_STATE: NewObjectState = {
-  step: Step.Initial,
-  destinationSetupData: {
-    displayName: undefined,
-    destination: undefined,
-    namespace: undefined,
-    targetType: undefined,
-    tableName: undefined,
-  },
-  syncMode: undefined,
-  cursorField: undefined,
-  primaryKey: undefined,
-  endCustomerIdField: undefined,
-  recurring: false,
-  frequency: undefined,
-  frequencyUnits: undefined,
-  objectFields: [],
-  fieldsError: undefined,
-  cursorFieldError: undefined,
-  endCustomerIdError: undefined,
-  frequencyError: undefined,
-  createError: undefined,
-};
-
-export const getFieldFromName = (objectFields: ObjectFieldInput[], fieldName: string): Field | undefined => {
-  const matchingField = objectFields.find((predicate) => predicate.name === fieldName);
-  if (!matchingField) {
-    return undefined;
-  }
-
-  return {
-    name: fieldName,
-    type: matchingField.type!,
-  };
-};
 
 export type ObjectTargetOption = {
   type: TargetType;

@@ -50,13 +50,6 @@ export const NewObject: React.FC<NewObjectProps> = ({ existingDestination, exist
           isUpdate={!!existingObject}
           initialFormState={state.destinationSetup}
           onComplete={(values) => {
-            // let maybeEndCustomerIdDummy: { endCustomerIdField?: Field } = {};
-            // if (values.targetType === TargetType.Webhook) {
-            //   maybeEndCustomerIdDummy = {
-            //     endCustomerIdField: { name: "dummy-end-customer-id", type: FieldType.Integer },
-            //   };
-            // }
-            // const createFields = shouldCreateFields(values.destination.connection.connection_type, values.targetType!);
             advanceToObjectFields(values);
           }}
         />

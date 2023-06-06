@@ -8,24 +8,17 @@ import { InputStyle } from "src/components/input/Input";
 import { DestinationSelector, NamespaceSelector, TableSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import {
-  objectTargetOptions,
   DestinationSetupFormSchema,
   DestinationSetupFormType,
   SUPPORTED_CONNECTION_TYPES,
   SupportedConnectionType,
+  objectTargetOptions,
 } from "src/pages/objects/helpers";
-import { Connection, ConnectionType, Destination, DestinationSchema, TargetType } from "src/rpc/api";
+import { Connection, ConnectionType, Destination, TargetType } from "src/rpc/api";
 import { mergeClasses } from "src/utils/twmerge";
-import { z } from "zod";
 
 interface DestinationSetupProps {
-  initialFormState?: {
-    displayName?: string;
-    destination?: Destination | undefined;
-    targetType?: TargetType | undefined;
-    namespace?: string | undefined;
-    tableName?: string | undefined;
-  };
+  initialFormState?: DestinationSetupFormType;
   onComplete: (values: DestinationSetupFormType) => void;
   isUpdate?: boolean;
 }
@@ -35,7 +28,7 @@ type Control = UseFormReturn["control"];
 type Errors = UseFormReturn["formState"]["errors"];
 
 function initializeFormState(initial: DestinationSetupProps["initialFormState"]): Partial<DestinationSetupFormType> {
-  const connectionType = initial?.destination?.connection?.connection_type;
+  const connectionType = initial?.connectionType;
   if (connectionType && !SUPPORTED_CONNECTION_TYPES.includes(connectionType as SupportedConnectionType)) {
     return {};
   }
@@ -71,7 +64,6 @@ export const DestinationSetup: React.FC<DestinationSetupProps> = ({ isUpdate, on
   const form = useForm<DestinationSetupFormType>({
     resolver: async (data, context, options) => {
       const errors = await zodResolver(DestinationSetupFormSchema)(data, context, options);
-      console.log("destinationSetupResolverErrors", errors);
       return errors;
     },
     defaultValues: initializeFormState(initialFormState),
@@ -83,16 +75,14 @@ export const DestinationSetup: React.FC<DestinationSetupProps> = ({ isUpdate, on
     control,
     watch,
   } = form;
-  const fullWatch = watch();
-  console.log("destinationSetupErrors", errors, fullWatch);
 
   const onSubmit = handleSubmit((values) => {
     onComplete(values);
   });
 
   const connectionType = watch("connectionType");
-  const watchDestination = watch("destination");
-  const watchNamespace = watch("namespace");
+  const destination = watch("destination");
+  const namespace = watch("namespace");
 
   return (
     <div>
@@ -109,7 +99,7 @@ export const DestinationSetup: React.FC<DestinationSetupProps> = ({ isUpdate, on
             </Tooltip>
           </label>
           <input autoFocus className={InputStyle} {...register("displayName")} placeholder="My Destination"></input>
-          {errors.displayName && <div className="tw-text-red-500 tw-mt-1">{errors.displayName.message}</div>}
+          <FormError message={errors.displayName?.message} className="mt-1" />
         </div>
 
         <div>
@@ -132,6 +122,7 @@ export const DestinationSetup: React.FC<DestinationSetupProps> = ({ isUpdate, on
                       form.setValue("targetType", TargetType.SingleExisting);
                     }
                     form.setValue("connectionType", connectionType as SupportedConnectionType);
+                    // Retrigger form validation for these fields since we're setting them manually.
                     form.trigger("targetType");
                     form.trigger("connectionType");
                   }}
@@ -145,15 +136,15 @@ export const DestinationSetup: React.FC<DestinationSetupProps> = ({ isUpdate, on
           <ObjectTargetFieldset control={control} errors={errors} disabled={isUpdate} />
         )}
         {connectionType === ConnectionType.BigQuery && (
-          <NamespaceField control={control} destination={watchDestination} errors={errors} isUpdate={isUpdate} />
+          <NamespaceField control={control} destination={destination} errors={errors} isUpdate={isUpdate} />
         )}
         {(connectionType === ConnectionType.BigQuery || connectionType === ConnectionType.DynamoDb) && (
           <TableField
             control={control}
-            connection={watchDestination.connection}
+            connection={destination.connection}
             errors={errors}
             isUpdate={isUpdate}
-            namespace={watchNamespace}
+            namespace={namespace}
           />
         )}
 
@@ -196,9 +187,7 @@ export function NamespaceField({
           );
         }}
       />
-      {"namespace" in errors && errors.namespace && (
-        <div className="tw-text-red-500 tw-mt-1">{errors.namespace.message}</div>
-      )}
+      <FormError message={errors.namespace?.message} className="mt-1" />
     </div>
   );
 }
@@ -237,9 +226,7 @@ function TableField({
           );
         }}
       />
-      {"tableName" in errors && errors.tableName && (
-        <div className="tw-text-red-500 tw-mt-1">{errors.tableName.message}</div>
-      )}
+      <FormError message={errors.tableName?.message} className="mt-1" />
     </div>
   );
 }
@@ -288,9 +275,7 @@ function ObjectTargetFieldset({ control, errors, disabled }: { control: Control;
           />
         ))}
       </div>
-      {"targetType" in errors && errors.targetType && (
-        <div className="tw-text-red-500 tw-mt-1">{errors.targetType.message}</div>
-      )}
+      <FormError message={errors.targetType?.message} className="mt-1" />
     </fieldset>
   );
 }

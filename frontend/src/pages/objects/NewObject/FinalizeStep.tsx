@@ -12,16 +12,14 @@ import { useShowToast } from "src/components/notifications/Notifications";
 import { FieldSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import {
-  createNewObject,
   DestinationSetupFormType,
   FinalizeObjectFormSchema,
   FinalizeObjectFormType,
-  NewObjectState,
   ObjectFieldsFormType,
+  createNewObject,
   updateObject,
 } from "src/pages/objects/helpers";
 import { ConnectionType, FabraObject, Field, FieldType, FrequencyUnits, GetObjects, SyncMode } from "src/rpc/api";
-import { forceError } from "src/utils/errors";
 import { useMutation } from "src/utils/queryHelpers";
 import { mutate } from "swr";
 
@@ -147,6 +145,7 @@ export const Finalize: React.FC<FinalizeStepProps> = ({
           </>
         )}
       />
+      <FormError message={errors.syncMode?.message} />
       {[SyncMode.IncrementalAppend, SyncMode.IncrementalUpdate].includes(syncMode) && (
         <>
           <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5 tw-mb-3">
@@ -244,7 +243,7 @@ export const Finalize: React.FC<FinalizeStepProps> = ({
                   />
                 )}
               />
-              {errors.endCustomerIdField && <FormError message={errors.endCustomerIdField.message} />}
+              <FormError message={errors.endCustomerIdField?.message} />
             </>
           )}
           {connectionType !== ConnectionType.Webhook && connectionType !== ConnectionType.DynamoDb && (
@@ -270,7 +269,7 @@ export const Finalize: React.FC<FinalizeStepProps> = ({
                   />
                 )}
               />
-              {errors.endCustomerIdField && <FormError message={errors.endCustomerIdField.message} />}
+              <FormError message={errors.endCustomerIdField?.message} />
             </>
           )}
           <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-6">
@@ -308,7 +307,7 @@ export const Finalize: React.FC<FinalizeStepProps> = ({
                   />
                 )}
               />
-              {errors.frequency && <FormError message={errors.frequency.message} />}
+              <FormError message={errors.frequency?.message} />
 
               <div className="tw-w-full tw-flex tw-flex-row tw-items-center tw-mt-5 tw-mb-3">
                 <span className="tw-font-medium">Frequency Units</span>
@@ -331,7 +330,7 @@ export const Finalize: React.FC<FinalizeStepProps> = ({
                   />
                 )}
               />
-              {errors.frequencyUnits && <FormError message={errors.frequencyUnits.message} />}
+              <FormError message={errors.frequencyUnits?.message} />
             </>
           )}
         </>

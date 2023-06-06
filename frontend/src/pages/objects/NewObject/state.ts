@@ -8,7 +8,6 @@ import {
   DestinationSetupWebhookFormType,
   FinalizeObjectFormSchema,
   FinalizeObjectFormType,
-  NewObjectState,
   ObjectFieldsFormType,
   ObjectFieldsSchema,
   Step,
@@ -17,18 +16,14 @@ import {
   ConnectionType,
   Destination,
   FabraObject,
+  Field,
   FieldType,
   ObjectField,
   TargetType,
+  getConnectionType,
   shouldCreateFields,
 } from "src/rpc/api";
 import { z } from "zod";
-
-export type ObjectStepProps = {
-  isUpdate: boolean;
-  state: NewObjectState;
-  setState: React.Dispatch<React.SetStateAction<NewObjectState>>;
-};
 
 const InitialStepSchema = z.object({
   step: z.literal(Step.Initial),
@@ -63,6 +58,7 @@ const FinalizeStepSchema = z.object({
 });
 type FinalizeStepSchema = z.infer<typeof FinalizeStepSchema>;
 
+/** If somehow we get to a destination whose connection type isn't supported yet. */
 const UnsupportedConnectionTypeSchema = z.object({
   step: z.literal(Step.UnsupportedConnectionType),
   message: z.string(),
@@ -80,7 +76,9 @@ type StateSchemaType = z.infer<typeof StateSchema>;
 
 type InitializeStateArgs = {
   existingObject: FabraObject | undefined;
+  /** If user is updating an existing object. */
   existingDestination: Destination | undefined;
+  /** Used for prefilling the destination field when creating an object from a destination details page. */
   maybeDestination: Destination | undefined;
 };
 
@@ -92,16 +90,17 @@ function initializeState({
   const connectionType =
     existingDestination?.connection.connection_type || maybeDestination?.connection.connection_type;
   if (!connectionType) {
+    // There's no existing destination or maybeDestination, so we're creating a new object from scratch.
     return {
       step: Step.Initial,
     } as InitialStepSchema;
   }
 
-  const destinationSetup = (function () {
+  const destinationSetup = (() => {
     const base = {
       destination: existingDestination || maybeDestination,
-      displayName: existingDestination?.display_name ?? "",
-      namespace: existingObject?.display_name,
+      displayName: existingObject?.display_name ?? "",
+      namespace: existingObject?.namespace,
       tableName: existingObject?.table_name,
     };
     switch (connectionType) {
@@ -143,16 +142,21 @@ function initializeState({
   if (existingObject) {
     objectFields = existingObject.object_fields;
     const endCustomerIdField = objectFields.find((field) => field.name === existingObject.end_customer_id_field);
-    let formCustomerIdField;
+    let formCustomerIdField: Field;
+    // Our hacky way of filling in the end-customer ID field for webhooks.
     if (connectionType === ConnectionType.Webhook) {
       formCustomerIdField = {
         name: existingObject.end_customer_id_field,
         type: FieldType.String,
       };
+    } else if (!endCustomerIdField) {
+      // This should never happen. Otherwise the server has a bug.
+      // Maybe in the future we can return the full field in the API response instead of just the name.
+      throw new Error("End customer ID field not found");
     } else {
       formCustomerIdField = {
         name: existingObject.end_customer_id_field,
-        type: endCustomerIdField?.type ?? FieldType.String,
+        type: endCustomerIdField.type,
       };
     }
     finalize = {
@@ -163,7 +167,6 @@ function initializeState({
       frequencyUnits: existingObject.frequency_units,
       recurring: existingObject.recurring,
     };
-    console.log("finalize", finalize);
   } else {
     finalize = undefined;
     objectFields = [];
@@ -185,7 +188,7 @@ function initializeState({
   // } else {
   //   state.destinationSetupData.targetType = TargetType.SingleExisting;
   // }
-  const returnState: InitialStepSchema = {
+  const initialState: InitialStepSchema = {
     step: Step.Initial,
     destinationSetup,
     objectFields: {
@@ -193,7 +196,9 @@ function initializeState({
     },
     finalize,
   };
-  return returnState;
+
+  console.log("final initial state", initialState);
+  return initialState;
 }
 
 export function useStateMachine(args: InitializeStateArgs, onComplete: () => void) {
@@ -268,23 +273,23 @@ export function useStateMachine(args: InitializeStateArgs, onComplete: () => voi
           default: {
             return {
               step: Step.UnsupportedConnectionType,
+              message: `${getConnectionType(
+                connectionType,
+              )} destinations are not supported yet. Message the Fabra team about this!`,
             } as UnsupportedConnectionTypeSchema;
           }
         }
       })();
       setState((state) => {
-        console.log("prevState", state);
         return { ...state, ...nextState };
       });
     },
     advanceToFinalizeObject: (destinationSetup: DestinationSetupFormType, objectFields: ObjectFieldsFormType) => {
-      const nextState = (() => {
-        return {
-          step: Step.Finalize,
-          destinationSetup,
-          objectFields,
-        } as FinalizeStepSchema;
-      })();
+      const nextState = {
+        step: Step.Finalize,
+        destinationSetup,
+        objectFields,
+      } as FinalizeStepSchema;
       setState((state) => ({ ...state, ...nextState }));
     },
     state,

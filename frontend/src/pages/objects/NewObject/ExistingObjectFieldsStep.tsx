@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Checkbox } from "@radix-ui/react-checkbox";
+import { Checkbox } from "src/components/checkbox/Checkbox";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { FormError } from "src/components/FormError";
 import { Button } from "src/components/button/Button";
 import { Input } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
@@ -18,8 +19,9 @@ interface ExistingObjectFieldsProps {
 
 export const ExistingObjectFields: React.FC<ExistingObjectFieldsProps> = ({
   destinationSetupData,
-  isUpdate,
+  isUpdate = false,
   onComplete,
+  initialFormState,
 }) => {
   const schemaQuery = useSchema(
     destinationSetupData.destination.connection.id,
@@ -44,17 +46,19 @@ export const ExistingObjectFields: React.FC<ExistingObjectFieldsProps> = ({
         </div>
       ) : (
         <ExistingObjectFieldsForm
-          isUpdate={!!isUpdate}
+          isUpdate={isUpdate}
           objectFields={
-            schemaQuery.schema?.map((field) => {
-              return {
-                name: field.name,
-                type: field.type,
-                omit: false,
-                optional: false,
-                id: undefined,
-              };
-            }) || []
+            initialFormState.objectFields.length > 0
+              ? initialFormState.objectFields
+              : schemaQuery.schema?.map((field) => {
+                  return {
+                    name: field.name,
+                    type: field.type,
+                    omit: false,
+                    optional: false,
+                    id: undefined,
+                  };
+                }) || []
           }
           onComplete={onComplete}
         />
@@ -85,6 +89,7 @@ const ExistingObjectFieldsForm: React.FC<{
   });
 
   const onSubmit = handleSubmit((values) => {
+    console.log("values", values);
     onComplete(values);
   });
 
@@ -156,7 +161,7 @@ const ExistingObjectFieldsForm: React.FC<{
       <Button type="submit" className="tw-mt-6 tw-w-100 tw-h-10">
         Continue
       </Button>
-      {errors.objectFields && <div className="tw-text-red-500">{errors.objectFields.message}</div>}
+      <FormError message={errors.objectFields?.message} />
     </form>
   );
 };
