@@ -11,6 +11,7 @@ import {
   ObjectFieldsFormType,
   ObjectFieldsSchema,
   Step,
+  createDummyWebhookCustomerIdField,
 } from "src/pages/objects/helpers";
 import {
   ConnectionType,
@@ -153,10 +154,7 @@ function initializeState({
     let formCustomerIdField: Field;
     // Our hacky way of filling in the end-customer ID field for webhooks.
     if (connectionType === ConnectionType.Webhook) {
-      formCustomerIdField = {
-        name: existingObject.end_customer_id_field,
-        type: FieldType.String,
-      };
+      formCustomerIdField = createDummyWebhookCustomerIdField(existingObject.end_customer_id_field);
     } else if (!endCustomerIdField) {
       // This should never happen. Otherwise the server has a bug.
       // Maybe in the future we can return the full field in the API response instead of just the name.

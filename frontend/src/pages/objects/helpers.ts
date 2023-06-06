@@ -5,6 +5,7 @@ import {
   CreateObjectRequest,
   DestinationSchema,
   FabraObject,
+  Field,
   FieldSchema,
   FieldType,
   FrequencyUnits,
@@ -283,3 +284,11 @@ export const updateObject = async (args: {
 
   return updateObjectResponse.object;
 };
+
+/** Do this in a shared method so it's searchable within the codebase. */
+export function createDummyWebhookCustomerIdField(name?: string, type?: FieldType): Field {
+  return {
+    name: name ?? "dummy_customer_id",
+    type: FieldType.String,
+  };
+}

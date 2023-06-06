@@ -16,6 +16,7 @@ import {
   FinalizeObjectFormSchema,
   FinalizeObjectFormType,
   ObjectFieldsFormType,
+  createDummyWebhookCustomerIdField,
   createNewObject,
   updateObject,
 } from "src/pages/objects/helpers";
@@ -54,7 +55,7 @@ export const Finalize: React.FC<FinalizeStepProps> = ({
       endCustomerIdField: initialFormState?.endCustomerIdField
         ? initialFormState.endCustomerIdField
         : destinationSetup.connectionType === ConnectionType.Webhook
-        ? { name: "dummy-end-customer-id", type: FieldType.String }
+        ? createDummyWebhookCustomerIdField()
         : undefined,
     },
   });
