@@ -297,7 +297,6 @@ export const Finalize: React.FC<FinalizeStepProps> = ({
                   <ValidatedInput
                     id="frequency"
                     className="tw-w-100"
-                    // min={props.state.frequencyUnits === FrequencyUnits.Minutes ? 30 : 1}
                     type="number"
                     value={field.value}
                     setValue={field.onChange}

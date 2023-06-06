@@ -68,7 +68,7 @@ export const NewObject: React.FC<NewObjectProps> = ({ existingDestination, exist
         <ExistingObjectFields
           destinationSetupData={state.destinationSetup}
           isUpdate={!!existingObject}
-          initialFormState={{ objectFields: state.objectFields?.objectFields ?? [] }}
+          initialFormState={state.objectFields}
           onComplete={(values) => {
             advanceToFinalizeObject(destinationSetup, values);
           }}
@@ -80,7 +80,7 @@ export const NewObject: React.FC<NewObjectProps> = ({ existingDestination, exist
       const { destinationSetup } = state;
       content = (
         <NewObjectFields
-          initialFormState={{ objectFields: state.objectFields?.objectFields ?? [] }}
+          initialFormState={state.objectFields}
           isUpdate={!!existingObject}
           onComplete={(values) => {
             advanceToFinalizeObject(destinationSetup, values);

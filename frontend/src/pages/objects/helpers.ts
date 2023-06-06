@@ -151,6 +151,14 @@ export const FinalizeObjectFormSchema = z
           path: ["frequencyUnits"],
         });
       }
+
+      if (values.frequencyUnits === FrequencyUnits.Minutes && values.frequency && values.frequency < 30) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Minimum frequency is 30 minutes",
+          path: ["frequency"],
+        });
+      }
     }
 
     if ([SyncMode.IncrementalAppend, SyncMode.IncrementalUpdate].includes(values.syncMode)) {
@@ -251,9 +259,9 @@ export const updateObject = async (args: {
   finalizeValues: FinalizeObjectFormType;
 }) => {
   const { objectFields, destinationSetup, existingObject, finalizeValues } = args;
-  // if (!props.existingObject) {
-  // throw new Error("Cannot update object without existing object");
-  // }
+  if (!existingObject) {
+    throw new Error("Cannot update object without existing object");
+  }
 
   // For object field updates, we need to compute the change sets.
   // TODO: support adding and removing fields when updating objects

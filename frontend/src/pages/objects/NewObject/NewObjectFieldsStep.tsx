@@ -13,7 +13,7 @@ import { FieldType } from "src/rpc/api";
 
 interface NewObjectFieldsProps {
   isUpdate?: boolean;
-  initialFormState: ObjectFieldsFormType;
+  initialFormState?: ObjectFieldsFormType;
   onComplete: (values: ObjectFieldsFormType) => void;
 }
 

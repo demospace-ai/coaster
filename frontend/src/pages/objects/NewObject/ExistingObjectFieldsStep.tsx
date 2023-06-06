@@ -13,7 +13,7 @@ import { mergeClasses } from "src/utils/twmerge";
 interface ExistingObjectFieldsProps {
   isUpdate?: boolean;
   destinationSetupData: DestinationSetupFormType;
-  initialFormState: ObjectFieldsFormType;
+  initialFormState?: ObjectFieldsFormType;
   onComplete: (values: ObjectFieldsFormType) => void;
 }
 
@@ -28,6 +28,7 @@ export const ExistingObjectFields: React.FC<ExistingObjectFieldsProps> = ({
     "namespace" in destinationSetupData ? destinationSetupData.namespace : undefined,
     "tableName" in destinationSetupData ? destinationSetupData.tableName : undefined,
   );
+  const initialObjectFields = initialFormState?.objectFields ?? [];
 
   return (
     <div>
@@ -48,8 +49,8 @@ export const ExistingObjectFields: React.FC<ExistingObjectFieldsProps> = ({
         <ExistingObjectFieldsForm
           isUpdate={isUpdate}
           objectFields={
-            initialFormState.objectFields.length > 0
-              ? initialFormState.objectFields
+            initialObjectFields.length > 0
+              ? initialObjectFields
               : schemaQuery.schema?.map((field) => {
                   return {
                     name: field.name,
