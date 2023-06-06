@@ -1,42 +1,23 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChangeEvent } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { FormError } from "src/components/FormError";
 import { Button } from "src/components/button/Button";
 import { InfoIcon } from "src/components/icons/Icons";
 import { InputStyle } from "src/components/input/Input";
 import { DestinationSelector, NamespaceSelector, TableSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
-import { objectTargetOptions } from "src/pages/objects/helpers";
+import {
+  objectTargetOptions,
+  DestinationSetupFormSchema,
+  DestinationSetupFormType,
+  SUPPORTED_CONNECTION_TYPES,
+  SupportedConnectionType,
+} from "src/pages/objects/helpers";
 import { Connection, ConnectionType, Destination, DestinationSchema, TargetType } from "src/rpc/api";
 import { mergeClasses } from "src/utils/twmerge";
 import { z } from "zod";
 
-const BaseSchema = z.object({
-  displayName: z.string().min(1, { message: "Please enter a display name" }),
-  destination: DestinationSchema,
-});
-
-const WebhookSchema = BaseSchema.extend({
-  connectionType: z.literal(ConnectionType.Webhook),
-  targetType: z.literal(TargetType.Webhook),
-});
-
-const BigQuerySchema = BaseSchema.extend({
-  connectionType: z.literal(ConnectionType.BigQuery),
-  targetType: z.enum([TargetType.SingleExisting]),
-  namespace: z.string(),
-  tableName: z.string(),
-});
-
-const DynamoDbSchema = BaseSchema.extend({
-  connectionType: z.literal(ConnectionType.DynamoDb),
-  tableName: z.string(),
-  targetType: z.enum([TargetType.SingleExisting]),
-});
-
-const FormSchema = z.discriminatedUnion("connectionType", [WebhookSchema, BigQuerySchema, DynamoDbSchema]);
-
-type FormType = z.infer<typeof FormSchema>;
 interface DestinationSetupProps {
   initialFormState?: {
     displayName?: string;
@@ -45,20 +26,17 @@ interface DestinationSetupProps {
     namespace?: string | undefined;
     tableName?: string | undefined;
   };
-  handleNextStep: (values: FormType) => void;
+  onComplete: (values: DestinationSetupFormType) => void;
   isUpdate?: boolean;
 }
 
-type UseFormReturn = ReturnType<typeof useForm<z.infer<typeof FormSchema>>>;
+type UseFormReturn = ReturnType<typeof useForm<DestinationSetupFormType>>;
 type Control = UseFormReturn["control"];
 type Errors = UseFormReturn["formState"]["errors"];
 
-const allowedConnectionTypes = [ConnectionType.BigQuery, ConnectionType.DynamoDb, ConnectionType.Webhook] as const;
-type AllowedConnectionType = (typeof allowedConnectionTypes)[number];
-
-function initializeFormState(initial: DestinationSetupProps["initialFormState"]): Partial<FormType> {
+function initializeFormState(initial: DestinationSetupProps["initialFormState"]): Partial<DestinationSetupFormType> {
   const connectionType = initial?.destination?.connection?.connection_type;
-  if (connectionType && !allowedConnectionTypes.includes(connectionType as AllowedConnectionType)) {
+  if (connectionType && !SUPPORTED_CONNECTION_TYPES.includes(connectionType as SupportedConnectionType)) {
     return {};
   }
 
@@ -66,7 +44,7 @@ function initializeFormState(initial: DestinationSetupProps["initialFormState"])
     return {
       displayName: initial?.displayName,
       destination: initial?.destination,
-      connectionType: connectionType as ConnectionType.BigQuery | undefined,
+      connectionType,
       targetType: TargetType.SingleExisting,
       namespace: initial?.namespace,
       tableName: initial?.tableName,
@@ -76,7 +54,7 @@ function initializeFormState(initial: DestinationSetupProps["initialFormState"])
       displayName: initial?.displayName,
       destination: initial?.destination,
       tableName: initial?.tableName,
-      connectionType: connectionType as ConnectionType.DynamoDb | undefined,
+      connectionType,
       targetType: TargetType.SingleExisting,
     };
   } else {
@@ -89,10 +67,11 @@ function initializeFormState(initial: DestinationSetupProps["initialFormState"])
   }
 }
 
-export const DestinationSetup: React.FC<DestinationSetupProps> = ({ isUpdate, handleNextStep, initialFormState }) => {
-  const form = useForm<FormType>({
+export const DestinationSetup: React.FC<DestinationSetupProps> = ({ isUpdate, onComplete, initialFormState }) => {
+  const form = useForm<DestinationSetupFormType>({
     resolver: async (data, context, options) => {
-      const errors = await zodResolver(FormSchema)(data, context, options);
+      const errors = await zodResolver(DestinationSetupFormSchema)(data, context, options);
+      console.log("destinationSetupResolverErrors", errors);
       return errors;
     },
     defaultValues: initializeFormState(initialFormState),
@@ -104,9 +83,11 @@ export const DestinationSetup: React.FC<DestinationSetupProps> = ({ isUpdate, ha
     control,
     watch,
   } = form;
+  const fullWatch = watch();
+  console.log("destinationSetupErrors", errors, fullWatch);
 
   const onSubmit = handleSubmit((values) => {
-    handleNextStep(values);
+    onComplete(values);
   });
 
   const connectionType = watch("connectionType");
@@ -150,22 +131,15 @@ export const DestinationSetup: React.FC<DestinationSetupProps> = ({ isUpdate, ha
                     } else {
                       form.setValue("targetType", TargetType.SingleExisting);
                     }
-
-                    if (!allowedConnectionTypes.includes(connectionType as AllowedConnectionType)) {
-                      form.setError("destination", {
-                        message: "This destination is not supported.",
-                      });
-                      return;
-                    } else {
-                      form.clearErrors("destination");
-                    }
-                    form.setValue("connectionType", connectionType as AllowedConnectionType);
+                    form.setValue("connectionType", connectionType as SupportedConnectionType);
+                    form.trigger("targetType");
+                    form.trigger("connectionType");
                   }}
                 />
               );
             }}
           />
-          {errors.destination && <div className="tw-text-red-500 tw-mt-1">{errors.destination.message}</div>}
+          <FormError message={errors.destination?.message || errors.connectionType?.message} />
         </div>
         {(connectionType === ConnectionType.BigQuery || connectionType === ConnectionType.DynamoDb) && (
           <ObjectTargetFieldset control={control} errors={errors} disabled={isUpdate} />
