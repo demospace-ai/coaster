@@ -1,6 +1,7 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BackButton } from "src/components/button/Button";
+import { ShouldNotReach } from "src/components/ShouldNotReach";
 import { Step } from "src/pages/objects/helpers";
 import { DestinationSetup } from "src/pages/objects/NewObject/DestinationSetupStep";
 import { ExistingObjectFields } from "src/pages/objects/NewObject/ExistingObjectFieldsStep";
@@ -37,10 +38,14 @@ export const NewObject: React.FC<NewObjectProps> = ({ existingDestination, exist
   switch (state.step) {
     case Step.UnsupportedConnectionType: {
       content = (
-        <div>
-          <h3>This is not supported</h3>
-          {state.message ?? "Unsupported connection type"}
-        </div>
+        <ShouldNotReach error={new Error(`Found an unsupported connection type ${state.connectionType}`)}>
+          <div className="tw-text-center">
+            <h3 className="tw-font-bold tw-text-xl tw-mb-2">Unable to proceed</h3>
+            <div className="tw-max-w-xs">
+              {state.message ?? "Unsupported connection type. Please contact the Fabra team for more help."}
+            </div>
+          </div>
+        </ShouldNotReach>
       );
       break;
     }
@@ -98,7 +103,14 @@ export const NewObject: React.FC<NewObjectProps> = ({ existingDestination, exist
       break;
     }
     default:
-      content = <div>Unknown step</div>;
+      content = (
+        <ShouldNotReach error={new Error("Found an invalid step in NewObject")}>
+          <div className="tw-text-center">
+            <h3 className="tw-font-bold tw-text-xl tw-mb-2">Unable to proceed</h3>
+            <div className="tw-max-w-xs">Unknown step. Please contact the Fabra team for more help.</div>
+          </div>
+        </ShouldNotReach>
+      );
   }
 
   return (

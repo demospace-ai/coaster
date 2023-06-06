@@ -83,13 +83,10 @@ export const Finalize: React.FC<FinalizeStepProps> = ({
     },
   );
 
-  console.log("errors", errors);
-
-  // TODO: fix this.
   const fields: Field[] = objectFields.objectFields
     .filter((field) => field.name && field.type && !field.omit && !field.optional)
     .map((field) => {
-      return { name: field.name!, type: field.type! };
+      return { name: field.name, type: field.type };
     });
 
   const syncMode = watch("syncMode");

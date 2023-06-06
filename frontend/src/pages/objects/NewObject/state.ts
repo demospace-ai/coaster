@@ -61,6 +61,14 @@ type FinalizeStepSchema = z.infer<typeof FinalizeStepSchema>;
 /** If somehow we get to a destination whose connection type isn't supported yet. */
 const UnsupportedConnectionTypeSchema = z.object({
   step: z.literal(Step.UnsupportedConnectionType),
+  connectionType: z.enum([
+    ConnectionType.Postgres,
+    ConnectionType.Redshift,
+    ConnectionType.Snowflake,
+    ConnectionType.Synapse,
+    ConnectionType.MongoDb,
+    ConnectionType.MySQL,
+  ]),
   message: z.string(),
 });
 type UnsupportedConnectionTypeSchema = z.infer<typeof UnsupportedConnectionTypeSchema>;
@@ -273,6 +281,7 @@ export function useStateMachine(args: InitializeStateArgs, onComplete: () => voi
           default: {
             return {
               step: Step.UnsupportedConnectionType,
+              connectionType: connectionType,
               message: `${getConnectionType(
                 connectionType,
               )} destinations are not supported yet. Message the Fabra team about this!`,
