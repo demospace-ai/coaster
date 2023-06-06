@@ -79,7 +79,8 @@ export const Finalize: React.FC<FinalizeStepProps> = ({
       },
       onError: (e) => {
         showToast("error", isUpdate ? "Failed to update object." : "Failed to create object.", 4000);
-        setError("root.createError", { message: e.message });
+        // Sets the form-level error message.
+        setError("root.createObject", { message: e.message });
       },
     },
   );
@@ -118,8 +119,8 @@ export const Finalize: React.FC<FinalizeStepProps> = ({
     <form
       className="tw-flex tw-flex-col tw-w-100"
       onSubmit={handleSubmit((values) => {
+        clearErrors("root.createObject");
         saveConfigurationMutation.mutate(values);
-        clearErrors("root.createError");
       })}
     >
       <div className="tw-w-full tw-text-center tw-mb-2 tw-font-bold tw-text-lg">Object Settings</div>
@@ -335,6 +336,7 @@ export const Finalize: React.FC<FinalizeStepProps> = ({
       <Button type="submit" className="tw-mt-10 tw-w-full tw-h-10">
         {saveConfigurationMutation.isLoading ? <Loading /> : existingObject ? "Update Object" : "Create Object"}
       </Button>
+      <FormError message={errors.root?.createObject?.message} />
     </form>
   );
 };
