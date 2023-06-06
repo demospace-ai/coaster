@@ -89,7 +89,6 @@ const ExistingObjectFieldsForm: React.FC<{
   });
 
   const onSubmit = handleSubmit((values) => {
-    console.log("values", values);
     onComplete(values);
   });
 

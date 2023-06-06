@@ -180,22 +180,6 @@ function initializeState({
     objectFields = [];
   }
 
-  // const state = initializeFromDestination(maybeDestination);
-
-  // const connectionType = maybeDestination.connection.connection_type;
-  // if (!SUPPORTED_CONNECTION_TYPES.includes(connectionType as SupportedConnectionType)) {
-  //   return {
-  //     step: Step.UnsupportedConnectionType,
-  //     message: `Connection type ${connectionType} is not supported yet. Message team@fabra.io to let us know you want this!`,
-  //   } as UnsupportedConnectionTypeSchema;
-  // }
-
-  // if (connectionType === ConnectionType.Webhook) {
-  //   state.destinationSetupData.targetType = TargetType.Webhook;
-  //   state.endCustomerIdField = { name: "end_customer_id", type: FieldType.Integer };
-  // } else {
-  //   state.destinationSetupData.targetType = TargetType.SingleExisting;
-  // }
   const initialState: InitialStepSchema = {
     step: Step.Initial,
     destinationSetup,
@@ -205,7 +189,6 @@ function initializeState({
     finalize,
   };
 
-  console.log("final initial state", initialState);
   return initialState;
 }
 
