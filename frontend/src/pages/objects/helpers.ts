@@ -234,9 +234,9 @@ export const createNewObject = async (args: {
     throw new Error("endCustomerIdField is required");
   }
   const payload: CreateObjectRequest = {
-    display_name: destinationSetup.displayName!,
-    destination_id: destinationSetup.destination!.id,
-    target_type: destinationSetup.targetType!,
+    display_name: destinationSetup.displayName,
+    destination_id: destinationSetup.destination.id,
+    target_type: destinationSetup.targetType,
     namespace: destinationSetup.namespace ?? "",
     table_name: destinationSetup.tableName ?? "",
     sync_mode: finalizeValues.syncMode,
