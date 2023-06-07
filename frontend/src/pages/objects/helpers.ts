@@ -105,7 +105,7 @@ export const ObjectFieldsSchema = z.object({
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: "Must set a field type",
-            path: ["type"],
+            path: ["fieldType"],
           });
         }
       }),
