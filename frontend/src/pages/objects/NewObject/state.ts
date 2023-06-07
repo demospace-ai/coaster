@@ -166,6 +166,7 @@ function initializeState({
       };
     }
     finalize = {
+      connectionType,
       syncMode: existingObject.sync_mode,
       cursorField: objectFields.find((field) => field.name === existingObject.cursor_field),
       endCustomerIdField: formCustomerIdField,

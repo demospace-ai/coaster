@@ -117,6 +117,9 @@ export type SupportedConnectionType = (typeof SUPPORTED_CONNECTION_TYPES)[number
 /** Finalize object form. */
 export const FinalizeObjectFormSchema = z
   .object({
+    connectionType: z.nativeEnum(ConnectionType, {
+      errorMap: () => ({ message: "Connection type is invalid or unsupported" }),
+    }),
     recurring: z.boolean(),
     cursorField: FieldSchema.optional(),
     primaryKey: FieldSchema.optional(),

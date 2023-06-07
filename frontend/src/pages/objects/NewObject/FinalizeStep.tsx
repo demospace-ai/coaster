@@ -52,6 +52,7 @@ export const Finalize: React.FC<FinalizeStepProps> = ({
     resolver: zodResolver(FinalizeObjectFormSchema),
     defaultValues: {
       ...initialFormState,
+      connectionType: destinationSetup.connectionType,
       endCustomerIdField: initialFormState?.endCustomerIdField
         ? initialFormState.endCustomerIdField
         : destinationSetup.connectionType === ConnectionType.Webhook
@@ -337,6 +338,7 @@ export const Finalize: React.FC<FinalizeStepProps> = ({
         {saveConfigurationMutation.isLoading ? <Loading /> : existingObject ? "Update Object" : "Create Object"}
       </Button>
       <FormError message={errors.root?.createObject?.message} />
+      <FormError message={errors.connectionType?.message} />
     </form>
   );
 };
