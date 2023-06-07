@@ -1,6 +1,6 @@
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { Controller, FieldError, useFieldArray, useForm } from "react-hook-form";
 import { Button, DeleteButton } from "src/components/button/Button";
 import { Checkbox } from "src/components/checkbox/Checkbox";
 import { FormError } from "src/components/FormError";
@@ -9,7 +9,6 @@ import { Input } from "src/components/input/Input";
 import { FieldTypeSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { ObjectFieldsFormType, ObjectFieldsSchema } from "src/pages/objects/helpers";
-import { FieldType } from "src/rpc/api";
 
 interface NewObjectFieldsProps {
   isUpdate?: boolean;
@@ -116,7 +115,10 @@ export function NewObjectFields({ initialFormState, onComplete, isUpdate = false
                   />
                 </div>
               </div>
-              <FormError message={errors.objectFields?.[i]?.name?.message} />
+              <div className="tw-flex">
+                <FormError className="tw-w-[405px]" message={errors.objectFields?.[i]?.name?.message} />
+                <FormError message={(errors.objectFields?.[i]?.type as FieldError | undefined)?.message} />
+              </div>
               <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
                 <span>Display Name</span>
                 <Tooltip
@@ -170,7 +172,7 @@ export function NewObjectFields({ initialFormState, onComplete, isUpdate = false
               onClick={() =>
                 append({
                   name: "",
-                  type: FieldType.String,
+                  type: undefined,
                   omit: false,
                   optional: false,
                 })
