@@ -370,7 +370,7 @@ export interface CreateLinkTokenResponse {
 export const ObjectFieldSchema = z.object({
   id: z.number(),
   name: z.string().min(1, { message: "Field name must be at least 1 character long" }),
-  type: z.nativeEnum(FieldType),
+  fieldType: z.nativeEnum(FieldType),
   omit: z.boolean(),
   optional: z.boolean(),
   display_name: z.string().optional(),

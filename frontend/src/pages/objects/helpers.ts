@@ -99,9 +99,9 @@ export const ObjectFieldsSchema = z.object({
     .array(
       ObjectFieldSchema.partial({
         id: true,
-        type: true,
+        fieldType: true,
       }).superRefine((values, ctx) => {
-        if (!values.type) {
+        if (!values.fieldType) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: "Must set a field type",
