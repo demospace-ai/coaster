@@ -1,7 +1,6 @@
 package link_tokens
 
 import (
-	"encoding/base64"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -13,6 +12,16 @@ type TokenInfo struct {
 	OrganizationID int64   `json:"organization_id"`
 	EndCustomerID  string  `json:"end_customer_id"`
 	DestinationIDs []int64 `json:"destination_ids"`
+}
+
+func (t TokenInfo) HasDestination(destinationID int64) bool {
+	for _, id := range t.DestinationIDs {
+		if id == destinationID {
+			return true
+		}
+	}
+
+	return false
 }
 
 type LinkTokenClaims struct {
@@ -34,17 +43,11 @@ func CreateLinkToken(tokenInfo TokenInfo) (*string, error) {
 		return nil, errors.Wrap(err, "(link_tokens.CreateLinkToken) signing token")
 	}
 
-	encoded := base64.StdEncoding.EncodeToString([]byte(signedToken))
-	return &encoded, nil
+	return &signedToken, nil
 }
 
 func ValidateLinkToken(linkTokenStr string) (*TokenInfo, error) {
-	decoded, err := base64.StdEncoding.DecodeString(linkTokenStr)
-	if err != nil {
-		return nil, errors.Wrap(err, "(link_tokens.ValidateLinkToken) decoding token")
-	}
-
-	token, err := jwt.ParseWithClaims(string(decoded), &LinkTokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(linkTokenStr, &LinkTokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return nil, nil // no key needs to be fetched— we just call the GCP KMS endpoint
 	})
 

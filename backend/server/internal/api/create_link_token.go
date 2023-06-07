@@ -14,7 +14,7 @@ import (
 
 type CreateLinkTokenRequest struct {
 	EndCustomerID  string             `json:"end_customer_id" validate:"required"`
-	DestinationIDs []int64            `json:"destination_ids,omitempty"`
+	DestinationIDs []int64            `json:"destination_ids"`
 	WebhookData    *input.WebhookData `json:"webhook_data,omitempty"`
 }
 

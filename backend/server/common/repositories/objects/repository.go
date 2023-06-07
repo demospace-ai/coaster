@@ -114,6 +114,27 @@ func LoadAllObjects(
 	return objects, nil
 }
 
+func LoadObjectsForDestinations(
+	db *gorm.DB,
+	organizationID int64,
+	destinationIDs []int64,
+) ([]models.Object, error) {
+	var objects []models.Object
+	result := db.Table("objects").
+		Select("objects.*").
+		Where("objects.organization_id = ?", organizationID).
+		Where("objects.destination_id IN ?", destinationIDs).
+		Where("objects.deactivated_at IS NULL").
+		Order("objects.created_at ASC").
+		Find(&objects)
+
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(objects.LoadAllObjects)")
+	}
+
+	return objects, nil
+}
+
 // OrganizationID is used to check that the object belongs to the organization.
 func CreateObjectField(
 	db *gorm.DB,

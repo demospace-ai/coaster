@@ -361,6 +361,7 @@ export type UpdateObjectRequest = Partial<Omit<CreateObjectRequest, "object_fiel
 
 export interface CreateLinkTokenRequest {
   end_customer_id: string;
+  destination_ids?: number[];
 }
 
 export interface CreateLinkTokenResponse {

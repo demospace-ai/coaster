@@ -34,6 +34,10 @@ export const Destination: React.FC = () => {
       </div>
       <div className="tw-flex tw-flex-col tw-w-fit tw-flex-wrap tw-items-start tw-px-3 tw-pt-1 tw-pb-2 tw-mt-3 tw-mb-5 tw-bg-white tw-border tw-border-slate-200 tw-rounded-md">
         <div className="tw-flex tw-flex-row tw-items-center tw-mt-1">
+          <span className="tw-font-medium tw-whitespace-pre">Destination ID: </span>
+          {destination.id}
+        </div>
+        <div className="tw-flex tw-flex-row tw-items-center tw-mt-1">
           <span className="tw-font-medium tw-whitespace-pre">Destination Type: </span>
           {getConnectionType(destination.connection.connection_type)}
           <ConnectionImage connectionType={destination.connection.connection_type} className="tw-h-5 tw-ml-1" />
