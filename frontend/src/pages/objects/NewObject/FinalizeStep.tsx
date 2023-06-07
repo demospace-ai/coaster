@@ -49,7 +49,10 @@ export const Finalize: React.FC<FinalizeStepProps> = ({
     clearErrors,
     handleSubmit,
   } = useForm<FinalizeObjectFormType>({
-    resolver: zodResolver(FinalizeObjectFormSchema),
+    resolver: async (data, context, options) => {
+      const errors = await zodResolver(FinalizeObjectFormSchema)(data, context, options);
+      return errors;
+    },
     defaultValues: {
       ...initialFormState,
       connectionType: destinationSetup.connectionType,

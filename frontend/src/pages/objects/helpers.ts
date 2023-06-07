@@ -136,9 +136,19 @@ export const FinalizeObjectFormSchema = z
       .optional(),
     frequencyUnits: z.nativeEnum(FrequencyUnits).optional(),
     syncMode: z.nativeEnum(SyncMode),
-    endCustomerIdField: FieldSchema,
+    endCustomerIdField: FieldSchema.optional(),
   })
   .superRefine((values, ctx) => {
+    if (values.connectionType !== ConnectionType.Webhook) {
+      if (!values.endCustomerIdField) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Please select an end customer ID field",
+          path: ["endCustomerIdField"],
+        });
+      }
+    }
+
     if (values.recurring) {
       if (!values.frequency) {
         ctx.addIssue({
