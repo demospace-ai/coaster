@@ -9,7 +9,6 @@ import { Input } from "src/components/input/Input";
 import { FieldTypeSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import { ObjectFieldsFormType, ObjectFieldsSchema } from "src/pages/objects/helpers";
-import { FieldType } from "src/rpc/api";
 
 interface NewObjectFieldsProps {
   isUpdate?: boolean;
@@ -102,9 +101,9 @@ export function NewObjectFields({ initialFormState, onComplete, isUpdate = false
                     </Tooltip>
                   </div>
                   <Controller
-                    name={`objectFields.${i}.type`}
+                    name={`objectFields.${i}.fieldType`}
                     control={control}
-                    defaultValue={objectField.type}
+                    defaultValue={objectField.fieldType}
                     render={({ field }) => (
                       <FieldTypeSelector
                         className="tw-w-48 tw-m-0"
@@ -116,7 +115,10 @@ export function NewObjectFields({ initialFormState, onComplete, isUpdate = false
                   />
                 </div>
               </div>
-              <FormError message={errors.objectFields?.[i]?.name?.message} />
+              <div className="tw-flex">
+                <FormError className="tw-w-[405px]" message={errors.objectFields?.[i]?.name?.message} />
+                <FormError message={errors.objectFields?.[i]?.fieldType?.message} />
+              </div>
               <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
                 <span>Display Name</span>
                 <Tooltip
@@ -170,7 +172,7 @@ export function NewObjectFields({ initialFormState, onComplete, isUpdate = false
               onClick={() =>
                 append({
                   name: "",
-                  type: FieldType.String,
+                  fieldType: undefined,
                   omit: false,
                   optional: false,
                 })

@@ -19,7 +19,7 @@ import {
   ObjectFieldsFormType,
   updateObject,
 } from "src/pages/objects/helpers";
-import { ConnectionType, FabraObject, Field, FrequencyUnits, GetObjects, SyncMode } from "src/rpc/api";
+import { ConnectionType, FabraObject, Field, FrequencyUnits, GetObjects, ObjectField, SyncMode } from "src/rpc/api";
 import { useMutation } from "src/utils/queryHelpers";
 import { mutate } from "swr";
 
@@ -82,9 +82,9 @@ export const Finalize: React.FC<FinalizeStepProps> = ({
   );
 
   const fields: Field[] = objectFields.objectFields
-    .filter((field) => field.name && field.type && !field.omit && !field.optional)
+    .filter((field): field is ObjectField => Boolean(field.name && field.fieldType && !field.omit && !field.optional))
     .map((field) => {
-      return { name: field.name, type: field.type };
+      return { name: field.name, type: field.fieldType };
     });
 
   const syncMode = watch("syncMode");
