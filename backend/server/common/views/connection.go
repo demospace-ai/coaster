@@ -53,7 +53,7 @@ type Object struct {
 	SyncMode           models.SyncMode        `json:"sync_mode"`
 	CursorField        *string                `json:"cursor_field,omitempty"`
 	PrimaryKey         *string                `json:"primary_key,omitempty"`
-	EndCustomerIDField string                 `json:"end_customer_id_field"`
+	EndCustomerIDField *string                `json:"end_customer_id_field"`
 	Recurring          bool                   `json:"recurring"`
 	Frequency          *int64                 `json:"frequency,omitempty"`
 	FrequencyUnits     *models.FrequencyUnits `json:"frequency_units,omitempty"`

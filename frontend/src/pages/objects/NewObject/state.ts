@@ -11,18 +11,16 @@ import {
   ObjectFieldsFormType,
   ObjectFieldsSchema,
   Step,
-  createDummyWebhookCustomerIdField,
 } from "src/pages/objects/helpers";
 import {
   ConnectionType,
   Destination,
   FabraObject,
   Field,
-  FieldType,
-  ObjectField,
-  TargetType,
   getConnectionType,
+  ObjectField,
   shouldCreateFields,
+  TargetType,
 } from "src/rpc/api";
 import { z } from "zod";
 
@@ -38,7 +36,6 @@ const CreatingObjectStepSchema = z.object({
   step: z.literal(Step.CreateFields),
   destinationSetup: DestinationSetupFormSchema,
   objectFields: ObjectFieldsSchema.optional(),
-
   finalize: FinalizeObjectFormSchema.optional(),
 });
 type CreatingObjectStepSchema = z.infer<typeof CreatingObjectStepSchema>;
@@ -151,21 +148,21 @@ function initializeState({
   if (existingObject) {
     objectFields = existingObject.object_fields;
     const endCustomerIdField = objectFields.find((field) => field.name === existingObject.end_customer_id_field);
-    let formCustomerIdField: Field;
-    // Our hacky way of filling in the end-customer ID field for webhooks.
-    if (connectionType === ConnectionType.Webhook) {
-      formCustomerIdField = createDummyWebhookCustomerIdField(existingObject.end_customer_id_field);
-    } else if (!endCustomerIdField) {
-      // This should never happen. Otherwise the server has a bug.
-      // Maybe in the future we can return the full field in the API response instead of just the name.
-      throw new Error("End customer ID field not found");
-    } else {
-      formCustomerIdField = {
-        name: existingObject.end_customer_id_field,
-        type: endCustomerIdField.type,
-      };
+    let formCustomerIdField: Field | undefined;
+    if (connectionType !== ConnectionType.Webhook) {
+      if (!endCustomerIdField) {
+        // This should never happen. Otherwise the server has a bug.
+        // Maybe in the future we can return the full field in the API response instead of just the name.
+        throw new Error("End Customer ID field not found");
+      } else {
+        formCustomerIdField = {
+          name: existingObject.end_customer_id_field,
+          type: endCustomerIdField.type!,
+        };
+      }
     }
     finalize = {
+      connectionType,
       syncMode: existingObject.sync_mode,
       cursorField: objectFields.find((field) => field.name === existingObject.cursor_field),
       endCustomerIdField: formCustomerIdField,

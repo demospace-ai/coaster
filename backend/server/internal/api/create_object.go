@@ -33,7 +33,7 @@ type CreateObjectRequest struct {
 	SyncMode           models.SyncMode        `json:"sync_mode" validate:"required"`
 	CursorField        *string                `json:"cursor_field,omitempty"`
 	PrimaryKey         *string                `json:"primary_key,omitempty"`
-	EndCustomerIDField string                 `json:"end_customer_id_field" validate:"required"`
+	EndCustomerIDField *string                `json:"end_customer_id_field,omitempty"`
 	Recurring          *bool                  `json:"recurring,omitempty" validate:"required"`
 	Frequency          *int64                 `json:"frequency,omitempty"`
 	FrequencyUnits     *models.FrequencyUnits `json:"frequency_units,omitempty"`
@@ -81,6 +81,10 @@ func (s ApiService) CreateObject(auth auth.Authentication, w http.ResponseWriter
 		}
 	}
 
+	if createObjectRequest.TargetType != models.TargetTypeWebhook && createObjectRequest.EndCustomerIDField == nil {
+		return errors.Wrap(errors.NewBadRequest("must specify end_customer_id_field for non-webhook objects"), "(api.CreateObject)")
+	}
+
 	// TODO: create model and fields in a transaction
 	object, err := objects.CreateObject(
 		s.db,
@@ -103,9 +107,11 @@ func (s ApiService) CreateObject(auth auth.Authentication, w http.ResponseWriter
 	}
 
 	// Ensure that the end customer ID field is marked as omit. It should not be exposed to the end customer
-	for i := range createObjectRequest.ObjectFields {
-		if createObjectRequest.ObjectFields[i].Name == createObjectRequest.EndCustomerIDField {
-			createObjectRequest.ObjectFields[i].Omit = true
+	if createObjectRequest.EndCustomerIDField != nil {
+		for i := range createObjectRequest.ObjectFields {
+			if createObjectRequest.ObjectFields[i].Name == *createObjectRequest.EndCustomerIDField {
+				createObjectRequest.ObjectFields[i].Omit = true
+			}
 		}
 	}
 

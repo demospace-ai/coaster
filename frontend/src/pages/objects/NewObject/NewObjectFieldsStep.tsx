@@ -1,9 +1,9 @@
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Checkbox } from "src/components/checkbox/Checkbox";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-import { FormError } from "src/components/FormError";
 import { Button, DeleteButton } from "src/components/button/Button";
+import { Checkbox } from "src/components/checkbox/Checkbox";
+import { FormError } from "src/components/FormError";
 import { InfoIcon } from "src/components/icons/Icons";
 import { Input } from "src/components/input/Input";
 import { FieldTypeSelector } from "src/components/selector/Selector";

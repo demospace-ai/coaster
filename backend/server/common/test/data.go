@@ -9,6 +9,7 @@ import (
 	"go.fabra.io/server/common/input"
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/repositories/sessions"
+	"go.fabra.io/server/common/strings"
 
 	"gorm.io/gorm"
 )
@@ -92,7 +93,7 @@ func CreateObject(db *gorm.DB, organizationID int64, destinationID int64, syncMo
 		DestinationID:      destinationID,
 		Namespace:          database.NewNullString("namespace"),
 		TableName:          database.NewNullString("table"),
-		EndCustomerIDField: "end_customer_id",
+		EndCustomerIDField: strings.GetPointer("end_customer_id"),
 		SyncMode:           syncMode,
 	}
 

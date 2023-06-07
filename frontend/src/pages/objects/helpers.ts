@@ -5,7 +5,6 @@ import {
   CreateObjectRequest,
   DestinationSchema,
   FabraObject,
-  Field,
   FieldSchema,
   FieldType,
   FrequencyUnits,
@@ -117,6 +116,7 @@ export type SupportedConnectionType = (typeof SUPPORTED_CONNECTION_TYPES)[number
 /** Finalize object form. */
 export const FinalizeObjectFormSchema = z
   .object({
+    connectionType: z.nativeEnum(ConnectionType),
     recurring: z.boolean(),
     cursorField: FieldSchema.optional(),
     primaryKey: FieldSchema.optional(),
@@ -133,9 +133,19 @@ export const FinalizeObjectFormSchema = z
       .optional(),
     frequencyUnits: z.nativeEnum(FrequencyUnits).optional(),
     syncMode: z.nativeEnum(SyncMode),
-    endCustomerIdField: FieldSchema,
+    endCustomerIdField: FieldSchema.optional(),
   })
   .superRefine((values, ctx) => {
+    if (values.connectionType !== ConnectionType.Webhook) {
+      if (!values.endCustomerIdField) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Please select an end customer ID field",
+          path: ["endCustomerIdField"],
+        });
+      }
+    }
+
     if (values.recurring) {
       if (!values.frequency) {
         ctx.addIssue({
@@ -230,19 +240,16 @@ export const createNewObject = async (args: {
   finalizeValues: FinalizeObjectFormType;
 }) => {
   const { destinationSetup, objectFields, finalizeValues } = args;
-  if (!finalizeValues.endCustomerIdField) {
-    throw new Error("endCustomerIdField is required");
-  }
   const payload: CreateObjectRequest = {
     display_name: destinationSetup.displayName,
     destination_id: destinationSetup.destination.id,
     target_type: destinationSetup.targetType,
-    namespace: destinationSetup.namespace ?? "",
-    table_name: destinationSetup.tableName ?? "",
+    namespace: destinationSetup.namespace,
+    table_name: destinationSetup.tableName,
     sync_mode: finalizeValues.syncMode,
     cursor_field: finalizeValues.cursorField?.name,
     primary_key: finalizeValues.primaryKey?.name,
-    end_customer_id_field: finalizeValues.endCustomerIdField.name,
+    end_customer_id_field: finalizeValues.endCustomerIdField ? finalizeValues.endCustomerIdField.name : undefined,
     recurring: finalizeValues.recurring,
     frequency: finalizeValues.frequency,
     frequency_units: finalizeValues.frequencyUnits,
@@ -292,11 +299,3 @@ export const updateObject = async (args: {
 
   return updateObjectResponse.object;
 };
-
-/** Do this in a shared method so it's searchable within the codebase. */
-export function createDummyWebhookCustomerIdField(name?: string, type?: FieldType): Field {
-  return {
-    name: name ?? "dummy_customer_id",
-    type: FieldType.String,
-  };
-}

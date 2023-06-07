@@ -181,7 +181,7 @@ func (bq BigQueryImpl) Write(
 
 	if rowsWritten > 0 {
 		writeMode := bq.toBigQueryWriteMode(sync.SyncMode)
-		csvSchema := bq.createCsvSchema(object.EndCustomerIDField, object.ObjectFields)
+		csvSchema := bq.createCsvSchema(*object.EndCustomerIDField, object.ObjectFields)
 		err := bq.client.LoadFromStaging(ctx, *object.Namespace, *object.TableName, query.LoadOptions{
 			GcsReference:   gcsReference,
 			BigQuerySchema: csvSchema,

@@ -267,6 +267,9 @@ export const createNewSource = async (
     case ConnectionType.MySQL:
       payload.mysql_config = state.newSourceState.mysqlConfig;
       break;
+    case ConnectionType.DynamoDb:
+      // TODO: throw an error
+      return;
     case ConnectionType.Webhook:
       // TODO: throw an error
       return;

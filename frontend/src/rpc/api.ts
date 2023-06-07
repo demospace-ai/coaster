@@ -339,9 +339,9 @@ export interface CreateObjectRequest {
   display_name: string;
   destination_id: number;
   target_type: TargetType;
-  namespace: string;
-  table_name: string;
-  end_customer_id_field: string;
+  namespace?: string;
+  table_name?: string;
+  end_customer_id_field?: string;
   sync_mode: SyncMode;
   recurring: boolean;
   frequency?: number;

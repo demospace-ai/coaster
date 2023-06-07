@@ -2,9 +2,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ChangeEvent } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { FormError } from "src/components/FormError";
 import { Button } from "src/components/button/Button";
 import { Checkbox } from "src/components/checkbox/Checkbox";
+import { FormError } from "src/components/FormError";
 import { InfoIcon } from "src/components/icons/Icons";
 import { ValidatedComboInput, ValidatedDropdownInput, ValidatedInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
@@ -12,15 +12,14 @@ import { useShowToast } from "src/components/notifications/Notifications";
 import { FieldSelector } from "src/components/selector/Selector";
 import { Tooltip } from "src/components/tooltip/Tooltip";
 import {
+  createNewObject,
   DestinationSetupFormType,
   FinalizeObjectFormSchema,
   FinalizeObjectFormType,
   ObjectFieldsFormType,
-  createDummyWebhookCustomerIdField,
-  createNewObject,
   updateObject,
 } from "src/pages/objects/helpers";
-import { ConnectionType, FabraObject, Field, FieldType, FrequencyUnits, GetObjects, SyncMode } from "src/rpc/api";
+import { ConnectionType, FabraObject, Field, FrequencyUnits, GetObjects, SyncMode } from "src/rpc/api";
 import { useMutation } from "src/utils/queryHelpers";
 import { mutate } from "swr";
 
@@ -52,11 +51,8 @@ export const Finalize: React.FC<FinalizeStepProps> = ({
     resolver: zodResolver(FinalizeObjectFormSchema),
     defaultValues: {
       ...initialFormState,
-      endCustomerIdField: initialFormState?.endCustomerIdField
-        ? initialFormState.endCustomerIdField
-        : destinationSetup.connectionType === ConnectionType.Webhook
-        ? createDummyWebhookCustomerIdField()
-        : undefined,
+      connectionType: destinationSetup.connectionType,
+      endCustomerIdField: initialFormState?.endCustomerIdField ? initialFormState.endCustomerIdField : undefined,
     },
   });
   const showToast = useShowToast();
@@ -337,6 +333,7 @@ export const Finalize: React.FC<FinalizeStepProps> = ({
         {saveConfigurationMutation.isLoading ? <Loading /> : existingObject ? "Update Object" : "Create Object"}
       </Button>
       <FormError message={errors.root?.createObject?.message} />
+      <FormError message={errors.connectionType?.message} />
     </form>
   );
 };
