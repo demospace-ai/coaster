@@ -6,8 +6,8 @@ import (
 	"go.fabra.io/server/common/application"
 	"go.fabra.io/server/common/crypto"
 	"go.fabra.io/server/common/errors"
+	"go.fabra.io/server/common/link_tokens"
 	"go.fabra.io/server/common/models"
-	"go.fabra.io/server/common/repositories/link_tokens"
 	"go.fabra.io/server/common/repositories/organizations"
 	"go.fabra.io/server/common/repositories/sessions"
 	"go.fabra.io/server/common/repositories/users"
@@ -58,7 +58,7 @@ func (as AuthServiceImpl) authenticateCookie(r *http.Request) (*Authentication, 
 				IsAuthenticated: false,
 			}, nil
 		} else {
-			return nil, errors.Wrap(err, "authenticateCookie")
+			return nil, errors.Wrap(err, "(auth.authenticateCookie)")
 		}
 	}
 
@@ -70,22 +70,22 @@ func (as AuthServiceImpl) authenticateCookie(r *http.Request) (*Authentication, 
 				IsAuthenticated: false,
 			}, nil
 		} else {
-			return nil, errors.Wrap(err, "authenticateCookie")
+			return nil, errors.Wrap(err, "(auth.authenticateCookie)")
 		}
 	}
 
 	refreshed, err := sessions.Refresh(as.db, session)
 	if err != nil {
-		return nil, errors.Wrap(err, "authenticateCookie")
+		return nil, errors.Wrap(err, "(auth.authenticateCookie)")
 	}
 
 	user, err := users.LoadUserByID(as.db, session.UserID)
 	if err != nil {
-		return nil, errors.Wrap(err, "Unexpected error fetching user: authenticateCookie")
+		return nil, errors.Wrap(err, "(auth.authenticateCookie) Unexpected error fetching user")
 	}
 
 	if user.Blocked {
-		return nil, errors.Wrap(errors.Forbidden, "authenticateCookie")
+		return nil, errors.Wrap(errors.Forbidden, "(auth.authenticateCookie)")
 	}
 
 	// If organization is null, this means the user still needs to set their organization
@@ -93,7 +93,7 @@ func (as AuthServiceImpl) authenticateCookie(r *http.Request) (*Authentication, 
 	if user.OrganizationID.Valid {
 		organization, err = organizations.LoadOrganizationByID(as.db, user.OrganizationID.Int64)
 		if err != nil {
-			return nil, errors.Wrap(err, "Unexpected error fetching organization: authenticateCookie")
+			return nil, errors.Wrap(err, "(auth.authenticateCookie) Unexpected error fetching organization")
 		}
 	}
 
@@ -116,7 +116,7 @@ func (as AuthServiceImpl) authApiKey(r *http.Request) (*Authentication, error) {
 	hashedKey := crypto.HashString(apiKey)
 	organization, err := organizations.LoadOrganizationByApiKey(as.db, hashedKey)
 	if err != nil {
-		return nil, errors.Wrap(err, "authApiKey")
+		return nil, errors.Wrap(err, "(auth.authApiKey)")
 	}
 
 	return &Authentication{
@@ -133,26 +133,18 @@ func (as AuthServiceImpl) authLinkToken(r *http.Request) (*Authentication, error
 		}, nil
 	}
 
-	hashedToken := crypto.HashString(linkToken)
-	linkTokenModel, err := link_tokens.LoadLinkTokenByHash(as.db, hashedToken)
+	tokenInfo, err := link_tokens.ValidateLinkToken(linkToken)
 	if err != nil {
-		if errors.IsRecordNotFound(err) {
-			// this just means that the authentication failed, not unexpected
-			return &Authentication{
-				IsAuthenticated: false,
-			}, nil
-		} else {
-			return nil, errors.Wrap(err, "authLinkToken")
-		}
+		return nil, errors.Wrap(err, "(auth.authLinkToken)")
 	}
 
-	organization, err := organizations.LoadOrganizationByID(as.db, linkTokenModel.OrganizationID)
+	organization, err := organizations.LoadOrganizationByID(as.db, tokenInfo.OrganizationID)
 	if err != nil {
-		return nil, errors.Wrap(err, "authLinkToken")
+		return nil, errors.Wrap(err, "(auth.authLinkToken)")
 	}
 
 	return &Authentication{
-		LinkToken:       linkTokenModel,
+		LinkToken:       tokenInfo,
 		Organization:    organization,
 		IsAuthenticated: true,
 	}, nil
@@ -161,7 +153,7 @@ func (as AuthServiceImpl) authLinkToken(r *http.Request) (*Authentication, error
 func (as AuthServiceImpl) GetAuthentication(r *http.Request) (*Authentication, error) {
 	authentication, err := as.authenticateCookie(r)
 	if err != nil {
-		return nil, errors.Wrap(err, "GetAuthentication")
+		return nil, errors.Wrap(err, "(auth.GetAuthentication)")
 	}
 
 	if authentication.IsAuthenticated {
@@ -171,7 +163,7 @@ func (as AuthServiceImpl) GetAuthentication(r *http.Request) (*Authentication, e
 	// no session found check for API key authentication first
 	authentication, err = as.authApiKey(r)
 	if err != nil {
-		return nil, errors.Wrap(err, "GetAuthentication")
+		return nil, errors.Wrap(err, "(auth.GetAuthentication)")
 	}
 	if authentication.IsAuthenticated {
 		return authentication, nil
@@ -186,7 +178,7 @@ func (as AuthServiceImpl) GetLinkAuthentication(r *http.Request) (*Authenticatio
 	// try link token first since some methods depends on it
 	authentication, err := as.authLinkToken(r)
 	if err != nil {
-		return nil, errors.Wrap(err, "GetLinkAuthentication")
+		return nil, errors.Wrap(err, "(auth.GetLinkAuthentication)")
 	}
 	if authentication.IsAuthenticated {
 		return authentication, nil
@@ -195,7 +187,7 @@ func (as AuthServiceImpl) GetLinkAuthentication(r *http.Request) (*Authenticatio
 	// some link authenticated routes should also work with regular authentication
 	authentication, err = as.GetAuthentication(r)
 	if err != nil {
-		return nil, errors.Wrap(err, "GetLinkAuthentication")
+		return nil, errors.Wrap(err, "(auth.GetLinkAuthentication)")
 	}
 	if authentication.IsAuthenticated {
 		return authentication, nil

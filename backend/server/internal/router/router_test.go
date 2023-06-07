@@ -183,6 +183,11 @@ var _ = Describe("Router", func() {
 		Expect(result.StatusCode).To(Equal(http.StatusUnauthorized))
 	})
 
+	// TODO: test link signature verification
+	It("returns 401 when link token has invalid signature for link authenticated route", func() {
+		// TODO: implement
+	})
+
 	It("returns 200 when active link token provided for link authenticated route", func() {
 		rr := httptest.NewRecorder()
 		req, err := http.NewRequest("GET", "/linkauthenticated", nil)

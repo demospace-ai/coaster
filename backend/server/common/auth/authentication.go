@@ -1,11 +1,14 @@
 package auth
 
-import "go.fabra.io/server/common/models"
+import (
+	"go.fabra.io/server/common/link_tokens"
+	"go.fabra.io/server/common/models"
+)
 
 type Authentication struct {
 	Session         *models.Session
 	User            *models.User
 	Organization    *models.Organization
-	LinkToken       *models.LinkToken
+	LinkToken       *link_tokens.TokenInfo
 	IsAuthenticated bool
 }

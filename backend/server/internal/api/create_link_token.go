@@ -1,23 +1,21 @@
 package api
 
 import (
-	"crypto/rand"
-	"encoding/base64"
 	"encoding/json"
 	"net/http"
 
 	"go.fabra.io/server/common/auth"
-	"go.fabra.io/server/common/crypto"
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/input"
-	"go.fabra.io/server/common/repositories/link_tokens"
+	"go.fabra.io/server/common/link_tokens"
 	"go.fabra.io/server/common/repositories/webhooks"
 	"gorm.io/gorm"
 )
 
 type CreateLinkTokenRequest struct {
-	EndCustomerID string             `json:"end_customer_id" validate:"required"`
-	WebhookData   *input.WebhookData `json:"webhook_data,omitempty"`
+	EndCustomerID  string             `json:"end_customer_id" validate:"required"`
+	DestinationIDs []int64            `json:"destination_ids,omitempty"`
+	WebhookData    *input.WebhookData `json:"webhook_data,omitempty"`
 }
 
 type CreateLinkTokenResponse struct {
@@ -36,8 +34,11 @@ func (s ApiService) CreateLinkToken(auth auth.Authentication, w http.ResponseWri
 		return errors.Wrap(err, "(api.CreateLinkToken)")
 	}
 
-	rawLinkToken := generateLinkToken()
-	_, err = link_tokens.CreateLinkToken(s.db, auth.Organization.ID, createLinkTokenRequest.EndCustomerID, crypto.HashString(rawLinkToken))
+	signedToken, err := link_tokens.CreateLinkToken(link_tokens.TokenInfo{
+		OrganizationID: auth.Organization.ID,
+		EndCustomerID:  createLinkTokenRequest.EndCustomerID,
+		DestinationIDs: createLinkTokenRequest.DestinationIDs,
+	})
 	if err != nil {
 		return errors.Wrap(err, "(api.CreateLinkToken)")
 	}
@@ -71,15 +72,6 @@ func (s ApiService) CreateLinkToken(auth auth.Authentication, w http.ResponseWri
 	}
 
 	return json.NewEncoder(w).Encode(CreateLinkTokenResponse{
-		LinkToken: rawLinkToken,
+		LinkToken: *signedToken,
 	})
-}
-
-func generateLinkToken() string {
-	randomBytes := make([]byte, 32)
-	_, err := rand.Read(randomBytes)
-	if err != nil {
-		panic(err)
-	}
-	return base64.StdEncoding.EncodeToString(randomBytes)
 }

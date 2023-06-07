@@ -1,12 +1,15 @@
 package test
 
 import (
+	"encoding/base64"
 	"log"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"go.fabra.io/server/common/crypto"
 	"go.fabra.io/server/common/database"
 	"go.fabra.io/server/common/input"
+	"go.fabra.io/server/common/link_tokens"
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/repositories/sessions"
 	"go.fabra.io/server/common/strings"
@@ -202,31 +205,41 @@ func CreateApiKey(db *gorm.DB, organizationID int64) string {
 }
 
 func CreateActiveLinkToken(db *gorm.DB, organizationID int64, endCustomerID string) string {
-	rawToken := "linkToken"
-	hashedToken := crypto.HashString(rawToken)
-	linkToken := models.LinkToken{
-		EndCustomerID:  endCustomerID,
-		OrganizationID: organizationID,
-		HashedToken:    hashedToken,
-		Expiration:     time.Now().Add(time.Duration(1) * time.Hour),
+	linkToken := jwt.NewWithClaims(crypto.SigningMethodKMSHS256, link_tokens.LinkTokenClaims{
+		TokenInfo: link_tokens.TokenInfo{
+			EndCustomerID:  endCustomerID,
+			OrganizationID: organizationID,
+		},
+		RegisteredClaims: jwt.RegisteredClaims{
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(1 * time.Hour)),
+		},
+	})
+
+	signedToken, err := linkToken.SignedString(nil)
+	if err != nil {
+		panic(err)
 	}
 
-	db.Create(&linkToken)
-
-	return rawToken
+	return base64.StdEncoding.EncodeToString([]byte(signedToken))
 }
 
 func CreateExpiredLinkToken(db *gorm.DB, organizationID int64, endCustomerID string) string {
-	rawToken := "linkToken"
-	hashedToken := crypto.HashString(rawToken)
-	linkToken := models.LinkToken{
-		EndCustomerID:  endCustomerID,
-		OrganizationID: organizationID,
-		HashedToken:    hashedToken,
-		Expiration:     time.Now().Add(-(time.Duration(1) * time.Hour)),
+	linkToken := jwt.NewWithClaims(crypto.SigningMethodKMSHS256, link_tokens.LinkTokenClaims{
+		TokenInfo: link_tokens.TokenInfo{
+			EndCustomerID:  endCustomerID,
+			OrganizationID: organizationID,
+		},
+		RegisteredClaims: jwt.RegisteredClaims{
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(-1 * time.Hour)),
+		},
+	})
+
+	signedToken, err := linkToken.SignedString(nil)
+	if err != nil {
+		panic(err)
 	}
 
-	db.Create(&linkToken)
-
-	return rawToken
+	return base64.StdEncoding.EncodeToString([]byte(signedToken))
 }
