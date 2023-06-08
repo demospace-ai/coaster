@@ -106,7 +106,7 @@ export const NewSourceConfiguration: React.FC<SetupSyncProps & FabraDisplayOptio
             If your warehouse is behind a firewall/private network, please add the following static IP addresses:
             <ul className="tw-mt-1">
               <li>• 34.145.25.122</li>
-              <li>• 34.83.102.120</li>
+              <li>• 34.168.71.183</li>
             </ul>
           </div>
           <div>
