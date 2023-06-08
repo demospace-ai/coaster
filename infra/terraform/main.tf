@@ -584,6 +584,10 @@ resource "google_container_cluster" "fabra-sync-cluster" {
 
   enable_autopilot = true
 
+  private_cluster_config {
+    enable_private_nodes = true
+  }
+
   cluster_autoscaling {
     auto_provisioning_defaults {
       service_account = google_service_account.fabra-sync.email
