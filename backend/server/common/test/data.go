@@ -1,7 +1,6 @@
 package test
 
 import (
-	"encoding/base64"
 	"log"
 	"time"
 
@@ -221,7 +220,7 @@ func CreateActiveLinkToken(db *gorm.DB, organizationID int64, endCustomerID stri
 		panic(err)
 	}
 
-	return base64.StdEncoding.EncodeToString([]byte(signedToken))
+	return signedToken
 }
 
 func CreateExpiredLinkToken(db *gorm.DB, organizationID int64, endCustomerID string) string {
@@ -241,5 +240,5 @@ func CreateExpiredLinkToken(db *gorm.DB, organizationID int64, endCustomerID str
 		panic(err)
 	}
 
-	return base64.StdEncoding.EncodeToString([]byte(signedToken))
+	return signedToken
 }
