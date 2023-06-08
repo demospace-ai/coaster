@@ -2,6 +2,7 @@ import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { Button } from "src/components/button/Button";
 import { DotsLoading, Loading } from "src/components/loading/Loading";
 import { useConnectShowToast } from "src/components/notifications/Notifications";
 import { EmptyTable } from "src/components/table/Table";
@@ -62,18 +63,18 @@ const SyncRunsList: React.FC<{ linkToken: string }> = ({ linkToken }) => {
   const syncRuns = sync.sync_runs ?? [];
 
   return (
-    <div className="tw-mt-2 tw-pb-16 tw-px-20 tw-flex tw-flex-col tw-overflow-auto">
+    <div className="tw-mt-4 tw-pb-16 tw-px-20 tw-flex tw-flex-col tw-overflow-auto">
       <div className="tw-flex tw-w-full tw-mb-2">
         <div className="tw-flex tw-flex-row tw-w-full tw-items-center tw-font-bold tw-text-xl tw-justify-between">
           Sync Runs • {sync.sync.display_name}
           <div className="tw-flex">
-            <button
-              className="tw-ml-auto tw-px-4 tw-py-1 tw-rounded-md tw-font-medium tw-text-base tw-bg-primary hover:tw-bg-primary-hover tw-text-white tw-mr-2 disabled:tw-bg-gray-500 disabled:tw-border-2"
+            <Button
+              className="tw-ml-auto tw-h-8 tw-w-32 tw-text-sm tw-whitespace-nowrap"
               disabled={runSyncMutation.isLoading}
               onClick={() => runSyncMutation.mutate()}
             >
-              {!runSyncMutation.isLoading ? "Run sync" : <Loading light className="tw-w-4 tw-h-4" />}
-            </button>
+              {!runSyncMutation.isLoading ? "Run Sync" : <Loading light className="tw-w-4 tw-h-4" />}
+            </Button>
           </div>
         </div>
       </div>

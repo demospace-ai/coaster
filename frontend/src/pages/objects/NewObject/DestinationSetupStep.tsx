@@ -1,8 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChangeEvent } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { FormError } from "src/components/FormError";
 import { Button } from "src/components/button/Button";
+import { FormError } from "src/components/FormError";
 import { InfoIcon } from "src/components/icons/Icons";
 import { InputStyle } from "src/components/input/Input";
 import { DestinationSelector, NamespaceSelector, TableSelector } from "src/components/selector/Selector";
@@ -10,9 +10,9 @@ import { Tooltip } from "src/components/tooltip/Tooltip";
 import {
   DestinationSetupFormSchema,
   DestinationSetupFormType,
-  SUPPORTED_CONNECTION_TYPES,
-  SupportedConnectionType,
   objectTargetOptions,
+  SupportedConnectionType,
+  SUPPORTED_CONNECTION_TYPES,
 } from "src/pages/objects/helpers";
 import { Connection, ConnectionType, Destination, TargetType } from "src/rpc/api";
 import { mergeClasses } from "src/utils/twmerge";
@@ -98,7 +98,7 @@ export const DestinationSetup: React.FC<DestinationSetupProps> = ({ isUpdate, on
               <InfoIcon className="tw-ml-1 tw-h-3 tw-fill-slate-400" />
             </Tooltip>
           </label>
-          <input autoFocus className={InputStyle} {...register("displayName")} placeholder="My Destination"></input>
+          <input autoFocus className={InputStyle} {...register("displayName")} placeholder="My Object"></input>
           <FormError message={errors.displayName?.message} className="mt-1" />
         </div>
 

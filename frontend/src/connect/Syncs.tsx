@@ -1,4 +1,4 @@
-import { ChevronRightIcon } from "@heroicons/react/24/outline";
+import { ChevronRightIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -63,8 +63,12 @@ const SyncList: React.FC<{ linkToken: string }> = ({ linkToken }) => {
             Setup a sync to connect your data source and map it to fields in the application.
           </div>
         </div>
-        <Button className="tw-ml-auto tw-h-9 tw-whitespace-nowrap" onClick={() => navigate("/newsync")}>
-          New Sync
+        <Button
+          className="tw-flex tw-flex-row tw-items-center tw-ml-auto tw-h-8 tw-whitespace-nowrap"
+          onClick={() => navigate("/newsync")}
+        >
+          <PlusCircleIcon className="tw-h-5 tw-mr-2 tw-stroke-2" />
+          <span className="tw-mr-1">New Sync</span>
         </Button>
       </div>
       <div className="tw-mt-10 tw-overflow-auto tw-shadow tw-ring-1 tw-ring-black tw-ring-opacity-5 tw-rounded-md">
