@@ -138,7 +138,7 @@ func (r Router) wrapWithErrorHandling(handler ErrorHandlerFunc) http.Handler {
 			http.Error(w, customerVisisbleError.Error(), http.StatusBadRequest)
 		default:
 			log.Printf("Unexpected error: %+v", err)
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			http.Error(w, "unexpected error", http.StatusInternalServerError)
 		}
 	})
 }

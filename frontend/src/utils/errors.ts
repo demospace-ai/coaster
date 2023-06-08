@@ -1,10 +1,12 @@
 import { H } from "highlight.run";
 export class HttpError extends Error {
   readonly code: number;
+  readonly statusText: string;
 
-  constructor(code: number, message: string) {
+  constructor(code: number, statusText: string, message: string) {
     super(message);
     this.code = code;
+    this.statusText = statusText;
 
     // Set the prototype explicitly.
     Object.setPrototypeOf(this, HttpError.prototype);

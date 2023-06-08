@@ -73,8 +73,7 @@ export async function sendRequest<RequestType extends Record<string, any>, Respo
 
   if (!response.ok) {
     const errorMessage = response.statusText + ": " + (await response.text());
-    // TODO: log error
-    throw new HttpError(response.status, errorMessage);
+    throw new HttpError(response.status, response.statusText, errorMessage);
   }
 
   if (endpoint.track) {

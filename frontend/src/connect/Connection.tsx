@@ -10,7 +10,7 @@ import { FabraDisplayOptions } from "src/connect/ConnectApp";
 import { NewSourceState, SetupSyncProps, SyncSetupStep, validateConnectionSetup } from "src/connect/state";
 import { sendLinkTokenRequest } from "src/rpc/ajax";
 import { ConnectionType, getConnectionType, TestDataConnection, TestDataConnectionRequest } from "src/rpc/api";
-import { forceError } from "src/utils/errors";
+import { consumeError, forceError } from "src/utils/errors";
 import { useMutation } from "src/utils/queryHelpers";
 import { mergeClasses } from "src/utils/twmerge";
 
@@ -59,6 +59,7 @@ export const NewSourceConfiguration: React.FC<SetupSyncProps & FabraDisplayOptio
     case ConnectionType.MySQL:
       inputs = <MySqlInputs state={state} setState={setNewSourceState} />;
       break;
+    case ConnectionType.DynamoDb:
     case ConnectionType.Webhook:
       inputs = <>Unexpected</>;
       break;
@@ -178,8 +179,13 @@ const TestConnectionButton: React.FC<{
         case ConnectionType.MySQL:
           payload.mysql_config = state.mysqlConfig;
           break;
+        case ConnectionType.DynamoDb:
+          // TODO: throw error
+          consumeError(new Error("DynamoDB is not supported as a source yet."));
+          return;
         case ConnectionType.Webhook:
           // TODO: throw error
+          consumeError(new Error("Webhook is not supported as a source."));
           return;
       }
 
