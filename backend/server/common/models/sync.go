@@ -26,9 +26,17 @@ const (
 	FrequencyUnitsWeeks   FrequencyUnits = "weeks"
 )
 
+type SyncStatus string
+
+const (
+	SyncStatusActive   SyncStatus = "active"
+	SyncStatusDisabled SyncStatus = "disabled"
+)
+
 type Sync struct {
 	OrganizationID int64
 	DisplayName    string              `json:"display_name"`
+	SyncStatus     SyncStatus          `json:"status"`
 	WorkflowID     string              `json:"workflow_id"`
 	EndCustomerID  string              `json:"end_customer_id"`
 	SourceID       int64               `json:"source_id"`

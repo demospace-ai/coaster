@@ -124,16 +124,28 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.CreateSync,
 		},
 		{
+			Name:        "Delete sync",
+			Method:      router.DELETE,
+			Pattern:     "/sync/{syncID}",
+			HandlerFunc: s.DeleteSync,
+		},
+		{
+			Name:        "Update sync",
+			Method:      router.PATCH,
+			Pattern:     "/sync/{syncID}",
+			HandlerFunc: s.UpdateSync,
+		},
+		{
 			Name:        "Run sync",
 			Method:      router.POST,
 			Pattern:     "/sync/{syncID}/run",
 			HandlerFunc: s.RunSync,
 		},
 		{
-			Name:        "Cancel sync",
+			Name:        "Cancel sync run",
 			Method:      router.DELETE,
-			Pattern:     "/sync/{syncID}",
-			HandlerFunc: s.CancelSync,
+			Pattern:     "/sync/{syncID}/run",
+			HandlerFunc: s.CancelSyncRun,
 		},
 		{
 			Name:        "Get sync",
@@ -238,16 +250,28 @@ func (s ApiService) LinkAuthenticatedRoutes() []router.LinkAuthenticatedRoute {
 			HandlerFunc: s.LinkCreateSync,
 		},
 		{
+			Name:        "Delete sync",
+			Method:      router.DELETE,
+			Pattern:     "/sync/{syncID}",
+			HandlerFunc: s.LinkDeleteSync,
+		},
+		{
+			Name:        "Update sync",
+			Method:      router.PATCH,
+			Pattern:     "/sync/{syncID}",
+			HandlerFunc: s.LinkUpdateSync,
+		},
+		{
 			Name:        "Run sync",
 			Method:      router.POST,
 			Pattern:     "/link/sync/{syncID}/run",
 			HandlerFunc: s.LinkRunSync,
 		},
 		{
-			Name:        "Cancel sync",
+			Name:        "Cancel sync run",
 			Method:      router.DELETE,
-			Pattern:     "/link/sync/{syncID}",
-			HandlerFunc: s.LinkCancelSync,
+			Pattern:     "/link/sync/{syncID}/run",
+			HandlerFunc: s.LinkCancelSyncRun,
 		},
 		{
 			Name:        "Get sync",

@@ -81,7 +81,24 @@ func LoadActiveByWorkflowID(db *gorm.DB, workflowID string) (*models.SyncRun, er
 		Select("sync_runs.*").
 		Where("sync_runs.workflow_id = ?", workflowID).
 		// We filter for active sync runs to be sure we have the right one
-		Where("sync_runs.status NOT IN ?", []string{string(models.SyncRunStatusCompleted), string(models.SyncRunStatusFailed)}).
+		Where("sync_runs.status = ?", string(models.SyncRunStatusRunning)).
+		Where("sync_runs.deactivated_at IS NULL").
+		Take(&sync)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &syncRun, nil
+}
+
+func LoadActiveRunBySyncID(db *gorm.DB, syncID int64) (*models.SyncRun, error) {
+	var syncRun models.SyncRun
+	var sync models.Sync
+	result := db.Table("sync_runs").
+		Select("sync_runs.*").
+		Where("sync_runs.sync_id = ?", syncID).
+		// We filter for active sync runs to be sure we have the right one
+		Where("sync_runs.status = ?", string(models.SyncRunStatusRunning)).
 		Where("sync_runs.deactivated_at IS NULL").
 		Take(&sync)
 	if result.Error != nil {

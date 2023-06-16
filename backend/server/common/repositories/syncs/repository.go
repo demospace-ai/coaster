@@ -1,6 +1,8 @@
 package syncs
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"go.fabra.io/server/common/database"
 	"go.fabra.io/server/common/errors"
@@ -106,6 +108,32 @@ func LoadSyncByID(db *gorm.DB, organizationID int64, syncID int64) (*models.Sync
 	}
 
 	return &sync, nil
+}
+
+func DeactivateSyncByID(db *gorm.DB, syncID int64) error {
+	result := db.Table("syncs").
+		Select("syncs.*").
+		Where("syncs.id = ?", syncID).
+		Update("deactivated_at", time.Now())
+
+	if result.Error != nil {
+		return errors.Wrap(result.Error, "(syncs.DeactivateSyncByID)")
+	}
+
+	return nil
+}
+
+func UpdateSyncStatusByID(db *gorm.DB, syncID int64, status models.SyncStatus) error {
+	result := db.Table("syncs").
+		Select("syncs.*").
+		Where("syncs.id = ?", syncID).
+		Update("status", status)
+
+	if result.Error != nil {
+		return errors.Wrap(result.Error, "(syncs.UpdateSyncStatusByID)")
+	}
+
+	return nil
 }
 
 func LoadSyncByIDAndCustomer(db *gorm.DB, organizationID int64, endCustomerID string, syncID int64) (*models.Sync, error) {

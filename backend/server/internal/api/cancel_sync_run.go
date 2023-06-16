@@ -8,11 +8,12 @@ import (
 	"github.com/gorilla/mux"
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/errors"
+	"go.fabra.io/server/common/repositories/sync_runs"
 	"go.fabra.io/server/common/repositories/syncs"
 	"go.fabra.io/sync/temporal"
 )
 
-func (s ApiService) CancelSync(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) CancelSyncRun(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
 		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "(api.CancelSync)")
 	}
@@ -20,7 +21,7 @@ func (s ApiService) CancelSync(auth auth.Authentication, w http.ResponseWriter, 
 	vars := mux.Vars(r)
 	strSyncId, ok := vars["syncID"]
 	if !ok {
-		return errors.Wrap(errors.NewBadRequestf("missing sync ID from RunSync request URL: %s", r.URL.RequestURI()), "(api.CancelSync)")
+		return errors.Wrap(errors.NewBadRequestf("missing sync ID from CancelSync request URL: %s", r.URL.RequestURI()), "(api.CancelSync)")
 	}
 
 	syncId, err := strconv.ParseInt(strSyncId, 10, 64)
@@ -34,20 +35,25 @@ func (s ApiService) CancelSync(auth auth.Authentication, w http.ResponseWriter, 
 		return errors.Wrap(err, "(api.CancelSync)")
 	}
 
+	syncRun, err := sync_runs.LoadActiveRunBySyncID(s.db, sync.ID)
+	if err != nil {
+		return errors.Wrap(err, "(api.CancelSync) loading sync run")
+	}
+
 	c, err := temporal.CreateClient(CLIENT_PEM_KEY, CLIENT_KEY_KEY)
 	if err != nil {
-		return errors.Wrap(err, "(api.CancelSync)")
+		return errors.Wrap(err, "(api.CancelSync) creating client")
 	}
 	defer c.Close()
 
 	ctx := context.TODO()
 	err = c.CancelWorkflow(
 		ctx,
-		sync.WorkflowID,
+		syncRun.WorkflowID,
 		"", // Empty RunID will result in the currently running workflow to be cancelled
 	)
 	if err != nil {
-		return errors.Wrap(err, "CancelSync")
+		return errors.Wrap(err, "(api.CancelSync) cancelling workflow")
 	}
 
 	return nil
