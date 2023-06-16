@@ -82,9 +82,9 @@ export const Finalize: React.FC<FinalizeStepProps> = ({
   );
 
   const fields: Field[] = objectFields.objectFields
-    .filter((field): field is ObjectField => Boolean(field.name && field.fieldType && !field.omit && !field.optional))
+    .filter((field): field is ObjectField => Boolean(field.name && field.field_type && !field.omit && !field.optional))
     .map((field) => {
-      return { name: field.name, type: field.fieldType };
+      return { name: field.name, type: field.field_type };
     });
 
   const syncMode = watch("syncMode");

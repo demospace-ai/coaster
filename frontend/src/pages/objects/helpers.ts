@@ -99,13 +99,13 @@ export const ObjectFieldsSchema = z.object({
     .array(
       ObjectFieldSchema.partial({
         id: true,
-        fieldType: true,
+        field_type: true,
       }).superRefine((values, ctx) => {
-        if (!values.fieldType) {
+        if (!values.field_type) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: "Must set a field type",
-            path: ["fieldType"],
+            path: ["field_type"],
           });
         }
       }),

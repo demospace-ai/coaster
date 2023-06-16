@@ -101,9 +101,9 @@ export function NewObjectFields({ initialFormState, onComplete, isUpdate = false
                     </Tooltip>
                   </div>
                   <Controller
-                    name={`objectFields.${i}.fieldType`}
+                    name={`objectFields.${i}.field_type`}
                     control={control}
-                    defaultValue={objectField.fieldType}
+                    defaultValue={objectField.field_type}
                     render={({ field }) => (
                       <FieldTypeSelector
                         className="tw-w-48 tw-m-0"
@@ -117,7 +117,7 @@ export function NewObjectFields({ initialFormState, onComplete, isUpdate = false
               </div>
               <div className="tw-flex">
                 <FormError className="tw-w-[405px]" message={errors.objectFields?.[i]?.name?.message} />
-                <FormError message={errors.objectFields?.[i]?.fieldType?.message} />
+                <FormError message={errors.objectFields?.[i]?.field_type?.message} />
               </div>
               <div className="tw-flex tw-flex-row tw-items-center tw-mt-4 tw-mb-1">
                 <span>Display Name</span>
@@ -172,7 +172,7 @@ export function NewObjectFields({ initialFormState, onComplete, isUpdate = false
               onClick={() =>
                 append({
                   name: "",
-                  fieldType: undefined,
+                  field_type: undefined,
                   omit: false,
                   optional: false,
                 })

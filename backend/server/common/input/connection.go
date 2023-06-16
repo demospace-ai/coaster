@@ -69,7 +69,7 @@ type BigQueryConfig struct {
 
 type ObjectField struct {
 	Name        string         `json:"name" validate:"required"`
-	Type        data.FieldType `json:"type" validate:"required"`
+	Type        data.FieldType `json:"field_type" validate:"required"`
 	Omit        bool           `json:"omit"`
 	Optional    bool           `json:"optional"`
 	DisplayName *string        `json:"display_name,omitempty"`
