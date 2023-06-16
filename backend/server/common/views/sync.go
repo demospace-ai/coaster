@@ -14,6 +14,7 @@ const CUSTOMER_VISIBLE_TIME_FORMAT = "01/02/06 at 03:04 PM MST"
 type Sync struct {
 	ID                int64                  `json:"id"`
 	OrganizationID    int64                  `json:"organization_id"`
+	Status            models.SyncStatus      `json:"status"`
 	EndCustomerID     string                 `json:"end_customer_id"`
 	DisplayName       string                 `json:"display_name"`
 	SourceID          int64                  `json:"source_id"`
@@ -52,6 +53,7 @@ func ConvertSync(sync *models.Sync) Sync {
 	syncView := Sync{
 		ID:             sync.ID,
 		OrganizationID: sync.OrganizationID,
+		Status:         sync.Status,
 		EndCustomerID:  sync.EndCustomerID,
 		DisplayName:    sync.DisplayName,
 		SourceID:       sync.SourceID,

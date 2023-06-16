@@ -29,14 +29,14 @@ const (
 type SyncStatus string
 
 const (
-	SyncStatusActive   SyncStatus = "active"
-	SyncStatusDisabled SyncStatus = "disabled"
+	SyncStatusActive SyncStatus = "active"
+	SyncStatusPaused SyncStatus = "paused"
 )
 
 type Sync struct {
 	OrganizationID int64
 	DisplayName    string              `json:"display_name"`
-	SyncStatus     SyncStatus          `json:"status"`
+	Status         SyncStatus          `json:"status"`
 	WorkflowID     string              `json:"workflow_id"`
 	EndCustomerID  string              `json:"end_customer_id"`
 	SourceID       int64               `json:"source_id"`
