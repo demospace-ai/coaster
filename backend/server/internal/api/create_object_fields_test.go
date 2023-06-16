@@ -70,8 +70,8 @@ var _ = Describe("Sending an ObjectField creation request", func() {
 			err := service.CreateObjectFields(auth, response, makeRequest(map[string]interface{}{
 				"object_fields": []interface{}{
 					map[string]interface{}{
-						"Name": "test",
-						"Type": "STRING",
+						"name":       "test",
+						"field_type": "STRING",
 					},
 				},
 			}))
