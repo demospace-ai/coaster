@@ -88,10 +88,10 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.GetSyncsForCustomer,
 		},
 		{
-			Name:        "Query object",
+			Name:        "Query object record for customer",
 			Method:      router.POST,
-			Pattern:     "/query_object",
-			HandlerFunc: s.QueryObject,
+			Pattern:     "/customer/{endCustomerId}/object/{objectId}/record",
+			HandlerFunc: s.QueryObjectRecord,
 		},
 		{
 			Name:        "Get all users",

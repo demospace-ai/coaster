@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/gorilla/mux"
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/models"
@@ -22,32 +24,46 @@ type QueryFilter struct {
 	FieldValue string `json:"field_value" validate:"required"`
 }
 
-type QueryObjectRequest struct {
-	EndCustomerID string        `json:"end_customer_id" validate:"required"`
-	ObjectID      int64         `json:"object_id" validate:"required"`
-	Filters       []QueryFilter `json:"filters,omitempty"`
+type QueryObjectRecordRequest struct {
+	Filters []QueryFilter `json:"filters,omitempty"`
 }
 
-func (s ApiService) QueryObject(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) QueryObjectRecord(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
 		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "(api.QueryObject)")
 	}
 
+	vars := mux.Vars(r)
+	endCustomerId, ok := vars["endCustomerId"]
+	if !ok {
+		return errors.Newf("(api.QueryObject) missing end customer ID from QueryObject request URL: %s", r.URL.RequestURI())
+	}
+
+	strObjectId, ok := vars["objectId"]
+	if !ok {
+		return errors.Newf("(api.QueryObject) missing object ID from QueryObject request URL: %s", r.URL.RequestURI())
+	}
+
+	objectId, err := strconv.ParseInt(strObjectId, 10, 64)
+	if err != nil {
+		return errors.Wrap(err, "(api.QueryObject)")
+	}
+
 	decoder := json.NewDecoder(r.Body)
-	var queryObjectRequest QueryObjectRequest
-	err := decoder.Decode(&queryObjectRequest)
+	var queryObjectRecordRequest QueryObjectRecordRequest
+	err = decoder.Decode(&queryObjectRecordRequest)
 	if err != nil {
 		return errors.Wrap(err, "(api.QueryObject) invalid request")
 	}
 
 	// TODO: validate connection parameters
 	validate := validator.New()
-	err = validate.Struct(queryObjectRequest)
+	err = validate.Struct(queryObjectRecordRequest)
 	if err != nil {
 		return errors.Wrap(errors.WrapCustomerVisibleError(err), "(api.QueryObject)")
 	}
 
-	payload, err := s.queryObject(auth.Organization, queryObjectRequest.EndCustomerID, queryObjectRequest.ObjectID, queryObjectRequest.Filters)
+	payload, err := s.queryObject(auth.Organization, endCustomerId, objectId, queryObjectRecordRequest.Filters)
 	if err != nil {
 		return errors.Wrap(err, "(api.QueryObject) running query")
 	}
@@ -109,6 +125,7 @@ func (s ApiService) queryObject(organization *models.Organization, endCustomerID
 		return nil, errors.Wrap(err, "(api.queryObject) failed to run query")
 	}
 
+	// TODO: rethink this
 	if len(data.Data) > 1 || len(data.Data) == 0 {
 		return nil, errors.Wrap(errors.NewBadRequest("must have exactly one record"), "(api.queryObject)")
 	}
