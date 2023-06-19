@@ -177,20 +177,43 @@ func LoadAllSyncsForCustomer(
 	organizationID int64,
 	endCustomerID string,
 ) ([]models.Sync, error) {
-	var sync []models.Sync
+	var syncs []models.Sync
 	result := db.Table("syncs").
 		Select("syncs.*").
 		Where("syncs.organization_id = ?", organizationID).
 		Where("syncs.end_customer_id = ?", endCustomerID).
 		Where("syncs.deactivated_at IS NULL").
 		Order("syncs.created_at DESC").
-		Find(&sync)
+		Find(&syncs)
 
 	if result.Error != nil {
 		return nil, errors.Wrap(result.Error, "(syncs.LoadAllSyncsForCustomer)")
 	}
 
-	return sync, nil
+	return syncs, nil
+}
+
+func LoadSyncsForCustomerAndObject(
+	db *gorm.DB,
+	organizationID int64,
+	endCustomerID string,
+	objectID int64,
+) ([]models.Sync, error) {
+	var syncs []models.Sync
+	result := db.Table("syncs").
+		Select("syncs.*").
+		Where("syncs.organization_id = ?", organizationID).
+		Where("syncs.end_customer_id = ?", endCustomerID).
+		Where("syncs.object_id = ?", objectID).
+		Where("syncs.deactivated_at IS NULL").
+		Order("syncs.created_at DESC").
+		Find(&syncs)
+
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(syncs.LoadSyncsForCustomerAndObject)")
+	}
+
+	return syncs, nil
 }
 
 func LoadFieldMappingsForSync(

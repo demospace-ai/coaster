@@ -82,6 +82,18 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.GetSyncs,
 		},
 		{
+			Name:        "Get all syncs for a customer",
+			Method:      router.GET,
+			Pattern:     "/customer/{endCustomerId}/syncs",
+			HandlerFunc: s.GetSyncsForCustomer,
+		},
+		{
+			Name:        "Query object",
+			Method:      router.POST,
+			Pattern:     "/query_object",
+			HandlerFunc: s.QueryObject,
+		},
+		{
 			Name:        "Get all users",
 			Method:      router.GET,
 			Pattern:     "/users",

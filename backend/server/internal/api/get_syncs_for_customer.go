@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/models"
@@ -13,23 +14,18 @@ import (
 	"go.fabra.io/server/common/views"
 )
 
-type GetSyncsForCustomerRequest struct {
-	EndCustomerID string `json:"end_customer_id"`
-}
-
 func (s ApiService) GetSyncsForCustomer(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	if auth.Organization == nil {
-		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "(api.LinkGetSyncs)")
+		return errors.Wrap(errors.NewBadRequest("must setup organization first"), "(api.GetSyncsForCustomer)")
 	}
 
-	decoder := json.NewDecoder(r.Body)
-	var getSyncsForCustomerRequest GetSyncsForCustomerRequest
-	err := decoder.Decode(&getSyncsForCustomerRequest)
-	if err != nil {
-		return errors.Wrap(err, "(api.GetSyncsForCustomer) invalid request")
+	vars := mux.Vars(r)
+	endCustomerId, ok := vars["endCustomerId"]
+	if !ok {
+		return errors.Newf("(api.GetSyncsForCustomer) missing end customer ID from GetSyncsForCustomer request URL: %s", r.URL.RequestURI())
 	}
 
-	syncs, sources, objects, err := s.getSyncsForCustomer(auth, getSyncsForCustomerRequest.EndCustomerID)
+	syncs, sources, objects, err := s.getSyncsForCustomer(auth, endCustomerId)
 	if err != nil {
 		return errors.Wrap(err, "(api.GetSyncsForCustomer)")
 	}
