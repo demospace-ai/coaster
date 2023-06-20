@@ -200,7 +200,15 @@ func (bq BigQueryImpl) Write(
 	close(errC)
 }
 
-func (bq BigQueryImpl) stageBatch(ctx context.Context, rows []data.Row, fieldMappings []views.FieldMapping, object views.Object, sync views.Sync, destinationOptions DestinationOptions, destClient query.WarehouseClient, objectName string) error {
+func (bq BigQueryImpl) stageBatch(
+	ctx context.Context,
+	rows []data.Row,
+	fieldMappings []views.FieldMapping,
+	object views.Object, sync views.Sync,
+	destinationOptions DestinationOptions,
+	destClient query.WarehouseClient,
+	objectName string,
+) error {
 	// count the fields since there may be multiple mappings for a single JSON object in the destination
 	// also track where each field should go in the output row based on the order of object fields.
 	// use the count as the index since we want to skip omitted fields in the output
