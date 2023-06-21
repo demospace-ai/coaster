@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/golang-jwt/jwt/v5"
 	"gorm.io/gorm"
 )
 
@@ -109,6 +110,10 @@ func IsRecordNotFound(err error) bool {
 
 func IsCookieNotFound(err error) bool {
 	return errors.Is(err, http.ErrNoCookie)
+}
+
+func IsInvalidLinkToken(err error) bool {
+	return errors.Is(err, jwt.ErrTokenInvalidClaims)
 }
 
 func Is(err, target error) bool {

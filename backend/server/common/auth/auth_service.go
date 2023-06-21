@@ -135,7 +135,13 @@ func (as AuthServiceImpl) authLinkToken(r *http.Request) (*Authentication, error
 
 	tokenInfo, err := link_tokens.ValidateLinkToken(linkToken)
 	if err != nil {
-		return nil, errors.Wrap(err, "(auth.authLinkToken)")
+		if errors.IsInvalidLinkToken(err) {
+			return &Authentication{
+				IsAuthenticated: false,
+			}, nil
+		} else {
+			return nil, errors.Wrap(err, "(auth.authLinkToken)")
+		}
 	}
 
 	organization, err := organizations.LoadOrganizationByID(as.db, tokenInfo.OrganizationID)

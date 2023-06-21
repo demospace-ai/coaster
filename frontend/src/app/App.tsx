@@ -52,7 +52,7 @@ const AppLayout: React.FC = () => {
   }, [location]);
 
   useEffect(() => {
-    // Recommended way to run one-time initialization: https://beta.reactjs.org/learn/you-might-not-need-an-effect#initializing-the-application
+    // Recommended way to run one-time initialization: https://react.dev/learn/you-might-not-need-an-effect#initializing-the-application
     if (needsInit) {
       start();
       needsInit = false;

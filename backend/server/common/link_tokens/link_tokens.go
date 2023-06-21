@@ -34,7 +34,7 @@ func CreateLinkToken(tokenInfo TokenInfo) (*string, error) {
 		tokenInfo,
 		jwt.RegisteredClaims{
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(1 * time.Hour)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(1 * time.Hour * 24)),
 		},
 	})
 
@@ -56,16 +56,12 @@ func ValidateLinkToken(linkTokenStr string) (*TokenInfo, error) {
 	}
 
 	if !token.Valid {
-		return nil, errors.Newf("(link_tokens.ValidateLinkToken) token invalid: %v", token.Raw)
+		return nil, errors.Wrapf(jwt.ErrTokenInvalidClaims, "(link_tokens.ValidateLinkToken) token invalid: %v", token.Raw)
 	}
 
 	claims, ok := token.Claims.(*LinkTokenClaims)
 	if !ok {
-		return nil, errors.Newf("(link_tokens.ValidateLinkToken) invalid claims: %v", token.Raw)
-	}
-
-	if claims.ExpiresAt.Before(time.Now()) {
-		return nil, errors.Newf("(link_tokens.ValidateLinkToken) token expired: %v", token.Raw)
+		return nil, errors.Wrapf(jwt.ErrTokenInvalidClaims, "(link_tokens.ValidateLinkToken) invalid claims: %v", token.Raw)
 	}
 
 	return &claims.TokenInfo, nil

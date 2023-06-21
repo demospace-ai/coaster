@@ -264,7 +264,7 @@ func (s ApiService) LinkAuthenticatedRoutes() []router.LinkAuthenticatedRoute {
 		{
 			Name:        "Delete sync",
 			Method:      router.DELETE,
-			Pattern:     "/sync/{syncID}",
+			Pattern:     "/link/sync/{syncID}",
 			HandlerFunc: s.LinkDeleteSync,
 		},
 		{

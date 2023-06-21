@@ -42,7 +42,7 @@ export const ConnectApp: React.FC = () => {
   };
 
   useEffect(() => {
-    // Recommended way to run one-time initialization: https://beta.reactjs.org/learn/you-might-not-need-an-effect#initializing-the-application
+    // Recommended way to run one-time initialization: https://react.dev/learn/you-might-not-need-an-effect#initializing-the-application
     if (needsInit) {
       window.addEventListener("message", (message: MessageEvent<FabraMessage>) => {
         switch (message.data.messageType) {
