@@ -40,6 +40,7 @@ func CreateSync(
 		SyncMode:       syncMode,
 		Frequency:      frequency,
 		FrequencyUnits: frequencyUnits,
+		Status:         models.SyncStatusActive,
 	}
 
 	if tableName != nil && namespace != nil {
