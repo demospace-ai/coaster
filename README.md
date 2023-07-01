@@ -49,7 +49,7 @@ including:
 1. Enable Cloud Build to deploy to Cloud Run:
 
         gcloud iam service-accounts add-iam-policy-binding \
-        fabra-backend@fabra-prod.iam.gserviceaccount.com \
-        --member="serviceAccount:fabra-prod@cloudbuild.gserviceaccount.com" \
-        --role="roles/iam.serviceAccountUser"
+          fabra-backend@fabra-prod.iam.gserviceaccount.com \
+          --member="serviceAccount:fabra-prod@cloudbuild.gserviceaccount.com" \
+          --role="roles/iam.serviceAccountUser"
 1. `terraform apply`
