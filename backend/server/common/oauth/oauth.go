@@ -20,12 +20,12 @@ import (
 )
 
 const GITHUB_PRODUCTION_CLIENT_ID = "7eff3cfd664e1e01e19b"
-const GITHUB_PRODUCTION_SECRET_KEY = "projects/932264813910/secrets/github-prod-client-secret/versions/latest"
+const GITHUB_PRODUCTION_SECRET_KEY = "projects/454026596701/secrets/github-prod-client-secret/versions/latest"
 const GITHUB_DEVELOPMENT_CLIENT_ID = "f84f670b7af18144af4a"
 const GITHUB_DEVELOPMENT_SECRET_KEY = "projects/86315250181/secrets/github-dev-client-secret/versions/latest"
 
 const GOOGLE_PRODUCTION_CLIENT_ID = "932264813910-egpk1omo3v2cedd89k8go851uko6djpa.apps.googleusercontent.com"
-const GOOGLE_PRODUCTION_SECRET_KEY = "projects/932264813910/secrets/google-prod-client-secret/versions/latest"
+const GOOGLE_PRODUCTION_SECRET_KEY = "projects/454026596701/secrets/google-prod-client-secret/versions/latest"
 const GOOGLE_DEVELOPMENT_CLIENT_ID = "86315250181-v19knnmf486fb5nebm2b47hu454abvet.apps.googleusercontent.com"
 const GOOGLE_DEVELOPMENT_SECRET_KEY = "projects/86315250181/secrets/google-dev-client-secret/versions/latest"
 

@@ -6,17 +6,17 @@ terraform {
   }
 
   backend "gcs" {
-    bucket = "fabra-344902-tfstate"
+    bucket = "fabra-prod-tfstate"
     prefix = "terraform/state"
   }
 }
 
 provider "google-beta" {
-  project = "fabra-344902"
+  project = "fabra-prod"
 }
 
 provider "google" {
-  project = "fabra-344902"
+  project = "fabra-prod"
 }
 
 resource "google_container_registry" "registry" {
@@ -27,13 +27,6 @@ resource "google_compute_network" "vpc" {
   name                    = "fabra-vpc"
   routing_mode            = "GLOBAL"
   auto_create_subnetworks = true
-}
-
-resource "google_compute_subnetwork" "subnet" {
-  name          = "fabra-vpc"
-  region        = "us-west1"
-  network       = google_compute_network.vpc.id
-  ip_cidr_range = "10.138.0.0/20"
 }
 
 # Setup IP block for VPC
@@ -61,7 +54,7 @@ resource "google_sql_database" "main_database" {
 resource "google_sql_database_instance" "main_instance" {
   name             = "fabra-database-instance"
   region           = "us-west1"
-  database_version = "POSTGRES_11"
+  database_version = "POSTGRES_14"
   settings {
     availability_type = "REGIONAL"
     tier              = "db-custom-1-3840"
@@ -146,7 +139,7 @@ resource "google_cloud_run_service" "fabra" {
     spec {
       service_account_name = google_service_account.fabra-backend.email
       containers {
-        image = "gcr.io/fabra-344902/fabra"
+        image = "us-docker.pkg.dev/fabra-prod/fabra-server/fabra"
         env {
           name  = "DB_USER"
           value = google_sql_user.db_user.name
@@ -173,7 +166,7 @@ resource "google_cloud_run_service" "fabra" {
     metadata {
       annotations = {
         # Limit scale up to prevent any cost blow outs!
-        "autoscaling.knative.dev/maxScale" = 5
+        "autoscaling.knative.dev/maxScale" = 15
         # Use the VPC Connector
         "run.googleapis.com/vpc-access-connector" = google_vpc_access_connector.connector.id
         # all egress from the service should go through the VPC Connector
@@ -386,7 +379,7 @@ resource "google_compute_region_network_endpoint_group" "fabra_neg" {
 }
 
 resource "google_storage_bucket" "fabra_frontend_bucket" {
-  name          = "fabra-frontend-bucket"
+  name          = "fabra-frontend-bucket-us"
   location      = "US"
   storage_class = "STANDARD"
 
@@ -443,7 +436,7 @@ resource "google_cloudbuild_trigger" "frontend-build-trigger" {
 }
 
 resource "google_storage_bucket" "fabra_connect_bucket" {
-  name          = "fabra-connect-bucket"
+  name          = "fabra-connect-bucket-us"
   location      = "US"
   storage_class = "STANDARD"
 
@@ -519,8 +512,7 @@ resource "google_kms_key_ring_iam_binding" "data-connection-key-ring-binding" {
   key_ring_id = google_kms_key_ring.data-connection-keyring.id
   role        = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
   members = [
-    "serviceAccount:fabra-sync@fabra-344902.iam.gserviceaccount.com",
-    "serviceAccount:fabra-backend@fabra-344902.iam.gserviceaccount.com"
+    "serviceAccount:fabra-backend@fabra-prod.iam.gserviceaccount.com"
   ]
 }
 
@@ -537,15 +529,6 @@ resource "google_kms_crypto_key" "api-key-key" {
   lifecycle {
     prevent_destroy = true
   }
-}
-
-resource "google_kms_key_ring_iam_binding" "api-key-key-ring-binding" {
-  key_ring_id = google_kms_key_ring.api-key-keyring.id
-  role        = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
-  members = [
-    "serviceAccount:fabra-sync@fabra-344902.iam.gserviceaccount.com",
-    "serviceAccount:fabra-backend@fabra-344902.iam.gserviceaccount.com"
-  ]
 }
 
 resource "google_compute_router" "fabra-ip-router" {
@@ -573,112 +556,9 @@ resource "google_compute_router_nat" "fabra-nat" {
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
 }
 
-resource "google_container_cluster" "fabra-sync-cluster" {
-  name     = "fabra-sync-gke-cluster"
-  location = "us-west1"
-
-  network    = google_compute_network.vpc.name
-  subnetwork = google_compute_subnetwork.subnet.name
-
-  ip_allocation_policy {}
-
-  enable_autopilot = true
-
-  private_cluster_config {
-    enable_private_nodes = true
-  }
-
-  cluster_autoscaling {
-    auto_provisioning_defaults {
-      service_account = google_service_account.fabra-sync.email
-    }
-  }
-}
-
-# TODO: figure out how to only trigger this when dependencies change
-resource "google_cloudbuild_trigger" "worker-build-trigger" {
-  name = "worker-trigger"
-
-  included_files = ["backend/sync/**"]
-
-  github {
-    name  = "fabra"
-    owner = "fabra-io"
-
-    push {
-      branch       = "main"
-      invert_regex = false
-    }
-  }
-
-  filename = "infra/cloudbuild/worker.yaml"
-}
-
 resource "google_service_account" "fabra-backend" {
   account_id   = "fabra-backend"
   display_name = "Fabra Backend Service"
-}
-
-resource "google_service_account" "fabra-sync" {
-  account_id   = "fabra-sync"
-  display_name = "Fabra Sync Service"
-}
-
-resource "google_service_account_iam_binding" "fabra-worker-gke-binding" {
-  service_account_id = google_service_account.fabra-sync.id
-  role               = "roles/iam.workloadIdentityUser"
-
-  members = [
-    "serviceAccount:fabra-344902.svc.id.goog[default/default]",
-  ]
-}
-
-resource "google_kms_key_ring" "webhook-verification-key-keyring" {
-  name     = "webhook-verification-key-keyring"
-  location = "global"
-}
-
-resource "google_kms_crypto_key" "webhook-verification-key-key" {
-  name            = "webhook-verification-key-key"
-  key_ring        = google_kms_key_ring.webhook-verification-key-keyring.id
-  rotation_period = "100000s"
-
-  lifecycle {
-    prevent_destroy = true
-  }
-}
-
-resource "google_kms_key_ring_iam_binding" "webhook-verification-key-ring-binding" {
-  key_ring_id = google_kms_key_ring.webhook-verification-key-keyring.id
-  role        = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
-  members = [
-    "serviceAccount:fabra-sync@fabra-344902.iam.gserviceaccount.com",
-    "serviceAccount:fabra-backend@fabra-344902.iam.gserviceaccount.com"
-  ]
-}
-
-resource "google_kms_key_ring" "end-customer-api-key-keyring" {
-  name     = "end-customer-api-key-keyring"
-  location = "global"
-}
-
-resource "google_kms_crypto_key" "end-customer-api-key-key" {
-  name            = "end-customer-api-key-key"
-  key_ring        = google_kms_key_ring.end-customer-api-key-keyring.id
-  rotation_period = "100000s"
-
-  lifecycle {
-    prevent_destroy = true
-  }
-}
-
-resource "google_kms_key_ring_iam_binding" "end-customer-api-key-ring-binding" {
-  key_ring_id = google_kms_key_ring.end-customer-api-key-keyring.id
-  role        = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
-  members = [
-    "serviceAccount:fabra-sync@fabra-344902.iam.gserviceaccount.com",
-    "serviceAccount:fabra-backend@fabra-344902.iam.gserviceaccount.com"
-  ]
 }
 
 resource "google_kms_key_ring" "jwt-signing-key-keyring" {
@@ -704,8 +584,7 @@ resource "google_kms_key_ring_iam_binding" "jwt-signing-key-ring-binding" {
   key_ring_id = google_kms_key_ring.jwt-signing-key-keyring.id
   role        = "roles/cloudkms.signerVerifier"
   members = [
-    "serviceAccount:fabra-sync@fabra-344902.iam.gserviceaccount.com",
-    "serviceAccount:fabra-backend@fabra-344902.iam.gserviceaccount.com"
+    "serviceAccount:fabra-backend@fabra-prod.iam.gserviceaccount.com"
   ]
 }
 
