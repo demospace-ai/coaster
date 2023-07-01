@@ -52,4 +52,4 @@ including:
           fabra-backend@fabra-prod.iam.gserviceaccount.com \
           --member="serviceAccount:fabra-prod@cloudbuild.gserviceaccount.com" \
           --role="roles/iam.serviceAccountUser"
-1. `terraform apply`
+1. Run `terraform apply`
