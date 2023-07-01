@@ -9,8 +9,8 @@ import (
 	"go.temporal.io/sdk/worker"
 )
 
-const WORKER_PEM_KEY = "projects/932264813910/secrets/temporal-worker-pem/versions/latest"
-const WORKER_KEY_KEY = "projects/932264813910/secrets/temporal-worker-key/versions/latest"
+const WORKER_PEM_KEY = "projects/454026596701/secrets/temporal-worker-pem/versions/latest"
+const WORKER_KEY_KEY = "projects/454026596701/secrets/temporal-worker-key/versions/latest"
 
 func main() {
 	c, err := temporal.CreateClient(WORKER_PEM_KEY, WORKER_KEY_KEY)

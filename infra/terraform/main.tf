@@ -640,3 +640,35 @@ resource "google_compute_security_policy" "fabra-security-policy" {
 
   timeouts {}
 }
+
+resource "google_artifact_registry_repository" "fabra_server" {
+  location      = "us"
+  repository_id = "fabra-server"
+  description   = "Fabra server image"
+  format        = "DOCKER"
+}
+
+resource "google_project_iam_member" "kms_encrypt_decrypt_role_binding" {
+  project = "fabra-prod"
+  role    = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+  member  = "serviceAccount:fabra-backend@fabra-prod.iam.gserviceaccount.com"
+}
+ 
+resource "google_project_iam_member" "secret_accessor_role_binding" {
+  project = "fabra-prod"
+  role    = "roles/secretmanager.secretAccessor"
+  member  = "serviceAccount:fabra-backend@fabra-prod.iam.gserviceaccount.com"
+}
+
+resource "google_project_iam_member" "secret_viewer_role_binding" {
+  project = "fabra-prod"
+  role    = "roles/secretmanager.viewer"
+  member  = "serviceAccount:fabra-backend@fabra-prod.iam.gserviceaccount.com"
+}
+
+resource "google_project_iam_member" "cloud_sql_client_role_binding" {
+  project = "fabra-prod"
+  role    = "roles/cloudsql.client"
+  member  = "serviceAccount:fabra-backend@fabra-prod.iam.gserviceaccount.com"
+}
+ 

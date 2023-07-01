@@ -45,3 +45,6 @@ including:
 1. Create a new DB password in the new projects Secret Manager with the name `fabra-db-password`
 1. Create a new Terraform bucket in Cloud Storage and add it to the Terraform file
 1. Connect the Github repository to the new GCP project
+1. Copy OAuth secrets to the new project's Secret Manager and ensure the code references them correctly
+1. Enable Cloud Build to deploy to Cloud Run:
+ 1. gcloud iam service-accounts add-iam-policy-binding fabra-backend@fabra-prod.iam.gserviceaccount.com --member="serviceAccount:fabra-prod@cloudbuild.gserviceaccount.com" --role="roles/iam.serviceAccountUser"

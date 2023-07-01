@@ -13,7 +13,7 @@ import (
 	"go.fabra.io/server/common/secret"
 )
 
-const INTERCOM_SECRET_KEY_KEY = "projects/932264813910/secrets/intercom-private-key/versions/latest"
+const INTERCOM_SECRET_KEY_KEY = "projects/454026596701/secrets/intercom-private-key/versions/latest"
 
 func GenerateIntercomHash(user models.User) (*string, error) {
 	if !application.IsProd() {

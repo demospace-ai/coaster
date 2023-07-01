@@ -21,8 +21,8 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-const CLIENT_PEM_KEY = "projects/932264813910/secrets/temporal-client-pem/versions/latest"
-const CLIENT_KEY_KEY = "projects/932264813910/secrets/temporal-client-key/versions/latest"
+const CLIENT_PEM_KEY = "projects/454026596701/secrets/temporal-client-pem/versions/latest"
+const CLIENT_KEY_KEY = "projects/454026596701/secrets/temporal-client-key/versions/latest"
 
 type CreateSyncRequest struct {
 	DisplayName       string                 `json:"display_name"`

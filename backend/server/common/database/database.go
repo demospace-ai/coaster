@@ -16,7 +16,7 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-const DB_PASSWORD_KEY = "projects/932264813910/secrets/fabra-db-password/versions/latest"
+const DB_PASSWORD_KEY = "projects/454026596701/secrets/fabra-db-password/versions/latest"
 
 func InitDatabase() (*gorm.DB, error) {
 	if application.IsProd() {
