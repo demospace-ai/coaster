@@ -690,6 +690,7 @@ resource "google_project_iam_member" "cloud-build-roles" {
     "roles/compute.networkAdmin",
     "roles/container.admin",
     "roles/storage.admin",
+    "roles/iam.securityAdmin",
     "roles/vpcaccess.admin",
     "roles/iam.serviceAccountAdmin"
   ])
