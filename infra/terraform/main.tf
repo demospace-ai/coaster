@@ -677,3 +677,22 @@ resource "google_secret_manager_secret_iam_member" "db_password_member" {
   role = "roles/secretmanager.secretAccessor"
   member = "serviceAccount:454026596701@cloudbuild.gserviceaccount.com"
 }
+
+resource "google_project_iam_member" "cloud-build-roles" {
+  project  = "fabra-prod"
+  for_each = toset([
+    "roles/cloudbuild.workerPoolEditor",
+    "roles/cloudsql.admin",
+    "roles/secretmanager.secretAccessor",
+    "roles/secretmanager.viewer",
+    "roles/cloudkms.admin",
+    "roles/run.admin",
+    "roles/compute.networkAdmin",
+    "roles/container.admin",
+    "roles/storage.admin",
+    "roles/vpcaccess.admin",
+    "roles/iam.serviceAccountAdmin"
+  ])
+  role   = each.key
+  member = "serviceAccount:454026596701@cloudbuild.gserviceaccount.com"
+}
