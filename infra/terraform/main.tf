@@ -671,4 +671,9 @@ resource "google_project_iam_member" "cloud_sql_client_role_binding" {
   role    = "roles/cloudsql.client"
   member  = "serviceAccount:fabra-backend@fabra-prod.iam.gserviceaccount.com"
 }
- 
+
+resource "google_secret_manager_secret_iam_member" "db_password_member" {
+  secret_id = "fabra-db-password"
+  role = "roles/secretmanager.secretAccessor"
+  member = "serviceAccount:454026596701@cloudbuild.gserviceaccount.com"
+}

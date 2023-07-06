@@ -24,5 +24,5 @@ options:
 
 availableSecrets:
   secretManager:
-    - versionName: projects/932264813910/secrets/fabra-db-password/versions/latest
+    - versionName: projects/454026596701/secrets/fabra-db-password/versions/latest
       env: DATABASE_PASS
