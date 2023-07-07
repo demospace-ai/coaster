@@ -14,5 +14,5 @@ steps:
   - id: deploy-frontend
     name: 'gcr.io/cloud-builders/gsutil'
     entrypoint: gsutil
-    args: ['cp', '-r', 'frontend/build/*', 'gs://fabra-frontend-bucket']
+    args: ['cp', '-r', 'frontend/build/*', 'gs://fabra-frontend-bucket-us']
     waitFor: ['build-frontend']
