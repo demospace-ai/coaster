@@ -22,13 +22,14 @@ run Terraform in the future.
 ## Deploy to new region
 
 1. Create a new GCP project.
-1. Create a new Terraform file for the region by copying infra/terraform/main.tf into a new subdirectory
-    1. Modify the project ID in the new Terraform file
+1. Create a new Terraform file for the region by copying infra/terraform/main.tf into a new subdirectory.
+1. Update the new Terraform file with the following changes:
+    1. Modify the project ID in the new Terraform file to match the new project.
     1. Modify the Cloud Storage bucket names to match the new region:
         1. Terraform bucket
         1. Frontend bucket
         1. Connect bucket
-    1. Run `terraform init` in the new subdirectory
+1. Run `terraform init` in the new subdirectory.
 1. Enable all the GCP APIs needed:
     1. Cloud Build
     1. Cloud Engine
@@ -41,10 +42,10 @@ run Terraform in the future.
     1. Serverless VPC Access
     1. Service Networking
     1. Artifact Registry
-1. Create a new DB password in the new projects Secret Manager with the name `fabra-db-password`
-1. Create a new Terraform bucket in Cloud Storage and add it to the Terraform file
-1. Connect the Github repository to the new GCP project
-1. Copy OAuth secrets to the new project's Secret Manager and ensure the code references them correctly
+1. Create a new DB password in the new projects Secret Manager with the name `fabra-db-password`.
+1. Create a new Terraform bucket in Cloud Storage and add it to the Terraform file.
+1. Connect the Github repository to the new GCP project.
+1. Copy OAuth secrets to the new project's Secret Manager and ensure the code references them correctly.
 1. Enable Cloud Build to deploy to Cloud Run:
 
         gcloud iam service-accounts add-iam-policy-binding \
@@ -56,5 +57,7 @@ run Terraform in the future.
 ### Other Notes
 Google Cloud Build is used for a various automatic actions triggered by pushes to the main Github branch:
 - Run Terraform to build any new infrastructure
-- Build Docker image for the Go code and deploy it to GCR
+- Build Docker image for backend code and push to Artifact Registry
+- Deploy new backend image to Cloud Run
+- Build frontend bundles and deploy to Cloud Storage buckets
 - Run database migrations
