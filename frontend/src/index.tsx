@@ -1,6 +1,5 @@
 import "src/index.css";
 
-import { ErrorBoundary } from "@highlight-run/react";
 import { H } from "highlight.run";
 import React from "react";
 import { createRoot } from "react-dom/client";
@@ -45,10 +44,8 @@ const root = createRoot(container!);
 
 root.render(
   <React.StrictMode>
-    <ErrorBoundary showDialog>
-      <Provider store={store}>
-        <RouterProvider router={router} />
-      </Provider>
-    </ErrorBoundary>
+    <Provider store={store}>
+      <RouterProvider router={router} />
+    </Provider>
   </React.StrictMode>,
 );

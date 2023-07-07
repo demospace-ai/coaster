@@ -1,4 +1,5 @@
-import { ReactNode, useEffect } from "react";
+import { ErrorBoundary } from "@highlight-run/react";
+import { ReactNode, useEffect, useState } from "react";
 import { createBrowserRouter, createRoutesFromElements, Navigate, Outlet, Route, useLocation } from "react-router-dom";
 import { useStart } from "src/app/actions";
 import { Header } from "src/components/header/Header";
@@ -51,6 +52,11 @@ const AppLayout: React.FC = () => {
     window.Intercom("update");
   }, [location]);
 
+  const error = useCatchGlobalError();
+  if (error) {
+    throw error;
+  }
+
   useEffect(() => {
     // Recommended way to run one-time initialization: https://react.dev/learn/you-might-not-need-an-effect#initializing-the-application
     if (needsInit) {
@@ -89,9 +95,25 @@ const AppLayout: React.FC = () => {
   );
 };
 
+function useCatchGlobalError() {
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    const errorHandler = (e: ErrorEvent) => {
+      setError(e.error);
+      return true;
+    };
+
+    window.addEventListener("error", errorHandler);
+    return () => window.removeEventListener("error", errorHandler);
+  }, []);
+
+  return error;
+}
+
 export const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route element={<AppLayout />}>
+    <Route element={<AppLayout />} errorElement={<ErrorBoundary showDialog />}>
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Login create />} />
