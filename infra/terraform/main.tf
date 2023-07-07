@@ -650,32 +650,14 @@ resource "google_artifact_registry_repository" "fabra_server" {
 
 resource "google_project_iam_member" "kms_encrypt_decrypt_role_binding" {
   project = "fabra-prod"
-  role    = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
-  member  = "serviceAccount:fabra-backend@fabra-prod.iam.gserviceaccount.com"
-}
- 
-resource "google_project_iam_member" "secret_accessor_role_binding" {
-  project = "fabra-prod"
-  role    = "roles/secretmanager.secretAccessor"
-  member  = "serviceAccount:fabra-backend@fabra-prod.iam.gserviceaccount.com"
-}
-
-resource "google_project_iam_member" "secret_viewer_role_binding" {
-  project = "fabra-prod"
-  role    = "roles/secretmanager.viewer"
-  member  = "serviceAccount:fabra-backend@fabra-prod.iam.gserviceaccount.com"
-}
-
-resource "google_project_iam_member" "cloud_sql_client_role_binding" {
-  project = "fabra-prod"
-  role    = "roles/cloudsql.client"
-  member  = "serviceAccount:fabra-backend@fabra-prod.iam.gserviceaccount.com"
-}
-
-resource "google_secret_manager_secret_iam_member" "db_password_member" {
-  secret_id = "fabra-db-password"
-  role = "roles/secretmanager.secretAccessor"
-  member = "serviceAccount:454026596701@cloudbuild.gserviceaccount.com"
+  for_each = toset([
+    "roles/cloudkms.cryptoKeyEncrypterDecrypter",
+    "roles/secretmanager.secretAccessor",
+    "roles/secretmanager.viewer",
+    "roles/cloudsql.client",
+  ])
+  role   = each.key
+  member = "serviceAccount:fabra-backend@fabra-prod.iam.gserviceaccount.com"
 }
 
 resource "google_project_iam_member" "cloud-build-roles" {
