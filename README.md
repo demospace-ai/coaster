@@ -24,7 +24,10 @@ run Terraform in the future.
 1. Create a new GCP project.
 1. Create a new Terraform file for the region by copying infra/terraform/main.tf into a new subdirectory
     1. Modify the project ID in the new Terraform file
-    1. Modify the Cloud Storage bucket names to match the new region
+    1. Modify the Cloud Storage bucket names to match the new region:
+        1. Terraform bucket
+        1. Frontend bucket
+        1. Connect bucket
     1. Run `terraform init` in the new subdirectory
 1. Enable all the GCP APIs needed:
     1. Cloud Build
@@ -55,5 +58,3 @@ Google Cloud Build is used for a various automatic actions triggered by pushes t
 - Run Terraform to build any new infrastructure
 - Build Docker image for the Go code and deploy it to GCR
 - Run database migrations
-
-
