@@ -1,39 +1,32 @@
 import { sendLinkTokenRequest, sendRequest } from "src/rpc/ajax";
 import {
-  ConnectionType,
   GetAllUsers,
-  GetAllUsersResponse,
   GetApiKey,
   GetDestination,
-  GetDestinationResponse,
   GetDestinations,
-  GetDestinationsResponse,
   GetFieldValues,
+  GetNamespaces,
+  GetObject,
+  GetSchema,
+  GetSync,
+  GetSyncs,
+  GetTables,
+} from "src/rpc/api";
+import {
+  ConnectionType,
+  GetAllUsersResponse,
+  GetDestinationResponse,
+  GetDestinationsResponse,
   GetFieldValuesRequest,
   GetFieldValuesResponse,
-  GetNamespaces,
   GetNamespacesResponse,
-  GetObject,
   GetObjectResponse,
-  GetObjects,
-  GetObjectsResponse,
-  GetSchema,
   GetSchemaRequest,
   GetSchemaResponse,
-  GetSourcesResponse,
-  GetSync,
   GetSyncResponse,
-  GetSyncs,
   GetSyncsResponse,
-  GetTables,
   GetTablesResponse,
-  LinkGetNamespaces,
-  LinkGetSchema,
-  LinkGetSources,
-  LinkGetSync,
-  LinkGetSyncs,
-  LinkGetTables,
-} from "src/rpc/api";
+} from "src/rpc/types";
 import useSWR, { Fetcher } from "swr";
 
 export function useApiKey() {
@@ -79,20 +72,6 @@ export function useDestination(destinationID: number | undefined) {
     fetcher,
   );
   return { destination: data?.destination, mutate, error, loading: isLoading || isValidating };
-}
-
-export function useObjects(opts: { linkToken?: string; destinationID?: number } = {}) {
-  const { linkToken, destinationID } = opts;
-  let fetchFn;
-  if (linkToken) {
-    fetchFn = () => sendLinkTokenRequest(GetObjects, linkToken);
-  } else {
-    fetchFn = () => sendRequest(GetObjects, { destinationID });
-  }
-
-  const fetcher: Fetcher<GetObjectsResponse, {}> = fetchFn;
-  const { data, mutate, error, isLoading, isValidating } = useSWR({ GetObjects, destinationID }, fetcher);
-  return { objects: data?.objects, mutate, error, loading: isLoading || isValidating };
 }
 
 export function useObject(objectID: number | undefined, linkToken?: string) {
@@ -169,79 +148,6 @@ export function useSync(syncID: number | undefined) {
   const { data, mutate, error, isLoading, isValidating } = useSWR(shouldFetch ? { GetSync, syncID } : null, fetcher, {
     refreshInterval: 1000,
   });
-  return { sync: data, mutate, error, loading: isLoading || isValidating };
-}
-
-export function useLinkNamespaces(sourceID: number | undefined, linkToken: string) {
-  const fetcher: Fetcher<GetNamespacesResponse, { sourceID: number }> = (payload: { sourceID: number }) =>
-    sendLinkTokenRequest(LinkGetNamespaces, linkToken, payload);
-  const shouldFetch = sourceID;
-  const { data, mutate, error, isLoading, isValidating } = useSWR(
-    shouldFetch ? { LinkGetNamespaces, sourceID } : null,
-    fetcher,
-  );
-  return { namespaces: data?.namespaces, mutate, error, loading: isLoading || isValidating };
-}
-
-export function useLinkTables(sourceID: number | undefined, namespace: string | undefined, linkToken: string) {
-  const fetcher: Fetcher<GetTablesResponse, { sourceID: number; namespace: string }> = (payload: {
-    sourceID: number;
-    namespace: string;
-  }) => sendLinkTokenRequest(LinkGetTables, linkToken, payload);
-  const shouldFetch = sourceID && namespace;
-  const { data, mutate, error, isLoading, isValidating } = useSWR(
-    shouldFetch ? { LinkGetTables, sourceID, namespace } : null,
-    fetcher,
-  );
-  return { tables: data?.tables, mutate, error, loading: isLoading || isValidating };
-}
-
-export function useLinkSchema(
-  sourceID: number | undefined,
-  namespace: string | undefined,
-  tableName: string | undefined,
-  linkToken: string,
-) {
-  const fetcher: Fetcher<GetSchemaResponse, { sourceID: number; namespace: string; tableName: string }> = (payload: {
-    sourceID: number;
-    namespace: string;
-    tableName: string;
-  }) => sendLinkTokenRequest(LinkGetSchema, linkToken, payload);
-  const shouldFetch = sourceID && namespace && tableName;
-  const { data, mutate, error, isLoading, isValidating } = useSWR(
-    shouldFetch ? { LinkGetSchema, sourceID, namespace, tableName } : null,
-    fetcher,
-  );
-  return { schema: data?.schema, mutate, error, loading: isLoading || isValidating };
-}
-
-export function useLinkSources(linkToken: string) {
-  const fetcher: Fetcher<GetSourcesResponse, {}> = () => sendLinkTokenRequest(LinkGetSources, linkToken);
-  const { data, mutate, error, isLoading, isValidating } = useSWR({ LinkGetSources }, fetcher);
-  return { sources: data?.sources, mutate, error, loading: isLoading || isValidating };
-}
-
-export function useLinkSyncs(linkToken: string) {
-  const fetcher: Fetcher<GetSyncsResponse, {}> = () => sendLinkTokenRequest(LinkGetSyncs, linkToken);
-  const { data, mutate, error, isLoading, isValidating } = useSWR({ LinkGetSyncs }, fetcher);
-  return {
-    syncs: data?.syncs,
-    objects: data?.objects,
-    sources: data?.sources,
-    mutate,
-    error,
-    loading: isLoading || isValidating,
-  };
-}
-
-export function useLinkSync(syncID: number | undefined, linkToken: string) {
-  const shouldFetch = syncID;
-  const fetcher: Fetcher<GetSyncResponse, { syncID: number }> = (payload: { syncID: number }) =>
-    sendLinkTokenRequest(LinkGetSync, linkToken, payload);
-  const { data, mutate, error, isLoading, isValidating } = useSWR(
-    shouldFetch ? { LinkGetSync: LinkGetSync, syncID } : null,
-    fetcher,
-  );
   return { sync: data, mutate, error, loading: isLoading || isValidating };
 }
 

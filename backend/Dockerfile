@@ -7,11 +7,11 @@ WORKDIR /app
 COPY . ./
 
 # Retrieve application dependencies.
-COPY sync/go.* ./
+COPY server/go.* ./
 RUN go mod download
 
 # Build the binary.
-RUN go build -mod=readonly -v -o worker sync/worker/main.go
+RUN go build -mod=readonly -v -o runserver cmd/main.go
 
 # Use the official Debian slim image for a lean production container.
 # https://hub.docker.com/_/debian
@@ -22,7 +22,7 @@ RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -
   rm -rf /var/lib/apt/lists/*
 
 # Copy the binary to the production image from the builder stage.
-COPY --from=builder /app/worker /app/worker
+COPY --from=builder /app/runserver /app/runserver
 
 # Run the web service on container startup.
-CMD ["/app/worker"]
+CMD ["/app/runserver"]

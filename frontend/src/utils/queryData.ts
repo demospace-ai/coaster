@@ -1,4 +1,4 @@
-import { Schema } from "src/rpc/api";
+import { Schema } from "src/rpc/types";
 
 export type DateRange = {
   minDate: Date;

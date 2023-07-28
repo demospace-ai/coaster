@@ -1,7 +1,6 @@
 import { Transition } from "@headlessui/react";
 import { CheckCircleIcon, InformationCircleIcon, XCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Fragment } from "react";
-import { useConnectDispatch } from "src/connect/model";
 import { useDispatch } from "src/root/model";
 
 export interface ToastOptions {
@@ -55,13 +54,6 @@ export const getToastContentFromDetails = (toast?: ToastOptions) => {
 
 export const useShowToast = (): ShowToastFunction => {
   const dispatch = useDispatch();
-  return (type: "success" | "error" | "info", content: string, duration?: number) => {
-    dispatch({ type: "toast", toast: { content, type, duration } });
-  };
-};
-
-export const useConnectShowToast = (): ShowToastFunction => {
-  const dispatch = useConnectDispatch();
   return (type: "success" | "error" | "info", content: string, duration?: number) => {
     dispatch({ type: "toast", toast: { content, type, duration } });
   };

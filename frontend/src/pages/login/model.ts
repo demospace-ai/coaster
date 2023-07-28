@@ -1,4 +1,4 @@
-import { Organization, User } from "src/rpc/api";
+import { Organization, User } from "src/rpc/types";
 
 const INITIAL_LOGIN_STATE: LoginState = {
   authenticated: false,

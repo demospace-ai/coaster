@@ -1,4 +1,5 @@
 import { H } from "highlight.run";
+
 export class HttpError extends Error {
   readonly code: number;
   readonly statusText: string;

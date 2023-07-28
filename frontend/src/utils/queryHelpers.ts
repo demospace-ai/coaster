@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { consumeError } from "./errors";
+import { consumeError } from "src/utils/errors";
 
 type AsyncFunction<Data = any, Args = any> = (variables?: Args) => Promise<Data>;
 

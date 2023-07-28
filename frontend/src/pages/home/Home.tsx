@@ -1,8 +1,6 @@
-import { CalendarDaysIcon, ChatBubbleLeftEllipsisIcon, CheckIcon, ClockIcon } from "@heroicons/react/24/outline";
-import classNames from "classnames";
+import { CalendarDaysIcon, ChatBubbleLeftEllipsisIcon, ClockIcon } from "@heroicons/react/24/outline";
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { useDestinations, useObjects } from "src/rpc/data";
 import { isProd } from "src/utils/env";
 
 export const Home: React.FC = () => {
@@ -10,12 +8,6 @@ export const Home: React.FC = () => {
     "tw-py-3 tw-px-4 tw-text-base tw-font-medium tw-bg-white tw-border tw-border-slate-100 tw-rounded-lg tw-flex tw-items-center tw-mb-5 tw-cursor-pointer tw-shadow hover:tw-bg-slate-100";
   const stepNumber =
     "tw-h-6 tw-w-6 tw-text-sm tw-rounded-full tw-border-2 tw-border-slate-400 tw-flex tw-justify-center tw-items-center tw-mr-4 tw-bg-white";
-
-  const { destinations } = useDestinations();
-  const { objects } = useObjects();
-
-  const destinationCreated = destinations && destinations.length > 0;
-  const objectCreated = objects && objects.length > 0;
 
   return (
     <div className="tw-h-full tw-py-7 tw-px-10">
@@ -40,16 +32,12 @@ export const Home: React.FC = () => {
             <CompletionTimeBanner />
           </div>
         </div>
-        <NavLink className={classNames(setupStep, destinationCreated && "tw-line-through")} to="/destinations">
-          <div className={stepNumber}>
-            {destinationCreated ? <CheckIcon className="tw-m-0.5 tw-w-full tw-stroke-2" /> : 1}
-          </div>
+        <NavLink className={setupStep} to="/destinations">
+          <div className={stepNumber}>1</div>
           Configure a destination where Fabra will send data
         </NavLink>
-        <NavLink className={classNames(setupStep, objectCreated && "tw-line-through")} to="/objects">
-          <div className={stepNumber}>
-            {objectCreated ? <CheckIcon className="tw-m-0.5 tw-w-full  tw-stroke-2" /> : 2}
-          </div>
+        <NavLink className={setupStep} to="/objects">
+          <div className={stepNumber}>2</div>
           Define objects that customers can send to you
         </NavLink>
         <a className={setupStep} href="https://docs.fabra.io/guides/fabra-connect" target="_blank" rel="noreferrer">

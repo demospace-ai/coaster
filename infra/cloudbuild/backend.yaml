@@ -2,7 +2,7 @@ steps:
 - id: test-backend
   name: 'golang:1.20'
   script: |
-    cd backend/server;
+    cd backend;
     go test -v ./...;
   env:
     - 'IS_CLOUD_BUILD=true'
@@ -16,8 +16,6 @@ steps:
   - 'us-docker.pkg.dev/fabra-prod/fabra-server/fabra:$COMMIT_SHA'
   - '-t'
   - 'us-docker.pkg.dev/fabra-prod/fabra-server/fabra:latest'
-  - '-f'
-  - 'backend/server/Dockerfile'
   - 'backend/'
   waitFor: ['test-backend']
 

@@ -10,7 +10,8 @@ import { LogoLoading } from "src/components/loading/LogoLoading";
 import { useSetOrganization } from "src/pages/login/actions";
 import { useSelector } from "src/root/model";
 import { getEndpointUrl } from "src/rpc/ajax";
-import { OAuthProvider, OAuthRedirect } from "src/rpc/api";
+import { OAuthRedirect } from "src/rpc/api";
+import { OAuthProvider } from "src/rpc/types";
 
 export enum LoginStep {
   Start = 1,

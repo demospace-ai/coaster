@@ -4,9 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { rudderanalytics } from "src/app/rudder";
 import { useDispatch } from "src/root/model";
 import { sendRequest } from "src/rpc/ajax";
-import { Logout, Organization, SetOrganization, User } from "src/rpc/api";
+import { Logout, SetOrganization } from "src/rpc/api";
+import { Organization, User } from "src/rpc/types";
 import { isProd } from "src/utils/env";
-import { consumeError } from "../../utils/errors";
+import { consumeError } from "src/utils/errors";
 
 export interface OrganizationArgs {
   organizationName?: string;

@@ -1,15 +1,4 @@
-import {
-  ArrowPathIcon,
-  ArrowTopRightOnSquareIcon,
-  BellIcon,
-  CircleStackIcon,
-  CubeIcon,
-  EyeIcon,
-  HomeIcon,
-  KeyIcon,
-  MapIcon,
-  UserPlusIcon,
-} from "@heroicons/react/24/outline";
+import { ArrowTopRightOnSquareIcon, HomeIcon, MapIcon, UserPlusIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import { NavLink } from "react-router-dom";
 import { QuestionCircleIcon } from "src/components/icons/Icons";
@@ -53,53 +42,10 @@ export const NavigationBar: React.FC = () => {
             <div className={route}>Home</div>
           </NavLink>
         </div>
-        <div className={routeContainer}>
-          <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-slate-200")} to={"/syncs"}>
-            <ArrowPathIcon className="tw-h-4" strokeWidth="2" />
-            <div className={route}>Syncs</div>
-          </NavLink>
-        </div>
-        <div className={routeContainer}>
-          <NavLink
-            className={({ isActive }) => classNames(navLink, isActive && "tw-bg-slate-200")}
-            to={"/notifications"}
-          >
-            <BellIcon className="tw-h-4" strokeWidth="2" />
-            <div className={route}>Notifications</div>
-          </NavLink>
-        </div>
-
         <div className="tw-my-5 tw-px-4">
           <div className="tw-border-b tw-border-solid tw-border-slate-300" />
         </div>
         <div className="tw-mx-4 tw-my-2 tw-uppercase tw-text-xs tw-text-slate-500 tw-font-medium">Develop</div>
-        <div className={routeContainer}>
-          <NavLink
-            className={({ isActive }) => classNames(navLink, isActive && "tw-bg-slate-200")}
-            to={"/destinations"}
-          >
-            <CircleStackIcon className="tw-h-4" strokeWidth="2" />
-            <div className={route}>Destinations</div>
-          </NavLink>
-        </div>
-        <div className={routeContainer}>
-          <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-slate-200")} to={"/objects"}>
-            <CubeIcon className="tw-h-4" strokeWidth="2" />
-            <div className={route}>Objects</div>
-          </NavLink>
-        </div>
-        <div className={routeContainer}>
-          <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-slate-200")} to={"/preview"}>
-            <EyeIcon className="tw-h-4" strokeWidth="2" />
-            <div className={route}>Preview</div>
-          </NavLink>
-        </div>
-        <div className={routeContainer}>
-          <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-slate-200")} to={"/apikey"}>
-            <KeyIcon className="tw-h-4" strokeWidth="2" />
-            <div className={route}>API Keys</div>
-          </NavLink>
-        </div>
         <div className={routeContainer}>
           <a className={navLink} href="https://docs.fabra.io/" target="_blank" rel="noreferrer">
             <MapIcon className="tw-h-4" strokeWidth="2" />

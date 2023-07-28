@@ -124,36 +124,6 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.UpdateObjectFields,
 		},
 		{
-			Name:        "Create sync",
-			Method:      router.POST,
-			Pattern:     "/sync",
-			HandlerFunc: s.CreateSync,
-		},
-		{
-			Name:        "Delete sync",
-			Method:      router.DELETE,
-			Pattern:     "/sync/{syncID}",
-			HandlerFunc: s.DeleteSync,
-		},
-		{
-			Name:        "Update sync",
-			Method:      router.PATCH,
-			Pattern:     "/sync/{syncID}",
-			HandlerFunc: s.UpdateSync,
-		},
-		{
-			Name:        "Run sync",
-			Method:      router.POST,
-			Pattern:     "/sync/{syncID}/run",
-			HandlerFunc: s.RunSync,
-		},
-		{
-			Name:        "Cancel sync run",
-			Method:      router.DELETE,
-			Pattern:     "/sync/{syncID}/run",
-			HandlerFunc: s.CancelSyncRun,
-		},
-		{
 			Name:        "Get sync",
 			Method:      router.GET,
 			Pattern:     "/sync/{syncID}",
