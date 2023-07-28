@@ -19,7 +19,6 @@ var ALLOWED_HEADERS = []string{"Content-Type", "X-LINK-TOKEN", "X-API-KEY", "X-T
 type ApiService interface {
 	AuthenticatedRoutes() []AuthenticatedRoute
 	UnauthenticatedRoutes() []UnauthenticatedRoute
-	LinkAuthenticatedRoutes() []LinkAuthenticatedRoute
 }
 
 type Router struct {
@@ -59,11 +58,6 @@ func (r Router) RegisterRoutes(service ApiService) {
 		r.router.Handle(route.Pattern, wrapped).Methods(route.Method.String(), "OPTIONS")
 	}
 
-	for _, route := range service.LinkAuthenticatedRoutes() {
-		wrapped := r.wrapLinkAuthenticatedRoute(route.HandlerFunc)
-		r.router.Handle(route.Pattern, wrapped).Methods(route.Method.String(), "OPTIONS")
-	}
-
 	r.router.Use(CORSMiddleware)
 
 	if application.IsProd() {
@@ -77,12 +71,6 @@ func (r Router) wrapAuthenticatedRoute(handler AuthenticatedHandlerFunc) http.Ha
 	return withError
 }
 
-func (r Router) wrapLinkAuthenticatedRoute(handler AuthenticatedHandlerFunc) http.Handler {
-	withAuth := r.wrapWithLinkAuth(handler)
-	withError := r.wrapWithErrorHandling(withAuth)
-	return withError
-}
-
 func (r Router) wrapUnauthenticatedRoute(handler ErrorHandlerFunc) http.Handler {
 	withError := r.wrapWithErrorHandling(handler)
 	return withError
@@ -91,22 +79,6 @@ func (r Router) wrapUnauthenticatedRoute(handler ErrorHandlerFunc) http.Handler 
 func (r Router) wrapWithAuth(handler AuthenticatedHandlerFunc) ErrorHandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) error {
 		auth, err := r.authService.GetAuthentication(req)
-		if err != nil {
-			return err
-		}
-
-		if !auth.IsAuthenticated {
-			http.Error(w, errors.Unauthorized.Error(), errors.Unauthorized.Code())
-			return nil
-		}
-
-		return handler(*auth, w, req)
-	}
-}
-
-func (r Router) wrapWithLinkAuth(handler AuthenticatedHandlerFunc) ErrorHandlerFunc {
-	return func(w http.ResponseWriter, req *http.Request) error {
-		auth, err := r.authService.GetLinkAuthentication(req)
 		if err != nil {
 			return err
 		}

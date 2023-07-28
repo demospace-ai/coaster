@@ -4,11 +4,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/golang-jwt/jwt/v5"
 	"go.fabra.io/server/common/crypto"
 	"go.fabra.io/server/common/database"
 	"go.fabra.io/server/common/input"
-	"go.fabra.io/server/common/link_tokens"
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/repositories/sessions"
 	"go.fabra.io/server/common/strings"
@@ -201,44 +199,4 @@ func CreateApiKey(db *gorm.DB, organizationID int64) string {
 	db.Create(&apiKey)
 
 	return rawKey
-}
-
-func CreateActiveLinkToken(db *gorm.DB, organizationID int64, endCustomerID string) string {
-	linkToken := jwt.NewWithClaims(crypto.SigningMethodKMSHS256, link_tokens.LinkTokenClaims{
-		TokenInfo: link_tokens.TokenInfo{
-			EndCustomerID:  endCustomerID,
-			OrganizationID: organizationID,
-		},
-		RegisteredClaims: jwt.RegisteredClaims{
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(1 * time.Hour)),
-		},
-	})
-
-	signedToken, err := linkToken.SignedString(nil)
-	if err != nil {
-		panic(err)
-	}
-
-	return signedToken
-}
-
-func CreateExpiredLinkToken(db *gorm.DB, organizationID int64, endCustomerID string) string {
-	linkToken := jwt.NewWithClaims(crypto.SigningMethodKMSHS256, link_tokens.LinkTokenClaims{
-		TokenInfo: link_tokens.TokenInfo{
-			EndCustomerID:  endCustomerID,
-			OrganizationID: organizationID,
-		},
-		RegisteredClaims: jwt.RegisteredClaims{
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(-1 * time.Hour)),
-		},
-	})
-
-	signedToken, err := linkToken.SignedString(nil)
-	if err != nil {
-		panic(err)
-	}
-
-	return signedToken
 }

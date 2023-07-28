@@ -82,12 +82,6 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.GetSyncs,
 		},
 		{
-			Name:        "Get all syncs for a customer",
-			Method:      router.GET,
-			Pattern:     "/customer/{endCustomerId}/syncs",
-			HandlerFunc: s.GetSyncsForCustomer,
-		},
-		{
 			Name:        "Query object record for customer",
 			Method:      router.POST,
 			Pattern:     "/customer/{endCustomerId}/object/{objectId}/record",
@@ -166,12 +160,6 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.GetSync,
 		},
 		{
-			Name:        "Create link token",
-			Method:      router.POST,
-			Pattern:     "/link_token",
-			HandlerFunc: s.CreateLinkToken,
-		},
-		{
 			Name:        "Get values for a specified field",
 			Method:      router.GET,
 			Pattern:     "/connection/field_values",
@@ -205,109 +193,6 @@ func (s ApiService) UnauthenticatedRoutes() []router.UnauthenticatedRoute {
 			Method:      router.GET,
 			Pattern:     "/oauth_login",
 			HandlerFunc: s.OAuthLogin,
-		},
-	}
-}
-
-// TODO: find a better way of doing this
-// Only a subset of the APIs should be accessible with Link Token Authentication
-func (s ApiService) LinkAuthenticatedRoutes() []router.LinkAuthenticatedRoute {
-	return []router.LinkAuthenticatedRoute{
-		{
-			Name:        "Get all objects",
-			Method:      router.GET,
-			Pattern:     "/objects",
-			HandlerFunc: s.GetObjects,
-		},
-		{
-			Name:        "Get object",
-			Method:      router.GET,
-			Pattern:     "/object/{objectID}",
-			HandlerFunc: s.GetObject,
-		},
-		{
-			Name:        "Get all sources",
-			Method:      router.GET,
-			Pattern:     "/link/sources",
-			HandlerFunc: s.LinkGetSources,
-		},
-		{
-			Name:        "Get source namespaces",
-			Method:      router.GET,
-			Pattern:     "/link/namespaces",
-			HandlerFunc: s.LinkGetNamespaces,
-		},
-		{
-			Name:        "Get tables for a given source and namespace",
-			Method:      router.GET,
-			Pattern:     "/link/tables",
-			HandlerFunc: s.LinkGetTables,
-		},
-		{
-			Name:        "Get schema for a given table",
-			Method:      router.GET,
-			Pattern:     "/link/schema",
-			HandlerFunc: s.LinkGetSchema,
-		},
-		{
-			Name:        "Create source for sync",
-			Method:      router.POST,
-			Pattern:     "/link/source",
-			HandlerFunc: s.LinkCreateSource,
-		},
-		{
-			Name:        "Create sync",
-			Method:      router.POST,
-			Pattern:     "/link/sync",
-			HandlerFunc: s.LinkCreateSync,
-		},
-		{
-			Name:        "Delete sync",
-			Method:      router.DELETE,
-			Pattern:     "/link/sync/{syncID}",
-			HandlerFunc: s.LinkDeleteSync,
-		},
-		{
-			Name:        "Update sync",
-			Method:      router.PATCH,
-			Pattern:     "/sync/{syncID}",
-			HandlerFunc: s.LinkUpdateSync,
-		},
-		{
-			Name:        "Run sync",
-			Method:      router.POST,
-			Pattern:     "/link/sync/{syncID}/run",
-			HandlerFunc: s.LinkRunSync,
-		},
-		{
-			Name:        "Cancel sync run",
-			Method:      router.DELETE,
-			Pattern:     "/link/sync/{syncID}/run",
-			HandlerFunc: s.LinkCancelSyncRun,
-		},
-		{
-			Name:        "Get sync",
-			Method:      router.GET,
-			Pattern:     "/link/sync/{syncID}",
-			HandlerFunc: s.LinkGetSync,
-		},
-		{
-			Name:        "Get all syncs",
-			Method:      router.GET,
-			Pattern:     "/link/syncs",
-			HandlerFunc: s.LinkGetSyncs,
-		},
-		{
-			Name:        "Get preview",
-			Method:      router.POST,
-			Pattern:     "/link/preview",
-			HandlerFunc: s.LinkGetPreview,
-		},
-		{
-			Name:        "Test data connection",
-			Method:      router.POST,
-			Pattern:     "/connection/test",
-			HandlerFunc: s.TestDataConnection,
 		},
 	}
 }

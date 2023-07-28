@@ -6,7 +6,6 @@ import (
 	"go.fabra.io/server/common/application"
 	"go.fabra.io/server/common/crypto"
 	"go.fabra.io/server/common/errors"
-	"go.fabra.io/server/common/link_tokens"
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/repositories/organizations"
 	"go.fabra.io/server/common/repositories/sessions"
@@ -19,7 +18,6 @@ const SESSION_COOKIE_NAME = "X-Session-Token"
 
 type AuthService interface {
 	GetAuthentication(r *http.Request) (*Authentication, error)
-	GetLinkAuthentication(r *http.Request) (*Authentication, error)
 }
 
 type AuthServiceImpl struct {
@@ -125,37 +123,6 @@ func (as AuthServiceImpl) authApiKey(r *http.Request) (*Authentication, error) {
 	}, nil
 }
 
-func (as AuthServiceImpl) authLinkToken(r *http.Request) (*Authentication, error) {
-	linkToken := r.Header.Get("X-LINK-TOKEN")
-	if linkToken == "" {
-		return &Authentication{
-			IsAuthenticated: false,
-		}, nil
-	}
-
-	tokenInfo, err := link_tokens.ValidateLinkToken(linkToken)
-	if err != nil {
-		if errors.IsInvalidLinkToken(err) {
-			return &Authentication{
-				IsAuthenticated: false,
-			}, nil
-		} else {
-			return nil, errors.Wrap(err, "(auth.authLinkToken)")
-		}
-	}
-
-	organization, err := organizations.LoadOrganizationByID(as.db, tokenInfo.OrganizationID)
-	if err != nil {
-		return nil, errors.Wrap(err, "(auth.authLinkToken)")
-	}
-
-	return &Authentication{
-		LinkToken:       tokenInfo,
-		Organization:    organization,
-		IsAuthenticated: true,
-	}, nil
-}
-
 func (as AuthServiceImpl) GetAuthentication(r *http.Request) (*Authentication, error) {
 	authentication, err := as.authenticateCookie(r)
 	if err != nil {
@@ -170,30 +137,6 @@ func (as AuthServiceImpl) GetAuthentication(r *http.Request) (*Authentication, e
 	authentication, err = as.authApiKey(r)
 	if err != nil {
 		return nil, errors.Wrap(err, "(auth.GetAuthentication)")
-	}
-	if authentication.IsAuthenticated {
-		return authentication, nil
-	}
-
-	return &Authentication{
-		IsAuthenticated: false,
-	}, nil
-}
-
-func (as AuthServiceImpl) GetLinkAuthentication(r *http.Request) (*Authentication, error) {
-	// try link token first since some methods depends on it
-	authentication, err := as.authLinkToken(r)
-	if err != nil {
-		return nil, errors.Wrap(err, "(auth.GetLinkAuthentication)")
-	}
-	if authentication.IsAuthenticated {
-		return authentication, nil
-	}
-
-	// some link authenticated routes should also work with regular authentication
-	authentication, err = as.GetAuthentication(r)
-	if err != nil {
-		return nil, errors.Wrap(err, "(auth.GetLinkAuthentication)")
 	}
 	if authentication.IsAuthenticated {
 		return authentication, nil
