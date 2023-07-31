@@ -277,7 +277,7 @@ resource "google_compute_global_forwarding_rule" "https" {
 }
 
 locals {
-  managed_domains = tolist(["app.fabra.io", "connect.fabra.io", "api.fabra.io"])
+  managed_domains = tolist(["app.fabra.io", "api.fabra.io"])
 }
 
 resource "random_id" "cert-name" {
@@ -314,13 +314,6 @@ resource "google_compute_url_map" "default" {
 
   host_rule {
     hosts = [
-      "connect.fabra.io",
-    ]
-    path_matcher = "fabra-connect-path-matcher"
-  }
-
-  host_rule {
-    hosts = [
       "api.fabra.io",
     ]
     path_matcher = "fabra-api-path-matcher"
@@ -334,11 +327,6 @@ resource "google_compute_url_map" "default" {
   path_matcher {
     name            = "fabra-api-path-matcher"
     default_service = google_compute_backend_service.default.id
-  }
-
-  path_matcher {
-    name            = "fabra-connect-path-matcher"
-    default_service = google_compute_backend_bucket.connect_backend.id
   }
 }
 
@@ -433,64 +421,6 @@ resource "google_cloudbuild_trigger" "frontend-build-trigger" {
   }
 
   filename = "infra/cloudbuild/frontend.yaml"
-}
-
-resource "google_storage_bucket" "fabra_connect_bucket" {
-  name          = "fabra-connect-bucket-us"
-  location      = "US"
-  storage_class = "STANDARD"
-
-  uniform_bucket_level_access = true
-
-  website {
-    main_page_suffix = "connect.html"
-    not_found_page   = "connect.html"
-  }
-
-  cors {
-    max_age_seconds = 3600
-    method = [
-      "GET",
-    ]
-    origin = [
-      "*",
-    ]
-    response_header = [
-      "Content-Type",
-    ]
-  }
-}
-
-resource "google_storage_bucket_iam_member" "public_connect_read_access" {
-  bucket = google_storage_bucket.fabra_connect_bucket.name
-  role   = "roles/storage.objectViewer"
-  member = "allUsers"
-}
-
-resource "google_compute_backend_bucket" "connect_backend" {
-  name        = "connect-backend-bucket"
-  description = "Static react web app for Fabra Connect"
-  bucket_name = google_storage_bucket.fabra_connect_bucket.name
-  enable_cdn  = true
-}
-
-# TODO: figure out how to only trigger this on connect changes
-resource "google_cloudbuild_trigger" "connect-build-trigger" {
-  name = "connect-trigger"
-
-  included_files = ["frontend/**"]
-
-  github {
-    name  = "fabra"
-    owner = "fabra-io"
-
-    push {
-      branch       = "main"
-      invert_regex = false
-    }
-  }
-
-  filename = "infra/cloudbuild/connect.yaml"
 }
 
 resource "google_kms_key_ring" "data-connection-keyring" {

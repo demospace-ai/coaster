@@ -51,26 +51,11 @@ func (s FakeService) UnauthenticatedRoutes() []router.UnauthenticatedRoute {
 	}
 }
 
-func (s FakeService) LinkAuthenticatedRoutes() []router.LinkAuthenticatedRoute {
-	return []router.LinkAuthenticatedRoute{
-		{
-			Name:        "LinkAuthenticated",
-			Method:      router.GET,
-			Pattern:     "/linkauthenticated",
-			HandlerFunc: s.LinkAuthenticated,
-		},
-	}
-}
-
 func (s FakeService) Authenticated(_ auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
 func (s FakeService) Unauthenticated(w http.ResponseWriter, r *http.Request) error {
-	return nil
-}
-
-func (s FakeService) LinkAuthenticated(_ auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
@@ -87,8 +72,6 @@ var _ = Describe("Router", func() {
 		activeSessionCookie  *http.Cookie
 		expiredSessionCookie *http.Cookie
 		apiKey               string
-		activeLinkToken      string
-		expiredLinkToken     string
 	)
 
 	BeforeEach(func() {
@@ -150,47 +133,6 @@ var _ = Describe("Router", func() {
 		req, err := http.NewRequest("GET", "/authenticated", nil)
 		Expect(err).To(BeNil())
 		req.Header.Add("X-API-KEY", apiKey)
-
-		r.ServeHTTP(rr, req)
-
-		result := rr.Result()
-		Expect(result.StatusCode).To(Equal(http.StatusOK))
-	})
-
-	It("returns 401 when active link token provided for not-link token authenticated route", func() {
-		rr := httptest.NewRecorder()
-		req, err := http.NewRequest("GET", "/authenticated", nil)
-		Expect(err).To(BeNil())
-		req.Header.Add("X-LINK-TOKEN", activeLinkToken)
-
-		r.ServeHTTP(rr, req)
-
-		result := rr.Result()
-		Expect(result.StatusCode).To(Equal(http.StatusUnauthorized))
-	})
-
-	It("returns 401 when expired link token provided for link authenticated route", func() {
-		rr := httptest.NewRecorder()
-		req, err := http.NewRequest("GET", "/authenticated", nil)
-		Expect(err).To(BeNil())
-		req.Header.Add("X-LINK-TOKEN", expiredLinkToken)
-
-		r.ServeHTTP(rr, req)
-
-		result := rr.Result()
-		Expect(result.StatusCode).To(Equal(http.StatusUnauthorized))
-	})
-
-	// TODO: test link signature verification
-	It("returns 401 when link token has invalid signature for link authenticated route", func() {
-		// TODO: implement
-	})
-
-	It("returns 200 when active link token provided for link authenticated route", func() {
-		rr := httptest.NewRecorder()
-		req, err := http.NewRequest("GET", "/linkauthenticated", nil)
-		Expect(err).To(BeNil())
-		req.Header.Add("X-LINK-TOKEN", activeLinkToken)
 
 		r.ServeHTTP(rr, req)
 
