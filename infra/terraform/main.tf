@@ -115,8 +115,8 @@ resource "google_cloudbuild_trigger" "terraform-build-trigger" {
 resource "google_cloudbuild_trigger" "backend-build-trigger" {
   name = "backend-trigger"
 
-  included_files = ["backend/server/**"]
-  ignored_files  = ["backend/server/migrations/**"]
+  included_files = ["backend/**"]
+  ignored_files  = ["backend/migrations/**"]
 
   github {
     name  = "fabra"
@@ -211,7 +211,7 @@ resource "google_cloud_run_service_iam_member" "all_users_member" {
 resource "google_cloudbuild_trigger" "database-migration-trigger" {
   name = "database-migration-trigger"
 
-  included_files = ["backend/server/migrations/**"]
+  included_files = ["backend/migrations/**"]
 
   github {
     name  = "fabra"
