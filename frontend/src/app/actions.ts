@@ -15,11 +15,9 @@ export function useStart() {
       dispatch({
         type: "login.authenticated",
         user: checkSessionResponse.user,
-        organization: checkSessionResponse.organization,
-        suggestedOrganizations: checkSessionResponse.suggested_organizations,
       });
 
-      onLoginSuccess(checkSessionResponse.user, checkSessionResponse.organization);
+      onLoginSuccess(checkSessionResponse.user);
       dispatch({ type: "login.error", error: null });
     } catch (e) {
       if (e instanceof HttpError) {

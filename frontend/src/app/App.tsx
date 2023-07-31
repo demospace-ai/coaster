@@ -3,14 +3,12 @@ import { ReactNode, useEffect, useState } from "react";
 import { Navigate, Outlet, Route, createBrowserRouter, createRoutesFromElements, useLocation } from "react-router-dom";
 import { useStart } from "src/app/actions";
 import { Header } from "src/components/header/Header";
-import { UpgradeBanner } from "src/components/header/UpgradeBanner";
 import { LogoLoading } from "src/components/loading/LogoLoading";
 import { NavigationBar } from "src/components/navigationBar/NavigationBar";
 import { Toast, getToastContentFromDetails } from "src/components/notifications/Notifications";
 import { Home } from "src/pages/home/Home";
 import { Login, Unauthorized } from "src/pages/login/Login";
 import { NotFound } from "src/pages/notfound/NotFound";
-import { Team } from "src/pages/team/Team";
 import { useDispatch, useSelector } from "src/root/model";
 
 type AuthenticationProps = {
@@ -60,7 +58,6 @@ const AppLayout: React.FC = () => {
 
   return (
     <>
-      <UpgradeBanner />
       <div className="tw-pointer-events-none tw-fixed tw-w-full tw-h-full">
         <Toast
           content={toastContent}
@@ -103,7 +100,6 @@ export const router = createBrowserRouter(
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Login create />} />
       <Route path="/" element={<RequireAuth element={<Home />} />} />
-      <Route path="/team" element={<RequireAuth element={<Team />} />} />
       <Route path="*" element={<NotFound />} />
     </Route>,
   ),

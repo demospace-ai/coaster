@@ -1,4 +1,4 @@
-import { ArrowTopRightOnSquareIcon, HomeIcon, MapIcon, UserPlusIcon } from "@heroicons/react/24/outline";
+import { ArrowTopRightOnSquareIcon, HomeIcon, MapIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import { NavLink } from "react-router-dom";
 import { QuestionCircleIcon } from "src/components/icons/Icons";
@@ -7,10 +7,9 @@ import { useSelector } from "src/root/model";
 
 export const NavigationBar: React.FC = () => {
   const isAuthenticated = useSelector((state) => state.login.authenticated);
-  const organization = useSelector((state) => state.login.organization);
 
   // No navigation bar whatsoever for login page
-  if (!isAuthenticated || !organization) {
+  if (!isAuthenticated) {
     return <></>;
   }
 
@@ -55,12 +54,6 @@ export const NavigationBar: React.FC = () => {
         </div>
         <div id="bottomSection" className="tw-mt-auto tw-mb-4">
           <div className="tw-mx-4 tw-mb-2 tw-uppercase tw-text-xs tw-text-slate-500 tw-font-medium">Account</div>
-          <div className={routeContainer}>
-            <NavLink className={({ isActive }) => classNames(navLink, isActive && "tw-bg-slate-200")} to="/team">
-              <UserPlusIcon className="tw-h-4 tw-ml-[1px] -tw-mr-[0.5px]" strokeWidth="2" />
-              <div className={route}>Team</div>
-            </NavLink>
-          </div>
           <div className={routeContainer}>
             <a className={navLink} href="mailto:nick@fabra.io?subject=Help with Fabra">
               <QuestionCircleIcon className="tw-h-[18px] tw-mt-[1px]" strokeWidth="2" />

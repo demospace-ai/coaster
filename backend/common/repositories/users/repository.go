@@ -86,15 +86,6 @@ func CreateUserForExternalInfo(db *gorm.DB, externalUserInfo *oauth.ExternalUser
 	return user, nil
 }
 
-func SetOrganization(db *gorm.DB, user *models.User, organizationID int64) (*models.User, error) {
-	result := db.Model(user).Update("organization_id", organizationID)
-	if result.Error != nil {
-		return nil, errors.Wrap(result.Error, "(users.SetOrganization)")
-	}
-
-	return user, nil
-}
-
 func GetOrCreateForExternalInfo(db *gorm.DB, externalUserInfo *oauth.ExternalUserInfo) (*models.User, error) {
 	existingUser, err := LoadByExternalID(db, externalUserInfo.ExternalID)
 	if err != nil && !errors.IsRecordNotFound(err) {
@@ -109,19 +100,4 @@ func GetOrCreateForExternalInfo(db *gorm.DB, externalUserInfo *oauth.ExternalUse
 	}
 
 	return user, nil
-}
-
-func LoadAllByOrganizationID(db *gorm.DB, organizationID int64) ([]models.User, error) {
-	var users []models.User
-	result := db.Table("users").
-		Where("users.organization_id = ?", organizationID).
-		Where("users.deactivated_at IS NULL").
-		Find(&users)
-
-	if result.Error != nil {
-		return nil, errors.Wrap(result.Error, "(users.LoadAllByOrganizationID)")
-	}
-
-	return users, nil
-
 }

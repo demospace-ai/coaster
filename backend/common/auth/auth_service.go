@@ -6,8 +6,6 @@ import (
 	"go.fabra.io/server/common/application"
 	"go.fabra.io/server/common/crypto"
 	"go.fabra.io/server/common/errors"
-	"go.fabra.io/server/common/models"
-	"go.fabra.io/server/common/repositories/organizations"
 	"go.fabra.io/server/common/repositories/sessions"
 	"go.fabra.io/server/common/repositories/users"
 
@@ -86,39 +84,9 @@ func (as AuthServiceImpl) authenticateCookie(r *http.Request) (*Authentication, 
 		return nil, errors.Wrap(errors.Forbidden, "(auth.authenticateCookie)")
 	}
 
-	// If organization is null, this means the user still needs to set their organization
-	var organization *models.Organization
-	if user.OrganizationID.Valid {
-		organization, err = organizations.LoadOrganizationByID(as.db, user.OrganizationID.Int64)
-		if err != nil {
-			return nil, errors.Wrap(err, "(auth.authenticateCookie) Unexpected error fetching organization")
-		}
-	}
-
 	return &Authentication{
 		Session:         refreshed,
 		User:            user,
-		Organization:    organization,
-		IsAuthenticated: true,
-	}, nil
-}
-
-func (as AuthServiceImpl) authApiKey(r *http.Request) (*Authentication, error) {
-	apiKey := r.Header.Get("X-API-KEY")
-	if apiKey == "" {
-		return &Authentication{
-			IsAuthenticated: false,
-		}, nil
-	}
-
-	hashedKey := crypto.HashString(apiKey)
-	organization, err := organizations.LoadOrganizationByApiKey(as.db, hashedKey)
-	if err != nil {
-		return nil, errors.Wrap(err, "(auth.authApiKey)")
-	}
-
-	return &Authentication{
-		Organization:    organization,
 		IsAuthenticated: true,
 	}, nil
 }
@@ -129,15 +97,6 @@ func (as AuthServiceImpl) GetAuthentication(r *http.Request) (*Authentication, e
 		return nil, errors.Wrap(err, "(auth.GetAuthentication)")
 	}
 
-	if authentication.IsAuthenticated {
-		return authentication, nil
-	}
-
-	// no session found check for API key authentication first
-	authentication, err = as.authApiKey(r)
-	if err != nil {
-		return nil, errors.Wrap(err, "(auth.GetAuthentication)")
-	}
 	if authentication.IsAuthenticated {
 		return authentication, nil
 	}

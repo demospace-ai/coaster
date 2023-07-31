@@ -1,51 +1,34 @@
 import classNames from "classnames";
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Button, FormButton } from "src/components/button/Button";
 import { GithubIcon } from "src/components/icons/Github";
 import { GoogleIcon } from "src/components/icons/Google";
 import longlogo from "src/components/images/long-logo.svg";
 import mail from "src/components/images/mail.svg";
-import { LogoLoading } from "src/components/loading/LogoLoading";
-import { useSetOrganization } from "src/pages/login/actions";
 import { useSelector } from "src/root/model";
 import { getEndpointUrl } from "src/rpc/ajax";
 import { OAuthRedirect } from "src/rpc/api";
 import { OAuthProvider } from "src/rpc/types";
 
-export enum LoginStep {
-  Start = 1,
-  ValidateCode,
-  Organization,
-}
-
 export const Login: React.FC<{ create?: boolean }> = ({ create }) => {
-  const [loading, setLoading] = useState(false);
   const isAuthenticated = useSelector((state) => state.login.authenticated);
-  const organization = useSelector((state) => state.login.organization);
   const navigate = useNavigate();
 
   // Use effect to navigate after render if authenticated
   useEffect(() => {
     let ignore = false;
-    if (isAuthenticated && organization && !ignore) {
+    if (isAuthenticated && !ignore) {
       navigate("/");
     }
 
     return () => {
       ignore = true;
     };
-  }, [navigate, isAuthenticated, organization]);
-
-  if (loading) {
-    return <LogoLoading />;
-  }
+  }, [navigate, isAuthenticated]);
 
   let loginContent;
   if (!isAuthenticated) {
     loginContent = <StartContent create={create} />;
-  } else if (!organization) {
-    loginContent = <OrganizationInput setLoading={setLoading} />;
   }
 
   return (
@@ -113,104 +96,6 @@ const StartContent: React.FC<{ create?: boolean }> = ({ create }) => {
         </div>
       )}
     </>
-  );
-};
-
-type OrganizationInputProps = {
-  setLoading: (loading: boolean) => void;
-};
-
-const OrganizationInput: React.FC<OrganizationInputProps> = (props) => {
-  const user = useSelector((state) => state.login.user);
-  const suggestedOrganizations = useSelector((state) => state.login.suggestedOrganizations);
-  const [organizationInput, setOrganizationInput] = useState("");
-  const setOrganization = useSetOrganization();
-  const [isValid, setIsValid] = useState(true);
-  const [overrideCreate, setOverrideCreate] = useState(false);
-
-  const classes = ["tw-border tw-border-slate-400 tw-rounded-md tw-px-3 tw-py-2 tw-w-full tw-box-border"];
-  if (!isValid) {
-    classes.push("tw-border-red-500 tw-outline-none");
-  }
-
-  const validateOrganization = (): boolean => {
-    const valid = organizationInput.length > 0;
-    setIsValid(valid);
-    return valid;
-  };
-
-  const onKeydown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    event.stopPropagation();
-    if (event.key === "Escape") {
-      event.currentTarget.blur();
-    }
-  };
-
-  const createNewOrganization = async (e: FormEvent) => {
-    e.preventDefault();
-    props.setLoading(true);
-    if (!validateOrganization()) {
-      return;
-    }
-
-    await setOrganization(user!, { organizationName: organizationInput });
-    props.setLoading(false);
-  };
-
-  const joinOrganization = async (organizationID: number) => {
-    props.setLoading(true);
-    // TODO how to specify positional arg with name
-    await setOrganization(user!, { organizationID: organizationID });
-  };
-
-  if (!suggestedOrganizations || suggestedOrganizations.length === 0 || overrideCreate) {
-    return (
-      <form className="tw-mt-5" onSubmit={createNewOrganization}>
-        <div className="tw-mb-5">Welcome, {user!.name}! Let's build out your team.</div>
-        <input
-          type="text"
-          id="organization"
-          name="organization"
-          autoComplete="organization"
-          placeholder="Organization Name"
-          className={classNames(classes)}
-          onKeyDown={onKeydown}
-          onFocus={() => setIsValid(true)}
-          onChange={(e) => setOrganizationInput(e.target.value)}
-          onBlur={validateOrganization}
-        />
-        {!isValid && (
-          <div className="tw-text-red-500 tw-mt-1 -tw-mb-1 tw-text-[15px] tw-text-left">
-            Please enter a valid organization name.
-          </div>
-        )}
-        <FormButton className="tw-mt-5 tw-h-10 tw-w-full">Continue</FormButton>
-      </form>
-    );
-  }
-
-  return (
-    <div className="tw-mt-5">
-      <div className="tw-mb-5">Welcome, {user!.name}! Join your team.</div>
-      {suggestedOrganizations.map((suggestion, index) => (
-        <li
-          key={index}
-          className="tw-border tw-border-black tw-rounded-md tw-list-none tw-p-8 tw-text-left tw-flex tw-flex-row"
-        >
-          <Button className="tw-inline-block tw-mr-8 tw-h-10 tw-w-1/2" onClick={() => joinOrganization(suggestion.id)}>
-            Join
-          </Button>
-          <div className="tw-flex tw-flex-col tw-h-10 tw-w-1/2 tw-text-center tw-justify-center">
-            <div className="tw-overflow-hidden tw-text-ellipsis tw-font-bold tw-text-lg">{suggestion.name}</div>
-            {/* TODO: add team size */}
-          </div>
-        </li>
-      ))}
-      <div className="tw-my-5 tw-mx-0">or</div>
-      <Button className="tw-w-full tw-h-10" onClick={() => setOverrideCreate(true)}>
-        Create new organization
-      </Button>
-    </div>
   );
 };
 

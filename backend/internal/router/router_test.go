@@ -71,15 +71,13 @@ var _ = Describe("Router", func() {
 	var (
 		activeSessionCookie  *http.Cookie
 		expiredSessionCookie *http.Cookie
-		apiKey               string
 	)
 
 	BeforeEach(func() {
 		fakeService := FakeService{}
 		r.RegisterRoutes(fakeService)
 
-		org := test.CreateOrganization(db)
-		user := test.CreateUser(db, org.ID)
+		user := test.CreateUser(db)
 		activeSessionToken := test.CreateActiveSession(db, user.ID)
 		activeSessionCookie = &http.Cookie{
 			Name:  auth.SESSION_COOKIE_NAME,
@@ -90,7 +88,6 @@ var _ = Describe("Router", func() {
 			Name:  auth.SESSION_COOKIE_NAME,
 			Value: expiredSessionToken,
 		}
-		apiKey = test.CreateApiKey(db, org.ID)
 	})
 
 	It("returns 401 when no session token provided for authenticated route", func() {
@@ -121,31 +118,6 @@ var _ = Describe("Router", func() {
 		req, err := http.NewRequest("GET", "/authenticated", nil)
 		Expect(err).To(BeNil())
 		req.AddCookie(activeSessionCookie)
-
-		r.ServeHTTP(rr, req)
-
-		result := rr.Result()
-		Expect(result.StatusCode).To(Equal(http.StatusOK))
-	})
-
-	It("returns 200 when API key and no session token provided for authenticated route", func() {
-		rr := httptest.NewRecorder()
-		req, err := http.NewRequest("GET", "/authenticated", nil)
-		Expect(err).To(BeNil())
-		req.Header.Add("X-API-KEY", apiKey)
-
-		r.ServeHTTP(rr, req)
-
-		result := rr.Result()
-		Expect(result.StatusCode).To(Equal(http.StatusOK))
-	})
-
-	It("returns 200 when API key and expired session token provided for authenticated route", func() {
-		rr := httptest.NewRecorder()
-		req, err := http.NewRequest("GET", "/authenticated", nil)
-		Expect(err).To(BeNil())
-		req.Header.Add("X-API-KEY", apiKey)
-		req.AddCookie(expiredSessionCookie)
 
 		r.ServeHTTP(rr, req)
 

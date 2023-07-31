@@ -1,0 +1,14 @@
+ALTER TABLE users DROP COLUMN organization_id;
+DROP TABLE IF EXISTS webhook_keys;
+DROP TABLE IF EXISTS sync_runs;
+DROP TABLE IF EXISTS field_mappings;
+DROP TABLE IF EXISTS syncs;
+DROP TABLE IF EXISTS sources;
+DROP TABLE IF EXISTS object_fields;
+DROP TABLE IF EXISTS objects;
+DROP TABLE IF EXISTS end_customer_api_keys;
+DROP TABLE IF EXISTS destinations;
+DROP TABLE IF EXISTS connections;
+DROP TABLE IF EXISTS api_keys;
+DROP TABLE IF EXISTS organizations;
+DROP TABLE IF EXISTS verifications;
