@@ -609,3 +609,37 @@ resource "google_project_iam_member" "cloud-build-roles" {
   role   = each.key
   member = "serviceAccount:454026596701@cloudbuild.gserviceaccount.com"
 }
+
+resource "google_storage_bucket" "user_images_bucket" {
+  name          = "user-images-bucket-us"
+  location      = "US"
+  storage_class = "STANDARD"
+
+  uniform_bucket_level_access = true
+
+  cors {
+    max_age_seconds = 3600
+    method = [
+      "GET",
+    ]
+    origin = [
+      "*",
+    ]
+    response_header = [
+      "Content-Type",
+    ]
+  }
+}
+
+resource "google_storage_bucket_iam_member" "public_user_images_read_access" {
+  bucket = google_storage_bucket.user_images_bucket.name
+  role   = "roles/storage.objectViewer"
+  member = "allUsers"
+}
+
+resource "google_compute_backend_bucket" "user_images_backend" {
+  name        = "user-images-backend"
+  description = "Static user uploaded images"
+  bucket_name = google_storage_bucket.user_images_bucket.name
+  enable_cdn  = true
+}
