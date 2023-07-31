@@ -4,7 +4,6 @@ import { Navigate, Outlet, Route, createBrowserRouter, createRoutesFromElements,
 import { useStart } from "src/app/actions";
 import { Header } from "src/components/header/Header";
 import { LogoLoading } from "src/components/loading/LogoLoading";
-import { NavigationBar } from "src/components/navigationBar/NavigationBar";
 import { Toast, getToastContentFromDetails } from "src/components/notifications/Notifications";
 import { Home } from "src/pages/home/Home";
 import { Login, Unauthorized } from "src/pages/login/Login";
@@ -67,7 +66,6 @@ const AppLayout: React.FC = () => {
         />
       </div>
       <div className="tw-flex tw-flex-row tw-w-full tw-h-full">
-        <NavigationBar />
         <div className="tw-flex tw-flex-col tw-h-full tw-w-full tw-bg-gray-10 tw-overflow-hidden">
           <Header />
           <Outlet />
@@ -99,7 +97,7 @@ export const router = createBrowserRouter(
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Login create />} />
-      <Route path="/" element={<RequireAuth element={<Home />} />} />
+      <Route path="/" element={<Home />} />
       <Route path="*" element={<NotFound />} />
     </Route>,
   ),

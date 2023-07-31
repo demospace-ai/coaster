@@ -1,138 +1,155 @@
 import { Menu, Transition } from "@headlessui/react";
-import { ArrowRightOnRectangleIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { UserIcon } from "@heroicons/react/20/solid";
+import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import React, { Fragment } from "react";
-import { NavLink, useLocation } from "react-router-dom";
-import { Loading } from "src/components/loading/Loading";
+import { NavLink, useNavigate } from "react-router-dom";
+import logo from "src/components/images/logo.svg";
 import { useLogout } from "src/pages/login/actions";
 import { useSelector } from "src/root/model";
-import { toTitleCase } from "src/utils/string";
 
 export const Header: React.FC = () => {
-  const location = useLocation();
-  const isAuthenticated = useSelector((state) => state.login.authenticated);
-
-  // No header whatsoever for login and home page
-  if (!isAuthenticated) {
-    return <></>;
-  }
-
   return (
-    <>
-      <div className="tw-flex tw-box-border tw-min-h-[64px] tw-h-16 tw-px-10 tw-py-3 tw-items-center tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white">
-        <Breadcrumbs pathname={location.pathname} />
-        <ProfileDropdown />
-      </div>
-    </>
-  );
-};
-
-type Breadcrumb = {
-  path: string;
-  title: string | undefined;
-};
-
-// Gluten free
-const Breadcrumbs: React.FC<{ pathname: string }> = (props) => {
-  const pathTokens = props.pathname.split("/");
-  switch (pathTokens[1]) {
-    default:
-      return <PageBreadcrumbs title={toTitleCase(pathTokens[1])} pathname={props.pathname} />;
-  }
-};
-
-const PageBreadcrumbs: React.FC<{ title?: string; pathname: string }> = (props) => {
-  let crumbs: Breadcrumb[] = [];
-  if (props.title) {
-    crumbs.push({ title: props.title, path: props.pathname });
-    document.title = props.title + " | Fabra";
-  } else {
-    document.title = "Fabra";
-  }
-
-  return <BreadcrumbsLayout crumbs={crumbs} />;
-};
-
-const BreadcrumbsLayout: React.FC<{ crumbs: Breadcrumb[] }> = (props) => {
-  return (
-    <div className="tw-flex tw-flex-row tw-items-center">
-      <NavLink className="tw-text-sm tw-font-medium tw-select-none tw-text-slate-900 hover:tw-text-slate-600" to="/">
-        Home
-      </NavLink>
-      {props.crumbs.map((crumb, index) => (
-        <div key={index} className="tw-flex tw-flex-row tw-items-center">
-          <ChevronRightIcon className="tw-h-3 tw-mx-3" />
-          <NavLink
-            className="tw-text-sm tw-font-medium tw-select-none tw-text-slate-900 tw-truncate hover:tw-text-slate-600"
-            to={crumb.path}
-          >
-            {crumb.title ? crumb.title : <Loading className="tw-h-4 tw-w-4" />}
-          </NavLink>
-        </div>
-      ))}
+    <div className="tw-flex tw-box-border tw-min-h-[64px] tw-h-16 tw-px-10 tw-py-3 tw-items-center tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white">
+      <LogoLink />
+      <ProfileDropdown />
     </div>
   );
 };
 
+const LogoLink: React.FC = () => {
+  return (
+    <NavLink className="tw-flex tw-flex-row tw-h-fit tw-box-border tw-cursor-pointer tw-w-fit" to="/">
+      <img
+        src={logo}
+        className="tw-h-6 tw-w-6 tw-justify-center tw-items-center tw-rounded tw-flex tw-my-auto tw-select-none"
+        alt="fabra logo"
+      />
+      <div className="tw-my-auto tw-ml-2.5 tw-max-w-[150px] tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-bold tw-font-[Montserrat] tw-text-2xl">
+        fabra
+      </div>
+    </NavLink>
+  );
+};
+
 const ProfileDropdown: React.FC = () => {
+  const isAuthenticated = useSelector((state) => state.login.authenticated);
+  return (
+    <div className="tw-flex tw-flex-col tw-justify-center tw-ml-auto">
+      {isAuthenticated ? <SignedInMenu /> : <SignedOutMenu />}
+    </div>
+  );
+};
+
+const SignedInMenu: React.FC = () => {
   const user = useSelector((state) => state.login.user);
   const logout = useLogout();
   const menuItem = "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded";
 
   return (
-    <div className="tw-flex tw-flex-col tw-justify-center tw-ml-auto">
-      <Menu as="div">
-        <Menu.Button className="tw-bg-orange-400 tw-text-white tw-rounded-full tw-w-7 tw-h-7 tw-cursor-pointer tw-select-none">
-          {user!.name.charAt(0)}
-        </Menu.Button>
-        <Transition
-          as={Fragment}
-          enter="tw-transition tw-ease-out tw-duration-100"
-          enterFrom="tw-transform tw-opacity-0 tw-scale-95"
-          enterTo="tw-transform tw-opacity-100 tw-scale-100"
-          leave="tw-transition tw-ease-in tw-duration-75"
-          leaveFrom="tw-transform tw-opacity-100 tw-scale-97"
-          leaveTo="tw-transform tw-opacity-0 tw-scale-95"
-        >
-          <Menu.Items className="tw-absolute tw-origin-top-right tw-z-10 tw-divide-y tw-right-5 tw-mt-2 tw-mr-2 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none tw-w-80">
-            <div className="tw-m-2">
-              <p className="tw-px-1 tw-pt-2 tw-pb-1 tw-text-xs tw-uppercase">Signed in as</p>
-              <Menu.Item>
-                {({ active }) => (
-                  <div
-                    className={classNames(
-                      active ? "tw-bg-slate-200 tw-text-slate-900" : "tw-text-slate-700",
-                      menuItem,
-                      "tw-pl-2",
-                    )}
-                  >
-                    <div className="tw-bg-slate-400 tw-text-white tw-rounded-full tw-w-7 tw-h-7 tw-select-none tw-flex tw-items-center tw-justify-center tw-mr-3">
-                      {user!.name.charAt(0)}
-                    </div>
-                    <div className="tw-flex tw-flex-col">
-                      <p className="tw-truncate tw-text-sm tw-font-semibold tw-text-slate-900">{user?.name}</p>
-                      <p className="tw-truncate tw-text-sm tw-font-medium tw-text-slate-900">{user?.email}</p>
-                    </div>
+    <Menu as="div">
+      <Menu.Button className="tw-bg-orange-400 tw-text-white tw-rounded-full tw-w-7 tw-h-7 tw-cursor-pointer tw-select-none">
+        {user!.name.charAt(0)}
+      </Menu.Button>
+      <Transition
+        as={Fragment}
+        enter="tw-transition tw-ease-out tw-duration-100"
+        enterFrom="tw-transform tw-opacity-0 tw-scale-95"
+        enterTo="tw-transform tw-opacity-100 tw-scale-100"
+        leave="tw-transition tw-ease-in tw-duration-75"
+        leaveFrom="tw-transform tw-opacity-100 tw-scale-97"
+        leaveTo="tw-transform tw-opacity-0 tw-scale-95"
+      >
+        <Menu.Items className="tw-absolute tw-origin-top-right tw-z-10 tw-divide-y tw-right-5 tw-mt-2 tw-mr-2 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none tw-w-80">
+          <div className="tw-m-2">
+            <p className="tw-px-1 tw-pt-2 tw-pb-1 tw-text-xs tw-uppercase">Signed in as</p>
+            <Menu.Item>
+              {({ active }) => (
+                <div
+                  className={classNames(
+                    active ? "tw-bg-slate-200 tw-text-slate-900" : "tw-text-slate-700",
+                    menuItem,
+                    "tw-pl-2",
+                  )}
+                >
+                  <div className="tw-bg-slate-400 tw-text-white tw-rounded-full tw-w-7 tw-h-7 tw-select-none tw-flex tw-items-center tw-justify-center tw-mr-3">
+                    {user!.name.charAt(0)}
                   </div>
-                )}
-              </Menu.Item>
-            </div>
-            <div className="tw-m-2 tw-pt-2">
-              <Menu.Item>
-                {({ active }) => (
-                  <div
-                    className={classNames(active ? "tw-bg-slate-200 tw-text-slate-900" : "tw-text-slate-700", menuItem)}
-                    onClick={logout}
-                  >
-                    <ArrowRightOnRectangleIcon className="tw-h-4 tw-inline tw-mr-2 tw-stroke-2" />
-                    Logout
+                  <div className="tw-flex tw-flex-col">
+                    <p className="tw-truncate tw-text-sm tw-font-semibold tw-text-slate-900">{user?.name}</p>
+                    <p className="tw-truncate tw-text-sm tw-text-slate-900">{user?.email}</p>
                   </div>
-                )}
-              </Menu.Item>
-            </div>
-          </Menu.Items>
-        </Transition>
-      </Menu>
-    </div>
+                </div>
+              )}
+            </Menu.Item>
+          </div>
+          <div className="tw-m-2 tw-pt-2">
+            <Menu.Item>
+              {({ active }) => (
+                <div
+                  className={classNames(active ? "tw-bg-slate-200 tw-text-slate-900" : "tw-text-slate-700", menuItem)}
+                  onClick={logout}
+                >
+                  <ArrowRightOnRectangleIcon className="tw-h-4 tw-inline tw-mr-2 tw-stroke-2" />
+                  Logout
+                </div>
+              )}
+            </Menu.Item>
+          </div>
+        </Menu.Items>
+      </Transition>
+    </Menu>
+  );
+};
+
+const SignedOutMenu: React.FC = () => {
+  const navigate = useNavigate();
+  const menuItem = "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded";
+  return (
+    <Menu as="div">
+      <Menu.Button className="tw-bg-gray-400 tw-text-white tw-rounded-full tw-w-7 tw-h-7 tw-cursor-pointer tw-select-none">
+        <UserIcon className="tw-m-1" />
+      </Menu.Button>
+      <Transition
+        as={Fragment}
+        enter="tw-transition tw-ease-out tw-duration-100"
+        enterFrom="tw-transform tw-opacity-0 tw-scale-95"
+        enterTo="tw-transform tw-opacity-100 tw-scale-100"
+        leave="tw-transition tw-ease-in tw-duration-75"
+        leaveFrom="tw-transform tw-opacity-100 tw-scale-97"
+        leaveTo="tw-transform tw-opacity-0 tw-scale-95"
+      >
+        <Menu.Items className="tw-absolute tw-origin-top-right tw-z-10 tw-right-5 tw-mt-2 tw-mr-2 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none tw-w-48">
+          <div className="tw-m-2">
+            <Menu.Item>
+              {({ active }) => (
+                <div
+                  className={classNames(
+                    active ? "tw-bg-slate-200 tw-text-slate-900" : "tw-text-slate-700",
+                    menuItem,
+                    "tw-font-semibold",
+                  )}
+                  onClick={() => navigate("/login")}
+                >
+                  Sign up
+                </div>
+              )}
+            </Menu.Item>
+          </div>
+          <div className="tw-m-2">
+            <Menu.Item>
+              {({ active }) => (
+                <div
+                  className={classNames(active ? "tw-bg-slate-200 tw-text-slate-900" : "tw-text-slate-700", menuItem)}
+                  onClick={() => navigate("/login")}
+                >
+                  Login
+                </div>
+              )}
+            </Menu.Item>
+          </div>
+        </Menu.Items>
+      </Transition>
+    </Menu>
   );
 };
