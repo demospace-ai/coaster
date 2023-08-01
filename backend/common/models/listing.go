@@ -14,7 +14,8 @@ type Listing struct {
 	Description string    `json:"description"`
 	Category    Category  `json:"category"`
 	Price       int64     `json:"price"`
-	Location    geo.Point `json:"location"`
+	Location    string    `json:"location"`
+	Coordinates geo.Point `json:"coordinates"`
 
 	BaseModel
 }

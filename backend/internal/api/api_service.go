@@ -36,17 +36,17 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			Pattern:     "/logout",
 			HandlerFunc: s.Logout,
 		},
+		{
+			Name:        "Create listing",
+			Method:      router.POST,
+			Pattern:     "/listing",
+			HandlerFunc: s.CreateListing,
+		},
 	}
 }
 
 func (s ApiService) UnauthenticatedRoutes() []router.UnauthenticatedRoute {
 	return []router.UnauthenticatedRoute{
-		{
-			Name:        "Hello",
-			Method:      router.GET,
-			Pattern:     "/hello",
-			HandlerFunc: s.Hello,
-		},
 		{
 			Name:        "OAuth Redirect",
 			Method:      router.GET,
@@ -58,6 +58,12 @@ func (s ApiService) UnauthenticatedRoutes() []router.UnauthenticatedRoute {
 			Method:      router.GET,
 			Pattern:     "/oauth_login",
 			HandlerFunc: s.OAuthLogin,
+		},
+		{
+			Name:        "Search listings",
+			Method:      router.GET,
+			Pattern:     "/listings",
+			HandlerFunc: s.SearchListings,
 		},
 	}
 }

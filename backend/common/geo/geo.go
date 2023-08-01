@@ -18,7 +18,7 @@ func (p *Point) String() string {
 }
 
 func (p *Point) Scan(val interface{}) error {
-	b, err := hex.DecodeString(string(val.([]uint8)))
+	b, err := hex.DecodeString(val.(string))
 	if err != nil {
 		return err
 	}

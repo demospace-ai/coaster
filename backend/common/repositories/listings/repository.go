@@ -2,6 +2,7 @@ package listings
 
 import (
 	"go.fabra.io/server/common/errors"
+	"go.fabra.io/server/common/geo"
 	"go.fabra.io/server/common/models"
 	"gorm.io/gorm"
 )
@@ -34,13 +35,15 @@ func LoadAllByUserID(db *gorm.DB, userID int64) ([]models.Listing, error) {
 	return listings, nil
 }
 
-func CreateListing(db *gorm.DB, userID int64, name string, description string, category models.Category, price int64) (*models.Listing, error) {
+func CreateListing(db *gorm.DB, userID int64, name string, description string, category models.Category, price int64, location string, coordinates geo.Point) (*models.Listing, error) {
 	listing := models.Listing{
 		UserID:      userID,
 		Name:        name,
 		Description: description,
 		Category:    category,
 		Price:       price,
+		Location:    location,
+		Coordinates: coordinates,
 	}
 
 	result := db.Create(&listing)
@@ -49,4 +52,14 @@ func CreateListing(db *gorm.DB, userID int64, name string, description string, c
 	}
 
 	return &listing, nil
+}
+
+func LoadListingsWithinRadius(db *gorm.DB, coordinates geo.Point, radius int64) ([]models.Listing, error) {
+	var listings []models.Listing
+	result := db.Raw("SELECT * FROM listings WHERE ST_DWithin(?, listings.coordinates::Geography, ?);", coordinates, radius).Find(&listings)
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(listings.LoadListingsWithinRadius)")
+	}
+
+	return listings, nil
 }

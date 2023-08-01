@@ -1,6 +1,6 @@
 import { Wrapper } from "@googlemaps/react-wrapper";
 import { Transition } from "@headlessui/react";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Modifier, usePopper } from "react-popper";
 import { isProd } from "src/utils/env";
 
@@ -23,10 +23,10 @@ export const MapSearch: React.FC = () => {
       <div className="tw-relative">
         <div
           ref={setReferenceElement}
-          className="tw-flex tw-w-96 tw-mt-5 tw-rounded-md tw-bg-white tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 focus-within:!tw-border-primary tw-transition tw-duration-100"
+          className="tw-flex tw-w-96 tw-mt-5 tw-rounded-md tw-bg-white tw-text-left tw-border tw-border-solid tw-border-slate-300 focus-within:!tw-border-primary tw-transition tw-duration-100"
         >
           <input
-            className="tw-inline tw-bg-transparent tw-w-[calc(100%-20px)] tw-border-none tw-text-sm tw-leading-5 tw-text-slate-900 tw-outline-none tw-text-ellipsis tw-cursor-pointer focus:tw-cursor-text"
+            className="tw-inline tw-bg-transparent tw-w-full tw-border-none tw-py-2.5 tw-px-3 tw-text-sm tw-leading-5 tw-text-slate-900 tw-outline-none tw-text-ellipsis tw-cursor-pointer focus:tw-cursor-text"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             onFocus={() => setFocused(true)}
@@ -66,14 +66,16 @@ const Suggestions: React.FC<{ query: string; setQuery: (query: string) => void }
     "Chicago",
   ]);
 
-  const autocomplete = new window.google.maps.places.AutocompleteService();
-  if (query.length > 0) {
-    autocomplete.getQueryPredictions(
-      { input: query },
-      (predictions: google.maps.places.QueryAutocompletePrediction[] | null) =>
-        setSuggestions(predictions?.map((p) => p.description) ?? []),
-    );
-  }
+  useEffect(() => {
+    const autocomplete = new window.google.maps.places.AutocompleteService();
+    if (query.length > 0) {
+      autocomplete.getQueryPredictions(
+        { input: query },
+        (predictions: google.maps.places.QueryAutocompletePrediction[] | null) =>
+          setSuggestions(predictions?.map((p) => p.description) ?? []),
+      );
+    }
+  }, [query]);
 
   return (
     <>

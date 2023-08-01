@@ -1,0 +1,3 @@
+ALTER TABLE listings RENAME COLUMN location TO coordinates;
+ALTER TABLE listings ADD COLUMN location VARCHAR(512) NOT NULL DEFAULT '';
+ALTER TABLE listings ALTER COLUMN location DROP DEFAULT;
