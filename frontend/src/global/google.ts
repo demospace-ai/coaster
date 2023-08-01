@@ -1,3 +1,5 @@
+import "@types/google.maps";
+
 export {};
 
 declare global {
@@ -13,6 +15,7 @@ declare global {
           initTokenClient(): void;
         };
       };
+      maps: typeof google.maps;
     };
   }
 }
