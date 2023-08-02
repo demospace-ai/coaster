@@ -50,7 +50,7 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
       <div
         ref={setReferenceElement}
         className={mergeClasses(
-          "tw-rounded-[50px] tw-bg-white tw-ring-1 tw-ring-slate-300 tw-relative tw-flex tw-w-full sm:tw-w-[25vw] tw-transition-all tw-duration-100",
+          "tw-rounded-[50px] tw-bg-white tw-shadow-centered-md tw-ring-1 tw-ring-slate-300 tw-relative tw-flex tw-w-full sm:tw-w-[25vw] tw-transition-all tw-duration-100",
           active && "sm:tw-w-[50vw] tw-rounded-lg",
         )}
       >

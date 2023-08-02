@@ -23,8 +23,9 @@ module.exports = {
       },
       boxShadow: {
         "modal": "0 4px 20px 4px rgba(0, 0, 0, 0.1)",
-        "centered": "rgba(99, 99, 99, 0.2) 0 0 10px",
-        "centered-sm": "rgba(99, 99, 99, 0.1) 0 0 4px",
+        "centered": "rgba(99, 99, 99, 0.15) 0 0 6px",
+        "centered-sm": "rgba(99, 99, 99, 0.15) 0 0 4px",
+        "centered-md": "rgba(99, 99, 99, 0.15) 0 0 8px",
       },
       width: {
         "100": "400px",
