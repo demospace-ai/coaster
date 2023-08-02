@@ -21,12 +21,9 @@ export const MapSearch: React.FC = () => {
   return (
     <div>
       <div className="tw-relative">
-        <div
-          ref={setReferenceElement}
-          className="tw-flex tw-w-96 tw-mt-5 tw-rounded-md tw-bg-white tw-text-left tw-border tw-border-solid tw-border-slate-300 focus-within:!tw-border-primary tw-transition tw-duration-100"
-        >
+        <div ref={setReferenceElement} className="tw-flex tw-w-96 tw-mt-5">
           <input
-            className="tw-inline tw-bg-transparent tw-w-full tw-border-none tw-py-2.5 tw-px-3 tw-text-sm tw-leading-5 tw-text-slate-900 tw-outline-none tw-text-ellipsis tw-cursor-pointer focus:tw-cursor-text"
+            className="tw-inline tw-placeholder-gray-700 tw-w-full tw-rounded-md tw-bg-white tw-border tw-border-solid tw-border-slate-300 focus-within:!tw-border-primary tw-py-2.5 tw-px-3 tw-text-sm tw-leading-5 tw-text-slate-900 tw-outline-none tw-text-ellipsis tw-cursor-pointer focus:tw-cursor-text tw-transition tw-duration-100"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             onFocus={() => setFocused(true)}
