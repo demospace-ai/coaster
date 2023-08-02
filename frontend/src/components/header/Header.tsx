@@ -5,13 +5,30 @@ import classNames from "classnames";
 import React, { Fragment } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import logo from "src/components/images/logo.svg";
+import { MapSearch } from "src/components/maps/MapSearch";
 import { useLogout } from "src/pages/login/actions";
 import { useSelector } from "src/root/model";
+import { sendRequest } from "src/rpc/ajax";
+import { SearchListings } from "src/rpc/api";
+import { HttpError, consumeError } from "src/utils/errors";
 
 export const Header: React.FC = () => {
+  const search = async (input: string) => {
+    try {
+      const response = await sendRequest(SearchListings, { location: input });
+      console.log(response);
+    } catch (e) {
+      if (e instanceof HttpError) {
+        const errorMessage = e.message;
+      }
+      consumeError(e);
+    }
+  };
+
   return (
-    <div className="tw-flex tw-box-border tw-min-h-[64px] tw-h-24 tw-px-24 tw-py-3 tw-items-center tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white">
+    <div className="tw-flex tw-box-border tw-min-h-[64px] tw-h-24 sm:tw-px-24 tw-py-3 tw-items-center tw-justify-between tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white">
       <LogoLink />
+      <MapSearch onSubmit={(input) => search(input)} />
       <ProfileDropdown />
     </div>
   );
@@ -19,7 +36,7 @@ export const Header: React.FC = () => {
 
 const LogoLink: React.FC = () => {
   return (
-    <NavLink className="tw-flex tw-flex-row tw-h-fit tw-box-border tw-cursor-pointer tw-w-fit" to="/">
+    <NavLink className="tw-hidden sm:tw-flex tw-flex-row tw-h-fit tw-box-border tw-cursor-pointer tw-w-fit" to="/">
       <img
         src={logo}
         className="tw-h-6 tw-w-6 tw-justify-center tw-items-center tw-rounded tw-flex tw-my-auto tw-select-none"
@@ -35,7 +52,7 @@ const LogoLink: React.FC = () => {
 const ProfileDropdown: React.FC = () => {
   const isAuthenticated = useSelector((state) => state.login.authenticated);
   return (
-    <div className="tw-flex tw-flex-col tw-justify-center tw-ml-auto">
+    <div className="tw-hidden sm:tw-flex tw-flex-col tw-justify-center">
       {isAuthenticated ? <SignedInMenu /> : <SignedOutMenu />}
     </div>
   );
@@ -145,7 +162,7 @@ const SignedOutMenu: React.FC = () => {
                         menuItem,
                         "tw-font-semibold",
                       )}
-                      onClick={() => navigate("/login")}
+                      onClick={() => navigate("/signup")}
                     >
                       Sign up
                     </div>

@@ -10,9 +10,16 @@ export interface IEndpoint<RequestType, ResponseType> {
 }
 
 export const CheckSession: IEndpoint<undefined, CheckSessionResponse> = {
-  name: "Session Checked",
+  name: "Check session",
   method: "GET",
   path: "/check_session",
+};
+
+export const SearchListings: IEndpoint<{ location: string; radius?: number }, CheckSessionResponse> = {
+  name: "Search listings",
+  method: "GET",
+  path: "/listings",
+  queryParams: ["location", "radius"],
 };
 
 export const Login: IEndpoint<LoginRequest, LoginResponse> = {
