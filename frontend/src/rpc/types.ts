@@ -13,6 +13,19 @@ export interface CheckSessionResponse {
   user: User;
 }
 
+export interface SearchListingsResponse {
+  listings: Listing[];
+}
+
+export interface Listing {
+  id: number;
+  name: string;
+  description: string;
+  category: string;
+  price: number;
+  location: string;
+}
+
 export enum OAuthProvider {
   Google = "google",
   Github = "github",

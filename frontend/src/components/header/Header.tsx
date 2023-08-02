@@ -8,27 +8,13 @@ import logo from "src/components/images/logo.svg";
 import { MapSearch } from "src/components/maps/MapSearch";
 import { useLogout } from "src/pages/login/actions";
 import { useSelector } from "src/root/model";
-import { sendRequest } from "src/rpc/ajax";
-import { SearchListings } from "src/rpc/api";
-import { HttpError, consumeError } from "src/utils/errors";
 
 export const Header: React.FC = () => {
-  const search = async (input: string) => {
-    try {
-      const response = await sendRequest(SearchListings, { location: input });
-      console.log(response);
-    } catch (e) {
-      if (e instanceof HttpError) {
-        const errorMessage = e.message;
-      }
-      consumeError(e);
-    }
-  };
-
+  const navigate = useNavigate();
   return (
-    <div className="tw-flex tw-box-border tw-min-h-[64px] tw-h-24 sm:tw-px-24 tw-py-3 tw-items-center tw-justify-between tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white">
+    <div className="tw-flex tw-box-border tw-min-h-[96px] tw-h-32 sm:tw-px-24 tw-py-3 tw-items-center tw-justify-between tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white">
       <LogoLink />
-      <MapSearch onSubmit={(input) => search(input)} />
+      <MapSearch onSubmit={(location) => navigate("/search?location=" + location)} />
       <ProfileDropdown />
     </div>
   );
@@ -69,7 +55,7 @@ const SignedInMenu: React.FC = () => {
         <>
           <Menu.Button
             className={classNames(
-              "tw-cursor-pointer tw-select-none tw-flex tw-items-center tw-rounded-full tw-border tw-border-solid tw-border-gray-300 tw-px-2 tw-py-1 hover:tw-shadow-md tw-ease-in-out tw-transition-all",
+              "tw-cursor-pointer tw-select-none tw-flex tw-items-center tw-rounded-full tw-border tw-border-solid tw-border-gray-300 tw-px-2 tw-py-1.5 hover:tw-shadow-md tw-ease-in-out tw-transition-all",
               open && "tw-shadow-md",
             )}
           >

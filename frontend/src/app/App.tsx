@@ -6,8 +6,10 @@ import { Header } from "src/components/header/Header";
 import { LogoLoading } from "src/components/loading/LogoLoading";
 import { Toast, getToastContentFromDetails } from "src/components/notifications/Notifications";
 import { Home } from "src/pages/home/Home";
+import { Listing } from "src/pages/listing/Listing";
 import { Login, Unauthorized } from "src/pages/login/Login";
 import { NotFound } from "src/pages/notfound/NotFound";
+import { Search } from "src/pages/search/Search";
 import { useDispatch, useSelector } from "src/root/model";
 
 type AuthenticationProps = {
@@ -97,6 +99,8 @@ export const router = createBrowserRouter(
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Login create />} />
+      <Route path="/search" element={<Search />} />
+      <Route path="/listings/:listingID" element={<Listing />} />
       <Route path="/" element={<Home />} />
       <Route path="*" element={<NotFound />} />
     </Route>,

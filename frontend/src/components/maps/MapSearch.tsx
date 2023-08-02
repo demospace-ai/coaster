@@ -29,63 +29,65 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
   };
 
   return (
-    <form
-      ref={formRef}
-      className="tw-w-full sm:tw-w-fit tw-p-5 sm:tw-p-0"
-      onSubmit={(e: FormEvent) => {
-        e.preventDefault();
-        onSubmit(query);
-      }}
-      onClick={() => {
-        setActive(true);
-        forceUpdate && forceUpdate(); // Do this to ensure alignment is correct
-      }}
-    >
+    <>
       <div
         className={mergeClasses(
-          "tw-absolute tw-left-0 tw-top-0 tw-w-full tw-h-full tw-bg-black/10 tw-backdrop-blur-sm tw-invisible tw-transition-all tw-duration-100 tw-pointer-events-none",
+          "tw-absolute tw-z-10 tw-left-0 tw-top-0 tw-w-full tw-h-full tw-bg-black/10 tw-backdrop-blur-sm tw-invisible tw-transition-all tw-duration-100",
           active && "tw-visible",
         )}
       />
-      <div
-        ref={setReferenceElement}
-        className={mergeClasses(
-          "tw-rounded-[50px] tw-bg-white tw-shadow-centered-md tw-ring-1 tw-ring-slate-300 tw-relative tw-flex tw-w-full sm:tw-w-[25vw] tw-transition-all tw-duration-100",
-          active && "sm:tw-w-[50vw] tw-rounded-lg",
-        )}
+      <form
+        ref={formRef}
+        className="tw-w-full sm:tw-w-fit tw-p-5 sm:tw-p-0"
+        onSubmit={(e: FormEvent) => {
+          e.preventDefault();
+          onSubmit(query);
+        }}
+        onClick={() => {
+          setActive(true);
+          forceUpdate && forceUpdate(); // Do this to ensure alignment is correct
+        }}
       >
-        <MagnifyingGlassIcon className="tw-cursor-point tw-ml-3 tw-w-5" />
-        <input
-          className="tw-inline tw-placeholder-gray-600 tw-w-full tw-bg-transparent tw-py-3 sm:tw-py-2.5 tw-px-3 tw-text-sm tw-leading-5 tw-outline-none tw-text-slate-900 tw-text-ellipsis tw-cursor-pointer tw-transition tw-duration-100"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Where to?"
-        />
-      </div>
-      <div
-        className="tw-relative tw-z-10 tw-w-[calc(100%-40px)] sm:tw-w-[50vw]"
-        ref={setPopperElement}
-        style={styles.popper}
-        {...attributes.popper}
-      >
-        <Transition
-          as={Fragment}
-          show={active}
-          enter="tw-transition tw-ease-out tw-duration-100"
-          enterFrom="tw-transform tw-opacity-0 tw-scale-80"
-          enterTo="tw-transform tw-opacity-100 tw-scale-100"
-          leave="tw-transition tw-ease-in tw-duration-100"
-          leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
-          leaveTo="tw-transform tw-opacity-0 tw-scale-0"
+        <div
+          ref={setReferenceElement}
+          className={mergeClasses(
+            "tw-rounded-[50px] tw-bg-white tw-shadow-centered-md tw-ring-1 tw-ring-slate-300 tw-relative tw-z-20 tw-flex tw-w-full sm:tw-w-[25vw] tw-transition-all tw-duration-100",
+            active && "sm:tw-w-[50vw] tw-rounded-lg",
+          )}
         >
-          <div className="tw-absolute tw-z-20 tw-mt-1 tw-min-w-full tw-max-h-80 tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-sm tw-text-black tw-shadow-lg tw-ring-1 tw-ring-slate-300 sm:tw-text-sm">
-            <Wrapper apiKey={isProd() ? PRODUCTION_MAPS_KEY : DEVELOPMENT_MAPS_KEY} libraries={["places"]}>
-              <Suggestions query={query} setQuery={setQuery} onSubmit={onSubmit} />
-            </Wrapper>
-          </div>
-        </Transition>
-      </div>
-    </form>
+          <MagnifyingGlassIcon className="tw-cursor-point tw-ml-3 tw-w-5" />
+          <input
+            className="tw-inline tw-placeholder-gray-600 tw-w-full tw-bg-transparent tw-py-4 sm:tw-py-3 tw-px-3 tw-text-sm tw-leading-5 tw-outline-none tw-text-slate-900 tw-text-ellipsis tw-cursor-pointer tw-transition tw-duration-100"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Where to?"
+          />
+        </div>
+        <div
+          className="tw-relative tw-z-20 tw-w-[calc(100%-40px)] sm:tw-w-[50vw]"
+          ref={setPopperElement}
+          style={styles.popper}
+          {...attributes.popper}
+        >
+          <Transition
+            as={Fragment}
+            show={active}
+            enter="tw-transition tw-ease-out tw-duration-100"
+            enterFrom="tw-transform tw-opacity-0 tw-scale-80"
+            enterTo="tw-transform tw-opacity-100 tw-scale-100"
+            leave="tw-transition tw-ease-in tw-duration-100"
+            leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
+            leaveTo="tw-transform tw-opacity-0 tw-scale-0"
+          >
+            <div className="tw-absolute tw-z-20 tw-mt-1 tw-min-w-full tw-max-h-80 tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-sm tw-text-black tw-shadow-lg tw-ring-1 tw-ring-slate-300 sm:tw-text-sm">
+              <Wrapper apiKey={isProd() ? PRODUCTION_MAPS_KEY : DEVELOPMENT_MAPS_KEY} libraries={["places"]}>
+                <Suggestions query={query} setQuery={setQuery} onSubmit={onSubmit} />
+              </Wrapper>
+            </div>
+          </Transition>
+        </div>
+      </form>
+    </>
   );
 };
 
