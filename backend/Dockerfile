@@ -3,12 +3,12 @@ FROM golang:1.20-buster as builder
 # Create and change to the app directory.
 WORKDIR /app
 
-# Copy local code to the container image.
-COPY . ./
-
-# Retrieve application dependencies.
-COPY server/go.* ./
+# Copy only Go code and fetch dependencies first so they can be cached.
+COPY go.* .
 RUN go mod download
+
+# Copy remaining local code to the container image.
+COPY . .
 
 # Build the binary.
 RUN go build -mod=readonly -v -o runserver cmd/main.go
