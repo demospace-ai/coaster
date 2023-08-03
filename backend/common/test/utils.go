@@ -29,8 +29,8 @@ func SetupDatabase() (*gorm.DB, func()) {
 
 	// pulls an image, creates a container based on it and runs it
 	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
-		Repository: "postgres",
-		Tag:        "14",
+		Repository: "postgis/postgis",
+		Tag:        "15-master",
 		Env: []string{
 			"POSTGRES_PASSWORD=fabratest",
 			"POSTGRES_USER=fabratest",

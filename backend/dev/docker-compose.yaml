@@ -2,7 +2,7 @@ version: '3.1'
 
 services:
   fabra_db:
-    image: postgis/postgis
+    image: postgis/postgis:15-master
     volumes:
       - ./certs:/var/lib/postgresql/certs
       - ./init_fabra.sql:/docker-entrypoint-initdb.d/init_fabra.sql
