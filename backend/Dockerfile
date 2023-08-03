@@ -3,7 +3,7 @@ FROM golang:1.20-buster as builder
 # Create and change to the app directory.
 WORKDIR /app
 
-# Copy only Go code and fetch dependencies first so they can be cached.
+# Copy only go.mod and go.sum to fetch dependencies so they can be cached.
 COPY go.* .
 RUN go mod download
 
