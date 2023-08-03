@@ -4,6 +4,7 @@ import { Loading } from "src/components/loading/Loading";
 import { sendRequest } from "src/rpc/ajax";
 import { SearchListings } from "src/rpc/api";
 import { Listing } from "src/rpc/types";
+import { isProd } from "src/utils/env";
 import { HttpError, consumeError } from "src/utils/errors";
 
 export const Search: React.FC = () => {
@@ -42,6 +43,7 @@ export const Search: React.FC = () => {
       <div className="tw-flex tw-flex-col tw-mt-8 tw-mb-5 tw-justify-end tw-font-bold tw-text-3xl">
         {results.map((listing: Listing) => (
           <div
+            key={listing.id}
             className="tw-relative tw-flex tw-flex-col tw-text-base tw-font-medium tw-w-64 tw-max-w-[256px] tw-cursor-pointer tw-text-ellipsis"
             onClick={() => navigate(`/listings/${listing.id}`)}
           >
@@ -49,7 +51,10 @@ export const Search: React.FC = () => {
             <div className="tw-absolute tw-right-3 tw-top-3 tw-justify-center tw-items-center tw-flex tw-w-6 tw-h-6">
               <HeartIcon className="tw-w-6  hover:tw-w-5 tw-transition-all tw-duration-100 tw-text-gray-600" />
             </div> */}
-            <img className="tw-rounded-xl tw-overflow-clip tw-bg-gray-100 tw-h-64 tw-mb-5" />
+            <img
+              className="tw-rounded-xl tw-overflow-clip tw-bg-gray-100 tw-h-64 tw-mb-5"
+              src={listing.images.length > 0 ? getImageUrl(listing.images[0]) : "TODO"}
+            />
             <span className="tw-font-bold tw-text-lg">{listing.name}</span>
             <span>{listing.location}</span>
             <span>${listing.price}</span>
@@ -59,3 +64,8 @@ export const Search: React.FC = () => {
     </div>
   );
 };
+
+function getImageUrl(image: string) {
+  const bucketName = isProd() ? "user-images-bucket-us" : "dev-user-images-bucket";
+  return `https://storage.googleapis.com/${bucketName}/${image}`;
+}

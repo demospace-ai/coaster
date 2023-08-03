@@ -319,6 +319,13 @@ resource "google_compute_url_map" "default" {
     path_matcher = "fabra-api-path-matcher"
   }
 
+  host_rule {
+    hosts = [
+      "images.fabra.io",
+    ]
+    path_matcher = "fabra-images-path-matcher"
+  }
+
   path_matcher {
     name            = "fabra-lb-path-matcher"
     default_service = google_compute_backend_bucket.frontend_backend.id
@@ -327,6 +334,11 @@ resource "google_compute_url_map" "default" {
   path_matcher {
     name            = "fabra-api-path-matcher"
     default_service = google_compute_backend_service.default.id
+  }
+
+  path_matcher {
+    name            = "fabra-images-path-matcher"
+    default_service = google_compute_backend_bucket.user_images_backend.id
   }
 }
 

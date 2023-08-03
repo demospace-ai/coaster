@@ -24,6 +24,7 @@ export interface Listing {
   category: string;
   price: number;
   location: string;
+  images: string[];
 }
 
 export enum OAuthProvider {

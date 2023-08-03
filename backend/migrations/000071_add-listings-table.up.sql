@@ -14,4 +14,4 @@ CREATE TABLE listings (
 );
 
 CREATE INDEX listings_user_id_idx ON listings(user_id);
-create index listings_geo_index on listings using GIST (location);
+CREATE INDEX listings_geo_index ON listings USING GIST (location);

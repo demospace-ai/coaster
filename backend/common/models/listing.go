@@ -16,6 +16,14 @@ type Listing struct {
 	Price       int64     `json:"price"`
 	Location    string    `json:"location"`
 	Coordinates geo.Point `json:"coordinates"`
+	Published   bool      `json:"published"`
+
+	BaseModel
+}
+
+type ListingImage struct {
+	ListingID int64  `json:"listing_id"`
+	StorageID string `json:"storage_id"`
 
 	BaseModel
 }
