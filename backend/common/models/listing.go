@@ -17,6 +17,7 @@ type Listing struct {
 	Location    string    `json:"location"`
 	Coordinates geo.Point `json:"coordinates"`
 	Published   bool      `json:"published"`
+	Featured    bool      `json:"featured"`
 
 	BaseModel
 }

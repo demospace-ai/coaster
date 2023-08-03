@@ -1,54 +1,37 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Loading } from "src/components/loading/Loading";
-import { sendRequest } from "src/rpc/ajax";
-import { SearchListings } from "src/rpc/api";
+import { useSearch } from "src/rpc/data";
 import { Listing } from "src/rpc/types";
-import { HttpError, consumeError } from "src/utils/errors";
 import { getGcsImageUrl } from "src/utils/images";
+import { toUndefined } from "src/utils/undefined";
 
 export const Search: React.FC = () => {
   const [searchParams] = useSearchParams();
+  const location = searchParams.get("location");
+  const { listings } = useSearch(toUndefined(location));
 
-  const [loading, setLoading] = useState<boolean>(true);
-  const [results, setResults] = useState<Listing[]>([]);
-
-  const search = async (location: string) => {
-    try {
-      const response = await sendRequest(SearchListings, { location });
-      setResults(response.listings);
-      setLoading(false);
-    } catch (e) {
-      if (e instanceof HttpError) {
-        const errorMessage = e.message;
-      }
-      consumeError(e);
-    }
-  };
-
-  useEffect(() => {
-    const location = searchParams.get("location");
-    if (location) {
-      search(location);
-    }
-  }, [searchParams]);
-
-  if (loading) {
+  if (!listings) {
     return <Loading />;
   }
 
   return (
-    <div className="tw-h-full tw-py-2 tw-px-5 tw-mx-auto sm:tw-pt-5 tw-pb-24 sm:tw-px-24 sm:tw-m-0 tw-overflow-scroll">
-      <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-3 2xl:tw-grid-cols-4 tw-mt-8 tw-mb-5 tw-font-bold tw-text-3xl tw-gap-10">
-        {results.map((listing: Listing) => (
-          <SearchResult key={listing.id} listing={listing} />
-        ))}
+    <div className="tw-flex tw-flex-col tw-items-center tw-h-full tw-pt-8 tw-pb-24 tw-px-5 sm:tw-px-24 tw-overflow-scroll">
+      <div>
+        <div className="tw-font-bold tw-text-xl tw-w-full tw-text-center sm:tw-text-left">
+          {listings.length} results for {location}
+        </div>
+        <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-3 2xl:tw-grid-cols-4 tw-mt-8 tw-mb-5 tw-font-bold tw-text-3xl tw-gap-10">
+          {listings.map((listing: Listing) => (
+            <SearchResult key={listing.id} listing={listing} />
+          ))}
+        </div>
       </div>
     </div>
   );
 };
 
-const SearchResult: React.FC<{ listing: Listing }> = ({ listing }) => {
+export const SearchResult: React.FC<{ listing: Listing }> = ({ listing }) => {
   const navigate = useNavigate();
 
   return (

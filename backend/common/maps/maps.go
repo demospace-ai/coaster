@@ -24,6 +24,10 @@ func GetLocationFromQuery(query string) (*string, error) {
 		return nil, errors.Wrap(err, "(maps.GetLocationFromQuery) autocomplete request")
 	}
 
+	if len(autocompleteResponse.Predictions) == 0 {
+		return nil, errors.Newf("(maps.GetLocationFromQuery) no predictions for query: %s", query)
+	}
+
 	return &autocompleteResponse.Predictions[0].Description, nil
 }
 
@@ -40,6 +44,10 @@ func GetCoordinatesFromLocation(location string) (*geo.Point, error) {
 	geoResponse, err := c.Geocode(context.TODO(), geoRequest)
 	if err != nil {
 		return nil, errors.Wrap(err, "(maps.GetCoordinatesFromLocation) geocode request")
+	}
+
+	if len(geoResponse) == 0 {
+		return nil, errors.Newf("(maps.GetCoordinatesFromLocation) no geocode response for location: %s", location)
 	}
 
 	coordinates := geo.Point{

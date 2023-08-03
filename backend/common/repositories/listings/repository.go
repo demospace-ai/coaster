@@ -72,6 +72,7 @@ func CreateListing(db *gorm.DB, userID int64, name string, description string, c
 		Location:    location,
 		Coordinates: coordinates,
 		Published:   false,
+		Featured:    false,
 	}
 
 	result := db.Create(&listing)
@@ -126,6 +127,33 @@ func LoadListingsWithinRadius(db *gorm.DB, coordinates geo.Point, radius int64) 
 		images, err := LoadImagesForListing(db, listing.ID)
 		if err != nil {
 			return nil, errors.Wrap(err, "(listings.LoadAllByUserID) getting images")
+		}
+		listingsAndImages[i] = ListingAndImages{
+			listing,
+			images,
+		}
+	}
+
+	return listingsAndImages, nil
+}
+
+func LoadFeatured(db *gorm.DB) ([]ListingAndImages, error) {
+	var listings []models.Listing
+	result := db.Table("listings").
+		Select("listings.*").
+		Where("listings.published = TRUE").
+		Where("listings.featured = TRUE").
+		Where("listings.deactivated_at IS NULL").
+		Find(&listings)
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(listings.LoadFeatured)")
+	}
+
+	listingsAndImages := make([]ListingAndImages, len(listings))
+	for i, listing := range listings {
+		images, err := LoadImagesForListing(db, listing.ID)
+		if err != nil {
+			return nil, errors.Wrap(err, "(listings.LoadFeatured) getting images")
 		}
 		listingsAndImages[i] = ListingAndImages{
 			listing,

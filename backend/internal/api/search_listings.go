@@ -11,10 +11,6 @@ import (
 	"go.fabra.io/server/common/views"
 )
 
-type SearchListingsResponse struct {
-	Listings []views.Listing `json:"listings"`
-}
-
 func (s ApiService) SearchListings(w http.ResponseWriter, r *http.Request) error {
 	locationQuery := r.URL.Query().Get("location")
 	if len(locationQuery) == 0 {
@@ -52,7 +48,5 @@ func (s ApiService) SearchListings(w http.ResponseWriter, r *http.Request) error
 		return errors.Wrap(err, "(api.SearchListings) loading listings")
 	}
 
-	return json.NewEncoder(w).Encode(SearchListingsResponse{
-		Listings: views.ConvertListings(listings),
-	})
+	return json.NewEncoder(w).Encode(views.ConvertListings(listings))
 }

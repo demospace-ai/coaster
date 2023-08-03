@@ -72,6 +72,12 @@ func (s ApiService) UnauthenticatedRoutes() []router.UnauthenticatedRoute {
 			HandlerFunc: s.SearchListings,
 		},
 		{
+			Name:        "Get featured listings",
+			Method:      router.GET,
+			Pattern:     "/featured",
+			HandlerFunc: s.GetFeaturedListings,
+		},
+		{
 			Name:        "Get listing",
 			Method:      router.GET,
 			Pattern:     "/listings/{listingID}",

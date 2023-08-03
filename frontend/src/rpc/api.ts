@@ -1,11 +1,4 @@
-import {
-  CheckSessionResponse,
-  Listing,
-  LoginRequest,
-  LoginResponse,
-  OAuthProvider,
-  SearchListingsResponse,
-} from "src/rpc/types";
+import { CheckSessionResponse, Listing, LoginRequest, LoginResponse, OAuthProvider } from "src/rpc/types";
 
 export interface IEndpoint<RequestType, ResponseType> {
   name: string;
@@ -22,7 +15,7 @@ export const CheckSession: IEndpoint<undefined, CheckSessionResponse> = {
   path: "/check_session",
 };
 
-export const SearchListings: IEndpoint<{ location?: string; radius?: number }, SearchListingsResponse> = {
+export const SearchListings: IEndpoint<{ location?: string; radius?: number }, Listing[]> = {
   name: "Search listings",
   method: "GET",
   path: "/listings",
@@ -33,6 +26,12 @@ export const GetListing: IEndpoint<{ listingID: number }, Listing> = {
   name: "Get listing",
   method: "GET",
   path: "/listings/:listingID",
+};
+
+export const GetFeaturedListings: IEndpoint<undefined, Listing[]> = {
+  name: "Get featured listings",
+  method: "GET",
+  path: "/featured",
 };
 
 export const Login: IEndpoint<LoginRequest, LoginResponse> = {
