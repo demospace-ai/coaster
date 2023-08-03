@@ -4,8 +4,8 @@ import { Loading } from "src/components/loading/Loading";
 import { sendRequest } from "src/rpc/ajax";
 import { SearchListings } from "src/rpc/api";
 import { Listing } from "src/rpc/types";
-import { isProd } from "src/utils/env";
 import { HttpError, consumeError } from "src/utils/errors";
+import { getGcsImageUrl } from "src/utils/images";
 
 export const Search: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -41,14 +41,14 @@ export const Search: React.FC = () => {
     <div className="tw-h-full tw-py-2 tw-px-5 tw-mx-auto sm:tw-pt-5 tw-pb-24 sm:tw-px-24 sm:tw-m-0 tw-overflow-scroll">
       <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-3 2xl:tw-grid-cols-4 tw-mt-8 tw-mb-5 tw-font-bold tw-text-3xl tw-gap-10">
         {results.map((listing: Listing) => (
-          <Listing key={listing.id} listing={listing} />
+          <SearchResult key={listing.id} listing={listing} />
         ))}
       </div>
     </div>
   );
 };
 
-const Listing: React.FC<{ listing: Listing }> = ({ listing }) => {
+const SearchResult: React.FC<{ listing: Listing }> = ({ listing }) => {
   const navigate = useNavigate();
 
   return (
@@ -62,7 +62,7 @@ const Listing: React.FC<{ listing: Listing }> = ({ listing }) => {
             </div> */}
       <img
         className="tw-rounded-xl tw-overflow-clip tw-bg-gray-100 tw-mb-5 tw-object-cover tw-aspect-square"
-        src={listing.images.length > 0 ? getImageUrl(listing.images[0]) : "TODO"}
+        src={listing.images.length > 0 ? getGcsImageUrl(listing.images[0]) : "TODO"}
       />
       <span className="tw-font-bold tw-text-lg">{listing.name}</span>
       <span>{listing.location}</span>
@@ -70,8 +70,3 @@ const Listing: React.FC<{ listing: Listing }> = ({ listing }) => {
     </div>
   );
 };
-
-function getImageUrl(image: string) {
-  const bucketName = isProd() ? "user-images-bucket-us" : "dev-user-images-bucket";
-  return `https://${bucketName}.storage.googleapis.com/${image}`;
-}
