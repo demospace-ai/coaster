@@ -12,7 +12,7 @@ import { useSelector } from "src/root/model";
 export const Header: React.FC = () => {
   const navigate = useNavigate();
   return (
-    <div className="tw-flex tw-box-border tw-min-h-[96px] tw-h-32 xs:tw-px-8 sm:tw-px-24 tw-py-3 tw-items-center tw-justify-between tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white">
+    <div className="tw-flex tw-box-border tw-min-h-[96px] tw-max-h-[96px] xs:tw-px-8 sm:tw-px-24 tw-py-3 tw-items-center tw-justify-between tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white">
       <LogoLink />
       <MapSearch onSubmit={(location) => navigate("/search?location=" + location)} />
       <ProfileDropdown />

@@ -3,6 +3,7 @@ import { Transition } from "@headlessui/react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { FormEvent, Fragment, useEffect, useRef, useState } from "react";
 import { usePopper } from "react-popper";
+import { useLocation, useSearchParams } from "react-router-dom";
 import { isProd } from "src/utils/env";
 import { mergeClasses } from "src/utils/twmerge";
 
@@ -10,6 +11,9 @@ const PRODUCTION_MAPS_KEY = "AIzaSyC5eBlci7ImDnJ0TRhT5uUq1LsKdxJOZP8";
 const DEVELOPMENT_MAPS_KEY = "AIzaSyD5BH5C_jcdkqpt3PnzEbgRfTv_0Lx6Huw";
 
 export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (props) => {
+  const urlPath = useLocation();
+  const [searchParams] = useSearchParams();
+
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(false);
 
@@ -22,6 +26,15 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
   const { styles, attributes, forceUpdate } = usePopper(referenceElement, popperElement, {
     strategy: "absolute",
   });
+
+  useEffect(() => {
+    if (urlPath.pathname === "/search") {
+      const location = searchParams.get("location");
+      if (location) {
+        setQuery(location);
+      }
+    }
+  }, [location, searchParams]);
 
   const onSubmit = (input: string) => {
     props.onSubmit && props.onSubmit(input);
