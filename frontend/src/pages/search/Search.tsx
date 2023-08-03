@@ -8,8 +8,7 @@ import { isProd } from "src/utils/env";
 import { HttpError, consumeError } from "src/utils/errors";
 
 export const Search: React.FC = () => {
-  const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   const [loading, setLoading] = useState<boolean>(true);
   const [results, setResults] = useState<Listing[]>([]);
@@ -39,33 +38,40 @@ export const Search: React.FC = () => {
   }
 
   return (
-    <div className="tw-h-full tw-py-7 tw-mx-auto sm:tw-px-24 sm:tw-m-0">
-      <div className="tw-flex tw-flex-col tw-mt-8 tw-mb-5 tw-justify-end tw-font-bold tw-text-3xl">
+    <div className="tw-h-full tw-py-2 tw-px-5 tw-mx-auto sm:tw-pt-5 tw-pb-24 sm:tw-px-24 sm:tw-m-0 tw-overflow-scroll">
+      <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-3 2xl:tw-grid-cols-4 tw-mt-8 tw-mb-5 tw-font-bold tw-text-3xl tw-gap-10">
         {results.map((listing: Listing) => (
-          <div
-            key={listing.id}
-            className="tw-relative tw-flex tw-flex-col tw-text-base tw-font-medium tw-w-64 tw-max-w-[256px] tw-cursor-pointer tw-text-ellipsis"
-            onClick={() => navigate(`/listings/${listing.id}`)}
-          >
-            {/* TODO: when adding wishlist functionality, uncomment this
-            <div className="tw-absolute tw-right-3 tw-top-3 tw-justify-center tw-items-center tw-flex tw-w-6 tw-h-6">
-              <HeartIcon className="tw-w-6  hover:tw-w-5 tw-transition-all tw-duration-100 tw-text-gray-600" />
-            </div> */}
-            <img
-              className="tw-rounded-xl tw-overflow-clip tw-bg-gray-100 tw-h-64 tw-mb-5"
-              src={listing.images.length > 0 ? getImageUrl(listing.images[0]) : "TODO"}
-            />
-            <span className="tw-font-bold tw-text-lg">{listing.name}</span>
-            <span>{listing.location}</span>
-            <span>${listing.price}</span>
-          </div>
+          <Listing key={listing.id} listing={listing} />
         ))}
       </div>
     </div>
   );
 };
 
+const Listing: React.FC<{ listing: Listing }> = ({ listing }) => {
+  const navigate = useNavigate();
+
+  return (
+    <div
+      className="tw-flex tw-flex-col tw-text-base tw-font-medium tw-cursor-pointer tw-text-ellipsis tw-max-w-[320px]"
+      onClick={() => navigate(`/listings/${listing.id}`)}
+    >
+      {/* TODO: when adding wishlist functionality, uncomment this
+            <div className="tw-absolute tw-right-3 tw-top-3 tw-justify-center tw-items-center tw-flex tw-w-6 tw-h-6">
+              <HeartIcon className="tw-w-6  hover:tw-w-5 tw-transition-all tw-duration-100 tw-text-gray-600" />
+            </div> */}
+      <img
+        className="tw-rounded-xl tw-overflow-clip tw-bg-gray-100 tw-mb-5 tw-object-cover tw-aspect-square"
+        src={listing.images.length > 0 ? getImageUrl(listing.images[0]) : "TODO"}
+      />
+      <span className="tw-font-bold tw-text-lg">{listing.name}</span>
+      <span>{listing.location}</span>
+      <span>${listing.price}</span>
+    </div>
+  );
+};
+
 function getImageUrl(image: string) {
   const bucketName = isProd() ? "user-images-bucket-us" : "dev-user-images-bucket";
-  return `https://storage.googleapis.com/${bucketName}/${image}`;
+  return `https://${bucketName}.storage.googleapis.com/${image}`;
 }

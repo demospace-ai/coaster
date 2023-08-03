@@ -4,11 +4,11 @@ FROM golang:1.20-buster as builder
 WORKDIR /app
 
 # Copy only go.mod and go.sum to fetch dependencies so they can be cached.
-COPY go.* .
+COPY go.* ./
 RUN go mod download
 
 # Copy remaining local code to the container image.
-COPY . .
+COPY . ./
 
 # Build the binary.
 RUN go build -mod=readonly -v -o runserver cmd/main.go
