@@ -20,7 +20,7 @@ export const Listing: React.FC = () => {
 
   return (
     <div className="tw-overflow-scroll">
-      <div className="tw-flex tw-flex-col tw-px-5 tw-pt-10 tw-pb-20 sm:tw-py-20 sm:tw-px-32 xl:tw-px-56">
+      <div className="tw-flex tw-flex-col tw-px-5 tw-pt-10 tw-pb-20 sm:tw-py-20 sm:tw-px-[5rem] lg:tw-px-[10rem] lg:tw-max-w-[90rem] lg:tw-mx-auto">
         <div className="tw-flex tw-max-h-[50vh] tw-rounded-xl tw-overflow-clip tw-mb-5">
           <div className="tw-flex tw-w-full sm:tw-w-3/4 sm:tw-mr-2">
             <img
@@ -39,7 +39,7 @@ export const Listing: React.FC = () => {
             />
           </div>
         </div>
-        <span className="tw-font-semibold sm:tw-font-bold tw-text-3xl sm:tw-text-4xl">{listing.name}</span>
+        <span className="tw-mt-3 tw-font-semibold sm:tw-font-bold tw-text-3xl sm:tw-text-4xl">{listing.name}</span>
         <span className="tw-mt-3 tw-font-medium tw-text-base">
           {listing.location} • {toTitleCase(listing.category)}
         </span>
