@@ -20,7 +20,6 @@ you must run `terraform apply` once manually to setup the correct permissions fo
 run Terraform in the future.
 
 ## Deploy to new region
-
 1. Create a new GCP project.
 1. Create a new Terraform file for the region by copying infra/terraform/main.tf into a new subdirectory.
 1. Update the new Terraform file with the following changes:
@@ -53,6 +52,11 @@ run Terraform in the future.
           --member="serviceAccount:fabra-prod@cloudbuild.gserviceaccount.com" \
           --role="roles/iam.serviceAccountUser"
 1. Run `terraform apply`
+
+### Point domain name to GCP
+To point the domain name at this new GCP setup, find the IP address of the external load balancer created in GCP
+(under Network Services > Load balancing). You'll need to create A records in your DNS provider that point to that
+DNS value for every subdomain you plan to host.
 
 ### Other Notes
 Google Cloud Build is used for a various automatic actions triggered by pushes to the main Github branch:

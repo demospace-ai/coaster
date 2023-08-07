@@ -38,8 +38,16 @@ const LogoLink: React.FC = () => {
 const ProfileDropdown: React.FC = () => {
   const isAuthenticated = useSelector((state) => state.login.authenticated);
   return (
-    <div className="tw-hidden sm:tw-flex tw-flex-col tw-justify-center">
-      {isAuthenticated ? <SignedInMenu /> : <SignedOutMenu />}
+    <div className="tw-flex">
+      <NavLink
+        className="tw-my-auto tw-mr-6 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-base hover:tw-bg-gray-100"
+        to="/listing/new"
+      >
+        List your experience
+      </NavLink>
+      <div className="tw-hidden sm:tw-flex tw-flex-col tw-justify-center">
+        {isAuthenticated ? <SignedInMenu /> : <SignedOutMenu />}
+      </div>
     </div>
   );
 };

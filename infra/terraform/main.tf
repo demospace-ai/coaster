@@ -277,7 +277,7 @@ resource "google_compute_global_forwarding_rule" "https" {
 }
 
 locals {
-  managed_domains = tolist(["app.fabra.io", "api.fabra.io"])
+  managed_domains = tolist(["trycoaster.com", "www.trycoaster.com", "api.trycoaster.com", "images.trycoaster.com"])
 }
 
 resource "random_id" "cert-name" {
@@ -307,23 +307,30 @@ resource "google_compute_url_map" "default" {
   default_service = google_compute_backend_bucket.frontend_backend.id
   host_rule {
     hosts = [
-      "app.fabra.io",
+      "www.trycoaster.com",
     ]
     path_matcher = "fabra-lb-path-matcher"
   }
 
   host_rule {
     hosts = [
-      "api.fabra.io",
+      "api.trycoaster.com",
     ]
     path_matcher = "fabra-api-path-matcher"
   }
 
   host_rule {
     hosts = [
-      "images.fabra.io",
+      "images.trycoaster.com",
     ]
     path_matcher = "fabra-images-path-matcher"
+  }
+
+  host_rule {
+    hosts        = [
+      "trycoaster.com",
+    ]
+    path_matcher = "fabra-www-redirect"
   }
 
   path_matcher {
@@ -339,6 +346,15 @@ resource "google_compute_url_map" "default" {
   path_matcher {
     name            = "fabra-images-path-matcher"
     default_service = google_compute_backend_bucket.user_images_backend.id
+  }
+
+  path_matcher {
+    name = "fabra-www-redirect"
+    default_url_redirect {
+      host_redirect  = "www.trycoaster.com"
+      https_redirect = true
+      strip_query    = false
+    }
   }
 }
 
