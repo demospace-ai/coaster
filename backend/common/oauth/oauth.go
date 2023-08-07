@@ -240,7 +240,7 @@ func getGoogleClientID() string {
 
 func getOauthRedirectUrl() string {
 	if application.IsProd() {
-		return "https://api.fabra.io/oauth_login"
+		return "https://api.trycoaster.com/oauth_login"
 	} else {
 		return "http://localhost:8080/oauth_login"
 	}
