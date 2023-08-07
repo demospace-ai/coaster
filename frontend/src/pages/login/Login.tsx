@@ -40,11 +40,11 @@ export const Login: React.FC<{ create?: boolean }> = ({ create }) => {
         </div>
         <div className="tw-text-xs tw-text-center tw-mt-4 tw-text-slate-800 tw-select-none">
           By continuing you agree to Fabra's{" "}
-          <a className="tw-text-blue-500" href="https://fabra.io/terms" target="_blank" rel="noreferrer">
+          <a className="tw-text-blue-500" href="https://trycoaster.com/terms" target="_blank" rel="noreferrer">
             Terms of Use
           </a>{" "}
           and{" "}
-          <a className="tw-text-blue-500" href="https://fabra.io/privacy" target="_blank" rel="noreferrer">
+          <a className="tw-text-blue-500" href="https://trycoaster.com/privacy" target="_blank" rel="noreferrer">
             Privacy Policy
           </a>
           .
@@ -113,7 +113,7 @@ export const Unauthorized: React.FC = () => {
                   Try again
                 </NavLink>{" "}
                 with a different account or{" "}
-                <a className="tw-text-blue-500" href="mailto:founders@fabra.io">
+                <a className="tw-text-blue-500" href="mailto:founders@trycoaster.com">
                   contact us
                 </a>{" "}
                 to get an account provisioned!

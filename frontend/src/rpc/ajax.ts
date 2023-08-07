@@ -4,7 +4,7 @@ import { IEndpoint } from "src/rpc/api";
 import { isProd } from "src/utils/env";
 import { HttpError } from "src/utils/errors";
 
-const ROOT_DOMAIN = isProd() ? "https://api.fabra.io" : "http://localhost:8080";
+const ROOT_DOMAIN = isProd() ? "https://api.trycoaster.com" : "http://localhost:8080";
 
 export async function sendLinkTokenRequest<RequestType extends Record<string, any>, ResponseType>(
   endpoint: IEndpoint<RequestType, ResponseType>,

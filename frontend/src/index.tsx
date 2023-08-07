@@ -15,7 +15,7 @@ const store = createStore();
 if (isProd()) {
   rudderanalytics.load("2DuH7iesuV4TtpwMqRvXqQttOvm", "https://fabranickbele.dataplane.rudderstack.com");
   H.init("7e3vw5g1", {
-    tracingOrigins: ["localhost", "api.fabra.io"],
+    tracingOrigins: ["localhost", "api.trycoaster.com"],
     networkRecording: {
       enabled: true,
       recordHeadersAndBody: true,

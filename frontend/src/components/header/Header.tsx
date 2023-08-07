@@ -29,7 +29,7 @@ const LogoLink: React.FC = () => {
         alt="fabra logo"
       />
       <div className="tw-my-auto tw-ml-2.5 tw-max-w-[150px] tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-bold tw-font-[Montserrat] tw-text-2xl">
-        fabra
+        coaster
       </div>
     </NavLink>
   );
