@@ -11,8 +11,13 @@ steps:
     args: ['--prefix', 'frontend/', 'run', 'build']
     waitFor: ['install-frontend']
 
-  - id: deploy-frontend
-    name: 'gcr.io/cloud-builders/gsutil'
-    entrypoint: gsutil
-    args: ['cp', '-r', 'frontend/build/*', 'gs://fabra-frontend-bucket-us']
+  - id: copy-config
+    name: 'bash'
+    script: cp frontend/app.yaml frontend/build/app.yaml
     waitFor: ['build-frontend']
+
+  - id: deploy-frontend
+    name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args: ['gcloud app deploy']
+    waitFor: ['copy-config']
