@@ -16,13 +16,10 @@ steps:
   - 'us-docker.pkg.dev/fabra-prod/fabra-server/fabra:$COMMIT_SHA'
   - '-t'
   - 'us-docker.pkg.dev/fabra-prod/fabra-server/fabra:latest'
+  - '--push'
   - 'backend/'
   waitFor: ['test-backend']
-
-- id: push-backend
-  name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'us-docker.pkg.dev/fabra-prod/fabra-server/fabra:latest']
-  waitFor: ['build-backend']
+  secretEnv: ['DEPOT_TOKEN']
 
 - id: deploy-backend
   name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -39,4 +36,7 @@ steps:
   - 'managed'
   waitFor: ['push-backend']
 
-images: ['us-docker.pkg.dev/fabra-prod/fabra-server/fabra:$COMMIT_SHA', 'us-docker.pkg.dev/fabra-prod/fabra-server/fabra:latest']
+availableSecrets:
+  secretManager:
+    - versionName: projects/454026596701/secrets/depot-token/versions/latest
+      env: DEPOT_TOKEN
