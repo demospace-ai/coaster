@@ -23,15 +23,6 @@ function identifyUser(user: User) {
     H.identify(user.email, {
       id: user.id.toString(),
     });
-
-    window.Intercom("boot", {
-      api_base: "https://api-iam.intercom.io",
-      app_id: "pdc06iv8",
-      name: user.name,
-      email: user.email,
-      user_id: user.id,
-      user_hash: user.intercom_hash,
-    });
   }
 }
 
@@ -40,7 +31,6 @@ export function useLogout() {
 
   return useCallback(async () => {
     rudderanalytics.reset();
-    window.Intercom("shutdown");
 
     await sendRequest(Logout);
     dispatch({

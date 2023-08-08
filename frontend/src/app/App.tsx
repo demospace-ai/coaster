@@ -34,10 +34,6 @@ const AppLayout: React.FC = () => {
   const toast = useSelector((state) => state.app.toast);
   const toastContent = getToastContentFromDetails(toast);
 
-  useEffect(() => {
-    window.Intercom("update");
-  }, [location]);
-
   const error = useCatchGlobalError();
   if (error) {
     throw error;

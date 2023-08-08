@@ -23,10 +23,6 @@ if (isProd()) {
       networkBodyKeysToRedact: ["link_token"],
     },
   });
-  window.Intercom("boot", {
-    api_base: "https://api-iam.intercom.io",
-    app_id: "pdc06iv8",
-  });
 } else {
   H.init("6gl37zg9", {
     tracingOrigins: ["localhost"],
