@@ -12,6 +12,8 @@ steps:
   name: 'ghcr.io/depot/cli:latest'
   args:
   - build
+  - '--project'
+  - '3wf60mzkqp'
   - '-t'
   - 'us-docker.pkg.dev/fabra-prod/fabra-server/fabra:$COMMIT_SHA'
   - '-t'
