@@ -1,7 +1,17 @@
+import {
+  autoUpdate,
+  flip,
+  offset,
+  shift,
+  useClick,
+  useDismiss,
+  useFloating,
+  useInteractions,
+  useRole,
+} from "@floating-ui/react";
 import { Combobox, Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { Fragment, HTMLInputTypeAttribute, InputHTMLAttributes, useRef, useState } from "react";
-import { Modifier, usePopper } from "react-popper";
 import { Loading } from "src/components/loading/Loading";
 import { mergeClasses } from "src/utils/twmerge";
 
@@ -241,12 +251,19 @@ export type ValidatedDropdownInputProps = {
 export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = (props) => {
   const [computedValid, setComputedValid] = useState<boolean>(true);
   const [focused, setFocused] = useState(false);
-  const [referenceElement, setReferenceElement] = useState<HTMLButtonElement | null>(null);
-  const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(null);
-  const { styles, attributes } = usePopper(referenceElement, popperElement, {
-    strategy: "fixed",
-    modifiers: [sameWidth],
+
+  const { refs, floatingStyles, context } = useFloating({
+    open: focused,
+    onOpenChange: setFocused,
+    middleware: [offset(10), flip({ fallbackAxisSideDirection: "end" }), shift()],
+    whileElementsMounted: autoUpdate,
   });
+  const click = useClick(context, {
+    keyboardHandlers: false,
+  });
+  const dismiss = useDismiss(context);
+  const role = useRole(context);
+  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
 
   const validateNotUndefined = (value: number | undefined): boolean => {
     const valid = value !== undefined;
@@ -291,7 +308,7 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = (pr
           </label>
         </Transition>
         <Listbox.Button
-          ref={setReferenceElement}
+          ref={refs.setReference}
           className={mergeClasses(
             "tw-flex tw-justify-center tw-items-center tw-w-96 tw-mt-5 tw-rounded-md tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 aria-expanded:tw-border-primary",
             !props.disabled && "hover:tw-border-primary-hover",
@@ -299,6 +316,7 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = (pr
             props.className,
             props.validated && !valid && "tw-border-red-600",
           )}
+          {...getReferenceProps()}
         >
           <div
             className={mergeClasses(
@@ -317,7 +335,7 @@ export const ValidatedDropdownInput: React.FC<ValidatedDropdownInputProps> = (pr
             </span>
           )}
         </Listbox.Button>
-        <div className="tw-relative tw-z-10" ref={setPopperElement} style={styles.popper} {...attributes.popper}>
+        <div className="tw-relative tw-z-10" ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
           <Transition
             as={Fragment}
             enter="tw-transition tw-ease-out tw-duration-100"
@@ -425,12 +443,19 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = (props) =
   const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
-  const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(null);
-  const { styles, attributes } = usePopper(referenceElement, popperElement, {
-    strategy: "fixed",
-    modifiers: [sameWidth],
+
+  const { refs, floatingStyles, context } = useFloating({
+    open: focused,
+    onOpenChange: setFocused,
+    middleware: [offset(10), flip({ fallbackAxisSideDirection: "end" }), shift()],
+    whileElementsMounted: autoUpdate,
   });
+  const click = useClick(context, {
+    keyboardHandlers: false,
+  });
+  const dismiss = useDismiss(context);
+  const role = useRole(context);
+  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
 
   const getFilteredOptions = () => {
     if (query === "") {
@@ -493,7 +518,7 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = (props) =
           </label>
         </Transition>
         <div
-          ref={setReferenceElement}
+          ref={refs.setReference}
           className={mergeClasses(
             "tw-flex tw-w-96 tw-mt-5 tw-rounded-md tw-bg-white tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 focus-within:!tw-border-primary tw-transition tw-duration-100",
             !props.disabled && "hover:tw-border-primary-hover",
@@ -501,6 +526,7 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = (props) =
             props.className,
             props.validated && !valid && "tw-border-red-600",
           )}
+          {...getReferenceProps()}
         >
           <Combobox.Input
             className={mergeClasses(
@@ -521,7 +547,7 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = (props) =
             </span>
           </Combobox.Button>
         </div>
-        <div className="tw-relative tw-z-10" ref={setPopperElement} style={styles.popper} {...attributes.popper}>
+        <div className="tw-relative tw-z-10" ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
           <Transition
             as={Fragment}
             enter="tw-transition tw-ease-out tw-duration-100"
@@ -641,17 +667,4 @@ const ComboOptions: React.FC<ComboOptionsProps> = (props) => {
       </>
     );
   }
-};
-
-const sameWidth: Modifier<"sameWidth"> = {
-  name: "sameWidth",
-  enabled: true,
-  phase: "beforeWrite",
-  requires: ["computeStyles"],
-  fn: ({ state }) => {
-    state.styles.popper.width = `${state.rects.reference.width}px`;
-  },
-  effect: ({ state }) => {
-    state.elements.popper.style.width = `${state.elements.reference.getBoundingClientRect().width}px`;
-  },
 };
