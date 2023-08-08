@@ -96,7 +96,7 @@ func (s ApiService) OAuthLogin(w http.ResponseWriter, r *http.Request) error {
 
 func getOauthSuccessRedirect() string {
 	if application.IsProd() {
-		return "https://app.fabra.io"
+		return "https://www.trycoaster.com"
 	} else {
 		return "http://localhost:3000"
 	}
@@ -104,7 +104,7 @@ func getOauthSuccessRedirect() string {
 
 func getUnauthorizedRedirect() string {
 	if application.IsProd() {
-		return "https://app.fabra.io/unauthorized"
+		return "https://www.trycoaster.com/unauthorized"
 	} else {
 		return "http://localhost:3000/unauthorized"
 	}

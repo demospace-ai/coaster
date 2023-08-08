@@ -26,9 +26,9 @@ const LogoLink: React.FC = () => {
       <img
         src={logo}
         className="tw-h-6 tw-w-6 tw-justify-center tw-items-center tw-rounded tw-flex tw-my-auto tw-select-none"
-        alt="fabra logo"
+        alt="coaster logo"
       />
-      <div className="tw-my-auto tw-ml-2.5 tw-max-w-[150px] tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-bold tw-font-[Montserrat] tw-text-2xl">
+      <div className="tw-my-auto tw-ml-2.5 tw-max-w-[150px] tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-tracking-[-0.5px] tw-mt-[-2px] tw-font-extrabold tw-font-[Lateef] tw-text-[40px]">
         coaster
       </div>
     </NavLink>
@@ -38,14 +38,14 @@ const LogoLink: React.FC = () => {
 const ProfileDropdown: React.FC = () => {
   const isAuthenticated = useSelector((state) => state.login.authenticated);
   return (
-    <div className="tw-flex">
+    <div className="tw-hidden sm:tw-flex">
       <NavLink
         className="tw-my-auto tw-mr-6 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-base hover:tw-bg-gray-100"
         to="/listing/new"
       >
         List your experience
       </NavLink>
-      <div className="tw-hidden sm:tw-flex tw-flex-col tw-justify-center">
+      <div className="tw-flex tw-flex-col tw-justify-center">
         {isAuthenticated ? <SignedInMenu /> : <SignedOutMenu />}
       </div>
     </div>
