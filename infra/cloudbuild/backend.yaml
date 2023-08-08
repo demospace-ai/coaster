@@ -19,6 +19,7 @@ steps:
   - '-t'
   - 'us-docker.pkg.dev/fabra-prod/fabra-server/fabra:latest'
   - '--push'
+  - '--provenance=false'
   - 'backend/'
   waitFor: ['test-backend']
   secretEnv: ['DEPOT_TOKEN']
