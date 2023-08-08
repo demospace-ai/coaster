@@ -1,7 +1,7 @@
-import { Menu, Transition } from "@headlessui/react";
-import { ArrowRightOnRectangleIcon, Bars3Icon } from "@heroicons/react/24/outline";
+import { Dialog, Menu, Transition } from "@headlessui/react";
+import { ArrowRightOnRectangleIcon, Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
-import React, { Fragment } from "react";
+import React, { Fragment, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { MapSearch } from "src/components/maps/MapSearch";
 import { useLogout } from "src/pages/login/actions";
@@ -11,7 +11,7 @@ import { mergeClasses } from "src/utils/twmerge";
 export const Header: React.FC = () => {
   const navigate = useNavigate();
   return (
-    <div className="tw-flex tw-box-border tw-min-h-[96px] tw-max-h-[96px] tw-px-5 xs:tw-px-8 sm:tw-px-20 tw-py-3 tw-items-center tw-justify-between tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white">
+    <div className="tw-sticky tw-top-0 tw-flex tw-box-border tw-max-h-[72px] tw-min-h-[72px] sm:tw-max-h-[96px] sm:tw-min-h-[96px] tw-w-full tw-px-5 xs:tw-px-8 sm:tw-px-20 tw-py-3 tw-items-center tw-justify-between tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white">
       <LogoLink />
       <MapSearch onSubmit={(location) => navigate("/search?location=" + location)} />
       <ProfileDropdown />
@@ -48,7 +48,7 @@ const ProfileDropdown: React.FC = () => {
         </div>
       </div>
       {/* TODO: make this open an actual menu on mobile */}
-      <Bars3Icon className="tw-flex lg:tw-hidden tw-w-6 tw-h-6 tw-ml-4" />
+      <MobileMenu />
     </div>
   );
 };
@@ -136,5 +136,103 @@ const SignedOutMenu: React.FC = () => {
         Log in
       </div>
     </div>
+  );
+};
+
+const MobileMenu: React.FC = () => {
+  const navigate = useNavigate();
+  const isAuthenticated = useSelector((state) => state.login.authenticated);
+  const user = useSelector((state) => state.login.user);
+  const logout = useLogout();
+  const menuItem =
+    "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded tw-mb-4";
+  const [open, setOpen] = useState(false);
+  const buttonStyle =
+    "tw-flex tw-justify-center tw-py-2 tw-w-full tw-cursor-pointer tw-select-none tw-whitespace-nowrap tw-rounded-3xl sm:tw-font-semibold tw-text-base tw-bg-gray-100 hover:tw-bg-gray-200";
+
+  return (
+    <>
+      <Bars3Icon className="tw-flex lg:tw-hidden tw-w-7 tw-ml-4" onClick={() => setOpen(true)} />
+      <Transition.Root show={open} as={Fragment}>
+        <Dialog as="div" className="tw-relative tw-z-10" onClose={setOpen}>
+          <div className="tw-fixed tw-inset-0 tw-overflow-hidden">
+            <div className="tw-absolute tw-inset-0 tw-overflow-hidden">
+              <div className="tw-pointer-events-none tw-fixed tw-inset-y-0 tw-right-0 tw-flex tw-max-w-full tw-pl-10 sm:tw-pl-16">
+                <Transition.Child
+                  as={Fragment}
+                  enter="tw-transform tw-transition tw-ease-in-out tw-duration-500 sm:tw-duration-700"
+                  enterFrom="tw-translate-x-full"
+                  enterTo="tw-translate-x-0"
+                  leave="tw-transform tw-transition tw-ease-in-out tw-duration-500 sm:tw-duration-700"
+                  leaveFrom="tw-translate-x-0"
+                  leaveTo="tw-translate-x-full"
+                >
+                  <Dialog.Panel className="tw-pointer-events-auto tw-w-screen tw-max-w-2xl">
+                    <div className="tw-flex tw-h-full tw-flex-col tw-overflow-y-scroll tw-bg-white tw-py-6 tw-shadow-xl">
+                      <div className="tw-px-4 sm:tw-px-6">
+                        <div className="tw-flex tw-items-start tw-justify-between">
+                          <div className="tw-ml-3 tw-flex tw-h-7 tw-items-center">
+                            <button
+                              type="button"
+                              className="tw-relative tw-text-gray-400 tw-outline-none"
+                              onClick={() => setOpen(false)}
+                            >
+                              <span className="tw-absolute tw-inset-2.5" />
+                              <span className="tw-sr-only">Close panel</span>
+                              <XMarkIcon className="tw-h-6 tw-w-6" aria-hidden="true" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="tw-relative tw-mt-6 tw-flex-1 tw-px-4 sm:tw-px-6">
+                        {isAuthenticated ? (
+                          <div>
+                            <div className={menuItem}>
+                              <p className="tw-truncate tw-text-lg tw-font-semibold tw-text-slate-900">
+                                Welcome, {user?.name}
+                              </p>
+                            </div>
+                            <div
+                              className={buttonStyle}
+                              onClick={() => {
+                                logout();
+                                setOpen(false);
+                              }}
+                            >
+                              Logout
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="tw-flex tw-flex-col tw-gap-4">
+                            <div
+                              className={mergeClasses(buttonStyle, "tw-text-white tw-bg-gray-900 hover:tw-bg-gray-800")}
+                              onClick={() => {
+                                navigate("/signup");
+                                setOpen(false);
+                              }}
+                            >
+                              Sign up
+                            </div>
+                            <div
+                              className={buttonStyle}
+                              onClick={() => {
+                                navigate("/login");
+                                setOpen(false);
+                              }}
+                            >
+                              Log in
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </Dialog.Panel>
+                </Transition.Child>
+              </div>
+            </div>
+          </div>
+        </Dialog>
+      </Transition.Root>
+    </>
   );
 };

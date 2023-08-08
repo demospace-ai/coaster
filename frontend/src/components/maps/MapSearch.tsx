@@ -27,9 +27,7 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(false);
 
-  const formRef = useRef<HTMLFormElement>(null);
-  useOutsideClick(formRef, () => setActive(false));
-  useEscapeKeyPress(() => setActive(false));
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const { refs, floatingStyles, context } = useFloating({
     open: active,
@@ -38,7 +36,10 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
     whileElementsMounted: autoUpdate,
   });
 
-  const click = useClick(context);
+  const click = useClick(context, {
+    toggle: false,
+    keyboardHandlers: false,
+  });
   const dismiss = useDismiss(context);
   const role = useRole(context);
 
@@ -61,39 +62,52 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
   return (
     <div className="tw-flex sm:tw-flex-1 tw-justify-center tw-items-center tw-h-full">
       <MagnifyingGlassIcon
-        className="tw-flex sm:tw-hidden tw-cursor-pointer tw-ml-3 tw-w-5"
-        onClick={() => setActive(true)}
+        className="tw-flex sm:tw-hidden tw-cursor-pointer tw-ml-3 tw-w-6"
+        onClick={() => {
+          setActive(true);
+          inputRef.current?.focus();
+        }}
       />
       <div
         className={mergeClasses(
-          "tw-absolute tw-z-10 tw-left-0 tw-top-0 tw-w-full tw-h-full tw-bg-black/10 tw-backdrop-blur-sm tw-invisible tw-transition-all tw-duration-100",
+          "tw-absolute tw-z-10 tw-left-0 tw-top-0 tw-w-[100vw] tw-h-[100vh] tw-bg-black/10 tw-backdrop-blur-sm tw-invisible tw-transition-all tw-duration-100",
           active && "tw-visible",
         )}
       />
       <form
-        ref={formRef}
+        ref={refs.setReference}
         className={mergeClasses(
-          "tw-hidden sm:tw-flex tw-left-0 sm:tw-left-[unset] tw-absolute tw-w-full sm:tw-w-fit tw-p-5 sm:tw-p-0",
+          "tw-hidden sm:tw-flex tw-left-0 sm:tw-left-[unset] tw-absolute tw-w-full sm:tw-w-fit tw-p-5 sm:tw-p-0 tw-mt-4 sm:tw-mt-0",
           active && "tw-flex",
         )}
         onSubmit={(e: FormEvent) => {
           e.preventDefault();
           onSubmit(query);
         }}
-        onClick={() => {
-          setActive(true);
-        }}
+        {...getReferenceProps({
+          onClick() {
+            inputRef.current?.focus();
+          },
+          onKeyDown(event) {
+            if (event.key === "Escape") {
+              inputRef.current?.blur();
+            }
+            if (event.key === "Enter") {
+              onSubmit(query);
+              inputRef.current?.blur();
+            }
+          },
+        })}
       >
         <div
-          ref={refs.setReference}
           className={mergeClasses(
             "tw-flex tw-w-0 tw-rounded-[50px] tw-bg-white tw-shadow-centered-md sm:tw-ring-1 tw-ring-slate-300 tw-relative tw-z-20 sm:tw-w-[25vw] tw-transition-all tw-duration-100",
             active && "tw-w-full sm:tw-w-[50vw] tw-rounded-lg",
           )}
-          {...getReferenceProps()}
         >
           <MagnifyingGlassIcon className="tw-cursor-pointer tw-ml-3 tw-w-5" />
           <input
+            ref={inputRef}
             className="tw-inline tw-placeholder-gray-600 tw-w-full tw-bg-transparent tw-py-4 sm:tw-py-3 tw-px-3 tw-text-sm tw-leading-5 tw-outline-none tw-text-slate-900 tw-text-ellipsis tw-cursor-pointer tw-transition tw-duration-100"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -116,7 +130,7 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
             leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
             leaveTo="tw-transform tw-opacity-0 tw-scale-0"
           >
-            <div className="tw-absolute tw-z-20 tw-mt-1 tw-min-w-full tw-max-h-80 tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-sm tw-text-black tw-shadow-lg tw-ring-1 tw-ring-slate-300 sm:tw-text-sm">
+            <div className="tw-absolute tw-z-20 tw-mt-[-10px] sm:tw-mt-0 tw-min-w-full tw-max-h-80 tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-sm tw-text-black tw-shadow-lg tw-ring-1 tw-ring-slate-300 sm:tw-text-sm">
               <Wrapper apiKey={isProd() ? PRODUCTION_MAPS_KEY : DEVELOPMENT_MAPS_KEY} libraries={["places"]}>
                 <Suggestions query={query} setQuery={setQuery} onSubmit={onSubmit} />
               </Wrapper>
@@ -171,35 +185,3 @@ const Suggestions: React.FC<{
     </>
   );
 };
-
-function useOutsideClick(ref: React.RefObject<HTMLElement>, callback: () => void) {
-  useEffect(() => {
-    function handleClickOutside(event: any) {
-      if (ref.current && !ref.current.contains(event.target)) {
-        callback();
-      }
-    }
-    // Bind the event listener
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      // Unbind the event listener on clean up
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [ref]);
-}
-
-function useEscapeKeyPress(callback: () => void) {
-  useEffect(() => {
-    function handleEscapeKeyPress(event: any) {
-      if (event.key === "Escape") {
-        callback();
-      }
-    }
-    // Bind the event listener
-    document.addEventListener("keydown", handleEscapeKeyPress);
-    return () => {
-      // Unbind the event listener on clean up
-      document.removeEventListener("keydown", handleEscapeKeyPress);
-    };
-  }, []);
-}

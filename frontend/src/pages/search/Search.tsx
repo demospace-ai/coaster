@@ -16,12 +16,12 @@ export const Search: React.FC = () => {
   }
 
   return (
-    <div className="tw-flex tw-flex-col tw-items-center tw-h-full tw-pt-8 tw-pb-24 tw-px-5 sm:tw-px-24 tw-overflow-scroll">
+    <div className="tw-flex tw-flex-col tw-items-center tw-h-full tw-pt-5 sm:tw-pt-8 tw-pb-24 tw-px-5 sm:tw-px-24 tw-overflow-scroll">
       <div>
         <div className="tw-font-bold tw-text-xl tw-w-full tw-text-center sm:tw-text-left">
           {listings.length} results for {location}
         </div>
-        <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-3 2xl:tw-grid-cols-4 tw-mt-8 tw-mb-5 tw-font-bold tw-text-3xl tw-gap-10">
+        <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-3 2xl:tw-grid-cols-4 tw-mt-5 sm:tw-mt-8 tw-mb-5 tw-font-bold tw-text-3xl tw-gap-10">
           {listings.map((listing: Listing) => (
             <SearchResult key={listing.id} listing={listing} />
           ))}
