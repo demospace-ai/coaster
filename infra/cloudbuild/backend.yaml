@@ -34,7 +34,7 @@ steps:
   - 'us-west1'
   - '--platform'
   - 'managed'
-  waitFor: ['push-backend']
+  waitFor: ['build-backend']
 
 availableSecrets:
   secretManager:
