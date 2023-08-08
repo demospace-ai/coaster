@@ -11,7 +11,7 @@ import { mergeClasses } from "src/utils/twmerge";
 export const Header: React.FC = () => {
   const navigate = useNavigate();
   return (
-    <div className="tw-flex tw-box-border tw-min-h-[96px] tw-max-h-[96px] xs:tw-px-8 sm:tw-px-20 tw-py-3 tw-items-center tw-justify-between tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white">
+    <div className="tw-flex tw-box-border tw-min-h-[96px] tw-max-h-[96px] tw-px-5 xs:tw-px-8 sm:tw-px-20 tw-py-3 tw-items-center tw-justify-between tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white">
       <LogoLink />
       <MapSearch onSubmit={(location) => navigate("/search?location=" + location)} />
       <ProfileDropdown />
@@ -21,27 +21,34 @@ export const Header: React.FC = () => {
 
 const LogoLink: React.FC = () => {
   return (
-    <NavLink className="tw-hidden sm:tw-flex tw-flex-row tw-h-fit tw-box-border tw-cursor-pointer tw-w-fit" to="/">
-      <div className="tw-my-auto tw-max-w-[150px] tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-tracking-[-0.5px] tw-mt-[-2px] tw-font-extrabold tw-font-[Lateef] tw-text-[48px]">
+    <div className="tw-flex tw-flex-1 tw-flex-row tw-h-fit tw-box-border tw-w-fit">
+      <NavLink
+        className="tw-my-auto tw-max-w-[150px] tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-tracking-[-0.5px] tw-mt-[-2px] tw-font-extrabold tw-font-[Lateef] tw-text-[48px]"
+        to="/"
+      >
         Coaster
-      </div>
-    </NavLink>
+      </NavLink>
+    </div>
   );
 };
 
 const ProfileDropdown: React.FC = () => {
   const isAuthenticated = useSelector((state) => state.login.authenticated);
   return (
-    <div className="tw-hidden sm:tw-flex">
-      <NavLink
-        className="tw-my-auto tw-mr-6 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-base hover:tw-bg-gray-100"
-        to="/listing/new"
-      >
-        List your experience
-      </NavLink>
-      <div className="tw-flex tw-flex-col tw-justify-center">
-        {isAuthenticated ? <SignedInMenu /> : <SignedOutMenu />}
+    <div className="tw-flex sm:tw-flex-[0.5_0.5_0%] lg:tw-flex-1 tw-justify-end">
+      <div className="tw-hidden lg:tw-flex">
+        <NavLink
+          className="tw-hidden xl:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
+          to="/listing/new"
+        >
+          List your experience
+        </NavLink>
+        <div className="tw-flex tw-flex-col tw-justify-center">
+          {isAuthenticated ? <SignedInMenu /> : <SignedOutMenu />}
+        </div>
       </div>
+      {/* TODO: make this open an actual menu on mobile */}
+      <Bars3Icon className="tw-flex lg:tw-hidden tw-w-6 tw-h-6 tw-ml-4" />
     </div>
   );
 };
@@ -116,7 +123,7 @@ const SignedInMenu: React.FC = () => {
 const SignedOutMenu: React.FC = () => {
   const navigate = useNavigate();
   const buttonStyle =
-    "tw-flex tw-items-center tw-py-3 tw-px-8 tw-cursor-pointer tw-select-none tw-whitespace-nowrap tw-rounded-3xl sm:tw-font-semibold tw-text-base tw-bg-gray-100 hover:tw-bg-gray-200";
+    "tw-flex tw-justify-center tw-py-2 tw-w-28 tw-cursor-pointer tw-select-none tw-whitespace-nowrap tw-rounded-3xl sm:tw-font-semibold tw-text-base tw-bg-gray-100 hover:tw-bg-gray-200";
   return (
     <div className="tw-flex tw-gap-3">
       <div

@@ -1,8 +1,18 @@
+import {
+  autoUpdate,
+  flip,
+  offset,
+  shift,
+  useClick,
+  useDismiss,
+  useFloating,
+  useInteractions,
+  useRole,
+} from "@floating-ui/react";
 import { Wrapper } from "@googlemaps/react-wrapper";
 import { Transition } from "@headlessui/react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { FormEvent, Fragment, useEffect, useRef, useState } from "react";
-import { usePopper } from "react-popper";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { isProd } from "src/utils/env";
 import { mergeClasses } from "src/utils/twmerge";
@@ -21,11 +31,18 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
   useOutsideClick(formRef, () => setActive(false));
   useEscapeKeyPress(() => setActive(false));
 
-  const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
-  const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(null);
-  const { styles, attributes, forceUpdate } = usePopper(referenceElement, popperElement, {
-    strategy: "absolute",
+  const { refs, floatingStyles, context } = useFloating({
+    open: active,
+    onOpenChange: setActive,
+    middleware: [offset(10), flip({ fallbackAxisSideDirection: "end" }), shift()],
+    whileElementsMounted: autoUpdate,
   });
+
+  const click = useClick(context);
+  const dismiss = useDismiss(context);
+  const role = useRole(context);
+
+  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
 
   useEffect(() => {
     if (urlPath.pathname === "/search") {
@@ -42,7 +59,11 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
   };
 
   return (
-    <>
+    <div className="tw-flex sm:tw-flex-1 tw-justify-center tw-items-center tw-h-full">
+      <MagnifyingGlassIcon
+        className="tw-flex sm:tw-hidden tw-cursor-pointer tw-ml-3 tw-w-5"
+        onClick={() => setActive(true)}
+      />
       <div
         className={mergeClasses(
           "tw-absolute tw-z-10 tw-left-0 tw-top-0 tw-w-full tw-h-full tw-bg-black/10 tw-backdrop-blur-sm tw-invisible tw-transition-all tw-duration-100",
@@ -51,24 +72,27 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
       />
       <form
         ref={formRef}
-        className="tw-w-full sm:tw-w-fit tw-p-5 sm:tw-p-0"
+        className={mergeClasses(
+          "tw-hidden sm:tw-flex tw-left-0 sm:tw-left-[unset] tw-absolute tw-w-full sm:tw-w-fit tw-p-5 sm:tw-p-0",
+          active && "tw-flex",
+        )}
         onSubmit={(e: FormEvent) => {
           e.preventDefault();
           onSubmit(query);
         }}
         onClick={() => {
           setActive(true);
-          forceUpdate && forceUpdate(); // Do this to ensure alignment is correct
         }}
       >
         <div
-          ref={setReferenceElement}
+          ref={refs.setReference}
           className={mergeClasses(
-            "tw-rounded-[50px] tw-bg-white tw-shadow-centered-md tw-ring-1 tw-ring-slate-300 tw-relative tw-z-20 tw-flex tw-w-full sm:tw-w-[25vw] tw-transition-all tw-duration-100",
-            active && "sm:tw-w-[50vw] tw-rounded-lg",
+            "tw-flex tw-w-0 tw-rounded-[50px] tw-bg-white tw-shadow-centered-md sm:tw-ring-1 tw-ring-slate-300 tw-relative tw-z-20 sm:tw-w-[25vw] tw-transition-all tw-duration-100",
+            active && "tw-w-full sm:tw-w-[50vw] tw-rounded-lg",
           )}
+          {...getReferenceProps()}
         >
-          <MagnifyingGlassIcon className="tw-cursor-point tw-ml-3 tw-w-5" />
+          <MagnifyingGlassIcon className="tw-cursor-pointer tw-ml-3 tw-w-5" />
           <input
             className="tw-inline tw-placeholder-gray-600 tw-w-full tw-bg-transparent tw-py-4 sm:tw-py-3 tw-px-3 tw-text-sm tw-leading-5 tw-outline-none tw-text-slate-900 tw-text-ellipsis tw-cursor-pointer tw-transition tw-duration-100"
             value={query}
@@ -78,9 +102,9 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
         </div>
         <div
           className="tw-relative tw-z-20 tw-w-[calc(100%-40px)] sm:tw-w-[50vw]"
-          ref={setPopperElement}
-          style={styles.popper}
-          {...attributes.popper}
+          ref={refs.setFloating}
+          style={floatingStyles}
+          {...getFloatingProps()}
         >
           <Transition
             as={Fragment}
@@ -100,7 +124,7 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
           </Transition>
         </div>
       </form>
-    </>
+    </div>
   );
 };
 
