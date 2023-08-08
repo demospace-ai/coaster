@@ -244,10 +244,10 @@ export const Privacy: React.FC = () => {
           If you are a resident of California and interact with us as a consumer, you have certain rights under the
           California Consumer Privacy Act or “CCPA” (Cal. Civ. Code § 1798.100 et seq.), including to request access to
           and deletion of your Personal Information (as defined in the CCPA). You may exercise these rights by
-          contacting us at founders@fabra.io. We do not sell your Personal Information, but we may allow our advertising
-          partners to collect certain device identifiers and electronic network activity that allows them to show ads
-          within their systems that are targeted to your interests. To opt out of having your Personal Information used
-          for targeted advertising purposes, please email us at founders@fabra.io.
+          contacting us at founders@trycoaster.com. We do not sell your Personal Information, but we may allow our
+          advertising partners to collect certain device identifiers and electronic network activity that allows them to
+          show ads within their systems that are targeted to your interests. To opt out of having your Personal
+          Information used for targeted advertising purposes, please email us at founders@trycoaster.com.
         </p>
         <p>
           <br />
@@ -255,14 +255,14 @@ export const Privacy: React.FC = () => {
           <br />
           We do not knowingly collect, maintain, or use personal information from children under 13 years of age, and no
           parts of our Services are directed to children. If you learn that a child has provided us with personal
-          information in violation of this Privacy Policy, then you may alert us at founders@fabra.io.
+          information in violation of this Privacy Policy, then you may alert us at founders@trycoaster.com.
           <br />
           <br />
           <em>How to Contact Us</em>
           <br />
           While we strive for error free performance, we cannot always catch an unintended privacy issue. As a result,
           we encourage your questions and comments about any privacy concerns. Please direct them to us by an email to
-          the following: founders@fabra.io.
+          the following: founders@trycoaster.com.
         </p>
       </div>
     </div>

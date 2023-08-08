@@ -35,7 +35,7 @@ export const Login: React.FC<{ create?: boolean }> = ({ create }) => {
     <div className="tw-flex tw-flex-row tw-h-full tw-bg-slate-100">
       <div className="tw-mt-32 tw-mb-auto tw-mx-auto tw-w-[400px]">
         <div className="tw-flex tw-flex-col tw-pt-12 tw-pb-10 tw-px-8 tw-rounded-lg tw-shadow-md tw-bg-white tw-items-center">
-          <img src={longlogo} className="tw-h-8 tw-select-none tw-mb-4" alt="fabra logo" />
+          <img src={longlogo} className="tw-h-8 tw-select-none tw-mb-4" alt="coaster logo" />
           <div className="tw-flex tw-flex-col tw-items-center tw-my-2">{loginContent}</div>
         </div>
         <div className="tw-text-xs tw-text-center tw-mt-4 tw-text-slate-800 tw-select-none">
@@ -104,10 +104,10 @@ export const Unauthorized: React.FC = () => {
     <div className="tw-flex tw-flex-row tw-h-full tw-bg-slate-100">
       <div className="tw-mt-56 tw-mb-auto tw-mx-auto tw-w-[400px] tw-select-none">
         <div className="tw-flex tw-flex-col tw-pt-12 tw-pb-10 tw-px-8 tw-rounded-lg tw-shadow-md tw-bg-white tw-items-center">
-          <img src={longlogo} className="tw-h-8 tw-mb-4" alt="fabra logo" />
+          <img src={longlogo} className="tw-h-8 tw-mb-4" alt="coaster logo" />
           <div className="tw-text-center tw-my-2">
             <div className="tw-flex tw-flex-col tw-justify-center">
-              <div>You must use a business account to access Fabra.</div>
+              <div>Something went wrong.</div>
               <div className="tw-mt-4">
                 <NavLink className="tw-text-blue-500" to="/signup">
                   Try again
@@ -116,7 +116,7 @@ export const Unauthorized: React.FC = () => {
                 <a className="tw-text-blue-500" href="mailto:founders@trycoaster.com">
                   contact us
                 </a>{" "}
-                to get an account provisioned!
+                to resolve your issue!
               </div>
               <img src={mail} alt="mail" className="tw-h-36 tw-mt-5" />
             </div>

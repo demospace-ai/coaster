@@ -12,7 +12,7 @@ import (
 func CreateUser(db *gorm.DB) *models.User {
 	user := models.User{
 		Name:              "Test Test",
-		Email:             "test@go.fabra.io",
+		Email:             "test@trycoaster.com",
 		ProfilePictureURL: "",
 	}
 

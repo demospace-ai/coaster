@@ -18,7 +18,7 @@ export const LogoLoading: React.FC = () => {
         tw-animate-shimmer
         [mask:linear-gradient(-60deg,#000_30%,#0005,#000_70%)_right/500%_100%]
         "
-      alt="fabra logo"
+      alt="coaster logo"
     />
   );
 };

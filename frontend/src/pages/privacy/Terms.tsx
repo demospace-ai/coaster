@@ -30,7 +30,7 @@ export const Terms: React.FC = () => {
         provide to us is accurate and that you will keep it accurate and up-to-date at all times. When you register, you
         will be asked to provide a password. You are solely responsible for maintaining the confidentiality of your
         account and password, and you accept responsibility for all activities that occur under your account. If you
-        believe that your account is no longer secure, then you must immediately notify us at founders@fabra.io.
+        believe that your account is no longer secure, then you must immediately notify us at founders@trycoaster.com.
         <br />
         <br />
         2. <em>Copyright</em>. The content of the Site, including all text, images, software, audio and video, links, as
@@ -174,7 +174,7 @@ export const Terms: React.FC = () => {
         <br />
         16. <em>Copyright Complaints</em>. Coaster respects your intellectual property rights as well as the rights of
         other third parties. If you believe that your work has been copied in a way that constitutes copyright
-        infringement, please email Coaster at founders@fabra.io.
+        infringement, please email Coaster at founders@trycoaster.com.
         <br />
         <br />
         17. <em>Notice</em>. You agree that Coaster may provide notice to you and other information concerning this Site
