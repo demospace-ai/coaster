@@ -33,13 +33,13 @@ export const Login: React.FC<{ create?: boolean }> = ({ create }) => {
 
   return (
     <div className="tw-flex tw-flex-row tw-h-full tw-bg-slate-100">
-      <div className="tw-mt-56 tw-mb-auto tw-mx-auto tw-w-[400px]">
+      <div className="tw-mt-32 tw-mb-auto tw-mx-auto tw-w-[400px]">
         <div className="tw-flex tw-flex-col tw-pt-12 tw-pb-10 tw-px-8 tw-rounded-lg tw-shadow-md tw-bg-white tw-items-center">
           <img src={longlogo} className="tw-h-8 tw-select-none tw-mb-4" alt="fabra logo" />
-          <div className="tw-text-center tw-my-2">{loginContent}</div>
+          <div className="tw-flex tw-flex-col tw-items-center tw-my-2">{loginContent}</div>
         </div>
         <div className="tw-text-xs tw-text-center tw-mt-4 tw-text-slate-800 tw-select-none">
-          By continuing you agree to Fabra's{" "}
+          By continuing you agree to Coaster's{" "}
           <a className="tw-text-blue-500" href="https://trycoaster.com/terms" target="_blank" rel="noreferrer">
             Terms of Use
           </a>{" "}
@@ -59,8 +59,8 @@ const StartContent: React.FC<{ create?: boolean }> = ({ create }) => {
   return (
     <>
       {loginError && <div className="tw-text-red-500">{loginError?.toString()}</div>}
-      <div className="tw-text-center tw-mb-6 tw-select-none">
-        {create ? "Start your free 30-day trial of Fabra!" : "Sign in to continue to Fabra."}
+      <div className="tw-text-center tw-text-base tw-font-medium tw-mb-2 tw-select-none">
+        {create ? "Welcome to Coaster." : "Sign in to continue to Coaster."}
       </div>
       <a
         className={classNames(

@@ -1,18 +1,17 @@
 import { Menu, Transition } from "@headlessui/react";
-import { UserIcon } from "@heroicons/react/20/solid";
 import { ArrowRightOnRectangleIcon, Bars3Icon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import React, { Fragment } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import logo from "src/components/images/logo.svg";
 import { MapSearch } from "src/components/maps/MapSearch";
 import { useLogout } from "src/pages/login/actions";
 import { useSelector } from "src/root/model";
+import { mergeClasses } from "src/utils/twmerge";
 
 export const Header: React.FC = () => {
   const navigate = useNavigate();
   return (
-    <div className="tw-flex tw-box-border tw-min-h-[96px] tw-max-h-[96px] xs:tw-px-8 sm:tw-px-12 tw-py-3 tw-items-center tw-justify-between tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white">
+    <div className="tw-flex tw-box-border tw-min-h-[96px] tw-max-h-[96px] xs:tw-px-8 sm:tw-px-20 tw-py-3 tw-items-center tw-justify-between tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white">
       <LogoLink />
       <MapSearch onSubmit={(location) => navigate("/search?location=" + location)} />
       <ProfileDropdown />
@@ -23,13 +22,8 @@ export const Header: React.FC = () => {
 const LogoLink: React.FC = () => {
   return (
     <NavLink className="tw-hidden sm:tw-flex tw-flex-row tw-h-fit tw-box-border tw-cursor-pointer tw-w-fit" to="/">
-      <img
-        src={logo}
-        className="tw-h-6 tw-w-6 tw-justify-center tw-items-center tw-rounded tw-flex tw-my-auto tw-select-none"
-        alt="coaster logo"
-      />
-      <div className="tw-my-auto tw-ml-2.5 tw-max-w-[150px] tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-tracking-[-0.5px] tw-mt-[-2px] tw-font-extrabold tw-font-[Lateef] tw-text-[40px]">
-        coaster
+      <div className="tw-my-auto tw-max-w-[150px] tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-tracking-[-0.5px] tw-mt-[-2px] tw-font-extrabold tw-font-[Lateef] tw-text-[48px]">
+        Coaster
       </div>
     </NavLink>
   );
@@ -121,64 +115,19 @@ const SignedInMenu: React.FC = () => {
 
 const SignedOutMenu: React.FC = () => {
   const navigate = useNavigate();
-  const menuItem = "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded";
+  const buttonStyle =
+    "tw-flex tw-items-center tw-py-3 tw-px-8 tw-cursor-pointer tw-select-none tw-whitespace-nowrap tw-rounded-3xl sm:tw-font-semibold tw-text-base tw-bg-gray-100 hover:tw-bg-gray-200";
   return (
-    <Menu as="div">
-      {({ open }) => (
-        <>
-          <Menu.Button
-            className={classNames(
-              "tw-cursor-pointer tw-select-none tw-flex tw-items-center tw-rounded-full tw-border tw-border-solid tw-border-gray-300 tw-px-2 tw-py-1 hover:tw-shadow-md tw-ease-in-out tw-transition-all",
-              open && "tw-shadow-md",
-            )}
-          >
-            <Bars3Icon className="tw-w-5 tw-h-5 tw-mr-2" />
-            <div className="tw-bg-gray-400 tw-text-white tw-rounded-full tw-w-7 tw-h-7 tw-flex tw-justify-center tw-items-center">
-              <UserIcon className="tw-m-1" />
-            </div>
-          </Menu.Button>
-          <Transition
-            as={Fragment}
-            enter="tw-transition tw-ease-out tw-duration-100"
-            enterFrom="tw-transform tw-opacity-0 tw-scale-95"
-            enterTo="tw-transform tw-opacity-100 tw-scale-100"
-            leave="tw-transition tw-ease-in tw-duration-75"
-            leaveFrom="tw-transform tw-opacity-100 tw-scale-97"
-            leaveTo="tw-transform tw-opacity-0 tw-scale-95"
-          >
-            <Menu.Items className="tw-absolute tw-origin-top-right tw-z-10 tw-right-20 tw-mt-2 tw-mr-2 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none tw-w-56">
-              <div className="tw-m-2">
-                <Menu.Item>
-                  {({ active }) => (
-                    <div
-                      className={classNames(
-                        active && "tw-bg-slate-200 tw-text-slate-900",
-                        menuItem,
-                        "tw-font-semibold",
-                      )}
-                      onClick={() => navigate("/signup")}
-                    >
-                      Sign up
-                    </div>
-                  )}
-                </Menu.Item>
-              </div>
-              <div className="tw-m-2">
-                <Menu.Item>
-                  {({ active }) => (
-                    <div
-                      className={classNames(active && "tw-bg-slate-200 tw-text-slate-900", menuItem)}
-                      onClick={() => navigate("/login")}
-                    >
-                      Log in
-                    </div>
-                  )}
-                </Menu.Item>
-              </div>
-            </Menu.Items>
-          </Transition>
-        </>
-      )}
-    </Menu>
+    <div className="tw-flex tw-gap-3">
+      <div
+        className={mergeClasses(buttonStyle, "tw-text-white tw-bg-gray-900 hover:tw-bg-gray-800")}
+        onClick={() => navigate("/signup")}
+      >
+        Sign up
+      </div>
+      <div className={buttonStyle} onClick={() => navigate("/login")}>
+        Log in
+      </div>
+    </div>
   );
 };
