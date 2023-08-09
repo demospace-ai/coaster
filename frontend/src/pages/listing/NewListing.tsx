@@ -1,6 +1,7 @@
 import { CustomFormTypeProps, FrigadeForm } from "@frigade/react";
 import { useEffect, useState } from "react";
 import mapPreview from "src/components/images/map-preview.webp";
+import { Loading } from "src/components/loading/Loading";
 import { InlineMapSearch, MapComponent, MapsWrapper } from "src/components/maps/Maps";
 import { useLocalStorage } from "src/utils/localStorage";
 
@@ -61,24 +62,24 @@ const LocationStepInternal: React.FC<{ params: CustomFormTypeProps }> = ({ param
   const [coordinates, setCoordinates] = useState<google.maps.LatLngLiteral | undefined>(undefined);
   const geocoder = new google.maps.Geocoder();
 
-  useEffect(() => {
-    params.setCanContinue(location !== undefined);
-    if (location) {
-      geocoder.geocode({ address: location }, (results, status) => {
-        if (status === "OK" && results && results.length > 0) {
-          setCoordinates(results[0].geometry.location.toJSON());
-        }
-      });
-    }
-  }, []);
-
-  const handleChange = (location: string) => {
-    setLocation(location);
+  const updateCoordinates = (location: string) => {
     geocoder.geocode({ address: location }, (results, status) => {
       if (status === "OK" && results && results.length > 0) {
         setCoordinates(results[0].geometry.location.toJSON());
       }
     });
+  };
+
+  useEffect(() => {
+    params.setCanContinue(location !== undefined);
+    if (location) {
+      updateCoordinates(location);
+    }
+  }, []);
+
+  const handleChange = (location: string) => {
+    setLocation(location);
+    updateCoordinates(location);
     params.onSaveData({
       location: location,
     });
@@ -92,7 +93,9 @@ const LocationStepInternal: React.FC<{ params: CustomFormTypeProps }> = ({ param
       {coordinates ? (
         <MapComponent center={coordinates} zoom={12} marker={coordinates} />
       ) : (
-        <img className="tw-rounded-lg" src={mapPreview} />
+        // Can just use a loading component whenever there is a location but no coordinates since we're just waiting
+        // for the geocode response to finish
+        <>{location ? <Loading className="tw-h-80" /> : <img className="tw-rounded-lg" src={mapPreview} />}</>
       )}
     </div>
   );
