@@ -5,6 +5,18 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .tw-hide-number-wheel {
+    -moz-appearance: textfield;
+  }
+
+  .tw-hide-number-wheel::-webkit-outer-spin-button,
+  .tw-hide-number-wheel::-webkit-inner-spin-button {
+    margin: 0;
+    -webkit-appearance: none;
+  }
+}
+
 :root {
   /* These are the default Fabra colors */
   --color-primary: var(--color-fabra-primary);

@@ -197,7 +197,7 @@ export const InlineMapSearch: React.FC<{
           },
         })}
       >
-        <div className="tw-flex tw-w-full tw-rounded-lg tw-bg-white tw-border tw-border-solid tw-border-[#bcbcbc] tw-relative tw-z-20 tw-transition-all tw-duration-100">
+        <div className="tw-flex tw-w-full tw-rounded-lg tw-bg-white tw-border tw-border-solid tw-border-[#bcbcbc] tw-transition-all tw-duration-100">
           <MapPinIcon className="tw-cursor-pointer tw-ml-3 tw-w-5" />
           <input
             ref={inputRef}
@@ -317,7 +317,11 @@ const MapComponentInner: React.FC<MapProps> = ({ className, center, zoom, marker
   }, [ref, center, zoom, marker]);
 
   return (
-    <div className={mergeClasses("tw-rounded-lg tw-h-80 tw-w-full tw-transition-all", className)} ref={ref} id="map" />
+    <div
+      className={mergeClasses("tw-rounded-lg tw-h-64 sm:tw-h-80 tw-w-full tw-transition-all", className)}
+      ref={ref}
+      id="map"
+    />
   );
 };
 
