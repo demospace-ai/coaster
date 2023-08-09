@@ -668,7 +668,8 @@ resource "google_project_iam_member" "cloud-build-roles" {
     "roles/iam.securityAdmin",
     "roles/vpcaccess.admin",
     "roles/iam.serviceAccountAdmin",
-    "roles/appengine.appAdmin"
+    "roles/appengine.appAdmin",
+    "roles/iam.serviceAccountUser"
   ])
   role   = each.key
   member = "serviceAccount:454026596701@cloudbuild.gserviceaccount.com"
