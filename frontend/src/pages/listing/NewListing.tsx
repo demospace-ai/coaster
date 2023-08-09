@@ -50,7 +50,7 @@ export const NewListing: React.FC = () => {
 
 const locationStep = (params: CustomFormTypeProps) => {
   return (
-    <MapsWrapper loadingClass="tw-h-64">
+    <MapsWrapper loadingClass="tw-h-80">
       <LocationStepInternal params={params} />
     </MapsWrapper>
   );
