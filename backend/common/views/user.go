@@ -9,11 +9,10 @@ type User struct {
 	IntercomHash string `json:"intercom_hash"`
 }
 
-func ConvertUser(user models.User, intercomHash string) User {
+func ConvertUser(user models.User) User {
 	return User{
-		ID:           user.ID,
-		Name:         user.Name,
-		Email:        user.Email,
-		IntercomHash: intercomHash,
+		ID:    user.ID,
+		Name:  user.Name,
+		Email: user.Email,
 	}
 }
