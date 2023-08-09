@@ -18,6 +18,7 @@ steps:
 
   - id: deploy-frontend
     name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    dir: 'frontend/build/'
     entrypoint: 'bash'
     args: ['-c', 'gcloud app deploy']
     waitFor: ['copy-config']
