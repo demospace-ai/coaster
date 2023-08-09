@@ -3,7 +3,7 @@ import { ArrowRightOnRectangleIcon, Bars3Icon, XMarkIcon } from "@heroicons/reac
 import classNames from "classnames";
 import React, { Fragment, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { MapSearch } from "src/components/maps/MapSearch";
+import { MapSearch } from "src/components/maps/Maps";
 import { useLogout } from "src/pages/login/actions";
 import { useSelector } from "src/root/model";
 import { mergeClasses } from "src/utils/twmerge";
@@ -39,7 +39,7 @@ const ProfileDropdown: React.FC = () => {
       <div className="tw-hidden lg:tw-flex">
         <NavLink
           className="tw-hidden xl:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
-          to="/listing/new"
+          to="/listings/new"
         >
           List your experience
         </NavLink>
