@@ -1,50 +1,57 @@
-import { CustomFormTypeProps, FrigadeForm } from "@frigade/react";
 import { useEffect, useRef, useState } from "react";
+import {
+  ErrorMessage,
+  InputStep,
+  MultiStep,
+  SelectorStep,
+  StepParams,
+  TextAreaStep,
+} from "src/components/form/MultiStep";
 import mapPreview from "src/components/images/map-preview.webp";
 import { Loading } from "src/components/loading/Loading";
 import { InlineMapSearch, MapComponent, MapsWrapper } from "src/components/maps/Maps";
-import { useLocalStorage } from "src/utils/localStorage";
+import { CategorySchema, DescriptionSchema, NameSchema, PriceSchema } from "src/pages/listing/schema";
+import { ZodError } from "zod";
 
 export const NewListing: React.FC = () => {
   return (
     <div className="tw-w-full tw-flex tw-justify-center">
-      <div className="tw-flex tw-px-8 sm:tw-px-0 tw-w-[500px] tw-h-[600px] tw-mt-10 tw-items-center">
-        <FrigadeForm
-          flowId="flow_VgZhRZThrelxTs4o"
-          type="inline"
-          repeatable
-          showPagination
-          allowBackNavigation
-          appearance={{
-            theme: {
-              colorBorder: "#bcbcbc",
+      <div className="tw-flex tw-px-8 sm:tw-px-0 tw-w-[500px] tw-min-h-[600px] tw-mt-10 tw-items-center">
+        <MultiStep
+          id="new-listing"
+          defaultValues={{ price: 205, description: "You'll have the time of your life on our one-of-a-kind trip." }}
+          steps={[
+            { id: "category", elementFn: categoryStep, title: "What kind of experience do you want to host?" },
+            { id: "location", elementFn: locationStep, title: "Where is your adventure located?" },
+            {
+              id: "name",
+              elementFn: nameStep,
+              title: "What do you want to call your adventure?",
+              subtitle: "Giving your trip a fun name can make you stand out!",
             },
-            styleOverrides: {
-              mediumTitle: "tw-text-2xl sm:tw-text-3xl tw-font-bold tw-mb-5",
-              mediumSubtitle: "tw-mt-[-10px] tw-mb-5",
-              formPagination: "tw-flex tw-justify-center tw-mb-2",
+            {
+              id: "description",
+              elementFn: descriptionStep,
+              title: "Create your description",
+              subtitle: "Share what makes your trip special.",
             },
-          }}
-          customStepTypes={{
-            locationStep: locationStep,
-            priceStep: priceStep,
-          }}
+            { id: "price", elementFn: priceStep, title: "Set a price", subtitle: "You can change it anytime." },
+          ]}
         />
       </div>
     </div>
   );
 };
 
-const locationStep = (params: CustomFormTypeProps) => {
+const locationStep = (params: StepParams) => {
   return (
-    <MapsWrapper loadingClass="tw-h-80">
-      <LocationStepInternal params={params} />
+    <MapsWrapper loadingClass="tw-h-64 sm:tw-h-80">
+      <LocationStep {...params} />
     </MapsWrapper>
   );
 };
 
-const LocationStepInternal: React.FC<{ params: CustomFormTypeProps }> = ({ params }) => {
-  const [location, setLocation] = useLocalStorage<string | undefined>("location", undefined);
+const LocationStep: React.FC<StepParams> = ({ setCanContinue, setData: saveData, data }) => {
   const [coordinates, setCoordinates] = useState<google.maps.LatLngLiteral | undefined>(undefined);
   const geocoder = new google.maps.Geocoder();
 
@@ -56,79 +63,97 @@ const LocationStepInternal: React.FC<{ params: CustomFormTypeProps }> = ({ param
     });
   };
 
+  // Effect to handle state from local storage
   useEffect(() => {
-    params.setCanContinue(location !== undefined);
-    if (location) {
-      updateCoordinates(location);
+    if (data) {
+      updateCoordinates(data);
+      setCanContinue(true);
     }
   }, []);
 
-  const handleChange = (location: string) => {
-    setLocation(location);
-    updateCoordinates(location);
-    params.onSaveData({
-      location: location,
-    });
-    params.setCanContinue(true);
+  const handleChange = (value: string) => {
+    updateCoordinates(value);
+    saveData(value);
+    setCanContinue(true);
   };
 
   return (
-    <div className="tw-flex tw-flex-col tw-items-center tw-mb-6">
-      <div className="tw-w-full tw-text-left tw-text-3xl tw-font-bold tw-mb-6">{params.stepData.title}</div>
-      <InlineMapSearch onSubmit={handleChange} initial={location} />
+    <div className="tw-flex tw-flex-col tw-items-center">
+      <InlineMapSearch onSubmit={handleChange} initial={data} />
       {coordinates ? (
         <MapComponent center={coordinates} zoom={12} marker={coordinates} />
       ) : (
         // Can just use a loading component whenever there is a location but no coordinates since we're just waiting
         // for the geocode response to finish
-        <>
-          {location ? <Loading className="tw-h-64 sm:tw-h-80" /> : <img className="tw-rounded-lg" src={mapPreview} />}
-        </>
+        <>{data ? <Loading className="tw-h-64 sm:tw-h-80" /> : <img className="tw-rounded-lg" src={mapPreview} />}</>
       )}
     </div>
   );
 };
 
-const priceStep = (params: CustomFormTypeProps) => {
-  const ref = useRef<HTMLInputElement>(null);
-  const [price, setPrice] = useLocalStorage<number>("price", 204);
+const priceStep = (params: StepParams) => {
+  return <PriceStep {...params} />;
+};
 
-  useEffect(() => {
-    params.setCanContinue(!Number.isNaN(price));
-  }, []);
+const PriceStep: React.FC<StepParams> = ({ setCanContinue, data, setData }) => {
+  const [error, setError] = useState<ZodError | null>(null);
+  const ref = useRef<HTMLInputElement>(null);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(event.target.value);
-    setPrice(value);
-    params.onSaveData({
-      price: value,
-    });
-    params.setCanContinue(!Number.isNaN(value));
+    const result = PriceSchema.safeParse(value);
+    if (result.success) {
+      setData(result.data);
+      setError(null);
+      setCanContinue(true);
+    } else {
+      setData(NaN);
+      setError(result.error);
+      setCanContinue(false);
+    }
   };
 
-  const toValue = (price: number) => {
-    return Number.isNaN(price) ? "" : price.toString();
+  const preventMinus = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.code === "Minus") {
+      e.preventDefault();
+    }
+  };
+
+  const toValue = (price: number | undefined) => {
+    return price === undefined || price === null || Number.isNaN(price) ? "" : price.toString();
   };
 
   return (
     <div className="tw-flex tw-flex-col tw-items-center tw-mb-6">
-      <div className="tw-w-full tw-text-left tw-text-3xl tw-font-bold tw-mb-2">{params.stepData.title}</div>
-      <div className="tw-w-full tw-text-left tw-text-[15px] tw-mb-6">{params.stepData.subtitle}</div>
       <div
-        className="tw-flex tw-w-full tw-mb-6 tw-border tw-border-solid tw-border-[#bcbcbc] tw-rounded-lg tw-text-3xl tw-font-semibold tw-justify-center focus-within:tw-border-2 focus-within:tw-border-blue-700 focus-within:tw-mt-[-1px] focus-within:tw-mb-[23px] tw-cursor-text"
+        className="tw-flex tw-w-full tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-text-3xl tw-font-semibold tw-justify-center focus-within:tw-border-2 focus-within:tw-border-blue-700 focus-within:tw-mt-[-1px] focus-within:tw-mb-[-1px] tw-cursor-text"
         onClick={() => ref.current?.focus()}
       >
         <div className="tw-inline-block tw-relative">
-          <div className="tw-flex tw-justify-center tw-items-center tw-h-20 tw-py-5 tw-px-3">${toValue(price)}</div>
+          <div className="tw-flex tw-justify-center tw-items-center tw-h-20 tw-py-5 tw-px-3">${toValue(data)}</div>
           <input
             ref={ref}
             type="number"
-            className="tw-flex tw-top-0 tw-right-0 tw-bg-transparent tw-absolute tw-h-20 tw-text-right tw-py-5 tw-px-3 tw-w-full tw-outline-0 tw-hide-number-wheel"
-            value={toValue(price)}
+            className="tw-flex tw-top-0 tw-right-0 tw-bg-transparent tw-absolute tw-h-20 tw-text-right tw-py-5 tw-px-3 tw-w-full tw-outline-0 tw-hide-number-wheel "
+            value={toValue(data)}
             onChange={handleChange}
+            onKeyDown={preventMinus}
           />
         </div>
       </div>
+      <ErrorMessage error={error} />
     </div>
   );
+};
+
+const nameStep = (params: StepParams) => {
+  return <InputStep {...params} schema={NameSchema} />;
+};
+
+const descriptionStep = (params: StepParams) => {
+  return <TextAreaStep {...params} schema={DescriptionSchema} />;
+};
+
+const categoryStep = (params: StepParams) => {
+  return <SelectorStep {...params} schema={CategorySchema} />;
 };

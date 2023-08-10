@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export interface LoginRequest {
   code?: string;
   state?: string;
@@ -21,7 +23,7 @@ export interface Listing {
   id: number;
   name: string;
   description: string;
-  category: string;
+  category: CategoryType;
   price: number;
   location: string;
   images: string[];
@@ -37,3 +39,6 @@ export interface User {
   name: string;
   email: string;
 }
+
+export const Category = z.enum(["surfing", "skiing", "fishing", "hiking", "camping", "cycling", "boating", "climbing"]);
+export type CategoryType = z.infer<typeof Category>;

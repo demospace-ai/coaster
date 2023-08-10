@@ -174,10 +174,10 @@ export const InlineMapSearch: React.FC<{
   };
 
   return (
-    <div className="tw-flex tw-justify-center tw-items-center tw-h-full tw-w-full tw-mb-4">
+    <div className="tw-flex tw-justify-center tw-items-center tw-relative tw-h-full tw-w-full tw-mb-4">
       <form
         ref={refs.setReference}
-        className="tw-flex tw-w-full tw-p-0 tw-mt-4 sm:tw-mt-0"
+        className="tw-flex tw-w-full tw-p-0 sm:tw-mt-0"
         onSubmit={(e: FormEvent) => {
           e.preventDefault();
           onSubmit(query);
@@ -197,12 +197,13 @@ export const InlineMapSearch: React.FC<{
           },
         })}
       >
-        <div className="tw-flex tw-w-full tw-rounded-lg tw-bg-white tw-border tw-border-solid tw-border-[#bcbcbc] tw-transition-all tw-duration-100">
+        <div className="tw-flex tw-w-full tw-rounded-lg tw-bg-white tw-border tw-border-solid tw-border-gray-300 tw-transition-all tw-duration-100">
           <MapPinIcon className="tw-cursor-pointer tw-ml-3 tw-w-5" />
           <input
             ref={inputRef}
             className="tw-inline tw-placeholder-gray-600 tw-w-full tw-bg-transparent tw-py-3 tw-px-3 tw-text-sm tw-leading-5 tw-outline-none tw-text-slate-900 tw-text-ellipsis tw-cursor-pointer tw-transition tw-duration-100"
             value={query}
+            autoComplete="off"
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Enter your address"
           />
