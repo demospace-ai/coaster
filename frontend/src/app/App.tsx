@@ -1,4 +1,3 @@
-import { FrigadeProvider } from "@frigade/react";
 import { ErrorBoundary } from "@highlight-run/react";
 import { ReactNode, useEffect, useState } from "react";
 import { Navigate, Outlet, Route, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
@@ -58,10 +57,7 @@ const AppLayout: React.FC = () => {
   }
 
   return (
-    <FrigadeProvider
-      publicApiKey="api_public_oETrjTdQcwgqzSviD9nKcVpt3RZ6icIN9abgQCqbDJUKbB972aDtpi5UnGNbS6Kl"
-      userId={user ? user.id.toString() : undefined}
-    >
+    <>
       <div className="tw-pointer-events-none tw-fixed tw-w-full tw-h-full">
         <Toast
           content={toastContent}
@@ -76,7 +72,7 @@ const AppLayout: React.FC = () => {
           <Outlet />
         </div>
       </div>
-    </FrigadeProvider>
+    </>
   );
 };
 
