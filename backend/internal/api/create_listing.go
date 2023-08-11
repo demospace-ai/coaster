@@ -13,11 +13,11 @@ import (
 )
 
 type CreateListingRequest struct {
-	Name        string          `json:"name" validate:"required"`
-	Description string          `json:"description" validate:"required"`
-	Category    models.Category `json:"category" validate:"required"`
-	Price       int64           `json:"price" validate:"required"`
-	Location    string          `json:"location" validate:"required"`
+	Name        string                 `json:"name" validate:"required"`
+	Description string                 `json:"description" validate:"required"`
+	Category    models.ListingCategory `json:"category" validate:"required"`
+	Price       int64                  `json:"price" validate:"required"`
+	Location    string                 `json:"location" validate:"required"`
 }
 
 type CreateListingResponse struct {

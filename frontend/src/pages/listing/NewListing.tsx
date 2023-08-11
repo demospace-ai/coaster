@@ -1,6 +1,6 @@
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRef, useState } from "react";
+import { FormEvent, useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   ErrorMessage,
@@ -10,13 +10,19 @@ import {
   StepParams,
   SubmitResult,
   TextAreaStep,
-  wrapSubmit,
+  wrapHandleSubmit,
 } from "src/components/form/MultiStep";
 import mapPreview from "src/components/images/map-preview.webp";
 import { Loading } from "src/components/loading/Loading";
 import { InlineMapSearch, MapComponent, MapsWrapper } from "src/components/maps/Maps";
 import { CategorySchema, DescriptionSchema, NameSchema, PriceSchema } from "src/pages/listing/schema";
-import { Coordinates } from "src/rpc/types";
+import { sendRequest } from "src/rpc/ajax";
+import { GetListing, GetNewListing, UploadListingImage } from "src/rpc/api";
+import { updateListing, useNewListing, useUpdateListing } from "src/rpc/data";
+import { CategoryType, Coordinates, Listing } from "src/rpc/types";
+import { getGcsImageUrl } from "src/utils/images";
+import { mutate } from "swr";
+import { z } from "zod";
 
 export const NewListing: React.FC = () => {
   return (
@@ -40,10 +46,10 @@ export const NewListing: React.FC = () => {
               subtitle: "Share what makes your trip special.",
             },
             {
-              id: "photos",
-              elementFn: photoStep,
-              title: "Add photos",
-              subtitle: "Show off your trip with at least three photos.",
+              id: "images",
+              elementFn: imageStep,
+              title: "Add images",
+              subtitle: "Show off your trip with at least three images.",
             },
             { id: "price", elementFn: priceStep, title: "Set a price", subtitle: "You can change it anytime." },
           ]}
@@ -54,149 +60,138 @@ export const NewListing: React.FC = () => {
 };
 
 const locationStep = (params: StepParams) => {
+  const { listing } = useNewListing();
+  if (!listing) {
+    return <Loading />;
+  }
+
   return (
     <MapsWrapper loadingClass="tw-h-64 sm:tw-h-80">
-      <LocationStep
-        {...params}
-        onSubmit={async (data: string): Promise<SubmitResult> => {
-          // TODO
-          return { success: true, error: "" };
-        }}
-      />
+      <LocationStep {...params} listing={listing} />
     </MapsWrapper>
   );
 };
 
 const priceStep = (params: StepParams) => {
-  return (
-    <PriceStep
-      {...params}
-      onSubmit={async (data: string): Promise<SubmitResult> => {
-        // TODO
-        return { success: true, error: "" };
-      }}
-    />
-  );
+  const { listing } = useNewListing();
+  if (!listing) {
+    return <Loading />;
+  }
+
+  return <PriceStep {...params} listing={listing} />;
 };
 
 const nameStep = (params: StepParams) => {
+  const { listing } = useNewListing();
+  if (!listing) {
+    return <Loading />;
+  }
+
   return (
     <InputStep
       {...params}
       schema={NameSchema}
-      onSubmit={async (data: string): Promise<SubmitResult> => {
-        // TODO
-        return { success: true, error: "" };
+      existingData={listing.name}
+      onSubmit={async (data: string) => {
+        return updateListing(listing.id, { name: data });
       }}
     />
   );
 };
 
 const descriptionStep = (params: StepParams) => {
+  const { listing } = useNewListing();
+  if (!listing) {
+    return <Loading />;
+  }
+
   return (
     <TextAreaStep
       {...params}
       schema={DescriptionSchema}
-      onSubmit={async (data: string): Promise<SubmitResult> => {
-        // TODO
-        return { success: true, error: "" };
+      existingData={listing.description}
+      onSubmit={async (data: string) => {
+        return updateListing(listing.id, { description: data });
       }}
     />
   );
 };
 
 const categoryStep = (params: StepParams) => {
+  const { listing } = useNewListing();
+  if (!listing) {
+    return <Loading />;
+  }
+
   return (
     <SelectorStep
       {...params}
       schema={CategorySchema}
-      onSubmit={async (data: string): Promise<SubmitResult> => {
-        // TODO
-        return { success: true, error: "" };
+      existingData={listing.category}
+      // TODO: fix the typing issue for the onChange data parameter
+      onChange={async (data: string): Promise<SubmitResult> => {
+        if (data === listing.category) {
+          // No API call needed if previous value was the same
+          return { success: true };
+        }
+        return updateListing(listing.id, { category: data as CategoryType });
       }}
     />
   );
 };
 
-const photoStep = (params: StepParams) => {
-  return (
-    <PhotoStep
-      {...params}
-      onSubmit={async (data: string): Promise<SubmitResult> => {
-        // TODO
-        return { success: true, error: "" };
-      }}
-    />
-  );
+const imageStep = (params: StepParams) => {
+  const { listing } = useNewListing();
+  if (!listing) {
+    return <Loading />;
+  }
+
+  return <ImageStep key={JSON.stringify(listing.images)} {...params} listing={listing} />;
 };
 
 const toGoogleCoordinates = (coordinates: Coordinates): google.maps.LatLngLiteral => {
   return { lat: coordinates.latitude, lng: coordinates.longitude };
 };
 
-const LocationStep: React.FC<
-  StepParams & {
-    onSubmit: (data: string) => Promise<SubmitResult>;
-    existingData?: { location: string; coordinates: Coordinates };
-  }
-> = ({ existingData, onSubmit, renderLayout: renderStep }) => {
-  const [location, setLocation] = useState<string | undefined>(existingData ? existingData.location : undefined);
-  const [coordinates, setCoordinates] = useState<google.maps.LatLngLiteral | undefined>(
-    existingData ? toGoogleCoordinates(existingData.coordinates) : undefined,
-  );
-  const geocoder = new google.maps.Geocoder();
-
-  const updateCoordinates = (location: string) => {
-    geocoder.geocode({ address: location }, (results, status) => {
-      if (status === "OK" && results && results.length > 0) {
-        setCoordinates(results[0].geometry.location.toJSON());
-      }
-    });
-  };
-
-  const handleChange = (value: string) => {
-    updateCoordinates(value);
-    setLocation(value);
-  };
-
-  return renderStep(
-    async () => {
-      if (location) {
-        return onSubmit(location);
-      } else {
-        return { success: false, error: "" };
-      }
-    },
-    location !== undefined,
-    () => (
-      <div className="tw-flex tw-flex-col tw-items-center">
-        <InlineMapSearch onSelect={handleChange} initial={existingData?.location} />
-        {coordinates ? (
-          <MapComponent center={coordinates} zoom={12} marker={coordinates} />
-        ) : (
-          // Can just use a loading component whenever there is a location but no coordinates since we're just waiting
-          // for the geocode response to finish
-          <>
-            {location ? <Loading className="tw-h-64 sm:tw-h-80" /> : <img className="tw-rounded-lg" src={mapPreview} />}
-          </>
-        )}
-      </div>
-    ),
-  );
+type LocationParams = {
+  listing: Listing;
 };
 
-const PriceStep: React.FC<
-  StepParams & { onSubmit: (data: string) => Promise<SubmitResult>; existingData?: number }
-> = ({ existingData, onSubmit, renderLayout: renderStep }) => {
+const LocationStep: React.FC<StepParams & LocationParams> = ({ listing, renderLayout }) => {
+  const { mutate, isLoading } = useUpdateListing(listing.id);
+  const onSelect = useCallback((location: string) => mutate({ location }), []);
+
+  const coordinates = listing.coordinates ? toGoogleCoordinates(listing.coordinates) : null;
+
+  return renderLayout(location !== undefined, () => (
+    <div className="tw-flex tw-flex-col tw-items-center">
+      <InlineMapSearch key={listing.location} onSelect={onSelect} initial={listing.location} />
+      {coordinates ? (
+        <MapComponent center={coordinates} zoom={12} marker={coordinates} />
+      ) : (
+        <>{isLoading ? <Loading /> : <img className="tw-rounded-lg" src={mapPreview} />}</>
+      )}
+    </div>
+  ));
+};
+
+type PriceParams = {
+  listing: Listing;
+};
+
+const PriceStep: React.FC<StepParams & PriceParams> = ({ listing, renderLayout }) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const formSchema = z.object({
+    value: PriceSchema,
+  });
   const {
     handleSubmit,
     control,
     formState: { errors, isValid },
-  } = useForm<{ price: number }>({
+  } = useForm<{ value: number }>({
     mode: "onBlur",
-    defaultValues: { price: existingData },
-    resolver: zodResolver(PriceSchema),
+    defaultValues: { value: listing.price },
+    resolver: zodResolver(formSchema),
   });
 
   const preventMinus = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -205,72 +200,103 @@ const PriceStep: React.FC<
     }
   };
 
-  const stringifyPrice = (price: number | undefined) => {
+  const stringifyPrice = (price: number | undefined): string => {
     return price === undefined || price === null || Number.isNaN(price) ? "" : price.toString();
   };
 
-  return renderStep(wrapSubmit(handleSubmit, onSubmit), isValid, () => (
-    <div className="tw-flex tw-flex-col tw-items-center tw-mb-6">
-      <div
-        className="tw-flex tw-w-full tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-text-3xl tw-font-semibold tw-justify-center focus-within:tw-border-2 focus-within:tw-border-blue-700 focus-within:tw-mt-[-1px] focus-within:tw-mb-[-1px] tw-cursor-text"
-        onClick={() => inputRef.current?.focus()}
-      >
-        <div className="tw-inline-block tw-relative">
-          <Controller
-            name={"price"}
-            control={control}
-            render={({ field }) => (
-              <>
-                <div className="tw-flex tw-justify-center tw-items-center tw-h-20 tw-py-5 tw-px-3">
-                  ${stringifyPrice(field.value)}
-                </div>
-                <input
-                  ref={(e) => {
-                    field.ref(e);
-                    inputRef.current = e;
-                  }}
-                  onChange={(e) => field.onChange(parseInt(e.target.value))}
-                  value={field.value}
-                  type="number"
-                  className="tw-flex tw-top-0 tw-right-0 tw-bg-transparent tw-absolute tw-h-20 tw-text-right tw-py-5 tw-px-3 tw-w-full tw-outline-0 tw-hide-number-wheel"
-                  onKeyDown={preventMinus}
-                />
-              </>
-            )}
-          />
+  // TODO: do we want to update on change too?
+  const updatePrice = async (data: number) => {
+    return updateListing(listing.id, { price: data });
+  };
+
+  return renderLayout(
+    isValid,
+    () => (
+      <div className="tw-flex tw-flex-col tw-items-center tw-mb-6">
+        <div
+          className="tw-flex tw-w-full tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-text-3xl tw-font-semibold tw-justify-center focus-within:tw-border-2 focus-within:tw-border-blue-700 focus-within:tw-mt-[-1px] focus-within:tw-mb-[-1px] tw-cursor-text"
+          onClick={() => inputRef.current?.focus()}
+        >
+          <div className="tw-inline-block tw-relative">
+            <Controller
+              name={"value"}
+              control={control}
+              render={({ field }) => (
+                <>
+                  <div className="tw-flex tw-justify-center tw-items-center tw-h-20 tw-py-5 tw-px-3">
+                    ${stringifyPrice(field.value)}
+                  </div>
+                  <input
+                    ref={(e) => {
+                      field.ref(e);
+                      inputRef.current = e;
+                    }}
+                    onChange={(e) => field.onChange(parseInt(e.target.value))}
+                    onBlur={field.onBlur}
+                    value={field.value ? field.value : ""}
+                    type="number"
+                    className="tw-flex tw-top-0 tw-right-0 tw-bg-transparent tw-absolute tw-h-20 tw-text-right tw-py-5 tw-px-3 tw-w-full tw-outline-0 tw-hide-number-wheel"
+                    onKeyDown={preventMinus}
+                  />
+                </>
+              )}
+            />
+          </div>
         </div>
+        <ErrorMessage error={errors.value} />
       </div>
-      <ErrorMessage error={errors.price} />
-    </div>
-  ));
+    ),
+    wrapHandleSubmit(handleSubmit, updatePrice),
+  );
 };
 
-const PhotoStep: React.FC<
-  StepParams & { onSubmit: (data: string) => Promise<SubmitResult>; existingData?: number }
-> = ({ existingData, onSubmit, renderLayout: renderStep }) => {
-  const ref = useRef<HTMLInputElement | null>(null);
-  const [photos, setPhotos] = useState<string[]>([]);
+type ImageParams = {
+  listing: Listing;
+};
 
-  return (
+const ImageStep: React.FC<StepParams & ImageParams> = ({ renderLayout, listing }) => {
+  const ref = useRef<HTMLInputElement | null>(null);
+  const isValid = listing.images.length > 2;
+
+  // TODO: validate size and type of file
+
+  const listingID = listing.id;
+  const addImage = async (e: FormEvent<HTMLInputElement>) => {
+    if (e.currentTarget && e.currentTarget.files) {
+      const formData = new FormData();
+      formData.append("listing_image", e.currentTarget.files[0]);
+      try {
+        await sendRequest(UploadListingImage, {
+          pathParams: { listingID },
+          formData: formData,
+        });
+
+        mutate({ GetNewListing });
+        mutate({ GetListing, listingID });
+      } catch (e) {}
+    }
+  };
+
+  // TODO
+  const deleteImage = (imageIndex: number) => {};
+
+  return renderLayout(isValid, () => (
     <div className="tw-flex tw-flex-col tw-items-center tw-mb-6">
       <button className="tw-flex tw-rounded-xl tw-bg-gray-200 tw-px-10 tw-py-3" onClick={() => ref.current?.click()}>
-        Add photo
+        Add image
       </button>
-      <input ref={ref} type="file" className="tw-flex tw-invisible" />
+      <input ref={ref} type="file" className="tw-flex tw-invisible" onChange={addImage} />
       <>
-        {photos.map((previewImage, index) => (
-          <div className="tw-relative" key={index}>
-            <img src={previewImage} alt="preview-image" className="tw-select-none" />
+        {listing.images.map((previewImage, index) => (
+          <div className="tw-relative tw-m-3" key={index}>
+            <img src={getGcsImageUrl(previewImage)} alt="preview-image" className="tw-select-none tw-rounded-lg" />
             <XMarkIcon
-              className="tw-w-8 tw-absolute tw-right-1 tw-top-1 tw-bg-gray-100 tw-p-1 tw-rounded-lg tw-opacity-[90%] tw-cursor-pointer hover:tw-opacity-100"
-              onClick={() => {
-                photos.splice(index, 1);
-                setPhotos(photos);
-              }}
+              className="tw-w-8 tw-absolute tw-right-2 tw-top-2 tw-bg-gray-100 tw-p-1 tw-rounded-lg tw-opacity-[90%] tw-cursor-pointer hover:tw-opacity-100"
+              onClick={() => deleteImage(index)}
             />
           </div>
         ))}
       </>
     </div>
-  );
+  ));
 };

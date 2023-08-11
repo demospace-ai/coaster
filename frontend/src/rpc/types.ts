@@ -21,13 +21,21 @@ export interface SearchListingsResponse {
 
 export interface Listing {
   id: number;
-  name: string;
-  description: string;
-  category: CategoryType;
-  price: number;
-  location: string;
-  coordinates: Coordinates;
+  name: string | undefined;
+  description: string | undefined;
+  category: CategoryType | undefined;
+  price: number | undefined;
+  location: string | undefined;
+  coordinates: Coordinates | undefined;
   images: string[];
+}
+
+export interface ListingUpdates {
+  name?: string;
+  description?: string;
+  category?: CategoryType;
+  price?: number;
+  location?: string;
 }
 
 export type Coordinates = { latitude: number; longitude: number };

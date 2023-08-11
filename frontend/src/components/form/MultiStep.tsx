@@ -1,6 +1,6 @@
 import { CheckCircleIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ReactElement, useState } from "react";
+import { ReactElement, useCallback, useState } from "react";
 import { FieldError, UseFormHandleSubmit, useForm } from "react-hook-form";
 import { useLocalStorage } from "src/utils/localStorage";
 import { toTitleCase } from "src/utils/string";
@@ -14,13 +14,20 @@ export const MultiStep: React.FC<MultiStepProps> = ({ id, steps }) => {
   const isLastStep = currentStepNumber === steps.length - 1;
   const currentStep = steps[currentStepNumber];
 
+  const renderForm = useCallback(currentStep.elementFn, [currentStep]);
+
   const renderLayout = (
-    submit: () => Promise<SubmitResult>,
     canContinue: boolean,
     renderStep: () => ReactElement,
+    submit?: () => Promise<SubmitResult>,
   ): ReactElement => {
     const nextStep = async () => {
       if (!canContinue) {
+        return;
+      }
+
+      if (!submit) {
+        setCurrentStepNumber(currentStepNumber + 1);
         return;
       }
 
@@ -31,8 +38,9 @@ export const MultiStep: React.FC<MultiStepProps> = ({ id, steps }) => {
         } else {
           setCurrentStepNumber(currentStepNumber + 1);
         }
+      } else {
+        // TODO: handle error
       }
-      // TODO: handle error
     };
 
     const previousStep = () => {
@@ -80,7 +88,7 @@ export const MultiStep: React.FC<MultiStepProps> = ({ id, steps }) => {
 
   return (
     <>
-      {currentStep.elementFn({
+      {renderForm({
         id: currentStep.id,
         renderLayout: renderLayout,
       })}
@@ -104,12 +112,17 @@ export type SubmitResult = { success: boolean; error?: string }; // TODO: use di
 
 export type StepParams = {
   id: string;
-  renderLayout: (submit: () => Promise<SubmitResult>, canContinue: boolean, render: () => ReactElement) => ReactElement;
+  renderLayout: (
+    canContinue: boolean,
+    render: () => ReactElement,
+    submit?: () => Promise<SubmitResult>,
+  ) => ReactElement;
 };
 
 type InputProps = {
   schema: ZodString;
-  onSubmit: (data: string) => Promise<SubmitResult>;
+  onChange?: (data: string) => void;
+  onSubmit?: (data: string) => Promise<SubmitResult>;
   existingData?: string;
   placeholder?: string;
 };
@@ -118,8 +131,9 @@ export const InputStep: React.FC<StepParams & InputProps> = ({
   id,
   schema,
   existingData,
+  onChange,
   onSubmit,
-  renderLayout: renderStep,
+  renderLayout,
 }) => {
   const formSchema = z.object({
     value: schema,
@@ -135,27 +149,32 @@ export const InputStep: React.FC<StepParams & InputProps> = ({
     resolver: zodResolver(formSchema),
   });
 
-  return renderStep(wrapSubmit(handleSubmit, onSubmit), isValid, () => (
-    <div className="tw-flex tw-flex-col tw-items-center">
-      <input
-        key={id}
-        type="text"
-        className="tw-flex tw-py-3 tw-px-3 tw-w-full tw-outline-0 tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-text-base tw-justify-center focus-within:tw-border-2 focus-within:tw-border-blue-700 focus-within:tw-m-[-1px] focus-within:tw-px-[11px] tw-cursor-text"
-        {...register("value", {
-          onChange: () => clearErrors("value"),
-        })}
-      />
-      <ErrorMessage error={errors.value} />
-    </div>
-  ));
+  return renderLayout(
+    isValid,
+    () => (
+      <div className="tw-flex tw-flex-col tw-items-center">
+        <input
+          key={id}
+          type="text"
+          className="tw-flex tw-py-3 tw-px-3 tw-w-full tw-outline-0 tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-text-base tw-justify-center focus-within:tw-border-2 focus-within:tw-border-blue-700 focus-within:tw-m-[-1px] focus-within:tw-px-[11px] tw-cursor-text"
+          {...register("value", {
+            onChange: () => clearErrors("value"),
+          })}
+        />
+        <ErrorMessage error={errors.value} />
+      </div>
+    ),
+    onSubmit && wrapHandleSubmit(handleSubmit, onSubmit),
+  );
 };
 
 export const TextAreaStep: React.FC<StepParams & InputProps> = ({
   id,
   schema,
   existingData,
+  onChange,
   onSubmit,
-  renderLayout: renderStep,
+  renderLayout,
 }) => {
   const formSchema = z.object({
     value: schema,
@@ -171,23 +190,28 @@ export const TextAreaStep: React.FC<StepParams & InputProps> = ({
     resolver: zodResolver(formSchema),
   });
 
-  return renderStep(wrapSubmit(handleSubmit, onSubmit), isValid, () => (
-    <div className="tw-flex tw-flex-col tw-items-center">
-      <textarea
-        key={id}
-        className="tw-flex tw-py-3 tw-px-3 tw-w-full tw-outline-0 tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-text-base tw-justify-center focus-within:tw-border-2 focus-within:tw-border-blue-700 focus-within:tw-m-[-1px] focus-within:tw-px-[11px] tw-cursor-text"
-        {...register("value", {
-          onChange: () => clearErrors("value"),
-        })}
-      />
-      <ErrorMessage error={errors.value} />
-    </div>
-  ));
+  return renderLayout(
+    isValid,
+    () => (
+      <div className="tw-flex tw-flex-col tw-items-center">
+        <textarea
+          key={id}
+          className="tw-flex tw-py-3 tw-px-3 tw-w-full tw-outline-0 tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-text-base tw-justify-center focus-within:tw-border-2 focus-within:tw-border-blue-700 focus-within:tw-m-[-1px] focus-within:tw-px-[11px] tw-cursor-text"
+          {...register("value", {
+            onChange: () => clearErrors("value"),
+          })}
+        />
+        <ErrorMessage error={errors.value} />
+      </div>
+    ),
+    onSubmit && wrapHandleSubmit(handleSubmit, onSubmit),
+  );
 };
 
 type SelectorProps = {
   schema: ZodEnum<[string, ...string[]]>;
-  onSubmit: (data: string) => Promise<SubmitResult>;
+  onChange?: (data: string) => void;
+  onSubmit?: (data: string) => Promise<SubmitResult>;
   existingData?: string;
   placeholder?: string;
 };
@@ -197,18 +221,12 @@ export const SelectorStep: React.FC<StepParams & SelectorProps> = ({
   schema,
   existingData,
   onSubmit,
-  renderLayout: renderStep,
+  onChange,
+  renderLayout,
 }) => {
   type schemaType = z.infer<typeof schema>;
   const [selected, setSelected] = useState<schemaType | null>(existingData || null);
-  return renderStep(
-    async () => {
-      if (selected) {
-        return onSubmit(selected);
-      } else {
-        return { success: false, error: "" };
-      }
-    },
+  return renderLayout(
     selected !== null,
     () => (
       <div key={id} className="tw-flex tw-flex-col tw-items-center">
@@ -219,11 +237,14 @@ export const SelectorStep: React.FC<StepParams & SelectorProps> = ({
               "tw-flex tw-justify-between tw-items-center tw-w-full tw-min-h-[56px] tw-px-4 tw-my-1 tw-rounded-lg tw-border tw-border-solid tw-border-gray-300 sm:hover:tw-border-black tw-cursor-pointer tw-select-none",
               option === selected && "tw-border-black",
             )}
-            onClick={() => {
+            onClick={async () => {
               if (option === selected) {
                 setSelected(null);
               } else {
                 setSelected(option);
+                if (onChange) {
+                  await onChange(option); // only call on change when a valid value is selected
+                }
               }
             }}
           >
@@ -237,6 +258,7 @@ export const SelectorStep: React.FC<StepParams & SelectorProps> = ({
         ))}
       </div>
     ),
+    onSubmit && wrapSubmit(selected, selected !== null, onSubmit),
   );
 };
 
@@ -259,14 +281,27 @@ export const ErrorMessage: React.FC<{ error: FieldError | undefined }> = ({ erro
 };
 
 // Convenience function to ensure a remote caller of onSubmit can await the result of the function
-export const wrapSubmit = (handleSubmit: UseFormHandleSubmit<any>, onSubmit: (data: any) => Promise<SubmitResult>) => {
+export const wrapHandleSubmit = (
+  handleSubmit: UseFormHandleSubmit<{ value: any }>,
+  onSubmit: (data: any) => Promise<SubmitResult>,
+) => {
   return async () => {
     let result = { success: true };
     await handleSubmit(async (data) => {
-      const innerResult = await onSubmit(data);
+      const innerResult = await onSubmit(data.value);
       result = { ...innerResult };
     })();
 
     return result;
+  };
+};
+
+export const wrapSubmit = (value: any, isValid: boolean, onSubmit: (data: any) => Promise<SubmitResult>) => {
+  return async () => {
+    if (isValid) {
+      return onSubmit(value);
+    } else {
+      return { success: false, error: "" };
+    }
   };
 };

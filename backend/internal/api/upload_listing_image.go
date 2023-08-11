@@ -15,7 +15,7 @@ import (
 	"go.fabra.io/server/common/repositories/listings"
 )
 
-var SUPPORTED_IMAGE_TYPES = map[string]bool{"image/jpeg": true, "image/png": true, "image/gif": true}
+var SUPPORTED_IMAGE_TYPES = map[string]bool{"image/jpeg": true, "image/png": true, "image/gif": true, "image/svg+xml": true}
 
 func (s ApiService) UploadListingImage(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)

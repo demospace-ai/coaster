@@ -32,6 +32,15 @@ export function forceError(maybe: Error | unknown | string | null): Error | null
   }
 }
 
+export function forceErrorMessage(maybe: Error | unknown | string | null): string {
+  const error = forceError(maybe);
+  if (error) {
+    return error.message;
+  } else {
+    return "Unknown error";
+  }
+}
+
 export function consumeError(error: Error | unknown, opts: { message?: string } = {}) {
   let e;
   let payload;

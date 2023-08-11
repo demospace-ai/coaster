@@ -3,13 +3,23 @@ import { consumeError } from "src/utils/errors";
 
 type AsyncFunction<Data = any, Args = any> = (variables?: Args) => Promise<Data>;
 
+export type MutationResult<Args = any> = {
+  mutate: AsyncFunction<void, Args>;
+  error: Error | null;
+  isLoading: boolean;
+  isSuccess: boolean;
+  isFailed: boolean;
+  data: any;
+  reset: () => void;
+};
+
 export function useMutation<Data = any, Args = any>(
   mutationFn: AsyncFunction<Data, Args>,
   opts: { onSuccess?: (data: Data) => void; onError?: (err: Error) => void } = {
     onSuccess: () => {},
     onError: () => {},
   },
-) {
+): MutationResult<Args> {
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<Data | undefined>();

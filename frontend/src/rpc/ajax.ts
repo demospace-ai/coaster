@@ -6,14 +6,6 @@ import { HttpError } from "src/utils/errors";
 
 const ROOT_DOMAIN = isProd() ? "https://api.trycoaster.com" : "http://localhost:8080";
 
-export async function sendLinkTokenRequest<RequestType extends Record<string, any>, ResponseType>(
-  endpoint: IEndpoint<RequestType, ResponseType>,
-  linkToken: string,
-  payload?: RequestType,
-): Promise<ResponseType> {
-  return sendRequest(endpoint, payload, [["X-LINK-TOKEN", linkToken]]);
-}
-
 export function getEndpointUrl<RequestType extends Record<string, any>, ResponseType>(
   endpoint: IEndpoint<RequestType, ResponseType>,
   payload?: RequestType,
@@ -35,30 +27,40 @@ export function getEndpointUrl<RequestType extends Record<string, any>, Response
   return url.toString();
 }
 
-export async function sendRequest<RequestType extends Record<string, any>, ResponseType>(
-  endpoint: IEndpoint<RequestType, ResponseType>,
-  payload?: RequestType,
-  extraHeaders?: [string, string][],
+export async function sendRequest<
+  RequestType extends Record<string, any>,
+  ResponseType,
+  PathParams extends Record<string, any>,
+  QueryParams extends Record<string, any>,
+>(
+  endpoint: IEndpoint<RequestType, ResponseType, PathParams, QueryParams>,
+  opts?: {
+    payload?: RequestType;
+    extraHeaders?: [string, string][];
+    pathParams?: PathParams;
+    queryParams?: QueryParams;
+    formData?: FormData;
+  },
 ): Promise<ResponseType> {
   const toPath = compile(endpoint.path);
-  const path = toPath(payload);
+  const path = toPath(opts?.pathParams);
 
   const url = new URL(ROOT_DOMAIN + path);
-  if (endpoint.queryParams && payload) {
+  if (endpoint.queryParams && opts?.queryParams) {
+    const queryParams = opts?.queryParams;
     endpoint.queryParams.forEach((queryParam) => {
-      const queryParamValue = payload[queryParam];
+      const queryParamValue = queryParams[queryParam];
       if (queryParamValue) {
         url.searchParams.append(queryParam, queryParamValue);
       }
     });
   }
 
-  const extraHeadersList = extraHeaders ? extraHeaders : [];
-  const headers = new Headers([
-    ["Content-Type", "application/json"],
-    ["X-TIME-ZONE", Intl.DateTimeFormat().resolvedOptions().timeZone],
-    ...extraHeadersList,
-  ]);
+  const extraHeadersList = opts?.extraHeaders ? opts?.extraHeaders : [];
+  const headers = new Headers([["X-TIME-ZONE", Intl.DateTimeFormat().resolvedOptions().timeZone], ...extraHeadersList]);
+  if (!opts?.formData) {
+    headers.append("Content-Type", "application/json");
+  }
   let options: RequestInit = {
     method: endpoint.method,
     headers: headers,
@@ -66,7 +68,11 @@ export async function sendRequest<RequestType extends Record<string, any>, Respo
   };
 
   if (["POST", "PATCH", "PUT"].includes(endpoint.method)) {
-    options.body = JSON.stringify(payload);
+    if (opts?.formData) {
+      options.body = opts?.formData;
+    } else {
+      options.body = JSON.stringify(opts?.payload);
+    }
   }
 
   const response = await fetch(url, options);

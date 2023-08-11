@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Loading } from "src/components/loading/Loading";
 import { useListing } from "src/rpc/data";
@@ -8,7 +7,6 @@ import { toTitleCase } from "src/utils/string";
 export const Listing: React.FC = () => {
   const { listingID } = useParams<{ listingID: string }>();
   const { listing, error } = useListing(Number(listingID));
-  const [file, setFile] = useState<File | null>(null);
 
   if (!listing) {
     if (!error) {
@@ -41,39 +39,10 @@ export const Listing: React.FC = () => {
         </div>
         <span className="tw-mt-3 tw-font-semibold sm:tw-font-bold tw-text-3xl sm:tw-text-4xl">{listing.name}</span>
         <span className="tw-mt-3 tw-font-medium tw-text-base">
-          {listing.location} • {toTitleCase(listing.category)}
+          {listing.location} • {toTitleCase(listing.category ? listing.category : "")}
         </span>
         <span className="tw-mt-4 tw-text-base">{listing.description}</span>
       </div>
     </div>
   );
 };
-
-/*
-How to upload file
-
-const [file, setFile] = useState<File | null>(null);
-
-<input
-  type="file"
-  onChange={(event: FormEvent<HTMLInputElement>) => {
-    if (event.currentTarget && event.currentTarget.files) setFile(event.currentTarget.files[0]);
-  }}
-/>
-<button
-  onClick={() => {
-    if (file) {
-      const formData = new FormData();
-      formData.append("listing_image", file);
-      fetch(`http://localhost:8080/listings/${listingID}/image`, {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-      });
-    }
-  }}
->
-  Upload
-</button>
-
-*/

@@ -1,6 +1,13 @@
-import { CheckSessionResponse, Listing, LoginRequest, LoginResponse, OAuthProvider } from "src/rpc/types";
+import {
+  CheckSessionResponse,
+  Listing,
+  ListingUpdates,
+  LoginRequest,
+  LoginResponse,
+  OAuthProvider,
+} from "src/rpc/types";
 
-export interface IEndpoint<RequestType, ResponseType> {
+export interface IEndpoint<RequestType, ResponseType, PathParams = {}, QueryParams = {}> {
   name: string;
   method: "GET" | "POST" | "DELETE" | "PUT" | "PATCH";
   path: string;
@@ -22,10 +29,28 @@ export const SearchListings: IEndpoint<{ location?: string; radius?: number }, L
   queryParams: ["location", "radius"],
 };
 
-export const GetListing: IEndpoint<{ listingID: number }, Listing> = {
+export const GetListing: IEndpoint<undefined, Listing, { listingID: number }> = {
   name: "Get listing",
   method: "GET",
   path: "/listings/:listingID",
+};
+
+export const GetNewListing: IEndpoint<undefined, Listing> = {
+  name: "Get new listing",
+  method: "GET",
+  path: "/listings/new",
+};
+
+export const UpdateListing: IEndpoint<ListingUpdates, Listing, { listingID: number }> = {
+  name: "Update listing",
+  method: "POST",
+  path: "/listings/:listingID",
+};
+
+export const UploadListingImage: IEndpoint<undefined, Listing, { listingID: number }> = {
+  name: "Upload listing image",
+  method: "POST",
+  path: "/listings/:listingID/image",
 };
 
 export const GetFeaturedListings: IEndpoint<undefined, Listing[]> = {
