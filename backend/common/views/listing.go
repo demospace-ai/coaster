@@ -12,7 +12,13 @@ type Listing struct {
 	Category    models.Category `json:"category"`
 	Price       int64           `json:"price"`
 	Location    string          `json:"location"`
+	Coordinates Coordinates     `json:"coordinates"`
 	Images      []string        `json:"images"`
+}
+
+type Coordinates struct {
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
 }
 
 func ConvertListings(listings []listings.ListingAndImages) []Listing {
@@ -32,6 +38,7 @@ func ConvertListing(listing listings.ListingAndImages) Listing {
 		Category:    listing.Category,
 		Price:       listing.Price,
 		Location:    listing.Location,
+		Coordinates: Coordinates{Latitude: listing.Coordinates.Latitude, Longitude: listing.Coordinates.Longitude},
 		Images:      ConvertImages(listing.Images),
 	}
 }

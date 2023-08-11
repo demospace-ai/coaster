@@ -144,7 +144,7 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
 };
 
 export const InlineMapSearch: React.FC<{
-  onSubmit?: (input: string) => void;
+  onSelect?: (input: string) => void;
   initial?: string;
 }> = (props) => {
   const [query, setQuery] = useState(props.initial ? props.initial : "");
@@ -168,8 +168,8 @@ export const InlineMapSearch: React.FC<{
 
   const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
 
-  const onSubmit = (input: string) => {
-    props.onSubmit && props.onSubmit(input);
+  const onSelect = (input: string) => {
+    props.onSelect && props.onSelect(input);
     setActive(false);
   };
 
@@ -180,7 +180,7 @@ export const InlineMapSearch: React.FC<{
         className="tw-flex tw-w-full tw-p-0 sm:tw-mt-0"
         onSubmit={(e: FormEvent) => {
           e.preventDefault();
-          onSubmit(query);
+          onSelect(query);
         }}
         {...getReferenceProps({
           onClick() {
@@ -226,7 +226,7 @@ export const InlineMapSearch: React.FC<{
           >
             <div className="tw-absolute tw-z-20 tw-mt-0 tw-min-w-full tw-max-h-80 tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-sm tw-text-black tw-shadow-lg tw-border tw-border-solid tw-border-slate-300">
               <MapsWrapper>
-                <Suggestions query={query} setQuery={setQuery} onSubmit={onSubmit} />
+                <Suggestions query={query} setQuery={setQuery} onSubmit={onSelect} />
               </MapsWrapper>
             </div>
           </Transition>

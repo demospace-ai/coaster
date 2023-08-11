@@ -26,8 +26,11 @@ export interface Listing {
   category: CategoryType;
   price: number;
   location: string;
+  coordinates: Coordinates;
   images: string[];
 }
+
+export type Coordinates = { latitude: number; longitude: number };
 
 export enum OAuthProvider {
   Google = "google",
