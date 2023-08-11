@@ -93,6 +93,10 @@ const nameStep = (params: StepParams) => {
       schema={NameSchema}
       existingData={listing.name}
       onSubmit={async (data: string) => {
+        if (data === listing.name) {
+          // No API call needed if previous value was the same
+          return { success: true };
+        }
         return updateListing(listing.id, { name: data });
       }}
     />
@@ -111,6 +115,10 @@ const descriptionStep = (params: StepParams) => {
       schema={DescriptionSchema}
       existingData={listing.description}
       onSubmit={async (data: string) => {
+        if (data === listing.description) {
+          // No API call needed if previous value was the same
+          return { success: true };
+        }
         return updateListing(listing.id, { description: data });
       }}
     />
@@ -206,6 +214,10 @@ const PriceStep: React.FC<StepParams & PriceParams> = ({ listing, renderLayout }
 
   // TODO: do we want to update on change too?
   const updatePrice = async (data: number) => {
+    if (data === listing.price) {
+      // No API call needed if previous value was the same
+      return { success: true };
+    }
     return updateListing(listing.id, { price: data });
   };
 
@@ -258,7 +270,7 @@ const ImageStep: React.FC<StepParams & ImageParams> = ({ renderLayout, listing }
   const ref = useRef<HTMLInputElement | null>(null);
   const isValid = listing.images.length > 2;
 
-  // TODO: validate size and type of file
+  // TODO: validate size and type of file on frontend
 
   const listingID = listing.id;
   const addImage = async (e: FormEvent<HTMLInputElement>) => {
