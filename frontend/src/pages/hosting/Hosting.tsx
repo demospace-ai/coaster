@@ -16,7 +16,7 @@ export const Hosting: React.FC = () => {
   }
 
   return (
-    <div className="tw-p-10 tw-overflow-scroll">
+    <div className="tw-pt-6 sm:tw-pt-8 tw-pb-24 tw-px-8 sm:tw-px-20 tw-overflow-scroll">
       <div className="tw-mb-4 tw-font-bold tw-text-2xl">Your listings</div>
       {hosted.map((listing: Listing) => (
         <div

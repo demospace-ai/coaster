@@ -63,7 +63,7 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
   return (
     <div className="tw-flex sm:tw-flex-1 tw-justify-center tw-items-center tw-h-full">
       <MagnifyingGlassIcon
-        className="tw-flex sm:tw-hidden tw-cursor-pointer tw-ml-3 tw-w-6"
+        className="tw-flex sm:tw-hidden tw-cursor-pointer tw-ml-3 tw-w-6 tw-text-gray-500"
         onClick={() => {
           setActive(true);
           inputRef.current?.focus();
@@ -102,11 +102,11 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
       >
         <div
           className={mergeClasses(
-            "tw-flex tw-w-0 tw-rounded-[50px] tw-bg-white tw-shadow-centered-md sm:tw-ring-1 tw-ring-slate-300 tw-relative tw-z-20 sm:tw-w-[25vw] tw-transition-all tw-duration-100",
+            "tw-flex tw-w-0 tw-rounded-[50px] tw-bg-white sm:tw-ring-1 tw-ring-slate-300 tw-relative tw-z-20 sm:tw-w-[25vw] tw-transition-all tw-duration-100",
             active && "tw-w-full sm:tw-w-[50vw] tw-rounded-lg",
           )}
         >
-          <MagnifyingGlassIcon className="tw-cursor-pointer tw-ml-3 tw-w-5" />
+          <MagnifyingGlassIcon className="tw-cursor-pointer tw-ml-3 tw-w-5 tw-text-gray-500" />
           <input
             ref={inputRef}
             className="tw-inline tw-placeholder-gray-600 tw-w-full tw-bg-transparent tw-py-4 sm:tw-py-3 tw-px-3 tw-text-sm tw-leading-5 tw-outline-none tw-text-slate-900 tw-text-ellipsis tw-cursor-pointer tw-transition tw-duration-100"
