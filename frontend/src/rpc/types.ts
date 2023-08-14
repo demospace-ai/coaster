@@ -36,6 +36,13 @@ export interface ListingUpdates {
   category?: CategoryType;
   price?: number;
   location?: string;
+  status?: ListingStatus;
+}
+
+export enum ListingStatus {
+  Published = "published",
+  Draft = "draft",
+  Review = "review",
 }
 
 export type Coordinates = { latitude: number; longitude: number };

@@ -6,6 +6,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { MapSearch } from "src/components/maps/Maps";
 import { useLogout } from "src/pages/login/actions";
 import { useSelector } from "src/root/model";
+import { useHostedListings } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
 
 export const Header: React.FC = () => {
@@ -34,15 +35,25 @@ const LogoLink: React.FC = () => {
 
 const ProfileDropdown: React.FC = () => {
   const isAuthenticated = useSelector((state) => state.login.authenticated);
+  const { hosted } = useHostedListings();
   return (
     <div className="tw-flex sm:tw-flex-[0.5_0.5_0%] lg:tw-flex-1 tw-justify-end">
       <div className="tw-hidden lg:tw-flex">
-        <NavLink
-          className="tw-hidden xl:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
-          to="/listings/new"
-        >
-          List your experience
-        </NavLink>
+        {hosted && hosted.length > 0 ? (
+          <NavLink
+            className="tw-hidden xl:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
+            to="/hosting"
+          >
+            Switch to hosting
+          </NavLink>
+        ) : (
+          <NavLink
+            className="tw-hidden xl:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
+            to="/listings/new"
+          >
+            List your experience
+          </NavLink>
+        )}
         <div className="tw-flex tw-flex-col tw-justify-center">
           {isAuthenticated ? <SignedInMenu /> : <SignedOutMenu />}
         </div>
@@ -55,8 +66,10 @@ const ProfileDropdown: React.FC = () => {
 
 const SignedInMenu: React.FC = () => {
   const user = useSelector((state) => state.login.user);
+  const { hosted } = useHostedListings();
   const logout = useLogout();
   const menuItem = "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded";
+  const navItem = "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded";
 
   return (
     <Menu as="div">
@@ -96,6 +109,19 @@ const SignedInMenu: React.FC = () => {
                         <p className="tw-truncate tw-text-sm tw-text-slate-900">{user?.email}</p>
                       </div>
                     </div>
+                  )}
+                </Menu.Item>
+              </div>
+              <div className="tw-m-2 tw-pt-2">
+                <Menu.Item>
+                  {hosted && hosted.length > 0 ? (
+                    <NavLink className={navItem} to="/hosting">
+                      Switch to hosting
+                    </NavLink>
+                  ) : (
+                    <NavLink className={navItem} to="/listings/new">
+                      List your experience
+                    </NavLink>
                   )}
                 </Menu.Item>
               </div>
@@ -142,10 +168,11 @@ const SignedOutMenu: React.FC = () => {
 const MobileMenu: React.FC = () => {
   const navigate = useNavigate();
   const isAuthenticated = useSelector((state) => state.login.authenticated);
+  const { hosted } = useHostedListings();
   const user = useSelector((state) => state.login.user);
   const logout = useLogout();
-  const menuItem =
-    "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded tw-mb-4";
+  const menuItem = "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-select-none tw-rounded";
+  const navItem = "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-select-none";
   const [open, setOpen] = useState(false);
   const buttonStyle =
     "tw-flex tw-justify-center tw-py-2 tw-w-full tw-cursor-pointer tw-select-none tw-whitespace-nowrap tw-rounded-3xl sm:tw-font-semibold tw-text-base tw-bg-gray-100 hover:tw-bg-gray-200";
@@ -171,29 +198,37 @@ const MobileMenu: React.FC = () => {
                     <div className="tw-flex tw-h-full tw-flex-col tw-overflow-y-scroll tw-bg-white tw-py-6 tw-shadow-xl">
                       <div className="tw-px-4 sm:tw-px-6">
                         <div className="tw-flex tw-items-start tw-justify-between">
-                          <div className="tw-ml-3 tw-flex tw-h-7 tw-items-center">
+                          <div className="tw-ml-1 tw-flex tw-h-7 tw-items-center">
                             <button
                               type="button"
                               className="tw-relative tw-text-gray-400 tw-outline-none"
                               onClick={() => setOpen(false)}
                             >
-                              <span className="tw-absolute tw-inset-2.5" />
                               <span className="tw-sr-only">Close panel</span>
                               <XMarkIcon className="tw-h-6 tw-w-6" aria-hidden="true" />
                             </button>
                           </div>
                         </div>
                       </div>
-                      <div className="tw-relative tw-mt-6 tw-flex-1 tw-px-4 sm:tw-px-6">
+                      <div className="tw-relative tw-mt-6 tw-h-full tw-px-4 sm:tw-px-6">
                         {isAuthenticated ? (
-                          <div>
+                          <div className="tw-h-full">
                             <div className={menuItem}>
                               <p className="tw-truncate tw-text-lg tw-font-semibold tw-text-slate-900">
                                 Welcome, {user?.name}
                               </p>
                             </div>
+                            {hosted && hosted.length > 0 ? (
+                              <NavLink className={navItem} to="/hosting">
+                                Switch to hosting
+                              </NavLink>
+                            ) : (
+                              <NavLink className={navItem} to="/listings/new">
+                                List your experience
+                              </NavLink>
+                            )}
                             <div
-                              className={buttonStyle}
+                              className={mergeClasses(buttonStyle, "tw-mt-10")}
                               onClick={() => {
                                 logout();
                                 setOpen(false);

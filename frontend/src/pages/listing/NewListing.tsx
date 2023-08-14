@@ -2,6 +2,7 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormEvent, useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import {
   ErrorMessage,
   InputStep,
@@ -19,17 +20,22 @@ import { CategorySchema, DescriptionSchema, NameSchema, PriceSchema } from "src/
 import { sendRequest } from "src/rpc/ajax";
 import { GetListing, GetNewListing, UploadListingImage } from "src/rpc/api";
 import { updateListing, useNewListing, useUpdateListing } from "src/rpc/data";
-import { CategoryType, Coordinates, Listing } from "src/rpc/types";
+import { CategoryType, Coordinates, Listing, ListingStatus } from "src/rpc/types";
 import { getGcsImageUrl } from "src/utils/images";
 import { mutate } from "swr";
 import { z } from "zod";
 
 export const NewListing: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="tw-w-full tw-flex tw-justify-center">
       <div className="tw-flex tw-px-8 sm:tw-px-0 tw-w-[500px] tw-min-h-[600px] tw-mt-10 tw-items-center tw-pb-24 tw-overflow-scroll">
         <MultiStep
           id="new-listing"
+          onComplete={() => {
+            navigate("/hosting");
+          }}
           steps={[
             { id: "category", elementFn: categoryStep, title: "What kind of experience do you want to host?" },
             { id: "location", elementFn: locationStep, title: "Where is your adventure located?" },
@@ -52,6 +58,12 @@ export const NewListing: React.FC = () => {
               subtitle: "Show off your trip with at least three images.",
             },
             { id: "price", elementFn: priceStep, title: "Set a price", subtitle: "You can change it anytime." },
+            {
+              id: "review",
+              elementFn: reviewStep,
+              title: "Review your listing",
+              subtitle: "Here's what we'll show to guests. Make sure everything looks good.",
+            },
           ]}
         />
       </div>
@@ -155,6 +167,32 @@ const imageStep = (params: StepParams) => {
   }
 
   return <ImageStep key={JSON.stringify(listing.images)} {...params} listing={listing} />;
+};
+
+const reviewStep = (params: StepParams) => {
+  const { listing } = useNewListing();
+  if (!listing) {
+    return <Loading />;
+  }
+
+  return params.renderLayout(
+    true,
+    () => (
+      <div className="tw-flex tw-flex-col tw-items-center tw-pb-6">
+        <div className="tw-p-8 tw-shadow-centered-md tw-rounded-xl">
+          <img
+            src={getGcsImageUrl(listing.images[0])}
+            alt="preview-cover"
+            className="tw-rounded-lg tw-aspect-square tw-object-cover tw-w-80"
+          />
+          <div className="tw-mt-4 tw-font-bold tw-text-xl">{listing.name}</div>
+          <div className="tw-mt-1 tw-font-medium">{listing.location}</div>
+          <div className="tw-mt-1">${listing.price} / person</div>
+        </div>
+      </div>
+    ),
+    () => updateListing(listing.id, { status: ListingStatus.Review }),
+  );
 };
 
 const toGoogleCoordinates = (coordinates: Coordinates): google.maps.LatLngLiteral => {
@@ -269,10 +307,10 @@ type ImageParams = {
 const ImageStep: React.FC<StepParams & ImageParams> = ({ renderLayout, listing }) => {
   const ref = useRef<HTMLInputElement | null>(null);
   const isValid = listing.images.length > 2;
+  const listingID = listing.id;
 
   // TODO: validate size and type of file on frontend
 
-  const listingID = listing.id;
   const addImage = async (e: FormEvent<HTMLInputElement>) => {
     if (e.currentTarget && e.currentTarget.files) {
       const formData = new FormData();

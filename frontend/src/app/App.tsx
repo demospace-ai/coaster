@@ -6,6 +6,7 @@ import { Header } from "src/components/header/Header";
 import { LogoLoading } from "src/components/loading/LogoLoading";
 import { Toast, getToastContentFromDetails } from "src/components/notifications/Notifications";
 import { Home } from "src/pages/home/Home";
+import { Hosting } from "src/pages/hosting/Hosting";
 import { Listing } from "src/pages/listing/Listing";
 import { NewListing } from "src/pages/listing/NewListing";
 import { Login, Unauthorized } from "src/pages/login/Login";
@@ -101,6 +102,7 @@ export const router = createBrowserRouter(
       <Route path="/search" element={<Search />} />
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/terms" element={<Terms />} />
+      <Route path="/hosting" element={<Hosting />} />
       <Route path="/listings/:listingID" element={<Listing />} />
       <Route path="/listings/new" element={<RequireAuth element={<NewListing />} />} />
       <Route path="/" element={<Home />} />

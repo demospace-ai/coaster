@@ -7,7 +7,7 @@ import { toTitleCase } from "src/utils/string";
 import { mergeClasses } from "src/utils/twmerge";
 import { ZodEnum, ZodString, z } from "zod";
 
-export const MultiStep: React.FC<MultiStepProps> = ({ id, steps }) => {
+export const MultiStep: React.FC<MultiStepProps> = ({ id, steps, onComplete }) => {
   const [currentStepNumber, setCurrentStepNumber] = useLocalStorage<number>(id + "-step", 0);
 
   const isFirstStep = currentStepNumber === 0;
@@ -27,14 +27,18 @@ export const MultiStep: React.FC<MultiStepProps> = ({ id, steps }) => {
       }
 
       if (!submit) {
-        setCurrentStepNumber(currentStepNumber + 1);
+        if (isLastStep) {
+          onComplete();
+        } else {
+          setCurrentStepNumber(currentStepNumber + 1);
+        }
         return;
       }
 
       const result = await submit();
       if (result.success) {
         if (isLastStep) {
-          console.log("submit"); // TODO
+          onComplete();
         } else {
           setCurrentStepNumber(currentStepNumber + 1);
         }
@@ -99,6 +103,7 @@ export const MultiStep: React.FC<MultiStepProps> = ({ id, steps }) => {
 export type MultiStepProps = {
   id: string;
   steps: Step[];
+  onComplete: () => void;
 };
 
 export type Step = {

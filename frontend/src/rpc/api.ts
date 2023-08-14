@@ -59,6 +59,12 @@ export const GetFeaturedListings: IEndpoint<undefined, Listing[]> = {
   path: "/featured",
 };
 
+export const GetHostedListings: IEndpoint<undefined, Listing[]> = {
+  name: "Get hosted listings",
+  method: "GET",
+  path: "/listings/hosted",
+};
+
 export const Login: IEndpoint<LoginRequest, LoginResponse> = {
   name: "Login",
   method: "POST",

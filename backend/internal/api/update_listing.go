@@ -21,6 +21,7 @@ type UpdateListingRequest struct {
 	Category    *models.ListingCategory `json:"category"`
 	Price       *int64                  `json:"price"`
 	Location    *string                 `json:"location"`
+	Status      *models.ListingStatus   `json:"status"`
 }
 
 type UpdateListingResponse struct {
@@ -52,7 +53,7 @@ func (s ApiService) UpdateListing(auth auth.Authentication, w http.ResponseWrite
 		return errors.Wrap(err, "(api.UpdateListing) validating request")
 	}
 
-	listing, err := listings.LoadUserListingByID(s.db, auth.User.ID, listingID)
+	listing, err := listings.LoadByUserAndID(s.db, auth.User.ID, listingID)
 	if err != nil {
 		return errors.Wrapf(err, "(api.UpdateListing) loading listing %d for user %d", listingID, auth.User.ID)
 	}
@@ -80,6 +81,7 @@ func (s ApiService) UpdateListing(auth auth.Authentication, w http.ResponseWrite
 		updateListingRequest.Price,
 		location,
 		coordinates,
+		updateListingRequest.Status,
 	)
 	if err != nil {
 		return errors.Wrap(err, "(api.UpdateListing) creating listing")

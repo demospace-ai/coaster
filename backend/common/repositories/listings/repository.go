@@ -35,7 +35,7 @@ func LoadByID(db *gorm.DB, listingID int64) (*ListingAndImages, error) {
 	}, nil
 }
 
-func LoadUserListingByID(db *gorm.DB, userID int64, listingID int64) (*models.Listing, error) {
+func LoadByUserAndID(db *gorm.DB, userID int64, listingID int64) (*models.Listing, error) {
 	var listing models.Listing
 	result := db.Table("listings").
 		Select("listings.*").
@@ -152,7 +152,7 @@ func CreateListing(db *gorm.DB, userID int64, name string, description string, c
 	return &listing, nil
 }
 
-func UpdateListing(db *gorm.DB, listing *models.Listing, name *string, description *string, category *models.ListingCategory, price *int64, location *string, coordinates *geo.Point) (*models.Listing, error) {
+func UpdateListing(db *gorm.DB, listing *models.Listing, name *string, description *string, category *models.ListingCategory, price *int64, location *string, coordinates *geo.Point, status *models.ListingStatus) (*models.Listing, error) {
 	if name != nil {
 		listing.Name = name
 	}
@@ -172,6 +172,11 @@ func UpdateListing(db *gorm.DB, listing *models.Listing, name *string, descripti
 	if location != nil && coordinates != nil {
 		listing.Location = location
 		listing.Coordinates = coordinates
+	}
+
+	// TODO: only admins can make the status published
+	if status != nil && *status != models.ListingStatusPublished {
+		listing.Status = *status
 	}
 
 	result := db.Save(&listing)

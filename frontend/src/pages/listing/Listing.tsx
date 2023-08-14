@@ -12,6 +12,7 @@ export const Listing: React.FC = () => {
     if (!error) {
       return <Loading />;
     } else {
+      console.log(error);
       return <div>Something unexpected happened.</div>;
     }
   }
