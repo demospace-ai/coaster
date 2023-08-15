@@ -12,13 +12,12 @@ export const Listing: React.FC = () => {
     if (!error) {
       return <Loading />;
     } else {
-      console.log(error);
       return <div>Something unexpected happened.</div>;
     }
   }
 
   return (
-    <div className="tw-overflow-scroll">
+    <div className="tw-overflow-scroll tw-h-full">
       <div className="tw-flex tw-flex-col tw-px-5 tw-pt-10 tw-pb-20 sm:tw-py-20 sm:tw-px-[5rem] lg:tw-px-[10rem] lg:tw-max-w-[90rem] lg:tw-mx-auto">
         <div className="tw-flex tw-max-h-[50vh] tw-rounded-xl tw-overflow-clip tw-mb-5">
           <div className="tw-flex tw-w-full sm:tw-w-3/4 sm:tw-mr-2">

@@ -52,8 +52,6 @@ func (s ApiService) OAuthLogin(w http.ResponseWriter, r *http.Request) error {
 	switch *provider {
 	case oauth.OauthProviderGoogle:
 		externalUserInfo, err = oauth.FetchGoogleInfo(code)
-	case oauth.OauthProviderGithub:
-		externalUserInfo, err = oauth.FetchGithubInfo(code)
 	default:
 		return errors.Newf("(api.OAuthLogin) unexpected provider %s", *provider)
 	}

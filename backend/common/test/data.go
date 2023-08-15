@@ -11,7 +11,8 @@ import (
 
 func CreateUser(db *gorm.DB) *models.User {
 	user := models.User{
-		Name:              "Test Test",
+		FirstName:         "Test",
+		LastName:          "User",
 		Email:             "test@trycoaster.com",
 		ProfilePictureURL: "",
 	}

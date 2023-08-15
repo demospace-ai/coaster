@@ -82,9 +82,16 @@ const SignedInMenu: React.FC = () => {
             )}
           >
             <Bars3Icon className="tw-w-5 tw-h-5 tw-mr-2" />
-            <div className="tw-bg-orange-400 tw-text-white tw-rounded-full tw-w-7 tw-h-7 tw-flex tw-justify-center tw-items-center">
-              {user!.name.charAt(0)}
-            </div>
+            {user?.profile_picture_url ? (
+              <img
+                src={user.profile_picture_url}
+                className="tw-rounded-full tw-w-7 tw-h-7 tw-select-none tw-flex tw-items-center tw-justify-center"
+              />
+            ) : (
+              <div className="tw-bg-orange-400 tw-text-white tw-rounded-full tw-w-7 tw-h-7 tw-flex tw-justify-center tw-items-center">
+                {user!.first_name.charAt(0)}
+              </div>
+            )}
           </Menu.Button>
           <Transition
             as={Fragment}
@@ -101,18 +108,27 @@ const SignedInMenu: React.FC = () => {
                 <Menu.Item>
                   {({ active }) => (
                     <div className={classNames(active && "tw-bg-slate-200 tw-text-slate-900", menuItem, "tw-pl-2")}>
-                      <div className="tw-bg-slate-400 tw-text-white tw-rounded-full tw-w-7 tw-h-7 tw-select-none tw-flex tw-items-center tw-justify-center tw-mr-3">
-                        {user!.name.charAt(0)}
-                      </div>
+                      {user?.profile_picture_url ? (
+                        <img
+                          src={user.profile_picture_url}
+                          className="tw-rounded-full tw-w-7 tw-h-7 tw-select-none tw-flex tw-items-center tw-justify-center tw-mr-3"
+                        />
+                      ) : (
+                        <div className="tw-bg-slate-400 tw-text-white tw-rounded-full tw-w-7 tw-h-7 tw-select-none tw-flex tw-items-center tw-justify-center tw-mr-3">
+                          {user!.first_name.charAt(0)}
+                        </div>
+                      )}
                       <div className="tw-flex tw-flex-col">
-                        <p className="tw-truncate tw-text-sm tw-font-semibold tw-text-slate-900">{user?.name}</p>
+                        <p className="tw-truncate tw-text-sm tw-font-semibold tw-text-slate-900">
+                          {user?.first_name} {user?.last_name}
+                        </p>
                         <p className="tw-truncate tw-text-sm tw-text-slate-900">{user?.email}</p>
                       </div>
                     </div>
                   )}
                 </Menu.Item>
               </div>
-              <div className="tw-m-2 tw-pt-2">
+              <div className="tw-flex xl:tw-hidden tw-m-2 tw-pt-2">
                 <Menu.Item>
                   {hosted && hosted.length > 0 ? (
                     <NavLink className={navItem} to="/hosting">
@@ -215,7 +231,7 @@ const MobileMenu: React.FC = () => {
                           <div className="tw-h-full">
                             <div className={menuItem}>
                               <p className="tw-truncate tw-text-lg tw-font-semibold tw-text-slate-900">
-                                Welcome, {user?.name}
+                                Welcome, {user?.first_name}
                               </p>
                             </div>
                             {hosted && hosted.length > 0 ? (

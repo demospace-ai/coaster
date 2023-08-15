@@ -1,7 +1,6 @@
 import classNames from "classnames";
 import React, { useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { GithubIcon } from "src/components/icons/Github";
 import { GoogleIcon } from "src/components/icons/Google";
 import longlogo from "src/components/images/long-logo.svg";
 import mail from "src/components/images/mail.svg";
@@ -70,15 +69,6 @@ const StartContent: React.FC<{ create?: boolean }> = ({ create }) => {
       >
         <GoogleIcon className="tw-mr-1.5 tw-h-[18px]" />
         Continue with Google
-      </a>
-      <a
-        className={classNames(
-          "tw-flex tw-items-center tw-select-none tw-cursor-pointer tw-justify-center tw-mt-4 tw-h-10 tw-bg-black hover:tw-bg-[#333333] tw-transition-colors tw-font-medium tw-w-80 tw-text-white tw-rounded",
-        )}
-        href={getEndpointUrl(OAuthRedirect, { provider: OAuthProvider.Github })}
-      >
-        <GithubIcon className="tw-mr-2" />
-        Continue with Github
       </a>
       {create ? (
         <div className="tw-mt-5  tw-select-none">

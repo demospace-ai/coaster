@@ -2,12 +2,10 @@ package oauth
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/google/go-github/github"
 	"go.fabra.io/server/common/application"
 	"go.fabra.io/server/common/crypto"
 	"go.fabra.io/server/common/errors"
@@ -15,14 +13,8 @@ import (
 	"golang.org/x/oauth2"
 	"google.golang.org/api/idtoken"
 
-	githuboauth "golang.org/x/oauth2/github"
 	googleoauth "golang.org/x/oauth2/google"
 )
-
-const GITHUB_PRODUCTION_CLIENT_ID = "7eff3cfd664e1e01e19b"
-const GITHUB_PRODUCTION_SECRET_KEY = "projects/454026596701/secrets/github-prod-client-secret/versions/latest"
-const GITHUB_DEVELOPMENT_CLIENT_ID = "f84f670b7af18144af4a"
-const GITHUB_DEVELOPMENT_SECRET_KEY = "projects/86315250181/secrets/github-dev-client-secret/versions/latest"
 
 const GOOGLE_PRODUCTION_CLIENT_ID = "454026596701-bcsu6bfr36alkdpcq7im8rjgmm2cgcnl.apps.googleusercontent.com"
 const GOOGLE_PRODUCTION_SECRET_KEY = "projects/454026596701/secrets/google-prod-client-secret/versions/latest"
@@ -38,66 +30,16 @@ type OauthProvider string
 
 const (
 	OauthProviderGoogle  OauthProvider = "google"
-	OauthProviderGithub  OauthProvider = "github"
 	OauthProviderUnknown OauthProvider = "unknown"
 )
 
 type ExternalUserInfo struct {
-	ExternalID    string
-	OauthProvider OauthProvider
-	Email         string
-	Name          string
-}
-
-func FetchGithubInfo(code string) (*ExternalUserInfo, error) {
-	secretKey := getGithubSecretKey()
-	githubClientSecret, err := secret.FetchSecret(context.TODO(), secretKey)
-	if err != nil {
-		return nil, errors.Wrap(err, "(oauth.FetchGithubInfo) fetching secret")
-	}
-
-	oauthConf := &oauth2.Config{
-		ClientID:     getGithubClientID(),
-		ClientSecret: *githubClientSecret,
-		Scopes:       []string{"user:email", "read:user"},
-		RedirectURL:  getOauthRedirectUrl(),
-		Endpoint:     githuboauth.Endpoint,
-	}
-
-	token, err := oauthConf.Exchange(context.TODO(), code)
-	if err != nil {
-		return nil, errors.Wrap(err, "(oauth.FetchGithubInfo) exchanging code for token")
-	}
-
-	oauthClient := oauthConf.Client(context.TODO(), token)
-	client := github.NewClient(oauthClient)
-	user, _, err := client.Users.Get(context.TODO(), "") // empty string will get info for authenticated user
-	if err != nil {
-		return nil, errors.Wrap(err, "(oauth.FetchGithubInfo) extracting user")
-	}
-
-	emails, _, err := client.Users.ListEmails(context.TODO(), nil)
-	if err != nil {
-		return nil, errors.Wrap(err, "(oauth.FetchGithubInfo) extracting email")
-	}
-
-	var primaryEmail string
-	for _, email := range emails {
-		if *email.Primary {
-			primaryEmail = email.GetEmail()
-		}
-	}
-
-	if primaryEmail == "" {
-		return nil, errors.New("(oauth.FetchGithubInfo) could not find primary email")
-	}
-
-	return &ExternalUserInfo{
-		ExternalID:    fmt.Sprintf("%d", user.GetID()),
-		OauthProvider: OauthProviderGithub,
-		Email:         primaryEmail,
-		Name:          user.GetName(),
-	}, nil
+	ExternalID        string
+	OauthProvider     OauthProvider
+	Email             string
+	FirstName         string
+	LastName          string
+	ProfilePictureURL string
 }
 
 func FetchGoogleInfo(code string) (*ExternalUserInfo, error) {
@@ -138,10 +80,12 @@ func FetchGoogleInfo(code string) (*ExternalUserInfo, error) {
 	}
 
 	return &ExternalUserInfo{
-		ExternalID:    payload.Subject,
-		OauthProvider: OauthProviderGoogle,
-		Email:         payload.Claims["email"].(string),
-		Name:          payload.Claims["name"].(string),
+		ExternalID:        payload.Subject,
+		OauthProvider:     OauthProviderGoogle,
+		Email:             payload.Claims["email"].(string),
+		FirstName:         payload.Claims["given_name"].(string),
+		LastName:          payload.Claims["family_name"].(string),
+		ProfilePictureURL: payload.Claims["picture"].(string),
 	}, nil
 }
 
@@ -156,13 +100,6 @@ func GetOauthRedirect(strProvider string) (*string, error) {
 			Scopes:      []string{"email", "profile", "openid"},
 			RedirectURL: getOauthRedirectUrl(),
 			Endpoint:    googleoauth.Endpoint,
-		}
-	case OauthProviderGithub:
-		oauthConf = &oauth2.Config{
-			ClientID:    getGithubClientID(),
-			Scopes:      []string{"user:email", "read:user"},
-			RedirectURL: getOauthRedirectUrl(),
-			Endpoint:    githuboauth.Endpoint,
 		}
 	default:
 		return nil, errors.Newf("unsupported login method: %s", strProvider)
@@ -206,22 +143,6 @@ func ValidateState(state string) (*OauthProvider, error) {
 	return &claims.Provider, nil
 }
 
-func getGithubSecretKey() string {
-	if application.IsProd() {
-		return GITHUB_PRODUCTION_SECRET_KEY
-	} else {
-		return GITHUB_DEVELOPMENT_SECRET_KEY
-	}
-}
-
-func getGithubClientID() string {
-	if application.IsProd() {
-		return GITHUB_PRODUCTION_CLIENT_ID
-	} else {
-		return GITHUB_DEVELOPMENT_CLIENT_ID
-	}
-}
-
 func getGoogleSecretKey() string {
 	if application.IsProd() {
 		return GOOGLE_PRODUCTION_SECRET_KEY
@@ -250,8 +171,6 @@ func getOAuthProvider(strProvider string) OauthProvider {
 	switch strings.ToLower(strProvider) {
 	case "google":
 		return OauthProviderGoogle
-	case "github":
-		return OauthProviderGithub
 	default:
 		return OauthProviderUnknown
 	}

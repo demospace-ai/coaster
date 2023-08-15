@@ -43,10 +43,12 @@ export const SearchResult: React.FC<{ listing: Listing }> = ({ listing }) => {
             <div className="tw-absolute tw-right-3 tw-top-3 tw-justify-center tw-items-center tw-flex tw-w-6 tw-h-6">
               <HeartIcon className="tw-w-6  hover:tw-w-5 tw-transition-all tw-duration-100 tw-text-gray-600" />
             </div> */}
-      <img
-        className="tw-rounded-xl tw-overflow-clip tw-bg-gray-100 tw-mb-5 tw-object-cover tw-aspect-square"
-        src={listing.images.length > 0 ? getGcsImageUrl(listing.images[0]) : "TODO"}
-      />
+      <div className="tw-flex tw-rounded-xl tw-overflow-clip tw-aspect-square tw-mb-5">
+        <img
+          className="tw-bg-gray-100 tw-object-cover tw-aspect-square hover:tw-scale-105 tw-transition-all tw-duration-200"
+          src={listing.images.length > 0 ? getGcsImageUrl(listing.images[0]) : "TODO"}
+        />
+      </div>
       <span className="tw-font-bold tw-text-lg">{listing.name}</span>
       <span>{listing.location}</span>
       <span>${listing.price}</span>

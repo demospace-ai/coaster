@@ -27,7 +27,24 @@ export interface Listing {
   price: number | undefined;
   location: string | undefined;
   coordinates: Coordinates | undefined;
+  short_description: string | undefined;
+  cancellation: CancellationPolicy | undefined;
+  duration_hours: number | undefined;
+  max_guests: number | undefined;
+  highlights: string[] | undefined;
+  includes: string[] | undefined;
+
+  host: Host;
+
   images: string[];
+}
+
+export interface Host {
+  id: number;
+  first_name: string;
+  last_name: string;
+  about: string | undefined;
+  profile_picture_url: string | undefined;
 }
 
 export interface ListingUpdates {
@@ -37,6 +54,12 @@ export interface ListingUpdates {
   price?: number;
   location?: string;
   status?: ListingStatus;
+}
+
+export enum CancellationPolicy {
+  Flexible = "flexible",
+  Moderate = "moderate",
+  Strict = "strict",
 }
 
 export enum ListingStatus {
@@ -54,8 +77,11 @@ export enum OAuthProvider {
 
 export interface User {
   id: number;
-  name: string;
+  first_name: string;
+  last_name: string;
   email: string;
+  profile_picture_url?: string;
+  about?: string;
 }
 
 export const Category = z.enum(["surfing", "skiing", "fishing", "hiking", "camping", "cycling", "boating", "climbing"]);

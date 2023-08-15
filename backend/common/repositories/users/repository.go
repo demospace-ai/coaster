@@ -1,6 +1,8 @@
 package users
 
 import (
+	"fmt"
+
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/events"
 	"go.fabra.io/server/common/models"
@@ -56,10 +58,12 @@ func LoadUserByID(db *gorm.DB, userID int64) (*models.User, error) {
 	return &user, nil
 }
 
-func create(db *gorm.DB, name string, email string) (*models.User, error) {
+func create(db *gorm.DB, firstName string, lastName string, email string, profilePictureURL string) (*models.User, error) {
 	user := models.User{
-		Name:  name,
-		Email: email,
+		FirstName:         firstName,
+		LastName:          lastName,
+		Email:             email,
+		ProfilePictureURL: profilePictureURL,
 	}
 
 	result := db.Create(&user)
@@ -71,7 +75,7 @@ func create(db *gorm.DB, name string, email string) (*models.User, error) {
 }
 
 func CreateUserForExternalInfo(db *gorm.DB, externalUserInfo *oauth.ExternalUserInfo) (*models.User, error) {
-	user, err := create(db, externalUserInfo.Name, externalUserInfo.Email)
+	user, err := create(db, externalUserInfo.FirstName, externalUserInfo.LastName, externalUserInfo.Email, externalUserInfo.ProfilePictureURL)
 	if err != nil {
 		return nil, errors.Wrap(err, "(users.CreateUserForExternalInfo)")
 	}
@@ -81,7 +85,7 @@ func CreateUserForExternalInfo(db *gorm.DB, externalUserInfo *oauth.ExternalUser
 		return nil, errors.Wrap(err, "(users.CreateUserForExternalInfo)")
 	}
 
-	events.TrackSignup(user.ID, user.Name, user.Email)
+	events.TrackSignup(user.ID, fmt.Sprintf("%s %s", user.FirstName, user.LastName), user.Email)
 
 	return user, nil
 }

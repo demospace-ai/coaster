@@ -2,6 +2,7 @@ import { ErrorBoundary } from "@highlight-run/react";
 import { ReactNode, useEffect, useState } from "react";
 import { Navigate, Outlet, Route, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
 import { useStart } from "src/app/actions";
+import { Footer } from "src/components/footer/Footer";
 import { Header } from "src/components/header/Header";
 import { LogoLoading } from "src/components/loading/LogoLoading";
 import { Toast, getToastContentFromDetails } from "src/components/notifications/Notifications";
@@ -71,6 +72,7 @@ const AppLayout: React.FC = () => {
         <div className="tw-flex tw-flex-col tw-h-full tw-w-full tw-bg-gray-10 tw-overflow-scroll">
           <Header />
           <Outlet />
+          <Footer />
         </div>
       </div>
     </>

@@ -9,20 +9,12 @@ import (
 	"github.com/gorilla/mux"
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/errors"
-	"go.fabra.io/server/common/geo"
+	"go.fabra.io/server/common/input"
 	"go.fabra.io/server/common/maps"
-	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/repositories/listings"
 )
 
-type UpdateListingRequest struct {
-	Name        *string                 `json:"name"`
-	Description *string                 `json:"description"`
-	Category    *models.ListingCategory `json:"category"`
-	Price       *int64                  `json:"price"`
-	Location    *string                 `json:"location"`
-	Status      *models.ListingStatus   `json:"status"`
-}
+type UpdateListingRequest = input.ListingUpdates
 
 type UpdateListingResponse struct {
 	ListingId int64 `json:"listing_id"`
@@ -58,30 +50,26 @@ func (s ApiService) UpdateListing(auth auth.Authentication, w http.ResponseWrite
 		return errors.Wrapf(err, "(api.UpdateListing) loading listing %d for user %d", listingID, auth.User.ID)
 	}
 
-	var location *string
-	var coordinates *geo.Point
 	if updateListingRequest.Location != nil {
-		location, err = maps.GetLocationFromQuery(*updateListingRequest.Location)
+		location, err := maps.GetLocationFromQuery(*updateListingRequest.Location)
 		if err != nil {
 			return errors.Wrap(err, "(api.UpdateListing) getting location from query")
 		}
 
-		coordinates, err = maps.GetCoordinatesFromLocation(*location)
+		coordinates, err := maps.GetCoordinatesFromLocation(*location)
 		if err != nil {
 			return errors.Wrap(err, "(api.UpdateListing) getting coordinates from query")
 		}
+
+		// Use the validated location and coordinates for the update
+		updateListingRequest.Location = location
+		updateListingRequest.Coordinates = coordinates
 	}
 
 	_, err = listings.UpdateListing(
 		s.db,
 		listing,
-		updateListingRequest.Name,
-		updateListingRequest.Description,
-		updateListingRequest.Category,
-		updateListingRequest.Price,
-		location,
-		coordinates,
-		updateListingRequest.Status,
+		updateListingRequest,
 	)
 	if err != nil {
 		return errors.Wrap(err, "(api.UpdateListing) creating listing")

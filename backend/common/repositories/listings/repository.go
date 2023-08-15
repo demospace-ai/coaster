@@ -3,16 +3,19 @@ package listings
 import (
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/geo"
+	"go.fabra.io/server/common/input"
 	"go.fabra.io/server/common/models"
+	"go.fabra.io/server/common/repositories/users"
 	"gorm.io/gorm"
 )
 
-type ListingAndImages struct {
+type ListingDetails struct {
 	models.Listing
+	Host   *models.User
 	Images []models.ListingImage
 }
 
-func LoadByID(db *gorm.DB, listingID int64) (*ListingAndImages, error) {
+func LoadByID(db *gorm.DB, listingID int64) (*ListingDetails, error) {
 	var listing models.Listing
 	result := db.Table("listings").
 		Select("listings.*").
@@ -29,8 +32,14 @@ func LoadByID(db *gorm.DB, listingID int64) (*ListingAndImages, error) {
 		return nil, errors.Wrap(err, "(listings.LoadByID) getting images")
 	}
 
-	return &ListingAndImages{
+	host, err := users.LoadUserByID(db, listing.UserID)
+	if err != nil {
+		return nil, errors.Wrap(err, "(listings.LoadByID) getting host")
+	}
+
+	return &ListingDetails{
 		listing,
+		host,
 		images,
 	}, nil
 }
@@ -50,7 +59,7 @@ func LoadByUserAndID(db *gorm.DB, userID int64, listingID int64) (*models.Listin
 	return &listing, nil
 }
 
-func LoadAllByUserID(db *gorm.DB, userID int64) ([]ListingAndImages, error) {
+func LoadAllByUserID(db *gorm.DB, userID int64) ([]ListingDetails, error) {
 	// No need to check if the listings are published since the user can always see their own listings
 	var listings []models.Listing
 	result := db.Table("listings").
@@ -62,14 +71,21 @@ func LoadAllByUserID(db *gorm.DB, userID int64) ([]ListingAndImages, error) {
 		return nil, errors.Wrap(result.Error, "(listings.LoadAllByUserID)")
 	}
 
-	listingsAndImages := make([]ListingAndImages, len(listings))
+	host, err := users.LoadUserByID(db, userID)
+	if err != nil {
+		return nil, errors.Wrap(err, "(listings.LoadAllByUserID) getting host")
+	}
+
+	listingsAndImages := make([]ListingDetails, len(listings))
 	for i, listing := range listings {
 		images, err := LoadImagesForListing(db, listing.ID)
 		if err != nil {
 			return nil, errors.Wrap(err, "(listings.LoadAllByUserID) getting images")
 		}
-		listingsAndImages[i] = ListingAndImages{
+
+		listingsAndImages[i] = ListingDetails{
 			listing,
+			host,
 			images,
 		}
 	}
@@ -77,7 +93,7 @@ func LoadAllByUserID(db *gorm.DB, userID int64) ([]ListingAndImages, error) {
 	return listingsAndImages, nil
 }
 
-func GetDraftListing(db *gorm.DB, userID int64) (*ListingAndImages, error) {
+func GetDraftListing(db *gorm.DB, userID int64) (*ListingDetails, error) {
 	existing, err := getExistingDraftListing(db, userID)
 	if err == nil {
 		return existing, nil
@@ -86,9 +102,10 @@ func GetDraftListing(db *gorm.DB, userID int64) (*ListingAndImages, error) {
 	}
 
 	listing := models.Listing{
-		UserID:   userID,
-		Status:   models.ListingStatusDraft,
-		Featured: false,
+		UserID:       userID,
+		Status:       models.ListingStatusDraft,
+		Featured:     false,
+		Cancellation: models.ListingCancellationFlexible,
 	}
 
 	result := db.Create(&listing)
@@ -96,10 +113,11 @@ func GetDraftListing(db *gorm.DB, userID int64) (*ListingAndImages, error) {
 		return nil, errors.Wrap(result.Error, "(listings.CreateListing)")
 	}
 
-	return &ListingAndImages{listing, []models.ListingImage{}}, nil
+	// Nil out the host since it's not needed for a draft listing
+	return &ListingDetails{listing, nil, []models.ListingImage{}}, nil
 }
 
-func getExistingDraftListing(db *gorm.DB, userID int64) (*ListingAndImages, error) {
+func getExistingDraftListing(db *gorm.DB, userID int64) (*ListingDetails, error) {
 	var listing models.Listing
 	result := db.Table("listings").
 		Select("listings.*").
@@ -116,8 +134,10 @@ func getExistingDraftListing(db *gorm.DB, userID int64) (*ListingAndImages, erro
 		return nil, errors.Wrap(err, "(listings.getDraftListing) getting images")
 	}
 
-	return &ListingAndImages{
+	// Nil out the host since it's not needed for a draft listing
+	return &ListingDetails{
 		listing,
+		nil,
 		images,
 	}, nil
 }
@@ -133,15 +153,16 @@ func SubmitListing(db *gorm.DB, listing *models.Listing) error {
 
 func CreateListing(db *gorm.DB, userID int64, name string, description string, category models.ListingCategory, price int64, location string, coordinates geo.Point) (*models.Listing, error) {
 	listing := models.Listing{
-		UserID:      userID,
-		Name:        &name,
-		Description: &description,
-		Category:    &category,
-		Price:       &price,
-		Location:    &location,
-		Coordinates: &coordinates,
-		Status:      models.ListingStatusUnderReview,
-		Featured:    false,
+		UserID:       userID,
+		Name:         &name,
+		Description:  &description,
+		Category:     &category,
+		Price:        &price,
+		Location:     &location,
+		Coordinates:  &coordinates,
+		Status:       models.ListingStatusUnderReview,
+		Featured:     false,
+		Cancellation: models.ListingCancellationFlexible,
 	}
 
 	result := db.Create(&listing)
@@ -152,31 +173,55 @@ func CreateListing(db *gorm.DB, userID int64, name string, description string, c
 	return &listing, nil
 }
 
-func UpdateListing(db *gorm.DB, listing *models.Listing, name *string, description *string, category *models.ListingCategory, price *int64, location *string, coordinates *geo.Point, status *models.ListingStatus) (*models.Listing, error) {
-	if name != nil {
-		listing.Name = name
+func UpdateListing(db *gorm.DB, listing *models.Listing, listingUpdates input.ListingUpdates) (*models.Listing, error) {
+	if listingUpdates.Name != nil {
+		listing.Name = listingUpdates.Name
 	}
 
-	if description != nil {
-		listing.Description = description
+	if listingUpdates.Description != nil {
+		listing.Description = listingUpdates.Description
 	}
 
-	if category != nil {
-		listing.Category = category
+	if listingUpdates.Category != nil {
+		listing.Category = listingUpdates.Category
 	}
 
-	if price != nil {
-		listing.Price = price
+	if listingUpdates.Price != nil {
+		listing.Price = listingUpdates.Price
 	}
 
-	if location != nil && coordinates != nil {
-		listing.Location = location
-		listing.Coordinates = coordinates
+	if listingUpdates.Location != nil && listingUpdates.Coordinates != nil {
+		listing.Location = listingUpdates.Location
+		listing.Coordinates = listingUpdates.Coordinates
+	}
+
+	if listingUpdates.ShortDescription != nil {
+		listing.ShortDescription = listingUpdates.ShortDescription
+	}
+
+	if listingUpdates.Cancellation != nil {
+		listing.Cancellation = *listingUpdates.Cancellation
+	}
+
+	if listingUpdates.DurationHours != nil {
+		listing.DurationHours = listingUpdates.DurationHours
+	}
+
+	if listingUpdates.MaxGuests != nil {
+		listing.MaxGuests = listingUpdates.MaxGuests
+	}
+
+	if listingUpdates.Highlights != nil {
+		listing.Highlights = listingUpdates.Highlights
+	}
+
+	if listingUpdates.Includes != nil {
+		listing.Includes = listingUpdates.Includes
 	}
 
 	// TODO: only admins can make the status published
-	if status != nil && *status != models.ListingStatusPublished {
-		listing.Status = *status
+	if listingUpdates.Status != nil && *listingUpdates.Status != models.ListingStatusPublished {
+		listing.Status = *listingUpdates.Status
 	}
 
 	result := db.Save(&listing)
@@ -187,10 +232,11 @@ func UpdateListing(db *gorm.DB, listing *models.Listing, name *string, descripti
 	return listing, nil
 }
 
-func CreateListingImage(db *gorm.DB, listingID int64, storageID string) (*models.ListingImage, error) {
+func CreateListingImage(db *gorm.DB, listingID int64, storageID string, rank int) (*models.ListingImage, error) {
 	listingImage := models.ListingImage{
 		ListingID: listingID,
 		StorageID: storageID,
+		Rank:      rank,
 	}
 
 	result := db.Create(&listingImage)
@@ -219,21 +265,28 @@ func LoadImagesForListing(db *gorm.DB, listingID int64) ([]models.ListingImage, 
 	return listingImages, nil
 }
 
-func LoadListingsWithinRadius(db *gorm.DB, coordinates geo.Point, radius int64) ([]ListingAndImages, error) {
+func LoadListingsWithinRadius(db *gorm.DB, coordinates geo.Point, radius int64) ([]ListingDetails, error) {
 	var listings []models.Listing
 	result := db.Raw("SELECT * FROM listings WHERE ST_DWithin(?, listings.coordinates::Geography, ?) AND listings.status = ?;", coordinates, radius, models.ListingStatusPublished).Find(&listings)
 	if result.Error != nil {
 		return nil, errors.Wrap(result.Error, "(listings.LoadListingsWithinRadius)")
 	}
 
-	listingsAndImages := make([]ListingAndImages, len(listings))
+	listingsAndImages := make([]ListingDetails, len(listings))
 	for i, listing := range listings {
 		images, err := LoadImagesForListing(db, listing.ID)
 		if err != nil {
 			return nil, errors.Wrap(err, "(listings.LoadListingsWithinRadius) getting images")
 		}
-		listingsAndImages[i] = ListingAndImages{
+
+		host, err := users.LoadUserByID(db, listing.UserID)
+		if err != nil {
+			return nil, errors.Wrap(err, "(listings.LoadListingsWithinRadius) getting host")
+		}
+
+		listingsAndImages[i] = ListingDetails{
 			listing,
+			host,
 			images,
 		}
 	}
@@ -241,7 +294,7 @@ func LoadListingsWithinRadius(db *gorm.DB, coordinates geo.Point, radius int64) 
 	return listingsAndImages, nil
 }
 
-func LoadFeatured(db *gorm.DB) ([]ListingAndImages, error) {
+func LoadFeatured(db *gorm.DB) ([]ListingDetails, error) {
 	var listings []models.Listing
 	result := db.Table("listings").
 		Select("listings.*").
@@ -253,14 +306,21 @@ func LoadFeatured(db *gorm.DB) ([]ListingAndImages, error) {
 		return nil, errors.Wrap(result.Error, "(listings.LoadFeatured)")
 	}
 
-	listingsAndImages := make([]ListingAndImages, len(listings))
+	listingsAndImages := make([]ListingDetails, len(listings))
 	for i, listing := range listings {
 		images, err := LoadImagesForListing(db, listing.ID)
 		if err != nil {
 			return nil, errors.Wrap(err, "(listings.LoadFeatured) getting images")
 		}
-		listingsAndImages[i] = ListingAndImages{
+
+		host, err := users.LoadUserByID(db, listing.UserID)
+		if err != nil {
+			return nil, errors.Wrap(err, "(listings.LoadFeatured) getting host")
+		}
+
+		listingsAndImages[i] = ListingDetails{
 			listing,
+			host,
 			images,
 		}
 	}

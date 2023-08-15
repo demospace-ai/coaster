@@ -29,6 +29,17 @@ func (s ApiService) UploadListingImage(auth auth.Authentication, w http.Response
 		return errors.Wrap(err, "(api.UploadListingImage) parsing listing ID")
 	}
 
+	// Make sure this user has ownership of this listing
+	_, err = listings.LoadByUserAndID(s.db, auth.User.ID, listingID)
+	if err != nil {
+		return errors.Wrapf(err, "(api.UploadListingImage) loading listing %d for user %d", listingID, auth.User.ID)
+	}
+
+	existingImages, err := listings.LoadImagesForListing(s.db, listingID)
+	if err != nil {
+		return errors.Wrapf(err, "(api.UploadListingImage) loading images for listing %d", listingID)
+	}
+
 	file, handler, err := r.FormFile("listing_image")
 	if err != nil {
 		return errors.Wrap(err, "(api.UploadListingImage) opening file")
@@ -65,6 +76,7 @@ func (s ApiService) UploadListingImage(auth auth.Authentication, w http.Response
 		s.db,
 		listingID,
 		storageID,
+		len(existingImages),
 	)
 	if err != nil {
 		return errors.Wrap(err, "(api.UploadListingImage) saving listing image details to DB")
