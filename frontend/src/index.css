@@ -1,5 +1,4 @@
-@import "tippy.js/dist/tippy.css";
-@import "../.mirrorful/theme.css";
+@import ".mirrorful/theme.css";
 
 @tailwind base;
 @tailwind components;
