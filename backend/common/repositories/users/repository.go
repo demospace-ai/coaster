@@ -64,6 +64,7 @@ func create(db *gorm.DB, firstName string, lastName string, email string, profil
 		LastName:          lastName,
 		Email:             email,
 		ProfilePictureURL: profilePictureURL,
+		IsHost:            false,
 	}
 
 	result := db.Create(&user)
@@ -104,4 +105,13 @@ func GetOrCreateForExternalInfo(db *gorm.DB, externalUserInfo *oauth.ExternalUse
 	}
 
 	return user, nil
+}
+
+func SetIsHost(db *gorm.DB, userID int64, isHost bool) error {
+	result := db.Model(&models.User{}).Where("id = ?", userID).Update("is_host", isHost)
+	if result.Error != nil {
+		return errors.Wrap(result.Error, "(users.SetIsHost)")
+	}
+
+	return nil
 }

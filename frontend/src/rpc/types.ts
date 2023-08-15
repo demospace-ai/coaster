@@ -80,8 +80,10 @@ export interface User {
   first_name: string;
   last_name: string;
   email: string;
+  phone?: string;
   profile_picture_url?: string;
   about?: string;
+  is_host: boolean;
 }
 
 export const Category = z.enum(["surfing", "skiing", "fishing", "hiking", "camping", "cycling", "boating", "climbing"]);

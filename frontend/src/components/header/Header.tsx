@@ -6,7 +6,6 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { MapSearch } from "src/components/maps/Maps";
 import { useLogout } from "src/pages/login/actions";
 import { useSelector } from "src/root/model";
-import { useHostedListings } from "src/rpc/data";
 import { mergeClasses } from "src/utils/twmerge";
 
 export const Header: React.FC = () => {
@@ -34,12 +33,12 @@ const LogoLink: React.FC = () => {
 };
 
 const ProfileDropdown: React.FC = () => {
+  const user = useSelector((state) => state.login.user);
   const isAuthenticated = useSelector((state) => state.login.authenticated);
-  const { hosted } = useHostedListings();
   return (
     <div className="tw-flex sm:tw-flex-[0.5_0.5_0%] lg:tw-flex-1 tw-justify-end">
       <div className="tw-hidden lg:tw-flex">
-        {hosted && hosted.length > 0 ? (
+        {user?.is_host ? (
           <NavLink
             className="tw-hidden xl:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
             to="/hosting"
@@ -66,10 +65,10 @@ const ProfileDropdown: React.FC = () => {
 
 const SignedInMenu: React.FC = () => {
   const user = useSelector((state) => state.login.user);
-  const { hosted } = useHostedListings();
   const logout = useLogout();
   const menuItem = "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded";
-  const navItem = "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded";
+  const navItem =
+    "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded hover:tw-bg-slate-200 tw-w-full";
 
   return (
     <Menu as="div">
@@ -130,7 +129,7 @@ const SignedInMenu: React.FC = () => {
               </div>
               <div className="tw-flex xl:tw-hidden tw-m-2 tw-pt-2">
                 <Menu.Item>
-                  {hosted && hosted.length > 0 ? (
+                  {user?.is_host ? (
                     <NavLink className={navItem} to="/hosting">
                       Switch to hosting
                     </NavLink>
@@ -184,7 +183,6 @@ const SignedOutMenu: React.FC = () => {
 const MobileMenu: React.FC = () => {
   const navigate = useNavigate();
   const isAuthenticated = useSelector((state) => state.login.authenticated);
-  const { hosted } = useHostedListings();
   const user = useSelector((state) => state.login.user);
   const logout = useLogout();
   const menuItem = "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-select-none tw-rounded";
@@ -234,7 +232,7 @@ const MobileMenu: React.FC = () => {
                                 Welcome, {user?.first_name}
                               </p>
                             </div>
-                            {hosted && hosted.length > 0 ? (
+                            {user?.is_host ? (
                               <NavLink className={navItem} to="/hosting">
                                 Switch to hosting
                               </NavLink>

@@ -113,8 +113,12 @@ func GetDraftListing(db *gorm.DB, userID int64) (*ListingDetails, error) {
 		return nil, errors.Wrap(result.Error, "(listings.CreateListing)")
 	}
 
-	// Nil out the host since it's not needed for a draft listing
-	return &ListingDetails{listing, nil, []models.ListingImage{}}, nil
+	host, err := users.LoadUserByID(db, userID)
+	if err != nil {
+		return nil, errors.Wrap(err, "(listings.CreateListing) getting host")
+	}
+
+	return &ListingDetails{listing, host, []models.ListingImage{}}, nil
 }
 
 func getExistingDraftListing(db *gorm.DB, userID int64) (*ListingDetails, error) {
@@ -134,10 +138,14 @@ func getExistingDraftListing(db *gorm.DB, userID int64) (*ListingDetails, error)
 		return nil, errors.Wrap(err, "(listings.getDraftListing) getting images")
 	}
 
-	// Nil out the host since it's not needed for a draft listing
+	host, err := users.LoadUserByID(db, userID)
+	if err != nil {
+		return nil, errors.Wrap(err, "(listings.getDraftListing) getting host")
+	}
+
 	return &ListingDetails{
 		listing,
-		nil,
+		host,
 		images,
 	}, nil
 }
