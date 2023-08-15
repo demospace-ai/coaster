@@ -25,7 +25,7 @@ export const Home: React.FC = () => {
     return <Loading />;
   }
 
-  if (featured.length > 0) {
+  if (featured.length === 0) {
     return <ComingSoon />;
   }
 
