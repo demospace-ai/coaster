@@ -33,6 +33,7 @@ export interface Listing {
   max_guests: number | undefined;
   highlights: string[] | undefined;
   includes: string[] | undefined;
+  status: ListingStatus;
 
   host: Host;
 

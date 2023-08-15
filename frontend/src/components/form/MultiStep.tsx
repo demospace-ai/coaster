@@ -2,13 +2,12 @@ import { CheckCircleIcon, ExclamationCircleIcon } from "@heroicons/react/24/outl
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ReactElement, useCallback, useState } from "react";
 import { FieldError, UseFormHandleSubmit, useForm } from "react-hook-form";
-import { useLocalStorage } from "src/utils/localStorage";
 import { toTitleCase } from "src/utils/string";
 import { mergeClasses } from "src/utils/twmerge";
 import { ZodEnum, ZodString, z } from "zod";
 
-export const MultiStep: React.FC<MultiStepProps> = ({ id, steps, onComplete }) => {
-  const [currentStepNumber, setCurrentStepNumber] = useLocalStorage<number>(id + "-step", 0);
+export const MultiStep: React.FC<MultiStepProps> = ({ initialStepNumber, steps, onComplete }) => {
+  const [currentStepNumber, setCurrentStepNumber] = useState<number>(initialStepNumber);
 
   const isFirstStep = currentStepNumber === 0;
   const isLastStep = currentStepNumber === steps.length - 1;
@@ -101,7 +100,7 @@ export const MultiStep: React.FC<MultiStepProps> = ({ id, steps, onComplete }) =
 };
 
 export type MultiStepProps = {
-  id: string;
+  initialStepNumber: number;
   steps: Step[];
   onComplete: () => void;
 };

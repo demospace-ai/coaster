@@ -26,16 +26,21 @@ import { mutate } from "swr";
 import { z } from "zod";
 
 export const NewListing: React.FC = () => {
+  const { listing } = useNewListing();
   const navigate = useNavigate();
+
+  if (!listing) {
+    return <Loading />;
+  }
 
   return (
     <div className="tw-w-full tw-flex tw-justify-center">
       <div className="tw-flex tw-px-8 sm:tw-px-0 tw-w-[500px] tw-min-h-[600px] tw-mt-10 tw-items-center tw-pb-24 tw-overflow-scroll">
         <MultiStep
-          id="new-listing"
           onComplete={() => {
             navigate("/hosting");
           }}
+          initialStepNumber={computeStepNumber(listing)}
           steps={[
             { id: "category", elementFn: categoryStep, title: "What kind of experience do you want to host?" },
             { id: "location", elementFn: locationStep, title: "Where is your adventure located?" },
@@ -349,4 +354,26 @@ const ImageStep: React.FC<StepParams & ImageParams> = ({ renderLayout, listing }
       </>
     </div>
   ));
+};
+
+const computeStepNumber = (listing: Listing): number => {
+  if (!listing.category) {
+    return 0;
+  }
+  if (!listing.location) {
+    return 1;
+  }
+  if (!listing.name) {
+    return 2;
+  }
+  if (!listing.description) {
+    return 3;
+  }
+  if (!listing.images || listing.images.length < 3) {
+    return 4;
+  }
+  if (!listing.price) {
+    return 5;
+  }
+  return 6;
 };
