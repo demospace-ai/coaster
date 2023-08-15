@@ -11,223 +11,137 @@ import {
 } from "@floating-ui/react";
 import { Combobox, Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
-import { Fragment, HTMLInputTypeAttribute, InputHTMLAttributes, useRef, useState } from "react";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import {
+  Fragment,
+  InputHTMLAttributes,
+  TextareaHTMLAttributes,
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { Loading } from "src/components/loading/Loading";
+import { Tooltip } from "src/components/tooltip/Tooltip";
 import { mergeClasses } from "src/utils/twmerge";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-  placeholder?: string;
-  setValue: (value: any) => void;
-  className?: string;
-  wrapperClass?: string;
-  textarea?: boolean;
-  type?: HTMLInputTypeAttribute;
   label?: string;
-  disabled?: boolean;
+  tooltip?: string;
 }
 
-export const Input: React.FC<InputProps> = (props) => {
-  const { id, value, placeholder, disabled, setValue, className, wrapperClass, textarea, type, label, ...other } =
-    props;
-  const [focused, setFocused] = useState(false);
+export const Input: React.FC<InputProps> = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
+  const { id, value, disabled, className, label, tooltip, ...other } = props;
   let classes = [
-    "tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border focus:tw-border-slate-700 tw-outline-none",
-    !disabled && "hover:tw-border-slate-400",
-    disabled && "tw-bg-slate-100 tw-text-slate-500 tw-cursor-not-allowed",
+    "tw-flex tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border focus:tw-border-slate-700 tw-outline-none",
+    !disabled && "hover:tw-border-slate-400 tw-cursor-text",
+    disabled && "tw-bg-slate-50 tw-select-none tw-cursor-not-allowed",
     className,
   ];
 
-  const onKeydown = (event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  useImperativeHandle<HTMLInputElement | null, HTMLInputElement | null>(ref, () => inputRef.current, []);
+
+  const onKeydown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     event.stopPropagation();
     if (event.key === "Escape") {
       event.currentTarget.blur();
     }
   };
 
-  const showLabel =
-    label !== undefined && (focused || (value !== undefined && (value !== "string" || value.length > 0)));
-
   return (
-    <div className={mergeClasses("tw-relative", label && "tw-mt-4", wrapperClass)}>
-      <Transition
-        show={showLabel}
-        enter="tw-transition tw-ease tw-duration-200 tw-transform"
-        enterFrom="tw-translate-y-4 tw-opacity-10"
-        enterTo="tw-translate-y-0"
-        leave="tw-transition tw-ease tw-duration-200 tw-transform"
-        leaveFrom="tw-translate-y-0"
-        leaveTo="tw-translate-y-4 tw-opacity-10"
-      >
+    <div
+      className={mergeClasses(...classes)}
+      onClick={() => {
+        inputRef.current?.focus();
+      }}
+    >
+      <div className="tw-flex tw-flex-col tw-w-full">
         <label
-          htmlFor="name"
-          className="tw-absolute -tw-top-2 tw-left-2 -tw-mt-px tw-inline-block tw-bg-white tw-px-1 tw-text-xs tw-font-medium tw-text-gray-900"
+          htmlFor={id}
+          className="-tw-mt-px tw-inline-block tw-text-xs tw-font-medium tw-text-gray-600 tw-cursor-[inherit] tw-select-none"
         >
           {label}
         </label>
-      </Transition>
-      {textarea ? (
-        <textarea
-          id={id}
-          name={id}
-          autoComplete={id}
-          placeholder={focused ? undefined : placeholder}
-          className={mergeClasses(classes)}
-          onKeyDown={onKeydown}
-          onFocus={() => {
-            setFocused(true);
-          }}
-          onChange={(e) => setValue(e.target.value)}
-          onBlur={() => {
-            setFocused(false);
-          }}
-          value={value ? value : ""}
-          disabled={disabled}
-        />
-      ) : (
         <input
-          type={type ? type : "text"}
           id={id}
           name={id}
+          ref={inputRef}
           autoComplete={id}
-          placeholder={focused ? undefined : placeholder}
-          className={mergeClasses(classes)}
+          className="tw-w-full tw-outline-none tw-text-base tw-mt-1 disabled:tw-bg-slate-50 disabled:tw-select-none tw-cursor-[inherit]"
           onKeyDown={onKeydown}
-          onFocus={() => {
-            setFocused(true);
-          }}
-          onChange={(e) => {
-            e.target.type === "number" ? setValue(parseInt(e.target.value)) : setValue(e.target.value);
-          }}
-          onBlur={() => {
-            setFocused(false);
-          }}
-          value={value ? value : ""}
+          value={value}
           disabled={disabled}
           {...other}
         />
+      </div>
+      {tooltip && (
+        <Tooltip label={tooltip}>
+          <InformationCircleIcon className="tw-w-5 tw-mr-4" />
+        </Tooltip>
       )}
     </div>
   );
-};
+});
 
-export const ColorPicker: React.FC<InputProps> = (props) => {
-  const { id, value, setValue, className, wrapperClass, textarea, type, label, ...other } = props;
+interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
+  label?: string;
+  tooltip?: string;
+}
+
+export const TextArea: React.FC<TextAreaProps> = forwardRef<HTMLTextAreaElement, TextAreaProps>((props, ref) => {
+  const { id, value, disabled, className, label, tooltip, ...other } = props;
   let classes = [
-    "tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border focus:tw-border-slate-700 tw-outline-none",
+    "tw-flex tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border focus:tw-border-slate-700 tw-outline-none",
+    !disabled && "hover:tw-border-slate-400 tw-cursor-text",
+    disabled && "tw-bg-slate-50 tw-select-none tw-cursor-not-allowed",
     className,
   ];
 
-  return (
-    <div className={mergeClasses("tw-flex tw-items-center tw-relative", wrapperClass)}>
-      <input className={mergeClasses(classes)} value={value} onChange={(e) => setValue(e.target.value)} {...other} />
-      <input
-        className="tw-w-6 tw-absolute tw-right-3"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        type="color"
-      />
-    </div>
-  );
-};
+  const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
+  useImperativeHandle<HTMLTextAreaElement | null, HTMLTextAreaElement | null>(ref, () => textAreaRef.current, []);
 
-export const InputStyle =
-  "tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border hover:tw-border-primary-hover focus:tw-border-primary tw-outline-none";
-
-export const ValidatedInput: React.FC<InputProps> = (props) => {
-  const { id, value, placeholder, setValue, className, textarea, type, label, ...other } = props;
-  const [isValid, setIsValid] = useState(true);
-  const [focused, setFocused] = useState(false);
-  let classes = [
-    "tw-border tw-border-solid tw-border-slate-300 tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border hover:tw-border-primary-hover focus:tw-border-primary tw-outline-none",
-    className,
-  ];
-  if (!isValid) {
-    classes.push("tw-border-red-600");
-  }
-
-  const onKeydown = (event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const onKeydown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     event.stopPropagation();
     if (event.key === "Escape") {
       event.currentTarget.blur();
     }
   };
 
-  const validateNotEmpty = (value: string | number | readonly string[] | undefined): boolean => {
-    if (typeof value === "number") {
-      return true;
-    }
-
-    const valid = value !== undefined && value.length > 0;
-    setIsValid(valid);
-    return valid;
-  };
-
-  const showLabel =
-    label !== undefined && (focused || (value !== undefined && (value !== "string" || value.length > 0)));
-
   return (
-    <div className={mergeClasses("tw-relative", label && "tw-mt-4")}>
-      <Transition
-        show={showLabel}
-        enter="tw-transition tw-ease tw-duration-200 tw-transform"
-        enterFrom="tw-translate-y-4 tw-opacity-10"
-        enterTo="tw-translate-y-0"
-        leave="tw-transition tw-ease tw-duration-200 tw-transform"
-        leaveFrom="tw-translate-y-0"
-        leaveTo="tw-translate-y-4 tw-opacity-10"
-      >
+    <div
+      className={mergeClasses(...classes)}
+      onClick={() => {
+        textAreaRef.current?.focus();
+      }}
+    >
+      <div className="tw-flex tw-flex-col tw-w-full">
         <label
-          htmlFor="name"
-          className="tw-absolute -tw-top-2 tw-left-2 -tw-mt-px tw-inline-block tw-bg-white tw-px-1 tw-text-xs tw-font-medium tw-text-primary"
+          htmlFor={id}
+          className="-tw-mt-px tw-inline-block tw-text-xs tw-font-medium tw-text-gray-600 tw-cursor-[inherit] tw-select-none"
         >
           {label}
         </label>
-      </Transition>
-      {textarea ? (
         <textarea
           id={id}
           name={id}
+          ref={textAreaRef}
           autoComplete={id}
-          placeholder={focused ? undefined : placeholder}
-          className={mergeClasses(classes)}
+          className="tw-w-full tw-outline-none tw-text-base tw-mt-1 disabled:tw-bg-slate-50 disabled:tw-select-none tw-cursor-[inherit]"
           onKeyDown={onKeydown}
-          onFocus={() => {
-            setIsValid(true);
-            setFocused(true);
-          }}
-          onChange={(e) => setValue(e.target.value)}
-          onBlur={() => {
-            validateNotEmpty(value);
-            setFocused(false);
-          }}
-          value={value ? value : ""}
-        />
-      ) : (
-        <input
-          type={type ? type : "text"}
-          name={id}
-          autoComplete={id}
-          placeholder={focused ? undefined : placeholder}
-          className={mergeClasses(classes)}
-          onKeyDown={onKeydown}
-          onFocus={() => {
-            setIsValid(true);
-            setFocused(true);
-          }}
-          onChange={(e) => {
-            e.target.type === "number" ? setValue(parseInt(e.target.value)) : setValue(e.target.value);
-          }}
-          onBlur={() => {
-            validateNotEmpty(value);
-            setFocused(false);
-          }}
-          value={value ? value : ""}
+          value={value}
+          disabled={disabled}
           {...other}
         />
+      </div>
+      {tooltip && (
+        <Tooltip label={tooltip}>
+          <InformationCircleIcon className="tw-w-5 tw-mr-4" />
+        </Tooltip>
       )}
     </div>
   );
-};
+});
 
 export type ValidatedDropdownInputProps = {
   id?: string;

@@ -66,6 +66,12 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			Pattern:     "/listings/hosted",
 			HandlerFunc: s.GetHostedListings,
 		},
+		{
+			Name:        "Update user",
+			Method:      router.POST,
+			Pattern:     "/user",
+			HandlerFunc: s.UpdateUser,
+		},
 	}
 }
 

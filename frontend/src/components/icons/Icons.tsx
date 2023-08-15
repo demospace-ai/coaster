@@ -284,42 +284,42 @@ export const ClimbingIcon: React.FC<IconProps> = (props) => {
       <path
         d="M87.5262 189.844H58.5938C32.7059 189.844 11.7188 210.831 11.7188 236.719V336.328C11.7188 355.744 27.4582 371.484 46.875 371.484C66.2918 371.484 82.0312 355.744 82.0312 336.328V330.469M134.766 160.547C112.113 160.547 93.75 142.184 93.75 119.531V84.375C93.75 61.7227 112.113 43.3594 134.766 43.3594C157.418 43.3594 175.781 61.7227 175.781 84.375V119.531C175.781 142.184 157.418 160.547 134.766 160.547Z"
         stroke="black"
-        stroke-width="16"
-        stroke-miterlimit="10"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="16"
+        strokeMiterlimit="10"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M187.5 315.571V219.634L215.634 211.046C223.417 208.671 230.447 204.31 236.033 198.394L327.66 101.345C336.491 91.9909 336.28 77.3097 327.184 68.2136C317.899 58.9288 302.846 58.9288 293.562 68.2136L201.23 160.547H134.766C105.641 160.547 82.0312 184.157 82.0312 213.281V324.61"
         stroke="black"
-        stroke-width="16"
-        stroke-miterlimit="10"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="16"
+        strokeMiterlimit="10"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M240.234 121.542V66.7969L210.938 42.1875V11.7188H588.281V371.484M222.656 488.673L219.532 513.668C217.996 525.962 226.293 537.328 238.47 539.611L289.119 549.108C300.254 551.196 310.548 542.653 310.548 531.323C310.548 526.525 308.641 521.923 305.249 518.529L275.391 488.673L282.724 375.001C285.032 339.229 254.964 309.787 219.248 312.85L82.0312 324.611V349.174C82.0312 387.294 117.854 415.263 154.836 406.018L222.656 389.064V488.673Z"
         stroke="black"
-        stroke-width="16"
-        stroke-miterlimit="10"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="16"
+        strokeMiterlimit="10"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M293.019 549.405L292.969 588.281H588.281V476.953M307.669 521.557L398.438 471.094L339.844 394.922L351.562 254.297M351.562 254.297L264.99 167.725M351.562 254.297L404.297 260.156L433.594 307.031L480.469 318.75M82.0312 219.141H187.5M588.281 119.531L457.031 137.109L445.312 183.984"
         stroke="black"
-        stroke-width="16"
-        stroke-miterlimit="10"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="16"
+        strokeMiterlimit="10"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M398.438 471.094L451.172 494.531L492.188 588.281M275.49 86.2864L310.114 119.93M175.781 90.2344H93.75M222.656 488.673H275.391"
         stroke="black"
-        stroke-width="16"
-        stroke-miterlimit="10"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="16"
+        strokeMiterlimit="10"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

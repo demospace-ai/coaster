@@ -1,15 +1,17 @@
 import { sendRequest } from "src/rpc/ajax";
 import {
+  CheckSession,
   GetFeaturedListings,
   GetHostedListings,
   GetListing,
   GetNewListing,
   SearchListings,
   UpdateListing,
+  UpdateUser,
 } from "src/rpc/api";
-import { Listing, ListingUpdates } from "src/rpc/types";
+import { Listing, ListingUpdates, UserUpdates } from "src/rpc/types";
 import { forceErrorMessage } from "src/utils/errors";
-import { MutationResult, useMutation } from "src/utils/queryHelpers";
+import { Mutation, useMutation } from "src/utils/queryHelpers";
 import useSWR, { Fetcher, mutate } from "swr";
 
 export function useListing(listingID: number | undefined) {
@@ -52,8 +54,8 @@ export function useFeatured() {
   return { featured: data, mutate, error, loading: isLoading || isValidating };
 }
 
-export function useUpdateListing(listingID: number): MutationResult<ListingUpdates> {
-  return useMutation<ListingUpdates>(
+export function useUpdateListing(listingID: number): Mutation<ListingUpdates> {
+  return useMutation<Listing, ListingUpdates>(
     (updates: ListingUpdates) => {
       return sendRequest(UpdateListing, { pathParams: { listingID }, payload: updates });
     },
@@ -75,4 +77,17 @@ export async function updateListing(listingID: number, updates: ListingUpdates) 
   } catch (e) {
     return { success: false, error: forceErrorMessage(e) };
   }
+}
+
+export function useUpdateUser(): Mutation<UserUpdates> {
+  return useMutation<undefined, UserUpdates>(
+    (updates: UserUpdates) => {
+      return sendRequest(UpdateUser, { payload: updates });
+    },
+    {
+      onSuccess: () => {
+        mutate({ CheckSession }); // TODO: this does nothing because we don't actually call check session through SWR
+      },
+    },
+  );
 }

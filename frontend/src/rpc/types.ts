@@ -87,5 +87,11 @@ export interface User {
   is_host: boolean;
 }
 
+export interface UserUpdates {
+  first_name: string;
+  last_name: string;
+  about?: string;
+}
+
 export const Category = z.enum(["surfing", "skiing", "fishing", "hiking", "camping", "cycling", "boating", "diving"]);
 export type CategoryType = z.infer<typeof Category>;

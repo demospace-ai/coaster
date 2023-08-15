@@ -5,6 +5,7 @@ import {
   LoginRequest,
   LoginResponse,
   OAuthProvider,
+  UserUpdates,
 } from "src/rpc/types";
 
 export interface IEndpoint<RequestType, ResponseType, PathParams = {}, QueryParams = {}> {
@@ -84,5 +85,12 @@ export const OAuthRedirect: IEndpoint<{ provider: OAuthProvider }, undefined> = 
   method: "GET",
   path: "/oauth_redirect",
   queryParams: ["provider"],
+  track: true,
+};
+
+export const UpdateUser: IEndpoint<UserUpdates, undefined> = {
+  name: "Update user",
+  method: "POST",
+  path: "/user",
   track: true,
 };

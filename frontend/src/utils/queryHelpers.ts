@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { consumeError } from "src/utils/errors";
 
-type AsyncFunction<Data = any, Args = any> = (variables?: Args) => Promise<Data>;
+type AsyncFunction<Data, Args> = (variables: Args) => Promise<Data>;
 
-export type MutationResult<Args = any> = {
+export type Mutation<Args = any> = {
   mutate: AsyncFunction<void, Args>;
   error: Error | null;
   isLoading: boolean;
@@ -13,19 +13,19 @@ export type MutationResult<Args = any> = {
   reset: () => void;
 };
 
-export function useMutation<Data = any, Args = any>(
+export function useMutation<Data = any | undefined, Args = any>(
   mutationFn: AsyncFunction<Data, Args>,
   opts: { onSuccess?: (data: Data) => void; onError?: (err: Error) => void } = {
     onSuccess: () => {},
     onError: () => {},
   },
-): MutationResult<Args> {
+): Mutation<Args> {
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<Data | undefined>();
   const [isSuccess, setIsSuccess] = useState(false);
   const [isFailed, setIsFailed] = useState(false);
-  const mutate = async (variables?: Args) => {
+  const mutate = async (variables: Args) => {
     setIsLoading(true);
     try {
       const response = await mutationFn(variables);

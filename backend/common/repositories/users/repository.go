@@ -5,6 +5,7 @@ import (
 
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/events"
+	"go.fabra.io/server/common/input"
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/oauth"
 	"go.fabra.io/server/common/repositories/external_profiles"
@@ -56,6 +57,27 @@ func LoadUserByID(db *gorm.DB, userID int64) (*models.User, error) {
 	}
 
 	return &user, nil
+}
+
+func UpdateUser(db *gorm.DB, user *models.User, updates input.UserUpdates) error {
+	if len(updates.FirstName) > 0 {
+		user.FirstName = updates.FirstName
+	}
+
+	if len(updates.LastName) > 0 {
+		user.LastName = updates.LastName
+	}
+
+	if len(updates.About) > 0 {
+		user.About = updates.About
+	}
+
+	result := db.Save(user)
+	if result.Error != nil {
+		return errors.Wrap(result.Error, "(users.UpdateUser)")
+	}
+
+	return nil
 }
 
 func create(db *gorm.DB, firstName string, lastName string, email string, profilePictureURL string) (*models.User, error) {

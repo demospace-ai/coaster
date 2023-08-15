@@ -14,6 +14,7 @@ import { Login, Unauthorized } from "src/pages/login/Login";
 import { NotFound } from "src/pages/notfound/NotFound";
 import { Privacy } from "src/pages/privacy/Privacy";
 import { Terms } from "src/pages/privacy/Terms";
+import { Profile } from "src/pages/profile/Profile";
 import { Search } from "src/pages/search/Search";
 import { useDispatch, useSelector } from "src/root/model";
 
@@ -103,6 +104,7 @@ export const router = createBrowserRouter(
       <Route path="/signup" element={<Login create />} />
       <Route path="/search" element={<Search />} />
       <Route path="/privacy" element={<Privacy />} />
+      <Route path="/profile" element={<Profile />} />
       <Route path="/terms" element={<Terms />} />
       <Route path="/hosting" element={<Hosting />} />
       <Route path="/listings/:listingID" element={<Listing />} />
