@@ -25,10 +25,10 @@ export const Home: React.FC = () => {
   }
 
   return (
-    <div className="tw-flex tw-flex-col tw-items-center tw-pt-1 sm:tw-pt-5 tw-pb-24 tw-px-5 sm:tw-px-20">
+    <div className="tw-flex tw-flex-col tw-items-center tw-pt-2 sm:tw-pt-5 tw-pb-24 tw-px-5 sm:tw-px-20">
       <CategorySelector />
       <div>
-        <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-3 xl:tw-grid-cols-4 2xl:tw-grid-cols-5 tw-mt-4 sm:tw-mt-8 tw-mb-5 tw-font-bold tw-text-3xl tw-gap-10">
+        <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-3 xl:tw-grid-cols-4 2xl:tw-grid-cols-5 tw-mt-1 sm:tw-mt-4 tw-mb-5 tw-font-bold tw-text-3xl tw-gap-10">
           {featured.map((listing: Listing) => (
             <SearchResult key={listing.id} listing={listing} />
           ))}
@@ -40,11 +40,11 @@ export const Home: React.FC = () => {
 
 export const CategorySelector: React.FC = () => {
   const categoryIcon =
-    "tw-flex tw-flex-col tw-items-center tw-p-2 tw-h-20 tw-w-20 tw-rounded-xl tw-cursor-pointer tw-select-none hover:tw-shadow-centered tw-mx-1";
+    "tw-flex tw-flex-col tw-items-center tw-cursor-pointer tw-select-none hover:tw-border-b-2 hover:-tw-mb-2 tw-pb-1 tw-border-solid tw-border-slate-700 tw-mx-1";
 
   return (
-    <div className="tw-mx-[-4px] tw-flex tw-w-full tw-overflow-scroll tw-py-3">
-      <div className="tw-flex tw-h-full tw-flex-1 tw-gap-3 tw-justify-between">
+    <div className="tw-mx-[-4px] tw-flex tw-w-full tw-overflow-scroll tw-pt-4 tw-pb-6">
+      <div className="tw-flex tw-h-full tw-flex-1 tw-gap-8 tw-justify-between">
         <div className={categoryIcon}>
           <SkiingIcon className="tw-w-10 tw-h-10" />
           <span className="tw-text-xs tw-font-medium tw-mt-1 sm:tw-mt-2">Skiing</span>

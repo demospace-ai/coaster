@@ -11,7 +11,7 @@ import { mergeClasses } from "src/utils/twmerge";
 export const Header: React.FC = () => {
   const navigate = useNavigate();
   return (
-    <div className="tw-sticky tw-z-10 tw-top-0 tw-flex tw-box-border tw-max-h-[72px] tw-min-h-[72px] sm:tw-max-h-[96px] sm:tw-min-h-[96px] tw-w-full tw-px-5 xs:tw-px-8 sm:tw-px-20 tw-py-3 tw-items-center tw-justify-between tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white">
+    <div className="tw-sticky tw-z-10 tw-top-0 tw-flex tw-box-border tw-max-h-[72px] tw-min-h-[72px] sm:tw-max-h-[96px] sm:tw-min-h-[96px] tw-w-full tw-px-4 sm:tw-px-20 tw-py-3 tw-items-center tw-justify-between tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white">
       <LogoLink />
       <MapSearch onSubmit={(location) => navigate("/search?location=" + location)} />
       <ProfileDropdown />
@@ -66,7 +66,8 @@ const ProfileDropdown: React.FC = () => {
 const SignedInMenu: React.FC = () => {
   const user = useSelector((state) => state.login.user);
   const logout = useLogout();
-  const menuItem = "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded";
+  const menuItem =
+    "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded hover:tw-bg-slate-200 ";
   const navItem =
     "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded hover:tw-bg-slate-200 tw-w-full";
 
@@ -85,6 +86,7 @@ const SignedInMenu: React.FC = () => {
               <img
                 src={user.profile_picture_url}
                 className="tw-rounded-full tw-w-7 tw-h-7 tw-select-none tw-flex tw-items-center tw-justify-center"
+                referrerPolicy="no-referrer"
               />
             ) : (
               <div className="tw-bg-orange-400 tw-text-white tw-rounded-full tw-w-7 tw-h-7 tw-flex tw-justify-center tw-items-center">
@@ -105,26 +107,32 @@ const SignedInMenu: React.FC = () => {
               <div className="tw-m-2">
                 <p className="tw-px-1 tw-pt-2 tw-pb-1 tw-text-xs tw-uppercase">Signed in as</p>
                 <Menu.Item>
-                  {({ active }) => (
-                    <div className={classNames(active && "tw-bg-slate-200 tw-text-slate-900", menuItem, "tw-pl-2")}>
-                      {user?.profile_picture_url ? (
-                        <img
-                          src={user.profile_picture_url}
-                          className="tw-rounded-full tw-w-7 tw-h-7 tw-select-none tw-flex tw-items-center tw-justify-center tw-mr-3"
-                        />
-                      ) : (
-                        <div className="tw-bg-slate-400 tw-text-white tw-rounded-full tw-w-7 tw-h-7 tw-select-none tw-flex tw-items-center tw-justify-center tw-mr-3">
-                          {user!.first_name.charAt(0)}
-                        </div>
-                      )}
-                      <div className="tw-flex tw-flex-col">
-                        <p className="tw-truncate tw-text-sm tw-font-semibold tw-text-slate-900">
-                          {user?.first_name} {user?.last_name}
-                        </p>
-                        <p className="tw-truncate tw-text-sm tw-text-slate-900">{user?.email}</p>
+                  <NavLink className={menuItem} to="/profile">
+                    {user?.profile_picture_url ? (
+                      <img
+                        src={user.profile_picture_url}
+                        className="tw-rounded-full tw-w-7 tw-h-7 tw-select-none tw-flex tw-items-center tw-justify-center tw-mr-3"
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <div className="tw-bg-slate-400 tw-text-white tw-rounded-full tw-w-7 tw-h-7 tw-select-none tw-flex tw-items-center tw-justify-center tw-mr-3">
+                        {user!.first_name.charAt(0)}
                       </div>
+                    )}
+                    <div className="tw-flex tw-flex-col">
+                      <p className="tw-truncate tw-text-sm tw-font-semibold tw-text-slate-900">
+                        {user?.first_name} {user?.last_name}
+                      </p>
+                      <p className="tw-truncate tw-text-sm tw-text-slate-900">{user?.email}</p>
                     </div>
-                  )}
+                  </NavLink>
+                </Menu.Item>
+              </div>
+              <div className="tw-flex tw-m-2 tw-pt-2">
+                <Menu.Item>
+                  <NavLink className={navItem} to="/profile">
+                    View profile
+                  </NavLink>
                 </Menu.Item>
               </div>
               <div className="tw-flex xl:tw-hidden tw-m-2 tw-pt-2">
@@ -142,15 +150,10 @@ const SignedInMenu: React.FC = () => {
               </div>
               <div className="tw-m-2 tw-pt-2">
                 <Menu.Item>
-                  {({ active }) => (
-                    <div
-                      className={classNames(active && "tw-bg-slate-200 tw-text-slate-900", menuItem)}
-                      onClick={logout}
-                    >
-                      <ArrowRightOnRectangleIcon className="tw-h-4 tw-inline tw-mr-2 tw-stroke-2" />
-                      Logout
-                    </div>
-                  )}
+                  <div className={menuItem} onClick={logout}>
+                    <ArrowRightOnRectangleIcon className="tw-h-4 tw-inline tw-mr-2 tw-stroke-2" />
+                    Logout
+                  </div>
                 </Menu.Item>
               </div>
             </Menu.Items>
@@ -185,8 +188,7 @@ const MobileMenu: React.FC = () => {
   const isAuthenticated = useSelector((state) => state.login.authenticated);
   const user = useSelector((state) => state.login.user);
   const logout = useLogout();
-  const menuItem = "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-select-none tw-rounded";
-  const navItem = "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-select-none";
+  const navItem = "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-base tw-select-none";
   const [open, setOpen] = useState(false);
   const buttonStyle =
     "tw-flex tw-justify-center tw-py-2 tw-w-full tw-cursor-pointer tw-select-none tw-whitespace-nowrap tw-rounded-3xl sm:tw-font-semibold tw-text-base tw-bg-gray-100 hover:tw-bg-gray-200";
@@ -227,11 +229,14 @@ const MobileMenu: React.FC = () => {
                       <div className="tw-relative tw-mt-6 tw-h-full tw-px-4 sm:tw-px-6">
                         {isAuthenticated ? (
                           <div className="tw-h-full">
-                            <div className={menuItem}>
-                              <p className="tw-truncate tw-text-lg tw-font-semibold tw-text-slate-900">
+                            <div className="tw-flex tw-items-center tw-py-2 tw-pl-2">
+                              <p className="tw-truncate tw-text-xl tw-font-semibold tw-text-slate-900 tw-select-none">
                                 Welcome, {user?.first_name}
                               </p>
                             </div>
+                            <NavLink className={navItem} to="/profile" onClick={() => setOpen(false)}>
+                              View profile
+                            </NavLink>
                             {user?.is_host ? (
                               <NavLink className={navItem} to="/hosting" onClick={() => setOpen(false)}>
                                 Switch to hosting

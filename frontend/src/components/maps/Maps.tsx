@@ -102,7 +102,7 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
       >
         <div
           className={mergeClasses(
-            "tw-flex tw-w-0 tw-rounded-[50px] tw-bg-white sm:tw-ring-1 tw-ring-slate-300 tw-relative tw-z-20 sm:tw-w-[25vw] tw-transition-all tw-duration-100",
+            "tw-flex tw-w-0 tw-rounded-[50px] tw-bg-white tw-ring-1 tw-ring-slate-300 tw-relative tw-z-20 sm:tw-w-[25vw] tw-transition-all tw-duration-100",
             active && "tw-w-full sm:tw-w-[50vw] tw-rounded-lg",
           )}
         >
@@ -132,7 +132,7 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
             leaveTo="tw-transform tw-opacity-0 tw-scale-0"
           >
             <div className="tw-absolute tw-z-20 tw-mt-[-10px] sm:tw-mt-0 tw-min-w-full tw-max-h-80 tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-sm tw-text-black tw-shadow-lg tw-ring-1 tw-ring-slate-300 sm:tw-text-sm">
-              <MapsWrapper>
+              <MapsWrapper loadingClass="tw-h-20">
                 <Suggestions query={query} setQuery={setQuery} onSubmit={onSubmit} />
               </MapsWrapper>
             </div>
@@ -225,7 +225,7 @@ export const InlineMapSearch: React.FC<{
             leaveTo="tw-transform tw-opacity-0 tw-scale-0"
           >
             <div className="tw-absolute tw-z-20 tw-mt-0 tw-min-w-full tw-max-h-80 tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-sm tw-text-black tw-shadow-lg tw-border tw-border-solid tw-border-slate-300">
-              <MapsWrapper>
+              <MapsWrapper loadingClass="tw-h-20">
                 <Suggestions query={query} setQuery={setQuery} onSubmit={onSelect} />
               </MapsWrapper>
             </div>
