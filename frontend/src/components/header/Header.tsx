@@ -77,7 +77,7 @@ const SignedInMenu: React.FC = () => {
         <>
           <Menu.Button
             className={classNames(
-              "tw-cursor-pointer tw-select-none tw-flex tw-items-center tw-rounded-full tw-border tw-border-solid tw-border-gray-300 tw-px-2 tw-py-1.5 hover:tw-shadow-md tw-ease-in-out tw-transition-all",
+              "tw-cursor-pointer tw-select-none tw-flex tw-items-center tw-rounded-full tw-bg-white tw-border tw-border-solid tw-border-gray-300 tw-px-2 tw-py-1.5 hover:tw-shadow-md tw-ease-in-out tw-transition-all",
               open && "tw-shadow-md",
             )}
           >

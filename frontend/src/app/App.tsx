@@ -6,6 +6,7 @@ import { Footer } from "src/components/footer/Footer";
 import { Header } from "src/components/header/Header";
 import { LogoLoading } from "src/components/loading/LogoLoading";
 import { Toast, getToastContentFromDetails } from "src/components/notifications/Notifications";
+import { About } from "src/pages/about/About";
 import { Home } from "src/pages/home/Home";
 import { Hosting } from "src/pages/hosting/Hosting";
 import { Listing } from "src/pages/listing/Listing";
@@ -104,6 +105,7 @@ export const router = createBrowserRouter(
       <Route path="/signup" element={<Login create />} />
       <Route path="/search" element={<Search />} />
       <Route path="/privacy" element={<Privacy />} />
+      <Route path="/about" element={<About />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/terms" element={<Terms />} />
       <Route path="/hosting" element={<Hosting />} />

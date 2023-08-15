@@ -1,4 +1,5 @@
 import React from "react";
+import { NavLink } from "react-router-dom";
 import {
   CampingIcon,
   ClimbingIcon,
@@ -22,6 +23,10 @@ export const Home: React.FC = () => {
 
   if (!featured) {
     return <Loading />;
+  }
+
+  if (featured.length > 0) {
+    return <ComingSoon />;
   }
 
   return (
@@ -89,6 +94,23 @@ export const CategorySelector: React.FC = () => {
           <SnowmobileIcon className="tw-h-10 tw-w-10" />
           <span className="tw-text-xs tw-font-medium tw-mt-1 sm:tw-mt-2">Snowmobile</span>
         </div>
+      </div>
+    </div>
+  );
+};
+
+export const ComingSoon: React.FC = () => {
+  return (
+    <div className="tw-z-0 tw-flex tw-flex-col tw-items-center tw-w-full tw-h-full">
+      <div className="tw-top-0 tw-w-[100vw] tw-h-[100vh] tw-absolute tw-object-cover tw-bg-[linear-gradient(0deg,_#fdfcfb_0%,_#f9e7d9_100%)]" />
+      <div className="tw-z-10 tw-flex tw-flex-col tw-w-full tw-h-full tw-justify-center tw-items-center -tw-mt-32">
+        <div className="tw-flex tw-w-fit tw-font-bold tw-text-6xl tw-font-[Lateef]">Adventure starts here</div>
+        <div className="tw-flex tw-w-fit tw-font-medium tw-text-3xl tw-font-[Lateef] tw-text-center">
+          Explore fully planned trips led by professional guides.
+        </div>
+        <NavLink className="tw-underline tw-mt-2" to="/about">
+          Learn more
+        </NavLink>
       </div>
     </div>
   );
