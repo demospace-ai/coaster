@@ -233,11 +233,11 @@ const MobileMenu: React.FC = () => {
                               </p>
                             </div>
                             {user?.is_host ? (
-                              <NavLink className={navItem} to="/hosting">
+                              <NavLink className={navItem} to="/hosting" onClick={() => setOpen(false)}>
                                 Switch to hosting
                               </NavLink>
                             ) : (
-                              <NavLink className={navItem} to="/listings/new">
+                              <NavLink className={navItem} to="/listings/new" onClick={() => setOpen(false)}>
                                 List your experience
                               </NavLink>
                             )}
