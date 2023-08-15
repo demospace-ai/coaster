@@ -36,7 +36,7 @@ export const SearchResult: React.FC<{ listing: Listing }> = ({ listing }) => {
 
   return (
     <div
-      className="tw-flex tw-flex-col tw-text-base tw-font-medium tw-cursor-pointer tw-text-ellipsis tw-max-w-[320px]"
+      className="tw-flex tw-flex-col tw-text-base tw-font-medium tw-cursor-pointer tw-text-ellipsis"
       onClick={() => navigate(`/listings/${listing.id}`)}
     >
       {/* TODO: when adding wishlist functionality, uncomment this
