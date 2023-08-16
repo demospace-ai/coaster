@@ -97,12 +97,12 @@ const StartContent: React.FC<{
         {create ? "Welcome to Coaster." : "Sign in to continue to Coaster."}
       </div>
       <EmailCheck setStep={setStep} setEmail={setEmail} />
-      <div className='tw-flex tw-w-full tw-items-center tw-text-xs tw-mt-5 tw-justify-between before:tw-block before:tw-w-full before:tw-h-px before:tw-content-[" "] before:tw-bg-gray-300 before:tw-mr-4 before:tw-ml-px after:tw-block after:tw-w-full after:tw-h-px after:tw-content-[" "] after:tw-bg-gray-300 after:tw-ml-4 after:tw-mr-px'>
+      <div className='tw-flex tw-w-full tw-items-center tw-text-sm tw-mt-5 tw-justify-between before:tw-block before:tw-w-full before:tw-h-px before:tw-content-[" "] before:tw-bg-gray-300 before:tw-mr-4 before:tw-ml-px after:tw-block after:tw-w-full after:tw-h-px after:tw-content-[" "] after:tw-bg-gray-300 after:tw-ml-4 after:tw-mr-px'>
         or
       </div>
       <a
         className={classNames(
-          "tw-relative tw-flex tw-items-center tw-select-none tw-cursor-pointer tw-justify-center tw-mt-4 tw-h-12 tw-border tw-border-slate-400 hover:tw-bg-slate-100 tw-transition-colors tw-font-medium tw-w-80 tw-text-slate-800 tw-rounded",
+          "tw-relative tw-flex tw-items-center tw-select-none tw-cursor-pointer tw-justify-center tw-mt-4 tw-h-12 tw-border tw-border-slate-400 hover:tw-bg-slate-100 tw-transition-colors tw-font-medium tw-w-full tw-text-slate-800 tw-rounded",
         )}
         href={getEndpointUrl(OAuthRedirect, { provider: OAuthProvider.Google })}
       >
