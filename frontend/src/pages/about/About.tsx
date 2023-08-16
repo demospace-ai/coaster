@@ -1,10 +1,11 @@
-import Founders from "src/components/images/founders.jpg";
+import { Image } from "src/components/images/Image";
+import Founders from "src/components/images/founders.webp";
 
 export const About: React.FC = () => {
   return (
     <div className="tw-flex tw-w-full tw-items-center tw-justify-center">
-      <div className="tw-flex tw-flex-col tw-items-center tw-max-w-[300px] sm:tw-max-w-[600px] tw-mb-64 tw-mt-10">
-        <img
+      <div className="tw-flex tw-flex-col tw-items-center tw-max-w-[300px] sm:tw-max-w-[600px] tw-mt-32">
+        <Image
           className="tw-rounded-xl tw-mb-5 sm:tw-mb-8 tw-max-w-[80%] sm:tw-max-w-xs"
           src={Founders}
           alt="The founders of Coaster"

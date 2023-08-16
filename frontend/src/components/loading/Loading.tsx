@@ -4,6 +4,7 @@ import { mergeClasses } from "src/utils/twmerge";
 type LoadingProps = {
   className?: string;
   light?: boolean;
+  style?: React.CSSProperties;
 };
 
 export const Loading: React.FC<LoadingProps> = (props) => {
@@ -11,6 +12,7 @@ export const Loading: React.FC<LoadingProps> = (props) => {
     return (
       <svg
         className={mergeClasses("tw-m-auto tw-animate-spin tw-h-5 tw-w-5 tw-text-slate-100", props.className)}
+        style={props.style}
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
@@ -27,6 +29,7 @@ export const Loading: React.FC<LoadingProps> = (props) => {
   return (
     <svg
       className={mergeClasses("tw-m-auto tw-animate-spin tw-h-5 tw-w-5 tw-text-slate-900", props.className)}
+      style={props.style}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"

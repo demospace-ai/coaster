@@ -13,7 +13,8 @@ import {
   SurfingIcon,
   YogaIcon,
 } from "src/components/icons/Icons";
-import Hero from "src/components/images/hero.jpeg";
+import { Image } from "src/components/images/Image";
+import Hero from "src/components/images/hero.webp";
 import { Loading } from "src/components/loading/Loading";
 import { SearchResult } from "src/pages/search/Search";
 import { useFeatured } from "src/rpc/data";
@@ -114,7 +115,7 @@ export const ComingSoon: React.FC = () => {
         <NavLink className="tw-underline tw-mt-2" to="/about">
           Learn more
         </NavLink>
-        <img src={Hero} className="tw-mt-10 sm:tw-rounded-xl tw-object-cover tw-h-[400px] sm:tw-h-[500px]" />
+        <Image src={Hero} className="tw-mt-10 sm:tw-rounded-xl tw-object-cover tw-h-[400px] sm:tw-h-[500px]" />
       </div>
     </div>
   );
