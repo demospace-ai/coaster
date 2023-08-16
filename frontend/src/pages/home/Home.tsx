@@ -25,7 +25,7 @@ export const Home: React.FC = () => {
     return <Loading />;
   }
 
-  if (featured.length === 0) {
+  if (featured.length >= 0) {
     return <ComingSoon />;
   }
 
@@ -104,7 +104,9 @@ export const ComingSoon: React.FC = () => {
     <div className="tw-z-0 tw-flex tw-flex-col tw-items-center tw-w-full tw-h-full">
       <div className="tw-top-0 tw-w-[100vw] tw-h-[100vh] tw-absolute tw-object-cover tw-bg-[linear-gradient(0deg,_#fdfcfb_0%,_#f9e7d9_100%)]" />
       <div className="tw-z-10 tw-flex tw-flex-col tw-w-full tw-h-full tw-justify-center tw-items-center -tw-mt-32">
-        <div className="tw-flex tw-w-fit tw-font-bold tw-text-6xl tw-font-[Lateef]">Adventure starts here</div>
+        <div className="tw-flex tw-w-fit tw-font-bold tw-text-[2.5rem] sm:tw-text-6xl tw-font-[Lateef] tw-text-center">
+          Adventure starts here
+        </div>
         <div className="tw-flex tw-w-fit tw-font-medium tw-text-3xl tw-font-[Lateef] tw-text-center">
           Explore fully planned trips led by professional guides.
         </div>
