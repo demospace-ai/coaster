@@ -23,3 +23,13 @@ const (
 	LoginMethodGoogle    LoginMethod = "google"
 	LoginMethodUndefined LoginMethod = "undefined"
 )
+
+type Waitlist struct {
+	Phone string `json:"phone"`
+
+	BaseModel
+}
+
+func (Waitlist) TableName() string {
+	return "waitlist"
+}

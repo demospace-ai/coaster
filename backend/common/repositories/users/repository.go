@@ -11,6 +11,7 @@ import (
 	"go.fabra.io/server/common/repositories/external_profiles"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 // Maximum of 62^8 guarantees number will be at most 8 digits in base
@@ -150,6 +151,18 @@ func SetIsHost(db *gorm.DB, userID int64, isHost bool) error {
 	result := db.Model(&models.User{}).Where("id = ?", userID).Update("is_host", isHost)
 	if result.Error != nil {
 		return errors.Wrap(result.Error, "(users.SetIsHost)")
+	}
+
+	return nil
+}
+
+func JoinWaitlist(db *gorm.DB, phone string) error {
+	waitlist := models.Waitlist{
+		Phone: phone,
+	}
+	result := db.Clauses(clause.OnConflict{DoNothing: true, Columns: []clause.Column{{Name: "phone"}}}).Create(&waitlist)
+	if result.Error != nil {
+		return errors.Wrap(result.Error, "(users.JoinWaitlist)")
 	}
 
 	return nil

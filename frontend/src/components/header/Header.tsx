@@ -10,6 +10,19 @@ import { mergeClasses } from "src/utils/twmerge";
 
 export const Header: React.FC = () => {
   const navigate = useNavigate();
+  if (true) {
+    return (
+      <div className="tw-flex tw-z-10 tw-w-full tw-mt-2 tw-justify-center">
+        <NavLink
+          className="tw-w-fit tw-my-auto tw-max-w-[150px] tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-tracking-[-0.5px] tw-mt-[-2px] tw-font-extrabold tw-font-[Lateef] tw-text-[48px]"
+          to="/"
+        >
+          Coaster
+        </NavLink>
+      </div>
+    );
+  }
+
   return (
     <div className="tw-sticky tw-z-10 tw-top-0 tw-flex tw-box-border tw-max-h-[72px] tw-min-h-[72px] sm:tw-max-h-[96px] sm:tw-min-h-[96px] tw-w-full tw-px-4 sm:tw-px-20 tw-py-3 tw-items-center tw-justify-between tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white">
       <LogoLink />

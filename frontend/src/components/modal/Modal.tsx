@@ -28,11 +28,14 @@ export const Modal: React.FC<ModalProps> = (props) => {
 
   return (
     <div
-      className={classNames("tw-fixed tw-z-50", showHideClassName)}
+      className={classNames(
+        "tw-absolute tw-top-0 tw-left-0 tw-h-full tw-w-full tw-z-50 tw-bg-[rgba(255,255,255,10%)] tw-backdrop-blur-sm",
+        showHideClassName,
+      )}
       onClick={props.clickToEscape ? props.close : undefined}
     >
       <section
-        className="tw-fixed tw-bg-white tw-flex tw-flex-col tw-top-[40%] tw-bottom-[50%] tw-translate-x-1/2 tw-translate-y-1/2 tw-rounded-lg tw-shadow-md"
+        className="tw-absolute tw-bg-white tw-flex tw-flex-col tw-top-[40%] tw-left-[50%] -tw-translate-x-1/2 -tw-translate-y-1/2 tw-rounded-lg tw-shadow-md"
         onClick={(e) => e.stopPropagation()}
       >
         <div style={{ display: "flex" }}>

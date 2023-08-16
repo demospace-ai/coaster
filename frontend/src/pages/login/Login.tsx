@@ -141,7 +141,7 @@ const EmailCheck: React.FC<{ setStep: (step: LoginStep) => void; setEmail: (emai
   const {
     handleSubmit,
     register,
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm<EmailCheckSchemaType>({
     mode: "onBlur",
     resolver: zodResolver(EmailCheckSchema),
@@ -168,6 +168,7 @@ const EmailCheck: React.FC<{ setStep: (step: LoginStep) => void; setEmail: (emai
       })}
     >
       <Input autoComplete="email" className="tw-w-full tw-flex tw-mt-3" label="Email" {...register("email")} />
+      <FormError message={errors.email?.message} />
       <button
         type="submit"
         className="tw-flex tw-items-center tw-justify-center tw-w-full tw-bg-[#3673aa] tw-text-white tw-font-medium tw-text-base tw-rounded-md tw-h-12 tw-mt-4"
@@ -191,7 +192,7 @@ const EmailLoginForm: React.FC<{ reset: () => void; email?: string }> = ({ reset
     handleSubmit,
     register,
     watch,
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm<EmailLoginSchemaType>({
     mode: "onBlur",
     defaultValues: {
@@ -226,6 +227,7 @@ const EmailLoginForm: React.FC<{ reset: () => void; email?: string }> = ({ reset
           {...register("email")}
           value={emailValue}
         />
+        <FormError message={errors.email?.message} />
         <Input
           autoComplete="password"
           type="password"
@@ -233,6 +235,7 @@ const EmailLoginForm: React.FC<{ reset: () => void; email?: string }> = ({ reset
           label="Password"
           {...register("password")}
         />
+        <FormError message={errors.password?.message} />
         <button
           type="submit"
           className="tw-flex tw-items-center tw-justify-center tw-w-full tw-bg-[#3673aa] tw-text-white tw-font-medium tw-text-base tw-rounded-md tw-h-12 tw-mt-4"
@@ -273,7 +276,7 @@ const EmailSignup: React.FC<{ reset: () => void; email?: string }> = ({ reset, e
     handleSubmit,
     register,
     watch,
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm<EmailSignupSchemaType>({
     mode: "onBlur",
     defaultValues: {

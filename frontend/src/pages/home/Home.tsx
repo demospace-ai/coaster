@@ -1,5 +1,8 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
+import { zodResolver } from "@hookform/resolvers/zod";
+import isValidPhoneNumber from "libphonenumber-js";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { Button } from "src/components/button/Button";
 import {
   CampingIcon,
   ClimbingIcon,
@@ -15,10 +18,16 @@ import {
 } from "src/components/icons/Icons";
 import { Image } from "src/components/images/Image";
 import Hero from "src/components/images/hero.webp";
+import { Input } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
+import { Modal } from "src/components/modal/Modal";
 import { SearchResult } from "src/pages/search/Search";
+import { sendRequest } from "src/rpc/ajax";
+import { JoinWaitlist } from "src/rpc/api";
 import { useFeatured } from "src/rpc/data";
 import { Listing } from "src/rpc/types";
+import { mergeClasses } from "src/utils/twmerge";
+import { z } from "zod";
 
 export const Home: React.FC = () => {
   const { featured } = useFeatured();
@@ -102,19 +111,70 @@ export const CategorySelector: React.FC = () => {
 };
 
 export const ComingSoon: React.FC = () => {
+  const [showWaitlist, setShowWaitlist] = useState<boolean>(false);
+  const [joined, setJoined] = useState<boolean>(false);
+  const waitlistSchema = z.object({
+    phone: z.string().refine((value) => isValidPhoneNumber(value, "US") !== undefined),
+  });
+  type WaitlistSchemaType = z.infer<typeof waitlistSchema>;
+  const {
+    handleSubmit,
+    register,
+    formState: { errors, isValid },
+  } = useForm<WaitlistSchemaType>({
+    mode: "onBlur",
+    resolver: zodResolver(waitlistSchema),
+  });
+
+  const joinWaitlist = async (data: { phone: string }) => {
+    await sendRequest(JoinWaitlist, { payload: { phone: data.phone } });
+    setJoined(true);
+  };
+
   return (
-    <div className="tw-z-0 tw-flex tw-flex-col tw-w-full tw-h-full">
+    <div className="tw-flex tw-flex-col tw-w-full tw-h-full">
+      <Modal show={showWaitlist} close={() => setShowWaitlist(false)} clickToEscape={true}>
+        <div className="tw-w-[400px] tw-h-[200px] tw-px-20 tw-pb-20">
+          {joined ? (
+            <div className="tw-mt-5 tw-flex tw-flex-col tw-items-center tw-justify-center">
+              <div className="tw-text-center tw-w-full tw-text-2xl tw-font-bold">You're on the list!</div>
+              <div className="tw-text-center tw-mt-2">We'll let you know when you can get started.</div>
+            </div>
+          ) : (
+            <>
+              <div className="tw-text-center tw-w-full tw-text-2xl tw-font-bold tw-mb-3">Join waitlist</div>
+              <Input
+                label="Phone number"
+                type="tel"
+                className={mergeClasses("tw-mb-2", errors.phone && "tw-border-red-600 hover:tw-border-red-600")}
+                {...register("phone")}
+              />
+              <Button
+                className="tw-flex tw-h-[52px] tw-items-center tw-justify-center tw-whitespace-nowrap tw-bg-[#a6701d] hover:tw-bg-[#824f00] tw-w-full"
+                onClick={handleSubmit(joinWaitlist)}
+              >
+                Join waitlist
+              </Button>
+            </>
+          )}
+        </div>
+      </Modal>
       <div className="tw-top-0 tw-w-[100vw] tw-h-[100vh] tw-absolute tw-object-cover tw-bg-[linear-gradient(0deg,_#fdfcfb_0%,_#f9e7d9_100%)]" />
       <div className="tw-z-10 tw-flex tw-flex-col tw-w-full tw-h-full tw-justify-center tw-items-center tw-mt-10">
         <div className="tw-flex tw-w-fit tw-font-bold tw-text-[2.5rem] sm:tw-text-8xl tw-font-[Lateef] tw-text-center">
           Adventure starts here
         </div>
         <div className="tw-flex tw-w-80 sm:tw-w-fit tw-font-medium tw-text-3xl tw-font-[Lateef] tw-text-center">
-          Explore fully planned trips led by professional guides.
+          Discover fully planned trips led by professional guides.
         </div>
-        <NavLink className="tw-underline tw-mt-2" to="/about">
-          Learn more
-        </NavLink>
+        <div className="tw-flex tw-items-center tw-gap-2 tw-mt-5">
+          <Button
+            className="tw-flex tw-h-[52px] tw-items-center tw-justify-center tw-whitespace-nowrap tw-bg-[#a6701d] hover:tw-bg-[#824f00] tw-px-8"
+            onClick={() => setShowWaitlist(true)}
+          >
+            Request access
+          </Button>
+        </div>
         <Image src={Hero} className="tw-mt-10 sm:tw-rounded-xl tw-object-cover tw-h-[400px] sm:tw-h-[500px]" />
       </div>
     </div>

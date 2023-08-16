@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS waitlist (
+  id    BIGSERIAL PRIMARY KEY,
+  phone VARCHAR(20) NOT NULL,
+
+  created_at     TIMESTAMP WITH TIME ZONE NOT NULL,
+  updated_at     TIMESTAMP WITH TIME ZONE NOT NULL,
+  deactivated_at TIMESTAMP WITH TIME ZONE
+);
+
+ALTER TABLE waitlist ADD CONSTRAINT unique_phone UNIQUE (phone);

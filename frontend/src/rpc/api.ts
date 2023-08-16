@@ -122,3 +122,10 @@ export const EmailLogin: IEndpoint<EmailLoginRequest, EmailLoginResponse> = {
   path: "/login",
   track: true,
 };
+
+export const JoinWaitlist: IEndpoint<{ phone: string }, undefined> = {
+  name: "Join waitlist",
+  method: "POST",
+  path: "/waitlist",
+  track: true,
+};

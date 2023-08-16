@@ -125,5 +125,11 @@ func (s ApiService) UnauthenticatedRoutes() []router.UnauthenticatedRoute {
 			Pattern:     "/login",
 			HandlerFunc: s.EmailLogin,
 		},
+		{
+			Name:        "Join waitlist",
+			Method:      router.POST,
+			Pattern:     "/waitlist",
+			HandlerFunc: s.JoinWaitlist,
+		},
 	}
 }
