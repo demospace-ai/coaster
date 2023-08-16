@@ -134,7 +134,7 @@ export const ComingSoon: React.FC = () => {
   return (
     <div className="tw-flex tw-flex-col tw-w-full tw-h-full">
       <Modal show={showWaitlist} close={() => setShowWaitlist(false)} clickToEscape={true}>
-        <div className="tw-w-[400px] tw-h-[200px] tw-px-20 tw-pb-20">
+        <div className="tw-w-[320px] sm:tw-w-[400px] tw-h-[200px] tw-px-10 sm:tw-px-20 tw-pb-20">
           {joined ? (
             <div className="tw-mt-5 tw-flex tw-flex-col tw-items-center tw-justify-center">
               <div className="tw-text-center tw-w-full tw-text-2xl tw-font-bold">You're on the list!</div>
@@ -175,7 +175,7 @@ export const ComingSoon: React.FC = () => {
             Request access
           </Button>
         </div>
-        <Image src={Hero} className="tw-mt-10 sm:tw-rounded-xl tw-object-cover tw-h-[400px] sm:tw-h-[500px]" />
+        <Image src={Hero} className="tw-mt-10 sm:tw-rounded-xl tw-object-cover tw-h-[400px]" />
       </div>
     </div>
   );
