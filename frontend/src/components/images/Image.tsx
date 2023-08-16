@@ -1,5 +1,6 @@
 import { ImgHTMLAttributes, useState } from "react";
 import { Loading } from "src/components/loading/Loading";
+import { mergeClasses } from "src/utils/twmerge";
 
 interface ImageProps extends ImgHTMLAttributes<HTMLImageElement> {}
 
@@ -8,8 +9,12 @@ export const Image: React.FC<ImageProps> = (props) => {
 
   return (
     <>
-      <Loading className={props.className} style={{ display: loaded ? "none" : "block" }} />
-      <img {...props} onLoad={() => setLoaded(true)} style={{ display: loaded ? "block" : "none" }} />
+      <Loading className={mergeClasses(props.className, loaded ? "tw-hidden" : "tw-block")} />
+      <img
+        className={mergeClasses(loaded ? "tw-block" : "tw-hidden", props.className)}
+        {...props}
+        onLoad={() => setLoaded(true)}
+      />
     </>
   );
 };

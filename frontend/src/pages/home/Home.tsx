@@ -36,7 +36,8 @@ export const Home: React.FC = () => {
     return <Loading />;
   }
 
-  if (featured.length >= 0) {
+  // TODO: launch
+  if (true) {
     return <ComingSoon />;
   }
 
@@ -45,7 +46,7 @@ export const Home: React.FC = () => {
       <CategorySelector />
       <div>
         <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-3 xl:tw-grid-cols-4 2xl:tw-grid-cols-5 tw-mt-1 sm:tw-mt-4 tw-mb-5 tw-font-bold tw-text-3xl tw-gap-10">
-          {featured.map((listing: Listing) => (
+          {featured?.map((listing: Listing) => (
             <SearchResult key={listing.id} listing={listing} />
           ))}
         </div>
@@ -175,7 +176,10 @@ export const ComingSoon: React.FC = () => {
             Request access
           </Button>
         </div>
-        <Image src={Hero} className="tw-mt-10 sm:tw-rounded-xl tw-object-cover tw-h-[400px]" />
+        <Image
+          src={Hero}
+          className="tw-invisible sm:tw-visible tw-mt-10 sm:tw-rounded-xl tw-object-cover tw-h-[400px]"
+        />
       </div>
     </div>
   );

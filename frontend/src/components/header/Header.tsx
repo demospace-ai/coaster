@@ -10,6 +10,8 @@ import { mergeClasses } from "src/utils/twmerge";
 
 export const Header: React.FC = () => {
   const navigate = useNavigate();
+
+  // TODO: launch
   if (true) {
     return (
       <div className="tw-flex tw-z-10 tw-w-full tw-mt-2 tw-justify-center">
