@@ -13,6 +13,7 @@ import {
   SurfingIcon,
   YogaIcon,
 } from "src/components/icons/Icons";
+import Hero from "src/components/images/hero.jpeg";
 import { Loading } from "src/components/loading/Loading";
 import { SearchResult } from "src/pages/search/Search";
 import { useFeatured } from "src/rpc/data";
@@ -101,18 +102,19 @@ export const CategorySelector: React.FC = () => {
 
 export const ComingSoon: React.FC = () => {
   return (
-    <div className="tw-z-0 tw-flex tw-flex-col tw-items-center tw-w-full tw-h-full">
+    <div className="tw-z-0 tw-flex tw-flex-col tw-w-full tw-h-full">
       <div className="tw-top-0 tw-w-[100vw] tw-h-[100vh] tw-absolute tw-object-cover tw-bg-[linear-gradient(0deg,_#fdfcfb_0%,_#f9e7d9_100%)]" />
-      <div className="tw-z-10 tw-flex tw-flex-col tw-w-full tw-h-full tw-justify-center tw-items-center -tw-mt-32">
-        <div className="tw-flex tw-w-fit tw-font-bold tw-text-[2.5rem] sm:tw-text-6xl tw-font-[Lateef] tw-text-center">
+      <div className="tw-z-10 tw-flex tw-flex-col tw-w-full tw-h-full tw-justify-center tw-items-center sm:tw-mt-10">
+        <div className="tw-flex tw-w-fit tw-font-bold tw-text-[2.5rem] sm:tw-text-8xl tw-font-[Lateef] tw-text-center">
           Adventure starts here
         </div>
-        <div className="tw-flex tw-w-fit tw-font-medium tw-text-3xl tw-font-[Lateef] tw-text-center">
+        <div className="tw-flex tw-w-80 sm:tw-w-fit tw-font-medium tw-text-3xl tw-font-[Lateef] tw-text-center">
           Explore fully planned trips led by professional guides.
         </div>
         <NavLink className="tw-underline tw-mt-2" to="/about">
           Learn more
         </NavLink>
+        <img src={Hero} className="tw-mt-10 sm:tw-rounded-xl tw-object-cover tw-h-[400px] sm:tw-h-[500px]" />
       </div>
     </div>
   );
