@@ -67,7 +67,7 @@ export const Login: React.FC<{ create?: boolean }> = ({ create }) => {
           <img src={longlogo} className="tw-h-8 tw-select-none tw-mb-4" alt="coaster logo" />
           <div className="tw-flex tw-flex-col tw-items-center tw-my-2 tw-w-full">{loginContent}</div>
         </div>
-        <div className="tw-text-xs tw-text-center tw-mt-4 tw-text-slate-800 tw-select-none">
+        <div className="tw-text-xs tw-text-center tw-mt-4 tw-text-slate-800 tw-select-none tw-mx-8 sm:tw-mx-0">
           By continuing you agree to Coaster's{" "}
           <a className="tw-text-blue-500" href="https://trycoaster.com/terms" target="_blank" rel="noreferrer">
             Terms of Use
@@ -102,7 +102,7 @@ const StartContent: React.FC<{
       </div>
       <a
         className={classNames(
-          "tw-relative tw-flex tw-items-center tw-select-none tw-cursor-pointer tw-justify-center tw-mt-4 tw-h-12 tw-border tw-border-slate-400 hover:tw-bg-slate-100 tw-transition-colors tw-font-medium tw-w-full tw-text-slate-800 tw-rounded",
+          "tw-relative tw-flex tw-items-center tw-select-none tw-cursor-pointer tw-justify-center tw-mt-4 tw-h-12 tw-bg-white tw-border tw-border-slate-300 hover:tw-bg-slate-100 tw-transition-colors tw-font-medium tw-w-full tw-text-slate-800 tw-rounded",
         )}
         href={getEndpointUrl(OAuthRedirect, { provider: OAuthProvider.Google })}
       >
