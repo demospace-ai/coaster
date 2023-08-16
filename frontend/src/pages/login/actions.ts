@@ -16,7 +16,7 @@ export function useOnLoginSuccess() {
 function identifyUser(user: User) {
   if (isProd()) {
     rudderanalytics.identify(user.id.toString(), {
-      name: `${user.name}`,
+      name: `${user.first_name} ${user.last_name}`,
       email: user.email,
     });
 

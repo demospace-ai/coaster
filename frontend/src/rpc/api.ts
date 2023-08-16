@@ -1,7 +1,12 @@
 import {
   CheckSessionResponse,
+  CreateUserRequest,
+  CreateUserResponse,
+  EmailLoginRequest,
+  EmailLoginResponse,
   Listing,
   ListingUpdates,
+  LoginMethod,
   LoginRequest,
   LoginResponse,
   OAuthProvider,
@@ -13,7 +18,6 @@ export interface IEndpoint<RequestType, ResponseType, PathParams = {}, QueryPara
   method: "GET" | "POST" | "DELETE" | "PUT" | "PATCH";
   path: string;
   track?: boolean;
-  queryParams?: string[]; // These will be used as query params instead of being used as path params
   noJson?: boolean; // TODO: do this better
 }
 
@@ -23,11 +27,10 @@ export const CheckSession: IEndpoint<undefined, CheckSessionResponse> = {
   path: "/check_session",
 };
 
-export const SearchListings: IEndpoint<{ location?: string; radius?: number }, Listing[]> = {
+export const SearchListings: IEndpoint<undefined, Listing[], undefined, { location?: string; radius?: number }> = {
   name: "Search listings",
   method: "GET",
   path: "/listings",
-  queryParams: ["location", "radius"],
 };
 
 export const GetListing: IEndpoint<undefined, Listing, { listingID: number }> = {
@@ -84,7 +87,6 @@ export const OAuthRedirect: IEndpoint<{ provider: OAuthProvider }, undefined> = 
   name: "OAuth Redirect",
   method: "GET",
   path: "/oauth_redirect",
-  queryParams: ["provider"],
   track: true,
 };
 
@@ -92,5 +94,31 @@ export const UpdateUser: IEndpoint<UserUpdates, undefined> = {
   name: "Update user",
   method: "POST",
   path: "/user",
+  track: true,
+};
+
+export const CheckEmail: IEndpoint<
+  undefined,
+  { exists: boolean; login_method: LoginMethod },
+  undefined,
+  { email: string }
+> = {
+  name: "Check email",
+  method: "GET",
+  path: "/email",
+  track: true,
+};
+
+export const CreateUser: IEndpoint<CreateUserRequest, CreateUserResponse> = {
+  name: "Create user",
+  method: "POST",
+  path: "/register",
+  track: true,
+};
+
+export const EmailLogin: IEndpoint<EmailLoginRequest, EmailLoginResponse> = {
+  name: "Email login",
+  method: "POST",
+  path: "/login",
   track: true,
 };

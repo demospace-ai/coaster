@@ -1,0 +1,3 @@
+ALTER TABLE users DROP COLUMN IF EXISTS login_method;
+ALTER TABLE users DROP COLUMN IF EXISTS hashed_password;
+ALTER TABLE users DROP COLUMN IF EXISTS email_verified;

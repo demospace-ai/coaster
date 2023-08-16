@@ -6,21 +6,17 @@ import { HttpError } from "src/utils/errors";
 
 const ROOT_DOMAIN = isProd() ? "https://api.trycoaster.com" : "http://localhost:8080";
 
-export function getEndpointUrl<RequestType extends Record<string, any>, ResponseType>(
-  endpoint: IEndpoint<RequestType, ResponseType>,
-  payload?: RequestType,
-  extraHeaders?: [string, string][],
+export function getEndpointUrl<QueryParams extends Record<string, any>>(
+  endpoint: IEndpoint<any, any, any, QueryParams>,
+  queryParams?: QueryParams,
 ): string {
   const toPath = compile(endpoint.path);
-  const path = toPath(payload);
+  const path = toPath();
 
   const url = new URL(ROOT_DOMAIN + path);
-  if (endpoint.queryParams && payload) {
-    endpoint.queryParams.forEach((queryParam) => {
-      const queryParamValue = payload[queryParam];
-      if (queryParamValue) {
-        url.searchParams.append(queryParam, queryParamValue);
-      }
+  if (queryParams) {
+    Object.entries(queryParams).forEach(([key, value]) => {
+      url.searchParams.append(key, value);
     });
   }
 
@@ -46,13 +42,9 @@ export async function sendRequest<
   const path = toPath(opts?.pathParams);
 
   const url = new URL(ROOT_DOMAIN + path);
-  if (endpoint.queryParams && opts?.queryParams) {
-    const queryParams = opts?.queryParams;
-    endpoint.queryParams.forEach((queryParam) => {
-      const queryParamValue = queryParams[queryParam];
-      if (queryParamValue) {
-        url.searchParams.append(queryParam, queryParamValue);
-      }
+  if (opts?.queryParams) {
+    Object.entries(opts.queryParams).forEach(([key, value]) => {
+      url.searchParams.append(key, value);
     });
   }
 

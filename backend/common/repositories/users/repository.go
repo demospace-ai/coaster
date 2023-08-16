@@ -9,6 +9,7 @@ import (
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/oauth"
 	"go.fabra.io/server/common/repositories/external_profiles"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -33,8 +34,7 @@ func LoadByExternalID(db *gorm.DB, externalID string) (*models.User, error) {
 func LoadByEmail(db *gorm.DB, email string) (*models.User, error) {
 	var user models.User
 	result := db.Table("users").
-		Joins("JOIN emails ON emails.user_id = users.id").
-		Where("emails.email = ?", email).
+		Where("users.email = ?", email).
 		Where("users.deactivated_at IS NULL").
 		Take(&user)
 
@@ -80,13 +80,39 @@ func UpdateUser(db *gorm.DB, user *models.User, updates input.UserUpdates) error
 	return nil
 }
 
-func create(db *gorm.DB, firstName string, lastName string, email string, profilePictureURL string) (*models.User, error) {
+func CreateUserFromEmail(db *gorm.DB, email string, firstName string, lastName string, password string) (*models.User, error) {
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, errors.Wrap(err, "(users.CreateUserFromEmail) generating password hash")
+	}
+	passwordHashStr := string(passwordHash)
+
 	user := models.User{
-		FirstName:         firstName,
-		LastName:          lastName,
-		Email:             email,
-		ProfilePictureURL: profilePictureURL,
+		Email:          email,
+		FirstName:      firstName,
+		LastName:       lastName,
+		HashedPassword: &passwordHashStr,
+		LoginMethod:    models.LoginMethodEmail,
+		IsHost:         false,
+		EmailVerified:  false,
+	}
+
+	result := db.Create(&user)
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(users.CreateUserFromEmail) creating user")
+	}
+
+	return &user, nil
+}
+
+func CreateUserForExternalInfo(db *gorm.DB, externalUserInfo *oauth.ExternalUserInfo) (*models.User, error) {
+	user := models.User{
+		FirstName:         externalUserInfo.FirstName,
+		LastName:          externalUserInfo.LastName,
+		Email:             externalUserInfo.Email,
+		ProfilePictureURL: externalUserInfo.ProfilePictureURL,
 		IsHost:            false,
+		EmailVerified:     true,
 	}
 
 	result := db.Create(&user)
@@ -94,23 +120,14 @@ func create(db *gorm.DB, firstName string, lastName string, email string, profil
 		return nil, errors.Wrap(result.Error, "(users.create)")
 	}
 
-	return &user, nil
-}
-
-func CreateUserForExternalInfo(db *gorm.DB, externalUserInfo *oauth.ExternalUserInfo) (*models.User, error) {
-	user, err := create(db, externalUserInfo.FirstName, externalUserInfo.LastName, externalUserInfo.Email, externalUserInfo.ProfilePictureURL)
-	if err != nil {
-		return nil, errors.Wrap(err, "(users.CreateUserForExternalInfo)")
-	}
-
-	_, err = external_profiles.Create(db, externalUserInfo.ExternalID, externalUserInfo.OauthProvider, user.ID)
+	_, err := external_profiles.Create(db, externalUserInfo.ExternalID, externalUserInfo.OauthProvider, user.ID)
 	if err != nil {
 		return nil, errors.Wrap(err, "(users.CreateUserForExternalInfo)")
 	}
 
 	events.TrackSignup(user.ID, fmt.Sprintf("%s %s", user.FirstName, user.LastName), user.Email)
 
-	return user, nil
+	return &user, nil
 }
 
 func GetOrCreateForExternalInfo(db *gorm.DB, externalUserInfo *oauth.ExternalUserInfo) (*models.User, error) {

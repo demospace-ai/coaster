@@ -107,5 +107,23 @@ func (s ApiService) UnauthenticatedRoutes() []router.UnauthenticatedRoute {
 			Pattern:     "/listings/{listingID}",
 			HandlerFunc: s.GetListing,
 		},
+		{
+			Name:        "Check email",
+			Method:      router.GET,
+			Pattern:     "/email",
+			HandlerFunc: s.CheckEmail,
+		},
+		{
+			Name:        "Create user",
+			Method:      router.POST,
+			Pattern:     "/register",
+			HandlerFunc: s.CreateUser,
+		},
+		{
+			Name:        "Email login",
+			Method:      router.POST,
+			Pattern:     "/login",
+			HandlerFunc: s.EmailLogin,
+		},
 	}
 }

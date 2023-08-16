@@ -73,7 +73,12 @@ export type Coordinates = { latitude: number; longitude: number };
 
 export enum OAuthProvider {
   Google = "google",
-  Github = "github",
+}
+
+export enum LoginMethod {
+  Google = "google",
+  Email = "email",
+  Undefined = "undefined",
 }
 
 export interface User {
@@ -91,6 +96,27 @@ export interface UserUpdates {
   first_name: string;
   last_name: string;
   about?: string;
+}
+
+export interface CreateUserRequest {
+  email: string;
+  first_name: string;
+  last_name: string;
+  password: string;
+  confirm_password: string;
+}
+
+export interface CreateUserResponse {
+  user: User;
+}
+
+export interface EmailLoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface EmailLoginResponse {
+  user: User;
 }
 
 export const Category = z.enum(["surfing", "skiing", "fishing", "hiking", "camping", "cycling", "boating", "diving"]);

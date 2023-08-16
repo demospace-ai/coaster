@@ -31,9 +31,10 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input: React.FC<InputProps> = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
-  const { id, value, disabled, className, label, tooltip, ...other } = props;
+  const { id, disabled, className, label, tooltip, onBlur, onFocus, ...other } = props;
+  const [focused, setFocused] = useState<boolean>(false);
   let classes = [
-    "tw-flex tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border focus:tw-border-slate-700 tw-outline-none",
+    "tw-flex tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-md tw-py-[6px] tw-px-3 tw-w-full tw-box-border focus:tw-border-slate-700 tw-outline-none",
     !disabled && "hover:tw-border-slate-400 tw-cursor-text",
     disabled && "tw-bg-slate-50 tw-select-none tw-cursor-not-allowed",
     className,
@@ -49,6 +50,8 @@ export const Input: React.FC<InputProps> = forwardRef<HTMLInputElement, InputPro
     }
   };
 
+  const showLabel = focused || inputRef.current?.value || props.value;
+
   return (
     <div
       className={mergeClasses(...classes)}
@@ -56,21 +59,33 @@ export const Input: React.FC<InputProps> = forwardRef<HTMLInputElement, InputPro
         inputRef.current?.focus();
       }}
     >
-      <div className="tw-flex tw-flex-col tw-w-full">
-        <label
-          htmlFor={id}
-          className="-tw-mt-px tw-inline-block tw-text-xs tw-font-medium tw-text-gray-600 tw-cursor-[inherit] tw-select-none"
-        >
-          {label}
-        </label>
+      <div className={mergeClasses("tw-relative tw-flex tw-flex-col tw-w-full", label && "tw-mt-3.5")}>
+        {label && (
+          <label
+            htmlFor={id}
+            className={mergeClasses(
+              "tw-absolute -tw-top-1.5 tw-text-base tw-text-gray-500 tw-cursor-[inherit] tw-select-none tw-inline-block tw-transition-all tw-duration-150",
+              showLabel && "-tw-top-3.5 tw-text-xs",
+            )}
+          >
+            {label}
+          </label>
+        )}
         <input
           id={id}
           name={id}
           ref={inputRef}
           autoComplete={id}
-          className="tw-w-full tw-outline-none tw-text-base tw-mt-1 disabled:tw-bg-slate-50 disabled:tw-select-none tw-cursor-[inherit]"
+          className="tw-w-full tw-mt-0.5 tw-outline-none tw-ring-none tw-text-base disabled:tw-bg-slate-50 disabled:tw-select-none tw-cursor-[inherit]"
           onKeyDown={onKeydown}
-          value={value}
+          onBlur={(e) => {
+            setFocused(false);
+            onBlur && onBlur(e);
+          }}
+          onFocus={(e) => {
+            setFocused(true);
+            onFocus && onFocus(e);
+          }}
           disabled={disabled}
           {...other}
         />
