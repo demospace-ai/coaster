@@ -104,7 +104,7 @@ export const ComingSoon: React.FC = () => {
   return (
     <div className="tw-z-0 tw-flex tw-flex-col tw-w-full tw-h-full">
       <div className="tw-top-0 tw-w-[100vw] tw-h-[100vh] tw-absolute tw-object-cover tw-bg-[linear-gradient(0deg,_#fdfcfb_0%,_#f9e7d9_100%)]" />
-      <div className="tw-z-10 tw-flex tw-flex-col tw-w-full tw-h-full tw-justify-center tw-items-center sm:tw-mt-10">
+      <div className="tw-z-10 tw-flex tw-flex-col tw-w-full tw-h-full tw-justify-center tw-items-center tw-mt-10">
         <div className="tw-flex tw-w-fit tw-font-bold tw-text-[2.5rem] sm:tw-text-8xl tw-font-[Lateef] tw-text-center">
           Adventure starts here
         </div>
