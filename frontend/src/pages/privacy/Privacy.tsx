@@ -1,7 +1,7 @@
 export const Privacy: React.FC = () => {
   return (
     <div className="tw-h-full tw-overflow-scroll">
-      <div className="tw-mx-64 tw-mb-64 tw-mt-10">
+      <div className="tw-mx-4 sm:tw-mx-64 tw-mb-64 tw-mt-10">
         <p>
           <div className="tw-text-5xl tw-font-bold tw-mb-8">Privacy Policy</div>
           <strong>Last Updated:</strong> August 7, 2023
