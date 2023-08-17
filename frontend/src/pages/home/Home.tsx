@@ -131,7 +131,7 @@ export const ComingSoon: React.FC = () => {
   };
 
   return (
-    <div className="tw-flex tw-flex-col tw-w-full tw-h-full">
+    <div className="tw-flex tw-flex-col tw-w-full tw-h-[100dvh] sm:tw-h-full">
       <Modal
         show={showWaitlist}
         close={() => {
@@ -165,7 +165,7 @@ export const ComingSoon: React.FC = () => {
           )}
         </div>
       </Modal>
-      <div className="tw-top-0 tw-w-[100vw] tw-h-[100svh] tw-absolute tw-object-cover tw-bg-[linear-gradient(0deg,_#fdfcfb_0%,_#f9e7d9_100%)]" />
+      <div className="tw-top-0 tw-w-screen tw-h-[100svh] tw-absolute tw-object-cover tw-bg-[linear-gradient(0deg,_#fdfcfb_0%,_#f9e7d9_100%)]" />
       <div className="tw-z-10 tw-flex tw-flex-col tw-w-full tw-h-full tw-justify-center tw-items-center">
         <div className="tw-flex tw-w-fit tw-font-bold tw-text-[2.5rem] sm:tw-text-8xl tw-font-[Lateef] tw-text-center -tw-mt-32">
           Adventure starts here
