@@ -118,6 +118,7 @@ export const ComingSoon: React.FC = () => {
   const {
     handleSubmit,
     register,
+    clearErrors,
     formState: { errors, isValid },
   } = useForm<WaitlistSchemaType>({
     mode: "onBlur",
@@ -131,7 +132,14 @@ export const ComingSoon: React.FC = () => {
 
   return (
     <div className="tw-flex tw-flex-col tw-w-full tw-h-full">
-      <Modal show={showWaitlist} close={() => setShowWaitlist(false)} clickToEscape={true}>
+      <Modal
+        show={showWaitlist}
+        close={() => {
+          setShowWaitlist(false);
+          clearErrors();
+        }}
+        clickToEscape={true}
+      >
         <div className="tw-w-[320px] sm:tw-w-[420px] tw-h-[200px] tw-px-8 sm:tw-px-12 tw-pb-20">
           {joined ? (
             <div className="tw-mt-10 tw-flex tw-flex-col tw-items-center tw-justify-center">
