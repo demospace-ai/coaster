@@ -14,7 +14,7 @@ export const Header: React.FC = () => {
   // TODO: launch
   if (true) {
     return (
-      <div className="tw-flex tw-z-10 tw-w-full tw-mt-2 tw-justify-center">
+      <div className="tw-fixed tw-flex tw-z-10 tw-w-full tw-mt-2 tw-justify-center">
         <NavLink
           className="tw-w-fit tw-my-auto tw-max-w-[150px] tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-tracking-[-0.5px] tw-mt-[-2px] tw-font-extrabold tw-font-[Lateef] tw-text-[48px]"
           to="/"

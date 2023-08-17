@@ -16,6 +16,7 @@ import {
   SurfingIcon,
   YogaIcon,
 } from "src/components/icons/Icons";
+import Hero from "src/components/images/hero.webp";
 import { PhoneInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { Modal } from "src/components/modal/Modal";
@@ -171,8 +172,10 @@ export const ComingSoon: React.FC = () => {
           )}
         </div>
       </Modal>
-      <div className="tw-top-0 tw-w-screen tw-h-[100svh] tw-absolute tw-object-cover tw-bg-[linear-gradient(0deg,_#fdfcfb_0%,_#f9e7d9_100%)]" />
-      <div className="tw-z-10 tw-flex tw-flex-col tw-w-full tw-h-full tw-justify-center tw-items-center">
+      <div
+        className="tw-flex tw-flex-col tw-w-screen tw-h-screen tw-justify-center tw-items-center tw-bg-top tw-bg-cover"
+        style={{ backgroundImage: `url(${Hero})` }}
+      >
         <div className="tw-flex tw-w-fit tw-font-bold tw-text-[2.5rem] sm:tw-text-8xl tw-font-[Lateef] tw-text-center -tw-mt-32">
           Curated Adventures
         </div>
