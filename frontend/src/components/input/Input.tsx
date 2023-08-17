@@ -603,8 +603,15 @@ const ComboOptions: React.FC<ComboOptionsProps> = (props) => {
 const getFormatted = (code: CountryCode, value: string | undefined) => {
   const ayt = new AsYouType(code);
   ayt.input(value ? (value as string) : "");
-  const number = ayt.getNumber();
-  return number ? number.formatNational() : ayt.getNationalNumber();
+  const national = ayt.getNationalNumber();
+
+  return new AsYouType(code).input(national);
+};
+
+const isLetterKey = (key: string) => {
+  if (key.length > 1) return false;
+  const lower = key.toLowerCase();
+  return lower >= "a" && lower <= "z";
 };
 
 export const PhoneInput = forwardRef<HTMLInputElement, InputProps & { wrapperClass: string }>((props, ref) => {
@@ -624,7 +631,18 @@ export const PhoneInput = forwardRef<HTMLInputElement, InputProps & { wrapperCla
   return (
     <div className={mergeClasses("tw-flex", wrapperClass)}>
       <CountryCodePicker currentCode={code} setCode={setCode} />
-      <Input ref={ref} type="tel" {...other} value={formatted} onChange={updatePhoneNumber} />
+      <Input
+        ref={ref}
+        type="tel"
+        {...other}
+        value={formatted}
+        onChange={updatePhoneNumber}
+        onKeyDown={(e) => {
+          if (isLetterKey(e.key) && !e.metaKey) {
+            e.preventDefault();
+          }
+        }}
+      />
     </div>
   );
 });
