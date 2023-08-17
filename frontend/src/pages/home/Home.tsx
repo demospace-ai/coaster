@@ -16,9 +16,7 @@ import {
   SurfingIcon,
   YogaIcon,
 } from "src/components/icons/Icons";
-import { Image } from "src/components/images/Image";
-import Hero from "src/components/images/hero.webp";
-import { Input } from "src/components/input/Input";
+import { PhoneInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { Modal } from "src/components/modal/Modal";
 import { SearchResult } from "src/pages/search/Search";
@@ -26,7 +24,6 @@ import { sendRequest } from "src/rpc/ajax";
 import { JoinWaitlist } from "src/rpc/api";
 import { useFeatured } from "src/rpc/data";
 import { Listing } from "src/rpc/types";
-import { mergeClasses } from "src/utils/twmerge";
 import { z } from "zod";
 
 export const Home: React.FC = () => {
@@ -135,19 +132,19 @@ export const ComingSoon: React.FC = () => {
   return (
     <div className="tw-flex tw-flex-col tw-w-full tw-h-full">
       <Modal show={showWaitlist} close={() => setShowWaitlist(false)} clickToEscape={true}>
-        <div className="tw-w-[320px] sm:tw-w-[400px] tw-h-[200px] tw-px-10 sm:tw-px-20 tw-pb-20">
+        <div className="tw-w-[320px] sm:tw-w-[420px] tw-h-[200px] tw-px-8 sm:tw-px-12 tw-pb-20">
           {joined ? (
-            <div className="tw-mt-5 tw-flex tw-flex-col tw-items-center tw-justify-center">
+            <div className="tw-mt-10 tw-flex tw-flex-col tw-items-center tw-justify-center">
               <div className="tw-text-center tw-w-full tw-text-2xl tw-font-bold">You're on the list!</div>
               <div className="tw-text-center tw-mt-2">We'll let you know when you can get started.</div>
             </div>
           ) : (
             <>
               <div className="tw-text-center tw-w-full tw-text-2xl tw-font-bold tw-mb-3">Join waitlist</div>
-              <Input
+              <PhoneInput
                 label="Phone number"
-                type="tel"
-                className={mergeClasses("tw-mb-2", errors.phone && "tw-border-red-600 hover:tw-border-red-600")}
+                wrapperClass={"tw-mb-2"}
+                className={errors.phone && "tw-border-red-600 hover:tw-border-red-600"}
                 {...register("phone")}
               />
               <Button
@@ -161,7 +158,7 @@ export const ComingSoon: React.FC = () => {
         </div>
       </Modal>
       <div className="tw-top-0 tw-w-[100vw] tw-h-[100vh] tw-absolute tw-object-cover tw-bg-[linear-gradient(0deg,_#fdfcfb_0%,_#f9e7d9_100%)]" />
-      <div className="tw-z-10 tw-flex tw-flex-col tw-w-full tw-h-full tw-justify-center tw-items-center tw-mt-10">
+      <div className="tw-z-10 tw-flex tw-flex-col tw-w-full tw-h-full tw-justify-center tw-items-center -tw-mt-12">
         <div className="tw-flex tw-w-fit tw-font-bold tw-text-[2.5rem] sm:tw-text-8xl tw-font-[Lateef] tw-text-center">
           Adventure starts here
         </div>
@@ -176,10 +173,6 @@ export const ComingSoon: React.FC = () => {
             Request access
           </Button>
         </div>
-        <Image
-          src={Hero}
-          className="tw-invisible sm:tw-visible tw-mt-10 sm:tw-rounded-xl tw-object-cover tw-h-[400px]"
-        />
       </div>
     </div>
   );
