@@ -600,20 +600,31 @@ const ComboOptions: React.FC<ComboOptionsProps> = (props) => {
   }
 };
 
+const getFormatted = (code: CountryCode, value: string | undefined) => {
+  const ayt = new AsYouType(code);
+  ayt.input(value ? (value as string) : "");
+  const number = ayt.getNumber();
+  return number ? number.formatNational() : ayt.getNationalNumber();
+};
+
 export const PhoneInput = forwardRef<HTMLInputElement, InputProps & { wrapperClass: string }>((props, ref) => {
-  const { onChange, type, wrapperClass, ...other } = props;
+  const { onChange, type, wrapperClass, value, ...other } = props;
   const [code, setCode] = useState<CountryCode>("US");
 
   const updatePhoneNumber = (event: React.ChangeEvent<HTMLInputElement>) => {
     const phoneNumber = event.target.value;
-    const formattedPhoneNumber = new AsYouType(code).input(phoneNumber);
-    onChange && onChange({ ...event, target: { ...event.target, value: formattedPhoneNumber } });
+    const asyoutype = new AsYouType(code);
+    asyoutype.input(phoneNumber);
+    const formatted = String(asyoutype.getNumberValue());
+    onChange && onChange({ ...event, target: { ...event.target, value: formatted } });
   };
+
+  const formatted = getFormatted(code, value as string | undefined);
 
   return (
     <div className={mergeClasses("tw-flex", wrapperClass)}>
       <CountryCodePicker currentCode={code} setCode={setCode} />
-      <Input ref={ref} type="tel" {...other} onChange={updatePhoneNumber} />
+      <Input ref={ref} type="tel" {...other} value={formatted} onChange={updatePhoneNumber} />
     </div>
   );
 });
@@ -663,6 +674,7 @@ export const CountryCodePicker: React.FC<{ currentCode: CountryCode; setCode: (c
             {CountryCodes.map((countryCode) => (
               <Listbox.Option
                 as="div"
+                key={countryCode}
                 className="tw-flex tw-items-center tw-justify-center hover:tw-bg-slate-100 tw-py-2 tw-px-3 tw-cursor-pointer tw-gap-2"
                 value={countryCode}
               >

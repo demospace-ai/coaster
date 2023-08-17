@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import isValidPhoneNumber from "libphonenumber-js";
+import { parsePhoneNumber } from "libphonenumber-js";
 import React, { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { Button } from "src/components/button/Button";
 import {
   CampingIcon,
@@ -112,14 +112,14 @@ export const ComingSoon: React.FC = () => {
   const [showWaitlist, setShowWaitlist] = useState<boolean>(false);
   const [joined, setJoined] = useState<boolean>(false);
   const waitlistSchema = z.object({
-    phone: z.string().refine((value) => isValidPhoneNumber(value, "US") !== undefined),
+    phone: z.string().refine((value) => parsePhoneNumber(value).isValid()),
   });
   type WaitlistSchemaType = z.infer<typeof waitlistSchema>;
   const {
     handleSubmit,
-    register,
+    control,
     clearErrors,
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm<WaitlistSchemaType>({
     mode: "onBlur",
     resolver: zodResolver(waitlistSchema),
@@ -149,11 +149,17 @@ export const ComingSoon: React.FC = () => {
           ) : (
             <>
               <div className="tw-text-center tw-w-full tw-text-2xl tw-font-bold tw-mb-3">Join waitlist</div>
-              <PhoneInput
-                label="Phone number"
-                wrapperClass={"tw-mb-2"}
-                className={errors.phone && "tw-border-red-600 hover:tw-border-red-600"}
-                {...register("phone")}
+              <Controller
+                name="phone"
+                control={control}
+                render={({ field }) => (
+                  <PhoneInput
+                    label="Phone number"
+                    wrapperClass={"tw-mb-2"}
+                    className={errors.phone && "tw-border-red-600 hover:tw-border-red-600"}
+                    {...field}
+                  />
+                )}
               />
               <Button
                 className="tw-flex tw-h-[52px] tw-items-center tw-justify-center tw-whitespace-nowrap tw-bg-[#a6701d] hover:tw-bg-[#824f00] tw-w-full"
@@ -168,7 +174,7 @@ export const ComingSoon: React.FC = () => {
       <div className="tw-top-0 tw-w-screen tw-h-[100svh] tw-absolute tw-object-cover tw-bg-[linear-gradient(0deg,_#fdfcfb_0%,_#f9e7d9_100%)]" />
       <div className="tw-z-10 tw-flex tw-flex-col tw-w-full tw-h-full tw-justify-center tw-items-center">
         <div className="tw-flex tw-w-fit tw-font-bold tw-text-[2.5rem] sm:tw-text-8xl tw-font-[Lateef] tw-text-center -tw-mt-32">
-          Adventure starts here
+          Curated Adventures
         </div>
         <div className="tw-flex tw-w-80 sm:tw-w-fit tw-font-medium tw-text-3xl tw-font-[Lateef] tw-text-center">
           Discover fully planned trips led by professional guides.

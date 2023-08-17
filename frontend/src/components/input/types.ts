@@ -1,6 +1,4 @@
-import { CountryCode } from "libphonenumber-js";
-
-export const CountryCodes: CountryCode[] = [
+export const CountryCodes = [
   "AC",
   "AD",
   "AE",
@@ -246,4 +244,4 @@ export const CountryCodes: CountryCode[] = [
   "ZA",
   "ZM",
   "ZW",
-];
+] as const;
