@@ -131,7 +131,7 @@ export const ComingSoon: React.FC = () => {
   };
 
   return (
-    <div className="tw-flex tw-flex-col tw-w-full tw-h-[100dvh] sm:tw-h-full">
+    <div className="tw-flex tw-flex-col tw-w-full tw-h-full">
       <Modal
         show={showWaitlist}
         close={() => {
