@@ -23,20 +23,20 @@ import { Modal } from "src/components/modal/Modal";
 import { SearchResult } from "src/pages/search/Search";
 import { sendRequest } from "src/rpc/ajax";
 import { JoinWaitlist } from "src/rpc/api";
-import { useFeatured } from "src/rpc/data";
 import { Listing } from "src/rpc/types";
 import { z } from "zod";
 
 export const Home: React.FC = () => {
-  const { featured } = useFeatured();
-
-  if (!featured) {
-    return <Loading />;
-  }
+  // const { featured } = useFeatured();
+  const featured = [];
 
   // TODO: launch
   if (true) {
     return <ComingSoon />;
+  }
+
+  if (!featured) {
+    return <Loading />;
   }
 
   return (
