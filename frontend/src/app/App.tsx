@@ -62,7 +62,7 @@ const AppLayout: React.FC = () => {
 
   return (
     <>
-      <div className="tw-pointer-events-none tw-fixed tw-w-full tw-h-full">
+      <div className="tw-pointer-events-none tw-p-safe tw-fixed tw-w-full tw-h-full">
         <Toast
           content={toastContent}
           show={!!toast}

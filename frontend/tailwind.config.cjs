@@ -37,6 +37,9 @@ module.exports = {
       width: {
         "100": "400px",
       },
+      padding: {
+        "safe": "env(safe-area-inset-top) 0 0 env(safe-area-inset-left)"
+      },
       keyframes: {
         "shimmer": {
           "100%": { "-webkit-mask-position": "left" }
