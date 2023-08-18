@@ -71,7 +71,7 @@ const AppLayout: React.FC = () => {
         />
       </div>
       <div className="tw-flex tw-flex-row tw-w-full tw-h-full">
-        <div className="tw-flex tw-flex-col tw-h-full tw-w-full tw-bg-gray-10">
+        <div className="tw-flex tw-flex-col tw-h-full tw-w-full">
           <Header />
           <Outlet />
           <Footer />
