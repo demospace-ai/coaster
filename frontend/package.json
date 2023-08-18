@@ -32,7 +32,7 @@
     "zod": "^3.21.4"
   },
   "scripts": {
-    "start": "vite dev --config vite-app.config.ts",
+    "start": "vite dev --host --config vite-app.config.ts",
     "build": "vite build --config vite-app.config.ts",
     "build-connect": "vite build --config vite-connect.config.ts",
     "build-initialize": "vite build --config vite-initialize.config.ts",
