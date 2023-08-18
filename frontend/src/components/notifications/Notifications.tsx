@@ -71,7 +71,7 @@ export const Toast: React.FC<ToastProps> = ({ content, show, duration, close }) 
       {/* Global notification live region, render this permanently at the end of the document */}
       <div
         aria-live="assertive"
-        className="tw-pointer-events-none tw-p-safe tw-fixed tw-inset-0 tw-flex tw-items-end tw-px-4 tw-py-6 sm:tw-items-start sm:tw-p-6"
+        className="tw-pointer-events-none tw-fixed tw-inset-0 tw-flex tw-items-end tw-px-4 tw-py-6 sm:tw-items-start sm:tw-p-6"
       >
         <div className="tw-flex tw-w-full tw-flex-col tw-items-center tw-space-y-4 sm:tw-items-end">
           {/* Notification panel, dynamically insert this into the live region when it needs to be displayed */}

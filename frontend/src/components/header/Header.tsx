@@ -14,7 +14,7 @@ export const Header: React.FC = () => {
   // TODO: launch
   if (true) {
     return (
-      <div className="tw-p-safe tw-fixed tw-flex tw-z-10 tw-w-full tw-mt-2 tw-justify-center">
+      <div className="tw-fixed tw-flex tw-z-10 tw-w-full tw-mt-2 tw-justify-center">
         <NavLink
           className="tw-w-fit tw-my-auto tw-max-w-[150px] tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-tracking-[-0.5px] tw-mt-[-2px] tw-font-extrabold tw-font-[Lateef] tw-text-[48px]"
           to="/"
@@ -213,9 +213,9 @@ const MobileMenu: React.FC = () => {
       <Bars3Icon className="tw-flex lg:tw-hidden tw-w-7 tw-ml-4" onClick={() => setOpen(true)} />
       <Transition.Root show={open} as={Fragment}>
         <Dialog as="div" className="tw-relative tw-z-10" onClose={setOpen}>
-          <div className="tw-p-safe tw-fixed tw-inset-0 tw-overflow-hidden">
+          <div className="tw-fixed tw-inset-0 tw-overflow-hidden">
             <div className="tw-absolute tw-inset-0 tw-overflow-hidden">
-              <div className="tw-pointer-events-none tw-p-safe tw-fixed tw-inset-y-0 tw-right-0 tw-flex tw-max-w-full tw-pl-10 sm:tw-pl-16">
+              <div className="tw-pointer-events-none tw-fixed tw-inset-y-0 tw-right-0 tw-flex tw-max-w-full tw-pl-10 sm:tw-pl-16">
                 <Transition.Child
                   as={Fragment}
                   enter="tw-transform tw-transition tw-ease-in-out tw-duration-500 sm:tw-duration-700"
