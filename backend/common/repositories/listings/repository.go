@@ -15,16 +15,22 @@ type ListingDetails struct {
 	Images []models.ListingImage
 }
 
-func LoadByID(db *gorm.DB, listingID int64) (*ListingDetails, error) {
+func LoadByID(db *gorm.DB, listingID int64, userID *int64) (*ListingDetails, error) {
 	var listing models.Listing
 	result := db.Table("listings").
 		Select("listings.*").
 		Where("listings.id = ?", listingID).
-		Where("listings.status = ?", models.ListingStatusPublished).
 		Where("listings.deactivated_at IS NULL").
 		Take(&listing)
 	if result.Error != nil {
-		return nil, errors.Wrap(result.Error, "(listings.LoadByID)")
+		return nil, errors.Wrapf(result.Error, "(listings.LoadByID) error for ID %d", listingID)
+	}
+
+	// Allow the owner to see their own listing even if it's not published
+	if listing.Status != models.ListingStatusPublished {
+		if userID == nil || listing.UserID != *userID {
+			return nil, gorm.ErrRecordNotFound
+		}
 	}
 
 	images, err := LoadImagesForListing(db, listingID)
@@ -94,34 +100,6 @@ func LoadAllByUserID(db *gorm.DB, userID int64) ([]ListingDetails, error) {
 }
 
 func GetDraftListing(db *gorm.DB, userID int64) (*ListingDetails, error) {
-	existing, err := getExistingDraftListing(db, userID)
-	if err == nil {
-		return existing, nil
-	} else if !errors.IsRecordNotFound(err) {
-		return nil, err
-	}
-
-	listing := models.Listing{
-		UserID:       userID,
-		Status:       models.ListingStatusDraft,
-		Featured:     false,
-		Cancellation: models.ListingCancellationFlexible,
-	}
-
-	result := db.Create(&listing)
-	if result.Error != nil {
-		return nil, errors.Wrap(result.Error, "(listings.CreateListing)")
-	}
-
-	host, err := users.LoadUserByID(db, userID)
-	if err != nil {
-		return nil, errors.Wrap(err, "(listings.CreateListing) getting host")
-	}
-
-	return &ListingDetails{listing, host, []models.ListingImage{}}, nil
-}
-
-func getExistingDraftListing(db *gorm.DB, userID int64) (*ListingDetails, error) {
 	var listing models.Listing
 	result := db.Table("listings").
 		Select("listings.*").
@@ -159,18 +137,30 @@ func SubmitListing(db *gorm.DB, listing *models.Listing) error {
 	return nil
 }
 
-func CreateListing(db *gorm.DB, userID int64, name string, description string, category models.ListingCategory, price int64, location string, coordinates geo.Point) (*models.Listing, error) {
+// TODO: pass other fields
+func CreateListing(
+	db *gorm.DB,
+	userID int64,
+	name *string,
+	description *string,
+	category *models.ListingCategory,
+	price *int64,
+	location *string,
+	coordinates *geo.Point,
+) (*models.Listing, error) {
 	listing := models.Listing{
 		UserID:       userID,
-		Name:         &name,
-		Description:  &description,
-		Category:     &category,
-		Price:        &price,
-		Location:     &location,
-		Coordinates:  &coordinates,
-		Status:       models.ListingStatusUnderReview,
+		Name:         name,
+		Description:  description,
+		Category:     category,
+		Price:        price,
+		Location:     location,
+		Coordinates:  coordinates,
+		Status:       models.ListingStatusDraft,
 		Featured:     false,
 		Cancellation: models.ListingCancellationFlexible,
+		Highlights:   []string{},
+		Includes:     []string{},
 	}
 
 	result := db.Create(&listing)
@@ -181,7 +171,7 @@ func CreateListing(db *gorm.DB, userID int64, name string, description string, c
 	return &listing, nil
 }
 
-func UpdateListing(db *gorm.DB, listing *models.Listing, listingUpdates input.ListingUpdates) (*models.Listing, error) {
+func UpdateListing(db *gorm.DB, listing *models.Listing, listingUpdates input.Listing) (*models.Listing, error) {
 	if listingUpdates.Name != nil {
 		listing.Name = listingUpdates.Name
 	}

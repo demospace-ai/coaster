@@ -7,18 +7,13 @@ import (
 	"github.com/go-playground/validator"
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/errors"
+	"go.fabra.io/server/common/geo"
+	"go.fabra.io/server/common/input"
 	"go.fabra.io/server/common/maps"
-	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/repositories/listings"
 )
 
-type CreateListingRequest struct {
-	Name        string                 `json:"name" validate:"required"`
-	Description string                 `json:"description" validate:"required"`
-	Category    models.ListingCategory `json:"category" validate:"required"`
-	Price       int64                  `json:"price" validate:"required"`
-	Location    string                 `json:"location" validate:"required"`
-}
+type CreateListingRequest = input.Listing
 
 type CreateListingResponse struct {
 	ListingId int64 `json:"listing_id"`
@@ -38,16 +33,21 @@ func (s ApiService) CreateListing(auth auth.Authentication, w http.ResponseWrite
 		return errors.Wrap(err, "(api.CreateListing) validating request")
 	}
 
-	location, err := maps.GetLocationFromQuery(createListingRequest.Location)
-	if err != nil {
-		return errors.Wrap(err, "(api.CreateListing) getting location from query")
+	var location *string
+	var coordinates *geo.Point
+	if createListingRequest.Location != nil {
+		location, err = maps.GetLocationFromQuery(*createListingRequest.Location)
+		if err != nil {
+			return errors.Wrap(err, "(api.CreateListing) getting location from query")
+		}
+
+		coordinates, err = maps.GetCoordinatesFromLocation(*location)
+		if err != nil {
+			return errors.Wrap(err, "(api.CreateListing) getting coordinates from query")
+		}
 	}
 
-	coordinates, err := maps.GetCoordinatesFromLocation(*location)
-	if err != nil {
-		return errors.Wrap(err, "(api.CreateListing) getting coordinates from query")
-	}
-
+	// TODO: pass other fields
 	listing, err := listings.CreateListing(
 		s.db,
 		auth.User.ID,
@@ -55,8 +55,8 @@ func (s ApiService) CreateListing(auth auth.Authentication, w http.ResponseWrite
 		createListingRequest.Description,
 		createListingRequest.Category,
 		createListingRequest.Price,
-		*location,
-		*coordinates,
+		location,
+		coordinates,
 	)
 	if err != nil {
 		return errors.Wrap(err, "(api.CreateListing) creating listing")

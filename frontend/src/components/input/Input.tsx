@@ -93,7 +93,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
         />
       </div>
       {tooltip && (
-        <Tooltip label={tooltip}>
+        <Tooltip content={tooltip}>
           <InformationCircleIcon className="tw-w-5 tw-mr-4" />
         </Tooltip>
       )}
@@ -152,7 +152,7 @@ export const TextArea: React.FC<TextAreaProps> = forwardRef<HTMLTextAreaElement,
         />
       </div>
       {tooltip && (
-        <Tooltip label={tooltip}>
+        <Tooltip content={tooltip}>
           <InformationCircleIcon className="tw-w-5 tw-mr-4" />
         </Tooltip>
       )}

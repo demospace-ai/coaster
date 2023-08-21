@@ -163,7 +163,7 @@ export const ComingSoon: React.FC = () => {
                 )}
               />
               <Button
-                className="tw-flex tw-h-[52px] tw-items-center tw-justify-center tw-whitespace-nowrap tw-bg-[#a6701d] hover:tw-bg-[#824f00] tw-w-full"
+                className="tw-flex tw-h-[52px] tw-items-center tw-justify-center tw-whitespace-nowrap tw-w-full"
                 onClick={handleSubmit(joinWaitlist)}
               >
                 Join waitlist
@@ -184,7 +184,7 @@ export const ComingSoon: React.FC = () => {
         </div>
         <div className="tw-flex tw-items-center tw-gap-2 tw-mt-5">
           <Button
-            className="tw-flex tw-h-[52px] tw-items-center tw-justify-center tw-whitespace-nowrap tw-bg-[#a6701d] hover:tw-bg-[#824f00] tw-px-8"
+            className="tw-flex tw-h-[52px] tw-items-center tw-justify-center tw-whitespace-nowrap tw-px-8"
             onClick={() => setShowWaitlist(true)}
           >
             Request access

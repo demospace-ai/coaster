@@ -5,7 +5,7 @@ import {
   EmailLoginRequest,
   EmailLoginResponse,
   Listing,
-  ListingUpdates,
+  ListingInput,
   LoginMethod,
   LoginRequest,
   LoginResponse,
@@ -39,13 +39,19 @@ export const GetListing: IEndpoint<undefined, Listing, { listingID: number }> = 
   path: "/listings/:listingID",
 };
 
-export const GetNewListing: IEndpoint<undefined, Listing> = {
-  name: "Get new listing",
+export const GetDraftListing: IEndpoint<undefined, Listing> = {
+  name: "Get draft listing",
   method: "GET",
-  path: "/listings/new",
+  path: "/listings/draft",
 };
 
-export const UpdateListing: IEndpoint<ListingUpdates, Listing, { listingID: number }> = {
+export const CreateListing: IEndpoint<ListingInput, Listing> = {
+  name: "Create new listing",
+  method: "POST",
+  path: "/listings",
+};
+
+export const UpdateListing: IEndpoint<ListingInput, Listing, { listingID: number }> = {
   name: "Update listing",
   method: "POST",
   path: "/listings/:listingID",

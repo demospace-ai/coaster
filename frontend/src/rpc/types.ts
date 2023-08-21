@@ -48,7 +48,7 @@ export interface Host {
   profile_picture_url: string | undefined;
 }
 
-export interface ListingUpdates {
+export interface ListingInput {
   name?: string;
   description?: string;
   category?: CategoryType;

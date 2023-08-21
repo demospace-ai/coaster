@@ -8,14 +8,15 @@ import { useLogout } from "src/pages/login/actions";
 import { useSelector } from "src/root/model";
 import { mergeClasses } from "src/utils/twmerge";
 
+const pagesWithHeader = ["search", "listings", "hosting"];
+
 export const Header: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const path = location.pathname.split("/")[1];
 
-  console.log(path);
   // TODO: launch
-  if (path !== "search" && path !== "listings") {
+  if (!pagesWithHeader.includes(path)) {
     return (
       <div className="tw-absolute tw-flex tw-z-10 tw-w-full tw-mt-2 tw-justify-center">
         <NavLink

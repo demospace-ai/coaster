@@ -11,7 +11,7 @@ import (
 	"go.fabra.io/server/common/views"
 )
 
-func (s ApiService) GetNewListing(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) GetDraftListing(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	listing, err := listings.GetDraftListing(
 		s.db,
 		auth.User.ID,

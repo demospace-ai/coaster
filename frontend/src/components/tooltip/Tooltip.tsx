@@ -92,16 +92,16 @@ export const useTooltipContext = () => {
 
 export function Tooltip({
   children,
-  label,
+  content,
   ...options
-}: { children: React.ReactElement; label: React.ReactNode } & TooltipOptions) {
+}: { children: React.ReactElement; content: React.ReactNode } & TooltipOptions) {
   // This can accept any props as options, e.g. `placement`,
   // or other positioning options.
   const tooltip = useTooltip(options);
   return (
     <TooltipContext.Provider value={tooltip}>
       <TooltipTrigger>{children}</TooltipTrigger>
-      <TooltipContent arrowRef={tooltip.arrowRef}>{label}</TooltipContent>
+      <TooltipContent arrowRef={tooltip.arrowRef}>{content}</TooltipContent>
     </TooltipContext.Provider>
   );
 }

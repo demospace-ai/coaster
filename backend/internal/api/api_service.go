@@ -55,10 +55,10 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.UpdateListing,
 		},
 		{
-			Name:        "Get new listing",
+			Name:        "Get draft listing",
 			Method:      router.GET,
-			Pattern:     "/listings/new",
-			HandlerFunc: s.GetNewListing,
+			Pattern:     "/listings/draft",
+			HandlerFunc: s.GetDraftListing,
 		},
 		{
 			Name:        "Get hosted listing",

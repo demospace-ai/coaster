@@ -5,7 +5,7 @@ import (
 	"go.fabra.io/server/common/models"
 )
 
-type ListingUpdates struct {
+type Listing struct {
 	Name             *string                     `json:"name"`
 	Description      *string                     `json:"description"`
 	Category         *models.ListingCategory     `json:"category"`

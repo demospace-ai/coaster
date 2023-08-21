@@ -16,8 +16,8 @@
 
 :root {
   /* These are the default Fabra colors */
-  --color-primary: var(--color-fabra-primary);
-  --color-primary-hover: var(--color-fabra-primary-hover);
+  --color-primary: #a6701d;
+  --color-primary-hover: #824f00;
   --color-primary-text: #ffffff;
   color-scheme: light;
 }

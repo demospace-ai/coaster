@@ -1,15 +1,16 @@
 import { sendRequest } from "src/rpc/ajax";
 import {
   CheckSession,
+  CreateListing,
+  GetDraftListing,
   GetFeaturedListings,
   GetHostedListings,
   GetListing,
-  GetNewListing,
   SearchListings,
   UpdateListing,
   UpdateUser,
 } from "src/rpc/api";
-import { Listing, ListingUpdates, UserUpdates } from "src/rpc/types";
+import { Listing, ListingInput, UserUpdates } from "src/rpc/types";
 import { forceErrorMessage } from "src/utils/errors";
 import { Mutation, useMutation } from "src/utils/queryHelpers";
 import useSWR, { Fetcher, mutate } from "swr";
@@ -31,9 +32,9 @@ export function useHostedListings() {
   return { hosted: data, mutate, error, loading: isLoading || isValidating };
 }
 
-export function useNewListing() {
-  const fetcher: Fetcher<Listing, {}> = () => sendRequest(GetNewListing);
-  const { data, mutate, error, isLoading, isValidating } = useSWR({ GetNewListing }, fetcher);
+export function useDraftListing() {
+  const fetcher: Fetcher<Listing, {}> = () => sendRequest(GetDraftListing);
+  const { data, mutate, error, isLoading, isValidating } = useSWR({ GetDraftListing }, fetcher);
   return { listing: data, mutate, error, loading: isLoading || isValidating };
 }
 
@@ -54,25 +55,35 @@ export function useFeatured() {
   return { featured: data, mutate, error, loading: isLoading || isValidating };
 }
 
-export function useUpdateListing(listingID: number): Mutation<ListingUpdates> {
-  return useMutation<Listing, ListingUpdates>(
-    (updates: ListingUpdates) => {
+export function useUpdateListing(listingID: number): Mutation<ListingInput> {
+  return useMutation<Listing, ListingInput>(
+    (updates: ListingInput) => {
       return sendRequest(UpdateListing, { pathParams: { listingID }, payload: updates });
     },
     {
       onSuccess: () => {
-        mutate({ GetNewListing });
+        mutate({ GetDraftListing });
         mutate({ GetListing, listingID });
       },
     },
   );
 }
 
-export async function updateListing(listingID: number, updates: ListingUpdates) {
+export async function updateListing(listingID: number, updates: ListingInput) {
   try {
     await sendRequest(UpdateListing, { pathParams: { listingID }, payload: updates });
-    mutate({ GetNewListing });
+    mutate({ GetDraftListing });
     mutate({ GetListing, listingID });
+    return { success: true, error: "" };
+  } catch (e) {
+    return { success: false, error: forceErrorMessage(e) };
+  }
+}
+
+export async function createListing(input: ListingInput) {
+  try {
+    await sendRequest(CreateListing, { payload: input });
+    mutate({ GetDraftListing });
     return { success: true, error: "" };
   } catch (e) {
     return { success: false, error: forceErrorMessage(e) };

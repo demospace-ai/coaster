@@ -14,7 +14,7 @@ import (
 	"go.fabra.io/server/common/repositories/listings"
 )
 
-type UpdateListingRequest = input.ListingUpdates
+type UpdateListingRequest = input.Listing
 
 type UpdateListingResponse struct {
 	ListingId int64 `json:"listing_id"`

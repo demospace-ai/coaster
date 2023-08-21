@@ -18,18 +18,18 @@ import { Loading } from "src/components/loading/Loading";
 import { InlineMapSearch, MapComponent, MapsWrapper } from "src/components/maps/Maps";
 import { CategorySchema, DescriptionSchema, NameSchema, PriceSchema } from "src/pages/listing/schema";
 import { sendRequest } from "src/rpc/ajax";
-import { GetListing, GetNewListing, UploadListingImage } from "src/rpc/api";
-import { updateListing, useNewListing, useUpdateListing } from "src/rpc/data";
+import { GetDraftListing, GetListing, UploadListingImage } from "src/rpc/api";
+import { createListing, updateListing, useDraftListing, useUpdateListing } from "src/rpc/data";
 import { CategoryType, Coordinates, Listing, ListingStatus } from "src/rpc/types";
 import { getGcsImageUrl } from "src/utils/images";
 import { mutate } from "swr";
 import { z } from "zod";
 
 export const NewListing: React.FC = () => {
-  const { listing } = useNewListing();
+  const { listing, loading } = useDraftListing();
   const navigate = useNavigate();
 
-  if (!listing) {
+  if (loading) {
     return <Loading />;
   }
 
@@ -77,7 +77,7 @@ export const NewListing: React.FC = () => {
 };
 
 const locationStep = (params: StepParams) => {
-  const { listing } = useNewListing();
+  const { listing } = useDraftListing();
   if (!listing) {
     return <Loading />;
   }
@@ -90,7 +90,7 @@ const locationStep = (params: StepParams) => {
 };
 
 const priceStep = (params: StepParams) => {
-  const { listing } = useNewListing();
+  const { listing } = useDraftListing();
   if (!listing) {
     return <Loading />;
   }
@@ -99,7 +99,7 @@ const priceStep = (params: StepParams) => {
 };
 
 const nameStep = (params: StepParams) => {
-  const { listing } = useNewListing();
+  const { listing } = useDraftListing();
   if (!listing) {
     return <Loading />;
   }
@@ -121,7 +121,7 @@ const nameStep = (params: StepParams) => {
 };
 
 const descriptionStep = (params: StepParams) => {
-  const { listing } = useNewListing();
+  const { listing } = useDraftListing();
   if (!listing) {
     return <Loading />;
   }
@@ -143,8 +143,8 @@ const descriptionStep = (params: StepParams) => {
 };
 
 const categoryStep = (params: StepParams) => {
-  const { listing } = useNewListing();
-  if (!listing) {
+  const { listing, loading } = useDraftListing();
+  if (loading) {
     return <Loading />;
   }
 
@@ -152,21 +152,25 @@ const categoryStep = (params: StepParams) => {
     <SelectorStep
       {...params}
       schema={CategorySchema}
-      existingData={listing.category}
+      existingData={listing?.category}
       // TODO: fix the typing issue for the onChange data parameter
       onChange={async (data: string): Promise<SubmitResult> => {
-        if (data === listing.category) {
-          // No API call needed if previous value was the same
-          return { success: true };
+        if (listing) {
+          if (data === listing.category) {
+            // No API call needed if previous value was the same
+            return { success: true };
+          }
+          return updateListing(listing.id, { category: data as CategoryType });
+        } else {
+          return createListing({ category: data as CategoryType });
         }
-        return updateListing(listing.id, { category: data as CategoryType });
       }}
     />
   );
 };
 
 const imageStep = (params: StepParams) => {
-  const { listing } = useNewListing();
+  const { listing } = useDraftListing();
   if (!listing) {
     return <Loading />;
   }
@@ -175,7 +179,7 @@ const imageStep = (params: StepParams) => {
 };
 
 const reviewStep = (params: StepParams) => {
-  const { listing } = useNewListing();
+  const { listing } = useDraftListing();
   if (!listing) {
     return <Loading />;
   }
@@ -326,7 +330,7 @@ const ImageStep: React.FC<StepParams & ImageParams> = ({ renderLayout, listing }
           formData: formData,
         });
 
-        mutate({ GetNewListing });
+        mutate({ GetDraftListing });
         mutate({ GetListing, listingID });
       } catch (e) {}
     }
@@ -356,7 +360,11 @@ const ImageStep: React.FC<StepParams & ImageParams> = ({ renderLayout, listing }
   ));
 };
 
-const computeStepNumber = (listing: Listing): number => {
+const computeStepNumber = (listing: Listing | undefined): number => {
+  if (!listing) {
+    return 0;
+  }
+
   if (!listing.category) {
     return 0;
   }
