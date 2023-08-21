@@ -1,6 +1,6 @@
 export const Terms: React.FC = () => {
   return (
-    <div className="tw-h-full tw-overflow-scroll">
+    <div className="tw-flex">
       <p className="tw-mx-4 sm:tw-mx-64 tw-mb-64 tw-mt-24">
         <div className="tw-text-5xl tw-font-bold tw-mb-8">Terms of Use</div>
         <strong>Last Updated:</strong> August 7, 2023

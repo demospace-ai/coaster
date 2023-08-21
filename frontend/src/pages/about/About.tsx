@@ -3,7 +3,7 @@ import Founders from "src/components/images/founders.webp";
 
 export const About: React.FC = () => {
   return (
-    <div className="tw-flex tw-w-full tw-h-full tw-items-center tw-justify-center tw-bg-white">
+    <div className="tw-flex tw-items-center tw-justify-center tw-py-24 sm:tw-py-32">
       <div className="tw-flex tw-flex-col tw-items-center tw-max-w-[300px] sm:tw-max-w-[600px]">
         <Image
           className="tw-rounded-xl tw-mb-5 sm:tw-mb-8 tw-max-w-[80%] sm:tw-max-w-xs"

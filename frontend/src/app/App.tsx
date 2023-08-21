@@ -70,12 +70,10 @@ const AppLayout: React.FC = () => {
           duration={toast?.duration}
         />
       </div>
-      <div className="tw-flex tw-flex-row tw-w-full tw-h-full">
-        <div className="tw-flex tw-flex-col tw-h-full tw-w-full">
-          <Header />
-          <Outlet />
-          <Footer />
-        </div>
+      <div className="tw-flex tw-flex-col tw-flex-grow tw-bg-white">
+        <Header />
+        <Outlet />
+        <Footer />
       </div>
     </>
   );

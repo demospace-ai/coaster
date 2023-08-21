@@ -2,7 +2,7 @@ import { Dialog, Menu, Transition } from "@headlessui/react";
 import { ArrowRightOnRectangleIcon, Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import React, { Fragment, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { MapSearch } from "src/components/maps/Maps";
 import { useLogout } from "src/pages/login/actions";
 import { useSelector } from "src/root/model";
@@ -10,9 +10,12 @@ import { mergeClasses } from "src/utils/twmerge";
 
 export const Header: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const path = location.pathname.split("/")[1];
 
+  console.log(path);
   // TODO: launch
-  if (true) {
+  if (path !== "search" && path !== "listings") {
     return (
       <div className="tw-absolute tw-flex tw-z-10 tw-w-full tw-mt-2 tw-justify-center">
         <NavLink
