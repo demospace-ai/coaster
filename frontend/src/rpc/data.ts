@@ -61,9 +61,9 @@ export function useUpdateListing(listingID: number): Mutation<ListingInput> {
       return sendRequest(UpdateListing, { pathParams: { listingID }, payload: updates });
     },
     {
-      onSuccess: () => {
-        mutate({ GetDraftListing });
-        mutate({ GetListing, listingID });
+      onSuccess: (listing: Listing) => {
+        mutate({ GetDraftListing }, listing, { revalidate: false });
+        mutate({ GetListing, listingID }, listing);
       },
     },
   );

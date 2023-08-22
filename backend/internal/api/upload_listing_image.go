@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"io"
 	"net/http"
 	"strconv"
@@ -76,7 +77,7 @@ func (s ApiService) UploadListingImage(auth auth.Authentication, w http.Response
 	}
 
 	// TODO: do this transactionally or figure out something to handle failures
-	_, err = listings.CreateListingImage(
+	listingImage, err := listings.CreateListingImage(
 		s.db,
 		listingID,
 		storageID,
@@ -86,7 +87,7 @@ func (s ApiService) UploadListingImage(auth auth.Authentication, w http.Response
 		return errors.Wrap(err, "(api.UploadListingImage) saving listing image details to DB")
 	}
 
-	return nil
+	return json.NewEncoder(w).Encode(listingImage.StorageID)
 }
 
 func getUserImageBucket() string {

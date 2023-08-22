@@ -1,6 +1,6 @@
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FormEvent, useCallback, useMemo, useRef } from "react";
+import { FormEvent, useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import {
@@ -28,8 +28,7 @@ import { z } from "zod";
 export const NewListing: React.FC = () => {
   const { listing, loading } = useDraftListing();
   const navigate = useNavigate();
-  // only set initial step once
-  const initialStep = useMemo(() => computeStepNumber(listing), [listing]);
+  const initialStep = computeStepNumber(listing);
 
   if (loading) {
     return <Loading />;
@@ -327,12 +326,12 @@ const ImageStep: React.FC<StepParams & ImageParams> = ({ renderLayout, listing }
       const formData = new FormData();
       formData.append("listing_image", e.currentTarget.files[0]);
       try {
-        await sendRequest(UploadListingImage, {
+        const listingImage = await sendRequest(UploadListingImage, {
           pathParams: { listingID },
           formData: formData,
         });
 
-        mutate({ GetDraftListing });
+        mutate({ GetDraftListing }, { ...listing, images: [...listing.images, listingImage] }, { revalidate: false });
         mutate({ GetListing, listingID });
       } catch (e) {}
     }
