@@ -13,6 +13,6 @@ export const DescriptionSchema = z
   .string()
   .nonempty("A description is required.")
   .min(4, "Your description must be at least 4 characters long.")
-  .max(500, "Descriptions can be up to 500 characters long.");
+  .max(1000, "Descriptions can be up to 500 characters long.");
 
 export const PriceSchema = z.number({ invalid_type_error: "Please enter a valid price." }).positive();
