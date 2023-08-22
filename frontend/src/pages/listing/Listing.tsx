@@ -226,17 +226,17 @@ const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) => {
     <div className="tw-flex tw-max-h-[50vh] tw-rounded-xl tw-overflow-clip">
       <div className="tw-flex tw-w-full sm:tw-w-3/4 sm:tw-mr-2">
         <img
-          className="tw-bg-gray-100 tw-object-cover tw-h-full tw-w-full hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
+          className="tw-w-full tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
           src={listing.images.length > 0 ? getGcsImageUrl(listing.images[0]) : "TODO"}
         />
       </div>
       <div className="tw-flex-col tw-w-1/4 tw-gap-2 tw-hidden sm:tw-flex">
         <img
-          className="tw-bg-gray-100 tw-object-cover tw-h-full tw-w-full hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
+          className="tw-h-1/2 tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
           src={listing.images.length > 1 ? getGcsImageUrl(listing.images[1]) : "TODO"}
         />
         <img
-          className="tw-bg-gray-100 tw-object-cover tw-h-full tw-w-full hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
+          className="tw-h-1/2 tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
           src={listing.images.length > 2 ? getGcsImageUrl(listing.images[2]) : "TODO"}
         />
       </div>
