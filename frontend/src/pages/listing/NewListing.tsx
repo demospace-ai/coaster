@@ -323,7 +323,7 @@ type ImageParams = {
 
 const ImageStep: React.FC<StepParams & ImageParams> = ({ renderLayout, listing }) => {
   const ref = useRef<HTMLInputElement | null>(null);
-  const isValid = listing.images.length > 2;
+  const isValid = listing.images && listing.images.length > 2;
   const listingID = listing.id;
 
   // TODO: validate size and type of file on frontend
