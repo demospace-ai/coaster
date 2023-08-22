@@ -1,3 +1,5 @@
+import { CheckBadgeIcon } from "@heroicons/react/20/solid";
+import { ClockIcon, GlobeAltIcon, StarIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import { useParams } from "react-router-dom";
 import { Button } from "src/components/button/Button";
 import { Callout } from "src/components/callouts/Callout";
@@ -24,14 +26,12 @@ export const Listing: React.FC = () => {
       {listing.status !== ListingStatus.Published && (
         <Callout content={"Not published - under review"} className="tw-border tw-border-yellow-400 tw-mb-4" />
       )}
-      <div className="tw-font-semibold sm:tw-font-bold tw-text-3xl sm:tw-text-4xl tw-hyphens-auto">
-        {listing.name} askdjfhaaslkjdhfalk aslkdjhfals aslkdjfhaksjldfh
-      </div>
+      <div className="tw-font-semibold sm:tw-font-bold tw-text-3xl sm:tw-text-4xl tw-hyphens-auto">{listing.name}</div>
       <div className="tw-flex tw-items-center tw-mt-3 tw-mb-4 tw-font-medium">
-        {listing.location} • {toTitleCase(listing.category ? listing.category : "")}{" "}
+        {listing.location} • {toTitleCase(listing.category ? listing.category : "")}
       </div>
       <ListingImages listing={listing} />
-      <div className="tw-flex tw-mt-12">
+      <div className="tw-flex tw-mt-8 sm:tw-mt-12">
         <ListingDetails listing={listing} />
         <BookingPanel listing={listing} />
       </div>
@@ -42,10 +42,9 @@ export const Listing: React.FC = () => {
 
 export const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) => {
   return (
-    <div className="tw-fixed md:tw-hidden tw-z-20 tw-bottom-0 tw-left-0 tw-flex tw-items-center tw-justify-between tw-bg-white tw-border-t tw-border-solid tw-border-gray-300 tw-h-20 tw-w-full tw-px-10">
+    <div className="tw-fixed md:tw-hidden tw-z-20 tw-bottom-0 tw-left-0 tw-flex tw-items-center tw-justify-between tw-bg-white tw-border-t tw-border-solid tw-border-gray-300 tw-h-20 tw-w-full tw-px-4">
       <span>
-        <span className="tw-font-bold">${listing.price}</span>
-        {listing.duration_hours ? listing.duration_hours : "/night"}
+        <span className="tw-font-bold">${listing.price}/person</span>
       </span>
       <Button className="tw-font-semibold tw-py-2">Check Availability</Button>
     </div>
@@ -55,16 +54,15 @@ export const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) =
 export const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
   return (
     <div className="tw-hidden md:tw-flex tw-w-[40%]">
-      <div className="tw-flex tw-flex-col tw-px-8 tw-py-6 tw-w-full tw-border tw-border-solid tw-border-gray-300 tw-rounded-xl tw-shadow-centered-lg">
+      <div className="tw-sticky tw-top-32 tw-flex tw-flex-col tw-px-8 tw-py-6 tw-w-full tw-h-fit tw-border tw-border-solid tw-border-gray-300 tw-rounded-xl tw-shadow-centered-sm">
         <span className="tw-text-2xl tw-font-semibold tw-mb-3">Reserve your spot</span>
         <span className="tw-mb-3">
-          <span className="tw-font-bold">${listing.price}</span>
-          {listing.duration_hours ? listing.duration_hours : "/night"}
+          <span className="tw-font-semibold">${listing.price}/person</span>
         </span>
         <Button className="tw-font-semibold tw-py-2 tw-mb-4">Check Availability</Button>
         <span className="tw-text-sm">
-          *Likely to sell out: Based on Coaster's booking data and information from the provider from the past 30 days,
-          it seems likely this experience will sell out soon.
+          *Likely to sell out: Based on Coaster's booking data and information from the provider, it seems likely this
+          experience will sell out soon.
         </span>
       </div>
     </div>
@@ -72,20 +70,135 @@ export const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) =>
 };
 
 export const ListingDetails: React.FC<{ listing: ListingType }> = ({ listing }) => {
-  // TODO: link to full description
-  const shortDescription = getShortDescription(listing);
-
   return (
-    <div className="tw-flex tw-flex-col tw-w-full md:tw-w-[60%]">
-      <div className="tw-font-semibold">About</div>
-      <div className="tw-mt-2">{shortDescription}</div>
-      <div className="tw-mt-5 tw-font-semibold">Full description</div>
+    <div className="tw-flex tw-flex-col tw-w-full md:tw-w-[60%] md:tw-mr-16">
+      <HostOverview listing={listing} />
+      <QuickInfo listing={listing} />
+      <Description listing={listing} />
+      <Included listing={listing} />
+      <Highlights listing={listing} />
+      <HostDetails listing={listing} />
+    </div>
+  );
+};
+
+const HostDetails: React.FC<{ listing: ListingType }> = ({ listing }) => {
+  return (
+    <div>
+      <div className="tw-mt-5 tw-flex tw-flex-row tw-items-center">
+        <img
+          src={listing.host.profile_picture_url}
+          className="tw-rounded-full tw-w-10 tw-aspect-square tw-select-none tw-flex tw-items-center tw-justify-center tw-mr-4"
+          referrerPolicy="no-referrer"
+          alt="guide profile picture"
+        />
+        <div>
+          <div className="tw-text-xl tw-font-medium">Meet your guide, {listing.host.first_name}</div>
+          <div className="tw-flex tw-flex-row tw-items-center">
+            <CheckBadgeIcon className="tw-h-4 tw-mr-1 tw-fill-green-600" />
+            Identity Verified
+          </div>
+        </div>
+      </div>
+      <div className="tw-mt-4">{listing.host.about}</div>
+      <Button className="tw-mt-6 tw-bg-white hover:tw-bg-gray-100 tw-text-black tw-border tw-border-solid tw-border-black tw-font-medium">
+        Contact
+      </Button>
+    </div>
+  );
+};
+
+const Description: React.FC<{ listing: ListingType }> = ({ listing }) => {
+  return (
+    <div className="tw-pb-6 tw-border-b tw-border-solid tw-border-gray-300">
+      <div className="tw-mt-5 tw-font-semibold">About</div>
       <div className="tw-mt-2 tw-whitespace-pre-wrap">{listing.description}</div>
     </div>
   );
 };
 
-export const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) => {
+const Included: React.FC<{ listing: ListingType }> = ({ listing }) => {
+  return (
+    <div className="tw-pb-6 tw-border-b tw-border-solid tw-border-gray-300">
+      <div className="tw-mt-5 tw-font-semibold">What's included</div>
+      <ul className="tw-list-disc tw-list-inside tw-mt-1">
+        {listing.includes?.map((included) => (
+          <li>{included}</li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+const Highlights: React.FC<{ listing: ListingType }> = ({ listing }) => {
+  return (
+    <div className="tw-pb-6 tw-border-b tw-border-solid tw-border-gray-300">
+      <div className="tw-mt-5 tw-font-semibold">Highlights</div>
+      <ul className="tw-list-disc tw-list-inside tw-mt-1">
+        {listing.highlights?.map((highlights) => (
+          <li>{highlights}</li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+const QuickInfo: React.FC<{ listing: ListingType }> = ({ listing }) => {
+  const duration = getDuration(listing);
+  const maxGuests = getMaxGuests(listing);
+
+  return (
+    <div className="tw-border-b tw-border-solid tw-border-gray-300 tw-mt-6">
+      <div className="tw-flex tw-items-center tw-mb-6">
+        <StarIcon className="tw-h-6 tw-mr-4" />
+        <div className="tw-flex tw-flex-col">
+          <span className="tw-font-medium">Professional guide</span>
+          <span className="tw-text-sm">Our guides are committed to providing a great experience.</span>
+        </div>
+      </div>
+      <div className="tw-flex tw-items-center tw-my-6">
+        <ClockIcon className="tw-h-6 tw-mr-4" />
+        <div className="tw-flex tw-flex-col">
+          <div className="tw-flex">
+            <span className="tw-font-medium tw-mr-1.5">Duration:</span>
+            {duration}
+          </div>
+          <span className="tw-text-sm">Check availability to see start times.</span>
+        </div>
+      </div>
+      <div className="tw-flex tw-items-center tw-my-6">
+        <UserGroupIcon className="tw-h-6 tw-mr-4" />
+        <div className="tw-flex">
+          <span className="tw-font-medium tw-mr-1.5">Max guests: </span>
+          {maxGuests}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const HostOverview: React.FC<{ listing: ListingType }> = ({ listing }) => {
+  const languages = listing.languages ? listing.languages.join(", ") : "English";
+  return (
+    <div className="tw-flex tw-items-center tw-pb-6 tw-border-b tw-border-solid tw-border-gray-300 tw-justify-between">
+      <div>
+        <div className="tw-text-xl sm:tw-text-2xl tw-font-medium">Activity led by {listing.host.first_name}</div>
+        <div className="tw-flex tw-items-center tw-mt-1">
+          <GlobeAltIcon className="tw-h-5 tw-mr-1.5" />
+          {languages}
+        </div>
+      </div>
+      <img
+        src={listing.host.profile_picture_url}
+        className="tw-rounded-full tw-w-12 tw-aspect-square tw-select-none tw-flex tw-items-center tw-justify-center"
+        referrerPolicy="no-referrer"
+        alt="guide profile picture"
+      />
+    </div>
+  );
+};
+
+const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) => {
   return (
     <div className="tw-flex tw-max-h-[50vh] tw-rounded-xl tw-overflow-clip">
       <div className="tw-flex tw-w-full sm:tw-w-3/4 sm:tw-mr-2">
@@ -106,6 +219,28 @@ export const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) =
       </div>
     </div>
   );
+};
+
+const getMaxGuests = (listing: ListingType) => {
+  if (listing.max_guests) {
+    return listing.max_guests;
+  } else {
+    return "not specified";
+  }
+};
+
+const getDuration = (listing: ListingType) => {
+  if (listing.duration_hours) {
+    const days = Math.floor(listing.duration_hours / 24);
+    const hours = listing.duration_hours % 24;
+    if (days > 0) {
+      return `${days} day${days > 1 ? "s" : ""}`;
+    } else {
+      return `${hours} hour${hours > 1 ? "s" : ""}`;
+    }
+  } else {
+    return "TBD";
+  }
 };
 
 const getShortDescription = (listing: ListingType) => {
