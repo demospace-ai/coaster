@@ -1,6 +1,6 @@
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FormEvent, useCallback, useRef } from "react";
+import { FormEvent, useCallback, useMemo, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import {
@@ -19,16 +19,57 @@ import { InlineMapSearch, MapComponent, MapsWrapper } from "src/components/maps/
 import { CategorySchema, DescriptionSchema, NameSchema, PriceSchema } from "src/pages/listing/schema";
 import { sendRequest } from "src/rpc/ajax";
 import { GetDraftListing, GetListing, UploadListingImage } from "src/rpc/api";
-import { createListing, updateListing, useDraftListing, useUpdateListing } from "src/rpc/data";
+import { createListing, updateListing, useDraftListing, useDraftListingOnce, useUpdateListing } from "src/rpc/data";
 import { CategoryType, Coordinates, Listing, ListingStatus } from "src/rpc/types";
 import { getGcsImageUrl } from "src/utils/images";
 import { mutate } from "swr";
 import { z } from "zod";
 
 export const NewListing: React.FC = () => {
-  const { listing, loading } = useDraftListing();
+  // only fetch it once to avoid re-rendering the entire multi-step form since we only use this for the intial step
+  const { listing, loading } = useDraftListingOnce();
   const navigate = useNavigate();
   const initialStep = computeStepNumber(listing);
+  const multiStep = useMemo(
+    () => (
+      <MultiStep
+        onComplete={() => {
+          navigate("/hosting");
+        }}
+        initialStepNumber={initialStep}
+        steps={[
+          { id: "category", elementFn: categoryStep, title: "What kind of experience do you want to host?" },
+          { id: "location", elementFn: locationStep, title: "Where is your adventure located?" },
+          {
+            id: "name",
+            elementFn: nameStep,
+            title: "What do you want to call your adventure?",
+            subtitle: "Giving your trip a fun name can make you stand out!",
+          },
+          {
+            id: "description",
+            elementFn: descriptionStep,
+            title: "Create your description",
+            subtitle: "Share what makes your trip special.",
+          },
+          {
+            id: "images",
+            elementFn: imageStep,
+            title: "Add images",
+            subtitle: "Show off your trip with at least three images.",
+          },
+          { id: "price", elementFn: priceStep, title: "Set a price", subtitle: "You can change it anytime." },
+          {
+            id: "review",
+            elementFn: reviewStep,
+            title: "Review your listing",
+            subtitle: "Here's what we'll show to guests. Make sure everything looks good.",
+          },
+        ]}
+      />
+    ),
+    [listing],
+  );
 
   if (loading) {
     return <Loading />;
@@ -37,41 +78,7 @@ export const NewListing: React.FC = () => {
   return (
     <div className="tw-w-full tw-flex tw-justify-center">
       <div className="tw-flex tw-px-8 sm:tw-px-0 tw-w-[500px] tw-min-h-[600px] tw-mt-10 tw-items-center tw-pb-24 tw-overflow-scroll">
-        <MultiStep
-          onComplete={() => {
-            navigate("/hosting");
-          }}
-          initialStepNumber={initialStep}
-          steps={[
-            { id: "category", elementFn: categoryStep, title: "What kind of experience do you want to host?" },
-            { id: "location", elementFn: locationStep, title: "Where is your adventure located?" },
-            {
-              id: "name",
-              elementFn: nameStep,
-              title: "What do you want to call your adventure?",
-              subtitle: "Giving your trip a fun name can make you stand out!",
-            },
-            {
-              id: "description",
-              elementFn: descriptionStep,
-              title: "Create your description",
-              subtitle: "Share what makes your trip special.",
-            },
-            {
-              id: "images",
-              elementFn: imageStep,
-              title: "Add images",
-              subtitle: "Show off your trip with at least three images.",
-            },
-            { id: "price", elementFn: priceStep, title: "Set a price", subtitle: "You can change it anytime." },
-            {
-              id: "review",
-              elementFn: reviewStep,
-              title: "Review your listing",
-              subtitle: "Here's what we'll show to guests. Make sure everything looks good.",
-            },
-          ]}
-        />
+        {multiStep}
       </div>
     </div>
   );
@@ -331,7 +338,7 @@ const ImageStep: React.FC<StepParams & ImageParams> = ({ renderLayout, listing }
           formData: formData,
         });
 
-        mutate({ GetDraftListing }, { ...listing, images: [...listing.images, listingImage] }, { revalidate: false });
+        mutate({ GetDraftListing }, { ...listing, images: [...listing.images, listingImage] });
         mutate({ GetListing, listingID });
       } catch (e) {}
     }

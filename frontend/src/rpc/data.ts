@@ -13,7 +13,8 @@ import {
 import { Listing, ListingInput, UserUpdates } from "src/rpc/types";
 import { forceErrorMessage } from "src/utils/errors";
 import { Mutation, useMutation } from "src/utils/queryHelpers";
-import useSWR, { Fetcher, mutate } from "swr";
+import useSWR, { Fetcher, SWRConfiguration, mutate } from "swr";
+import useSWRImmutable from "swr/immutable";
 
 export function useListing(listingID: number | undefined) {
   const shouldFetch = listingID;
@@ -32,10 +33,16 @@ export function useHostedListings() {
   return { hosted: data, mutate, error, loading: isLoading || isValidating };
 }
 
-export function useDraftListing() {
+export function useDraftListing(opts?: SWRConfiguration) {
   const fetcher: Fetcher<Listing, {}> = () => sendRequest(GetDraftListing);
-  const { data, mutate, error, isLoading, isValidating } = useSWR({ GetDraftListing }, fetcher);
-  return { listing: data, mutate, error, loading: isLoading || isValidating };
+  const { data, mutate, error, isLoading } = useSWR({ GetDraftListing }, fetcher, opts);
+  return { listing: data, mutate, error, loading: isLoading };
+}
+
+export function useDraftListingOnce(opts?: SWRConfiguration) {
+  const fetcher: Fetcher<Listing, {}> = () => sendRequest(GetDraftListing);
+  const { data, error, isLoading } = useSWRImmutable({ GetDraftListing, immutable: true }, fetcher, opts);
+  return { listing: data, loading: isLoading, error };
 }
 
 export function useSearch(location: string | undefined) {
@@ -62,7 +69,7 @@ export function useUpdateListing(listingID: number): Mutation<ListingInput> {
     },
     {
       onSuccess: (listing: Listing) => {
-        mutate({ GetDraftListing }, listing, { revalidate: false });
+        mutate({ GetDraftListing }, listing);
         mutate({ GetListing, listingID }, listing);
       },
     },
@@ -72,7 +79,7 @@ export function useUpdateListing(listingID: number): Mutation<ListingInput> {
 export async function updateListing(listingID: number, updates: ListingInput) {
   try {
     const listing = await sendRequest(UpdateListing, { pathParams: { listingID }, payload: updates });
-    mutate({ GetDraftListing }, listing, { revalidate: false });
+    mutate({ GetDraftListing }, listing);
     mutate({ GetListing, listingID }, listing);
     return { success: true, error: "" };
   } catch (e) {
@@ -83,7 +90,7 @@ export async function updateListing(listingID: number, updates: ListingInput) {
 export async function createListing(input: ListingInput) {
   try {
     const listing = await sendRequest(CreateListing, { payload: input });
-    mutate({ GetDraftListing }, listing, { revalidate: false });
+    mutate({ GetDraftListing }, listing);
     return { success: true, error: "" };
   } catch (e) {
     return { success: false, error: forceErrorMessage(e) };
