@@ -10,6 +10,7 @@ import (
 	"go.fabra.io/server/common/geo"
 	"go.fabra.io/server/common/input"
 	"go.fabra.io/server/common/maps"
+	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/repositories/listings"
 	"go.fabra.io/server/common/views"
 )
@@ -63,5 +64,9 @@ func (s ApiService) CreateListing(auth auth.Authentication, w http.ResponseWrite
 		return errors.Wrap(err, "(api.CreateListing) creating listing")
 	}
 
-	return json.NewEncoder(w).Encode(views.ConvertBasicListing(*listing))
+	return json.NewEncoder(w).Encode(views.ConvertListing(listings.ListingDetails{
+		Listing: *listing,
+		Host:    auth.User,
+		Images:  []models.ListingImage{},
+	}))
 }

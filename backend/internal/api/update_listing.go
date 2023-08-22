@@ -72,5 +72,14 @@ func (s ApiService) UpdateListing(auth auth.Authentication, w http.ResponseWrite
 		return errors.Wrap(err, "(api.UpdateListing) creating listing")
 	}
 
-	return json.NewEncoder(w).Encode(views.ConvertBasicListing(*listing))
+	listingImages, err := listings.LoadImagesForListing(s.db, listing.ID)
+	if err != nil {
+		return errors.Wrapf(err, "(api.UpdateListing) loading images for listing %d", listing.ID)
+	}
+
+	return json.NewEncoder(w).Encode(views.ConvertListing(listings.ListingDetails{
+		Listing: *listing,
+		Host:    auth.User,
+		Images:  listingImages,
+	}))
 }
