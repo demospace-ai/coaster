@@ -43,7 +43,7 @@ export const Home: React.FC = () => {
     <div className="tw-flex tw-flex-col tw-items-center tw-pt-2 sm:tw-pt-5 tw-pb-24 tw-px-5 sm:tw-px-20">
       <CategorySelector />
       <div>
-        <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-3 xl:tw-grid-cols-4 2xl:tw-grid-cols-5 tw-mt-1 sm:tw-mt-4 tw-mb-5 tw-font-bold tw-text-3xl tw-gap-10">
+        <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-3 xl:tw-grid-cols-4 2xl:tw-grid-cols-5 tw-mt-1 sm:tw-mt-4 tw-mb-5 tw-font-bold tw-text-3xl tw-gap-10 tw-w-full">
           {featured?.map((listing: Listing) => (
             <SearchResult key={listing.id} listing={listing} />
           ))}
