@@ -48,6 +48,29 @@ func ConvertListings(listings []listings.ListingDetails) []Listing {
 	return converted
 }
 
+func ConvertBasicListing(listing models.Listing) Listing {
+	var coordinates *Coordinates
+	if listing.Coordinates != nil {
+		coordinates = &Coordinates{Latitude: listing.Coordinates.Latitude, Longitude: listing.Coordinates.Longitude}
+	}
+	return Listing{
+		ID:               listing.ID,
+		Name:             listing.Name,
+		Description:      listing.Description,
+		Category:         listing.Category,
+		Price:            listing.Price,
+		Location:         listing.Location,
+		Coordinates:      coordinates,
+		ShortDescription: listing.ShortDescription,
+		Cancellation:     listing.Cancellation,
+		DurationHours:    listing.DurationHours,
+		MaxGuests:        listing.MaxGuests,
+		Highlights:       listing.Highlights,
+		Includes:         listing.Includes,
+		Status:           listing.Status,
+	}
+}
+
 func ConvertListing(listing listings.ListingDetails) Listing {
 	var coordinates *Coordinates
 	if listing.Coordinates != nil {

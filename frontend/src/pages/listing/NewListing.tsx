@@ -1,6 +1,6 @@
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FormEvent, useCallback, useRef } from "react";
+import { FormEvent, useCallback, useMemo, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import {
@@ -28,6 +28,8 @@ import { z } from "zod";
 export const NewListing: React.FC = () => {
   const { listing, loading } = useDraftListing();
   const navigate = useNavigate();
+  // only set initial step once
+  const initialStep = useMemo(() => computeStepNumber(listing), []);
 
   if (loading) {
     return <Loading />;
@@ -40,7 +42,7 @@ export const NewListing: React.FC = () => {
           onComplete={() => {
             navigate("/hosting");
           }}
-          initialStepNumber={computeStepNumber(listing)}
+          initialStepNumber={initialStep}
           steps={[
             { id: "category", elementFn: categoryStep, title: "What kind of experience do you want to host?" },
             { id: "location", elementFn: locationStep, title: "Where is your adventure located?" },

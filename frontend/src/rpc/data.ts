@@ -71,9 +71,9 @@ export function useUpdateListing(listingID: number): Mutation<ListingInput> {
 
 export async function updateListing(listingID: number, updates: ListingInput) {
   try {
-    await sendRequest(UpdateListing, { pathParams: { listingID }, payload: updates });
-    mutate({ GetDraftListing });
-    mutate({ GetListing, listingID });
+    const listing = await sendRequest(UpdateListing, { pathParams: { listingID }, payload: updates });
+    mutate({ GetDraftListing }, listing, { revalidate: false });
+    mutate({ GetListing, listingID }, listing);
     return { success: true, error: "" };
   } catch (e) {
     return { success: false, error: forceErrorMessage(e) };
@@ -82,8 +82,8 @@ export async function updateListing(listingID: number, updates: ListingInput) {
 
 export async function createListing(input: ListingInput) {
   try {
-    await sendRequest(CreateListing, { payload: input });
-    mutate({ GetDraftListing });
+    const listing = await sendRequest(CreateListing, { payload: input });
+    mutate({ GetDraftListing }, listing, { revalidate: false });
     return { success: true, error: "" };
   } catch (e) {
     return { success: false, error: forceErrorMessage(e) };

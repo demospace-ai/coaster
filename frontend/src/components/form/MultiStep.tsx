@@ -214,7 +214,7 @@ export const TextAreaStep: React.FC<StepParams & InputProps> = ({
 
 type SelectorProps = {
   schema: ZodEnum<[string, ...string[]]>;
-  onChange?: (data: string) => void;
+  onChange?: (data: string) => Promise<SubmitResult>;
   onSubmit?: (data: string) => Promise<SubmitResult>;
   existingData?: string;
   placeholder?: string;

@@ -12,13 +12,10 @@ import (
 	"go.fabra.io/server/common/input"
 	"go.fabra.io/server/common/maps"
 	"go.fabra.io/server/common/repositories/listings"
+	"go.fabra.io/server/common/views"
 )
 
 type UpdateListingRequest = input.Listing
-
-type UpdateListingResponse struct {
-	ListingId int64 `json:"listing_id"`
-}
 
 func (s ApiService) UpdateListing(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
@@ -66,7 +63,7 @@ func (s ApiService) UpdateListing(auth auth.Authentication, w http.ResponseWrite
 		updateListingRequest.Coordinates = coordinates
 	}
 
-	_, err = listings.UpdateListing(
+	listing, err = listings.UpdateListing(
 		s.db,
 		listing,
 		updateListingRequest,
@@ -75,7 +72,5 @@ func (s ApiService) UpdateListing(auth auth.Authentication, w http.ResponseWrite
 		return errors.Wrap(err, "(api.UpdateListing) creating listing")
 	}
 
-	return json.NewEncoder(w).Encode(UpdateListingResponse{
-		ListingId: listing.ID,
-	})
+	return json.NewEncoder(w).Encode(views.ConvertBasicListing(*listing))
 }
