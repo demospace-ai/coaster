@@ -42,7 +42,7 @@ const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) => {
   const showToast = useShowToast();
 
   return (
-    <div className="tw-flex tw-flex-row tw-items-center tw-justify-between">
+    <div className="tw-flex tw-flex-row tw-items-start tw-justify-between">
       <div>
         <div className="tw-font-semibold sm:tw-font-bold tw-text-3xl sm:tw-text-4xl tw-hyphens-auto">
           {listing.name}
@@ -52,13 +52,13 @@ const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) => {
         </div>
       </div>
       <div
-        className="tw-cursor-pointer hover:tw-bg-gray-100 tw-rounded-lg tw-p-2"
+        className="tw-cursor-pointer hover:tw-bg-gray-100 tw-rounded-lg tw-p-0.5 sm:tw-p-2"
         onClick={() => {
           navigator.clipboard.writeText(window.location.href);
           showToast("success", "Copied link to clipboard", 2000);
         }}
       >
-        <ArrowUpOnSquareIcon className="tw-h-7" />
+        <ArrowUpOnSquareIcon className="tw-h-6 sm:tw-h-7" />
       </div>
     </div>
   );
@@ -117,7 +117,7 @@ const HostDetails: React.FC<{ listing: ListingType }> = ({ listing }) => {
           alt="guide profile picture"
         />
         <div>
-          <div className="tw-text-xl tw-font-medium">Meet your guide, {listing.host.first_name}</div>
+          <div className="tw-text-xl tw-font-medium">Meet your guide: {listing.host.first_name}</div>
           <div className="tw-flex tw-flex-row tw-items-center">
             <CheckBadgeIcon className="tw-h-4 tw-mr-1 tw-fill-green-600" />
             Identity Verified
