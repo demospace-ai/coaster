@@ -28,15 +28,10 @@ func (s ApiService) GetListing(w http.ResponseWriter, r *http.Request) error {
 		return errors.Wrap(err, "(api.GetListing) unexpected authentication error")
 	}
 
-	var userID *int64 = nil
-	if auth.IsAuthenticated {
-		userID = &auth.User.ID
-	}
-
 	listing, err := listings.LoadByID(
 		s.db,
 		listingID,
-		userID,
+		auth.User,
 	)
 	if err != nil {
 		return errors.Wrap(err, "(api.GetListing) loading listing")

@@ -70,7 +70,7 @@ func UpdateUser(db *gorm.DB, user *models.User, updates input.UserUpdates) error
 	}
 
 	if len(updates.About) > 0 {
-		user.About = updates.About
+		user.About = &updates.About
 	}
 
 	result := db.Save(user)
@@ -111,7 +111,7 @@ func CreateUserForExternalInfo(db *gorm.DB, externalUserInfo *oauth.ExternalUser
 		FirstName:         externalUserInfo.FirstName,
 		LastName:          externalUserInfo.LastName,
 		Email:             externalUserInfo.Email,
-		ProfilePictureURL: externalUserInfo.ProfilePictureURL,
+		ProfilePictureURL: &externalUserInfo.ProfilePictureURL,
 		IsHost:            false,
 		EmailVerified:     true,
 	}

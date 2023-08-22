@@ -27,11 +27,11 @@ type Listing struct {
 }
 
 type Host struct {
-	ID                int64  `json:"id"`
-	FirstName         string `json:"first_name"`
-	LastName          string `json:"last_name"`
-	ProfilePictureURL string `json:"profile_picture_url"`
-	About             string `json:"about"`
+	ID                int64   `json:"id"`
+	FirstName         string  `json:"first_name"`
+	LastName          string  `json:"last_name"`
+	ProfilePictureURL *string `json:"profile_picture_url"`
+	About             *string `json:"about"`
 }
 
 type Coordinates struct {

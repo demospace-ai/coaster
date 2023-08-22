@@ -8,8 +8,8 @@ type User struct {
 	LastName          string  `json:"last_name"`
 	Email             string  `json:"email"`
 	Phone             *string `json:"phone"`
-	About             string  `json:"about"`
-	ProfilePictureURL string  `json:"profile_picture_url"`
+	About             *string `json:"about"`
+	ProfilePictureURL *string `json:"profile_picture_url"`
 	IsHost            bool    `json:"is_host"`
 }
 

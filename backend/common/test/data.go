@@ -14,7 +14,7 @@ func CreateUser(db *gorm.DB) *models.User {
 		FirstName:         "Test",
 		LastName:          "User",
 		Email:             "test@trycoaster.com",
-		ProfilePictureURL: "",
+		ProfilePictureURL: nil,
 	}
 
 	db.Create(&user)

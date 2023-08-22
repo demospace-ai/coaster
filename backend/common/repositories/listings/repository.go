@@ -15,7 +15,7 @@ type ListingDetails struct {
 	Images []models.ListingImage
 }
 
-func LoadByID(db *gorm.DB, listingID int64, userID *int64) (*ListingDetails, error) {
+func LoadByID(db *gorm.DB, listingID int64, user *models.User) (*ListingDetails, error) {
 	var listing models.Listing
 	result := db.Table("listings").
 		Select("listings.*").
@@ -28,7 +28,7 @@ func LoadByID(db *gorm.DB, listingID int64, userID *int64) (*ListingDetails, err
 
 	// Allow the owner to see their own listing even if it's not published
 	if listing.Status != models.ListingStatusPublished {
-		if userID == nil || listing.UserID != *userID {
+		if user == nil || (listing.UserID != user.ID && !user.IsAdmin) {
 			return nil, gorm.ErrRecordNotFound
 		}
 	}
