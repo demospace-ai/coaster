@@ -92,7 +92,7 @@ export const Toast: React.FC<ToastProps> = ({ content, show, duration, close }) 
                   <div className="tw-ml-4 tw-flex tw-flex-shrink-0">
                     <button
                       type="button"
-                      className="tw-inline-flex tw-rounded-md tw-bg-white tw-text-gray-400 hover:tw-text-gray-500 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-indigo-500 focus:tw-ring-offset-2"
+                      className="tw-inline-flex tw-rounded-md tw-bg-white tw-text-gray-400 hover:tw-text-gray-500 focus:tw-outline-none"
                       onClick={() => {
                         close();
                       }}

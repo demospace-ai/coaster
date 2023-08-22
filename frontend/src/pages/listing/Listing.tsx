@@ -1,9 +1,10 @@
 import { CheckBadgeIcon } from "@heroicons/react/20/solid";
-import { ClockIcon, GlobeAltIcon, StarIcon, UserGroupIcon } from "@heroicons/react/24/outline";
+import { ArrowUpOnSquareIcon, ClockIcon, GlobeAltIcon, StarIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import { useParams } from "react-router-dom";
 import { Button } from "src/components/button/Button";
 import { Callout } from "src/components/callouts/Callout";
 import { Loading } from "src/components/loading/Loading";
+import { useShowToast } from "src/components/notifications/Notifications";
 import { useListing } from "src/rpc/data";
 import { ListingStatus, Listing as ListingType } from "src/rpc/types";
 import { getGcsImageUrl } from "src/utils/images";
@@ -26,10 +27,7 @@ export const Listing: React.FC = () => {
       {listing.status !== ListingStatus.Published && (
         <Callout content={"Not published - under review"} className="tw-border tw-border-yellow-400 tw-mb-4" />
       )}
-      <div className="tw-font-semibold sm:tw-font-bold tw-text-3xl sm:tw-text-4xl tw-hyphens-auto">{listing.name}</div>
-      <div className="tw-flex tw-items-center tw-mt-3 tw-mb-4 tw-font-medium">
-        {listing.location} • {toTitleCase(listing.category ? listing.category : "")}
-      </div>
+      <ListingHeader listing={listing} />
       <ListingImages listing={listing} />
       <div className="tw-flex tw-mt-8 sm:tw-mt-12">
         <ListingDetails listing={listing} />
@@ -40,7 +38,33 @@ export const Listing: React.FC = () => {
   );
 };
 
-export const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) => {
+const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) => {
+  const showToast = useShowToast();
+
+  return (
+    <div className="tw-flex tw-flex-row tw-items-center tw-justify-between">
+      <div>
+        <div className="tw-font-semibold sm:tw-font-bold tw-text-3xl sm:tw-text-4xl tw-hyphens-auto">
+          {listing.name}
+        </div>
+        <div className="tw-flex tw-items-center tw-mt-3 tw-mb-4 tw-font-medium">
+          {listing.location} • {toTitleCase(listing.category ? listing.category : "")}
+        </div>
+      </div>
+      <div
+        className="tw-cursor-pointer hover:tw-bg-gray-100 tw-rounded-lg tw-p-2"
+        onClick={() => {
+          navigator.clipboard.writeText(window.location.href);
+          showToast("success", "Copied link to clipboard", 2000);
+        }}
+      >
+        <ArrowUpOnSquareIcon className="tw-h-7" />
+      </div>
+    </div>
+  );
+};
+
+const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) => {
   return (
     <div className="tw-fixed md:tw-hidden tw-z-20 tw-bottom-0 tw-left-0 tw-flex tw-items-center tw-justify-between tw-bg-white tw-border-t tw-border-solid tw-border-gray-300 tw-h-20 tw-w-full tw-px-4">
       <span>
@@ -51,7 +75,7 @@ export const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) =
   );
 };
 
-export const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
+const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
   return (
     <div className="tw-hidden md:tw-flex tw-w-[40%]">
       <div className="tw-sticky tw-top-32 tw-flex tw-flex-col tw-px-8 tw-py-6 tw-w-full tw-h-fit tw-border tw-border-solid tw-border-gray-300 tw-rounded-xl tw-shadow-centered-sm">
@@ -69,7 +93,7 @@ export const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) =>
   );
 };
 
-export const ListingDetails: React.FC<{ listing: ListingType }> = ({ listing }) => {
+const ListingDetails: React.FC<{ listing: ListingType }> = ({ listing }) => {
   return (
     <div className="tw-flex tw-flex-col tw-w-full md:tw-w-[60%] md:tw-mr-16">
       <HostOverview listing={listing} />
@@ -123,7 +147,7 @@ const Included: React.FC<{ listing: ListingType }> = ({ listing }) => {
       <div className="tw-mt-5 tw-font-semibold">What's included</div>
       <ul className="tw-list-disc tw-list-inside tw-mt-1">
         {listing.includes?.map((included) => (
-          <li>{included}</li>
+          <li key={included}>{included}</li>
         ))}
       </ul>
     </div>
@@ -135,8 +159,8 @@ const Highlights: React.FC<{ listing: ListingType }> = ({ listing }) => {
     <div className="tw-pb-6 tw-border-b tw-border-solid tw-border-gray-300">
       <div className="tw-mt-5 tw-font-semibold">Highlights</div>
       <ul className="tw-list-disc tw-list-inside tw-mt-1">
-        {listing.highlights?.map((highlights) => (
-          <li>{highlights}</li>
+        {listing.highlights?.map((highlight) => (
+          <li key={highlight}>{highlight}</li>
         ))}
       </ul>
     </div>
