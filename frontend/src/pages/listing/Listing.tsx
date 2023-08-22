@@ -100,7 +100,6 @@ const ListingDetails: React.FC<{ listing: ListingType }> = ({ listing }) => {
       <QuickInfo listing={listing} />
       <Description listing={listing} />
       <Included listing={listing} />
-      <Highlights listing={listing} />
       <HostDetails listing={listing} />
     </div>
   );
@@ -117,7 +116,7 @@ const HostDetails: React.FC<{ listing: ListingType }> = ({ listing }) => {
           alt="guide profile picture"
         />
         <div>
-          <div className="tw-text-xl tw-font-medium">Meet your guide: {listing.host.first_name}</div>
+          <div className="tw-text-xl tw-font-medium">Meet your trip provider: {listing.host.first_name}</div>
           <div className="tw-flex tw-flex-row tw-items-center">
             <CheckBadgeIcon className="tw-h-4 tw-mr-1 tw-fill-green-600" />
             Identity Verified
@@ -205,7 +204,7 @@ const HostOverview: React.FC<{ listing: ListingType }> = ({ listing }) => {
   return (
     <div className="tw-flex tw-items-center tw-pb-6 tw-border-b tw-border-solid tw-border-gray-300 tw-justify-between">
       <div>
-        <div className="tw-text-xl sm:tw-text-2xl tw-font-medium">Activity led by {listing.host.first_name}</div>
+        <div className="tw-text-xl sm:tw-text-2xl tw-font-medium">Activity provided by {listing.host.first_name}</div>
         <div className="tw-flex tw-items-center tw-mt-1">
           <GlobeAltIcon className="tw-h-5 tw-mr-1.5" />
           {languages}
