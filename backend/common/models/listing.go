@@ -16,6 +16,7 @@ const (
 	CategoryCycling    ListingCategory = "cycling"
 	CategoryBoating    ListingCategory = "boating"
 	CategoryClimbing   ListingCategory = "climbing"
+	CategoryOutdoors   ListingCategory = "outdoors"
 	CategoryDiving     ListingCategory = "diving"
 	CategorySnorkeling ListingCategory = "snorkeling"
 	CategoryHunting    ListingCategory = "hunting"

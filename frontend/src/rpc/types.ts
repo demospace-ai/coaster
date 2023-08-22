@@ -120,5 +120,16 @@ export interface EmailLoginResponse {
   user: User;
 }
 
-export const Category = z.enum(["surfing", "skiing", "fishing", "hiking", "camping", "cycling", "boating", "diving"]);
+export const Category = z.enum([
+  "surfing",
+  "skiing",
+  "fishing",
+  "hiking",
+  "camping",
+  "climbing",
+  "cycling",
+  "boating",
+  "diving",
+  "outdoors",
+]);
 export type CategoryType = z.infer<typeof Category>;

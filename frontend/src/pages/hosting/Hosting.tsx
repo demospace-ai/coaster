@@ -35,8 +35,15 @@ export const Hosting: React.FC = () => {
           <ExclamationCircleIcon className="tw-h-6 tw-text-yellow-600 tw-ml-2 sm:tw-ml-12" />
         </div>
       )}
-      <NavLink to={"/listings/new"}>New Listing</NavLink>
-      <div className="tw-mb-4 tw-font-bold tw-text-2xl">Your listings</div>
+      <div className="tw-flex tw-flex-row tw-items-center tw-mt-6 tw-mb-4">
+        <div className="tw-font-bold tw-text-2xl">Your listings</div>
+        <NavLink
+          className="tw-border tw-border-solid tw-border-gray-600 tw-px-3 tw-py-2 tw-rounded-lg tw-ml-8 hover:tw-bg-gray-200"
+          to={"/listings/new"}
+        >
+          New Listing
+        </NavLink>
+      </div>
       {hosted.map((listing: Listing) => (
         <div
           className="tw-my-2 tw-cursor-pointer tw-w-fit"

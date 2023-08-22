@@ -187,7 +187,6 @@ const QuickInfo: React.FC<{ listing: ListingType }> = ({ listing }) => {
             <span className="tw-font-medium tw-mr-1.5">Duration:</span>
             {duration}
           </div>
-          <span className="tw-text-sm">Check availability to see start times.</span>
         </div>
       </div>
       <div className="tw-flex tw-items-center tw-my-6">
