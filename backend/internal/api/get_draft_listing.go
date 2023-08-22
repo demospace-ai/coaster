@@ -17,13 +17,17 @@ func (s ApiService) GetDraftListing(auth auth.Authentication, w http.ResponseWri
 		auth.User.ID,
 	)
 	if err != nil {
-		return errors.Wrap(err, "(api.GetNewListing) getting new listing")
+		if errors.IsRecordNotFound(err) {
+			return errors.NotFound
+		} else {
+			return errors.Wrap(err, "(api.GetDraftListing) getting new listing")
+		}
 	}
 
 	if !auth.User.IsHost {
 		err = users.SetIsHost(s.db, auth.User.ID, true)
 		if err != nil {
-			return errors.Wrap(err, "(api.GetNewListing) setting user as host")
+			return errors.Wrap(err, "(api.GetDraftListing) setting user as host")
 		}
 	}
 

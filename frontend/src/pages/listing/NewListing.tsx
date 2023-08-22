@@ -29,7 +29,7 @@ export const NewListing: React.FC = () => {
   const { listing, loading } = useDraftListing();
   const navigate = useNavigate();
   // only set initial step once
-  const initialStep = useMemo(() => computeStepNumber(listing), []);
+  const initialStep = useMemo(() => computeStepNumber(listing), [listing]);
 
   if (loading) {
     return <Loading />;

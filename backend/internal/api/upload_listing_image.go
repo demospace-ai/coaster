@@ -46,6 +46,10 @@ func (s ApiService) UploadListingImage(auth auth.Authentication, w http.Response
 	}
 	defer file.Close()
 
+	if (handler.Size / 1024) > 1024 {
+		return errors.NewBadRequest("Image must be less than 1MB")
+	}
+
 	contentType := handler.Header.Get("Content-Type")
 	if _, supported := SUPPORTED_IMAGE_TYPES[contentType]; !supported {
 		return errors.NewBadRequestf("Unsupported image type: %s", contentType)

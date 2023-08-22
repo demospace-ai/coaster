@@ -708,3 +708,12 @@ resource "google_compute_backend_bucket" "user_images_backend" {
   bucket_name = google_storage_bucket.user_images_bucket.name
   enable_cdn  = true
 }
+
+resource "google_project_iam_member" "backend_roles" {
+  project  = "fabra-prod"
+  for_each = toset([
+    "roles/storage.objectAdmin",
+  ])
+  role   = each.key
+  member = "serviceAccount:${google_service_account.fabra-backend.email}"
+}
