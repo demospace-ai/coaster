@@ -255,11 +255,11 @@ const getMaxGuests = (listing: ListingType) => {
 
 const getDuration = (listing: ListingType) => {
   if (listing.duration_hours) {
-    const days = Math.floor(listing.duration_hours / 24);
-    const hours = listing.duration_hours % 24;
+    const days = Math.ceil(listing.duration_hours / 24);
     if (days > 0) {
       return `${days} day${days > 1 ? "s" : ""}`;
     } else {
+      const hours = listing.duration_hours;
       return `${hours} hour${hours > 1 ? "s" : ""}`;
     }
   } else {
