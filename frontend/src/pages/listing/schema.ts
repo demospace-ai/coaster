@@ -7,7 +7,7 @@ export const NameSchema = z
   .string()
   .nonempty("A name is required.")
   .min(4, "Your name must be at least 4 characters long.")
-  .max(32, "Your name can be up to 32 characters long.");
+  .max(64, "Your name can be up to 64 characters long.");
 
 export const DescriptionSchema = z
   .string()
