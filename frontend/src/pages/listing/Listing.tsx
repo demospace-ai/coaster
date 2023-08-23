@@ -23,7 +23,7 @@ export const Listing: React.FC = () => {
   }
 
   return (
-    <div className="tw-flex tw-flex-col tw-px-5 tw-pt-5 sm:tw-pt-16 tw-pb-32 sm:tw-px-[5rem] lg:tw-px-[10rem] lg:tw-max-w-[90rem] lg:tw-mx-auto tw-text-base">
+    <div className="tw-flex tw-flex-col tw-px-5 tw-pt-5 sm:tw-pt-12 tw-pb-32 sm:tw-px-[5rem] lg:tw-px-[10rem] lg:tw-max-w-[90rem] lg:tw-mx-auto tw-text-base">
       {listing.status !== ListingStatus.Published && (
         <Callout content={"Not published - under review"} className="tw-border tw-border-yellow-400 tw-mb-4" />
       )}
