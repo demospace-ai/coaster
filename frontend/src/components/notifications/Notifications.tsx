@@ -69,11 +69,8 @@ export const Toast: React.FC<ToastProps> = ({ content, show, duration, close }) 
   return (
     <>
       {/* Global notification live region, render this permanently at the end of the document */}
-      <div
-        aria-live="assertive"
-        className="tw-pointer-events-none tw-fixed tw-inset-0 tw-flex tw-items-end tw-px-4 tw-py-6 sm:tw-items-start sm:tw-p-6"
-      >
-        <div className="tw-flex tw-w-full tw-flex-col tw-items-center tw-space-y-4 sm:tw-items-end">
+      <div aria-live="assertive" className="tw-pointer-events-none tw-fixed tw-inset-0 tw-flex tw-p-6 tw-items-start">
+        <div className="tw-flex tw-w-full tw-flex-col tw-space-y-4 tw-items-end">
           {/* Notification panel, dynamically insert this into the live region when it needs to be displayed */}
           <Transition
             show={show}
@@ -81,7 +78,7 @@ export const Toast: React.FC<ToastProps> = ({ content, show, duration, close }) 
             enter="tw-transform tw-ease-out tw-duration-300 tw-transition"
             enterFrom="tw-translate-y-2 tw-opacity-0 sm:tw-translate-y-0 sm:tw-translate-x-2"
             enterTo="tw-translate-y-0 tw-opacity-100 sm:tw-translate-x-0"
-            leave="tw-transition tw-ease-in tw-duration-100"
+            leave="tw-transition tw-ease-in tw-duration-300"
             leaveFrom="tw-opacity-100"
             leaveTo="tw-opacity-0"
           >
