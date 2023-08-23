@@ -10,6 +10,7 @@ import {
   LoginRequest,
   LoginResponse,
   OAuthProvider,
+  User,
   UserUpdates,
 } from "src/rpc/types";
 
@@ -96,10 +97,17 @@ export const OAuthRedirect: IEndpoint<{ provider: OAuthProvider }, undefined> = 
   track: true,
 };
 
-export const UpdateUser: IEndpoint<UserUpdates, undefined> = {
+export const UpdateUser: IEndpoint<UserUpdates, User> = {
   name: "Update user",
   method: "POST",
   path: "/user",
+  track: true,
+};
+
+export const UpdateProfilePicture: IEndpoint<undefined, User> = {
+  name: "Update listing image",
+  method: "POST",
+  path: "/user/profile_picture",
   track: true,
 };
 

@@ -1,9 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { FormEvent, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormError } from "src/components/FormError";
 import { Input, TextArea } from "src/components/input/Input";
 import { useSelector } from "src/root/model";
-import { useUpdateUser } from "src/rpc/data";
+import { useUpdateProfilePicture, useUpdateUser } from "src/rpc/data";
 import { z } from "zod";
 
 const ProfileFormSchema = z.object({
@@ -17,7 +18,10 @@ type ProfileFormSchemaType = z.infer<typeof ProfileFormSchema>;
 
 export const Profile: React.FC = () => {
   const user = useSelector((state) => state.login.user);
-  const { mutate } = useUpdateUser();
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const { mutate: mutateUser } = useUpdateUser();
+  const { mutate: mutateProfilePicture } = useUpdateProfilePicture();
+
   const {
     handleSubmit,
     register,
@@ -34,7 +38,7 @@ export const Profile: React.FC = () => {
   });
 
   const onSubmit = (data: ProfileFormSchemaType) => {
-    mutate({
+    mutateUser({
       first_name: data.first_name,
       last_name: data.last_name,
       about: data.about,
@@ -42,7 +46,7 @@ export const Profile: React.FC = () => {
   };
 
   return (
-    <div className="tw-flex tw-flex-col tw-items-center tw-h-full tw-bg-slate-200 tw-pt-4 sm:tw-pt-10">
+    <div className="tw-flex tw-flex-col tw-items-center tw-h-full tw-bg-slate-200 tw-pt-20 sm:tw-pt-24">
       <form
         className="tw-flex tw-flex-col tw-max-w-full sm:tw-max-w-2xl tw-w-full tw-px-4 sm:tw-px-0"
         onSubmit={handleSubmit(onSubmit)}
@@ -50,12 +54,33 @@ export const Profile: React.FC = () => {
         <div className="tw-text-center sm:tw-text-left tw-w-full tw-text-3xl tw-font-semibold tw-mb-3">
           Profile Details
         </div>
-        <div className="tw-flex tw-w-full tw-justify-center">
-          <img
-            src={user?.profile_picture_url}
-            className="tw-rounded-full tw-h-24 sm:tw-h-32 tw-mb-5 tw-mt-2"
-            referrerPolicy="no-referrer"
+        <div className="tw-flex tw-w-full tw-justify-center tw-mb-5">
+          <input
+            ref={imageInputRef}
+            type="file"
+            className="tw-hidden"
+            onChange={(e: FormEvent<HTMLInputElement>) => {
+              if (e.currentTarget && e.currentTarget.files) {
+                const file = e.currentTarget.files[0];
+                mutateProfilePicture(file);
+              }
+            }}
           />
+          {user?.profile_picture_url ? (
+            <img
+              src={user?.profile_picture_url}
+              className="tw-rounded-full tw-object-cover tw-aspect-square tw-h-24 tw-mt-2 tw-cursor-pointer"
+              referrerPolicy="no-referrer"
+              onClick={() => imageInputRef.current?.click()}
+            />
+          ) : (
+            <div
+              className="tw-bg-slate-400 tw-text-white tw-text-4xl tw-rounded-full tw-aspect-square tw-h-24 tw-select-none tw-flex tw-items-center tw-justify-center tw-cursor-pointer"
+              onClick={() => imageInputRef.current?.click()}
+            >
+              {user!.first_name.charAt(0)}
+            </div>
+          )}
         </div>
         <Input className="tw-my-1" label="First Name" {...register("first_name")} />
         <FormError message={errors.first_name?.message} />
@@ -72,7 +97,7 @@ export const Profile: React.FC = () => {
         <FormError message={errors.about?.message} />
         <button
           type="submit"
-          className="tw-flex tw-justify-center tw-w-full sm:tw-w-fit tw-rounded-lg tw-bg-blue-500 tw-text-white tw-font-medium tw-px-10 tw-py-2 tw-mt-3"
+          className="tw-flex tw-justify-center tw-w-full sm:tw-w-fit tw-rounded-lg tw-bg-yellow-700 tw-text-white tw-font-medium tw-px-10 tw-py-2 tw-mt-3"
         >
           Save
         </button>

@@ -1,6 +1,6 @@
+import { useDispatch } from "src/root/model";
 import { sendRequest } from "src/rpc/ajax";
 import {
-  CheckSession,
   CreateListing,
   GetDraftListing,
   GetFeaturedListings,
@@ -8,9 +8,10 @@ import {
   GetListing,
   SearchListings,
   UpdateListing,
+  UpdateProfilePicture,
   UpdateUser,
 } from "src/rpc/api";
-import { Listing, ListingInput, UserUpdates } from "src/rpc/types";
+import { Listing, ListingInput, User, UserUpdates } from "src/rpc/types";
 import { forceErrorMessage } from "src/utils/errors";
 import { Mutation, useMutation } from "src/utils/queryHelpers";
 import useSWR, { Fetcher, SWRConfiguration, mutate } from "swr";
@@ -98,13 +99,34 @@ export async function createListing(input: ListingInput) {
 }
 
 export function useUpdateUser(): Mutation<UserUpdates> {
-  return useMutation<undefined, UserUpdates>(
+  const dispatch = useDispatch();
+  return useMutation<User, UserUpdates>(
     (updates: UserUpdates) => {
       return sendRequest(UpdateUser, { payload: updates });
     },
     {
-      onSuccess: () => {
-        mutate({ CheckSession }); // TODO: this does nothing because we don't actually call check session through SWR
+      onSuccess: (user: User) => {
+        dispatch({ type: "login.update", user: user });
+      },
+    },
+  );
+}
+
+export function useUpdateProfilePicture(): Mutation<File> {
+  const dispatch = useDispatch();
+
+  return useMutation<User, File>(
+    (profilePicture: File) => {
+      const formData = new FormData();
+      formData.append("profile_picture", profilePicture);
+      return sendRequest(UpdateProfilePicture, { formData });
+    },
+    {
+      onSuccess: (user) => {
+        dispatch({ type: "login.update", user: user });
+      },
+      onError: (e) => {
+        dispatch({ type: "toast", toast: { type: "error", content: forceErrorMessage(e) } });
       },
     },
   );

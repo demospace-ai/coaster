@@ -72,6 +72,12 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			Pattern:     "/user",
 			HandlerFunc: s.UpdateUser,
 		},
+		{
+			Name:        "Update profile picture",
+			Method:      router.POST,
+			Pattern:     "/user/profile_picture",
+			HandlerFunc: s.UpdateProfilePicture,
+		},
 	}
 }
 

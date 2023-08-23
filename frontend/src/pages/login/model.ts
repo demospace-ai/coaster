@@ -22,6 +22,10 @@ export type LoginAction =
       email: string;
     }
   | {
+      type: "login.update";
+      user: User;
+    }
+  | {
       type: "login.logout";
     }
   | {
@@ -40,6 +44,11 @@ export function loginReducer(state: LoginState = INITIAL_LOGIN_STATE, action: Lo
     case "login.logout":
       // simplify by just going back to initial state
       return INITIAL_LOGIN_STATE;
+    case "login.update":
+      return {
+        ...state,
+        user: action.user,
+      };
     case "login.error":
       return {
         ...state,

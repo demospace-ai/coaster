@@ -9,6 +9,7 @@ import (
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/input"
 	"go.fabra.io/server/common/repositories/users"
+	"go.fabra.io/server/common/views"
 )
 
 type UpdateUserRequest = input.UserUpdates
@@ -27,7 +28,7 @@ func (s ApiService) UpdateUser(auth auth.Authentication, w http.ResponseWriter, 
 		return errors.Wrap(err, "(api.UpdateUser) validating request")
 	}
 
-	err = users.UpdateUser(
+	user, err := users.UpdateUser(
 		s.db,
 		auth.User,
 		updateUserRequest,
@@ -36,5 +37,5 @@ func (s ApiService) UpdateUser(auth auth.Authentication, w http.ResponseWriter, 
 		return errors.Wrap(err, "(api.UpdateUser) updating user")
 	}
 
-	return nil
+	return json.NewEncoder(w).Encode(views.ConvertUser(*user))
 }

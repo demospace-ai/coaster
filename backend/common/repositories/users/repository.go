@@ -60,25 +60,36 @@ func LoadUserByID(db *gorm.DB, userID int64) (*models.User, error) {
 	return &user, nil
 }
 
-func UpdateUser(db *gorm.DB, user *models.User, updates input.UserUpdates) error {
-	if len(updates.FirstName) > 0 {
-		user.FirstName = updates.FirstName
+func UpdateUser(db *gorm.DB, user *models.User, updates input.UserUpdates) (*models.User, error) {
+	if updates.FirstName != nil {
+		user.FirstName = *updates.FirstName
 	}
 
-	if len(updates.LastName) > 0 {
-		user.LastName = updates.LastName
+	if updates.LastName != nil {
+		user.LastName = *updates.LastName
 	}
 
-	if len(updates.About) > 0 {
-		user.About = &updates.About
+	if updates.About != nil {
+		user.About = updates.About
 	}
 
 	result := db.Save(user)
 	if result.Error != nil {
-		return errors.Wrap(result.Error, "(users.UpdateUser)")
+		return nil, errors.Wrap(result.Error, "(users.UpdateUser)")
 	}
 
-	return nil
+	return user, nil
+}
+
+func UpdateProfilePicture(db *gorm.DB, user *models.User, profilePictureUrl string) (*models.User, error) {
+	user.ProfilePictureURL = &profilePictureUrl
+
+	result := db.Save(user)
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(users.UpdateProfilePicture)")
+	}
+
+	return user, nil
 }
 
 func CreateUserFromEmail(db *gorm.DB, email string, firstName string, lastName string, password string) (*models.User, error) {
