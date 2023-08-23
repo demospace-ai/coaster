@@ -133,7 +133,7 @@ const HostDetails: React.FC<{ listing: ListingType }> = ({ listing }) => {
           </div>
         </div>
       </div>
-      <div className="tw-mt-4">{listing.host.about}</div>
+      <div className="tw-mt-4 tw-whitespace-pre-wrap">{listing.host.about}</div>
       <LinkButton
         className="tw-mt-6 tw-bg-white hover:tw-bg-gray-100 tw-text-black tw-border tw-border-solid tw-border-black tw-w-fit tw-px-8"
         href={`mailto:${listing.host.email}?subject=Question about your trip`}
