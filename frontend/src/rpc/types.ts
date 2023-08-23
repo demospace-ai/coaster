@@ -97,6 +97,7 @@ export interface UserUpdates {
   first_name: string;
   last_name: string;
   about?: string;
+  password?: string;
 }
 
 export interface CreateUserRequest {

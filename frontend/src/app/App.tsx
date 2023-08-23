@@ -104,10 +104,10 @@ export const router = createBrowserRouter(
       <Route path="/search" element={<Search />} />
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/about" element={<About />} />
-      <Route path="/profile" element={<Profile />} />
       <Route path="/terms" element={<Terms />} />
-      <Route path="/hosting" element={<Hosting />} />
       <Route path="/listings/:listingID" element={<Listing />} />
+      <Route path="/hosting" element={<RequireAuth element={<Hosting />} />} />
+      <Route path="/profile" element={<RequireAuth element={<Profile />} />} />
       <Route path="/listings/new" element={<RequireAuth element={<NewListing />} />} />
       <Route path="/" element={<Home />} />
       <Route path="*" element={<NotFound />} />

@@ -7,12 +7,24 @@ import { useSelector } from "src/root/model";
 import { useUpdateProfilePicture, useUpdateUser } from "src/rpc/data";
 import { z } from "zod";
 
-const ProfileFormSchema = z.object({
-  first_name: z.string().min(1, { message: "First name is required" }),
-  last_name: z.string().min(1, { message: "Last name is required" }),
-  email: z.string().email({ message: "Invalid email address" }),
-  about: z.string().optional(),
-});
+const ProfileFormSchema = z
+  .object({
+    first_name: z.string().min(1, { message: "First name is required" }),
+    last_name: z.string().min(1, { message: "Last name is required" }),
+    email: z.string().email({ message: "Invalid email address" }),
+    about: z.string().optional(),
+    password: z.string().min(8, { message: "Password must be at least 8 characters" }),
+    confirm_password: z.string(),
+  })
+  .superRefine(({ confirm_password, password }, ctx) => {
+    if (confirm_password !== password) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["confirm_password"],
+        message: "The passwords did not match.",
+      });
+    }
+  });
 
 type ProfileFormSchemaType = z.infer<typeof ProfileFormSchema>;
 
@@ -25,6 +37,7 @@ export const Profile: React.FC = () => {
   const {
     handleSubmit,
     register,
+    watch,
     formState: { errors, isValid },
   } = useForm<ProfileFormSchemaType>({
     mode: "onBlur",
@@ -42,11 +55,17 @@ export const Profile: React.FC = () => {
       first_name: data.first_name,
       last_name: data.last_name,
       about: data.about,
+      password: data.password,
     });
   };
 
+  // Needed to display label correctly
+  const first_name = watch("first_name");
+  const last_name = watch("last_name");
+  const email = watch("email");
+
   return (
-    <div className="tw-flex tw-flex-col tw-items-center tw-h-full tw-bg-slate-200 tw-pt-20 sm:tw-pt-24">
+    <div className="tw-flex tw-flex-col tw-items-center tw-h-full tw-bg-slate-200 tw-pt-8 sm:tw-pt-14">
       <form
         className="tw-flex tw-flex-col tw-max-w-full sm:tw-max-w-2xl tw-w-full tw-px-4 sm:tw-px-0"
         onSubmit={handleSubmit(onSubmit)}
@@ -82,12 +101,23 @@ export const Profile: React.FC = () => {
             </div>
           )}
         </div>
-        <Input className="tw-my-1" label="First Name" {...register("first_name")} />
+        <Input className="tw-my-1" label="First Name" {...register("first_name")} value={first_name} />
         <FormError message={errors.first_name?.message} />
-        <Input className="tw-my-1" label="Last Name" {...register("last_name")} />
+        <Input className="tw-my-1" label="Last Name" {...register("last_name")} value={last_name} />
         <FormError message={errors.last_name?.message} />
-        <Input className="tw-my-1" label="Email" {...register("email")} disabled tooltip="Cannot change email" />
+        <Input
+          className="tw-my-1"
+          label="Email"
+          {...register("email")}
+          disabled
+          tooltip="Cannot change email"
+          value={email}
+        />
         <FormError message={errors.email?.message} />
+        <Input className="tw-my-1" label="New Password" {...register("password")} type="password" />
+        <FormError message={errors.password?.message} />
+        <Input className="tw-my-1" label="Confirm Password" {...register("confirm_password")} type="password" />
+        <FormError message={errors.confirm_password?.message} />
         <TextArea
           className="tw-my-1"
           label="About"

@@ -73,6 +73,15 @@ func UpdateUser(db *gorm.DB, user *models.User, updates input.UserUpdates) (*mod
 		user.About = updates.About
 	}
 
+	if updates.Password != nil {
+		passwordHash, err := bcrypt.GenerateFromPassword([]byte(*updates.Password), bcrypt.DefaultCost)
+		if err != nil {
+			return nil, errors.Wrap(err, "(users.CreateUserFromEmail) generating password hash")
+		}
+		hashedPassword := string(passwordHash)
+		user.HashedPassword = &hashedPassword
+	}
+
 	result := db.Save(user)
 	if result.Error != nil {
 		return nil, errors.Wrap(result.Error, "(users.UpdateUser)")

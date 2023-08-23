@@ -200,6 +200,8 @@ const EmailLoginForm: React.FC<{ reset: () => void; email?: string }> = ({ reset
     },
     resolver: zodResolver(EmailLoginSchema),
   });
+
+  // Needed to display label correctly
   const emailValue = watch("email");
 
   return (
@@ -284,6 +286,8 @@ const EmailSignup: React.FC<{ reset: () => void; email?: string }> = ({ reset, e
     },
     resolver: zodResolver(EmailSignupSchema),
   });
+
+  // Needed to display label correctly
   const emailValue = watch("email");
 
   return (
