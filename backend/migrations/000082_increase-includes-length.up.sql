@@ -1,0 +1,2 @@
+ALTER TABLE listings ALTER COLUMN includes TYPE VARCHAR(160)[];
+ALTER TABLE listings ALTER COLUMN highlights TYPE VARCHAR(160)[];
