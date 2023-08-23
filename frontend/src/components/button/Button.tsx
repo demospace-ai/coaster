@@ -37,7 +37,7 @@ export const LinkButton: React.FC<LinkButtonProps> = forwardRef<HTMLAnchorElemen
   const { href, className, children, ...remaining } = props;
 
   const buttonStyle = mergeClasses(
-    "tw-text-primary-text tw-bg-primary hover:tw-bg-primary-hover",
+    "tw-flex tw-items-center tw-justify-center tw-text-primary-text tw-bg-primary hover:tw-bg-primary-hover",
     "tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition tw-select-none",
     props.className,
   );

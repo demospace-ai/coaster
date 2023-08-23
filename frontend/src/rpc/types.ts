@@ -45,6 +45,7 @@ export interface Host {
   id: number;
   first_name: string;
   last_name: string;
+  email: string;
   about: string | undefined;
   profile_picture_url: string | undefined;
 }

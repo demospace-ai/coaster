@@ -30,6 +30,7 @@ type Host struct {
 	ID                int64   `json:"id"`
 	FirstName         string  `json:"first_name"`
 	LastName          string  `json:"last_name"`
+	Email             string  `json:"email"`
 	ProfilePictureURL *string `json:"profile_picture_url"`
 	About             *string `json:"about"`
 }
@@ -76,10 +77,12 @@ func ConvertListing(listing listings.ListingDetails) Listing {
 }
 
 func ConvertHost(user *models.User) Host {
+	// TODO: prevent email when email is not verified
 	return Host{
 		ID:                user.ID,
 		FirstName:         user.FirstName,
 		LastName:          user.LastName,
+		Email:             user.Email,
 		ProfilePictureURL: user.ProfilePictureURL,
 		About:             user.About,
 	}

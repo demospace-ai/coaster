@@ -1,7 +1,7 @@
 import { CheckBadgeIcon } from "@heroicons/react/20/solid";
 import { ArrowUpOnSquareIcon, ClockIcon, GlobeAltIcon, StarIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import { useParams } from "react-router-dom";
-import { Button } from "src/components/button/Button";
+import { LinkButton } from "src/components/button/Button";
 import { Callout } from "src/components/callouts/Callout";
 import { Loading } from "src/components/loading/Loading";
 import { useShowToast } from "src/components/notifications/Notifications";
@@ -70,7 +70,12 @@ const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) => {
       <span>
         <span className="tw-font-bold">${listing.price}/person</span>
       </span>
-      <Button className="tw-font-semibold tw-py-2">Check Availability</Button>
+      <LinkButton
+        className="tw-font-semibold tw-py-2 tw-mb-4"
+        href={`mailto:${listing.host.email}?subject=Checking availability&body=Hi ${listing.host.first_name}, I'm interested in booking your trip!`}
+      >
+        Check Availability
+      </LinkButton>
     </div>
   );
 };
@@ -83,7 +88,12 @@ const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
         <span className="tw-mb-3">
           <span className="tw-font-semibold">${listing.price}/person</span>
         </span>
-        <Button className="tw-font-semibold tw-py-2 tw-mb-4">Check Availability</Button>
+        <LinkButton
+          className="tw-font-semibold tw-py-2 tw-mb-4"
+          href={`mailto:${listing.host.email}?subject=Checking availability&body=Hi ${listing.host.first_name}, I'm interested in booking your trip!`}
+        >
+          Check Availability
+        </LinkButton>
         <span className="tw-text-sm">
           *Likely to sell out: Based on Coaster's booking data and information from the provider, it seems likely this
           experience will sell out soon.
@@ -124,9 +134,12 @@ const HostDetails: React.FC<{ listing: ListingType }> = ({ listing }) => {
         </div>
       </div>
       <div className="tw-mt-4">{listing.host.about}</div>
-      <Button className="tw-mt-6 tw-bg-white hover:tw-bg-gray-100 tw-text-black tw-border tw-border-solid tw-border-black tw-font-medium">
+      <LinkButton
+        className="tw-mt-6 tw-bg-white hover:tw-bg-gray-100 tw-text-black tw-border tw-border-solid tw-border-black tw-w-fit tw-px-8"
+        href={`mailto:${listing.host.email}?subject=Question about your trip`}
+      >
         Contact
-      </Button>
+      </LinkButton>
     </div>
   );
 };
