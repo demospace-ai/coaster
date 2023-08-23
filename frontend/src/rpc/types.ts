@@ -29,7 +29,7 @@ export interface Listing {
   coordinates: Coordinates | undefined;
   short_description: string | undefined;
   cancellation: CancellationPolicy | undefined;
-  duration_hours: number | undefined;
+  duration_minutes: number | undefined;
   max_guests: number | undefined;
   highlights: string[] | undefined;
   includes: string[] | undefined;

@@ -203,7 +203,7 @@ const reviewStep = (params: StepParams) => {
             className="tw-rounded-lg tw-aspect-square tw-object-cover tw-w-80"
           />
           <div className="tw-mt-4 tw-font-bold tw-text-xl">{listing.name}</div>
-          <div className="tw-mt-1 tw-font-medium">{listing.location}</div>
+          <div className="tw-mt-1 tw-font-medium tw-w-80">{listing.location}</div>
           <div className="tw-mt-1">${listing.price} / person</div>
         </div>
       </div>

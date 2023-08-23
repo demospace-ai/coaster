@@ -252,15 +252,20 @@ const getMaxGuests = (listing: ListingType) => {
 };
 
 const getDuration = (listing: ListingType) => {
-  if (listing.duration_hours) {
-    const days = Math.floor(listing.duration_hours / 24);
+  if (listing.duration_minutes) {
+    const days = listing.duration_minutes / 1440; // 1440 minutes in a day
     if (days > 0) {
-      const roundedDays = Math.round(listing.duration_hours / 24);
+      const roundedDays = Math.round(days);
       return `${roundedDays} day${roundedDays > 1 ? "s" : ""}`;
-    } else {
-      const hours = listing.duration_hours;
-      return `${hours} hour${hours > 1 ? "s" : ""}`;
     }
+
+    const hours = listing.duration_minutes / 60;
+    if (hours > 0) {
+      const roundedHours = Math.round(hours);
+      return `${roundedHours} hour${roundedHours > 1 ? "s" : ""}`;
+    }
+
+    return `${listing.duration_minutes} minute${listing.duration_minutes > 1 ? "s" : ""}`;
   } else {
     return "TBD";
   }

@@ -15,7 +15,7 @@ type Listing struct {
 	Status           *models.ListingStatus       `json:"status"`
 	ShortDescription *string                     `json:"short_description"`
 	Cancellation     *models.ListingCancellation `json:"cancellation"`
-	DurationHours    *int64                      `json:"duration_hours"`
+	DurationMinutes  *int64                      `json:"duration_minutes"`
 	MaxGuests        *int64                      `json:"max_guests"`
 	Highlights       []string                    `json:"highlights"`
 	Includes         []string                    `json:"includes"`

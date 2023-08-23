@@ -201,8 +201,8 @@ func UpdateListing(db *gorm.DB, listing *models.Listing, listingUpdates input.Li
 		listing.Cancellation = *listingUpdates.Cancellation
 	}
 
-	if listingUpdates.DurationHours != nil {
-		listing.DurationHours = listingUpdates.DurationHours
+	if listingUpdates.DurationMinutes != nil {
+		listing.DurationMinutes = listingUpdates.DurationMinutes
 	}
 
 	if listingUpdates.MaxGuests != nil {

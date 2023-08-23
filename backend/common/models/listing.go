@@ -50,7 +50,7 @@ type Listing struct {
 	Featured         bool                `json:"featured"`
 	ShortDescription *string             `json:"short_description"`
 	Cancellation     ListingCancellation `json:"cancellation"`
-	DurationHours    *int64              `json:"duration_hours"`
+	DurationMinutes  *int64              `json:"duration_minutes"`
 	MaxGuests        *int64              `json:"max_guests"`
 	Highlights       pq.StringArray      `json:"highlights" gorm:"type:varchar(128)[]"`
 	Includes         pq.StringArray      `json:"includes" gorm:"type:varchar(128)[]"`
