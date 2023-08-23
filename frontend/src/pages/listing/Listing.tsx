@@ -204,7 +204,7 @@ const HostOverview: React.FC<{ listing: ListingType }> = ({ listing }) => {
   return (
     <div className="tw-flex tw-items-center tw-pb-6 tw-border-b tw-border-solid tw-border-gray-300 tw-justify-between">
       <div>
-        <div className="tw-text-xl sm:tw-text-2xl tw-font-medium">Activity provided by {listing.host.first_name}</div>
+        <div className="tw-text-xl sm:tw-text-2xl tw-font-medium">Provided by {listing.host.first_name}</div>
         <div className="tw-flex tw-items-center tw-mt-1">
           <GlobeAltIcon className="tw-h-5 tw-mr-1.5" />
           {languages}
