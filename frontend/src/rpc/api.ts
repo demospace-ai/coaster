@@ -10,6 +10,8 @@ import {
   LoginRequest,
   LoginResponse,
   OAuthProvider,
+  ResetPasswordRequest,
+  SendResetRequest,
   User,
   UserUpdates,
 } from "src/rpc/types";
@@ -134,6 +136,20 @@ export const EmailLogin: IEndpoint<EmailLoginRequest, EmailLoginResponse> = {
   name: "Email login",
   method: "POST",
   path: "/login",
+  track: true,
+};
+
+export const SendReset: IEndpoint<SendResetRequest, undefined> = {
+  name: "Send reset",
+  method: "POST",
+  path: "/send_reset",
+  track: true,
+};
+
+export const ResetPassword: IEndpoint<ResetPasswordRequest, User> = {
+  name: "Reset password",
+  method: "POST",
+  path: "/reset_password",
   track: true,
 };
 

@@ -83,7 +83,13 @@ func LoadValidByToken(db *gorm.DB, rawToken string) (*models.Session, error) {
 	token := HashToken(rawToken)
 
 	var session models.Session
-	result := db.Take(&session, "token = ? AND expiration >= ? AND deactivated_at IS NULL", token, time.Now())
+	result := db.Table("sessions").
+		Select("sessions.*").
+		Where("sessions.token = ?", token).
+		Where("sessions.expiration >= ?", time.Now()).
+		Where("sessions.deactivated_at IS NULL").
+		Take(&session)
+
 	if result.Error != nil {
 		return nil, errors.Wrap(result.Error, "(sessions.LoadValidByToken)")
 	}

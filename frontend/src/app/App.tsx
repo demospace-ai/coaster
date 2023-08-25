@@ -12,6 +12,7 @@ import { Hosting } from "src/pages/hosting/Hosting";
 import { Listing } from "src/pages/listing/Listing";
 import { NewListing } from "src/pages/listing/NewListing";
 import { Login, Unauthorized } from "src/pages/login/Login";
+import { ResetPassword } from "src/pages/login/ResetPassword";
 import { NotFound } from "src/pages/notfound/NotFound";
 import { Privacy } from "src/pages/privacy/Privacy";
 import { Terms } from "src/pages/privacy/Terms";
@@ -101,6 +102,7 @@ export const router = createBrowserRouter(
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Login create />} />
+      <Route path="/reset_password" element={<ResetPassword />} />
       <Route path="/search" element={<Search />} />
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/about" element={<About />} />

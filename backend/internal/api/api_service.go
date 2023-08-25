@@ -126,6 +126,18 @@ func (s ApiService) UnauthenticatedRoutes() []router.UnauthenticatedRoute {
 			HandlerFunc: s.CreateUser,
 		},
 		{
+			Name:        "Send reset email",
+			Method:      router.POST,
+			Pattern:     "/send_reset",
+			HandlerFunc: s.SendReset,
+		},
+		{
+			Name:        "Reset password",
+			Method:      router.POST,
+			Pattern:     "/reset_password",
+			HandlerFunc: s.ResetPassword,
+		},
+		{
 			Name:        "Email login",
 			Method:      router.POST,
 			Pattern:     "/login",

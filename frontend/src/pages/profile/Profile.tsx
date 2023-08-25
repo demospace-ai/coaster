@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { FormEvent, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormError } from "src/components/FormError";
+import { Button } from "src/components/button/Button";
 import { Input, TextArea } from "src/components/input/Input";
 import { useSelector } from "src/root/model";
 import { useUpdateProfilePicture, useUpdateUser } from "src/rpc/data";
@@ -38,7 +39,7 @@ export const Profile: React.FC = () => {
     handleSubmit,
     register,
     watch,
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm<ProfileFormSchemaType>({
     mode: "onBlur",
     defaultValues: {
@@ -125,12 +126,9 @@ export const Profile: React.FC = () => {
           placeholder="Share some facts about yourself!"
         />
         <FormError message={errors.about?.message} />
-        <button
-          type="submit"
-          className="tw-flex tw-justify-center tw-w-full sm:tw-w-fit tw-rounded-lg tw-bg-yellow-700 tw-text-white tw-font-medium tw-px-10 tw-py-2 tw-mt-3"
-        >
+        <Button type="submit" className="tw-w-full sm:tw-w-fit tw-px-10 tw-py-2 tw-mt-3">
           Save
-        </button>
+        </Button>
       </form>
     </div>
   );

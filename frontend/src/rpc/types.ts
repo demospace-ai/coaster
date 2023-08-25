@@ -118,6 +118,15 @@ export interface EmailLoginRequest {
   password: string;
 }
 
+export interface SendResetRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  password: string;
+  token: string;
+}
+
 export interface EmailLoginResponse {
   user: User;
 }

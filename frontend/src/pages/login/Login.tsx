@@ -4,13 +4,15 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FormError } from "src/components/FormError";
+import { Button } from "src/components/button/Button";
 import { GoogleIcon } from "src/components/icons/Google";
 import longlogo from "src/components/images/long-logo.svg";
 import mail from "src/components/images/mail.svg";
 import { Input } from "src/components/input/Input";
+import { Loading } from "src/components/loading/Loading";
 import { useDispatch, useSelector } from "src/root/model";
 import { getEndpointUrl, sendRequest } from "src/rpc/ajax";
-import { CheckEmail, CreateUser, EmailLogin, OAuthRedirect } from "src/rpc/api";
+import { CheckEmail, CreateUser, EmailLogin, OAuthRedirect, SendReset } from "src/rpc/api";
 import { LoginMethod, OAuthProvider } from "src/rpc/types";
 import { z } from "zod";
 
@@ -19,6 +21,7 @@ enum LoginStep {
   EmailCreate = "email-create",
   EmailLogin = "email-login",
   GoogleLogin = "google-login",
+  SendReset = "send-reset",
 }
 
 export const Login: React.FC<{ create?: boolean }> = ({ create }) => {
@@ -57,6 +60,9 @@ export const Login: React.FC<{ create?: boolean }> = ({ create }) => {
       break;
     case LoginStep.GoogleLogin:
       loginContent = <GoogleLogin email={email} reset={reset} />;
+      break;
+    case LoginStep.SendReset:
+      loginContent = <SendResetForm reset={reset} />;
       break;
   }
 
@@ -124,6 +130,11 @@ const StartContent: React.FC<{
           </NavLink>
         </div>
       )}
+      <div className="tw-mt-3 tw-select-none">
+        <span className="tw-text-blue-500 tw-cursor-pointer" onClick={() => setStep(LoginStep.SendReset)}>
+          Forgot your password?
+        </span>
+      </div>
     </>
   );
 };
@@ -169,12 +180,9 @@ const EmailCheck: React.FC<{ setStep: (step: LoginStep) => void; setEmail: (emai
     >
       <Input autoComplete="email" className="tw-w-full tw-flex tw-mt-3" label="Email" {...register("email")} />
       <FormError message={errors.email?.message} />
-      <button
-        type="submit"
-        className="tw-flex tw-items-center tw-justify-center tw-w-full tw-bg-[#3673aa] tw-text-white tw-font-medium tw-text-base tw-rounded-md tw-h-12 tw-mt-4"
-      >
+      <Button type="submit" className="tw-w-full tw-bg-[#3673aa] hover:tw-bg-[#396082] tw-h-12 tw-mt-4">
         Submit
-      </button>
+      </Button>
     </form>
   );
 };
@@ -238,12 +246,9 @@ const EmailLoginForm: React.FC<{ reset: () => void; email?: string }> = ({ reset
           {...register("password")}
         />
         <FormError message={errors.password?.message} />
-        <button
-          type="submit"
-          className="tw-flex tw-items-center tw-justify-center tw-w-full tw-bg-[#3673aa] tw-text-white tw-font-medium tw-text-base tw-rounded-md tw-h-12 tw-mt-4"
-        >
+        <Button type="submit" className="tw-w-full tw-bg-[#3673aa] hover:tw-bg-[#396082] tw-h-12 tw-mt-4">
           Submit
-        </button>
+        </Button>
       </form>
       <div className="tw-mt-4 tw-text-blue-500 tw-cursor-pointer" onClick={reset}>
         More ways to sign in
@@ -355,12 +360,9 @@ const EmailSignup: React.FC<{ reset: () => void; email?: string }> = ({ reset, e
           {...register("confirmPassword")}
         />
         <FormError className="tw-ml-1" message={errors.confirmPassword?.message} />
-        <button
-          type="submit"
-          className="tw-flex tw-items-center tw-justify-center tw-w-full tw-bg-[#3673aa] tw-text-white tw-font-medium tw-text-base tw-rounded-md tw-h-12 tw-mt-4"
-        >
+        <Button type="submit" className="tw-w-full tw-bg-[#3673aa] hover:tw-bg-[#396082] tw-h-12 tw-mt-4">
           Submit
-        </button>
+        </Button>
       </form>
       <div className="tw-mt-4 tw-text-blue-500 tw-cursor-pointer" onClick={reset}>
         More ways to sign up
@@ -415,5 +417,76 @@ export const Unauthorized: React.FC = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const SendResetSchema = z.object({
+  email: z.string().email({ message: "Invalid email address" }),
+});
+
+type SendResetSchemaType = z.infer<typeof SendResetSchema>;
+
+const SendResetForm: React.FC<{ reset: () => void }> = ({ reset }) => {
+  const [resetSent, setResetSent] = useState<boolean>(false);
+  const [sendingReset, setSendingReset] = useState<boolean>(false);
+  const {
+    handleSubmit,
+    register,
+    watch,
+    setError,
+    formState: { errors },
+  } = useForm<SendResetSchemaType>({
+    mode: "onBlur",
+    resolver: zodResolver(SendResetSchema),
+  });
+
+  // Needed to display label correctly
+  const emailValue = watch("email");
+
+  if (resetSent) {
+    return <div className="tw-text-center">Check your email and follow the instructions there to continue.</div>;
+  }
+
+  return (
+    <>
+      <form
+        className="tw-w-full"
+        onSubmit={handleSubmit(async (values) => {
+          try {
+            setSendingReset(true);
+            await sendRequest(SendReset, {
+              payload: {
+                email: values.email,
+              },
+            });
+
+            setResetSent(true);
+          } catch (e) {
+            // TODO: use error from server once we return a better response
+            setError("email", { type: "server", message: "Are you sure you have an account with this email?" });
+          }
+          setSendingReset(false);
+        })}
+      >
+        <div className="tw-font-bold tw-text-xl tw-w-full tw-text-center tw-mb-2">Reset password</div>
+        <div className="tw-w-full tw-text-center tw-mb-2">
+          Enter your email to receive a link to reset your password.
+        </div>
+        <Input
+          autoComplete="email"
+          className="tw-w-full tw-flex tw-mt-3"
+          label="Email"
+          {...register("email")}
+          value={emailValue}
+        />
+        <FormError message={errors.email?.message} />
+        <Button type="submit" className="tw-w-full tw-bg-[#3673aa] hover:tw-bg-[#396082] tw-h-12 tw-mt-4">
+          {sendingReset ? <Loading /> : "Submit"}
+        </Button>
+      </form>
+      <div className="tw-mt-4 tw-text-blue-500 tw-cursor-pointer" onClick={reset}>
+        Go back
+      </div>
+    </>
   );
 };

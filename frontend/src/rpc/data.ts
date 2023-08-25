@@ -6,12 +6,13 @@ import {
   GetFeaturedListings,
   GetHostedListings,
   GetListing,
+  ResetPassword,
   SearchListings,
   UpdateListing,
   UpdateProfilePicture,
   UpdateUser,
 } from "src/rpc/api";
-import { Listing, ListingInput, User, UserUpdates } from "src/rpc/types";
+import { Listing, ListingInput, ResetPasswordRequest, User, UserUpdates } from "src/rpc/types";
 import { forceErrorMessage } from "src/utils/errors";
 import { Mutation, useMutation } from "src/utils/queryHelpers";
 import useSWR, { Fetcher, SWRConfiguration, mutate } from "swr";
@@ -127,6 +128,20 @@ export function useUpdateProfilePicture(): Mutation<File> {
       },
       onError: (e) => {
         dispatch({ type: "toast", toast: { type: "error", content: forceErrorMessage(e) } });
+      },
+    },
+  );
+}
+
+export function useResetPassword(): Mutation<ResetPasswordRequest> {
+  const dispatch = useDispatch();
+  return useMutation<User, ResetPasswordRequest>(
+    (request: ResetPasswordRequest) => {
+      return sendRequest(ResetPassword, { payload: request });
+    },
+    {
+      onSuccess: (user: User) => {
+        dispatch({ type: "login.authenticated", user: user });
       },
     },
   );
