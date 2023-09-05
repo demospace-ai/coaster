@@ -196,14 +196,14 @@ const reviewStep = (params: StepParams) => {
     true,
     () => (
       <div className="tw-flex tw-flex-col tw-items-center tw-pb-6">
-        <div className="tw-p-8 tw-shadow-centered-md tw-rounded-xl">
+        <div className="tw-p-8 tw-shadow-centered-md tw-rounded-xl tw-w-96">
           <img
             src={getGcsImageUrl(listing.images[0])}
             alt="preview-cover"
-            className="tw-rounded-lg tw-aspect-square tw-object-cover tw-w-80"
+            className="tw-rounded-lg tw-aspect-square tw-object-cover"
           />
           <div className="tw-mt-4 tw-font-bold tw-text-xl">{listing.name}</div>
-          <div className="tw-mt-1 tw-font-medium tw-w-80">{listing.location}</div>
+          <div className="tw-mt-1 tw-font-medium">{listing.location}</div>
           <div className="tw-mt-1">${listing.price} / person</div>
         </div>
       </div>
