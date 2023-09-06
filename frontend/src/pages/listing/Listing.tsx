@@ -235,7 +235,7 @@ const HostOverview: React.FC<{ listing: ListingType }> = ({ listing }) => {
 
 const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) => {
   return (
-    <div className="tw-flex tw-max-h-[50vh] tw-rounded-xl tw-overflow-clip">
+    <div className="tw-flex tw-max-h-[50vh] tw-min-h-[50vh] tw-rounded-xl tw-overflow-clip">
       <div className="tw-flex tw-w-full sm:tw-w-3/4 sm:tw-mr-2">
         <img
           className="tw-w-full tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
