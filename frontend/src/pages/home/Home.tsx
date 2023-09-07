@@ -16,7 +16,7 @@ import {
   SurfingIcon,
   YogaIcon,
 } from "src/components/icons/Icons";
-import Hero from "src/components/images/hero.webp";
+import Hero from "src/components/images/map.webp";
 import { PhoneInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { Modal } from "src/components/modal/Modal";
@@ -176,15 +176,12 @@ export const ComingSoon: React.FC = () => {
         className="tw-flex tw-flex-col tw-w-screen tw-h-screen tw-justify-center tw-items-center tw-bg-top tw-bg-cover"
         style={{ backgroundImage: `url(${Hero})` }}
       >
-        <div className="tw-flex tw-w-fit tw-font-bold tw-text-[2.5rem] sm:tw-text-8xl tw-font-[Lateef] tw-text-center -tw-mt-32">
-          Curated Adventures
+        <div className="tw-flex tw-w-80 sm:tw-w-fit tw-font-semibold tw-text-5xl tw-font-[Lateef] tw-text-center">
+          Explore the world with local guides
         </div>
-        <div className="tw-flex tw-w-80 sm:tw-w-fit tw-font-medium tw-text-3xl tw-font-[Lateef] tw-text-center">
-          Discover fully planned trips led by professional guides.
-        </div>
-        <div className="tw-flex tw-items-center tw-gap-2 tw-mt-5">
+        <div className="tw-flex tw-items-center tw-gap-2 tw-mt-8">
           <Button
-            className="tw-flex tw-h-[52px] tw-items-center tw-justify-center tw-whitespace-nowrap tw-px-8"
+            className="tw-flex tw-h-[52px] tw-items-center tw-justify-center tw-whitespace-nowrap tw-px-8 tw-bg-transparent tw-border-black tw-border-solid tw-border-2 hover:tw-bg-[rgba(0,0,0,0.2)] tw-text-black"
             onClick={() => setShowWaitlist(true)}
           >
             Request access
