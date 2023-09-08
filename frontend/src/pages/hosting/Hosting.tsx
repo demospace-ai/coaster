@@ -46,8 +46,8 @@ export const Hosting: React.FC = () => {
       </div>
       {hosted.map((listing: Listing) => (
         <div
-          className="tw-my-2 tw-cursor-pointer tw-w-fit"
-          onClick={() => navigate(`/listings/${listing.id}`)}
+          className="tw-my-2 tw-cursor-pointer tw-w-fit tw-underline"
+          onClick={() => navigate(`/listings/${listing.id}/edit`)}
           key={listing.id}
         >
           {listing.name}

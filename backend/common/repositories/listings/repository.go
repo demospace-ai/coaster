@@ -250,6 +250,7 @@ func LoadImagesForListing(db *gorm.DB, listingID int64) ([]models.ListingImage, 
 	result := db.Table("listing_images").
 		Select("listing_images.*").
 		Where("listing_images.listing_id = ?", listingID).
+		Order("listing_images.rank ASC").
 		Find(&listingImages)
 	if result.Error != nil {
 		// Not guaranteed to have any images for a listing so just return an empty slice

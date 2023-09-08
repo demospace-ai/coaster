@@ -144,6 +144,9 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
 };
 
 export const InlineMapSearch: React.FC<{
+  className?: string;
+  label?: string;
+  hideIcon?: boolean;
   onSelect?: (input: string) => void;
   initial?: string;
 }> = (props) => {
@@ -173,8 +176,15 @@ export const InlineMapSearch: React.FC<{
     setActive(false);
   };
 
+  const showLabel = active || inputRef.current?.value || props.initial;
+
   return (
-    <div className="tw-flex tw-justify-center tw-items-center tw-relative tw-h-full tw-w-full tw-mb-4">
+    <div
+      className={mergeClasses(
+        "tw-flex tw-justify-center tw-items-center tw-relative tw-w-full tw-mb-4",
+        props.className,
+      )}
+    >
       <form
         ref={refs.setReference}
         className="tw-flex tw-w-full tw-p-0 sm:tw-mt-0"
@@ -197,16 +207,33 @@ export const InlineMapSearch: React.FC<{
           },
         })}
       >
-        <div className="tw-flex tw-w-full tw-rounded-lg tw-bg-white tw-border tw-border-solid tw-border-gray-300 tw-transition-all tw-duration-100">
-          <MapPinIcon className="tw-cursor-pointer tw-ml-3 tw-w-5" />
-          <input
-            ref={inputRef}
-            className="tw-inline tw-placeholder-gray-600 tw-w-full tw-bg-transparent tw-py-3 tw-px-3 tw-text-sm tw-leading-5 tw-outline-none tw-text-slate-900 tw-text-ellipsis tw-cursor-pointer tw-transition tw-duration-100"
-            value={query}
-            autoComplete="off"
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Enter your address"
-          />
+        <div
+          className={mergeClasses(
+            "tw-flex tw-w-full tw-rounded-lg tw-bg-white tw-border tw-border-solid tw-border-gray-300 tw-transition-all tw-duration-100",
+            props.label && "tw-py-3",
+          )}
+        >
+          {props.label && (
+            <label
+              className={mergeClasses(
+                "tw-absolute -tw-top-1.5 tw-text-base tw-text-slate-600 tw-cursor-[inherit] tw-select-none tw-inline-block tw-transition-all tw-duration-150",
+                showLabel && "tw-top-1.5 tw-left-3 tw-text-xs",
+              )}
+            >
+              {props.label}
+            </label>
+          )}
+          <div className={mergeClasses("tw-flex tw-w-full", props.label && "tw-mt-1 -tw-mb-2")}>
+            {!props.hideIcon && <MapPinIcon className="tw-ml-3 tw-w-5 tw-cursor-pointer" />}
+            <input
+              ref={inputRef}
+              className="tw-inline tw-placeholder-gray-600 tw-w-full tw-bg-transparent tw-py-3 tw-px-3 tw-text-sm tw-leading-5 tw-outline-none tw-text-slate-900 tw-text-ellipsis tw-cursor-text tw-transition tw-duration-100"
+              value={query}
+              autoComplete="off"
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Enter your address"
+            />
+          </div>
         </div>
         <div
           className="tw-relative tw-z-20 tw-w-full"

@@ -3,10 +3,12 @@ import {
   flip,
   offset,
   shift,
+  size,
   useClick,
   useDismiss,
   useFloating,
   useInteractions,
+  useMergeRefs,
   useRole,
 } from "@floating-ui/react";
 import { Combobox, Listbox, Transition } from "@headlessui/react";
@@ -36,7 +38,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
   const { id, disabled, className, label, tooltip, onBlur, onFocus, ...other } = props;
   const [focused, setFocused] = useState<boolean>(false);
   let classes = [
-    "tw-flex tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-md tw-py-[6px] tw-px-3 tw-w-full tw-box-border focus:tw-border-slate-700 tw-outline-none",
+    "tw-flex tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-md tw-py-[6px] tw-px-3 tw-w-full tw-box-border focus-within:tw-border-slate-400 tw-outline-none",
     !disabled && "hover:tw-border-slate-400 tw-cursor-text",
     disabled && "tw-bg-slate-50 tw-select-none tw-cursor-not-allowed",
     className,
@@ -66,7 +68,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
           <label
             htmlFor={id}
             className={mergeClasses(
-              "tw-absolute -tw-top-1.5 tw-text-base tw-text-gray-500 tw-cursor-[inherit] tw-select-none tw-inline-block tw-transition-all tw-duration-150",
+              "tw-absolute -tw-top-1.5 tw-text-base tw-text-slate-600 tw-cursor-[inherit] tw-select-none tw-inline-block tw-transition-all tw-duration-150",
               showLabel && "-tw-top-3.5 tw-text-xs",
             )}
           >
@@ -107,9 +109,10 @@ interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
 }
 
 export const TextArea: React.FC<TextAreaProps> = forwardRef<HTMLTextAreaElement, TextAreaProps>((props, ref) => {
-  const { id, value, disabled, className, label, tooltip, ...other } = props;
+  const { id, value, disabled, className, label, tooltip, onBlur, onFocus, ...other } = props;
+  const [focused, setFocused] = useState<boolean>(false);
   let classes = [
-    "tw-flex tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border focus:tw-border-slate-700 tw-outline-none",
+    "tw-flex tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border focus-within:tw-border-slate-400 tw-outline-none",
     !disabled && "hover:tw-border-slate-400 tw-cursor-text",
     disabled && "tw-bg-slate-50 tw-select-none tw-cursor-not-allowed",
     className,
@@ -125,6 +128,8 @@ export const TextArea: React.FC<TextAreaProps> = forwardRef<HTMLTextAreaElement,
     }
   };
 
+  const showLabel = focused || textAreaRef.current?.value || props.value;
+
   return (
     <div
       className={mergeClasses(...classes)}
@@ -132,21 +137,37 @@ export const TextArea: React.FC<TextAreaProps> = forwardRef<HTMLTextAreaElement,
         textAreaRef.current?.focus();
       }}
     >
-      <div className="tw-flex tw-flex-col tw-w-full">
-        <label
-          htmlFor={id}
-          className="-tw-mt-px tw-inline-block tw-text-xs tw-font-medium tw-text-gray-600 tw-cursor-[inherit] tw-select-none"
-        >
-          {label}
-        </label>
+      <div className="tw-relative tw-flex tw-flex-col tw-w-full">
+        {label && (
+          <label
+            htmlFor={id}
+            className={mergeClasses(
+              "tw-absolute tw-top-0 tw-text-base tw-text-slate-600 tw-cursor-[inherit] tw-select-none tw-inline-block tw-transition-all tw-duration-150",
+              showLabel && "-tw-top-1 tw-text-xs",
+            )}
+          >
+            {label}
+          </label>
+        )}
         <textarea
           id={id}
           name={id}
           ref={textAreaRef}
           autoComplete={id}
-          className="tw-w-full tw-outline-none tw-text-base tw-mt-1 disabled:tw-bg-slate-50 disabled:tw-select-none tw-cursor-[inherit]"
+          className={mergeClasses(
+            "tw-w-full tw-outline-none tw-text-base tw-mt-1 disabled:tw-bg-slate-50 disabled:tw-select-none tw-cursor-[inherit]",
+            label && "tw-pt-2",
+          )}
           onKeyDown={onKeydown}
           value={value}
+          onBlur={(e) => {
+            setFocused(false);
+            onBlur && onBlur(e);
+          }}
+          onFocus={(e) => {
+            setFocused(true);
+            onFocus && onFocus(e);
+          }}
           disabled={disabled}
           {...other}
         />
@@ -351,16 +372,15 @@ const DropdownOptions: React.FC<DropdownOptionsProps> = (props) => {
   }
 };
 
-export type ValidatedComboInputProps = {
+export type ComboInputProps = {
   options: any[] | undefined;
-  selected: any | undefined;
-  setSelected: (option: any) => void;
+  value: any;
+  onChange: (...event: any[]) => void;
   getElementForDisplay?: (option: any) => string | React.ReactElement;
-  loading: boolean;
+  loading?: boolean;
   placeholder: string;
-  noOptionsString: string;
+  noOptionsString?: string;
   className?: string;
-  validated?: boolean;
   allowCustom?: boolean;
   label?: string;
   dropdownHeight?: string;
@@ -369,16 +389,27 @@ export type ValidatedComboInputProps = {
   disabled?: boolean;
 };
 
-export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = (props) => {
-  const [computedValid, setComputedValid] = useState<boolean>(true);
+export const ComboInput: React.FC<ComboInputProps> = (props) => {
   const [query, setQuery] = useState("");
-  const [focused, setFocused] = useState(false);
+  const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  const { refs, floatingStyles, context } = useFloating({
-    open: focused,
-    onOpenChange: setFocused,
-    middleware: [offset(10), flip({ fallbackAxisSideDirection: "end" }), shift()],
+  const { refs, floatingStyles, context } = useFloating<HTMLDivElement>({
+    open,
+    onOpenChange: setOpen,
+    middleware: [
+      offset(4),
+      shift(),
+      size({
+        apply({ rects, availableHeight, elements }) {
+          Object.assign(elements.floating.style, {
+            width: `${rects.reference.width}px`,
+            maxHeight: `${availableHeight}px`,
+          });
+        },
+        padding: 10,
+      }),
+    ],
     whileElementsMounted: autoUpdate,
   });
   const click = useClick(context, {
@@ -408,30 +439,21 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = (props) =
   };
   const filteredOptions = getFilteredOptions();
   const getElementForDisplay = props.getElementForDisplay ? props.getElementForDisplay : (value: any) => value;
-  const showLabel = props.label !== undefined && (focused || props.selected !== undefined);
-
-  const validateNotUndefined = (value: number | undefined): boolean => {
-    const valid = value !== undefined;
-    setComputedValid(valid);
-    return valid;
-  };
+  const showLabel = props.label !== undefined && (open || props.value !== undefined);
 
   // An undefined value will cause the input to be uncontrolled, so change to null
-  const value = props.selected === undefined ? null : props.selected;
-
-  // Allow explicitly passing the valid property to override the computed value
-  const valid = props.valid !== undefined ? props.valid : computedValid;
+  const value = props.value === undefined ? null : props.value;
 
   return (
     <Combobox
       value={value}
       disabled={props.disabled}
-      onChange={(value: number) => {
-        props.setSelected(value);
-        setComputedValid(true);
+      onChange={(e) => {
+        setOpen(false);
+        props.onChange(e);
       }}
     >
-      <div className="tw-relative">
+      <div className="tw-relative tw-flex">
         <Transition
           show={showLabel}
           enter="tw-transition tw-ease tw-duration-200 tw-transform"
@@ -443,67 +465,69 @@ export const ValidatedComboInput: React.FC<ValidatedComboInputProps> = (props) =
         >
           <label
             htmlFor="name"
-            className="tw-absolute -tw-top-2 tw-left-2 -tw-mt-px tw-inline-block tw-bg-white tw-px-1 tw-text-xs tw-font-medium tw-text-primary"
+            className="tw-absolute tw-top-5 tw-left-2 -tw-mt-px tw-inline-block tw-bg-white tw-px-1 tw-text-xs tw-text-slate-600"
           >
             {props.label}
           </label>
         </Transition>
         <div
           ref={refs.setReference}
+          {...getReferenceProps()}
           className={mergeClasses(
-            "tw-flex tw-w-96 tw-mt-5 tw-rounded-md tw-bg-white tw-py-2.5 tw-px-3 tw-text-left tw-border tw-border-solid tw-border-slate-300 focus-within:!tw-border-primary tw-transition tw-duration-100",
-            !props.disabled && "hover:tw-border-primary-hover",
+            "tw-flex tw-rounded-md tw-bg-white tw-text-left tw-border tw-border-solid tw-border-slate-300 focus-within:!tw-border-gray-700 tw-transition tw-duration-100 tw-cursor-pointer",
+            !props.disabled && "hover:tw-border-gray-400",
             props.disabled && "tw-bg-slate-100 tw-cursor-not-allowed",
             props.className,
-            props.validated && !valid && "tw-border-red-600",
+            props.valid === false && "tw-border-red-600",
           )}
-          {...getReferenceProps()}
         >
-          <Combobox.Input
-            className={mergeClasses(
-              "tw-inline tw-bg-transparent tw-w-[calc(100%-20px)] tw-border-none tw-text-sm tw-leading-5 tw-text-slate-900 tw-outline-none tw-text-ellipsis tw-cursor-pointer focus:tw-cursor-text",
-              props.disabled && "tw-bg-slate-100 tw-text-slate-400 tw-cursor-not-allowed",
-            )}
-            displayValue={(selected) => (selected ? getElementForDisplay(selected) : "")}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder={props.placeholder}
-            onClick={() => buttonRef.current?.click()}
-          ></Combobox.Input>
-          <Combobox.Button className="tw-inline-block tw-h-full" ref={buttonRef}>
-            <span className="tw-pointer-events-none pr-2">
-              <ChevronUpDownIcon
-                className="tw-inline tw-float-right tw-h-5 tw-w-5 tw-text-slate-400"
-                aria-hidden="true"
-              />
-            </span>
-          </Combobox.Button>
+          <div className="tw-py-4 tw-px-3 tw-flex tw-flex-1">
+            <Combobox.Input
+              className={mergeClasses(
+                "tw-inline tw-bg-transparent tw-w-[calc(100%-20px)] tw-border-none tw-text-sm tw-leading-5 tw-text-slate-900 tw-outline-none tw-text-ellipsis tw-cursor-pointer focus:tw-cursor-text tw-transition-all tw-duration-10",
+                showLabel && "tw-mt-3 -tw-mb-1",
+                props.disabled && "tw-bg-slate-100 tw-text-slate-400 tw-cursor-not-allowed",
+              )}
+              onClick={(e) => open && e.stopPropagation()}
+              displayValue={(value) => (value ? getElementForDisplay(value) : "")}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder={props.placeholder}
+            />
+            <Combobox.Button className="tw-inline-block tw-h-full" ref={buttonRef}>
+              <span className="tw-pointer-events-none pr-2">
+                <ChevronUpDownIcon
+                  className="tw-inline tw-float-right tw-h-5 tw-w-5 tw-text-slate-400"
+                  aria-hidden="true"
+                />
+              </span>
+            </Combobox.Button>
+          </div>
         </div>
         <div className="tw-relative tw-z-10" ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
           <Transition
             as={Fragment}
+            show={open}
             enter="tw-transition tw-ease-out tw-duration-100"
             enterFrom="tw-transform tw-opacity-0 tw-scale-95"
             enterTo="tw-transform tw-opacity-100 tw-scale-100"
             leave="tw-transition tw-ease-in tw-duration-100"
             leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
             leaveTo="tw-transform tw-opacity-0 tw-scale-95"
-            beforeEnter={() => setFocused(true)}
             afterLeave={() => {
-              validateNotUndefined(props.selected);
               setQuery("");
-              setFocused(false);
             }}
           >
             <Combobox.Options
+              static
               className={mergeClasses(
                 "tw-absolute tw-z-20 tw-mt-1 tw-min-w-full tw-max-h-60 tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm",
                 props.dropdownHeight,
               )}
             >
               <ComboOptions
-                loading={props.loading}
+                loading={props.loading ? props.loading : false}
                 options={filteredOptions}
-                noOptionsString={props.noOptionsString}
+                noOptionsString={props.noOptionsString ? props.noOptionsString : "No options!"}
                 getElementForDisplay={getElementForDisplay}
                 query={query}
                 allowCustom={props.allowCustom}
@@ -708,3 +732,63 @@ export const CountryCodePicker: React.FC<{ currentCode: CountryCode; setCode: (c
     </Listbox>
   );
 };
+
+export const PriceInput = forwardRef<HTMLInputElement, InputProps>((props, propRef) => {
+  const { id, disabled, className, label, tooltip, value, ...other } = props;
+
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const mergedRef = useMergeRefs([inputRef, propRef]);
+
+  const preventMinus = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.code === "Minus") {
+      e.preventDefault();
+    }
+  };
+
+  const stringifyPrice = (price: number | undefined | string | readonly string[]): string => {
+    return price === undefined || price === null || Number.isNaN(price) ? "" : price.toString();
+  };
+
+  return (
+    <div
+      className={mergeClasses(
+        "tw-flex tw-w-full tw-rounded-lg tw-outline tw-outline-1 tw-outline-slate-300 focus-within:tw-outline-slate-400 hover:tw-outline-slate-400 tw-cursor-text",
+        className,
+      )}
+      onClick={() => inputRef.current?.focus()}
+    >
+      <div className="tw-inline-block tw-relative">
+        <div
+          className={mergeClasses(
+            "tw-flex tw-justify-center tw-items-center tw-py-4 tw-px-3",
+            label && "tw-mt-2 -tw-mb-1",
+          )}
+        >
+          ${stringifyPrice(value)}
+        </div>
+        {label && (
+          <label
+            htmlFor={id}
+            className={mergeClasses(
+              "tw-absolute tw-top-1.5 tw-left-3 tw-text-xs tw-text-slate-600 tw-cursor-[inherit] tw-select-none tw-inline-block tw-transition-all tw-duration-150",
+            )}
+          >
+            {label}
+          </label>
+        )}
+        <input
+          id={id}
+          ref={mergedRef}
+          type="number"
+          value={value ? value : ""}
+          className={mergeClasses(
+            "tw-flex tw-top-0 tw-right-0 tw-bg-transparent tw-absolute tw-text-right tw-py-4 tw-px-3 tw-w-full tw-outline-0 tw-hide-number-wheel",
+            label && "tw-mt-2 -tw-mb-1",
+          )}
+          onKeyDown={preventMinus}
+          {...other}
+        />
+      </div>
+    </div>
+  );
+});

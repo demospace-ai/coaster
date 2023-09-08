@@ -16,3 +16,11 @@ export const DescriptionSchema = z
   .max(1500, "Descriptions can be up to 1500 characters long.");
 
 export const PriceSchema = z.number({ invalid_type_error: "Please enter a valid price." }).positive();
+
+export const DurationSchema = z.number().positive().min(30, "The minimum duration is 30 minutes.");
+
+export const MaxGuestsSchema = z
+  .number()
+  .positive()
+  .min(1, "The minimum number of guests is 1.")
+  .max(100, "The maximum number of guests is 100.");

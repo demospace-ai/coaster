@@ -9,6 +9,7 @@ import { Toast, getToastContentFromDetails } from "src/components/notifications/
 import { About } from "src/pages/about/About";
 import { Home } from "src/pages/home/Home";
 import { Hosting } from "src/pages/hosting/Hosting";
+import { EditListing } from "src/pages/listing/EditListing";
 import { Listing } from "src/pages/listing/Listing";
 import { NewListing } from "src/pages/listing/NewListing";
 import { Login, Unauthorized } from "src/pages/login/Login";
@@ -108,9 +109,10 @@ export const router = createBrowserRouter(
       <Route path="/about" element={<About />} />
       <Route path="/terms" element={<Terms />} />
       <Route path="/listings/:listingID" element={<Listing />} />
+      <Route path="/listings/:listingID/edit" element={<EditListing />} />
+      <Route path="/listings/new" element={<RequireAuth element={<NewListing />} />} />
       <Route path="/hosting" element={<RequireAuth element={<Hosting />} />} />
       <Route path="/profile" element={<RequireAuth element={<Profile />} />} />
-      <Route path="/listings/new" element={<RequireAuth element={<NewListing />} />} />
       <Route path="/" element={<Home />} />
       <Route path="*" element={<NotFound />} />
     </Route>,

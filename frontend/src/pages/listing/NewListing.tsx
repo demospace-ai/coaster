@@ -14,6 +14,7 @@ import {
   wrapHandleSubmit,
 } from "src/components/form/MultiStep";
 import mapPreview from "src/components/images/map-preview.webp";
+import { PriceInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { InlineMapSearch, MapComponent, MapsWrapper } from "src/components/maps/Maps";
 import { CategorySchema, DescriptionSchema, NameSchema, PriceSchema } from "src/pages/listing/schema";
@@ -243,7 +244,6 @@ type PriceParams = {
 };
 
 const PriceStep: React.FC<StepParams & PriceParams> = ({ listing, renderLayout }) => {
-  const inputRef = useRef<HTMLInputElement | null>(null);
   const formSchema = z.object({
     value: PriceSchema,
   });
@@ -257,16 +257,6 @@ const PriceStep: React.FC<StepParams & PriceParams> = ({ listing, renderLayout }
     resolver: zodResolver(formSchema),
   });
 
-  const preventMinus = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.code === "Minus") {
-      e.preventDefault();
-    }
-  };
-
-  const stringifyPrice = (price: number | undefined): string => {
-    return price === undefined || price === null || Number.isNaN(price) ? "" : price.toString();
-  };
-
   // TODO: do we want to update on change too?
   const updatePrice = async (data: number) => {
     if (data === listing.price) {
@@ -279,37 +269,21 @@ const PriceStep: React.FC<StepParams & PriceParams> = ({ listing, renderLayout }
   return renderLayout(
     isValid,
     () => (
-      <div className="tw-flex tw-flex-col tw-items-center tw-mb-6">
-        <div
-          className="tw-flex tw-w-full tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-text-3xl tw-font-semibold tw-justify-center focus-within:tw-border-2 focus-within:tw-border-blue-700 focus-within:tw-mt-[-1px] focus-within:tw-mb-[-1px] tw-cursor-text"
-          onClick={() => inputRef.current?.focus()}
-        >
-          <div className="tw-inline-block tw-relative">
-            <Controller
-              name={"value"}
-              control={control}
-              render={({ field }) => (
-                <>
-                  <div className="tw-flex tw-justify-center tw-items-center tw-h-20 tw-py-5 tw-px-3">
-                    ${stringifyPrice(field.value)}
-                  </div>
-                  <input
-                    ref={(e) => {
-                      field.ref(e);
-                      inputRef.current = e;
-                    }}
-                    onChange={(e) => field.onChange(parseInt(e.target.value))}
-                    onBlur={field.onBlur}
-                    value={field.value ? field.value : ""}
-                    type="number"
-                    className="tw-flex tw-top-0 tw-right-0 tw-bg-transparent tw-absolute tw-h-20 tw-text-right tw-py-5 tw-px-3 tw-w-full tw-outline-0 tw-hide-number-wheel"
-                    onKeyDown={preventMinus}
-                  />
-                </>
-              )}
-            />
-          </div>
-        </div>
+      <div className="tw-flex tw-flex-col tw-items-center tw-mb-6 tw-mx-0.5">
+        <Controller
+          name={"value"}
+          control={control}
+          render={({ field }) => {
+            const { onChange, ...other } = field;
+            return (
+              <PriceInput
+                className="tw-text-3xl tw-font-semibold tw-justify-center focus-within:tw-outline-2 focus-within:tw-outline-blue-700"
+                onChange={(e) => onChange(parseInt(e.target.value))}
+                {...other}
+              />
+            );
+          }}
+        />
         <ErrorMessage error={errors.value} />
       </div>
     ),
