@@ -16,7 +16,7 @@ import {
   SurfingIcon,
   YogaIcon,
 } from "src/components/icons/Icons";
-import Hero from "src/components/images/map.webp";
+import Hero from "src/components/images/hero.webp";
 import { PhoneInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { Modal } from "src/components/modal/Modal";
