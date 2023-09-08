@@ -163,7 +163,7 @@ export const ComingSoon: React.FC = () => {
                 )}
               />
               <Button
-                className="tw-flex tw-h-[52px] tw-items-center tw-justify-center tw-whitespace-nowrap tw-w-full"
+                className="tw-flex tw-h-[52px] tw-items-center tw-justify-center tw-whitespace-nowrap tw-w-full tw-bg-blue-500 hover:tw-bg-blue-600"
                 onClick={handleSubmit(joinWaitlist)}
               >
                 Join waitlist
@@ -176,7 +176,7 @@ export const ComingSoon: React.FC = () => {
         className="tw-flex tw-flex-col tw-w-screen tw-h-screen tw-justify-center tw-items-center tw-bg-top tw-bg-cover"
         style={{ backgroundImage: `url(${Hero})` }}
       >
-        <div className="tw-flex tw-w-80 sm:tw-w-fit tw-font-semibold tw-text-5xl tw-font-[Lateef] tw-text-center">
+        <div className="tw-flex tw-w-80 sm:tw-w-fit tw-font-semibold tw-text-5xl tw-font-[Lateef] tw-text-center -tw-mt-24 sm:-tw-mt-32">
           Explore the world with local guides
         </div>
         <div className="tw-flex tw-items-center tw-gap-2 tw-mt-8">
