@@ -18,6 +18,7 @@ export const Button: React.FC<ButtonProps> = forwardRef<HTMLButtonElement, Butto
   const buttonStyle = mergeClasses(
     "tw-text-primary-text tw-bg-primary hover:tw-bg-primary-hover",
     "tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition tw-select-none",
+    props.disabled && "tw-text-slate-600 tw-bg-slate-300 hover:tw-bg-slate-300 tw-cursor-not-allowed",
     props.className,
   );
   return (

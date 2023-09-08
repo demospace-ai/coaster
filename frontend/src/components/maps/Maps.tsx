@@ -227,7 +227,7 @@ export const InlineMapSearch: React.FC<{
             {!props.hideIcon && <MapPinIcon className="tw-ml-3 tw-w-5 tw-cursor-pointer" />}
             <input
               ref={inputRef}
-              className="tw-inline tw-placeholder-gray-600 tw-w-full tw-bg-transparent tw-py-3 tw-px-3 tw-text-sm tw-leading-5 tw-outline-none tw-text-slate-900 tw-text-ellipsis tw-cursor-text tw-transition tw-duration-100"
+              className="tw-inline tw-placeholder-gray-600 tw-w-full tw-bg-transparent tw-py-3 tw-px-3 tw-text-base tw-leading-5 tw-outline-none tw-text-slate-900 tw-text-ellipsis tw-cursor-text tw-transition tw-duration-100"
               value={query}
               autoComplete="off"
               onChange={(event) => setQuery(event.target.value)}

@@ -1,7 +1,7 @@
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormEvent, useCallback, useMemo, useRef } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import {
   ErrorMessage,
@@ -249,7 +249,7 @@ const PriceStep: React.FC<StepParams & PriceParams> = ({ listing, renderLayout }
   });
   const {
     handleSubmit,
-    control,
+    register,
     formState: { errors, isValid },
   } = useForm<{ value: number }>({
     mode: "onBlur",
@@ -270,19 +270,9 @@ const PriceStep: React.FC<StepParams & PriceParams> = ({ listing, renderLayout }
     isValid,
     () => (
       <div className="tw-flex tw-flex-col tw-items-center tw-mb-6 tw-mx-0.5">
-        <Controller
-          name={"value"}
-          control={control}
-          render={({ field }) => {
-            const { onChange, ...other } = field;
-            return (
-              <PriceInput
-                className="tw-text-3xl tw-font-semibold tw-justify-center focus-within:tw-outline-2 focus-within:tw-outline-blue-700"
-                onChange={(e) => onChange(parseInt(e.target.value))}
-                {...other}
-              />
-            );
-          }}
+        <PriceInput
+          className="tw-text-3xl tw-font-semibold tw-justify-center focus-within:tw-outline-2 focus-within:tw-outline-blue-700"
+          {...register("value", { valueAsNumber: true })}
         />
         <ErrorMessage error={errors.value} />
       </div>

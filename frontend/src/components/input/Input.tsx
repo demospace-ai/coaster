@@ -35,7 +35,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
-  const { id, disabled, className, label, tooltip, onBlur, onFocus, ...other } = props;
+  const { id, disabled, className, label, tooltip, value, onBlur, onFocus, ...other } = props;
   const [focused, setFocused] = useState<boolean>(false);
   let classes = [
     "tw-flex tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-md tw-py-[6px] tw-px-3 tw-w-full tw-box-border focus-within:tw-border-slate-400 tw-outline-none",
@@ -91,6 +91,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
             onFocus && onFocus(e);
           }}
           disabled={disabled}
+          value={value ? value : ""}
           {...other}
         />
       </div>
@@ -156,7 +157,7 @@ export const TextArea: React.FC<TextAreaProps> = forwardRef<HTMLTextAreaElement,
           autoComplete={id}
           className="tw-w-full tw-outline-none tw-text-base tw-mt-1 disabled:tw-bg-slate-50 disabled:tw-select-none tw-cursor-[inherit]"
           onKeyDown={onKeydown}
-          value={value}
+          value={value ? value : ""}
           onBlur={(e) => {
             setFocused(false);
             onBlur && onBlur(e);
@@ -481,7 +482,7 @@ export const ComboInput: React.FC<ComboInputProps> = (props) => {
           <div className="tw-py-4 tw-px-3 tw-flex tw-flex-1">
             <Combobox.Input
               className={mergeClasses(
-                "tw-inline tw-bg-transparent tw-w-[calc(100%-20px)] tw-border-none tw-text-sm tw-leading-5 tw-text-slate-900 tw-outline-none tw-text-ellipsis tw-cursor-pointer focus:tw-cursor-text tw-transition-all tw-duration-10",
+                "tw-inline tw-bg-transparent tw-w-[calc(100%-20px)] tw-border-none tw-text-base tw-leading-5 tw-text-slate-900 tw-outline-none tw-text-ellipsis tw-cursor-pointer focus:tw-cursor-text tw-transition-all tw-duration-10",
                 showLabel && "tw-mt-3 -tw-mb-1",
                 props.disabled && "tw-bg-slate-100 tw-text-slate-400 tw-cursor-not-allowed",
               )}
@@ -562,7 +563,7 @@ const ComboOptions: React.FC<ComboOptionsProps> = (props) => {
           <Combobox.Option
             value={props.query}
             className={({ active, selected }) =>
-              `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${
+              `tw-relative tw-cursor-pointer tw-select-none tw-text-base tw-py-2.5 tw-pl-4 tw-pr-4 ${
                 active || selected ? "tw-bg-slate-100 tw-text-slate-900" : "tw-text-slate-900"
               }`
             }
@@ -575,7 +576,7 @@ const ComboOptions: React.FC<ComboOptionsProps> = (props) => {
             key={index}
             value={option}
             className={({ active, selected }) =>
-              `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 ${
+              `tw-relative tw-cursor-pointer tw-select-none tw-text-base tw-py-2.5 tw-pl-4 tw-pr-4 ${
                 active || selected ? "tw-bg-slate-100 tw-text-slate-900" : "tw-text-slate-900"
               }`
             }
@@ -749,7 +750,7 @@ export const PriceInput = forwardRef<HTMLInputElement, InputProps>((props, propR
   return (
     <div
       className={mergeClasses(
-        "tw-flex tw-w-full tw-rounded-lg tw-outline tw-outline-1 tw-outline-slate-300 focus-within:tw-outline-slate-400 hover:tw-outline-slate-400 tw-cursor-text",
+        "tw-flex tw-w-full tw-rounded-lg tw-outline tw-outline-1 tw-outline-slate-300 focus-within:tw-outline-slate-400 hover:tw-outline-slate-400 tw-text-base tw-cursor-text",
         className,
       )}
       onClick={() => inputRef.current?.focus()}
@@ -779,7 +780,7 @@ export const PriceInput = forwardRef<HTMLInputElement, InputProps>((props, propR
           type="number"
           value={value ? value : ""}
           className={mergeClasses(
-            "tw-flex tw-top-0 tw-right-0 tw-bg-transparent tw-absolute tw-text-right tw-py-4 tw-px-3 tw-w-full tw-outline-0 tw-hide-number-wheel",
+            "tw-flex tw-top-0 tw-right-0 tw-bg-transparent tw-absolute tw-text-right tw-text-base tw-py-4 tw-px-3 tw-w-full tw-outline-0 tw-hide-number-wheel",
             label && "tw-mt-2 -tw-mb-1",
           )}
           onKeyDown={preventMinus}

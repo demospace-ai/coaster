@@ -3,10 +3,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { NavLink, useParams } from "react-router-dom";
 import { FormError } from "src/components/FormError";
-import { BackButton } from "src/components/button/Button";
+import { BackButton, Button } from "src/components/button/Button";
 import { ComboInput, Input, PriceInput, TextArea } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { InlineMapSearch } from "src/components/maps/Maps";
+import { useShowToast } from "src/components/notifications/Notifications";
 import {
   CategorySchema,
   DescriptionSchema,
@@ -15,8 +16,10 @@ import {
   NameSchema,
   PriceSchema,
 } from "src/pages/listing/schema";
+import { sendRequest } from "src/rpc/ajax";
+import { UpdateListing } from "src/rpc/api";
 import { useListing } from "src/rpc/data";
-import { Category, Listing } from "src/rpc/types";
+import { Category, Listing, ListingInput } from "src/rpc/types";
 import { toTitleCase } from "src/utils/string";
 import { z } from "zod";
 
@@ -46,7 +49,7 @@ export const EditListing: React.FC = () => {
 
   return (
     <div className="tw-flex tw-flex-col tw-w-full tw-justify-center tw-items-center tw-px-4 sm:tw-px-20 tw-py-4 sm:tw-py-12">
-      <BackButton className="tw-mr-auto tw-mb-10" />
+      <BackButton className="tw-mr-auto tw-mb-5" />
       <div className="tw-flex tw-w-full tw-max-w-lg tw-justify-between tw-items-center">
         <div className="tw-font-semibold sm:tw-font-bold tw-text-3xl sm:tw-text-4xl tw-hyphens-auto">Edit Listing</div>
         <NavLink className="tw-flex tw-items-center tw-gap-1 tw-text-blue-600" to={`/listings/${listingID}`}>
@@ -60,12 +63,14 @@ export const EditListing: React.FC = () => {
 };
 
 const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
+  const showToast = useShowToast();
   const {
     handleSubmit,
     register,
+    reset,
     control,
     watch,
-    formState: { errors },
+    formState: { errors, dirtyFields, isSubmitting, isDirty },
   } = useForm<EditListingSchemaType>({
     mode: "onBlur",
     resolver: zodResolver(EditListingSchema),
@@ -88,8 +93,32 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
   const durationValue = watch("duration");
   const maxGuestsValue = watch("maxGuests");
 
+  const updateListing = async (values: EditListingSchemaType) => {
+    const payload = {} as ListingInput;
+    dirtyFields.name && (payload.name = values.name);
+    dirtyFields.description && (payload.description = values.description);
+    dirtyFields.price && (payload.price = values.price);
+    dirtyFields.category && (payload.category = values.category);
+    dirtyFields.location && (payload.location = values.location);
+    dirtyFields.duration && (payload.duration_minutes = values.duration);
+    dirtyFields.maxGuests && (payload.max_guests = values.maxGuests);
+
+    try {
+      await sendRequest(UpdateListing, {
+        pathParams: { listingID: listing.id },
+        payload,
+      });
+
+      reset({}, { keepValues: true });
+
+      showToast("success", "Listing updated successfully.", 2000);
+    } catch (e) {
+      //TODO
+    }
+  };
+
   return (
-    <form className="tw-mt-4 tw-w-full tw-max-w-lg">
+    <form className="tw-mt-4 tw-w-full tw-max-w-lg" onSubmit={handleSubmit(updateListing)}>
       <Input className="tw-w-full tw-flex tw-mt-3" label="Name" {...register("name")} value={nameValue} />
       <FormError message={errors.name?.message} />
       <TextArea
@@ -99,7 +128,12 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
         value={descriptionValue}
       />
       <FormError message={errors.description?.message} />
-      <PriceInput className="tw-w-full tw-flex tw-mt-3" label="Price" {...register("price")} value={priceValue} />
+      <PriceInput
+        className="tw-w-full tw-flex tw-mt-3"
+        label="Price"
+        {...register("price", { valueAsNumber: true })}
+        value={priceValue}
+      />
       <FormError message={errors.price?.message} />
       <Controller
         name="category"
@@ -148,6 +182,10 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
         value={maxGuestsValue}
       />
       <FormError message={errors.maxGuests?.message} />
+      <Button type="submit" className="tw-mt-3 tw-w-32 tw-h-8" disabled={!isDirty}>
+        {isSubmitting ? <Loading /> : "Save"}
+      </Button>
+      <FormError message={errors.root?.message} />
     </form>
   );
 };

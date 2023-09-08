@@ -1,7 +1,7 @@
 import { CheckBadgeIcon } from "@heroicons/react/20/solid";
 import { ArrowUpOnSquareIcon, ClockIcon, GlobeAltIcon, StarIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import { useParams } from "react-router-dom";
-import { LinkButton } from "src/components/button/Button";
+import { BackButton, LinkButton } from "src/components/button/Button";
 import { Callout } from "src/components/callouts/Callout";
 import { Loading } from "src/components/loading/Loading";
 import { useShowToast } from "src/components/notifications/Notifications";
@@ -24,6 +24,7 @@ export const Listing: React.FC = () => {
 
   return (
     <div className="tw-flex tw-flex-col tw-px-5 tw-pt-5 sm:tw-pt-12 tw-pb-32 sm:tw-px-[5rem] lg:tw-px-[10rem] lg:tw-max-w-[90rem] lg:tw-mx-auto tw-text-base">
+      <BackButton className="tw-mr-auto tw-mb-4" />
       {listing.status !== ListingStatus.Published && (
         <Callout content={"Not published - under review"} className="tw-border tw-border-yellow-400 tw-mb-4" />
       )}

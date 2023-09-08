@@ -72,6 +72,7 @@ func LoadAllByUserID(db *gorm.DB, userID int64) ([]ListingDetails, error) {
 		Select("listings.*").
 		Where("listings.user_id = ?", userID).
 		Where("listings.deactivated_at IS NULL").
+		Order("listings.created_at ASC").
 		Find(&listings)
 	if result.Error != nil {
 		return nil, errors.Wrap(result.Error, "(listings.LoadAllByUserID)")
