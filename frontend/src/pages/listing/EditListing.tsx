@@ -2,6 +2,7 @@ import { EyeIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { NavLink, useParams } from "react-router-dom";
+import { FormError } from "src/components/FormError";
 import { BackButton } from "src/components/button/Button";
 import { ComboInput, Input, PriceInput, TextArea } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
@@ -75,6 +76,7 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
       category: listing.category,
       location: listing.location,
       duration: listing.duration_minutes,
+      maxGuests: listing.max_guests,
     },
   });
 
@@ -83,17 +85,22 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
   const descriptionValue = watch("description");
   const priceValue = watch("price");
   const categoryValue = watch("category");
+  const durationValue = watch("duration");
+  const maxGuestsValue = watch("maxGuests");
 
   return (
     <form className="tw-mt-4 tw-w-full tw-max-w-lg">
       <Input className="tw-w-full tw-flex tw-mt-3" label="Name" {...register("name")} value={nameValue} />
+      <FormError message={errors.name?.message} />
       <TextArea
         className="tw-w-full tw-flex tw-mt-3"
         label="Description"
         {...register("description")}
         value={descriptionValue}
       />
+      <FormError message={errors.description?.message} />
       <PriceInput className="tw-w-full tw-flex tw-mt-3" label="Price" {...register("price")} value={priceValue} />
+      <FormError message={errors.price?.message} />
       <Controller
         name="category"
         control={control}
@@ -109,6 +116,7 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
           />
         )}
       />
+      <FormError message={errors.category?.message} />
       <Controller
         name="location"
         control={control}
@@ -123,6 +131,23 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
           />
         )}
       />
+      <FormError message={errors.location?.message} />
+      <Input
+        type="number"
+        className="tw-w-full tw-flex tw-mt-3"
+        label="Duration"
+        {...register("duration", { valueAsNumber: true })}
+        value={durationValue}
+      />
+      <FormError message={errors.duration?.message} />
+      <Input
+        type="number"
+        className="tw-w-full tw-flex tw-mt-3"
+        label="Max Guests"
+        {...register("maxGuests", { valueAsNumber: true })}
+        value={maxGuestsValue}
+      />
+      <FormError message={errors.maxGuests?.message} />
     </form>
   );
 };

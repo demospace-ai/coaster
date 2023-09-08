@@ -137,7 +137,7 @@ export const TextArea: React.FC<TextAreaProps> = forwardRef<HTMLTextAreaElement,
         textAreaRef.current?.focus();
       }}
     >
-      <div className="tw-relative tw-flex tw-flex-col tw-w-full">
+      <div className={mergeClasses("tw-relative tw-flex tw-flex-col tw-w-full", label && "tw-pt-3")}>
         {label && (
           <label
             htmlFor={id}
@@ -154,10 +154,7 @@ export const TextArea: React.FC<TextAreaProps> = forwardRef<HTMLTextAreaElement,
           name={id}
           ref={textAreaRef}
           autoComplete={id}
-          className={mergeClasses(
-            "tw-w-full tw-outline-none tw-text-base tw-mt-1 disabled:tw-bg-slate-50 disabled:tw-select-none tw-cursor-[inherit]",
-            label && "tw-pt-2",
-          )}
+          className="tw-w-full tw-outline-none tw-text-base tw-mt-1 disabled:tw-bg-slate-50 disabled:tw-select-none tw-cursor-[inherit]"
           onKeyDown={onKeydown}
           value={value}
           onBlur={(e) => {
