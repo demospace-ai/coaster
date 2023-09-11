@@ -25,3 +25,5 @@ export const MaxGuestsSchema = z
   .number({ invalid_type_error: "The minimum duration is 30 minutes." }) // needed to handle NaN
   .min(1, "The minimum number of guests is 1.")
   .max(100, "The maximum number of guests is 100.");
+
+export const IncludesSchema = z.array(z.object({ value: z.string().nonempty("Included amenities cannot be empty") }));

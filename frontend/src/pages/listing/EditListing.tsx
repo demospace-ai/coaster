@@ -1,10 +1,10 @@
-import { EyeIcon, PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { EyeIcon, PlusIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import update from "immutability-helper";
 import { FormEvent, useCallback, useRef, useState } from "react";
 import { DndProvider, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { Controller, useForm } from "react-hook-form";
+import { Control, Controller, FieldErrors, UseFormRegister, useFieldArray, useForm } from "react-hook-form";
 import { NavLink, useParams } from "react-router-dom";
 import { FormError } from "src/components/FormError";
 import { BackButton, Button } from "src/components/button/Button";
@@ -18,6 +18,7 @@ import {
   CategorySchema,
   DescriptionSchema,
   DurationSchema,
+  IncludesSchema,
   MaxGuestsSchema,
   NameSchema,
   PriceSchema,
@@ -39,6 +40,7 @@ const EditListingSchema = z.object({
   location: z.string().min(1),
   duration: DurationSchema,
   maxGuests: MaxGuestsSchema,
+  includes: IncludesSchema,
 });
 
 type EditListingSchemaType = z.infer<typeof EditListingSchema>;
@@ -90,6 +92,9 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
       location: listing.location,
       duration: listing.duration_minutes,
       maxGuests: listing.max_guests,
+      includes: listing.includes?.map((include) => ({
+        value: include,
+      })),
     },
   });
 
@@ -110,6 +115,10 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
     dirtyFields.location && (payload.location = values.location);
     dirtyFields.duration && (payload.duration_minutes = values.duration);
     dirtyFields.maxGuests && (payload.max_guests = values.maxGuests);
+    dirtyFields.includes &&
+      (payload.includes = values.includes
+        .filter((include) => include.value.length > 0)
+        .map((include) => include.value));
 
     try {
       await sendRequest(UpdateListing, {
@@ -190,6 +199,7 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
         value={maxGuestsValue}
       />
       <FormError message={errors.maxGuests?.message} />
+      <Includes register={register} control={control} errors={errors} />
       <Images listing={listing} />
       <Button type="submit" className="tw-mt-3 tw-w-full sm:tw-w-32 tw-h-12 tw-ml-auto" disabled={!isDirty}>
         {isSubmitting ? <Loading /> : "Save"}
@@ -199,28 +209,57 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
   );
 };
 
-export const Images: React.FC<{ listing: Listing }> = ({ listing }) => {
+const Includes: React.FC<{
+  register: UseFormRegister<EditListingSchemaType>;
+  control: Control<EditListingSchemaType>;
+  errors: FieldErrors<EditListingSchemaType>;
+}> = ({ register, control, errors }) => {
+  const { fields, append, remove } = useFieldArray({
+    name: "includes",
+    control,
+  });
+
+  return (
+    <div className="tw-flex tw-flex-col tw-mt-5 tw-gap-3">
+      <div className="tw-text-xl tw-font-semibold tw-mb-2">Included Amenities</div>
+      {fields.map((field, idx) => (
+        <div key={field.id}>
+          <div className="tw-flex tw-items-center">
+            <Input {...register(`includes.${idx}.value`)} />
+            <TrashIcon
+              className="tw-h-10 tw-rounded tw-ml-1 tw-p-2 tw-cursor-pointer hover:tw-bg-gray-100"
+              onClick={() => remove(idx)}
+            />
+          </div>
+          <FormError message={errors.includes?.[idx]?.value?.message} />
+        </div>
+      ))}
+      <Button
+        className="tw-flex tw-items-center tw-justify-center tw-bg-white hover:tw-bg-slate-100 tw-text-black tw-font-medium tw-border tw-border-solid tw-border-black tw-py-2 tw-mt-2"
+        onClick={() => {
+          append({ value: "" });
+        }}
+      >
+        <PlusIcon className="tw-h-4 tw-mr-1.5" />
+        Add Included Item
+      </Button>
+    </div>
+  );
+};
+
+const Images: React.FC<{ listing: Listing }> = ({ listing }) => {
   return (
     <DndProvider backend={HTML5Backend}>
-      <ImagesInner listingID={listing.id} />
+      <ImagesInner listing={listing} />
     </DndProvider>
   );
 };
 
-const ImagesInner: React.FC<{ listingID: number }> = ({ listingID }) => {
-  const { listing, error } = useListing(Number(listingID));
-  const [images, setImages] = useState(listing ? listing.images : []);
+const ImagesInner: React.FC<{ listing: Listing }> = ({ listing }) => {
+  const [images, setImages] = useState(listing.images);
   const newImageRef = useRef<HTMLInputElement | null>(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [imageToDelete, setImageToDelete] = useState<number | null>(null);
-
-  if (!listing) {
-    if (!error) {
-      return <Loading />;
-    } else {
-      return <div>Something unexpected happened.</div>;
-    }
-  }
 
   const findCard = useCallback(
     (id: string) => {
@@ -277,50 +316,53 @@ const ImagesInner: React.FC<{ listingID: number }> = ({ listingID }) => {
 
   const [, drop] = useDrop(() => ({ accept: "card" }));
   return (
-    <div ref={drop} className="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-mt-5 tw-gap-2">
-      {images.map((image) => (
-        <Card
-          key={image.id}
-          id={String(image.id)}
-          moveCard={moveCard}
-          findCard={findCard}
-          onDrop={updateImages}
-          className="tw-relative"
+    <div>
+      <div className="tw-text-xl tw-font-semibold tw-mt-4">Images</div>
+      <div ref={drop} className="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-mt-3 tw-gap-2">
+        {images.map((image) => (
+          <Card
+            key={image.id}
+            id={String(image.id)}
+            moveCard={moveCard}
+            findCard={findCard}
+            onDrop={updateImages}
+            className="tw-relative"
+          >
+            <img
+              className="tw-aspect-square sm:tw-h-64 tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-transition-all tw-duration-100 tw-rounded-lg tw-cursor-grab"
+              src={listing.images.length > 0 ? getGcsImageUrl(image) : "TODO"}
+            />
+            <XMarkIcon
+              className="tw-w-8 tw-absolute tw-right-2 tw-top-2 tw-bg-gray-100 tw-p-1 tw-rounded-lg tw-opacity-80 tw-cursor-pointer hover:tw-opacity-100"
+              onClick={() => {
+                setImageToDelete(image.id);
+                setShowDeleteConfirmation(true);
+              }}
+            />
+          </Card>
+        ))}
+        <div
+          className="tw-group tw-aspect-square sm:tw-h-64 tw-bg-gray-100 tw-rounded-lg tw-cursor-pointer tw-flex tw-justify-center tw-items-center"
+          onClick={() => newImageRef.current?.click()}
         >
-          <img
-            className="tw-aspect-square sm:tw-h-64 tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-transition-all tw-duration-100 tw-rounded-lg tw-cursor-grab"
-            src={listing.images.length > 0 ? getGcsImageUrl(image) : "TODO"}
+          <input ref={newImageRef} type="file" className="tw-hidden tw-invisible" onChange={addImage} />
+          <PlusIcon className="tw-h-12 tw-mx-auto tw-my-auto tw-text-gray-400 group-hover:tw-text-gray-600 tw-transition-all tw-duration-100" />
+        </div>
+        <Modal
+          show={showDeleteConfirmation}
+          close={() => {
+            setShowDeleteConfirmation(false);
+          }}
+          clickToEscape={true}
+        >
+          <DeleteModal
+            listing={listing}
+            imageID={imageToDelete}
+            setImages={setImages}
+            closeModal={() => setShowDeleteConfirmation(false)}
           />
-          <XMarkIcon
-            className="tw-w-8 tw-absolute tw-right-2 tw-top-2 tw-bg-gray-100 tw-p-1 tw-rounded-lg tw-opacity-80 tw-cursor-pointer hover:tw-opacity-100"
-            onClick={() => {
-              setImageToDelete(image.id);
-              setShowDeleteConfirmation(true);
-            }}
-          />
-        </Card>
-      ))}
-      <div
-        className="tw-group tw-aspect-square sm:tw-h-64 tw-bg-gray-100 tw-rounded-lg tw-cursor-pointer tw-flex tw-justify-center tw-items-center"
-        onClick={() => newImageRef.current?.click()}
-      >
-        <input ref={newImageRef} type="file" className="tw-hidden tw-invisible" onChange={addImage} />
-        <PlusIcon className="tw-h-12 tw-mx-auto tw-my-auto tw-text-gray-400 group-hover:tw-text-gray-600 tw-transition-all tw-duration-100" />
+        </Modal>
       </div>
-      <Modal
-        show={showDeleteConfirmation}
-        close={() => {
-          setShowDeleteConfirmation(false);
-        }}
-        clickToEscape={true}
-      >
-        <DeleteModal
-          listing={listing}
-          imageID={imageToDelete}
-          setImages={setImages}
-          closeModal={() => setShowDeleteConfirmation(false)}
-        />
-      </Modal>
     </div>
   );
 };

@@ -64,6 +64,7 @@ export interface ListingInput {
   status?: ListingStatus;
   duration_minutes?: number;
   max_guests?: number;
+  includes?: string[];
 }
 
 export enum CancellationPolicy {
