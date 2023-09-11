@@ -1,11 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { FormError } from "src/components/FormError";
 import { Button } from "src/components/button/Button";
 import longlogo from "src/components/images/long-logo.svg";
 import { Input } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
+import { useSelector } from "src/root/model";
 import { useResetPassword } from "src/rpc/data";
 import { z } from "zod";
 
@@ -27,9 +29,12 @@ const ResetPasswordFormSchema = z
 type ResetPasswordFormSchemaType = z.infer<typeof ResetPasswordFormSchema>;
 
 export const ResetPassword: React.FC = () => {
-  const { mutate: mutatePassword, isLoading, error: submitError } = useResetPassword();
+  const navigate = useNavigate();
+  const isAuthenticated = useSelector((state) => state.login.authenticated);
   const [searchParams] = useSearchParams();
+  const destination = searchParams.get("destination") ?? "";
   const token = searchParams.get("token");
+  const { mutate: mutatePassword, isLoading, error: submitError } = useResetPassword();
   const {
     handleSubmit,
     register,
@@ -38,6 +43,18 @@ export const ResetPassword: React.FC = () => {
     mode: "onBlur",
     resolver: zodResolver(ResetPasswordFormSchema),
   });
+
+  // Use effect to navigate after render if authenticated
+  useEffect(() => {
+    let ignore = false;
+    if (isAuthenticated && !ignore) {
+      navigate("/" + destination);
+    }
+
+    return () => {
+      ignore = true;
+    };
+  }, [navigate, isAuthenticated]);
 
   if (!token) {
     return <div>Unexpected error</div>;

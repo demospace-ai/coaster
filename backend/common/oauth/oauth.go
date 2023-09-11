@@ -22,7 +22,8 @@ const GOOGLE_DEVELOPMENT_CLIENT_ID = "86315250181-v19knnmf486fb5nebm2b47hu454abv
 const GOOGLE_DEVELOPMENT_SECRET_KEY = "projects/86315250181/secrets/google-dev-client-secret/versions/latest"
 
 type StateClaims struct {
-	Provider OauthProvider `json:"provider"`
+	Destination string        `json:"destination"`
+	Provider    OauthProvider `json:"provider"`
 	jwt.RegisteredClaims
 }
 
@@ -89,7 +90,7 @@ func FetchGoogleInfo(code string) (*ExternalUserInfo, error) {
 	}, nil
 }
 
-func GetOauthRedirect(strProvider string) (*string, error) {
+func GetOauthRedirect(destination string, strProvider string) (*string, error) {
 	provider := getOAuthProvider(strProvider)
 
 	var oauthConf *oauth2.Config
@@ -106,6 +107,7 @@ func GetOauthRedirect(strProvider string) (*string, error) {
 	}
 
 	token := jwt.NewWithClaims(crypto.SigningMethodKMSHS256, StateClaims{
+		destination,
 		provider,
 		jwt.RegisteredClaims{
 			IssuedAt: jwt.NewNumericDate(time.Now()),
@@ -122,25 +124,25 @@ func GetOauthRedirect(strProvider string) (*string, error) {
 	return &url, nil
 }
 
-func ValidateState(state string) (*OauthProvider, error) {
+func ValidateState(state string) (*OauthProvider, *string, error) {
 	token, err := jwt.ParseWithClaims(state, &StateClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return nil, nil // no key needs to be fetched— we just call the GCP KMS endpoint
 	})
 
 	if err != nil {
-		return nil, errors.Wrap(err, "(oauth.ValidateState) parsing token")
+		return nil, nil, errors.Wrap(err, "(oauth.ValidateState) parsing token")
 	}
 
 	if !token.Valid {
-		return nil, errors.Newf("token invalid: %v", token.Raw)
+		return nil, nil, errors.Newf("token invalid: %v", token.Raw)
 	}
 
 	claims, ok := token.Claims.(*StateClaims)
 	if !ok {
-		return nil, errors.Newf("token invalid: %v", token.Raw)
+		return nil, nil, errors.Newf("token invalid: %v", token.Raw)
 	}
 
-	return &claims.Provider, nil
+	return &claims.Provider, &claims.Destination, nil
 }
 
 func getGoogleSecretKey() string {

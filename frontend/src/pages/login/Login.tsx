@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import classNames from "classnames";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useSearchParams } from "react-router-dom";
 import { FormError } from "src/components/FormError";
 import { Button } from "src/components/button/Button";
 import { GoogleIcon } from "src/components/icons/Google";
@@ -28,13 +28,15 @@ export const Login: React.FC<{ create?: boolean }> = ({ create }) => {
   const isAuthenticated = useSelector((state) => state.login.authenticated);
   const [step, setStep] = useState<LoginStep>(LoginStep.Start);
   const [email, setEmail] = useState<string | undefined>(undefined);
+  const [searchParams] = useSearchParams();
+  const destination = searchParams.get("destination") ?? "";
   const navigate = useNavigate();
 
   // Use effect to navigate after render if authenticated
   useEffect(() => {
     let ignore = false;
     if (isAuthenticated && !ignore) {
-      navigate("/");
+      navigate("/" + destination);
     }
 
     return () => {
@@ -50,7 +52,7 @@ export const Login: React.FC<{ create?: boolean }> = ({ create }) => {
   let loginContent;
   switch (step) {
     case LoginStep.Start:
-      loginContent = <StartContent create={create} setStep={setStep} setEmail={setEmail} />;
+      loginContent = <StartContent create={create} setStep={setStep} setEmail={setEmail} destination={destination} />;
       break;
     case LoginStep.EmailCreate:
       loginContent = <EmailSignup email={email} reset={reset} />;
@@ -59,10 +61,10 @@ export const Login: React.FC<{ create?: boolean }> = ({ create }) => {
       loginContent = <EmailLoginForm email={email} reset={reset} />;
       break;
     case LoginStep.GoogleLogin:
-      loginContent = <GoogleLogin email={email} reset={reset} />;
+      loginContent = <GoogleLogin email={email} reset={reset} destination={destination} />;
       break;
     case LoginStep.SendReset:
-      loginContent = <SendResetForm reset={reset} />;
+      loginContent = <SendResetForm reset={reset} destination={destination} />;
       break;
   }
 
@@ -93,7 +95,8 @@ const StartContent: React.FC<{
   create?: boolean;
   setStep: (step: LoginStep) => void;
   setEmail: (email: string) => void;
-}> = ({ create, setStep, setEmail }) => {
+  destination: string;
+}> = ({ create, setStep, setEmail, destination }) => {
   const loginError = useSelector((state) => state.login.error);
 
   return (
@@ -110,7 +113,7 @@ const StartContent: React.FC<{
         className={classNames(
           "tw-relative tw-flex tw-items-center tw-select-none tw-cursor-pointer tw-justify-center tw-mt-4 tw-h-12 tw-bg-white tw-border tw-border-slate-300 hover:tw-bg-slate-100 tw-transition-colors tw-font-medium tw-w-full tw-text-slate-800 tw-rounded",
         )}
-        href={getEndpointUrl(OAuthRedirect, { provider: OAuthProvider.Google })}
+        href={getEndpointUrl(OAuthRedirect, { provider: OAuthProvider.Google, destination })}
       >
         <GoogleIcon className="tw-absolute tw-left-3 tw-h-5" />
         Continue with Google
@@ -371,7 +374,11 @@ const EmailSignup: React.FC<{ reset: () => void; email?: string }> = ({ reset, e
   );
 };
 
-const GoogleLogin: React.FC<{ reset: () => void; email?: string }> = ({ email, reset }) => {
+const GoogleLogin: React.FC<{ reset: () => void; email?: string; destination: string }> = ({
+  email,
+  reset,
+  destination,
+}) => {
   return (
     <>
       <div className="tw-text-center tw-text-base tw-mb-2 tw-select-none">You have an existing account with email:</div>
@@ -380,7 +387,7 @@ const GoogleLogin: React.FC<{ reset: () => void; email?: string }> = ({ email, r
         className={classNames(
           "tw-relative tw-flex tw-items-center tw-select-none tw-cursor-pointer tw-justify-center tw-mt-4 tw-h-12 tw-border tw-border-slate-400 hover:tw-bg-slate-100 tw-transition-colors tw-font-medium tw-w-80 tw-text-slate-800 tw-rounded",
         )}
-        href={getEndpointUrl(OAuthRedirect, { provider: OAuthProvider.Google })}
+        href={getEndpointUrl(OAuthRedirect, { provider: OAuthProvider.Google, destination })}
       >
         <GoogleIcon className="tw-absolute tw-left-3 tw-h-5" />
         Continue with Google
@@ -426,7 +433,7 @@ const SendResetSchema = z.object({
 
 type SendResetSchemaType = z.infer<typeof SendResetSchema>;
 
-const SendResetForm: React.FC<{ reset: () => void }> = ({ reset }) => {
+const SendResetForm: React.FC<{ reset: () => void; destination: string }> = ({ reset, destination }) => {
   const [resetSent, setResetSent] = useState<boolean>(false);
   const [sendingReset, setSendingReset] = useState<boolean>(false);
   const {
@@ -457,6 +464,7 @@ const SendResetForm: React.FC<{ reset: () => void }> = ({ reset }) => {
             await sendRequest(SendReset, {
               payload: {
                 email: values.email,
+                destination,
               },
             });
 

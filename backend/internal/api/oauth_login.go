@@ -43,7 +43,7 @@ func (s ApiService) OAuthLogin(w http.ResponseWriter, r *http.Request) error {
 	state := r.URL.Query().Get("state")
 	code := r.URL.Query().Get("code")
 
-	provider, err := oauth.ValidateState(state)
+	provider, destination, err := oauth.ValidateState(state)
 	if err != nil {
 		return errors.Wrap(err, "(api.OAuthLogin)")
 	}
@@ -87,16 +87,16 @@ func (s ApiService) OAuthLogin(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	auth.AddSessionCookie(w, *sessionToken)
-	http.Redirect(w, r, getOauthSuccessRedirect(), http.StatusFound)
+	http.Redirect(w, r, getOauthSuccessRedirect(*destination), http.StatusFound)
 
 	return nil
 }
 
-func getOauthSuccessRedirect() string {
+func getOauthSuccessRedirect(destination string) string {
 	if application.IsProd() {
-		return "https://www.trycoaster.com"
+		return "https://www.trycoaster.com/" + destination
 	} else {
-		return "http://localhost:3000"
+		return "http://localhost:3000/" + destination
 	}
 }
 

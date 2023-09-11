@@ -122,6 +122,7 @@ export interface EmailLoginRequest {
 
 export interface SendResetRequest {
   email: string;
+  destination: string;
 }
 
 export interface ResetPasswordRequest {

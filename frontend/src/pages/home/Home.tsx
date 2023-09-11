@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { parsePhoneNumber } from "libphonenumber-js";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { NavLink } from "react-router-dom";
 import { Button } from "src/components/button/Button";
 import {
   CampingIcon,
@@ -21,6 +22,7 @@ import { PhoneInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { Modal } from "src/components/modal/Modal";
 import { SearchResult } from "src/pages/search/Search";
+import { useSelector } from "src/root/model";
 import { sendRequest } from "src/rpc/ajax";
 import { JoinWaitlist } from "src/rpc/api";
 import { Listing } from "src/rpc/types";
@@ -110,6 +112,7 @@ export const CategorySelector: React.FC = () => {
 };
 
 export const ComingSoon: React.FC = () => {
+  const isAuthenticated = useSelector((state) => state.login.authenticated);
   const [showWaitlist, setShowWaitlist] = useState<boolean>(false);
   const [joined, setJoined] = useState<boolean>(false);
   const waitlistSchema = z.object({
@@ -141,7 +144,7 @@ export const ComingSoon: React.FC = () => {
         }}
         clickToEscape={true}
       >
-        <div className="tw-w-[320px] sm:tw-w-[420px] tw-h-[200px] tw-px-8 sm:tw-px-12 tw-pb-20">
+        <div className="tw-w-[320px] sm:tw-w-[420px] tw-h-[240px] tw-px-8 sm:tw-px-12 tw-pb-20">
           {joined ? (
             <div className="tw-mt-10 tw-flex tw-flex-col tw-items-center tw-justify-center">
               <div className="tw-text-center tw-w-full tw-text-2xl tw-font-bold">You're on the list!</div>
@@ -149,21 +152,22 @@ export const ComingSoon: React.FC = () => {
             </div>
           ) : (
             <>
-              <div className="tw-text-center tw-w-full tw-text-2xl tw-font-bold tw-mb-3">Join waitlist</div>
+              <div className="tw-text-center tw-w-full tw-text-2xl tw-font-bold tw-mb-2">Join waitlist</div>
+              <div className="tw-text-center tw-w-full tw-mb-4">Coaster is currently invite only.</div>
               <Controller
                 name="phone"
                 control={control}
                 render={({ field }) => (
                   <PhoneInput
                     label="Phone number"
-                    wrapperClass={"tw-mb-2"}
+                    wrapperClass={"tw-mb-4"}
                     className={errors.phone && "tw-border-red-600 hover:tw-border-red-600"}
                     {...field}
                   />
                 )}
               />
               <Button
-                className="tw-flex tw-h-[52px] tw-items-center tw-justify-center tw-whitespace-nowrap tw-w-full tw-bg-blue-500 hover:tw-bg-blue-600"
+                className="tw-flex tw-h-[52px] tw-items-center tw-justify-center tw-whitespace-nowrap tw-w-full tw-bg-blue-700 hover:tw-bg-blue-900"
                 onClick={handleSubmit(joinWaitlist)}
               >
                 Join waitlist
@@ -179,13 +183,30 @@ export const ComingSoon: React.FC = () => {
         <div className="tw-flex tw-w-80 sm:tw-w-fit tw-font-semibold tw-text-5xl tw-font-[Lateef] tw-text-center -tw-mt-24 sm:-tw-mt-32">
           Explore the world with local guides
         </div>
-        <div className="tw-flex tw-items-center tw-gap-2 tw-mt-8">
-          <Button
-            className="tw-flex tw-h-[52px] tw-items-center tw-justify-center tw-whitespace-nowrap tw-px-8 tw-bg-transparent tw-border-black tw-border-solid tw-border-2 hover:tw-bg-[rgba(0,0,0,0.2)] tw-text-black"
-            onClick={() => setShowWaitlist(true)}
-          >
-            Request access
-          </Button>
+        <div className="tw-flex tw-items-center tw-mt-8">
+          {isAuthenticated ? (
+            <NavLink
+              className="tw-flex tw-h-[52px] tw-w-48 tw-rounded-xl tw-font-bold tw-tracking-[1px] tw-items-center tw-justify-center tw-whitespace-nowrap tw-px-8 tw-bg-transparent tw-border-black tw-border-solid tw-border-2 hover:tw-bg-[rgba(0,0,0,0.2)] tw-text-black"
+              to="/profile"
+            >
+              Dashboard
+            </NavLink>
+          ) : (
+            <>
+              <Button
+                className="tw-flex tw-h-[52px] tw-w-48 tw-rounded-l-xl tw-rounded-r-none tw-items-center tw-justify-center tw-whitespace-nowrap tw-px-8 tw-bg-transparent tw-border-black tw-border-solid tw-border-2 hover:tw-bg-[rgba(0,0,0,0.2)] tw-text-black"
+                onClick={() => setShowWaitlist(true)}
+              >
+                Join
+              </Button>
+              <NavLink
+                className="tw-flex tw-h-[52px] tw-w-48 tw-rounded-r-xl tw-font-bold tw-tracking-[1px] tw-items-center tw-justify-center tw-whitespace-nowrap tw-px-8 tw-bg-transparent tw-border-black tw-border-solid tw-border-r-2 tw-border-b-2 tw-border-t-2 hover:tw-bg-[rgba(0,0,0,0.2)] tw-text-black"
+                to="/login?destination=profile"
+              >
+                Sign In
+              </NavLink>
+            </>
+          )}
         </div>
       </div>
     </div>

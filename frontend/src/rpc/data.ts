@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import { useDispatch } from "src/root/model";
 import { sendRequest } from "src/rpc/ajax";
 import {
@@ -135,7 +134,6 @@ export function useUpdateProfilePicture(): Mutation<File> {
 }
 
 export function useResetPassword(): Mutation<ResetPasswordRequest> {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   return useMutation<User, ResetPasswordRequest>(
     (request: ResetPasswordRequest) => {
@@ -144,7 +142,6 @@ export function useResetPassword(): Mutation<ResetPasswordRequest> {
     {
       onSuccess: (user: User) => {
         dispatch({ type: "login.authenticated", user: user });
-        navigate("/profile");
       },
     },
   );
