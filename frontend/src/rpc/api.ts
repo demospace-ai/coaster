@@ -4,6 +4,7 @@ import {
   CreateUserResponse,
   EmailLoginRequest,
   EmailLoginResponse,
+  Image,
   Listing,
   ListingInput,
   LoginMethod,
@@ -60,10 +61,22 @@ export const UpdateListing: IEndpoint<ListingInput, Listing, { listingID: number
   path: "/listings/:listingID",
 };
 
-export const UploadListingImage: IEndpoint<undefined, Listing, { listingID: number }> = {
-  name: "Upload listing image",
+export const AddListingImage: IEndpoint<undefined, Image, { listingID: number }> = {
+  name: "Add listing image",
   method: "POST",
   path: "/listings/:listingID/image",
+};
+
+export const DeleteListingImage: IEndpoint<undefined, Image, { listingID: number; imageID: number }> = {
+  name: "Delete listing image",
+  method: "DELETE",
+  path: "/listings/:listingID/image/:imageID",
+};
+
+export const UpdateListingImages: IEndpoint<{ images: Image[] }, undefined, { listingID: number }> = {
+  name: "Update listing images",
+  method: "PATCH",
+  path: "/listings/:listingID/images",
 };
 
 export const GetFeaturedListings: IEndpoint<undefined, Listing[]> = {

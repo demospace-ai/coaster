@@ -19,7 +19,7 @@ import { Loading } from "src/components/loading/Loading";
 import { InlineMapSearch, MapComponent, MapsWrapper } from "src/components/maps/Maps";
 import { CategorySchema, DescriptionSchema, NameSchema, PriceSchema } from "src/pages/listing/schema";
 import { sendRequest } from "src/rpc/ajax";
-import { GetDraftListing, GetListing, UploadListingImage } from "src/rpc/api";
+import { AddListingImage, GetDraftListing, GetListing } from "src/rpc/api";
 import { createListing, updateListing, useDraftListing, useDraftListingOnce, useUpdateListing } from "src/rpc/data";
 import { CategoryType, Coordinates, Listing, ListingStatus } from "src/rpc/types";
 import { getGcsImageUrl } from "src/utils/images";
@@ -297,7 +297,7 @@ const ImageStep: React.FC<StepParams & ImageParams> = ({ renderLayout, listing }
       const formData = new FormData();
       formData.append("listing_image", e.currentTarget.files[0]);
       try {
-        const listingImage = await sendRequest(UploadListingImage, {
+        const listingImage = await sendRequest(AddListingImage, {
           pathParams: { listingID },
           formData: formData,
         });

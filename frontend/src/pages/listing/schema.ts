@@ -17,9 +17,11 @@ export const DescriptionSchema = z
 
 export const PriceSchema = z.number().positive().max(100000, "The maximum price is $100,000.");
 
-export const DurationSchema = z.number().min(30, "The minimum duration is 30 minutes.");
+export const DurationSchema = z
+  .number({ invalid_type_error: "The minimum duration is 30 minutes." }) // needed to handle NaN
+  .min(30, "The minimum duration is 30 minutes.");
 
 export const MaxGuestsSchema = z
-  .number()
+  .number({ invalid_type_error: "The minimum duration is 30 minutes." }) // needed to handle NaN
   .min(1, "The minimum number of guests is 1.")
   .max(100, "The maximum number of guests is 100.");

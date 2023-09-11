@@ -20,3 +20,7 @@ type Listing struct {
 	Highlights       []string                    `json:"highlights"`
 	Includes         []string                    `json:"includes"`
 }
+
+type ListingImage struct {
+	ID int64 `json:"id"`
+}

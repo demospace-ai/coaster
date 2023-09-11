@@ -1,6 +1,8 @@
 package listings
 
 import (
+	"time"
+
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/geo"
 	"go.fabra.io/server/common/input"
@@ -246,11 +248,50 @@ func CreateListingImage(db *gorm.DB, listingID int64, storageID string, rank int
 	return &listingImage, nil
 }
 
+func DeleteListingImage(db *gorm.DB, listingImage *models.ListingImage) error {
+	currentTime := time.Now()
+	result := db.Model(listingImage).Update("deactivated_at", currentTime)
+	if result.Error != nil {
+		return errors.Wrap(result.Error, "(listings.DeleteListingImage)")
+	}
+
+	return nil
+}
+
+func LoadListingImage(db *gorm.DB, listingID int64, imageID int64) (*models.ListingImage, error) {
+	var listingImage models.ListingImage
+	result := db.Table("listing_images").
+		Select("listing_images.*").
+		Where("listing_images.listing_id = ?", listingID).
+		Where("listing_images.id = ?", imageID).
+		Where("listing_images.deactivated_at IS NULL").
+		Take(&listingImage)
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(listings.GetImagesForListing)")
+	}
+
+	return &listingImage, nil
+}
+
+func UpdateImageRank(db *gorm.DB, listingID int64, imageID int64, rank int) error {
+	result := db.Table("listing_images").
+		Where("listing_images.listing_id = ?", listingID).
+		Where("listing_images.id = ?", imageID).
+		Update("rank", rank)
+
+	if result.Error != nil {
+		return errors.Wrap(result.Error, "(listings.DeleteListingImage)")
+	}
+
+	return nil
+}
+
 func LoadImagesForListing(db *gorm.DB, listingID int64) ([]models.ListingImage, error) {
 	var listingImages []models.ListingImage
 	result := db.Table("listing_images").
 		Select("listing_images.*").
 		Where("listing_images.listing_id = ?", listingID).
+		Where("listing_images.deactivated_at IS NULL").
 		Order("listing_images.rank ASC").
 		Find(&listingImages)
 	if result.Error != nil {

@@ -43,10 +43,22 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.CreateListing,
 		},
 		{
-			Name:        "Upload listing image",
+			Name:        "Add listing image",
 			Method:      router.POST,
 			Pattern:     "/listings/{listingID}/image",
-			HandlerFunc: s.UploadListingImage,
+			HandlerFunc: s.AddListingImage,
+		},
+		{
+			Name:        "Delete listing image",
+			Method:      router.DELETE,
+			Pattern:     "/listings/{listingID}/image/{imageID}",
+			HandlerFunc: s.DeleteListingImage,
+		},
+		{
+			Name:        "Update listing images",
+			Method:      router.PATCH,
+			Pattern:     "/listings/{listingID}/images",
+			HandlerFunc: s.UpdateListingImages,
 		},
 		{
 			Name:        "Update listing",

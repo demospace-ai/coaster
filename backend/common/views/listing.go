@@ -23,7 +23,12 @@ type Listing struct {
 
 	Host Host `json:"host"`
 
-	Images []string `json:"images"`
+	Images []Image `json:"images"`
+}
+
+type Image struct {
+	ID        int64  `json:"id"`
+	StorageID string `json:"storage_id"`
 }
 
 type Host struct {
@@ -88,10 +93,13 @@ func ConvertHost(user *models.User) Host {
 	}
 }
 
-func ConvertImages(images []models.ListingImage) []string {
-	converted := make([]string, len(images))
+func ConvertImages(images []models.ListingImage) []Image {
+	converted := make([]Image, len(images))
 	for i, image := range images {
-		converted[i] = image.StorageID
+		converted[i] = Image{
+			ID:        image.ID,
+			StorageID: image.StorageID,
+		}
 	}
 
 	return converted

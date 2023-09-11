@@ -29,7 +29,7 @@ export const Modal: React.FC<ModalProps> = (props) => {
   return (
     <div
       className={classNames(
-        "tw-absolute tw-top-0 tw-left-0 tw-h-full tw-w-full tw-z-50 tw-bg-[rgba(255,255,255,10%)] tw-backdrop-blur-sm",
+        "tw-fixed tw-overscroll-contain tw-top-0 tw-left-0 tw-h-full tw-w-full tw-z-50 tw-bg-[rgba(255,255,255,10%)] tw-backdrop-blur-sm",
         showHideClassName,
       )}
       onClick={props.clickToEscape ? props.close : undefined}
@@ -42,7 +42,10 @@ export const Modal: React.FC<ModalProps> = (props) => {
           <div className={classNames("tw-inline tw-m-6 tw-mb-2 tw-select-none", props.titleStyle)}>{props.title}</div>
           <button
             className="tw-inline tw-m-6 tw-ml-auto tw-mb-2 tw-bg-transparent tw-border-none tw-cursor-pointer tw-p-0"
-            onClick={props.close}
+            onClick={(e) => {
+              e.preventDefault();
+              props.close && props.close();
+            }}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
               <path

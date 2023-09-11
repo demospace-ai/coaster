@@ -80,7 +80,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
           name={id}
           ref={inputRef}
           autoComplete={id}
-          className="tw-w-full tw-mt-0.5 tw-outline-none tw-ring-none tw-text-base disabled:tw-bg-slate-50 disabled:tw-select-none tw-cursor-[inherit]"
+          className="tw-w-full tw-mt-0.5 tw-outline-none tw-ring-none tw-text-base disabled:tw-bg-slate-50 disabled:tw-select-none tw-cursor-[inherit] tw-hide-number-wheel"
           onKeyDown={onKeydown}
           onBlur={(e) => {
             setFocused(false);

@@ -1,12 +1,18 @@
-import { EyeIcon } from "@heroicons/react/24/outline";
+import { EyeIcon, PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
+import update from "immutability-helper";
+import { FormEvent, useCallback, useRef, useState } from "react";
+import { DndProvider, useDrop } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import { Controller, useForm } from "react-hook-form";
 import { NavLink, useParams } from "react-router-dom";
 import { FormError } from "src/components/FormError";
 import { BackButton, Button } from "src/components/button/Button";
+import { Card } from "src/components/dnd/DragAndDrop";
 import { ComboInput, Input, PriceInput, TextArea } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { InlineMapSearch } from "src/components/maps/Maps";
+import { Modal } from "src/components/modal/Modal";
 import { useShowToast } from "src/components/notifications/Notifications";
 import {
   CategorySchema,
@@ -17,10 +23,12 @@ import {
   PriceSchema,
 } from "src/pages/listing/schema";
 import { sendRequest } from "src/rpc/ajax";
-import { UpdateListing } from "src/rpc/api";
+import { AddListingImage, DeleteListingImage, GetListing, UpdateListing, UpdateListingImages } from "src/rpc/api";
 import { useListing } from "src/rpc/data";
-import { Category, Listing, ListingInput } from "src/rpc/types";
+import { Category, Image, Listing, ListingInput } from "src/rpc/types";
+import { getGcsImageUrl } from "src/utils/images";
 import { toTitleCase } from "src/utils/string";
+import { mutate } from "swr";
 import { z } from "zod";
 
 const EditListingSchema = z.object({
@@ -49,7 +57,7 @@ export const EditListing: React.FC = () => {
 
   return (
     <div className="tw-flex tw-flex-col tw-w-full tw-justify-center tw-items-center tw-px-4 sm:tw-px-20 tw-py-4 sm:tw-py-12">
-      <BackButton className="tw-mr-auto tw-mb-5" />
+      <BackButton className="tw-mr-auto tw-mb-4" />
       <div className="tw-flex tw-w-full tw-max-w-lg tw-justify-between tw-items-center">
         <div className="tw-font-semibold sm:tw-font-bold tw-text-3xl sm:tw-text-4xl tw-hyphens-auto">Edit Listing</div>
         <NavLink className="tw-flex tw-items-center tw-gap-1 tw-text-blue-600" to={`/listings/${listingID}`}>
@@ -182,10 +190,174 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
         value={maxGuestsValue}
       />
       <FormError message={errors.maxGuests?.message} />
+      <Images listing={listing} />
       <Button type="submit" className="tw-mt-3 tw-w-full sm:tw-w-32 tw-h-12 tw-ml-auto" disabled={!isDirty}>
         {isSubmitting ? <Loading /> : "Save"}
       </Button>
       <FormError message={errors.root?.message} />
     </form>
+  );
+};
+
+export const Images: React.FC<{ listing: Listing }> = ({ listing }) => {
+  return (
+    <DndProvider backend={HTML5Backend}>
+      <ImagesInner listingID={listing.id} />
+    </DndProvider>
+  );
+};
+
+const ImagesInner: React.FC<{ listingID: number }> = ({ listingID }) => {
+  const { listing, error } = useListing(Number(listingID));
+  const [images, setImages] = useState(listing ? listing.images : []);
+  const newImageRef = useRef<HTMLInputElement | null>(null);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [imageToDelete, setImageToDelete] = useState<number | null>(null);
+
+  if (!listing) {
+    if (!error) {
+      return <Loading />;
+    } else {
+      return <div>Something unexpected happened.</div>;
+    }
+  }
+
+  const findCard = useCallback(
+    (id: string) => {
+      const image = images.filter((image) => `${image.id}` === id)[0];
+      return {
+        image,
+        index: images.indexOf(image),
+      };
+    },
+    [images],
+  );
+
+  const moveCard = useCallback(
+    (id: string, atIndex: number) => {
+      const { image, index } = findCard(id);
+      setImages(
+        update(images, {
+          $splice: [
+            [index, 1],
+            [atIndex, 0, image],
+          ],
+        }),
+      );
+    },
+    [findCard, images, setImages],
+  );
+
+  const updateImages = async () => {
+    try {
+      await sendRequest(UpdateListingImages, {
+        pathParams: { listingID: listing.id },
+        payload: { images },
+      });
+
+      mutate({ GetListing, listingID: listing.id }, { ...listing, images });
+    } catch (e) {}
+  };
+
+  const addImage = async (e: FormEvent<HTMLInputElement>) => {
+    if (e.currentTarget && e.currentTarget.files) {
+      const formData = new FormData();
+      formData.append("listing_image", e.currentTarget.files[0]);
+      try {
+        const listingImage = await sendRequest(AddListingImage, {
+          pathParams: { listingID: listing.id },
+          formData: formData,
+        });
+
+        mutate({ GetListing, listingID: listing.id }, { ...listing, images: [...listing.images, listingImage] });
+        setImages([...images, listingImage]);
+      } catch (e) {}
+    }
+  };
+
+  const [, drop] = useDrop(() => ({ accept: "card" }));
+  return (
+    <div ref={drop} className="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-mt-5 tw-gap-2">
+      {images.map((image) => (
+        <Card
+          key={image.id}
+          id={String(image.id)}
+          moveCard={moveCard}
+          findCard={findCard}
+          onDrop={updateImages}
+          className="tw-relative"
+        >
+          <img
+            className="tw-aspect-square sm:tw-h-64 tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-transition-all tw-duration-100 tw-rounded-lg tw-cursor-grab"
+            src={listing.images.length > 0 ? getGcsImageUrl(image) : "TODO"}
+          />
+          <XMarkIcon
+            className="tw-w-8 tw-absolute tw-right-2 tw-top-2 tw-bg-gray-100 tw-p-1 tw-rounded-lg tw-opacity-80 tw-cursor-pointer hover:tw-opacity-100"
+            onClick={() => {
+              setImageToDelete(image.id);
+              setShowDeleteConfirmation(true);
+            }}
+          />
+        </Card>
+      ))}
+      <div
+        className="tw-group tw-aspect-square sm:tw-h-64 tw-bg-gray-100 tw-rounded-lg tw-cursor-pointer tw-flex tw-justify-center tw-items-center"
+        onClick={() => newImageRef.current?.click()}
+      >
+        <input ref={newImageRef} type="file" className="tw-hidden tw-invisible" onChange={addImage} />
+        <PlusIcon className="tw-h-12 tw-mx-auto tw-my-auto tw-text-gray-400 group-hover:tw-text-gray-600 tw-transition-all tw-duration-100" />
+      </div>
+      <Modal
+        show={showDeleteConfirmation}
+        close={() => {
+          setShowDeleteConfirmation(false);
+        }}
+        clickToEscape={true}
+      >
+        <DeleteModal
+          listing={listing}
+          imageID={imageToDelete}
+          setImages={setImages}
+          closeModal={() => setShowDeleteConfirmation(false)}
+        />
+      </Modal>
+    </div>
+  );
+};
+
+interface DeleteModalProps {
+  listing: Listing;
+  imageID: number | null;
+  setImages: (images: Image[]) => void;
+  closeModal: () => void;
+}
+
+const DeleteModal: React.FC<DeleteModalProps> = ({ listing, imageID, setImages, closeModal }) => {
+  const [deleting, setDeleting] = useState(false);
+  const deleteImage = async () => {
+    setDeleting(true);
+    try {
+      await sendRequest(DeleteListingImage, {
+        pathParams: { listingID: listing.id, imageID },
+      });
+
+      const newImages = listing.images.filter((item) => item.id !== imageID);
+      mutate({ GetListing, listingID: listing.id }, { ...listing, images: newImages });
+      setImages(newImages);
+      closeModal();
+    } catch (e) {}
+    setDeleting(false);
+  };
+
+  return (
+    <div className="tw-w-[320px] sm:tw-w-[420px] tw-px-8 sm:tw-px-12 tw-pb-10">
+      <div className="tw-text-center tw-w-full tw-text-xl tw-font-semibold tw-mb-5">Permanently delete this image?</div>
+      <Button
+        className="tw-flex tw-h-[52px] tw-items-center tw-justify-center tw-whitespace-nowrap tw-w-full"
+        onClick={deleteImage}
+      >
+        {deleting ? <Loading /> : "Delete"}
+      </Button>
+    </div>
   );
 };

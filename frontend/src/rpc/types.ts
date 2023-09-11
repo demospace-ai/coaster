@@ -38,7 +38,12 @@ export interface Listing {
 
   host: Host;
 
-  images: string[];
+  images: Image[];
+}
+
+export interface Image {
+  id: number;
+  storage_id: string;
 }
 
 export interface Host {
