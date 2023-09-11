@@ -91,7 +91,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
             onFocus && onFocus(e);
           }}
           disabled={disabled}
-          value={value ? value : ""}
           {...other}
         />
       </div>
@@ -143,7 +142,7 @@ export const TextArea: React.FC<TextAreaProps> = forwardRef<HTMLTextAreaElement,
           <label
             htmlFor={id}
             className={mergeClasses(
-              "tw-absolute tw-top-0 tw-text-base tw-text-slate-600 tw-cursor-[inherit] tw-select-none tw-inline-block tw-transition-all tw-duration-150",
+              "tw-absolute -tw-top-1 tw-text-base tw-text-slate-600 tw-cursor-[inherit] tw-select-none tw-inline-block tw-transition-all tw-duration-150",
               showLabel && "-tw-top-1 tw-text-xs",
             )}
           >

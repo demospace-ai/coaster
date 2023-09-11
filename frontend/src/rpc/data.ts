@@ -144,7 +144,7 @@ export function useResetPassword(): Mutation<ResetPasswordRequest> {
     {
       onSuccess: (user: User) => {
         dispatch({ type: "login.authenticated", user: user });
-        navigate("/");
+        navigate("/profile");
       },
     },
   );

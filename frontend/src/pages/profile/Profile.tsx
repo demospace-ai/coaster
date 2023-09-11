@@ -64,6 +64,7 @@ export const Profile: React.FC = () => {
   const first_name = watch("first_name");
   const last_name = watch("last_name");
   const email = watch("email");
+  const about = watch("about");
 
   return (
     <div className="tw-flex tw-flex-col tw-items-center tw-h-full tw-bg-slate-200 tw-pt-8 sm:tw-pt-14">
@@ -124,6 +125,7 @@ export const Profile: React.FC = () => {
           label="About"
           {...register("about")}
           placeholder="Share some facts about yourself!"
+          value={about}
         />
         <FormError message={errors.about?.message} />
         <Button type="submit" className="tw-w-full sm:tw-w-fit tw-px-10 tw-py-2 tw-mt-3">
