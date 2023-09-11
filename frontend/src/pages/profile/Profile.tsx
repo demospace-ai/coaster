@@ -118,7 +118,7 @@ export const Profile: React.FC = () => {
           label="Email"
           {...register("email")}
           disabled
-          tooltip="Cannot change email"
+          tooltip="Contact us at support@trycoaster.com to change your email."
           value={email}
         />
         <FormError message={errors.email?.message} />

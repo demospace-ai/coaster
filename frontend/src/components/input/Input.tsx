@@ -96,7 +96,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
       </div>
       {tooltip && (
         <Tooltip content={tooltip}>
-          <InformationCircleIcon className="tw-w-5 tw-mr-4" />
+          <InformationCircleIcon className="tw-w-5 tw-mr-2" />
         </Tooltip>
       )}
     </div>
