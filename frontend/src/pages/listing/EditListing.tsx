@@ -118,7 +118,7 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
   };
 
   return (
-    <form className="tw-mt-4 tw-w-full tw-max-w-lg" onSubmit={handleSubmit(updateListing)}>
+    <form className="tw-mt-4 tw-mb-10 tw-w-full tw-max-w-lg" onSubmit={handleSubmit(updateListing)}>
       <Input className="tw-w-full tw-flex tw-mt-3" label="Name" {...register("name")} value={nameValue} />
       <FormError message={errors.name?.message} />
       <TextArea
@@ -158,7 +158,7 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
           <InlineMapSearch
             label="Location"
             hideIcon
-            className="tw-justify-start tw-mt-3"
+            className="tw-justify-start tw-mt-3 tw-mb-0"
             key={listing.location}
             onSelect={field.onChange}
             initial={listing.location}
@@ -182,7 +182,7 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
         value={maxGuestsValue}
       />
       <FormError message={errors.maxGuests?.message} />
-      <Button type="submit" className="tw-mt-3 tw-w-32 tw-h-8" disabled={!isDirty}>
+      <Button type="submit" className="tw-mt-3 tw-w-full sm:tw-w-32 tw-h-12 tw-ml-auto" disabled={!isDirty}>
         {isSubmitting ? <Loading /> : "Save"}
       </Button>
       <FormError message={errors.root?.message} />

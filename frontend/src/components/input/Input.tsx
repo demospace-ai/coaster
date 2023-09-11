@@ -749,7 +749,7 @@ export const PriceInput = forwardRef<HTMLInputElement, InputProps>((props, propR
   return (
     <div
       className={mergeClasses(
-        "tw-flex tw-w-full tw-rounded-lg tw-outline tw-outline-1 tw-outline-slate-300 focus-within:tw-outline-slate-400 hover:tw-outline-slate-400 tw-text-base tw-cursor-text",
+        "tw-flex tw-w-full tw-rounded-md tw-outline tw-outline-1 tw-outline-slate-300 focus-within:tw-outline-slate-400 hover:tw-outline-slate-400 tw-text-base tw-cursor-text",
         className,
       )}
       onClick={() => inputRef.current?.focus()}
@@ -758,7 +758,7 @@ export const PriceInput = forwardRef<HTMLInputElement, InputProps>((props, propR
         <div
           className={mergeClasses(
             "tw-flex tw-justify-center tw-items-center tw-py-4 tw-px-3",
-            label && "tw-mt-2 -tw-mb-1",
+            label && "tw-mt-2 -tw-mb-2",
           )}
         >
           ${stringifyPrice(value)}
@@ -780,7 +780,7 @@ export const PriceInput = forwardRef<HTMLInputElement, InputProps>((props, propR
           value={value ? value : ""}
           className={mergeClasses(
             "tw-flex tw-top-0 tw-right-0 tw-bg-transparent tw-absolute tw-text-right tw-text-base tw-py-4 tw-px-3 tw-w-full tw-outline-0 tw-hide-number-wheel",
-            label && "tw-mt-2 -tw-mb-1",
+            label && "tw-mt-2 -tw-mb-2",
           )}
           onKeyDown={preventMinus}
           {...other}

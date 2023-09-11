@@ -3,10 +3,11 @@ import { mergeClasses } from "src/utils/twmerge";
 
 export const Footer: React.FC = () => {
   const location = useLocation();
-  // TODO: do this better
+  // TODO: do this better - this is to account for the extra footer on the listing page on mobile
   const path = location.pathname.split("/")[1];
   const isNew = location.pathname.split("/")[2] === "new";
-  const hasMobileFooter = path === "listings" && !isNew;
+  const isEdit = location.pathname.split("/")[3] === "edit";
+  const hasMobileFooter = path === "listings" && !isNew && !isEdit;
 
   return (
     <div

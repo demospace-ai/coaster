@@ -185,13 +185,9 @@ export const InlineMapSearch: React.FC<{
         props.className,
       )}
     >
-      <form
+      <div
         ref={refs.setReference}
         className="tw-flex tw-w-full tw-p-0 sm:tw-mt-0"
-        onSubmit={(e: FormEvent) => {
-          e.preventDefault();
-          onSelect(query);
-        }}
         {...getReferenceProps({
           onClick() {
             inputRef.current?.focus();
@@ -199,10 +195,6 @@ export const InlineMapSearch: React.FC<{
           onKeyDown(event) {
             if (event.key === "Escape") {
               inputRef.current?.blur();
-            }
-            if (event.key === "Enter") {
-              // Don't allow enter to submit. User must select from dropdown
-              event.preventDefault();
             }
           },
         })}
@@ -258,7 +250,7 @@ export const InlineMapSearch: React.FC<{
             </div>
           </Transition>
         </div>
-      </form>
+      </div>
     </div>
   );
 };

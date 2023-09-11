@@ -75,7 +75,7 @@ export const Profile: React.FC = () => {
         <div className="tw-text-center sm:tw-text-left tw-w-full tw-text-3xl tw-font-semibold tw-mb-3">
           Profile Details
         </div>
-        <div className="tw-flex tw-w-full tw-justify-center tw-mb-5">
+        <div className="tw-flex tw-flex-col tw-w-full tw-items-center tw-justify-center tw-mb-5">
           <input
             ref={imageInputRef}
             type="file"
@@ -90,7 +90,7 @@ export const Profile: React.FC = () => {
           {user?.profile_picture_url ? (
             <img
               src={user?.profile_picture_url}
-              className="tw-rounded-full tw-object-cover tw-aspect-square tw-h-24 tw-mt-2 tw-cursor-pointer"
+              className="tw-rounded-full tw-object-cover tw-aspect-square tw-w-24 tw-mt-2 tw-cursor-pointer"
               referrerPolicy="no-referrer"
               onClick={() => imageInputRef.current?.click()}
             />
@@ -102,6 +102,12 @@ export const Profile: React.FC = () => {
               {user!.first_name.charAt(0)}
             </div>
           )}
+          <div
+            className="tw-text-blue-600 tw-select-none tw-opacity-80 tw-cursor-pointer tw-mt-1"
+            onClick={() => imageInputRef.current?.click()}
+          >
+            Edit
+          </div>
         </div>
         <Input className="tw-my-1" label="First Name" {...register("first_name")} value={first_name} />
         <FormError message={errors.first_name?.message} />
