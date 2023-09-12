@@ -779,7 +779,7 @@ export const PriceInput = forwardRef<HTMLInputElement, InputProps>((props, propR
           type="number"
           value={value ? value : ""}
           className={mergeClasses(
-            "tw-flex tw-top-0 tw-right-0 tw-bg-transparent tw-absolute tw-text-right tw-text-base tw-py-4 tw-px-3 tw-w-full tw-outline-0 tw-hide-number-wheel",
+            "tw-flex tw-h-full tw-top-0 tw-right-0 tw-bg-transparent tw-absolute tw-text-right tw-text-inherit tw-py-4 tw-px-3 tw-w-full tw-outline-0 tw-hide-number-wheel",
             label && "tw-mt-2 -tw-mb-2",
           )}
           onKeyDown={preventMinus}

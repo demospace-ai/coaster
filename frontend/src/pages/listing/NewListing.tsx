@@ -248,6 +248,7 @@ const PriceStep: React.FC<StepParams & PriceParams> = ({ listing, renderLayout }
     value: PriceSchema,
   });
   const {
+    watch,
     handleSubmit,
     register,
     formState: { errors, isValid },
@@ -256,6 +257,7 @@ const PriceStep: React.FC<StepParams & PriceParams> = ({ listing, renderLayout }
     defaultValues: { value: listing.price },
     resolver: zodResolver(formSchema),
   });
+  const priceValue = watch("value");
 
   // TODO: do we want to update on change too?
   const updatePrice = async (data: number) => {
@@ -273,6 +275,7 @@ const PriceStep: React.FC<StepParams & PriceParams> = ({ listing, renderLayout }
         <PriceInput
           className="tw-text-3xl tw-font-semibold tw-justify-center focus-within:tw-outline-2 focus-within:tw-outline-blue-700"
           {...register("value", { valueAsNumber: true })}
+          value={priceValue}
         />
         <ErrorMessage error={errors.value} />
       </div>
