@@ -1,9 +1,7 @@
 package api
 
 import (
-	"log"
 	"net/http"
-	"strings"
 
 	"go.fabra.io/server/common/application"
 	"go.fabra.io/server/common/auth"
@@ -12,24 +10,6 @@ import (
 	"go.fabra.io/server/common/repositories/sessions"
 	"go.fabra.io/server/common/repositories/users"
 )
-
-var UNAUTHORIZED_DOMAINS = map[string]bool{
-	"gmail.com":     true,
-	"outlook.com":   true,
-	"icloud.com":    true,
-	"yahoo.com":     true,
-	"aol.com":       true,
-	"hotmail.com":   true,
-	"hey.com":       true,
-	"supaglue.com":  true,
-	"merge.dev":     true,
-	"vessel.land":   true,
-	"hightouch.com": true,
-	"getcensus.com": true,
-	"airbyte.io":    true,
-	"airbyte.com":   true,
-	"fivetran.com":  true,
-}
 
 func (s ApiService) OAuthLogin(w http.ResponseWriter, r *http.Request) error {
 	if !r.URL.Query().Has("state") {
@@ -67,14 +47,6 @@ func (s ApiService) OAuthLogin(w http.ResponseWriter, r *http.Request) error {
 
 	// no user exists yet, so if the domain is not allowed then redirect
 	if user == nil {
-		var userEmailDomain = strings.Split(externalUserInfo.Email, "@")[1]
-		// allow unauthorized domains in development
-		if _, unauthorized := UNAUTHORIZED_DOMAINS[userEmailDomain]; unauthorized && application.IsProd() {
-			log.Printf("Unauthorized login: %v", externalUserInfo)
-			http.Redirect(w, r, getUnauthorizedRedirect(), http.StatusFound)
-			return nil
-		}
-
 		user, err = users.CreateUserForExternalInfo(s.db, externalUserInfo)
 		if err != nil {
 			return errors.Wrap(err, "(api.OAuthLogin)")
@@ -97,13 +69,5 @@ func getOauthSuccessRedirect(destination string) string {
 		return "https://www.trycoaster.com/" + destination
 	} else {
 		return "http://localhost:3000/" + destination
-	}
-}
-
-func getUnauthorizedRedirect() string {
-	if application.IsProd() {
-		return "https://www.trycoaster.com/unauthorized"
-	} else {
-		return "http://localhost:3000/unauthorized"
 	}
 }
