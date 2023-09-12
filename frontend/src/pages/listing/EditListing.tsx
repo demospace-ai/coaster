@@ -102,14 +102,6 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
     },
   });
 
-  // Needed to display label correctly
-  const nameValue = watch("name");
-  const descriptionValue = watch("description");
-  const priceValue = watch("price");
-  const categoryValue = watch("category");
-  const durationValue = watch("duration");
-  const maxGuestsValue = watch("maxGuests");
-
   const updateListing = async (values: EditListingSchemaType) => {
     const payload = {} as ListingInput;
     dirtyFields.name && (payload.name = values.name);
@@ -141,20 +133,20 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
   return (
     <form className="tw-mt-4 tw-mb-10 tw-w-full" onSubmit={handleSubmit(updateListing)}>
       <div className="tw-text-xl tw-font-semibold tw-mb-2">Listing Basics</div>
-      <Input className="tw-w-full tw-flex tw-mt-3" label="Name" {...register("name")} value={nameValue} />
+      <Input className="tw-w-full tw-flex tw-mt-3" label="Name" {...register("name")} value={watch("name")} />
       <FormError message={errors.name?.message} />
       <TextArea
         className="tw-w-full tw-flex tw-mt-3"
         label="Description"
         {...register("description")}
-        value={descriptionValue}
+        value={watch("description")}
       />
       <FormError message={errors.description?.message} />
       <PriceInput
         className="tw-w-full tw-flex tw-mt-3"
         label="Price"
         {...register("price", { valueAsNumber: true })}
-        value={priceValue}
+        value={watch("price")}
       />
       <FormError message={errors.price?.message} />
       <Controller
@@ -165,7 +157,7 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
             placeholder={"Category"}
             className="tw-w-full tw-flex tw-mt-3"
             label="Category"
-            value={categoryValue}
+            value={watch("category")}
             options={Category.options}
             onChange={field.onChange}
             getElementForDisplay={(value) => toTitleCase(value)}
@@ -193,7 +185,7 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
         className="tw-w-full tw-flex tw-mt-3"
         label="Duration (minutes)"
         {...register("duration", { valueAsNumber: true })}
-        value={durationValue}
+        value={watch("duration")}
       />
       <FormError message={errors.duration?.message} />
       <Input
@@ -201,7 +193,7 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
         className="tw-w-full tw-flex tw-mt-3"
         label="Max Guests"
         {...register("maxGuests", { valueAsNumber: true })}
-        value={maxGuestsValue}
+        value={watch("maxGuests")}
       />
       <FormError message={errors.maxGuests?.message} />
       <Button type="submit" className="tw-mt-6 tw-w-full sm:tw-w-32 tw-h-12 tw-ml-auto" disabled={!isDirty}>
@@ -235,11 +227,11 @@ const Includes: React.FC<{
   return (
     <div className="tw-flex tw-flex-col tw-mt-8">
       <div className="tw-text-xl tw-font-semibold tw-mb-2">Included Amenities</div>
-      <div className="tw-gap-3">
+      <div className="tw-flex tw-flex-col tw-gap-3">
         {fields.map((field, idx) => (
           <div key={field.id} className="last:tw-mb-5">
             <div className="tw-flex tw-items-center">
-              <Input {...register(`includes.${idx}.value`)} />
+              <Input {...register(`includes.${idx}.value`)} value={field.value} />
               <TrashIcon
                 className="tw-h-10 tw-rounded tw-ml-1 tw-p-2 tw-cursor-pointer hover:tw-bg-gray-100"
                 onClick={() => remove(idx)}

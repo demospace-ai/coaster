@@ -8,7 +8,6 @@ import {
   useDismiss,
   useFloating,
   useInteractions,
-  useMergeRefs,
   useRole,
 } from "@floating-ui/react";
 import { Combobox, Listbox, Transition } from "@headlessui/react";
@@ -30,6 +29,7 @@ import { Tooltip } from "src/components/tooltip/Tooltip";
 import { mergeClasses } from "src/utils/twmerge";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+  value: string | number; // Need explicit value prop to display label correctly
   label?: string;
   tooltip?: string;
 }
@@ -730,11 +730,11 @@ export const CountryCodePicker: React.FC<{ currentCode: CountryCode; setCode: (c
   );
 };
 
-export const PriceInput = forwardRef<HTMLInputElement, InputProps>((props, propRef) => {
+export const PriceInput = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
   const { id, disabled, className, label, tooltip, value, ...other } = props;
 
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const mergedRef = useMergeRefs([inputRef, propRef]);
+  useImperativeHandle<HTMLInputElement | null, HTMLInputElement | null>(ref, () => inputRef.current, []);
 
   const preventMinus = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.code === "Minus") {
@@ -775,7 +775,7 @@ export const PriceInput = forwardRef<HTMLInputElement, InputProps>((props, propR
         )}
         <input
           id={id}
-          ref={mergedRef}
+          ref={inputRef}
           type="number"
           value={value ? value : ""}
           className={mergeClasses(

@@ -153,6 +153,7 @@ const EmailCheck: React.FC<{ setStep: (step: LoginStep) => void; setEmail: (emai
   setEmail,
 }) => {
   const {
+    watch,
     handleSubmit,
     register,
     formState: { errors },
@@ -181,7 +182,13 @@ const EmailCheck: React.FC<{ setStep: (step: LoginStep) => void; setEmail: (emai
         }
       })}
     >
-      <Input autoComplete="email" className="tw-w-full tw-flex tw-mt-3" label="Email" {...register("email")} />
+      <Input
+        autoComplete="email"
+        className="tw-w-full tw-flex tw-mt-3"
+        label="Email"
+        {...register("email")}
+        value={watch("email")}
+      />
       <FormError message={errors.email?.message} />
       <Button type="submit" className="tw-w-full tw-bg-[#3673aa] hover:tw-bg-[#396082] tw-h-12 tw-mt-4">
         Submit
@@ -212,9 +219,6 @@ const EmailLoginForm: React.FC<{ reset: () => void; email?: string }> = ({ reset
     resolver: zodResolver(EmailLoginSchema),
   });
 
-  // Needed to display label correctly
-  const emailValue = watch("email");
-
   return (
     <>
       <form
@@ -238,7 +242,7 @@ const EmailLoginForm: React.FC<{ reset: () => void; email?: string }> = ({ reset
           className="tw-w-full tw-flex tw-mt-3"
           label="Email"
           {...register("email")}
-          value={emailValue}
+          value={watch("email")}
         />
         <FormError message={errors.email?.message} />
         <Input
@@ -247,6 +251,7 @@ const EmailLoginForm: React.FC<{ reset: () => void; email?: string }> = ({ reset
           className="tw-w-full tw-flex tw-mt-3"
           label="Password"
           {...register("password")}
+          value={watch("password")}
         />
         <FormError message={errors.password?.message} />
         <Button type="submit" className="tw-w-full tw-bg-[#3673aa] hover:tw-bg-[#396082] tw-h-12 tw-mt-4">
@@ -295,9 +300,6 @@ const EmailSignup: React.FC<{ reset: () => void; email?: string }> = ({ reset, e
     resolver: zodResolver(EmailSignupSchema),
   });
 
-  // Needed to display label correctly
-  const emailValue = watch("email");
-
   return (
     <>
       <form
@@ -326,6 +328,7 @@ const EmailSignup: React.FC<{ reset: () => void; email?: string }> = ({ reset, e
               className="tw-w-full tw-flex tw-mt-3"
               label="First name"
               {...register("firstName")}
+              value={watch("firstName")}
             />
             <FormError className="tw-ml-1" message={errors.firstName?.message} />
           </div>
@@ -335,6 +338,7 @@ const EmailSignup: React.FC<{ reset: () => void; email?: string }> = ({ reset, e
               className="tw-w-full tw-flex tw-mt-3"
               label="Last name"
               {...register("lastName")}
+              value={watch("lastName")}
             />
             <FormError className="tw-ml-1" message={errors.lastName?.message} />
           </div>
@@ -344,7 +348,7 @@ const EmailSignup: React.FC<{ reset: () => void; email?: string }> = ({ reset, e
           className="tw-w-full tw-flex tw-mt-3"
           label="Email"
           {...register("email")}
-          value={emailValue}
+          value={watch("email")}
         />
         <FormError className="tw-ml-1" message={errors.email?.message} />
         <Input
@@ -353,6 +357,7 @@ const EmailSignup: React.FC<{ reset: () => void; email?: string }> = ({ reset, e
           className="tw-w-full tw-flex tw-mt-3"
           label="Password"
           {...register("password")}
+          value={watch("password")}
         />
         <FormError className="tw-ml-1" message={errors.password?.message} />
         <Input
@@ -361,6 +366,7 @@ const EmailSignup: React.FC<{ reset: () => void; email?: string }> = ({ reset, e
           className="tw-w-full tw-flex tw-mt-3"
           label="Confirm Password"
           {...register("confirmPassword")}
+          value={watch("confirmPassword")}
         />
         <FormError className="tw-ml-1" message={errors.confirmPassword?.message} />
         <Button type="submit" className="tw-w-full tw-bg-[#3673aa] hover:tw-bg-[#396082] tw-h-12 tw-mt-4">
@@ -447,9 +453,6 @@ const SendResetForm: React.FC<{ reset: () => void; destination: string }> = ({ r
     resolver: zodResolver(SendResetSchema),
   });
 
-  // Needed to display label correctly
-  const emailValue = watch("email");
-
   if (resetSent) {
     return <div className="tw-text-center">Check your email and follow the instructions there to continue.</div>;
   }
@@ -485,7 +488,7 @@ const SendResetForm: React.FC<{ reset: () => void; destination: string }> = ({ r
           className="tw-w-full tw-flex tw-mt-3"
           label="Email"
           {...register("email")}
-          value={emailValue}
+          value={watch("email")}
         />
         <FormError message={errors.email?.message} />
         <Button type="submit" className="tw-w-full tw-bg-[#3673aa] hover:tw-bg-[#396082] tw-h-12 tw-mt-4">

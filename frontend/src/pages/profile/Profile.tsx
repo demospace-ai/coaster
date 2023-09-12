@@ -60,12 +60,6 @@ export const Profile: React.FC = () => {
     });
   };
 
-  // Needed to display label correctly
-  const first_name = watch("first_name");
-  const last_name = watch("last_name");
-  const email = watch("email");
-  const about = watch("about");
-
   return (
     <div className="tw-flex tw-flex-col tw-items-center tw-h-full tw-bg-slate-200 tw-pt-8 sm:tw-pt-14">
       <form
@@ -109,9 +103,9 @@ export const Profile: React.FC = () => {
             Edit
           </div>
         </div>
-        <Input className="tw-my-1" label="First Name" {...register("first_name")} value={first_name} />
+        <Input className="tw-my-1" label="First Name" {...register("first_name")} value={watch("first_name")} />
         <FormError message={errors.first_name?.message} />
-        <Input className="tw-my-1" label="Last Name" {...register("last_name")} value={last_name} />
+        <Input className="tw-my-1" label="Last Name" {...register("last_name")} value={watch("last_name")} />
         <FormError message={errors.last_name?.message} />
         <Input
           className="tw-my-1"
@@ -119,19 +113,31 @@ export const Profile: React.FC = () => {
           {...register("email")}
           disabled
           tooltip="Contact us at support@trycoaster.com to change your email."
-          value={email}
+          value={watch("email")}
         />
         <FormError message={errors.email?.message} />
-        <Input className="tw-my-1" label="New Password" {...register("password")} type="password" />
+        <Input
+          className="tw-my-1"
+          label="New Password"
+          {...register("password")}
+          type="password"
+          value={watch("password")}
+        />
         <FormError message={errors.password?.message} />
-        <Input className="tw-my-1" label="Confirm Password" {...register("confirm_password")} type="password" />
+        <Input
+          className="tw-my-1"
+          label="Confirm Password"
+          {...register("confirm_password")}
+          type="password"
+          value={watch("confirm_password")}
+        />
         <FormError message={errors.confirm_password?.message} />
         <TextArea
           className="tw-my-1"
           label="About"
           {...register("about")}
           placeholder="Share some facts about yourself!"
-          value={about}
+          value={watch("about")}
         />
         <FormError message={errors.about?.message} />
         <Button type="submit" className="tw-w-full sm:tw-w-fit tw-px-10 tw-py-2 tw-mt-3">

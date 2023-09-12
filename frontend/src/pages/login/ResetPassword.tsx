@@ -36,6 +36,7 @@ export const ResetPassword: React.FC = () => {
   const token = searchParams.get("token");
   const { mutate: mutatePassword, isLoading, error: submitError } = useResetPassword();
   const {
+    watch,
     handleSubmit,
     register,
     formState: { errors },
@@ -74,9 +75,21 @@ export const ResetPassword: React.FC = () => {
           <img src={longlogo} className="tw-h-8 tw-select-none tw-mb-4" alt="coaster logo" />
           <form className="tw-flex tw-flex-col tw-items-center tw-my-2 tw-w-full" onSubmit={handleSubmit(onSubmit)}>
             <div className="tw-text-xl tw-font-semibold tw-text-center tw-mb-2">Reset Password</div>
-            <Input className="tw-my-1" label="New Password" {...register("password")} type="password" />
+            <Input
+              className="tw-my-1"
+              label="New Password"
+              {...register("password")}
+              type="password"
+              value={watch("password")}
+            />
             <FormError message={errors.password?.message} />
-            <Input className="tw-my-1" label="Confirm Password" {...register("confirm_password")} type="password" />
+            <Input
+              className="tw-my-1"
+              label="Confirm Password"
+              {...register("confirm_password")}
+              type="password"
+              value={watch("confirm_password")}
+            />
             <FormError message={errors.confirm_password?.message} />
             <Button type="submit" className="tw-w-full tw-bg-[#3673aa] hover:tw-bg-[#396082] tw-px-10 tw-h-12 tw-mt-4">
               {isLoading ? <Loading /> : "Submit"}
