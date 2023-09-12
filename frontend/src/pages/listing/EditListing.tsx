@@ -60,14 +60,18 @@ export const EditListing: React.FC = () => {
   return (
     <div className="tw-flex tw-flex-col tw-w-full tw-justify-center tw-items-center tw-px-4 sm:tw-px-20 tw-py-4 sm:tw-py-12">
       <BackButton className="tw-mr-auto tw-mb-4" />
-      <div className="tw-flex tw-w-full tw-max-w-lg tw-justify-between tw-items-center">
-        <div className="tw-font-semibold sm:tw-font-bold tw-text-3xl sm:tw-text-4xl tw-hyphens-auto">Edit Listing</div>
-        <NavLink className="tw-flex tw-items-center tw-gap-1 tw-text-blue-600" to={`/listings/${listingID}`}>
-          See preview
-          <EyeIcon className="tw-h-4" />
-        </NavLink>
+      <div className="tw-flex tw-flex-col tw-w-full tw-max-w-2xl">
+        <div className="tw-flex tw-w-full tw-justify-between tw-items-center">
+          <div className="tw-font-semibold sm:tw-font-bold tw-text-3xl sm:tw-text-4xl tw-hyphens-auto">
+            Edit Listing
+          </div>
+          <NavLink className="tw-flex tw-items-center tw-gap-1 tw-text-blue-600" to={`/listings/${listingID}`}>
+            See preview
+            <EyeIcon className="tw-h-4" />
+          </NavLink>
+        </div>
+        <EditListingForm listing={listing} />
       </div>
-      <EditListingForm listing={listing} />
     </div>
   );
 };
@@ -135,7 +139,8 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
   };
 
   return (
-    <form className="tw-mt-4 tw-mb-10 tw-w-full tw-max-w-lg" onSubmit={handleSubmit(updateListing)}>
+    <form className="tw-mt-4 tw-mb-10 tw-w-full" onSubmit={handleSubmit(updateListing)}>
+      <div className="tw-text-xl tw-font-semibold tw-mb-2">Listing Basics</div>
       <Input className="tw-w-full tw-flex tw-mt-3" label="Name" {...register("name")} value={nameValue} />
       <FormError message={errors.name?.message} />
       <TextArea
@@ -186,7 +191,7 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
       <Input
         type="number"
         className="tw-w-full tw-flex tw-mt-3"
-        label="Duration"
+        label="Duration (minutes)"
         {...register("duration", { valueAsNumber: true })}
         value={durationValue}
       />
@@ -199,9 +204,17 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
         value={maxGuestsValue}
       />
       <FormError message={errors.maxGuests?.message} />
+      <Button type="submit" className="tw-mt-6 tw-w-full sm:tw-w-32 tw-h-12 tw-ml-auto" disabled={!isDirty}>
+        {isSubmitting ? <Loading /> : "Save"}
+      </Button>
+      <FormError message={errors.root?.message} />
       <Includes register={register} control={control} errors={errors} />
+      <Button type="submit" className="tw-mt-6 tw-w-full sm:tw-w-32 tw-h-12 tw-ml-auto" disabled={!isDirty}>
+        {isSubmitting ? <Loading /> : "Save"}
+      </Button>
+      <FormError message={errors.root?.message} />
       <Images listing={listing} />
-      <Button type="submit" className="tw-mt-3 tw-w-full sm:tw-w-32 tw-h-12 tw-ml-auto" disabled={!isDirty}>
+      <Button type="submit" className="tw-mt-6 tw-w-full sm:tw-w-32 tw-h-12 tw-ml-auto" disabled={!isDirty}>
         {isSubmitting ? <Loading /> : "Save"}
       </Button>
       <FormError message={errors.root?.message} />
@@ -220,22 +233,24 @@ const Includes: React.FC<{
   });
 
   return (
-    <div className="tw-flex tw-flex-col tw-mt-5 tw-gap-3">
+    <div className="tw-flex tw-flex-col tw-mt-8">
       <div className="tw-text-xl tw-font-semibold tw-mb-2">Included Amenities</div>
-      {fields.map((field, idx) => (
-        <div key={field.id}>
-          <div className="tw-flex tw-items-center">
-            <Input {...register(`includes.${idx}.value`)} />
-            <TrashIcon
-              className="tw-h-10 tw-rounded tw-ml-1 tw-p-2 tw-cursor-pointer hover:tw-bg-gray-100"
-              onClick={() => remove(idx)}
-            />
+      <div className="tw-gap-3">
+        {fields.map((field, idx) => (
+          <div key={field.id} className="last:tw-mb-5">
+            <div className="tw-flex tw-items-center">
+              <Input {...register(`includes.${idx}.value`)} />
+              <TrashIcon
+                className="tw-h-10 tw-rounded tw-ml-1 tw-p-2 tw-cursor-pointer hover:tw-bg-gray-100"
+                onClick={() => remove(idx)}
+              />
+            </div>
+            <FormError message={errors.includes?.[idx]?.value?.message} />
           </div>
-          <FormError message={errors.includes?.[idx]?.value?.message} />
-        </div>
-      ))}
+        ))}
+      </div>
       <Button
-        className="tw-flex tw-items-center tw-justify-center tw-bg-white hover:tw-bg-slate-100 tw-text-black tw-font-medium tw-border tw-border-solid tw-border-black tw-py-2 tw-mt-2"
+        className="tw-flex tw-items-center tw-justify-center tw-bg-white hover:tw-bg-slate-100 tw-text-black tw-font-medium tw-border tw-border-solid tw-border-black tw-py-2"
         onClick={() => {
           append({ value: "" });
         }}
@@ -316,9 +331,12 @@ const ImagesInner: React.FC<{ listing: Listing }> = ({ listing }) => {
 
   const [, drop] = useDrop(() => ({ accept: "card" }));
   return (
-    <div>
-      <div className="tw-text-xl tw-font-semibold tw-mt-4">Images</div>
-      <div ref={drop} className="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-mt-3 tw-gap-2">
+    <div className="tw-mt-8">
+      <div className="tw-text-xl tw-font-semibold">Images</div>
+      <div
+        ref={drop}
+        className="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-mt-3 tw-gap-4 sm:tw-gap-8 tw-justify-items-center"
+      >
         {images.map((image) => (
           <Card
             key={image.id}
@@ -326,10 +344,10 @@ const ImagesInner: React.FC<{ listing: Listing }> = ({ listing }) => {
             moveCard={moveCard}
             findCard={findCard}
             onDrop={updateImages}
-            className="tw-relative"
+            className="tw-relative tw-w-fit"
           >
             <img
-              className="tw-aspect-square sm:tw-h-64 tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-transition-all tw-duration-100 tw-rounded-lg tw-cursor-grab"
+              className="tw-aspect-square tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-transition-all tw-duration-100 tw-rounded-lg tw-cursor-grab"
               src={listing.images.length > 0 ? getGcsImageUrl(image) : "TODO"}
             />
             <XMarkIcon
@@ -342,7 +360,7 @@ const ImagesInner: React.FC<{ listing: Listing }> = ({ listing }) => {
           </Card>
         ))}
         <div
-          className="tw-group tw-aspect-square sm:tw-h-64 tw-bg-gray-100 tw-rounded-lg tw-cursor-pointer tw-flex tw-justify-center tw-items-center"
+          className="tw-group tw-aspect-square tw-w-full tw-bg-gray-100 tw-rounded-lg tw-cursor-pointer tw-flex tw-justify-center tw-items-center"
           onClick={() => newImageRef.current?.click()}
         >
           <input ref={newImageRef} type="file" className="tw-hidden tw-invisible" onChange={addImage} />
