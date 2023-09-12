@@ -110,7 +110,7 @@ const ListingDetails: React.FC<{ listing: ListingType }> = ({ listing }) => {
       <HostOverview listing={listing} />
       <QuickInfo listing={listing} />
       <Description listing={listing} />
-      <Included listing={listing} />
+      {listing.includes && listing.includes.length > 0 && <Included listing={listing} />}
       <HostDetails listing={listing} />
     </div>
   );
@@ -185,7 +185,7 @@ const QuickInfo: React.FC<{ listing: ListingType }> = ({ listing }) => {
   const maxGuests = getMaxGuests(listing);
 
   return (
-    <div className="tw-border-b tw-border-solid tw-border-gray-300 tw-mt-6">
+    <div className="tw-border-b tw-border-solid tw-border-gray-300 tw-mt-6 tw-pb-2">
       <div className="tw-flex tw-items-center tw-mb-6">
         <StarIcon className="tw-h-6 tw-mr-4" />
         <div className="tw-flex tw-flex-col">

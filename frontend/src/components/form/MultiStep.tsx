@@ -1,7 +1,7 @@
 import { CheckCircleIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ReactElement, useCallback, useState } from "react";
-import { FieldError, UseFormHandleSubmit, useForm } from "react-hook-form";
+import { FieldError, FieldValues, UseFormHandleSubmit, useForm } from "react-hook-form";
 import { toTitleCase } from "src/utils/string";
 import { mergeClasses } from "src/utils/twmerge";
 import { ZodEnum, ZodString, z } from "zod";
@@ -125,29 +125,23 @@ export type StepParams = {
 
 type InputProps = {
   schema: ZodString;
-  onChange?: (data: string) => void;
-  onSubmit?: (data: string) => Promise<SubmitResult>;
+  onChange?: (data: { value: string }) => void;
+  onSubmit?: (data: { value: string }) => Promise<SubmitResult>;
   existingData?: string;
   placeholder?: string;
 };
 
-export const InputStep: React.FC<StepParams & InputProps> = ({
-  id,
-  schema,
-  existingData,
-  onChange,
-  onSubmit,
-  renderLayout,
-}) => {
+export const InputStep: React.FC<StepParams & InputProps> = ({ id, schema, existingData, onSubmit, renderLayout }) => {
   const formSchema = z.object({
     value: schema,
   });
+  type formSchemaType = z.infer<typeof formSchema>;
   const {
     handleSubmit,
     clearErrors,
     register,
     formState: { errors, isValid },
-  } = useForm<{ value: string }>({
+  } = useForm<formSchemaType>({
     mode: "onBlur",
     defaultValues: { value: existingData },
     resolver: zodResolver(formSchema),
@@ -176,19 +170,19 @@ export const TextAreaStep: React.FC<StepParams & InputProps> = ({
   id,
   schema,
   existingData,
-  onChange,
   onSubmit,
   renderLayout,
 }) => {
   const formSchema = z.object({
     value: schema,
   });
+  type formSchemaType = z.infer<typeof formSchema>;
   const {
     handleSubmit,
     clearErrors,
     register,
     formState: { errors, isValid },
-  } = useForm<{ value: string }>({
+  } = useForm<formSchemaType>({
     mode: "onBlur",
     defaultValues: { value: existingData },
     resolver: zodResolver(formSchema),
@@ -285,20 +279,20 @@ export const ErrorMessage: React.FC<{ error: FieldError | undefined }> = ({ erro
 };
 
 // Convenience function to ensure a remote caller of onSubmit can await the result of the function
-export const wrapHandleSubmit = (
-  handleSubmit: UseFormHandleSubmit<{ value: any }>,
-  onSubmit: (data: any) => Promise<SubmitResult>,
-) => {
+export function wrapHandleSubmit<T extends FieldValues>(
+  handleSubmit: UseFormHandleSubmit<T>,
+  onSubmit: (data: T) => Promise<SubmitResult>,
+) {
   return async () => {
     let result = { success: true };
     await handleSubmit(async (data) => {
-      const innerResult = await onSubmit(data.value);
+      const innerResult = await onSubmit(data);
       result = { ...innerResult };
     })();
 
     return result;
   };
-};
+}
 
 export const wrapSubmit = (value: any, isValid: boolean, onSubmit: (data: any) => Promise<SubmitResult>) => {
   return async () => {

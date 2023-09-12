@@ -1,8 +1,8 @@
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import { EyeIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormEvent, useCallback, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   ErrorMessage,
   InputStep,
@@ -14,14 +14,21 @@ import {
   wrapHandleSubmit,
 } from "src/components/form/MultiStep";
 import mapPreview from "src/components/images/map-preview.webp";
-import { PriceInput } from "src/components/input/Input";
+import { Input, PriceInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { InlineMapSearch, MapComponent, MapsWrapper } from "src/components/maps/Maps";
-import { CategorySchema, DescriptionSchema, NameSchema, PriceSchema } from "src/pages/listing/schema";
+import {
+  CategorySchema,
+  DescriptionSchema,
+  DurationSchema,
+  MaxGuestsSchema,
+  NameSchema,
+  PriceSchema,
+} from "src/pages/listing/schema";
 import { sendRequest } from "src/rpc/ajax";
 import { AddListingImage, GetDraftListing, GetListing } from "src/rpc/api";
 import { createListing, updateListing, useDraftListing, useDraftListingOnce, useUpdateListing } from "src/rpc/data";
-import { CategoryType, Coordinates, Listing, ListingStatus } from "src/rpc/types";
+import { CategoryType, Coordinates, Listing, ListingInput, ListingStatus } from "src/rpc/types";
 import { getGcsImageUrl } from "src/utils/images";
 import { mutate } from "swr";
 import { z } from "zod";
@@ -60,6 +67,12 @@ export const NewListing: React.FC = () => {
             subtitle: "Show off your trip with at least three images.",
           },
           { id: "price", elementFn: priceStep, title: "Set a price", subtitle: "You can change it anytime." },
+          {
+            id: "details",
+            elementFn: detailsStep,
+            title: "Provide a few final details",
+            subtitle: "Let your guests know what to expect.",
+          },
           {
             id: "review",
             elementFn: reviewStep,
@@ -107,6 +120,15 @@ const priceStep = (params: StepParams) => {
   return <PriceStep {...params} listing={listing} />;
 };
 
+const detailsStep = (params: StepParams) => {
+  const { listing } = useDraftListing();
+  if (!listing) {
+    return <Loading />;
+  }
+
+  return <DetailsStep {...params} listing={listing} />;
+};
+
 const nameStep = (params: StepParams) => {
   const { listing } = useDraftListing();
   if (!listing) {
@@ -118,12 +140,12 @@ const nameStep = (params: StepParams) => {
       {...params}
       schema={NameSchema}
       existingData={listing.name}
-      onSubmit={async (data: string) => {
-        if (data === listing.name) {
+      onSubmit={async (data: { value: string }) => {
+        if (data.value === listing.name) {
           // No API call needed if previous value was the same
           return { success: true };
         }
-        return updateListing(listing.id, { name: data });
+        return updateListing(listing.id, { name: data.value });
       }}
     />
   );
@@ -140,12 +162,12 @@ const descriptionStep = (params: StepParams) => {
       {...params}
       schema={DescriptionSchema}
       existingData={listing.description}
-      onSubmit={async (data: string) => {
-        if (data === listing.description) {
+      onSubmit={async (data: { value: string }) => {
+        if (data.value === listing.description) {
           // No API call needed if previous value was the same
           return { success: true };
         }
-        return updateListing(listing.id, { description: data });
+        return updateListing(listing.id, { description: data.value });
       }}
     />
   );
@@ -197,7 +219,7 @@ const reviewStep = (params: StepParams) => {
     true,
     () => (
       <div className="tw-flex tw-flex-col tw-items-center tw-pb-6">
-        <div className="tw-p-8 tw-shadow-centered-md tw-rounded-xl tw-w-96">
+        <div className="tw-p-8 tw-shadow-centered-md tw-rounded-xl tw-w-full sm:tw-w-96">
           <img
             src={getGcsImageUrl(listing.images[0])}
             alt="preview-cover"
@@ -206,6 +228,13 @@ const reviewStep = (params: StepParams) => {
           <div className="tw-mt-4 tw-font-bold tw-text-xl">{listing.name}</div>
           <div className="tw-mt-1 tw-font-medium">{listing.location}</div>
           <div className="tw-mt-1">${listing.price} / person</div>
+          <NavLink
+            className="tw-flex tw-w-fit tw-items-center tw-gap-1 tw-mt-1 tw-text-blue-600"
+            to={`/listings/${listing.id}`}
+          >
+            See full preview
+            <EyeIcon className="tw-h-4" />
+          </NavLink>
         </div>
       </div>
     ),
@@ -247,24 +276,25 @@ const PriceStep: React.FC<StepParams & PriceParams> = ({ listing, renderLayout }
   const formSchema = z.object({
     value: PriceSchema,
   });
+  type formSchemaType = z.infer<typeof formSchema>;
   const {
     watch,
     handleSubmit,
     register,
     formState: { errors, isValid },
-  } = useForm<{ value: number }>({
+  } = useForm<formSchemaType>({
     mode: "onBlur",
     defaultValues: { value: listing.price },
     resolver: zodResolver(formSchema),
   });
 
   // TODO: do we want to update on change too?
-  const updatePrice = async (data: number) => {
-    if (data === listing.price) {
+  const updatePrice = async (data: { value: number }) => {
+    if (data.value === listing.price) {
       // No API call needed if previous value was the same
       return { success: true };
     }
-    return updateListing(listing.id, { price: data });
+    return updateListing(listing.id, { price: data.value });
   };
 
   return renderLayout(
@@ -334,6 +364,72 @@ const ImageStep: React.FC<StepParams & ImageParams> = ({ renderLayout, listing }
   ));
 };
 
+type DetailsParams = {
+  listing: Listing;
+};
+
+const DetailsStep: React.FC<StepParams & DetailsParams> = ({ listing, renderLayout }) => {
+  const formSchema = z.object({
+    duration: DurationSchema,
+    maxGuests: MaxGuestsSchema,
+  });
+  type formSchemaType = z.infer<typeof formSchema>;
+  const {
+    watch,
+    handleSubmit,
+    register,
+    formState: { errors, isValid },
+  } = useForm<formSchemaType>({
+    mode: "onBlur",
+    defaultValues: { duration: listing.duration_minutes, maxGuests: listing.max_guests },
+    resolver: zodResolver(formSchema),
+  });
+
+  // TODO: do we want to update on change too?
+  const updateDetails = async (data: formSchemaType) => {
+    if (data.duration === listing.duration_minutes && data.maxGuests === listing.max_guests) {
+      // No API call needed if previous value was the same
+      return { success: true };
+    }
+
+    const payload: ListingInput = {};
+    if (data.duration !== listing.duration_minutes) {
+      payload.duration_minutes = data.duration;
+    }
+
+    if (data.maxGuests !== listing.max_guests) {
+      payload.max_guests = data.maxGuests;
+    }
+
+    return updateListing(listing.id, payload);
+  };
+
+  return renderLayout(
+    isValid,
+    () => (
+      <div className="tw-flex tw-flex-col tw-items-center tw-mb-6 tw-gap-1 tw-mx-0.5">
+        <Input
+          label="Duration (minutes)"
+          type="number"
+          className=""
+          {...register("duration", { valueAsNumber: true })}
+          value={watch("duration")}
+        />
+        <ErrorMessage error={errors.duration} />
+        <Input
+          label="Max Guests"
+          type="number"
+          className=""
+          {...register("maxGuests", { valueAsNumber: true })}
+          value={watch("maxGuests")}
+        />
+        <ErrorMessage error={errors.duration} />
+      </div>
+    ),
+    wrapHandleSubmit(handleSubmit, updateDetails),
+  );
+};
+
 const computeStepNumber = (listing: Listing | undefined): number => {
   if (!listing) {
     return 0;
@@ -357,5 +453,8 @@ const computeStepNumber = (listing: Listing | undefined): number => {
   if (!listing.price) {
     return 5;
   }
-  return 6;
+  if (!listing.duration_minutes || !listing.max_guests) {
+    return 6;
+  }
+  return 7;
 };
