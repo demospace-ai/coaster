@@ -49,7 +49,7 @@ export const ResetPassword: React.FC = () => {
   useEffect(() => {
     let ignore = false;
     if (isAuthenticated && !ignore) {
-      navigate("/" + destination);
+      navigate("/" + decodeURIComponent(destination));
     }
 
     return () => {

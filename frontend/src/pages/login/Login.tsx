@@ -36,7 +36,7 @@ export const Login: React.FC<{ create?: boolean }> = ({ create }) => {
   useEffect(() => {
     let ignore = false;
     if (isAuthenticated && !ignore) {
-      navigate("/" + destination);
+      navigate("/" + decodeURIComponent(destination));
     }
 
     return () => {
@@ -413,7 +413,6 @@ export const Unauthorized: React.FC = () => {
           <img src={longlogo} className="tw-h-8 tw-mb-4" alt="coaster logo" />
           <div className="tw-text-center tw-my-2">
             <div className="tw-flex tw-flex-col tw-justify-center">
-              <div>Something went wrong.</div>
               <div className="tw-mt-4">
                 <NavLink className="tw-text-blue-500" to="/signup">
                   Try again

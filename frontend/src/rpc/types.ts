@@ -151,5 +151,6 @@ export const Category = z.enum([
   "boating",
   "diving",
   "outdoors",
+  "safari",
 ]);
 export type CategoryType = z.infer<typeof Category>;

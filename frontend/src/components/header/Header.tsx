@@ -184,18 +184,20 @@ const SignedInMenu: React.FC = () => {
 };
 
 const SignedOutMenu: React.FC = () => {
+  const location = useLocation();
   const navigate = useNavigate();
+  const currentPath = encodeURIComponent(location.pathname.substring(1) + location.search);
   const buttonStyle =
     "tw-flex tw-justify-center tw-py-2 tw-w-28 tw-cursor-pointer tw-select-none tw-whitespace-nowrap tw-rounded-3xl sm:tw-font-semibold tw-text-base tw-bg-gray-100 hover:tw-bg-gray-200";
   return (
     <div className="tw-flex tw-gap-3">
       <div
         className={mergeClasses(buttonStyle, "tw-text-white tw-bg-gray-900 hover:tw-bg-gray-800")}
-        onClick={() => navigate("/signup")}
+        onClick={() => navigate(`/signup?destination=${currentPath}`)}
       >
         Sign up
       </div>
-      <div className={buttonStyle} onClick={() => navigate("/login")}>
+      <div className={buttonStyle} onClick={() => navigate(`/login?destination=${currentPath}`)}>
         Log in
       </div>
     </div>
