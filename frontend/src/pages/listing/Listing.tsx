@@ -17,7 +17,6 @@ import { Modal } from "src/components/modal/Modal";
 import { useShowToast } from "src/components/notifications/Notifications";
 import { useListing } from "src/rpc/data";
 import { ListingStatus, Listing as ListingType } from "src/rpc/types";
-import { useDebounce } from "src/utils/debounce";
 import { getGcsImageUrl } from "src/utils/images";
 import { toTitleCase } from "src/utils/string";
 import useWindowDimensions from "src/utils/window";
@@ -262,13 +261,13 @@ const ImagesModal: React.FC<{ listing: ListingType; imageIndex: number; setImage
     }
   }, [imageIndex]);
 
-  const handleScroll = useDebounce(() => {
+  const handleScroll = useCallback(() => {
     if (carouselRef.current) {
       const newIndex = Math.round(carouselRef.current.scrollLeft / width);
       setImageIndex(newIndex);
       setScrolledToIndex(newIndex);
     }
-  }, 100);
+  }, []);
 
   const scrollForward = () => {
     const newIndex = (imageIndex + 1) % listing.images.length;
@@ -300,6 +299,14 @@ const ImagesModal: React.FC<{ listing: ListingType; imageIndex: number; setImage
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
+  // Use effect to attach to the scrollend event rather than just every scroll
+  useEffect(() => {
+    if (carouselRef.current) {
+      carouselRef.current.addEventListener("scrollend", handleScroll);
+    }
+    return () => carouselRef.current?.removeEventListener("scrollend", handleScroll);
+  }, [carouselRef, handleScroll]);
+
   return (
     <div>
       <div className="tw-absolute tw-top-1/2 -tw-translate-y-1/2 tw-w-full tw-z-10">
@@ -325,7 +332,7 @@ const ImagesModal: React.FC<{ listing: ListingType; imageIndex: number; setImage
       <div
         ref={carouselRef}
         className="tw-absolute tw-left-1/2 -tw-translate-x-1/2 tw-flex tw-pt-[10vh] tw-h-[90vh] tw-w-screen sm:tw-w-[90vw] tw-overflow-x-auto tw-snap-mandatory tw-snap-x tw-items-center tw-hide-scrollbar"
-        onScroll={handleScroll}
+        // onScroll={handleScroll}
       >
         {listing.images.map((image) => (
           <div key={image.id} className="tw-flex tw-basis-full tw-snap-center tw-h-full">
