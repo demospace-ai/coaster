@@ -27,17 +27,16 @@ import {
 } from "src/pages/listing/schema";
 import { sendRequest } from "src/rpc/ajax";
 import { AddListingImage, GetDraftListing, GetListing } from "src/rpc/api";
-import { createListing, updateListing, useDraftListing, useDraftListingOnce, useUpdateListing } from "src/rpc/data";
+import { createListing, updateListing, useDraftListing, useUpdateListing } from "src/rpc/data";
 import { CategoryType, Coordinates, Listing, ListingInput, ListingStatus } from "src/rpc/types";
 import { getGcsImageUrl } from "src/utils/images";
 import { mutate } from "swr";
 import { z } from "zod";
 
 export const NewListing: React.FC = () => {
-  // only fetch it once to avoid re-rendering the entire multi-step form since we only use this for the intial step
-  const { listing, loading } = useDraftListingOnce();
+  const { listing, loading } = useDraftListing();
   const navigate = useNavigate();
-  const initialStep = computeStepNumber(listing);
+  const initialStep = computeInitialStep(listing);
   const multiStep = useMemo(
     () => (
       <MultiStep
@@ -82,7 +81,7 @@ export const NewListing: React.FC = () => {
         ]}
       />
     ),
-    [listing],
+    [initialStep, navigate],
   );
 
   if (loading) {
@@ -430,11 +429,10 @@ const DetailsStep: React.FC<StepParams & DetailsParams> = ({ listing, renderLayo
   );
 };
 
-const computeStepNumber = (listing: Listing | undefined): number => {
+const computeInitialStep = (listing: Listing | undefined): number => {
   if (!listing) {
     return 0;
   }
-
   if (!listing.category) {
     return 0;
   }
@@ -456,5 +454,6 @@ const computeStepNumber = (listing: Listing | undefined): number => {
   if (!listing.duration_minutes || !listing.max_guests) {
     return 6;
   }
+
   return 7;
 };

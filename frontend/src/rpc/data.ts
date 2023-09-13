@@ -16,7 +16,6 @@ import { Listing, ListingInput, ResetPasswordRequest, User, UserUpdates } from "
 import { forceErrorMessage } from "src/utils/errors";
 import { Mutation, useMutation } from "src/utils/queryHelpers";
 import useSWR, { Fetcher, SWRConfiguration, mutate } from "swr";
-import useSWRImmutable from "swr/immutable";
 
 export function useListing(listingID: number | undefined) {
   const shouldFetch = listingID;
@@ -39,12 +38,6 @@ export function useDraftListing(opts?: SWRConfiguration) {
   const fetcher: Fetcher<Listing, {}> = () => sendRequest(GetDraftListing);
   const { data, mutate, error, isLoading } = useSWR({ GetDraftListing }, fetcher, opts);
   return { listing: data, mutate, error, loading: isLoading };
-}
-
-export function useDraftListingOnce(opts?: SWRConfiguration) {
-  const fetcher: Fetcher<Listing, {}> = () => sendRequest(GetDraftListing);
-  const { data, error, isLoading } = useSWRImmutable({ GetDraftListing, immutable: true }, fetcher, opts);
-  return { listing: data, loading: isLoading, error };
 }
 
 export function useSearch(location: string | undefined) {
