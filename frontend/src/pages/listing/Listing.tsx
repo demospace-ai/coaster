@@ -319,9 +319,6 @@ const ImagesModal: React.FC<{ listing: ListingType; initialIndex?: number }> = (
                 src={getGcsImageUrl(image)}
                 onClick={(e) => {
                   e.stopPropagation();
-                  const newIndex = (imageIndex + 1) % listing.images.length;
-                  setImageIndex(newIndex);
-                  carouselRef.current?.scrollTo({ left: width * newIndex, behavior: "smooth" });
                 }}
               />
             </div>
