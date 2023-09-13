@@ -12,6 +12,15 @@
     margin: 0;
     -webkit-appearance: none;
   }
+
+  .tw-hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .tw-hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 :root {

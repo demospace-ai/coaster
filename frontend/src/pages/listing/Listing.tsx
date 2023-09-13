@@ -1,14 +1,17 @@
 import { CheckBadgeIcon } from "@heroicons/react/20/solid";
 import { ArrowUpOnSquareIcon, ClockIcon, GlobeAltIcon, StarIcon, UserGroupIcon } from "@heroicons/react/24/outline";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { BackButton, LinkButton } from "src/components/button/Button";
 import { Callout } from "src/components/callouts/Callout";
 import { Loading } from "src/components/loading/Loading";
+import { Modal } from "src/components/modal/Modal";
 import { useShowToast } from "src/components/notifications/Notifications";
 import { useListing } from "src/rpc/data";
 import { ListingStatus, Listing as ListingType } from "src/rpc/types";
 import { getGcsImageUrl } from "src/utils/images";
 import { toTitleCase } from "src/utils/string";
+import useWindowDimensions from "src/utils/window";
 
 export const Listing: React.FC = () => {
   const { listingID } = useParams<{ listingID: string }>();
@@ -234,13 +237,88 @@ const HostOverview: React.FC<{ listing: ListingType }> = ({ listing }) => {
   );
 };
 
+const ImagesModal: React.FC<{ listing: ListingType; initialIndex?: number }> = ({ listing, initialIndex }) => {
+  const { width } = useWindowDimensions();
+  const [imageIndex, setImageIndex] = useState(initialIndex ? initialIndex : 0);
+  const carouselRef = useRef<HTMLDivElement>(null);
+
+  const handleScroll = useCallback(() => {
+    if (carouselRef.current) {
+      setImageIndex(Math.round(carouselRef.current.scrollLeft / width));
+    }
+  }, []);
+
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      let indexChange: number;
+      if (event.key === "ArrowRight") {
+        indexChange = 1;
+      } else if (event.key === "ArrowLeft") {
+        indexChange = -1;
+      } else {
+        return;
+      }
+      if (carouselRef.current) {
+        const newIndex = (imageIndex + indexChange) % listing.images.length;
+        setImageIndex(newIndex);
+        carouselRef.current.scrollTo({ left: width * newIndex, behavior: "smooth" });
+      }
+    },
+    [imageIndex],
+  );
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
+
+  return (
+    <div
+      ref={carouselRef}
+      className="tw-absolute tw-left-1/2 -tw-translate-x-1/2 tw-flex tw-pt-[10vh] tw-h-[90vh] tw-w-[90vw] tw-overflow-x-auto tw-snap-mandatory tw-snap-x tw-items-center tw-hide-scrollbar"
+      onScroll={handleScroll}
+    >
+      {listing.images.map((image) => (
+        <div key={image.id} className="tw-flex tw-basis-full tw-snap-center tw-h-full">
+          <div className="tw-flex tw-w-[90vw] tw-px-10 tw-h-full tw-justify-center tw-items-center">
+            <img
+              className="tw-flex tw-max-h-full tw-object-contain tw-cursor-pointer tw-rounded-xl tw-overflow-hidden"
+              src={getGcsImageUrl(image)}
+              onClick={(e) => {
+                e.stopPropagation();
+                const newIndex = (imageIndex + 1) % listing.images.length;
+                setImageIndex(newIndex);
+                carouselRef.current?.scrollTo({ left: width * newIndex, behavior: "smooth" });
+              }}
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) => {
+  const [showImages, setShowImages] = useState(false);
+
   return (
     <div className="tw-flex tw-max-h-[50vh] tw-min-h-[50vh] tw-rounded-xl tw-overflow-clip">
+      <Modal
+        show={showImages}
+        close={() => {
+          setShowImages(false);
+        }}
+        clickToEscape={true}
+        noContainer
+        darkBackground
+      >
+        <ImagesModal listing={listing} />
+      </Modal>
       <div className="tw-flex tw-w-full sm:tw-w-3/4 sm:tw-mr-2">
         <img
           className="tw-w-full tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
           src={listing.images.length > 0 ? getGcsImageUrl(listing.images[0]) : "TODO"}
+          onClick={() => setShowImages(true)}
         />
       </div>
       <div className="tw-flex-col tw-w-1/4 tw-gap-2 tw-hidden sm:tw-flex">
