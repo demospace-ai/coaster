@@ -736,8 +736,8 @@ export const PriceInput = forwardRef<HTMLInputElement, InputProps>((props, ref) 
   const inputRef = useRef<HTMLInputElement | null>(null);
   useImperativeHandle<HTMLInputElement | null, HTMLInputElement | null>(ref, () => inputRef.current, []);
 
-  const preventMinus = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.code === "Minus") {
+  const preventMinusAndPeriod = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.code === "Minus" || e.code === "Period") {
       e.preventDefault();
     }
   };
@@ -782,7 +782,7 @@ export const PriceInput = forwardRef<HTMLInputElement, InputProps>((props, ref) 
             "tw-flex tw-h-full tw-top-0 tw-right-0 tw-bg-transparent tw-absolute tw-text-right tw-text-inherit tw-py-4 tw-px-3 tw-w-full tw-outline-0 tw-hide-number-wheel",
             label && "tw-mt-2 -tw-mb-2",
           )}
-          onKeyDown={preventMinus}
+          onKeyDown={preventMinusAndPeriod}
           {...other}
         />
       </div>
