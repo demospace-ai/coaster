@@ -43,7 +43,7 @@ func (s ApiService) DeleteListingImage(auth auth.Authentication, w http.Response
 	// No need to update rank of other listings since the order stays the same
 	listingImage, err := listings.LoadListingImage(s.db, listingID, imageID)
 	if err != nil {
-		return errors.Wrapf(err, "(api.DeleteListingImage) loading images for listing %d", listingID)
+		return errors.Wrapf(err, "(api.DeleteListingImage) loading image for listing %d", listingID)
 	}
 
 	// TODO: do this transactionally or figure out something to handle failures

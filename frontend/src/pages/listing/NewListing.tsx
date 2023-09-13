@@ -1,8 +1,12 @@
 import { EyeIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FormEvent, useCallback, useMemo, useRef } from "react";
+import update from "immutability-helper";
+import { FormEvent, useCallback, useMemo, useRef, useState } from "react";
+import { DndProvider, useDrop } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import { useForm } from "react-hook-form";
 import { NavLink, useNavigate } from "react-router-dom";
+import { Card } from "src/components/dnd/DragAndDrop";
 import {
   ErrorMessage,
   InputStep,
@@ -26,7 +30,7 @@ import {
   PriceSchema,
 } from "src/pages/listing/schema";
 import { sendRequest } from "src/rpc/ajax";
-import { AddListingImage, GetDraftListing, GetListing } from "src/rpc/api";
+import { AddListingImage, DeleteListingImage, GetDraftListing, GetListing, UpdateListingImages } from "src/rpc/api";
 import { createListing, updateListing, useDraftListing, useUpdateListing } from "src/rpc/data";
 import { CategoryType, Coordinates, Listing, ListingInput, ListingStatus } from "src/rpc/types";
 import { getGcsImageUrl } from "src/utils/images";
@@ -205,7 +209,11 @@ const imageStep = (params: StepParams) => {
     return <Loading />;
   }
 
-  return <ImageStep key={JSON.stringify(listing.images)} {...params} listing={listing} />;
+  return (
+    <DndProvider backend={HTML5Backend}>
+      <ImageStep key={JSON.stringify(listing.images)} {...params} listing={listing} />
+    </DndProvider>
+  );
 };
 
 const reviewStep = (params: StepParams) => {
@@ -320,8 +328,48 @@ const ImageStep: React.FC<StepParams & ImageParams> = ({ renderLayout, listing }
   const ref = useRef<HTMLInputElement | null>(null);
   const isValid = listing.images && listing.images.length > 2;
   const listingID = listing.id;
+  const [images, setImages] = useState(listing.images);
 
   // TODO: validate size and type of file on frontend
+
+  const findCard = useCallback(
+    (id: string) => {
+      const image = images.filter((image) => `${image.id}` === id)[0];
+      return {
+        image,
+        index: images.indexOf(image),
+      };
+    },
+    [images],
+  );
+
+  const moveCard = useCallback(
+    (id: string, atIndex: number) => {
+      const { image, index } = findCard(id);
+      setImages(
+        update(images, {
+          $splice: [
+            [index, 1],
+            [atIndex, 0, image],
+          ],
+        }),
+      );
+    },
+    [findCard, images, setImages],
+  );
+
+  const [, drop] = useDrop(() => ({ accept: "card" }));
+
+  const updateImages = async () => {
+    try {
+      await sendRequest(UpdateListingImages, {
+        pathParams: { listingID: listing.id },
+        payload: { images },
+      });
+
+      mutate({ GetListing, listingID: listing.id }, { ...listing, images });
+    } catch (e) {}
+  };
 
   const addImage = async (e: FormEvent<HTMLInputElement>) => {
     if (e.currentTarget && e.currentTarget.files) {
@@ -335,12 +383,22 @@ const ImageStep: React.FC<StepParams & ImageParams> = ({ renderLayout, listing }
 
         mutate({ GetDraftListing }, { ...listing, images: [...listing.images, listingImage] });
         mutate({ GetListing, listingID });
+        setImages([...images, listingImage]);
       } catch (e) {}
     }
   };
 
-  // TODO
-  const deleteImage = (imageIndex: number) => {};
+  const deleteImage = async (imageID: number) => {
+    try {
+      await sendRequest(DeleteListingImage, {
+        pathParams: { listingID: listing.id, imageID },
+      });
+
+      const newImages = listing.images.filter((item) => item.id !== imageID);
+      mutate({ GetListing, listingID: listing.id }, { ...listing, images: newImages });
+      setImages(newImages);
+    } catch (e) {}
+  };
 
   return renderLayout(isValid, () => (
     <div className="tw-flex tw-flex-col tw-items-center tw-mb-6">
@@ -348,17 +406,28 @@ const ImageStep: React.FC<StepParams & ImageParams> = ({ renderLayout, listing }
         Add image
       </button>
       <input ref={ref} type="file" className="tw-flex tw-invisible" onChange={addImage} />
-      <>
-        {listing.images.map((previewImage, index) => (
-          <div className="tw-relative tw-m-3" key={index}>
-            <img src={getGcsImageUrl(previewImage)} alt="preview-image" className="tw-select-none tw-rounded-lg" />
+      <div ref={drop} className="tw-grid tw-grid-cols-2 tw-gap-4 tw-justify-items-center tw-items-center">
+        {images.map((image, index) => (
+          <Card
+            key={image.id}
+            id={String(image.id)}
+            moveCard={moveCard}
+            findCard={findCard}
+            onDrop={updateImages}
+            className="tw-flex tw-relative tw-w-fit tw-h-fit"
+          >
+            <img
+              src={getGcsImageUrl(image)}
+              alt="preview-image"
+              className="tw-select-none tw-rounded-lg tw-cursor-grab"
+            />
             <XMarkIcon
               className="tw-w-8 tw-absolute tw-right-2 tw-top-2 tw-bg-gray-100 tw-p-1 tw-rounded-lg tw-opacity-[90%] tw-cursor-pointer hover:tw-opacity-100"
-              onClick={() => deleteImage(index)}
+              onClick={() => deleteImage(image.id)}
             />
-          </div>
+          </Card>
         ))}
-      </>
+      </div>
     </div>
   ));
 };
