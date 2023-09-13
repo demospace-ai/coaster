@@ -282,8 +282,8 @@ const ImagesModal: React.FC<{ listing: ListingType; initialIndex?: number }> = (
 
   return (
     <div>
-      <div className="tw-absolute tw-top-1/2 tw-translate-y-1/2 tw-w-full tw-z-10">
-        <div className="tw-fixed tw-right-20">
+      <div className="tw-absolute tw-top-1/2 -tw-translate-y-1/2 tw-w-full tw-z-10">
+        <div className="tw-fixed tw-right-0 sm:tw-right-[10vw]">
           <ChevronRightIcon
             className="tw-h-10 tw-cursor-pointer tw-stroke-slate-300"
             onClick={(e) => {
@@ -294,7 +294,7 @@ const ImagesModal: React.FC<{ listing: ListingType; initialIndex?: number }> = (
             }}
           />
         </div>
-        <div className="tw-fixed tw-left-20">
+        <div className="tw-fixed tw-left-0 sm:tw-left-[10vw]">
           <ChevronLeftIcon
             className="tw-h-10 tw-cursor-pointer tw-stroke-slate-300"
             onClick={(e) => {
@@ -308,12 +308,12 @@ const ImagesModal: React.FC<{ listing: ListingType; initialIndex?: number }> = (
       </div>
       <div
         ref={carouselRef}
-        className="tw-absolute tw-left-1/2 -tw-translate-x-1/2 tw-flex tw-pt-[10vh] tw-h-[90vh] tw-w-[90vw] tw-overflow-x-auto tw-snap-mandatory tw-snap-x tw-items-center tw-hide-scrollbar"
+        className="tw-absolute tw-left-1/2 -tw-translate-x-1/2 tw-flex tw-pt-[10vh] tw-h-[90vh] tw-w-screen sm:tw-w-[90vw] tw-overflow-x-auto tw-snap-mandatory tw-snap-x tw-items-center tw-hide-scrollbar"
         onScroll={handleScroll}
       >
         {listing.images.map((image) => (
           <div key={image.id} className="tw-flex tw-basis-full tw-snap-center tw-h-full">
-            <div className="tw-flex tw-w-[90vw] tw-px-10 tw-h-full tw-justify-center tw-items-center">
+            <div className="tw-flex tw-w-screen sm:tw-w-[90vw] tw-px-10 tw-h-full tw-justify-center tw-items-center">
               <img
                 className="tw-flex tw-max-h-full tw-object-contain tw-cursor-pointer tw-rounded-xl tw-overflow-hidden"
                 src={getGcsImageUrl(image)}
@@ -348,14 +348,20 @@ const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) => {
       >
         <ImagesModal listing={listing} />
       </Modal>
-      <div className="tw-flex tw-w-full sm:tw-w-3/4 sm:tw-mr-2">
+      <div className="tw-relative tw-flex tw-w-full sm:tw-w-3/4 sm:tw-mr-2">
         <img
-          className="tw-w-full tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
+          className="tw-w-full tw-aspect-square tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
           src={listing.images.length > 0 ? getGcsImageUrl(listing.images[0]) : "TODO"}
           onClick={() => setShowImages(true)}
         />
+        <div
+          className="tw-absolute tw-bottom-4 tw-left-1/2 -tw-translate-x-1/2 tw-flex sm:tw-hidden tw-bg-white hover:tw-bg-slate-200 tw-cursor-pointer tw-rounded-3xl tw-border tw-border-black tw-border-solid tw-px-3 tw-text-sm tw-font-medium tw-py-1 tw-w-fit tw-mt-4"
+          onClick={() => setShowImages(true)}
+        >
+          See all images →
+        </div>
       </div>
-      <div className="tw-flex-col tw-w-1/4 tw-gap-2 tw-hidden sm:tw-flex">
+      <div className="tw-relative tw-flex-col tw-w-1/4 tw-gap-2 tw-hidden sm:tw-flex">
         <img
           className="tw-h-1/2 tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
           src={listing.images.length > 1 ? getGcsImageUrl(listing.images[1]) : "TODO"}
@@ -366,6 +372,12 @@ const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) => {
           src={listing.images.length > 2 ? getGcsImageUrl(listing.images[2]) : "TODO"}
           onClick={() => setShowImages(true)}
         />
+        <div
+          className="tw-absolute tw-bottom-2 tw-right-2 tw-bg-white hover:tw-bg-slate-200 tw-cursor-pointer tw-rounded-3xl tw-border tw-border-black tw-border-solid tw-px-3 tw-text-sm tw-font-medium tw-py-1"
+          onClick={() => setShowImages(true)}
+        >
+          See all images →
+        </div>
       </div>
     </div>
   );

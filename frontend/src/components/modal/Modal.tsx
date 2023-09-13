@@ -80,7 +80,7 @@ const ModalCloseButton: React.FC<{ close?: () => void }> = ({ close }) => {
 const NoContainerModalCloseButton: React.FC<{ close?: () => void }> = ({ close }) => {
   return (
     <button
-      className="tw-absolute tw-z-20 tw-top-8 tw-right-8 tw-bg-transparent tw-border-none tw-cursor-pointer tw-p-0"
+      className="tw-absolute tw-z-20 tw-top-4 sm:tw-top-8 tw-right-0 sm:tw-right-8 tw-bg-transparent tw-border-none tw-cursor-pointer tw-p-0"
       onClick={(e) => {
         e.preventDefault();
         close && close();
