@@ -194,13 +194,13 @@ export const ComingSoon: React.FC = () => {
           ) : (
             <>
               <Button
-                className="tw-flex tw-h-[52px] tw-w-48 tw-rounded-l-xl tw-rounded-r-none tw-items-center tw-justify-center tw-whitespace-nowrap tw-px-8 tw-bg-transparent tw-border-black tw-border-solid tw-border-2 hover:tw-bg-[rgba(0,0,0,0.2)] tw-text-black"
+                className="tw-flex tw-h-[52px] tw-w-32 sm:tw-w-48 tw-rounded-l-xl tw-rounded-r-none tw-items-center tw-justify-center tw-whitespace-nowrap tw-px-8 tw-bg-transparent tw-border-black tw-border-solid tw-border-2 hover:tw-bg-[rgba(0,0,0,0.2)] tw-text-black"
                 onClick={() => setShowWaitlist(true)}
               >
                 Join
               </Button>
               <NavLink
-                className="tw-flex tw-h-[52px] tw-w-48 tw-rounded-r-xl tw-font-bold tw-tracking-[1px] tw-items-center tw-justify-center tw-whitespace-nowrap tw-px-8 tw-bg-transparent tw-border-black tw-border-solid tw-border-r-2 tw-border-b-2 tw-border-t-2 hover:tw-bg-[rgba(0,0,0,0.2)] tw-text-black"
+                className="tw-flex tw-h-[52px] tw-w-32 sm:tw-w-48 tw-rounded-r-xl tw-font-bold tw-tracking-[1px] tw-items-center tw-justify-center tw-whitespace-nowrap tw-px-8 tw-bg-transparent tw-border-black tw-border-solid tw-border-r-2 tw-border-b-2 tw-border-t-2 hover:tw-bg-[rgba(0,0,0,0.2)] tw-text-black"
                 to="/login?destination=profile"
               >
                 Sign In

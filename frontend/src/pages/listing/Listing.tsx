@@ -1,5 +1,13 @@
 import { CheckBadgeIcon } from "@heroicons/react/20/solid";
-import { ArrowUpOnSquareIcon, ClockIcon, GlobeAltIcon, StarIcon, UserGroupIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowUpOnSquareIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ClockIcon,
+  GlobeAltIcon,
+  StarIcon,
+  UserGroupIcon,
+} from "@heroicons/react/24/outline";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { BackButton, LinkButton } from "src/components/button/Button";
@@ -273,27 +281,53 @@ const ImagesModal: React.FC<{ listing: ListingType; initialIndex?: number }> = (
   }, [handleKeyDown]);
 
   return (
-    <div
-      ref={carouselRef}
-      className="tw-absolute tw-left-1/2 -tw-translate-x-1/2 tw-flex tw-pt-[10vh] tw-h-[90vh] tw-w-[90vw] tw-overflow-x-auto tw-snap-mandatory tw-snap-x tw-items-center tw-hide-scrollbar"
-      onScroll={handleScroll}
-    >
-      {listing.images.map((image) => (
-        <div key={image.id} className="tw-flex tw-basis-full tw-snap-center tw-h-full">
-          <div className="tw-flex tw-w-[90vw] tw-px-10 tw-h-full tw-justify-center tw-items-center">
-            <img
-              className="tw-flex tw-max-h-full tw-object-contain tw-cursor-pointer tw-rounded-xl tw-overflow-hidden"
-              src={getGcsImageUrl(image)}
-              onClick={(e) => {
-                e.stopPropagation();
-                const newIndex = (imageIndex + 1) % listing.images.length;
-                setImageIndex(newIndex);
-                carouselRef.current?.scrollTo({ left: width * newIndex, behavior: "smooth" });
-              }}
-            />
-          </div>
+    <div>
+      <div className="tw-absolute tw-top-1/2 tw-translate-y-1/2 tw-w-full tw-z-10">
+        <div className="tw-fixed tw-right-20">
+          <ChevronRightIcon
+            className="tw-h-10 tw-cursor-pointer tw-stroke-slate-300"
+            onClick={(e) => {
+              e.stopPropagation();
+              const newIndex = (imageIndex + 1) % listing.images.length;
+              setImageIndex(newIndex);
+              carouselRef.current?.scrollTo({ left: width * newIndex, behavior: "smooth" });
+            }}
+          />
         </div>
-      ))}
+        <div className="tw-fixed tw-left-20">
+          <ChevronLeftIcon
+            className="tw-h-10 tw-cursor-pointer tw-stroke-slate-300"
+            onClick={(e) => {
+              e.stopPropagation();
+              const newIndex = (imageIndex - 1) % listing.images.length;
+              setImageIndex(newIndex);
+              carouselRef.current?.scrollTo({ left: width * newIndex, behavior: "smooth" });
+            }}
+          />
+        </div>
+      </div>
+      <div
+        ref={carouselRef}
+        className="tw-absolute tw-left-1/2 -tw-translate-x-1/2 tw-flex tw-pt-[10vh] tw-h-[90vh] tw-w-[90vw] tw-overflow-x-auto tw-snap-mandatory tw-snap-x tw-items-center tw-hide-scrollbar"
+        onScroll={handleScroll}
+      >
+        {listing.images.map((image) => (
+          <div key={image.id} className="tw-flex tw-basis-full tw-snap-center tw-h-full">
+            <div className="tw-flex tw-w-[90vw] tw-px-10 tw-h-full tw-justify-center tw-items-center">
+              <img
+                className="tw-flex tw-max-h-full tw-object-contain tw-cursor-pointer tw-rounded-xl tw-overflow-hidden"
+                src={getGcsImageUrl(image)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const newIndex = (imageIndex + 1) % listing.images.length;
+                  setImageIndex(newIndex);
+                  carouselRef.current?.scrollTo({ left: width * newIndex, behavior: "smooth" });
+                }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
@@ -325,10 +359,12 @@ const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) => {
         <img
           className="tw-h-1/2 tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
           src={listing.images.length > 1 ? getGcsImageUrl(listing.images[1]) : "TODO"}
+          onClick={() => setShowImages(true)}
         />
         <img
           className="tw-h-1/2 tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
           src={listing.images.length > 2 ? getGcsImageUrl(listing.images[2]) : "TODO"}
+          onClick={() => setShowImages(true)}
         />
       </div>
     </div>
