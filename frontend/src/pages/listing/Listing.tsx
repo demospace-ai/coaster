@@ -15,7 +15,7 @@ import { Callout } from "src/components/callouts/Callout";
 import { Loading } from "src/components/loading/Loading";
 import { Modal } from "src/components/modal/Modal";
 import { useShowToast } from "src/components/notifications/Notifications";
-import { ProfilePicture } from "src/components/profilePicture/ProfilePicture";
+import { ProfilePicture } from "src/components/profile/ProfilePicture";
 import { useListing } from "src/rpc/data";
 import { ListingStatus, Listing as ListingType } from "src/rpc/types";
 import { getGcsImageUrl } from "src/utils/images";

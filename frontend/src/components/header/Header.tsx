@@ -5,7 +5,7 @@ import React, { Fragment, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Loading } from "src/components/loading/Loading";
 import { MapSearch } from "src/components/maps/Maps";
-import { ProfilePicture } from "src/components/profilePicture/ProfilePicture";
+import { ProfilePicture } from "src/components/profile/ProfilePicture";
 import { useLogout } from "src/pages/login/actions";
 import { useSelector } from "src/root/model";
 import { mergeClasses } from "src/utils/twmerge";

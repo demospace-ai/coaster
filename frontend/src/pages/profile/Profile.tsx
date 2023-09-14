@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { FormError } from "src/components/FormError";
 import { Button } from "src/components/button/Button";
 import { Input, TextArea } from "src/components/input/Input";
-import { ProfilePicture } from "src/components/profilePicture/ProfilePicture";
+import { ProfilePicture } from "src/components/profile/ProfilePicture";
 import { useSelector } from "src/root/model";
 import { useUpdateProfilePicture, useUpdateUser } from "src/rpc/data";
 import { z } from "zod";

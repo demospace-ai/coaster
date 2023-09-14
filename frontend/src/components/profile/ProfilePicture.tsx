@@ -12,7 +12,7 @@ export const ProfilePicture: React.FC<{
         <img
           src={url}
           className={mergeClasses(
-            "tw-rounded-full tw-select-none tw-flex tw-items-center tw-justify-center",
+            "tw-rounded-full tw-select-none tw-flex tw-items-center tw-justify-center tw-object-cover",
             className,
           )}
           referrerPolicy="no-referrer"
