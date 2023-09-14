@@ -35,9 +35,11 @@ func (s ApiService) DeleteListingImage(auth auth.Authentication, w http.Response
 	}
 
 	// Make sure this user has ownership of this listing
-	_, err = listings.LoadByUserAndID(s.db, auth.User.ID, listingID)
-	if err != nil {
-		return errors.Wrapf(err, "(api.DeleteListingImage) loading listing %d for user %d", listingID, auth.User.ID)
+	if !auth.User.IsAdmin {
+		_, err = listings.LoadByUserAndID(s.db, auth.User.ID, listingID)
+		if err != nil {
+			return errors.Wrapf(err, "(api.DeleteListingImage) loading listing %d for user %d", listingID, auth.User.ID)
+		}
 	}
 
 	// No need to update rank of other listings since the order stays the same

@@ -32,9 +32,11 @@ func (s ApiService) AddListingImage(auth auth.Authentication, w http.ResponseWri
 	}
 
 	// Make sure this user has ownership of this listing
-	_, err = listings.LoadByUserAndID(s.db, auth.User.ID, listingID)
-	if err != nil {
-		return errors.Wrapf(err, "(api.AddListingImage) loading listing %d for user %d", listingID, auth.User.ID)
+	if !auth.User.IsAdmin {
+		_, err = listings.LoadByUserAndID(s.db, auth.User.ID, listingID)
+		if err != nil {
+			return errors.Wrapf(err, "(api.AddListingImage) loading listing %d for user %d", listingID, auth.User.ID)
+		}
 	}
 
 	existingImages, err := listings.LoadImagesForListing(s.db, listingID)
