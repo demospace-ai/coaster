@@ -12,7 +12,7 @@ import (
 const RESEND_PRODUCTION_API_KEY = "projects/454026596701/secrets/resend-prod-api-key/versions/latest"
 const RESEND_DEVELOPMENT_API_KEY = "projects/86315250181/secrets/resend-dev-api-key/versions/latest"
 
-func SendEmail(from string, to []string, subject string, html string) error {
+func SendEmail(from string, replyTo string, to []string, subject string, html string) error {
 	resendApiKey, err := getResendApiKey()
 	if err != nil {
 		return errors.Wrap(err, "(emails.SendEmail) getting resend api key")
@@ -22,6 +22,7 @@ func SendEmail(from string, to []string, subject string, html string) error {
 
 	params := &resend.SendEmailRequest{
 		From:    from,
+		ReplyTo: replyTo,
 		To:      to,
 		Subject: subject,
 		Html:    html,
