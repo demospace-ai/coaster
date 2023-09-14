@@ -188,6 +188,18 @@ export const Terms: React.FC = () => {
         Use, or portion thereof, to be unenforceable, that provision of the agreement will be enforced to the maximum
         extent permissible so as to effect the intent of the parties, and the remainder of this Terms of Use will
         continue in full force and effect.
+        <br />
+        <br />
+        19. <em>Commission</em>. You agree to the commissions(as defined in this Section), calculations, other identified 
+        costs, and payout schedules set forth below. You agree and authorize Coaster and/or its payment processors to deduct
+        all commissions and fees due and owing from your payout amount, and to settle and transfer funds to your bank account
+        as designated by you through your Coaster account.
+          Commissions.
+            (i) Except as explicitly stated in these Terms, Coaster charges the following commission (the “Commission”) on
+            orders placed through the Services (at times referred to as the Coaster “marketplace”): The Commission charge is
+            10% of the Order Subtotal (as defined below)
+            As used herein “Order Subtotal” means the total product cost, less provider funded discounts as reflected in the 
+            invoice provided by Coaster to the applicable provider.
       </p>
     </div>
   );
