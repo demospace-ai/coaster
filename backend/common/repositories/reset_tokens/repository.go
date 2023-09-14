@@ -11,31 +11,10 @@ import (
 )
 
 const RESET_TOKEN_BITS = 256
-const RESET_TOKEN_EXPIRATION = time.Minute * 30
+const RESET_TOKEN_EXPIRATION = time.Hour * 72 // TODO: shorten
 
 func GetActiveResetToken(db *gorm.DB, user *models.User) (*models.ResetToken, error) {
 	cutoffTime := time.Now().Add(-RESET_TOKEN_EXPIRATION)
-	var resetToken *models.ResetToken
-	result := db.Table("reset_tokens").
-		Select("reset_tokens.*").
-		Where("reset_tokens.user_id = ?", user.ID).
-		Where("reset_tokens.created_at >= ?", cutoffTime).
-		Where("reset_tokens.deactivated_at IS NULL").
-		Take(&resetToken)
-
-	if result.Error != nil {
-		if errors.IsRecordNotFound(result.Error) {
-			return create(db, user)
-		} else {
-			return nil, errors.Wrap(result.Error, "(reset_tokens.GetActiveResetToken)")
-		}
-	}
-
-	return resetToken, nil
-}
-
-func GetExtendedResetToken(db *gorm.DB, user *models.User) (*models.ResetToken, error) {
-	cutoffTime := time.Now().Add(-time.Hour * 72)
 	var resetToken *models.ResetToken
 	result := db.Table("reset_tokens").
 		Select("reset_tokens.*").
