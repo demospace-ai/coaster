@@ -27,10 +27,12 @@ enum LoginStep {
 export const Login: React.FC<{ create?: boolean }> = ({ create }) => {
   const isAuthenticated = useSelector((state) => state.login.authenticated);
   const [step, setStep] = useState<LoginStep>(LoginStep.Start);
-  const [email, setEmail] = useState<string | undefined>(undefined);
   const [searchParams] = useSearchParams();
   const destination = searchParams.get("destination") ?? "";
+  const emailParam = searchParams.get("email");
+  const initialEmail = emailParam ? decodeURIComponent(emailParam) : undefined;
   const navigate = useNavigate();
+  const [email, setEmail] = useState<string | undefined>(initialEmail);
 
   // Use effect to navigate after render if authenticated
   useEffect(() => {
@@ -46,13 +48,15 @@ export const Login: React.FC<{ create?: boolean }> = ({ create }) => {
 
   const reset = () => {
     setStep(LoginStep.Start);
-    setEmail(undefined);
+    setEmail(initialEmail);
   };
 
   let loginContent;
   switch (step) {
     case LoginStep.Start:
-      loginContent = <StartContent create={create} setStep={setStep} setEmail={setEmail} destination={destination} />;
+      loginContent = (
+        <StartContent create={create} setStep={setStep} email={email} setEmail={setEmail} destination={destination} />
+      );
       break;
     case LoginStep.EmailCreate:
       loginContent = <EmailSignup email={email} reset={reset} />;
@@ -94,9 +98,10 @@ export const Login: React.FC<{ create?: boolean }> = ({ create }) => {
 const StartContent: React.FC<{
   create?: boolean;
   setStep: (step: LoginStep) => void;
+  email?: string;
   setEmail: (email: string) => void;
   destination: string;
-}> = ({ create, setStep, setEmail, destination }) => {
+}> = ({ create, setStep, email, setEmail, destination }) => {
   const loginError = useSelector((state) => state.login.error);
 
   return (
@@ -105,7 +110,7 @@ const StartContent: React.FC<{
       <div className="tw-text-center tw-text-base tw-font-medium tw-mb-2 tw-select-none">
         {create ? "Welcome to Coaster." : "Sign in to continue to Coaster."}
       </div>
-      <EmailCheck setStep={setStep} setEmail={setEmail} />
+      <EmailCheck email={email} setStep={setStep} setEmail={setEmail} />
       <div className='tw-flex tw-w-full tw-items-center tw-text-sm tw-mt-5 tw-justify-between before:tw-block before:tw-w-full before:tw-h-px before:tw-content-[" "] before:tw-bg-gray-300 before:tw-mr-4 before:tw-ml-px after:tw-block after:tw-w-full after:tw-h-px after:tw-content-[" "] after:tw-bg-gray-300 after:tw-ml-4 after:tw-mr-px'>
         or
       </div>
@@ -148,10 +153,11 @@ const EmailCheckSchema = z.object({
 
 type EmailCheckSchemaType = z.infer<typeof EmailCheckSchema>;
 
-const EmailCheck: React.FC<{ setStep: (step: LoginStep) => void; setEmail: (email: string) => void }> = ({
-  setStep,
-  setEmail,
-}) => {
+const EmailCheck: React.FC<{
+  setStep: (step: LoginStep) => void;
+  email?: string;
+  setEmail: (email: string) => void;
+}> = ({ setStep, email, setEmail }) => {
   const {
     watch,
     handleSubmit,
@@ -160,6 +166,9 @@ const EmailCheck: React.FC<{ setStep: (step: LoginStep) => void; setEmail: (emai
   } = useForm<EmailCheckSchemaType>({
     mode: "onBlur",
     resolver: zodResolver(EmailCheckSchema),
+    defaultValues: {
+      email,
+    },
   });
 
   return (
@@ -191,7 +200,7 @@ const EmailCheck: React.FC<{ setStep: (step: LoginStep) => void; setEmail: (emai
       />
       <FormError message={errors.email?.message} />
       <Button type="submit" className="tw-w-full tw-bg-[#3673aa] hover:tw-bg-[#396082] tw-h-12 tw-mt-4">
-        Submit
+        Continue
       </Button>
     </form>
   );
@@ -255,7 +264,7 @@ const EmailLoginForm: React.FC<{ reset: () => void; email?: string }> = ({ reset
         />
         <FormError message={errors.password?.message} />
         <Button type="submit" className="tw-w-full tw-bg-[#3673aa] hover:tw-bg-[#396082] tw-h-12 tw-mt-4">
-          Submit
+          Login
         </Button>
       </form>
       <div className="tw-mt-4 tw-text-blue-500 tw-cursor-pointer" onClick={reset}>
@@ -370,7 +379,7 @@ const EmailSignup: React.FC<{ reset: () => void; email?: string }> = ({ reset, e
         />
         <FormError className="tw-ml-1" message={errors.confirmPassword?.message} />
         <Button type="submit" className="tw-w-full tw-bg-[#3673aa] hover:tw-bg-[#396082] tw-h-12 tw-mt-4">
-          Submit
+          Create Account
         </Button>
       </form>
       <div className="tw-mt-4 tw-text-blue-500 tw-cursor-pointer" onClick={reset}>
@@ -491,7 +500,7 @@ const SendResetForm: React.FC<{ reset: () => void; destination: string }> = ({ r
         />
         <FormError message={errors.email?.message} />
         <Button type="submit" className="tw-w-full tw-bg-[#3673aa] hover:tw-bg-[#396082] tw-h-12 tw-mt-4">
-          {sendingReset ? <Loading /> : "Submit"}
+          {sendingReset ? <Loading /> : "Send Reset"}
         </Button>
       </form>
       <div className="tw-mt-4 tw-text-blue-500 tw-cursor-pointer" onClick={reset}>

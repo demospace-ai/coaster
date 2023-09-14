@@ -147,10 +147,17 @@ const SignedInMenu: React.FC = () => {
                   </NavLink>
                 </Menu.Item>
               </div>
-              <div className="tw-flex tw-m-2 tw-pt-2">
+              <div className="tw-flex tw-flex-col tw-m-2 tw-pt-2">
                 <Menu.Item>
                   <NavLink className={navItem} to="/profile">
                     View profile
+                  </NavLink>
+                </Menu.Item>
+              </div>
+              <div className="tw-flex tw-flex-col tw-m-2 tw-pt-2">
+                <Menu.Item>
+                  <NavLink className={navItem} to="/invite">
+                    Invite friends
                   </NavLink>
                 </Menu.Item>
               </div>
@@ -257,6 +264,9 @@ const MobileMenu: React.FC = () => {
                             </div>
                             <NavLink className={navItem} to="/profile" onClick={() => setOpen(false)}>
                               View profile
+                            </NavLink>
+                            <NavLink className={navItem} to="/invite" onClick={() => setOpen(false)}>
+                              Invite friends
                             </NavLink>
                             {user?.is_host ? (
                               <NavLink className={navItem} to="/hosting" onClick={() => setOpen(false)}>

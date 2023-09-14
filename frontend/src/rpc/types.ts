@@ -136,6 +136,10 @@ export interface ResetPasswordRequest {
   token: string;
 }
 
+export interface SendInviteRequest {
+  emails: string[];
+}
+
 export interface EmailLoginResponse {
   user: User;
 }

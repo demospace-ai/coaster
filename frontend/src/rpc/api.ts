@@ -12,6 +12,7 @@ import {
   LoginResponse,
   OAuthProvider,
   ResetPasswordRequest,
+  SendInviteRequest,
   SendResetRequest,
   User,
   UserUpdates,
@@ -168,6 +169,13 @@ export const ResetPassword: IEndpoint<ResetPasswordRequest, User> = {
   name: "Reset password",
   method: "POST",
   path: "/reset_password",
+  track: true,
+};
+
+export const SendInvite: IEndpoint<SendInviteRequest, undefined> = {
+  name: "SendInvite",
+  method: "POST",
+  path: "/send_invite",
   track: true,
 };
 

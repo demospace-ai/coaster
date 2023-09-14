@@ -407,7 +407,7 @@ const ImageStep: React.FC<StepParams & ImageParams> = ({ renderLayout, listing }
       </button>
       <input ref={ref} type="file" className="tw-flex tw-invisible" onChange={addImage} />
       <div ref={drop} className="tw-grid tw-grid-cols-2 tw-gap-4 tw-justify-items-center tw-items-center">
-        {images.map((image, index) => (
+        {images.map((image) => (
           <Card
             key={image.id}
             id={String(image.id)}

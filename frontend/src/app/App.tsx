@@ -12,6 +12,8 @@ import { Hosting } from "src/pages/hosting/Hosting";
 import { EditListing } from "src/pages/listing/EditListing";
 import { Listing } from "src/pages/listing/Listing";
 import { NewListing } from "src/pages/listing/NewListing";
+import { CreatePassword } from "src/pages/login/CreatePassword";
+import { Invite } from "src/pages/login/Invite";
 import { Login, Unauthorized } from "src/pages/login/Login";
 import { ResetPassword } from "src/pages/login/ResetPassword";
 import { NotFound } from "src/pages/notfound/NotFound";
@@ -104,6 +106,8 @@ export const router = createBrowserRouter(
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Login create />} />
       <Route path="/reset_password" element={<ResetPassword />} />
+      <Route path="/create_password" element={<CreatePassword />} />
+      <Route path="/invite" element={<RequireAuth element={<Invite />} />} />
       <Route path="/search" element={<Search />} />
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/about" element={<About />} />

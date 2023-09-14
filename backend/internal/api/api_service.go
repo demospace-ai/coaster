@@ -90,6 +90,12 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			Pattern:     "/user/profile_picture",
 			HandlerFunc: s.UpdateProfilePicture,
 		},
+		{
+			Name:        "Send invite",
+			Method:      router.POST,
+			Pattern:     "/send_invite",
+			HandlerFunc: s.SendInvite,
+		},
 	}
 }
 
