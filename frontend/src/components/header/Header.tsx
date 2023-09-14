@@ -3,7 +3,9 @@ import { ArrowRightOnRectangleIcon, Bars3Icon, XMarkIcon } from "@heroicons/reac
 import classNames from "classnames";
 import React, { Fragment, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Loading } from "src/components/loading/Loading";
 import { MapSearch } from "src/components/maps/Maps";
+import { ProfilePicture } from "src/components/profilePicture/ProfilePicture";
 import { useLogout } from "src/pages/login/actions";
 import { useSelector } from "src/root/model";
 import { mergeClasses } from "src/utils/twmerge";
@@ -90,6 +92,11 @@ const SignedInMenu: React.FC = () => {
   const navItem =
     "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded hover:tw-bg-slate-200 tw-w-full";
 
+  if (!user) {
+    // Should never happen
+    return <Loading />;
+  }
+
   return (
     <Menu as="div">
       {({ open }) => (
@@ -101,17 +108,7 @@ const SignedInMenu: React.FC = () => {
             )}
           >
             <Bars3Icon className="tw-w-5 tw-h-5 tw-mr-2" />
-            {user?.profile_picture_url ? (
-              <img
-                src={user.profile_picture_url}
-                className="tw-rounded-full tw-w-7 tw-h-7 tw-select-none tw-flex tw-items-center tw-justify-center"
-                referrerPolicy="no-referrer"
-              />
-            ) : (
-              <div className="tw-bg-orange-400 tw-text-white tw-rounded-full tw-w-7 tw-h-7 tw-flex tw-justify-center tw-items-center">
-                {user!.first_name.charAt(0)}
-              </div>
-            )}
+            <ProfilePicture url={user.profile_picture_url} name={user.first_name} className="tw-w-7 tw-h-7" />
           </Menu.Button>
           <Transition
             as={Fragment}
@@ -127,17 +124,11 @@ const SignedInMenu: React.FC = () => {
                 <p className="tw-px-1 tw-pt-2 tw-pb-1 tw-text-xs tw-uppercase">Signed in as</p>
                 <Menu.Item>
                   <NavLink className={menuItem} to="/profile">
-                    {user?.profile_picture_url ? (
-                      <img
-                        src={user.profile_picture_url}
-                        className="tw-rounded-full tw-w-7 tw-h-7 tw-select-none tw-flex tw-items-center tw-justify-center tw-mr-3"
-                        referrerPolicy="no-referrer"
-                      />
-                    ) : (
-                      <div className="tw-bg-slate-400 tw-text-white tw-rounded-full tw-w-7 tw-h-7 tw-select-none tw-flex tw-items-center tw-justify-center tw-mr-3">
-                        {user!.first_name.charAt(0)}
-                      </div>
-                    )}
+                    <ProfilePicture
+                      url={user.profile_picture_url}
+                      name={user.first_name}
+                      className="tw-w-7 tw-h-7 tw-mr-3"
+                    />
                     <div className="tw-flex tw-flex-col">
                       <p className="tw-truncate tw-text-sm tw-font-semibold tw-text-slate-900">
                         {user?.first_name} {user?.last_name}

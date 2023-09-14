@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { FormError } from "src/components/FormError";
 import { Button } from "src/components/button/Button";
 import { Input, TextArea } from "src/components/input/Input";
+import { ProfilePicture } from "src/components/profilePicture/ProfilePicture";
 import { useSelector } from "src/root/model";
 import { useUpdateProfilePicture, useUpdateUser } from "src/rpc/data";
 import { z } from "zod";
@@ -82,10 +83,10 @@ export const Profile: React.FC = () => {
             }}
           />
           {user?.profile_picture_url ? (
-            <img
-              src={user?.profile_picture_url}
-              className="tw-rounded-full tw-object-cover tw-aspect-square tw-w-24 tw-mt-2 tw-cursor-pointer"
-              referrerPolicy="no-referrer"
+            <ProfilePicture
+              url={user.profile_picture_url}
+              className="tw-w-24 tw-h-24 tw-cursor-pointer"
+              name={user.first_name}
               onClick={() => imageInputRef.current?.click()}
             />
           ) : (

@@ -15,6 +15,7 @@ import { Callout } from "src/components/callouts/Callout";
 import { Loading } from "src/components/loading/Loading";
 import { Modal } from "src/components/modal/Modal";
 import { useShowToast } from "src/components/notifications/Notifications";
+import { ProfilePicture } from "src/components/profilePicture/ProfilePicture";
 import { useListing } from "src/rpc/data";
 import { ListingStatus, Listing as ListingType } from "src/rpc/types";
 import { getGcsImageUrl } from "src/utils/images";
@@ -131,11 +132,10 @@ const HostDetails: React.FC<{ listing: ListingType }> = ({ listing }) => {
   return (
     <div>
       <div className="tw-mt-5 tw-flex tw-flex-row tw-items-center">
-        <img
-          src={listing.host.profile_picture_url}
-          className="tw-rounded-full tw-w-10 tw-aspect-square tw-select-none tw-flex tw-items-center tw-justify-center tw-mr-4"
-          referrerPolicy="no-referrer"
-          alt="guide profile picture"
+        <ProfilePicture
+          url={listing.host.profile_picture_url}
+          name={listing.host.first_name}
+          className="tw-w-10 tw-h-10 tw-mr-4"
         />
         <div>
           <div className="tw-text-xl tw-font-medium">Meet your trip provider: {listing.host.first_name}</div>
@@ -235,11 +235,10 @@ const HostOverview: React.FC<{ listing: ListingType }> = ({ listing }) => {
           {languages}
         </div>
       </div>
-      <img
-        src={listing.host.profile_picture_url}
-        className="tw-rounded-full tw-w-12 tw-aspect-square tw-select-none tw-flex tw-items-center tw-justify-center"
-        referrerPolicy="no-referrer"
-        alt="guide profile picture"
+      <ProfilePicture
+        url={listing.host.profile_picture_url}
+        name={listing.host.first_name}
+        className="tw-w-12 tw-h-12"
       />
     </div>
   );
