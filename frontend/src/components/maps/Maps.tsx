@@ -7,12 +7,13 @@ import {
   useDismiss,
   useFloating,
   useInteractions,
+  useListNavigation,
   useRole,
 } from "@floating-ui/react";
 import { Status, Wrapper } from "@googlemaps/react-wrapper";
 import { Transition } from "@headlessui/react";
 import { MagnifyingGlassIcon, MapPinIcon } from "@heroicons/react/24/outline";
-import { FormEvent, Fragment, ReactElement, useEffect, useRef, useState } from "react";
+import { FormEvent, Fragment, HTMLProps, ReactElement, useEffect, useRef, useState } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { Loading } from "src/components/loading/Loading";
 import { isProd } from "src/utils/env";
@@ -29,6 +30,15 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
   const [active, setActive] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<Array<HTMLElement | null>>([]);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [suggestions, setSuggestions] = useState<string[]>([
+    "Las Vegas",
+    "Los Angeles",
+    "San Francisco",
+    "New York",
+    "Chicago",
+  ]);
 
   const { refs, floatingStyles, context } = useFloating({
     open: active,
@@ -43,8 +53,15 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
   });
   const dismiss = useDismiss(context);
   const role = useRole(context);
+  const listNav = useListNavigation(context, {
+    listRef,
+    activeIndex,
+    onNavigate: setActiveIndex,
+    virtual: true,
+    loop: true,
+  });
 
-  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
+  const { getReferenceProps, getFloatingProps, getItemProps } = useInteractions([click, dismiss, role, listNav]);
 
   useEffect(() => {
     if (urlPath.pathname === "/search") {
@@ -83,7 +100,11 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
         )}
         onSubmit={(e: FormEvent) => {
           e.preventDefault();
-          onSubmit(query);
+          if (activeIndex) {
+            onSubmit(suggestions[activeIndex]);
+          } else {
+            onSubmit(query);
+          }
         }}
         {...getReferenceProps({
           onClick() {
@@ -94,7 +115,11 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
               inputRef.current?.blur();
             }
             if (event.key === "Enter") {
-              onSubmit(query);
+              if (activeIndex) {
+                onSubmit(suggestions[activeIndex]);
+              } else {
+                onSubmit(query);
+              }
               inputRef.current?.blur();
             }
           },
@@ -108,6 +133,7 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
         >
           <MagnifyingGlassIcon className="tw-cursor-pointer tw-ml-3 tw-w-5 tw-text-gray-500" />
           <input
+            id="search"
             ref={inputRef}
             className="tw-inline tw-placeholder-gray-600 tw-w-full tw-bg-transparent tw-py-4 sm:tw-py-3 tw-px-3 tw-text-sm tw-leading-5 tw-outline-none tw-text-slate-900 tw-text-ellipsis tw-cursor-pointer tw-transition tw-duration-100"
             value={query}
@@ -131,9 +157,18 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
             leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
             leaveTo="tw-transform tw-opacity-0 tw-scale-0"
           >
-            <div className="tw-absolute tw-z-20 tw-mt-[-10px] sm:tw-mt-0 tw-min-w-full tw-max-h-80 tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-sm tw-text-black tw-shadow-lg tw-ring-1 tw-ring-slate-300 sm:tw-text-sm">
+            <div className="tw-absolute tw-z-20 -tw-mt-3 sm:tw-mt-0 tw-min-w-full tw-max-h-80 tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-sm tw-text-black tw-shadow-lg tw-ring-1 tw-ring-slate-300 sm:tw-text-sm">
               <MapsWrapper loadingClass="tw-h-20">
-                <Suggestions query={query} setQuery={setQuery} onSubmit={onSubmit} />
+                <Suggestions
+                  query={query}
+                  setQuery={setQuery}
+                  suggestions={suggestions}
+                  setSuggestions={setSuggestions}
+                  activeIndex={activeIndex}
+                  listRef={listRef}
+                  onSubmit={onSubmit}
+                  getItemProps={getItemProps}
+                />
               </MapsWrapper>
             </div>
           </Transition>
@@ -154,6 +189,15 @@ export const InlineMapSearch: React.FC<{
   const [active, setActive] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<Array<HTMLElement | null>>([]);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [suggestions, setSuggestions] = useState<string[]>([
+    "Las Vegas",
+    "Los Angeles",
+    "San Francisco",
+    "New York",
+    "Chicago",
+  ]);
 
   const { refs, floatingStyles, context } = useFloating({
     open: active,
@@ -169,11 +213,24 @@ export const InlineMapSearch: React.FC<{
   const dismiss = useDismiss(context);
   const role = useRole(context);
 
-  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
+  const listNav = useListNavigation(context, {
+    listRef,
+    activeIndex,
+    onNavigate: setActiveIndex,
+    virtual: true,
+    loop: true,
+  });
+
+  const { getReferenceProps, getFloatingProps, getItemProps } = useInteractions([click, dismiss, role, listNav]);
 
   const onSelect = (input: string) => {
     props.onSelect && props.onSelect(input);
     setActive(false);
+  };
+
+  const onSubmit = (input: string) => {
+    setQuery(input);
+    onSelect(input);
   };
 
   const showLabel = active || inputRef.current?.value || props.initial;
@@ -185,7 +242,7 @@ export const InlineMapSearch: React.FC<{
         props.className,
       )}
     >
-      <div
+      <form
         ref={refs.setReference}
         className="tw-flex tw-w-full tw-p-0 sm:tw-mt-0"
         {...getReferenceProps({
@@ -196,8 +253,24 @@ export const InlineMapSearch: React.FC<{
             if (event.key === "Escape") {
               inputRef.current?.blur();
             }
+            if (event.key === "Enter") {
+              if (activeIndex) {
+                onSubmit(suggestions[activeIndex]);
+              } else {
+                onSubmit(query);
+              }
+              inputRef.current?.blur();
+            }
           },
         })}
+        onSubmit={() => {
+          if (activeIndex) {
+            onSubmit(suggestions[activeIndex]);
+          } else {
+            onSubmit(query);
+          }
+          inputRef.current?.blur();
+        }}
       >
         <div
           className={mergeClasses(
@@ -218,6 +291,7 @@ export const InlineMapSearch: React.FC<{
           <div className={mergeClasses("tw-flex tw-w-full", props.label && "tw-mt-1 -tw-mb-2")}>
             {!props.hideIcon && <MapPinIcon className="tw-ml-3 tw-w-5 tw-cursor-pointer" />}
             <input
+              id="search"
               ref={inputRef}
               className="tw-inline tw-placeholder-gray-600 tw-w-full tw-bg-transparent tw-py-3 tw-px-3 tw-text-base tw-leading-5 tw-outline-none tw-text-slate-900 tw-text-ellipsis tw-cursor-text tw-transition tw-duration-100"
               value={query}
@@ -243,14 +317,23 @@ export const InlineMapSearch: React.FC<{
             leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
             leaveTo="tw-transform tw-opacity-0 tw-scale-0"
           >
-            <div className="tw-absolute tw-z-20 tw-mt-0 tw-min-w-full tw-max-h-80 tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-sm tw-text-black tw-shadow-lg tw-border tw-border-solid tw-border-slate-300">
+            <div className="tw-absolute tw-z-20 -tw-mt-3 sm:tw-mt-0 tw-min-w-full tw-max-h-80 tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-sm tw-text-black tw-shadow-lg tw-ring-1 tw-ring-slate-300 sm:tw-text-sm">
               <MapsWrapper loadingClass="tw-h-20">
-                <Suggestions query={query} setQuery={setQuery} onSubmit={onSelect} />
+                <Suggestions
+                  query={query}
+                  setQuery={setQuery}
+                  suggestions={suggestions}
+                  setSuggestions={setSuggestions}
+                  activeIndex={activeIndex}
+                  listRef={listRef}
+                  onSubmit={onSelect}
+                  getItemProps={getItemProps}
+                />
               </MapsWrapper>
             </div>
           </Transition>
         </div>
-      </div>
+      </form>
     </div>
   );
 };
@@ -258,16 +341,13 @@ export const InlineMapSearch: React.FC<{
 const Suggestions: React.FC<{
   query: string;
   setQuery: (query: string) => void;
+  suggestions: string[];
+  setSuggestions: (suggestions: string[]) => void;
+  activeIndex: number | null;
+  listRef: React.MutableRefObject<Array<HTMLElement | null>>;
+  getItemProps: (userProps?: HTMLProps<HTMLElement>) => Record<string, unknown>;
   onSubmit?: (input: string) => void;
-}> = ({ query, setQuery, onSubmit }) => {
-  const [suggestions, setSuggestions] = useState<string[]>([
-    "Las Vegas",
-    "Los Angeles",
-    "San Francisco",
-    "New York",
-    "Chicago",
-  ]);
-
+}> = ({ query, setQuery, suggestions, setSuggestions, activeIndex, listRef, getItemProps, onSubmit }) => {
   useEffect(() => {
     const autocomplete = new google.maps.places.AutocompleteService();
     if (query.length > 0) {
@@ -281,16 +361,22 @@ const Suggestions: React.FC<{
 
   return (
     <>
-      {suggestions.map((suggestion) => (
+      {suggestions.map((suggestion, idx) => (
         <div
           key={suggestion}
-          className="tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 hover:tw-bg-slate-100"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setQuery(suggestion);
-            onSubmit && onSubmit(suggestion);
-          }}
+          ref={(node) => (listRef.current[idx] = node)}
+          className={mergeClasses(
+            "tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4",
+            idx === activeIndex && "tw-bg-slate-200",
+          )}
+          {...getItemProps({
+            onClick: (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setQuery(suggestion);
+              onSubmit && onSubmit(suggestion);
+            },
+          })}
         >
           {suggestion}
         </div>
