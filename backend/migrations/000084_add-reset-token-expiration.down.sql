@@ -1,0 +1,1 @@
+ALTER TABLE reset_tokens DROP COLUMN IF EXISTS expiration;
