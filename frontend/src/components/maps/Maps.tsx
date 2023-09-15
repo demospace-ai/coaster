@@ -12,7 +12,7 @@ import {
 } from "@floating-ui/react";
 import { Status, Wrapper } from "@googlemaps/react-wrapper";
 import { Transition } from "@headlessui/react";
-import { MagnifyingGlassIcon, MapPinIcon } from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon, MapPinIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { FormEvent, Fragment, HTMLProps, ReactElement, useEffect, useRef, useState } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { Loading } from "src/components/loading/Loading";
@@ -139,6 +139,10 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Where to?"
+          />
+          <XMarkIcon
+            className={mergeClasses("tw-hidden tw-cursor-pointer tw-mr-3 tw-w-5 tw-text-gray-500", active && "tw-flex")}
+            onClick={() => setQuery("")}
           />
         </div>
         <div
@@ -298,6 +302,13 @@ export const InlineMapSearch: React.FC<{
               autoComplete="off"
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Enter your address"
+            />
+            <XMarkIcon
+              className={mergeClasses(
+                "tw-hidden tw-cursor-pointer tw-mr-4 -tw-mt-2 tw-w-5 tw-text-gray-500",
+                active && "tw-flex",
+              )}
+              onClick={() => setQuery("")}
             />
           </div>
         </div>
