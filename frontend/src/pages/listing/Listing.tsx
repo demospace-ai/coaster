@@ -402,7 +402,7 @@ const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) => {
           }}
         />
         <div
-          className="tw-absolute tw-bottom-2 tw-right-2 tw-bg-white hover:tw-bg-slate-200 tw-cursor-pointer tw-rounded-3xl tw-border tw-border-black tw-border-solid tw-px-3 tw-text-sm tw-font-medium tw-py-1"
+          className="tw-absolute tw-bottom-3 tw-right-3 tw-bg-white hover:tw-bg-slate-200 tw-cursor-pointer tw-rounded-3xl tw-border tw-border-black tw-border-solid tw-px-3 tw-text-sm tw-font-medium tw-py-1"
           onClick={() => setShowImages(true)}
         >
           See all images →

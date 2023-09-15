@@ -78,7 +78,9 @@ func (s ApiService) sendInvite(email string, sender *models.User) error {
 			return nil
 		}
 
-		token, err := reset_tokens.GetActiveResetToken(s.db, user)
+		// Invites for existing users are just password reset emails with a longer expiration. There isn't much
+		// risk to using an extended expiration here since the account doesn't have any user-created data.
+		token, err := reset_tokens.GetExtendedResetToken(s.db, user)
 		if err != nil {
 			return errors.Wrap(err, "(api.sendInvite) creating reset token")
 		}
