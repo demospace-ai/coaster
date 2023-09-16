@@ -21,47 +21,28 @@ import { mergeClasses } from "src/utils/twmerge";
 
 const PRODUCTION_MAPS_KEY = "AIzaSyC5eBlci7ImDnJ0TRhT5uUq1LsKdxJOZP8";
 const DEVELOPMENT_MAPS_KEY = "AIzaSyD5BH5C_jcdkqpt3PnzEbgRfTv_0Lx6Huw";
+const INITIAL_SUGGESTIONS = ["Las Vegas", "Los Angeles", "San Francisco", "New York", "Chicago"];
 
 export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (props) => {
   const urlPath = useLocation();
   const [searchParams] = useSearchParams();
 
-  const [query, setQuery] = useState("");
-  const [active, setActive] = useState(false);
-
-  const inputRef = useRef<HTMLInputElement>(null);
-  const listRef = useRef<Array<HTMLElement | null>>([]);
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const [suggestions, setSuggestions] = useState<string[]>([
-    "Las Vegas",
-    "Los Angeles",
-    "San Francisco",
-    "New York",
-    "Chicago",
-  ]);
-
-  const { refs, floatingStyles, context } = useFloating({
-    open: active,
-    onOpenChange: setActive,
-    middleware: [offset(10), flip({ fallbackAxisSideDirection: "end" }), shift()],
-    whileElementsMounted: autoUpdate,
-  });
-
-  const click = useClick(context, {
-    toggle: false,
-    keyboardHandlers: false,
-  });
-  const dismiss = useDismiss(context);
-  const role = useRole(context);
-  const listNav = useListNavigation(context, {
+  const {
+    refs,
+    floatingStyles,
+    getReferenceProps,
+    getFloatingProps,
+    getItemProps,
+    inputRef,
     listRef,
+    query,
+    setQuery,
+    open,
+    setOpen,
     activeIndex,
-    onNavigate: setActiveIndex,
-    virtual: true,
-    loop: true,
-  });
-
-  const { getReferenceProps, getFloatingProps, getItemProps } = useInteractions([click, dismiss, role, listNav]);
+    suggestions,
+    setSuggestions,
+  } = useMapSearchState("");
 
   useEffect(() => {
     if (urlPath.pathname === "/search") {
@@ -74,7 +55,7 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
 
   const onSubmit = (input: string) => {
     props.onSubmit && props.onSubmit(input);
-    setActive(false);
+    setOpen(false);
   };
 
   return (
@@ -82,25 +63,25 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
       <MagnifyingGlassIcon
         className="tw-flex sm:tw-hidden tw-cursor-pointer tw-ml-3 tw-w-6 tw-text-gray-500"
         onClick={() => {
-          setActive(true);
+          setOpen(true);
           inputRef.current?.focus();
         }}
       />
       <div
         className={mergeClasses(
           "tw-absolute tw-z-10 tw-left-0 tw-top-0 tw-w-[100vw] tw-h-[100vh] tw-bg-black/10 tw-backdrop-blur-sm tw-invisible tw-transition-all tw-duration-100",
-          active && "tw-visible",
+          open && "tw-visible",
         )}
       />
       <form
         ref={refs.setReference}
         className={mergeClasses(
           "tw-hidden sm:tw-flex tw-left-0 sm:tw-left-[unset] tw-absolute tw-w-full sm:tw-w-fit tw-p-5 sm:tw-p-0 tw-mt-4 sm:tw-mt-0",
-          active && "tw-flex",
+          open && "tw-flex",
         )}
         onSubmit={(e: FormEvent) => {
           e.preventDefault();
-          if (activeIndex) {
+          if (activeIndex !== null) {
             onSubmit(suggestions[activeIndex]);
           } else {
             onSubmit(query);
@@ -115,7 +96,7 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
               inputRef.current?.blur();
             }
             if (event.key === "Enter") {
-              if (activeIndex) {
+              if (activeIndex !== null) {
                 onSubmit(suggestions[activeIndex]);
               } else {
                 onSubmit(query);
@@ -128,7 +109,7 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
         <div
           className={mergeClasses(
             "tw-flex tw-w-0 tw-rounded-[50px] tw-bg-white tw-ring-1 tw-ring-slate-300 tw-relative tw-z-20 sm:tw-w-[25vw] tw-transition-all tw-duration-100",
-            active && "tw-w-full sm:tw-w-[50vw] tw-rounded-lg",
+            open && "tw-w-full sm:tw-w-[50vw] tw-rounded-lg",
           )}
         >
           <MagnifyingGlassIcon className="tw-cursor-pointer tw-ml-3 tw-w-5 tw-text-gray-500" />
@@ -138,10 +119,12 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
             className="tw-inline tw-placeholder-gray-600 tw-w-full tw-bg-transparent tw-py-4 sm:tw-py-3 tw-px-3 tw-text-sm tw-leading-5 tw-outline-none tw-text-slate-900 tw-text-ellipsis tw-cursor-pointer tw-transition tw-duration-100"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
+            autoComplete="off"
+            aria-autocomplete="list"
             placeholder="Where to?"
           />
           <XMarkIcon
-            className={mergeClasses("tw-hidden tw-cursor-pointer tw-mr-3 tw-w-5 tw-text-gray-500", active && "tw-flex")}
+            className={mergeClasses("tw-hidden tw-cursor-pointer tw-mr-3 tw-w-5 tw-text-gray-500", open && "tw-flex")}
             onClick={() => setQuery("")}
           />
         </div>
@@ -153,7 +136,7 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
         >
           <Transition
             as={Fragment}
-            show={active}
+            show={open}
             enter="tw-transition tw-ease-out tw-duration-100"
             enterFrom="tw-transform tw-opacity-0 tw-scale-80"
             enterTo="tw-transform tw-opacity-100 tw-scale-100"
@@ -189,47 +172,26 @@ export const InlineMapSearch: React.FC<{
   onSelect?: (input: string) => void;
   initial?: string;
 }> = (props) => {
-  const [query, setQuery] = useState(props.initial ? props.initial : "");
-  const [active, setActive] = useState(false);
-
-  const inputRef = useRef<HTMLInputElement>(null);
-  const listRef = useRef<Array<HTMLElement | null>>([]);
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const [suggestions, setSuggestions] = useState<string[]>([
-    "Las Vegas",
-    "Los Angeles",
-    "San Francisco",
-    "New York",
-    "Chicago",
-  ]);
-
-  const { refs, floatingStyles, context } = useFloating({
-    open: active,
-    onOpenChange: setActive,
-    middleware: [offset(10), flip({ fallbackAxisSideDirection: "end" }), shift()],
-    whileElementsMounted: autoUpdate,
-  });
-
-  const click = useClick(context, {
-    toggle: false,
-    keyboardHandlers: false,
-  });
-  const dismiss = useDismiss(context);
-  const role = useRole(context);
-
-  const listNav = useListNavigation(context, {
+  const {
+    refs,
+    floatingStyles,
+    getReferenceProps,
+    getFloatingProps,
+    getItemProps,
+    inputRef,
     listRef,
+    query,
+    setQuery,
+    open,
+    setOpen,
     activeIndex,
-    onNavigate: setActiveIndex,
-    virtual: true,
-    loop: true,
-  });
-
-  const { getReferenceProps, getFloatingProps, getItemProps } = useInteractions([click, dismiss, role, listNav]);
+    suggestions,
+    setSuggestions,
+  } = useMapSearchState(props.initial);
 
   const onSelect = (input: string) => {
     props.onSelect && props.onSelect(input);
-    setActive(false);
+    setOpen(false);
   };
 
   const onSubmit = (input: string) => {
@@ -237,7 +199,7 @@ export const InlineMapSearch: React.FC<{
     onSelect(input);
   };
 
-  const showLabel = active || inputRef.current?.value || props.initial;
+  const showLabel = open || inputRef.current?.value || props.initial;
 
   return (
     <div
@@ -246,7 +208,7 @@ export const InlineMapSearch: React.FC<{
         props.className,
       )}
     >
-      <form
+      <div
         ref={refs.setReference}
         className="tw-flex tw-w-full tw-p-0 sm:tw-mt-0"
         {...getReferenceProps({
@@ -258,23 +220,13 @@ export const InlineMapSearch: React.FC<{
               inputRef.current?.blur();
             }
             if (event.key === "Enter") {
-              if (activeIndex) {
+              if (activeIndex !== null) {
                 onSubmit(suggestions[activeIndex]);
-              } else {
-                onSubmit(query);
               }
               inputRef.current?.blur();
             }
           },
         })}
-        onSubmit={() => {
-          if (activeIndex) {
-            onSubmit(suggestions[activeIndex]);
-          } else {
-            onSubmit(query);
-          }
-          inputRef.current?.blur();
-        }}
       >
         <div
           className={mergeClasses(
@@ -300,13 +252,14 @@ export const InlineMapSearch: React.FC<{
               className="tw-inline tw-placeholder-gray-600 tw-w-full tw-bg-transparent tw-py-3 tw-px-3 tw-text-base tw-leading-5 tw-outline-none tw-text-slate-900 tw-text-ellipsis tw-cursor-text tw-transition tw-duration-100"
               value={query}
               autoComplete="off"
+              aria-autocomplete="list"
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Enter your address"
             />
             <XMarkIcon
               className={mergeClasses(
                 "tw-hidden tw-cursor-pointer tw-mr-4 -tw-mt-2 tw-w-5 tw-text-gray-500",
-                active && "tw-flex",
+                open && "tw-flex",
               )}
               onClick={() => setQuery("")}
             />
@@ -320,7 +273,7 @@ export const InlineMapSearch: React.FC<{
         >
           <Transition
             as={Fragment}
-            show={active}
+            show={open}
             enter="tw-transition tw-ease-out tw-duration-100"
             enterFrom="tw-transform tw-opacity-0 tw-scale-80"
             enterTo="tw-transform tw-opacity-100 tw-scale-100"
@@ -344,9 +297,60 @@ export const InlineMapSearch: React.FC<{
             </div>
           </Transition>
         </div>
-      </form>
+      </div>
     </div>
   );
+};
+
+const useMapSearchState = (initial?: string) => {
+  const [query, setQuery] = useState(initial ? initial : "");
+  const [open, setOpen] = useState(false);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<Array<HTMLElement | null>>([]);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [suggestions, setSuggestions] = useState<string[]>(INITIAL_SUGGESTIONS);
+
+  const { refs, floatingStyles, context } = useFloating({
+    open: open,
+    onOpenChange: setOpen,
+    middleware: [offset(10), flip({ fallbackAxisSideDirection: "end" }), shift()],
+    whileElementsMounted: autoUpdate,
+  });
+
+  const click = useClick(context, {
+    toggle: false,
+    keyboardHandlers: false,
+  });
+  const dismiss = useDismiss(context);
+  const role = useRole(context, { role: "listbox" });
+
+  const listNav = useListNavigation(context, {
+    listRef,
+    activeIndex,
+    onNavigate: setActiveIndex,
+    virtual: true,
+    loop: true,
+  });
+
+  const { getReferenceProps, getFloatingProps, getItemProps } = useInteractions([click, dismiss, role, listNav]);
+
+  return {
+    refs,
+    floatingStyles,
+    getReferenceProps,
+    getFloatingProps,
+    getItemProps,
+    inputRef,
+    listRef,
+    query,
+    setQuery,
+    open,
+    setOpen,
+    activeIndex,
+    suggestions,
+    setSuggestions,
+  };
 };
 
 const Suggestions: React.FC<{
@@ -376,6 +380,8 @@ const Suggestions: React.FC<{
         <div
           key={suggestion}
           ref={(node) => (listRef.current[idx] = node)}
+          role="option"
+          aria-selected={idx === activeIndex}
           className={mergeClasses(
             "tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4",
             idx === activeIndex && "tw-bg-slate-200",
