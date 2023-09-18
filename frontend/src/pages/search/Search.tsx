@@ -96,8 +96,8 @@ export const ListingImages: React.FC<{ listing: Listing }> = ({ listing }) => {
 
   return (
     <div className="tw-relative tw-group tw-select-none">
-      <div className="tw-absolute tw-flex tw-h-full tw-w-full tw-items-center group-hover:tw-opacity-100 tw-opacity-0 tw-transition-all tw-duration-100">
-        <div className="tw-absolute tw-right-2">
+      <div className="tw-absolute tw-flex tw-pointer-events-none tw-h-full tw-w-full tw-items-center group-hover:tw-opacity-100 tw-opacity-0 tw-transition-all tw-duration-200">
+        <div className="tw-absolute tw-right-2 tw-pointer-events-auto">
           <ChevronRightIcon
             className="tw-h-8 tw-cursor-pointer tw-stroke-slate-800 tw-p-2 tw-bg-white tw-rounded-full tw-opacity-90 hover:tw-opacity-100 hover:tw-scale-105 tw-transition-all tw-duration-100"
             onClick={(e) => {
@@ -106,7 +106,7 @@ export const ListingImages: React.FC<{ listing: Listing }> = ({ listing }) => {
             }}
           />
         </div>
-        <div className="tw-absolute tw-left-2">
+        <div className="tw-absolute tw-left-2 tw-pointer-events-auto">
           <ChevronLeftIcon
             className="tw-h-8 tw-cursor-pointer tw-stroke-slate-800 tw-p-2 tw-bg-white tw-rounded-full tw-opacity-90 hover:tw-opacity-100 hover:tw-scale-105 tw-transition-all tw-duration-100"
             onClick={(e) => {
