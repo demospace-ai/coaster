@@ -13,7 +13,7 @@ import { isProd } from "src/utils/env";
 const store = createStore();
 
 if (isProd()) {
-  rudderanalytics.load("2DuH7iesuV4TtpwMqRvXqQttOvm", "https://fabranickbele.dataplane.rudderstack.com");
+  rudderanalytics.load("2Va8vvJ85DejVV7jncdVenC6smB", "https://trycoasterlyoh.dataplane.rudderstack.com");
   H.init("7e3vw5g1", {
     tracingOrigins: ["localhost", "api.trycoaster.com"],
     networkRecording: {

@@ -12,7 +12,7 @@ func TrackSignup(userID int64, name string, email string) {
 		return
 	}
 
-	client := analytics.New("2DuH7iesuV4TtpwMqRvXqQttOvm", "https://fabranickbele.dataplane.rudderstack.com")
+	client := analytics.New("2Va8zq1kRrOOFb9sK4MYOrqPFbr", "https://trycoasterlyoh.dataplane.rudderstack.com")
 
 	// Enqueues a track event that will be sent asynchronously.
 	client.Enqueue(analytics.Track{

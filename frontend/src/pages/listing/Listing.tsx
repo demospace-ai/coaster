@@ -17,7 +17,7 @@ import { Modal } from "src/components/modal/Modal";
 import { useShowToast } from "src/components/notifications/Notifications";
 import { ProfilePicture } from "src/components/profile/ProfilePicture";
 import { useListing } from "src/rpc/data";
-import { ListingStatus, Listing as ListingType } from "src/rpc/types";
+import { Host, ListingStatus, Listing as ListingType } from "src/rpc/types";
 import { getGcsImageUrl } from "src/utils/images";
 import { toTitleCase } from "src/utils/string";
 import useWindowDimensions from "src/utils/window";
@@ -85,7 +85,9 @@ const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) => {
       </span>
       <LinkButton
         className="tw-font-semibold tw-py-2 tw-mb-4"
-        href={`mailto:${listing.host.email}?subject=Checking availability&body=Hi ${listing.host.first_name}, I'm interested in booking your trip!`}
+        href={`mailto:${listing.host.email}?subject=Checking availability&body=Hi ${getHostName(
+          listing.host,
+        )}, I'm interested in booking your trip!`}
       >
         Check Availability
       </LinkButton>
@@ -103,7 +105,9 @@ const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
         </span>
         <LinkButton
           className="tw-font-semibold tw-py-2 tw-mb-4"
-          href={`mailto:${listing.host.email}?subject=Checking availability&body=Hi ${listing.host.first_name}, I'm interested in booking your trip!`}
+          href={`mailto:${listing.host.email}?subject=Checking availability&body=Hi ${getHostName(
+            listing.host,
+          )}, I'm interested in booking your trip!`}
         >
           Check Availability
         </LinkButton>
@@ -134,11 +138,11 @@ const HostDetails: React.FC<{ listing: ListingType }> = ({ listing }) => {
       <div className="tw-mt-5 tw-flex tw-flex-row tw-items-center">
         <ProfilePicture
           url={listing.host.profile_picture_url}
-          name={listing.host.first_name}
+          name={getHostName(listing.host)}
           className="tw-w-10 tw-h-10 tw-mr-4"
         />
         <div>
-          <div className="tw-text-xl tw-font-medium">Meet your trip provider: {listing.host.first_name}</div>
+          <div className="tw-text-xl tw-font-medium">Meet your trip provider: {getHostName(listing.host)}</div>
           <div className="tw-flex tw-flex-row tw-items-center">
             <CheckBadgeIcon className="tw-h-4 tw-mr-1 tw-fill-green-600" />
             Identity Verified
@@ -229,7 +233,7 @@ const HostOverview: React.FC<{ listing: ListingType }> = ({ listing }) => {
   return (
     <div className="tw-flex tw-items-center tw-pb-6 tw-border-b tw-border-solid tw-border-gray-300 tw-justify-between">
       <div>
-        <div className="tw-text-xl sm:tw-text-2xl tw-font-medium">Provided by {listing.host.first_name}</div>
+        <div className="tw-text-xl sm:tw-text-2xl tw-font-medium">Provided by {getHostName(listing.host)}</div>
         <div className="tw-flex tw-items-center tw-mt-1">
           <GlobeAltIcon className="tw-h-5 tw-mr-1.5" />
           {languages}
@@ -237,7 +241,7 @@ const HostOverview: React.FC<{ listing: ListingType }> = ({ listing }) => {
       </div>
       <ProfilePicture
         url={listing.host.profile_picture_url}
-        name={listing.host.first_name}
+        name={getHostName(listing.host)}
         className="tw-w-12 tw-h-12"
       />
     </div>
@@ -458,4 +462,16 @@ const getShortDescription = (listing: ListingType) => {
     }
   }
   return shortDescription;
+};
+
+const getHostName = (host: Host) => {
+  if (host.first_name && host.last_name) {
+    return `${host.first_name} ${host.last_name}`;
+  } else if (host.first_name) {
+    return host.first_name;
+  } else if (host.last_name) {
+    return host.last_name;
+  } else {
+    return "Unknown";
+  }
 };
