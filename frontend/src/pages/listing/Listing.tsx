@@ -331,7 +331,6 @@ const ImagesModal: React.FC<{ listing: ListingType; imageIndex: number; setImage
       <div
         ref={carouselRef}
         className="tw-absolute tw-left-1/2 -tw-translate-x-1/2 tw-flex tw-pt-[10vh] tw-h-[90vh] tw-w-screen sm:tw-w-[90vw] tw-overflow-x-auto tw-snap-mandatory tw-snap-x tw-items-center tw-hide-scrollbar"
-        // onScroll={handleScroll}
       >
         {listing.images.map((image) => (
           <div key={image.id} className="tw-flex tw-basis-full tw-snap-center tw-h-full">

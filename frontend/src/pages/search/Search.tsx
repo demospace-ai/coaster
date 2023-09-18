@@ -1,4 +1,5 @@
-import React from "react";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Loading } from "src/components/loading/Loading";
 import { useSearch } from "src/rpc/data";
@@ -41,15 +42,93 @@ export const SearchResult: React.FC<{ listing: Listing }> = ({ listing }) => {
             <div className="tw-absolute tw-right-3 tw-top-3 tw-justify-center tw-items-center tw-flex tw-w-6 tw-h-6">
               <HeartIcon className="tw-w-6  hover:tw-w-5 tw-transition-all tw-duration-100 tw-text-gray-600" />
             </div> */}
-      <div className="tw-flex tw-rounded-xl tw-overflow-clip tw-aspect-square tw-mb-5">
-        <img
-          className="tw-bg-gray-100 tw-object-cover tw-aspect-square hover:tw-scale-105 tw-transition-all tw-duration-200"
-          src={listing.images.length > 0 ? getGcsImageUrl(listing.images[0]) : "TODO"}
-        />
-      </div>
-      <span className="tw-font-bold tw-text-lg">{listing.name}</span>
+      <ListingImages listing={listing} />
+      <span className="tw-mt-5 tw-font-bold tw-text-lg">{listing.name}</span>
       <span>{listing.location}</span>
       <span>${listing.price}</span>
+    </div>
+  );
+};
+
+export const ListingImages: React.FC<{ listing: Listing }> = ({ listing }) => {
+  const [imageIndex, setImageIndex] = useState(0);
+  const [scrolledToIndex, setScrolledToIndex] = useState(0);
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(0);
+
+  useEffect(() => {
+    if (scrolledToIndex !== imageIndex) {
+      setScrolledToIndex(imageIndex);
+      carouselRef.current?.scrollTo({ left: width * imageIndex, behavior: "smooth" });
+    }
+  }, [imageIndex]);
+
+  const handleScroll = useCallback(() => {
+    if (carouselRef.current) {
+      const newIndex = Math.round(carouselRef.current.scrollLeft / width);
+      setImageIndex(newIndex);
+      setScrolledToIndex(newIndex);
+    }
+  }, [width]);
+
+  const scrollForward = () => {
+    const newIndex = (imageIndex + 1) % listing.images.length;
+    setImageIndex(newIndex);
+    setScrolledToIndex(newIndex);
+    carouselRef.current?.scrollTo({ left: width * newIndex, behavior: "smooth" });
+  };
+
+  const scrollBack = () => {
+    const newIndex = (imageIndex - 1) % listing.images.length;
+    setImageIndex(newIndex);
+    setScrolledToIndex(newIndex);
+    carouselRef.current?.scrollTo({ left: width * newIndex, behavior: "smooth" });
+  };
+
+  // Use effect to attach to the scrollend event rather than just every scroll
+  useEffect(() => {
+    if (carouselRef.current) {
+      carouselRef.current.addEventListener("scrollend", handleScroll);
+      setWidth(carouselRef.current.clientWidth);
+    }
+    return () => carouselRef.current?.removeEventListener("scrollend", handleScroll);
+  }, [carouselRef, handleScroll]);
+
+  return (
+    <div className="tw-relative tw-group tw-select-none">
+      <div className="tw-absolute tw-flex tw-h-full tw-w-full tw-items-center group-hover:tw-opacity-100 tw-opacity-0 tw-transition-all tw-duration-100">
+        <div className="tw-absolute tw-right-2">
+          <ChevronRightIcon
+            className="tw-h-8 tw-cursor-pointer tw-stroke-slate-800 tw-p-2 tw-bg-white tw-rounded-full tw-opacity-90 hover:tw-opacity-100 hover:tw-scale-105 tw-transition-all tw-duration-100"
+            onClick={(e) => {
+              e.stopPropagation();
+              scrollForward();
+            }}
+          />
+        </div>
+        <div className="tw-absolute tw-left-2">
+          <ChevronLeftIcon
+            className="tw-h-8 tw-cursor-pointer tw-stroke-slate-800 tw-p-2 tw-bg-white tw-rounded-full tw-opacity-90 hover:tw-opacity-100 hover:tw-scale-105 tw-transition-all tw-duration-100"
+            onClick={(e) => {
+              e.stopPropagation();
+              scrollBack();
+            }}
+          />
+        </div>
+      </div>
+      <div
+        ref={carouselRef}
+        className="tw-flex tw-items-center tw-w-full tw-h-full tw-rounded-xl tw-aspect-square tw-overflow-clip tw-overflow-x-auto tw-snap-mandatory tw-snap-x tw-hide-scrollbar"
+      >
+        {listing.images.map((image) => (
+          <img
+            key={image.id}
+            tabIndex={-1}
+            className="tw-flex-none tw-w-full tw-h-full tw-bg-gray-100 tw-object-cover tw-snap-center tw-snap-always tw-cursor-pointer"
+            src={getGcsImageUrl(image)}
+          />
+        ))}
+      </div>
     </div>
   );
 };
