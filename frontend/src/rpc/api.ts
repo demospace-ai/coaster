@@ -179,7 +179,7 @@ export const SendInvite: IEndpoint<SendInviteRequest, undefined> = {
   track: true,
 };
 
-export const JoinWaitlist: IEndpoint<{ phone: string }, undefined> = {
+export const JoinWaitlist: IEndpoint<{ email: string }, undefined> = {
   name: "Join waitlist",
   method: "POST",
   path: "/waitlist",

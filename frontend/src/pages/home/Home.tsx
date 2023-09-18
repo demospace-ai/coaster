@@ -1,8 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { parsePhoneNumber } from "libphonenumber-js";
 import React, { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { NavLink } from "react-router-dom";
+import { FormError } from "src/components/FormError";
 import { Button } from "src/components/button/Button";
 import {
   CampingIcon,
@@ -18,7 +18,7 @@ import {
   YogaIcon,
 } from "src/components/icons/Icons";
 import Hero from "src/components/images/hero.webp";
-import { PhoneInput } from "src/components/input/Input";
+import { Input } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { Modal } from "src/components/modal/Modal";
 import { SearchResult } from "src/pages/search/Search";
@@ -116,21 +116,22 @@ export const ComingSoon: React.FC = () => {
   const [showWaitlist, setShowWaitlist] = useState<boolean>(false);
   const [joined, setJoined] = useState<boolean>(false);
   const waitlistSchema = z.object({
-    phone: z.string().refine((value) => parsePhoneNumber(value).isValid()),
+    email: z.string().email(),
   });
   type WaitlistSchemaType = z.infer<typeof waitlistSchema>;
   const {
     handleSubmit,
-    control,
+    register,
     clearErrors,
+    watch,
     formState: { errors },
   } = useForm<WaitlistSchemaType>({
     mode: "onBlur",
     resolver: zodResolver(waitlistSchema),
   });
 
-  const joinWaitlist = async (data: { phone: string }) => {
-    await sendRequest(JoinWaitlist, { payload: { phone: data.phone } });
+  const joinWaitlist = async (data: { email: string }) => {
+    await sendRequest(JoinWaitlist, { payload: { email: data.email } });
     setJoined(true);
   };
 
@@ -144,30 +145,25 @@ export const ComingSoon: React.FC = () => {
         }}
         clickToEscape={true}
       >
-        <div className="tw-w-[320px] sm:tw-w-[420px] tw-h-[240px] tw-px-8 sm:tw-px-12 tw-pb-20">
+        <div className="tw-w-[320px] sm:tw-w-[420px] tw-px-8 sm:tw-px-12 tw-pb-10">
           {joined ? (
             <div className="tw-mt-10 tw-flex tw-flex-col tw-items-center tw-justify-center">
               <div className="tw-text-center tw-w-full tw-text-2xl tw-font-bold">You're on the list!</div>
-              <div className="tw-text-center tw-mt-2">We'll let you know when you can get started.</div>
+              <div className="tw-text-center tw-mt-2 tw-pb-10">We'll let you know when you can get started.</div>
             </div>
           ) : (
             <>
               <div className="tw-text-center tw-w-full tw-text-2xl tw-font-bold tw-mb-2">Join waitlist</div>
               <div className="tw-text-center tw-w-full tw-mb-4">Coaster is currently invite only.</div>
-              <Controller
-                name="phone"
-                control={control}
-                render={({ field }) => (
-                  <PhoneInput
-                    label="Phone number"
-                    wrapperClass={"tw-mb-4"}
-                    className={errors.phone && "tw-border-red-600 hover:tw-border-red-600"}
-                    {...field}
-                  />
-                )}
+              <Input
+                value={watch("email")}
+                label="Email"
+                className={errors.email && "tw-border-red-600 hover:tw-border-red-600"}
+                {...register("email")}
               />
+              <FormError message={errors.email?.message} />
               <Button
-                className="tw-flex tw-h-[52px] tw-items-center tw-justify-center tw-whitespace-nowrap tw-w-full tw-bg-blue-700 hover:tw-bg-blue-900"
+                className="tw-flex tw-h-[52px] tw-items-center tw-justify-center tw-whitespace-nowrap tw-w-full tw-bg-blue-700 hover:tw-bg-blue-900 tw-mt-4"
                 onClick={handleSubmit(joinWaitlist)}
               >
                 Join waitlist

@@ -26,6 +26,7 @@ const (
 )
 
 type Waitlist struct {
+	Email string `json:"email"`
 	Phone string `json:"phone"`
 
 	BaseModel

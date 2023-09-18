@@ -10,7 +10,7 @@ import (
 )
 
 type JoinWaitlistRequest struct {
-	Phone string `json:"phone" validate:"required"`
+	Email string `json:"email" validate:"required"`
 }
 
 func (s ApiService) JoinWaitlist(w http.ResponseWriter, r *http.Request) error {
@@ -27,7 +27,7 @@ func (s ApiService) JoinWaitlist(w http.ResponseWriter, r *http.Request) error {
 		return errors.Wrap(err, "(api.JoinWaitlist) validating request")
 	}
 
-	err = users.JoinWaitlist(s.db, joinWaitlistRequest.Phone)
+	err = users.JoinWaitlist(s.db, joinWaitlistRequest.Email)
 	if err != nil {
 		return errors.Wrap(err, "(api.JoinWaitlist) joining waitlist")
 	}

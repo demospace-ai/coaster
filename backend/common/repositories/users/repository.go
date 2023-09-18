@@ -176,9 +176,10 @@ func SetIsHost(db *gorm.DB, userID int64, isHost bool) error {
 	return nil
 }
 
-func JoinWaitlist(db *gorm.DB, phone string) error {
+func JoinWaitlist(db *gorm.DB, email string) error {
 	waitlist := models.Waitlist{
-		Phone: phone,
+		Email: email,
+		Phone: "", // Not taking phone numbers anymore
 	}
 	result := db.Clauses(clause.OnConflict{DoNothing: true, Columns: []clause.Column{{Name: "phone"}}}).Create(&waitlist)
 	if result.Error != nil {
