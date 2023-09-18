@@ -8,18 +8,25 @@ import (
 type ListingCategory string
 
 const (
-	CategorySurfing    ListingCategory = "surfing"
-	CategorySkiing     ListingCategory = "skiing"
-	CategoryFishing    ListingCategory = "fishing"
-	CategoryHiking     ListingCategory = "hiking"
-	CategoryCamping    ListingCategory = "camping"
-	CategoryCycling    ListingCategory = "cycling"
-	CategoryBoating    ListingCategory = "boating"
-	CategoryClimbing   ListingCategory = "climbing"
-	CategoryOutdoors   ListingCategory = "outdoors"
-	CategoryDiving     ListingCategory = "diving"
-	CategorySnorkeling ListingCategory = "snorkeling"
-	CategoryHunting    ListingCategory = "hunting"
+	CategorySurfing      ListingCategory = "surfing"
+	CategorySkiing       ListingCategory = "skiing"
+	CategoryFishing      ListingCategory = "fishing"
+	CategoryHiking       ListingCategory = "hiking"
+	CategoryCamping      ListingCategory = "camping"
+	CategoryCycling      ListingCategory = "cycling"
+	CategoryBoating      ListingCategory = "boating"
+	CategoryClimbing     ListingCategory = "climbing"
+	CategoryOutdoors     ListingCategory = "outdoors"
+	CategoryDiving       ListingCategory = "diving"
+	CategorySnorkeling   ListingCategory = "snorkeling"
+	CategorySafari       ListingCategory = "safari"
+	CategorySup          ListingCategory = "paddleboarding"
+	CategoryKiteBoarding ListingCategory = "kiteboarding"
+	CategoryWindSurfing  ListingCategory = "windsurfing"
+	CategoryKayaking     ListingCategory = "kayaking"
+	CategoryBuggying     ListingCategory = "buggying"
+	CategoryEfoiling     ListingCategory = "efoiling"
+	CategoryHunting      ListingCategory = "hunting"
 )
 
 type ListingStatus string
