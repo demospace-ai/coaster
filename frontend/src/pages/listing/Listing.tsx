@@ -302,8 +302,12 @@ const ImagesModal: React.FC<{ listing: ListingType; imageIndex: number; setImage
   useEffect(() => {
     if (carouselRef.current) {
       carouselRef.current.addEventListener("scrollend", handleScroll);
+      carouselRef.current.addEventListener("touchend", handleScroll);
     }
-    return () => carouselRef.current?.removeEventListener("scrollend", handleScroll);
+    return () => {
+      carouselRef.current?.removeEventListener("scrollend", handleScroll);
+      carouselRef.current?.removeEventListener("touchend", handleScroll);
+    };
   }, [carouselRef, handleScroll]);
 
   return (
