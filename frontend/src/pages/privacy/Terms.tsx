@@ -194,11 +194,12 @@ export const Terms: React.FC = () => {
         costs, and payout schedules set forth below. You agree and authorize Coaster and/or its payment processors to deduct
         all commissions and fees due and owing from your payout amount, and to settle and transfer funds to your bank account
         as designated by you through your Coaster account.
-          Commissions.
-            (i) Except as explicitly stated in these Terms, Coaster charges the following commission (the “Commission”) on
+        <br />
+            (i) Except as explicitly stated otherwise, Coaster charges the following commission (the “Commission”) on
             orders placed through the Services (at times referred to as the Coaster “marketplace”): The Commission charge is
-            15% of the Order Subtotal (as defined below)
-            As used herein “Order Subtotal” means the total product cost, less provider funded discounts as reflected in the 
+            15% of the Order Subtotal (as defined below).
+        <br />
+            (ii) As used herein “Order Subtotal” means the total product cost, less provider funded discounts as reflected in the 
             invoice provided by Coaster to the applicable provider.
       </p>
     </div>
