@@ -187,7 +187,7 @@ export const Terms: React.FC = () => {
         same or different kind. If for any reason a court of competent jurisdiction finds any provision of this Terms of
         Use, or portion thereof, to be unenforceable, that provision of the agreement will be enforced to the maximum
         extent permissible so as to effect the intent of the parties, and the remainder of this Terms of Use will
-        continue in full force and effect.
+        continue in full force and effect. 
       </p>
     </div>
   );
