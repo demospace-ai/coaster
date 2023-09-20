@@ -14,7 +14,8 @@ const store = createStore();
 
 if (isProd()) {
   rudderanalytics.load("2Va8vvJ85DejVV7jncdVenC6smB", "https://trycoasterlyoh.dataplane.rudderstack.com");
-  H.init("7e3vw5g1", {
+  H.init("6glrn57g", {
+    serviceName: "frontend-app",
     tracingOrigins: ["localhost", "api.trycoaster.com"],
     networkRecording: {
       enabled: true,
