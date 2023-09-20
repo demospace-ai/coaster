@@ -10,6 +10,7 @@ import longlogo from "src/components/images/long-logo.svg";
 import mail from "src/components/images/mail.svg";
 import { Input } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
+import { useOnLoginSuccess } from "src/pages/login/actions";
 import { useDispatch, useSelector } from "src/root/model";
 import { getEndpointUrl, sendRequest } from "src/rpc/ajax";
 import { CheckEmail, CreateUser, EmailLogin, OAuthRedirect, SendReset } from "src/rpc/api";
@@ -215,6 +216,8 @@ type EmailLoginSchemaType = z.infer<typeof EmailLoginSchema>;
 
 const EmailLoginForm: React.FC<{ reset: () => void; email?: string }> = ({ reset, email }) => {
   const dispatch = useDispatch();
+  const onLoginSuccess = useOnLoginSuccess();
+
   const {
     handleSubmit,
     register,
@@ -244,6 +247,7 @@ const EmailLoginForm: React.FC<{ reset: () => void; email?: string }> = ({ reset
             type: "login.authenticated",
             user: result.user,
           });
+          onLoginSuccess(result.user);
         })}
       >
         <Input
@@ -296,6 +300,7 @@ type EmailSignupSchemaType = z.infer<typeof EmailSignupSchema>;
 
 const EmailSignup: React.FC<{ reset: () => void; email?: string }> = ({ reset, email }) => {
   const dispatch = useDispatch();
+  const onLoginSuccess = useOnLoginSuccess();
   const {
     handleSubmit,
     register,
@@ -328,6 +333,7 @@ const EmailSignup: React.FC<{ reset: () => void; email?: string }> = ({ reset, e
             type: "login.authenticated",
             user: result.user,
           });
+          onLoginSuccess(result.user);
         })}
       >
         <div className="tw-flex tw-gap-2">

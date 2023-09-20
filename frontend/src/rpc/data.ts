@@ -1,3 +1,4 @@
+import { useOnLoginSuccess } from "src/pages/login/actions";
 import { useDispatch } from "src/root/model";
 import { sendRequest } from "src/rpc/ajax";
 import {
@@ -128,6 +129,7 @@ export function useUpdateProfilePicture(): Mutation<File> {
 
 export function useResetPassword(): Mutation<ResetPasswordRequest> {
   const dispatch = useDispatch();
+  const onLoginSuccess = useOnLoginSuccess();
   return useMutation<User, ResetPasswordRequest>(
     (request: ResetPasswordRequest) => {
       return sendRequest(ResetPassword, { payload: request });
@@ -135,6 +137,7 @@ export function useResetPassword(): Mutation<ResetPasswordRequest> {
     {
       onSuccess: (user: User) => {
         dispatch({ type: "login.authenticated", user: user });
+        onLoginSuccess(user);
       },
     },
   );
