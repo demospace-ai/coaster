@@ -26,6 +26,7 @@ const (
 	CategoryKayaking     ListingCategory = "kayaking"
 	CategoryBuggying     ListingCategory = "buggying"
 	CategoryEfoiling     ListingCategory = "efoiling"
+	CategoryKiteFoiling  ListingCategory = "kitefoiling"
 	CategoryHunting      ListingCategory = "hunting"
 )
 
