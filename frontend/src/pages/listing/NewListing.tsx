@@ -1,7 +1,7 @@
 import { EyeIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import update from "immutability-helper";
-import { FormEvent, useCallback, useMemo, useRef, useState } from "react";
+import { FormEvent, useCallback, useRef, useState } from "react";
 import { DndProvider, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useForm } from "react-hook-form";
@@ -41,52 +41,6 @@ export const NewListing: React.FC = () => {
   const { listing, loading } = useDraftListing();
   const navigate = useNavigate();
   const initialStep = computeInitialStep(listing);
-  const multiStep = useMemo(
-    () => (
-      <MultiStep
-        onComplete={() => {
-          navigate("/hosting");
-        }}
-        initialStepNumber={initialStep}
-        steps={[
-          { id: "category", elementFn: categoryStep, title: "What kind of experience do you want to host?" },
-          { id: "location", elementFn: locationStep, title: "Where is your adventure located?" },
-          {
-            id: "name",
-            elementFn: nameStep,
-            title: "What do you want to call your adventure?",
-            subtitle: "Giving your trip a fun name can make you stand out!",
-          },
-          {
-            id: "description",
-            elementFn: descriptionStep,
-            title: "Create your description",
-            subtitle: "Share what makes your trip special.",
-          },
-          {
-            id: "images",
-            elementFn: imageStep,
-            title: "Add images",
-            subtitle: "Show off your trip with at least three images.",
-          },
-          { id: "price", elementFn: priceStep, title: "Set a price", subtitle: "You can change it anytime." },
-          {
-            id: "details",
-            elementFn: detailsStep,
-            title: "Provide a few final details",
-            subtitle: "Let your guests know what to expect.",
-          },
-          {
-            id: "review",
-            elementFn: reviewStep,
-            title: "Review your listing",
-            subtitle: "Here's what we'll show to guests. Make sure everything looks good.",
-          },
-        ]}
-      />
-    ),
-    [initialStep, navigate],
-  );
 
   if (loading) {
     return <Loading />;
@@ -95,7 +49,47 @@ export const NewListing: React.FC = () => {
   return (
     <div className="tw-w-full tw-flex tw-justify-center">
       <div className="tw-flex tw-px-8 sm:tw-px-0 tw-w-[500px] tw-min-h-[600px] tw-mt-10 tw-items-center tw-pb-24 tw-overflow-scroll">
-        {multiStep}
+        <MultiStep
+          onComplete={() => {
+            navigate("/hosting");
+          }}
+          initialStepNumber={initialStep}
+          steps={[
+            { id: "category", elementFn: categoryStep, title: "What kind of experience do you want to host?" },
+            { id: "location", elementFn: locationStep, title: "Where is your adventure located?" },
+            {
+              id: "name",
+              elementFn: nameStep,
+              title: "What do you want to call your adventure?",
+              subtitle: "Giving your trip a fun name can make you stand out!",
+            },
+            {
+              id: "description",
+              elementFn: descriptionStep,
+              title: "Create your description",
+              subtitle: "Share what makes your trip special.",
+            },
+            {
+              id: "images",
+              elementFn: imageStep,
+              title: "Add images",
+              subtitle: "Show off your trip with at least three images.",
+            },
+            { id: "price", elementFn: priceStep, title: "Set a price", subtitle: "You can change it anytime." },
+            {
+              id: "details",
+              elementFn: detailsStep,
+              title: "Provide a few final details",
+              subtitle: "Let your guests know what to expect.",
+            },
+            {
+              id: "review",
+              elementFn: reviewStep,
+              title: "Review your listing",
+              subtitle: "Here's what we'll show to guests. Make sure everything looks good.",
+            },
+          ]}
+        />
       </div>
     </div>
   );
