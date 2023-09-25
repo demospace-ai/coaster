@@ -1,9 +1,10 @@
-import { CalendarDaysIcon, ClockIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
+import { CalendarDaysIcon, CheckIcon, ClockIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { NavLink } from "react-router-dom";
 import { Loading } from "src/components/loading/Loading";
 import { useSelector } from "src/root/model";
 import { useHostedListings } from "src/rpc/data";
 import { ListingStatus } from "src/rpc/types";
+import { mergeClasses } from "src/utils/twmerge";
 
 export const Hosting: React.FC = () => {
   const user = useSelector((state) => state.login.user);
@@ -23,6 +24,8 @@ export const Hosting: React.FC = () => {
   }
 
   const draft = hosted.find((listing) => listing.status === ListingStatus.Draft);
+  const listingCreated = hosted && hosted.length > 0;
+  const profileComplete = user && user.profile_picture_url;
 
   return (
     <div className="tw-flex tw-justify-center tw-pt-6 sm:tw-pt-12 tw-pb-24 tw-px-8 tw-overflow-scroll">
@@ -47,17 +50,21 @@ export const Hosting: React.FC = () => {
           </div>
         </div>
         <div className="tw-mb-6">Complete these steps so that your activities can go live.</div>
-        <NavLink className={setupStep} to="/listings/new">
-          <div className={stepNumber}>1</div>
+        <NavLink className={mergeClasses(setupStep, listingCreated && "tw-line-through")} to="/listings/new">
+          <div className={stepNumber}>
+            {listingCreated ? <CheckIcon className="tw-m-0.5 tw-w-full tw-stroke-2" /> : 1}
+          </div>
           Create your first listing
         </NavLink>
-        <NavLink className={setupStep} to="/profile">
-          <div className={stepNumber}>2</div>
+        <NavLink className={mergeClasses(setupStep, profileComplete && "tw-line-through")} to="/profile">
+          <div className={stepNumber}>
+            {profileComplete ? <CheckIcon className="tw-m-0.5 tw-w-full tw-stroke-2" /> : 2}
+          </div>
           Setup your profile to tell travelers about yourself
         </NavLink>
         <a className={setupStep} target="_blank" rel="noreferrer">
           <div className={stepNumber}>3</div>
-          Add your payment information
+          Add your payment information (<span className="tw-italic">Coming soon</span>)
         </a>
         <div className="tw-bg-white tw-shadow tw-border tw-border-slate-100 tw-border-solid tw-rounded-lg tw-mt-10">
           <div className="tw-px-4 tw-py-5 sm:tw-p-6">

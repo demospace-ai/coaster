@@ -15,6 +15,7 @@ import {
   useRole,
 } from "@floating-ui/react";
 import * as React from "react";
+import { HTMLAttributes, forwardRef } from "react";
 
 interface TooltipOptions {
   initialOpen?: boolean;
@@ -41,7 +42,7 @@ export function useTooltip({
     onOpenChange: setOpen,
     whileElementsMounted: autoUpdate,
     middleware: [
-      offset({ mainAxis: -5 }),
+      offset({ mainAxis: 10 }),
       arrow({
         element: arrowRef,
       }),
@@ -53,7 +54,6 @@ export function useTooltip({
   const hover = useHover(context, {
     move: false,
     enabled: controlledOpen == null,
-    delay: 100,
     handleClose: safePolygon(),
   });
   const focus = useFocus(context, {
@@ -101,7 +101,7 @@ export function Tooltip({
   return (
     <TooltipContext.Provider value={tooltip}>
       <TooltipTrigger>{children}</TooltipTrigger>
-      <TooltipContent arrowRef={tooltip.arrowRef}>{content}</TooltipContent>
+      <TooltipContent>{content}</TooltipContent>
     </TooltipContext.Provider>
   );
 }
@@ -110,7 +110,7 @@ interface TooltipTriggerProps extends React.HTMLProps<React.ReactElement> {
   children: React.ReactElement;
 }
 
-const TooltipTrigger = React.forwardRef<React.ReactElement, TooltipTriggerProps>(function TooltipTrigger(
+const TooltipTrigger = forwardRef<React.ReactElement, TooltipTriggerProps>(function TooltipTrigger(
   { children, ...props },
   propRef,
 ) {
@@ -129,14 +129,7 @@ const TooltipTrigger = React.forwardRef<React.ReactElement, TooltipTriggerProps>
   );
 });
 
-interface TooltipContentProps extends React.HTMLProps<HTMLDivElement> {
-  arrowRef?: React.RefObject<SVGSVGElement>;
-}
-
-const TooltipContent = React.forwardRef<HTMLDivElement, TooltipContentProps>(function TooltipContent(
-  { style, arrowRef, ...props },
-  propRef,
-) {
+const TooltipContent = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ children, ...props }, propRef) => {
   const context = useTooltipContext();
   const ref = useMergeRefs([context.refs.setFloating, propRef]);
 
@@ -148,12 +141,13 @@ const TooltipContent = React.forwardRef<HTMLDivElement, TooltipContentProps>(fun
         ref={ref}
         style={{
           ...context.floatingStyles,
-          ...style,
         }}
         className="tw-bg-slate-600 tw-text-white tw-py-1 tw-px-2 tw-rounded-lg"
         {...context.getFloatingProps(props)}
-      />
-      <FloatingArrow className="tw-text-black" ref={arrowRef} context={context} />
+      >
+        {children}
+        <FloatingArrow className="tw-fill-slate-600" ref={context.arrowRef} context={context} />
+      </div>
     </FloatingPortal>
   );
 });
