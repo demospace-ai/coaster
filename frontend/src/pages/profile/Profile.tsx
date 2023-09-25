@@ -12,7 +12,7 @@ import { z } from "zod";
 const ProfileFormSchema = z
   .object({
     first_name: z.string().min(1, { message: "First name is required" }),
-    last_name: z.string().min(1, { message: "Last name is required" }),
+    last_name: z.string().optional(),
     email: z.string().email({ message: "Invalid email address" }),
     about: z.string().optional(),
     password: z.string().min(8, { message: "Password must be at least 8 characters" }),
