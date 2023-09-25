@@ -7,6 +7,7 @@ import { Input, TextArea } from "src/components/input/Input";
 import { ProfilePicture } from "src/components/profile/ProfilePicture";
 import { useSelector } from "src/root/model";
 import { useUpdateProfilePicture, useUpdateUser } from "src/rpc/data";
+import { UserUpdates } from "src/rpc/types";
 import { z } from "zod";
 
 const ProfileFormSchema = z
@@ -15,7 +16,9 @@ const ProfileFormSchema = z
     last_name: z.string().optional(),
     email: z.string().email({ message: "Invalid email address" }),
     about: z.string().optional(),
-    password: z.string().min(8, { message: "Password must be at least 8 characters" }),
+    password: z
+      .union([z.string().length(0), z.string().min(8, { message: "Password must be at least 8 characters" })])
+      .optional(),
     confirm_password: z.string(),
   })
   .superRefine(({ confirm_password, password }, ctx) => {
@@ -40,7 +43,7 @@ export const Profile: React.FC = () => {
     handleSubmit,
     register,
     watch,
-    formState: { errors },
+    formState: { errors, dirtyFields },
   } = useForm<ProfileFormSchemaType>({
     mode: "onBlur",
     defaultValues: {
@@ -53,14 +56,15 @@ export const Profile: React.FC = () => {
   });
 
   const lastName = watch("last_name");
+  const password = watch("password");
 
   const onSubmit = (data: ProfileFormSchemaType) => {
-    mutateUser({
-      first_name: data.first_name,
-      last_name: data.last_name,
-      about: data.about,
-      password: data.password,
-    });
+    const payload = {} as UserUpdates;
+    dirtyFields.first_name && (payload.first_name = data.first_name);
+    dirtyFields.last_name && (payload.last_name = data.last_name);
+    dirtyFields.password && (payload.password = data.password);
+    dirtyFields.about && (payload.about = data.about);
+    mutateUser(payload);
   };
 
   return (
@@ -119,13 +123,7 @@ export const Profile: React.FC = () => {
           value={watch("email")}
         />
         <FormError message={errors.email?.message} />
-        <Input
-          className="tw-my-1"
-          label="New Password"
-          {...register("password")}
-          type="password"
-          value={watch("password")}
-        />
+        <Input className="tw-my-1" label="New Password" {...register("password")} type="password" value={password} />
         <FormError message={errors.password?.message} />
         <Input
           className="tw-my-1"
