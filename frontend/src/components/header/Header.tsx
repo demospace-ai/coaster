@@ -242,7 +242,15 @@ const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
                             <NavLink className={navItem} to="/invite" onClick={() => setOpen(false)}>
                               Invite friends
                             </NavLink>
-                            {!onHostApp && hostAppLink}
+                            {onHostApp ? (
+                              <>
+                                <NavLink className={navItem} to="/listings" onClick={() => setOpen(false)}>
+                                  Your listings
+                                </NavLink>
+                              </>
+                            ) : (
+                              hostAppLink
+                            )}
                             <div
                               className={mergeClasses(buttonStyle, "tw-mt-10")}
                               onClick={() => {
@@ -292,8 +300,28 @@ export const SupplierHeader: React.FC = () => {
   return (
     <div className="tw-sticky tw-z-10 tw-top-0 tw-flex tw-box-border tw-max-h-[72px] tw-min-h-[72px] sm:tw-max-h-[96px] sm:tw-min-h-[96px] tw-w-full tw-px-4 sm:tw-px-20 tw-py-3 tw-items-center tw-justify-between tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white">
       <LogoLink />
+      <SupplierLinks></SupplierLinks>
       <ProfileDropdown onHostApp={true} />
     </div>
+  );
+};
+
+const SupplierLinks: React.FC = () => {
+  return (
+    <>
+      <NavLink
+        className="tw-hidden lg:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
+        to="/"
+      >
+        Home
+      </NavLink>
+      <NavLink
+        className="tw-hidden lg:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
+        to="/listings"
+      >
+        Listings
+      </NavLink>
+    </>
   );
 };
 

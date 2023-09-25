@@ -123,7 +123,13 @@ export const Profile: React.FC = () => {
           value={watch("email")}
         />
         <FormError message={errors.email?.message} />
-        <Input className="tw-my-1" label="New Password" {...register("password")} type="password" value={password} />
+        <Input
+          className="tw-my-1"
+          label="New Password"
+          {...register("password")}
+          type="password"
+          value={password ? password : ""}
+        />
         <FormError message={errors.password?.message} />
         <Input
           className="tw-my-1"

@@ -1,4 +1,4 @@
-# Fabra Frontend
+# Coaster Frontend
 
 ## Available Scripts
 
