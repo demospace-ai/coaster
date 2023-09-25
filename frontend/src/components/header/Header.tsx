@@ -53,38 +53,41 @@ const LogoLink: React.FC = () => {
   );
 };
 
-const ProfileDropdown: React.FC = () => {
+const ProfileDropdown: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
   const user = useSelector((state) => state.login.user);
   const isAuthenticated = useSelector((state) => state.login.authenticated);
+
+  const hostAppLink = user?.is_host ? (
+    <NavLink
+      className="tw-hidden xl:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
+      to="/hosting"
+    >
+      Switch to hosting
+    </NavLink>
+  ) : (
+    <NavLink
+      className="tw-hidden xl:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
+      to="/listings/new"
+    >
+      List your experience
+    </NavLink>
+  );
+
   return (
     <div className="tw-flex sm:tw-flex-[0.5_0.5_0%] lg:tw-flex-1 tw-justify-end">
       <div className="tw-hidden lg:tw-flex">
-        {user?.is_host ? (
-          <NavLink
-            className="tw-hidden xl:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
-            to="/hosting"
-          >
-            Switch to hosting
-          </NavLink>
-        ) : (
-          <NavLink
-            className="tw-hidden xl:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
-            to="/listings/new"
-          >
-            List your experience
-          </NavLink>
-        )}
+        {!onHostApp && hostAppLink}
         <div className="tw-flex tw-flex-col tw-justify-center">
-          {isAuthenticated ? <SignedInMenu /> : <SignedOutMenu />}
+          {isAuthenticated ? <SignedInMenu onHostApp={onHostApp} /> : <SignedOutMenu />}
         </div>
       </div>
       {/* TODO: make this open an actual menu on mobile */}
-      <MobileMenu />
+      <MobileMenu onHostApp={onHostApp} />
     </div>
   );
 };
 
-const SignedInMenu: React.FC = () => {
+const SignedInMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
   const user = useSelector((state) => state.login.user);
   const logout = useLogout();
   const menuItem =
@@ -96,6 +99,21 @@ const SignedInMenu: React.FC = () => {
     // Should never happen
     return <Loading />;
   }
+  const hostAppLink = (
+    <div className="tw-flex xl:tw-hidden tw-m-2 tw-pt-2">
+      <Menu.Item>
+        {user?.is_host ? (
+          <NavLink className={navItem} to="/hosting">
+            Switch to hosting
+          </NavLink>
+        ) : (
+          <NavLink className={navItem} to="/listings/new">
+            List your experience
+          </NavLink>
+        )}
+      </Menu.Item>
+    </div>
+  );
 
   return (
     <Menu as="div">
@@ -152,19 +170,7 @@ const SignedInMenu: React.FC = () => {
                   </NavLink>
                 </Menu.Item>
               </div>
-              <div className="tw-flex xl:tw-hidden tw-m-2 tw-pt-2">
-                <Menu.Item>
-                  {user?.is_host ? (
-                    <NavLink className={navItem} to="/hosting">
-                      Switch to hosting
-                    </NavLink>
-                  ) : (
-                    <NavLink className={navItem} to="/listings/new">
-                      List your experience
-                    </NavLink>
-                  )}
-                </Menu.Item>
-              </div>
+              {!onHostApp && hostAppLink}
               <div className="tw-m-2 tw-pt-2">
                 <Menu.Item>
                   <div className={menuItem} onClick={logout}>
@@ -202,7 +208,7 @@ const SignedOutMenu: React.FC = () => {
   );
 };
 
-const MobileMenu: React.FC = () => {
+const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
   const navigate = useNavigate();
   const isAuthenticated = useSelector((state) => state.login.authenticated);
   const user = useSelector((state) => state.login.user);
@@ -211,6 +217,15 @@ const MobileMenu: React.FC = () => {
   const [open, setOpen] = useState(false);
   const buttonStyle =
     "tw-flex tw-justify-center tw-py-2 tw-w-full tw-cursor-pointer tw-select-none tw-whitespace-nowrap tw-rounded-3xl sm:tw-font-semibold tw-text-base tw-bg-gray-100 hover:tw-bg-gray-200";
+  const hostAppLink = user?.is_host ? (
+    <NavLink className={navItem} to="/hosting" onClick={() => setOpen(false)}>
+      Switch to hosting
+    </NavLink>
+  ) : (
+    <NavLink className={navItem} to="/listings/new" onClick={() => setOpen(false)}>
+      List your experience
+    </NavLink>
+  );
 
   return (
     <>
@@ -259,15 +274,7 @@ const MobileMenu: React.FC = () => {
                             <NavLink className={navItem} to="/invite" onClick={() => setOpen(false)}>
                               Invite friends
                             </NavLink>
-                            {user?.is_host ? (
-                              <NavLink className={navItem} to="/hosting" onClick={() => setOpen(false)}>
-                                Switch to hosting
-                              </NavLink>
-                            ) : (
-                              <NavLink className={navItem} to="/listings/new" onClick={() => setOpen(false)}>
-                                List your experience
-                              </NavLink>
-                            )}
+                            {!onHostApp && hostAppLink}
                             <div
                               className={mergeClasses(buttonStyle, "tw-mt-10")}
                               onClick={() => {
@@ -310,5 +317,14 @@ const MobileMenu: React.FC = () => {
         </Dialog>
       </Transition.Root>
     </>
+  );
+};
+
+export const SupplierHeader: React.FC = () => {
+  return (
+    <div className="tw-sticky tw-z-10 tw-top-0 tw-flex tw-box-border tw-max-h-[72px] tw-min-h-[72px] sm:tw-max-h-[96px] sm:tw-min-h-[96px] tw-w-full tw-px-4 sm:tw-px-20 tw-py-3 tw-items-center tw-justify-between tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white">
+      <LogoLink />
+      <ProfileDropdown onHostApp={true} />
+    </div>
   );
 };

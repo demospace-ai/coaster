@@ -37,6 +37,7 @@ func addCookie(w http.ResponseWriter, name string, value string) {
 		Secure:   application.IsProd(), // disable secure for local testing
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
+		Domain:   "trycoaster.com", // share cookies across subdomains
 	}
 	http.SetCookie(w, &cookie)
 }
