@@ -13,7 +13,7 @@ import (
 	highlightGorillaMux "github.com/highlight/highlight/sdk/highlight-go/middleware/gorillamux"
 )
 
-var ALLOWED_ORIGINS = []string{"https://www.trycoaster.com"}
+var ALLOWED_ORIGINS = []string{"https://www.trycoaster.com", "https://supplier.trycoaster.com"}
 var ALLOWED_HEADERS = []string{"Content-Type", "X-LINK-TOKEN", "X-API-KEY", "X-TIME-ZONE", "X-HIGHLIGHT-REQUEST"}
 
 type ApiService interface {

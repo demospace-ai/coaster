@@ -9,6 +9,8 @@ import { LogoLoading } from "src/components/loading/LogoLoading";
 import { Toast, getToastContentFromDetails } from "src/components/notifications/Notifications";
 import { About } from "src/pages/about/About";
 import { Hosting } from "src/pages/hosting/Hosting";
+import { EditListing } from "src/pages/listing/EditListing";
+import { NewListing } from "src/pages/listing/NewListing";
 import { CreatePassword } from "src/pages/login/CreatePassword";
 import { Invite } from "src/pages/login/Invite";
 import { Login, Unauthorized } from "src/pages/login/Login";
@@ -97,6 +99,9 @@ export const supplierRouter = createBrowserRouter(
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/about" element={<About />} />
       <Route path="/terms" element={<Terms />} />
+      <Route path="/listings/:listingID/edit" element={<EditListing />} />
+      <Route path="/listings/new" element={<RequireAuth element={<NewListing />} />} />
+      <Route path="/hosting" element={<RequireAuth element={<Hosting />} />} />
       <Route path="/profile" element={<RequireAuth element={<Profile />} />} />
       <Route path="/" element={<RequireAuth element={<Hosting />} />} />
       <Route path="*" element={<NotFound />} />

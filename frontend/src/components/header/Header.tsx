@@ -57,21 +57,7 @@ const ProfileDropdown: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
   const user = useSelector((state) => state.login.user);
   const isAuthenticated = useSelector((state) => state.login.authenticated);
 
-  const hostAppLink = user?.is_host ? (
-    <NavLink
-      className="tw-hidden xl:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
-      to="/hosting"
-    >
-      Switch to hosting
-    </NavLink>
-  ) : (
-    <NavLink
-      className="tw-hidden xl:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
-      to="/listings/new"
-    >
-      List your experience
-    </NavLink>
-  );
+  const hostAppLink = getSwitchToHostingLink(user?.is_host);
 
   return (
     <div className="tw-flex sm:tw-flex-[0.5_0.5_0%] lg:tw-flex-1 tw-justify-end">
@@ -101,17 +87,7 @@ const SignedInMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
   }
   const hostAppLink = (
     <div className="tw-flex xl:tw-hidden tw-m-2 tw-pt-2">
-      <Menu.Item>
-        {user?.is_host ? (
-          <NavLink className={navItem} to="/hosting">
-            Switch to hosting
-          </NavLink>
-        ) : (
-          <NavLink className={navItem} to="/listings/new">
-            List your experience
-          </NavLink>
-        )}
-      </Menu.Item>
+      <Menu.Item>{getSwitchToHostingLink(user?.is_host)}</Menu.Item>
     </div>
   );
 
@@ -217,15 +193,7 @@ const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
   const [open, setOpen] = useState(false);
   const buttonStyle =
     "tw-flex tw-justify-center tw-py-2 tw-w-full tw-cursor-pointer tw-select-none tw-whitespace-nowrap tw-rounded-3xl sm:tw-font-semibold tw-text-base tw-bg-gray-100 hover:tw-bg-gray-200";
-  const hostAppLink = user?.is_host ? (
-    <NavLink className={navItem} to="/hosting" onClick={() => setOpen(false)}>
-      Switch to hosting
-    </NavLink>
-  ) : (
-    <NavLink className={navItem} to="/listings/new" onClick={() => setOpen(false)}>
-      List your experience
-    </NavLink>
-  );
+  const hostAppLink = getSwitchToHostingLink(user?.is_host, () => setOpen(false));
 
   return (
     <>
@@ -326,5 +294,25 @@ export const SupplierHeader: React.FC = () => {
       <LogoLink />
       <ProfileDropdown onHostApp={true} />
     </div>
+  );
+};
+
+const getSwitchToHostingLink = (isHost: boolean | undefined, onClick?: () => void) => {
+  return isHost ? (
+    <a
+      className="tw-hidden xl:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
+      href="supplier.trycoaster.com"
+      onClick={onClick}
+    >
+      Switch to hosting
+    </a>
+  ) : (
+    <a
+      className="tw-hidden xl:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
+      href="supplier.trycoaster.com/listings/new"
+      onClick={onClick}
+    >
+      List your experience
+    </a>
   );
 };

@@ -59,23 +59,27 @@ func (s ApiService) SendInvite(auth auth.Authentication, w http.ResponseWriter, 
 func (s ApiService) sendInvite(email string, sender *models.User) error {
 	senderName := fmt.Sprintf("%s %s", sender.FirstName, sender.LastName)
 
+	var domain string
+	if application.IsProd() {
+		domain = "https://www.trycoaster.com"
+	} else {
+		domain = "http://localhost:3000"
+	}
+
 	// TODO: rate limit emails
 	user, err := users.LoadByEmail(s.db, email)
 	if err != nil && !errors.IsRecordNotFound(err) {
 		return errors.Wrap(err, "(api.sendInvite) unexpected error")
 	}
 
-	var domain string
-	if application.IsProd() {
-		domain = "https://trycoaster.com"
-	} else {
-		domain = "http://localhost:3000"
-	}
-
 	if err == nil {
 		// Only admins can send invites for existing users
 		if !sender.IsAdmin {
 			return nil
+		}
+
+		if user.IsHost && application.IsProd() {
+			domain = "https://supplier.trycoaster.com"
 		}
 
 		// Invites for existing users are just password reset emails with a longer expiration. There isn't much

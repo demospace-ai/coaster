@@ -1,5 +1,5 @@
 import { ErrorBoundary } from "@highlight-run/react";
-import { ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, Route, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
 import { useStart } from "src/app/actions";
 import { RequireAuth } from "src/components/auth/RequireAuth";
@@ -9,10 +9,7 @@ import { LogoLoading } from "src/components/loading/LogoLoading";
 import { Toast, getToastContentFromDetails } from "src/components/notifications/Notifications";
 import { About } from "src/pages/about/About";
 import { Home } from "src/pages/home/Home";
-import { Hosting } from "src/pages/hosting/Hosting";
-import { EditListing } from "src/pages/listing/EditListing";
 import { Listing } from "src/pages/listing/Listing";
-import { NewListing } from "src/pages/listing/NewListing";
 import { CreatePassword } from "src/pages/login/CreatePassword";
 import { Invite } from "src/pages/login/Invite";
 import { Login, Unauthorized } from "src/pages/login/Login";
@@ -104,9 +101,6 @@ export const router = createBrowserRouter(
       <Route path="/about" element={<About />} />
       <Route path="/terms" element={<Terms />} />
       <Route path="/listings/:listingID" element={<Listing />} />
-      <Route path="/listings/:listingID/edit" element={<EditListing />} />
-      <Route path="/listings/new" element={<RequireAuth element={<NewListing />} />} />
-      <Route path="/hosting" element={<RequireAuth element={<Hosting />} />} />
       <Route path="/profile" element={<RequireAuth element={<Profile />} />} />
       <Route path="/" element={<Home />} />
       <Route path="*" element={<NotFound />} />

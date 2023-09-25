@@ -5,7 +5,7 @@ import { FormEvent, useCallback, useRef, useState } from "react";
 import { DndProvider, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Control, Controller, FieldErrors, UseFormRegister, useFieldArray, useForm } from "react-hook-form";
-import { NavLink, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { FormError } from "src/components/FormError";
 import { BackButton, Button } from "src/components/button/Button";
 import { Card } from "src/components/dnd/DragAndDrop";
@@ -65,10 +65,15 @@ export const EditListing: React.FC = () => {
           <div className="tw-font-semibold sm:tw-font-bold tw-text-3xl sm:tw-text-4xl tw-hyphens-auto">
             Edit Listing
           </div>
-          <NavLink className="tw-flex tw-items-center tw-gap-1 tw-text-blue-600" to={`/listings/${listingID}`}>
+          <a
+            className="tw-flex tw-items-center tw-gap-1 tw-text-blue-600"
+            href={`https://www.trycoaster.com/listings/${listingID}`}
+            target="_blank"
+            rel="noreferrer"
+          >
             See preview
             <EyeIcon className="tw-h-4" />
-          </NavLink>
+          </a>
         </div>
         <EditListingForm listing={listing} />
       </div>
