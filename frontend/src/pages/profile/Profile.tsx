@@ -4,6 +4,8 @@ import { useForm } from "react-hook-form";
 import { FormError } from "src/components/FormError";
 import { Button } from "src/components/button/Button";
 import { Input, TextArea } from "src/components/input/Input";
+import { Loading } from "src/components/loading/Loading";
+import { useShowToast } from "src/components/notifications/Notifications";
 import { ProfilePicture } from "src/components/profile/ProfilePicture";
 import { useSelector } from "src/root/model";
 import { useUpdateProfilePicture, useUpdateUser } from "src/rpc/data";
@@ -34,16 +36,21 @@ const ProfileFormSchema = z
 type ProfileFormSchemaType = z.infer<typeof ProfileFormSchema>;
 
 export const Profile: React.FC = () => {
+  const showToast = useShowToast();
   const user = useSelector((state) => state.login.user);
   const imageInputRef = useRef<HTMLInputElement>(null);
-  const { mutate: mutateUser } = useUpdateUser();
+  const { mutate: mutateUser, isLoading: isSaving } = useUpdateUser(() => {
+    showToast("success", "Profile updated successfully.", 2000);
+    reset({}, { keepValues: true });
+  });
   const { mutate: mutateProfilePicture } = useUpdateProfilePicture();
 
   const {
     handleSubmit,
     register,
     watch,
-    formState: { errors, dirtyFields },
+    reset,
+    formState: { errors, dirtyFields, isDirty },
   } = useForm<ProfileFormSchemaType>({
     mode: "onBlur",
     defaultValues: {
@@ -59,6 +66,10 @@ export const Profile: React.FC = () => {
   const password = watch("password");
 
   const onSubmit = (data: ProfileFormSchemaType) => {
+    if (!isDirty) {
+      return;
+    }
+
     const payload = {} as UserUpdates;
     dirtyFields.first_name && (payload.first_name = data.first_name);
     dirtyFields.last_name && (payload.last_name = data.last_name);
@@ -147,8 +158,12 @@ export const Profile: React.FC = () => {
           value={watch("about")}
         />
         <FormError message={errors.about?.message} />
-        <Button type="submit" className="tw-w-full sm:tw-w-fit tw-px-10 tw-py-2 tw-mt-3">
-          Save
+        <Button
+          type="submit"
+          className="tw-w-full sm:tw-w-32 tw-flex tw-items-center tw-justify-center tw-px-10 tw-py-2 tw-mt-3"
+          disabled={!isDirty}
+        >
+          {isSaving ? <Loading /> : "Save"}
         </Button>
       </form>
     </div>

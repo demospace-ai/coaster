@@ -108,6 +108,10 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
   });
 
   const updateListing = async (values: EditListingSchemaType) => {
+    if (!isDirty) {
+      return;
+    }
+
     const payload = {} as ListingInput;
     dirtyFields.name && (payload.name = values.name);
     dirtyFields.description && (payload.description = values.description);

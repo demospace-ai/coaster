@@ -93,7 +93,7 @@ export async function createListing(input: ListingInput) {
   }
 }
 
-export function useUpdateUser(): Mutation<UserUpdates> {
+export function useUpdateUser(onSuccess?: () => void): Mutation<UserUpdates> {
   const dispatch = useDispatch();
   return useMutation<User, UserUpdates>(
     (updates: UserUpdates) => {
@@ -102,6 +102,7 @@ export function useUpdateUser(): Mutation<UserUpdates> {
     {
       onSuccess: (user: User) => {
         dispatch({ type: "login.update", user: user });
+        onSuccess && onSuccess();
       },
     },
   );
