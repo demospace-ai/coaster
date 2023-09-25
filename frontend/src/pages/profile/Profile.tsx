@@ -52,6 +52,8 @@ export const Profile: React.FC = () => {
     resolver: zodResolver(ProfileFormSchema),
   });
 
+  const lastName = watch("last_name");
+
   const onSubmit = (data: ProfileFormSchemaType) => {
     mutateUser({
       first_name: data.first_name,
@@ -106,7 +108,7 @@ export const Profile: React.FC = () => {
         </div>
         <Input className="tw-my-1" label="First Name" {...register("first_name")} value={watch("first_name")} />
         <FormError message={errors.first_name?.message} />
-        <Input className="tw-my-1" label="Last Name" {...register("last_name")} value={watch("last_name")} />
+        <Input className="tw-my-1" label="Last Name" {...register("last_name")} value={lastName ? lastName : ""} />
         <FormError message={errors.last_name?.message} />
         <Input
           className="tw-my-1"
