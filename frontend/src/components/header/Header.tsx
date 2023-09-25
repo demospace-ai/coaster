@@ -329,7 +329,7 @@ const getSwitchToHostingLink = (isHost: boolean | undefined, onClick?: () => voi
   return isHost ? (
     <a
       className="tw-hidden xl:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
-      href="supplier.trycoaster.com"
+      href="https://supplier.trycoaster.com"
       onClick={onClick}
     >
       Switch to hosting
@@ -337,7 +337,7 @@ const getSwitchToHostingLink = (isHost: boolean | undefined, onClick?: () => voi
   ) : (
     <a
       className="tw-hidden xl:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
-      href="supplier.trycoaster.com/listings/new"
+      href="https://supplier.trycoaster.com/listings/new"
       onClick={onClick}
     >
       List your experience
