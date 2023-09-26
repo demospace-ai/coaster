@@ -1,0 +1,1 @@
+ALTER TABLE listings ALTER COLUMN availability_type SET DEFAULT '';
