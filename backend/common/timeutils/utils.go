@@ -89,3 +89,15 @@ func GetDurationString(duration time.Duration) (*string, error) {
 
 	return &outputStr, nil
 }
+
+func BetweenOrEqual(t time.Time, start time.Time, end time.Time) bool {
+	return t.Compare(start) > -1 && t.Compare(end) < 1
+}
+
+// TODO: there must be a better way than just looping
+func FirstDayOfWeekInMonth(year int, month time.Month, dayOfWeek time.Weekday) time.Time {
+	day := time.Date(year, month, 1, 0, 0, 0, 0, time.UTC)
+	for ; day.Weekday() != dayOfWeek; day = day.AddDate(0, 0, 1) {
+	}
+	return day
+}

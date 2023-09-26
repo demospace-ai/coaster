@@ -17,10 +17,6 @@ import (
 
 type CreateListingRequest = input.Listing
 
-type CreateListingResponse struct {
-	ListingId int64 `json:"listing_id"`
-}
-
 func (s ApiService) CreateListing(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	decoder := json.NewDecoder(r.Body)
 	var createListingRequest CreateListingRequest

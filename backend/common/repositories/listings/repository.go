@@ -17,7 +17,7 @@ type ListingDetails struct {
 	Images []models.ListingImage
 }
 
-func LoadByID(db *gorm.DB, listingID int64, user *models.User) (*ListingDetails, error) {
+func LoadByIDAndUser(db *gorm.DB, listingID int64, user *models.User) (*ListingDetails, error) {
 	var listing models.Listing
 	result := db.Table("listings").
 		Select("listings.*").
@@ -52,7 +52,7 @@ func LoadByID(db *gorm.DB, listingID int64, user *models.User) (*ListingDetails,
 	}, nil
 }
 
-func LoadByUserAndID(db *gorm.DB, userID int64, listingID int64) (*models.Listing, error) {
+func LoadByIDAndUserID(db *gorm.DB, userID int64, listingID int64) (*models.Listing, error) {
 	var listing models.Listing
 	result := db.Table("listings").
 		Select("listings.*").
