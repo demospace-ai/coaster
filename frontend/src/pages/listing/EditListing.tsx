@@ -101,7 +101,7 @@ export const EditListing: React.FC = () => {
                     key={section}
                     className={({ selected }) =>
                       mergeClasses(
-                        "tw-w-full tw-rounded-lg tw-py-2.5 tw-px-4 tw-text-sm tw-font-medium tw-leading-5 tw-whitespace-nowrap tw-text-start tw-outline-none",
+                        "tw-w-full tw-rounded-lg tw-py-2.5 tw-px-4 tw-font-medium tw-leading-5 tw-whitespace-nowrap tw-text-start tw-outline-none",
                         selected ? "tw-bg-white tw-shadow" : "hover:tw-bg-slate-100",
                       )
                     }
