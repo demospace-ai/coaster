@@ -533,8 +533,8 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ listing, imageID, setImages, 
 function getAvailabilityTypeDisplay(value: AvailabilityTypeType) {
   switch (value) {
     case AvailabilityType.Enum.date:
-      return "Full day (customer reserves the full day)";
+      return "Full day (customer just chooses a date)";
     case AvailabilityType.Enum.datetime:
-      return "Date and time (customer chooses a time slot)";
+      return "Date and time (customer chooses a date and time slot)";
   }
 }
