@@ -31,13 +31,17 @@ func NewAuthService(db *gorm.DB, cryptoService crypto.CryptoService) AuthService
 }
 
 func addCookie(w http.ResponseWriter, name string, value string) {
+	domain := "trycoaster.com"
+	if !application.IsProd() {
+		domain = "localhost"
+	}
 	cookie := http.Cookie{
 		Name:     name,
 		Value:    value,
 		Secure:   application.IsProd(), // disable secure for local testing
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
-		Domain:   "trycoaster.com", // share cookies across subdomains
+		Domain:   domain, // share cookies across subdomains
 	}
 	http.SetCookie(w, &cookie)
 }

@@ -1,4 +1,4 @@
-import { Category } from "src/rpc/types";
+import { AvailabilityType, Category } from "src/rpc/types";
 import { z } from "zod";
 
 export const CategorySchema = Category;
@@ -30,3 +30,5 @@ export const MaxGuestsSchema = z
   .max(100, "The maximum number of guests is 100.");
 
 export const IncludesSchema = z.array(z.object({ value: z.string().nonempty("Included amenities cannot be empty") }));
+
+export const AvailabilityTypeSchema = AvailabilityType;

@@ -46,6 +46,13 @@ const (
 	ListingCancellationStrict   ListingCancellation = "strict"
 )
 
+type AvailabilityType string
+
+const (
+	AvailabilityTypeDate     AvailabilityType = "date"
+	AvailabilityTypeDateTime AvailabilityType = "datetime"
+)
+
 type Listing struct {
 	UserID           int64               `json:"user_id"`
 	Name             *string             `json:"name"`
@@ -62,6 +69,7 @@ type Listing struct {
 	MaxGuests        *int64              `json:"max_guests"`
 	Highlights       pq.StringArray      `json:"highlights" gorm:"type:varchar(128)[]"`
 	Includes         pq.StringArray      `json:"includes" gorm:"type:varchar(128)[]"`
+	AvailabilityType AvailabilityType    `json:"availability_type"`
 
 	BaseModel
 }

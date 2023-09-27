@@ -9,12 +9,13 @@ import { useParams } from "react-router-dom";
 import { FormError } from "src/components/FormError";
 import { BackButton, Button } from "src/components/button/Button";
 import { Card } from "src/components/dnd/DragAndDrop";
-import { ComboInput, Input, PriceInput, TextArea } from "src/components/input/Input";
+import { ComboInput, DropdownInput, Input, PriceInput, TextArea } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { InlineMapSearch } from "src/components/maps/Maps";
 import { Modal } from "src/components/modal/Modal";
 import { useShowToast } from "src/components/notifications/Notifications";
 import {
+  AvailabilityTypeSchema,
   CategorySchema,
   DescriptionSchema,
   DurationSchema,
@@ -26,7 +27,7 @@ import {
 import { sendRequest } from "src/rpc/ajax";
 import { AddListingImage, DeleteListingImage, GetListing, UpdateListing, UpdateListingImages } from "src/rpc/api";
 import { useListing } from "src/rpc/data";
-import { Category, Image, Listing, ListingInput } from "src/rpc/types";
+import { AvailabilityType, AvailabilityTypeType, Category, Image, Listing, ListingInput } from "src/rpc/types";
 import { getGcsImageUrl } from "src/utils/images";
 import { toTitleCase } from "src/utils/string";
 import { mutate } from "swr";
@@ -41,6 +42,7 @@ const EditListingSchema = z.object({
   duration: DurationSchema,
   maxGuests: MaxGuestsSchema,
   includes: IncludesSchema,
+  availabilityType: AvailabilityTypeSchema,
 });
 
 type EditListingSchemaType = z.infer<typeof EditListingSchema>;
@@ -101,6 +103,7 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
       location: listing.location,
       duration: listing.duration_minutes,
       maxGuests: listing.max_guests,
+      availabilityType: listing.availability_type,
       includes: listing.includes?.map((include) => ({
         value: include,
       })),
@@ -120,6 +123,7 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
     dirtyFields.location && (payload.location = values.location);
     dirtyFields.duration && (payload.duration_minutes = values.duration);
     dirtyFields.maxGuests && (payload.max_guests = values.maxGuests);
+    dirtyFields.availabilityType && (payload.availability_type = values.availabilityType);
     dirtyFields.includes &&
       (payload.includes = values.includes
         .filter((include) => include.value.length > 0)
@@ -205,6 +209,22 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
         value={watch("maxGuests")}
       />
       <FormError message={errors.maxGuests?.message} />
+      <Controller
+        name="availabilityType"
+        control={control}
+        render={({ field }) => (
+          <DropdownInput
+            placeholder={"Availability Type"}
+            className="tw-w-full tw-flex tw-mt-3"
+            label="Availability Type"
+            value={watch("availabilityType")}
+            options={AvailabilityType.options}
+            onChange={field.onChange}
+            getElementForDisplay={getAvailabilityTypeDisplay}
+          />
+        )}
+      />
+      <FormError message={errors.category?.message} />
       <Button type="submit" className="tw-mt-6 tw-w-full sm:tw-w-32 tw-h-12 tw-ml-auto" disabled={!isDirty}>
         {isSubmitting ? <Loading /> : "Save"}
       </Button>
@@ -422,3 +442,12 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ listing, imageID, setImages, 
     </div>
   );
 };
+
+function getAvailabilityTypeDisplay(value: AvailabilityTypeType) {
+  switch (value) {
+    case AvailabilityType.Enum.date:
+      return "Full day (customer reserves the full day)";
+    case AvailabilityType.Enum.datetime:
+      return "Date and time (customer chooses a time slot)";
+  }
+}

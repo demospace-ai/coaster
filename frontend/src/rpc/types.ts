@@ -35,6 +35,7 @@ export interface Listing {
   includes: string[] | undefined;
   languages: string[] | undefined;
   status: ListingStatus;
+  availability_type: AvailabilityTypeType;
 
   host: Host;
 
@@ -65,6 +66,7 @@ export interface ListingInput {
   duration_minutes?: number;
   max_guests?: number;
   includes?: string[];
+  availability_type?: AvailabilityTypeType;
 }
 
 export enum CancellationPolicy {
@@ -166,3 +168,6 @@ export const Category = z.enum([
   "safari",
 ]);
 export type CategoryType = z.infer<typeof Category>;
+
+export const AvailabilityType = z.enum(["date", "datetime"]);
+export type AvailabilityTypeType = z.infer<typeof AvailabilityType>;

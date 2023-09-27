@@ -20,6 +20,7 @@ type Listing struct {
 	Highlights       []string                   `json:"highlights"`
 	Includes         []string                   `json:"includes"`
 	Status           models.ListingStatus       `json:"status"`
+	AvailabilityType models.AvailabilityType    `json:"availability_type"`
 
 	Host Host `json:"host"`
 
@@ -74,6 +75,7 @@ func ConvertListing(listing listings.ListingDetails) Listing {
 		Highlights:       listing.Highlights,
 		Includes:         listing.Includes,
 		Status:           listing.Status,
+		AvailabilityType: listing.AvailabilityType,
 
 		Host: ConvertHost(listing.Host),
 

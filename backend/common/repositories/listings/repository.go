@@ -152,18 +152,19 @@ func CreateListing(
 	coordinates *geo.Point,
 ) (*models.Listing, error) {
 	listing := models.Listing{
-		UserID:       userID,
-		Name:         name,
-		Description:  description,
-		Category:     category,
-		Price:        price,
-		Location:     location,
-		Coordinates:  coordinates,
-		Status:       models.ListingStatusDraft,
-		Featured:     false,
-		Cancellation: models.ListingCancellationFlexible,
-		Highlights:   []string{},
-		Includes:     []string{},
+		UserID:           userID,
+		Name:             name,
+		Description:      description,
+		Category:         category,
+		Price:            price,
+		Location:         location,
+		Coordinates:      coordinates,
+		Status:           models.ListingStatusDraft,
+		Featured:         false,
+		Cancellation:     models.ListingCancellationFlexible,
+		Highlights:       []string{},
+		Includes:         []string{},
+		AvailabilityType: models.AvailabilityTypeDate,
 	}
 
 	result := db.Create(&listing)
@@ -218,6 +219,10 @@ func UpdateListing(db *gorm.DB, listing *models.Listing, listingUpdates input.Li
 
 	if listingUpdates.Includes != nil {
 		listing.Includes = listingUpdates.Includes
+	}
+
+	if listingUpdates.AvailabilityType != nil {
+		listing.AvailabilityType = *listingUpdates.AvailabilityType
 	}
 
 	// TODO: only admins can make the status published

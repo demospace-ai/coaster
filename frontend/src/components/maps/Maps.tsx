@@ -275,13 +275,13 @@ export const InlineMapSearch: React.FC<{
             as={Fragment}
             show={open}
             enter="tw-transition tw-ease-out tw-duration-100"
-            enterFrom="tw-transform tw-opacity-0 tw-scale-80"
+            enterFrom="tw-transform tw-opacity-0 tw-scale-95"
             enterTo="tw-transform tw-opacity-100 tw-scale-100"
             leave="tw-transition tw-ease-in tw-duration-100"
             leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
-            leaveTo="tw-transform tw-opacity-0 tw-scale-0"
+            leaveTo="tw-transform tw-opacity-0 tw-scale-95"
           >
-            <div className="tw-absolute tw-z-20 -tw-mt-3 sm:tw-mt-0 tw-min-w-full tw-max-h-80 tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-sm tw-text-black tw-shadow-lg tw-ring-1 tw-ring-slate-300 sm:tw-text-sm">
+            <div className="tw-absolute tw-z-20 -tw-mt-3 sm:tw-mt-0 tw-min-w-full tw-max-h-80 tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-sm tw-text-black tw-shadow-lg tw-ring-1 tw-ring-slate-100 sm:tw-text-sm">
               <MapsWrapper loadingClass="tw-h-20">
                 <Suggestions
                   query={query}
