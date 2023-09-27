@@ -1,13 +1,21 @@
-import { EyeIcon, PlusIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { Tab } from "@headlessui/react";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  EyeIcon,
+  PlusIcon,
+  TrashIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import update from "immutability-helper";
 import { FormEvent, useCallback, useRef, useState } from "react";
 import { DndProvider, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { Control, Controller, FieldErrors, UseFormRegister, useFieldArray, useForm } from "react-hook-form";
+import { Control, Controller, FormState, UseFormRegister, UseFormWatch, useFieldArray, useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { FormError } from "src/components/FormError";
-import { BackButton, Button } from "src/components/button/Button";
+import { Button } from "src/components/button/Button";
 import { Card } from "src/components/dnd/DragAndDrop";
 import { ComboInput, DropdownInput, Input, PriceInput, TextArea } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
@@ -28,8 +36,11 @@ import { sendRequest } from "src/rpc/ajax";
 import { AddListingImage, DeleteListingImage, GetListing, UpdateListing, UpdateListingImages } from "src/rpc/api";
 import { useListing } from "src/rpc/data";
 import { AvailabilityType, AvailabilityTypeType, Category, Image, Listing, ListingInput } from "src/rpc/types";
+import { isProd } from "src/utils/env";
+import { forceErrorMessage } from "src/utils/errors";
 import { getGcsImageUrl } from "src/utils/images";
 import { toTitleCase } from "src/utils/string";
+import { mergeClasses } from "src/utils/twmerge";
 import { mutate } from "swr";
 import { z } from "zod";
 
@@ -61,15 +72,18 @@ export const EditListing: React.FC = () => {
 
   return (
     <div className="tw-flex tw-flex-col tw-w-full tw-justify-center tw-items-center tw-px-4 sm:tw-px-20 tw-py-4 sm:tw-py-12">
-      <BackButton className="tw-mr-auto tw-mb-4" />
-      <div className="tw-flex tw-flex-col tw-w-full tw-max-w-2xl">
+      <div className="tw-flex tw-flex-col tw-w-full tw-max-w-7xl">
         <div className="tw-flex tw-w-full tw-justify-between tw-items-center">
           <div className="tw-font-semibold sm:tw-font-bold tw-text-3xl sm:tw-text-4xl tw-hyphens-auto">
             Edit Listing
           </div>
           <a
-            className="tw-flex tw-items-center tw-gap-1 tw-text-blue-600"
-            href={`https://www.trycoaster.com/listings/${listingID}`}
+            className="tw-flex tw-items-center tw-gap-1 tw-text-blue-600 tw-border tw-border-solid tw-border-blue-600 tw-px-3 tw-py-1 tw-rounded-lg"
+            href={
+              isProd()
+                ? `https://www.trycoaster.com/listings/${listingID}`
+                : `http://localhost:3000/listings/${listingID}`
+            }
             target="_blank"
             rel="noreferrer"
           >
@@ -77,7 +91,30 @@ export const EditListing: React.FC = () => {
             <EyeIcon className="tw-h-4" />
           </a>
         </div>
-        <EditListingForm listing={listing} />
+        <div className="tw-flex tw-flex-col sm:tw-flex-row tw-mt-4 sm:tw-mt-8">
+          <Tab.Group>
+            <div className="tw-relative tw-flex tw-items-center sm:tw-items-start tw-mb-3">
+              <ChevronLeftIcon className="sm:tw-hidden tw-h-4" />
+              <Tab.List className="sm:tw-sticky sm:tw-top-32 tw-flex tw-flex-1 sm:tw-flex-col tw-space-x-1 tw-rounded-xl tw-p-1 tw-overflow-scroll tw-hide-scrollbar sm:tw-overflow-visible tw-gap-3 sm:tw-mr-[10vw]">
+                {["Listing Details", "Images", "Included Amenities", "Availability"].map((section) => (
+                  <Tab
+                    key={section}
+                    className={({ selected }) =>
+                      mergeClasses(
+                        "tw-w-full tw-rounded-lg tw-py-2.5 tw-px-4 tw-text-sm tw-font-medium tw-leading-5 tw-whitespace-nowrap tw-text-start tw-outline-none",
+                        selected ? "tw-bg-white tw-shadow" : "hover:tw-bg-slate-100",
+                      )
+                    }
+                  >
+                    {section}
+                  </Tab>
+                ))}
+              </Tab.List>
+              <ChevronRightIcon className="sm:tw-hidden tw-h-4" />
+            </div>
+            <EditListingForm listing={listing} />
+          </Tab.Group>
+        </div>
       </div>
     </div>
   );
@@ -85,14 +122,7 @@ export const EditListing: React.FC = () => {
 
 const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
   const showToast = useShowToast();
-  const {
-    handleSubmit,
-    register,
-    reset,
-    control,
-    watch,
-    formState: { errors, dirtyFields, isSubmitting, isDirty },
-  } = useForm<EditListingSchemaType>({
+  const { handleSubmit, register, reset, control, watch, formState } = useForm<EditListingSchemaType>({
     mode: "onBlur",
     resolver: zodResolver(EditListingSchema),
     defaultValues: {
@@ -111,20 +141,20 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
   });
 
   const updateListing = async (values: EditListingSchemaType) => {
-    if (!isDirty) {
+    if (!formState.isDirty) {
       return;
     }
 
     const payload = {} as ListingInput;
-    dirtyFields.name && (payload.name = values.name);
-    dirtyFields.description && (payload.description = values.description);
-    dirtyFields.price && (payload.price = values.price);
-    dirtyFields.category && (payload.category = values.category);
-    dirtyFields.location && (payload.location = values.location);
-    dirtyFields.duration && (payload.duration_minutes = values.duration);
-    dirtyFields.maxGuests && (payload.max_guests = values.maxGuests);
-    dirtyFields.availabilityType && (payload.availability_type = values.availabilityType);
-    dirtyFields.includes &&
+    formState.dirtyFields.name && (payload.name = values.name);
+    formState.dirtyFields.description && (payload.description = values.description);
+    formState.dirtyFields.price && (payload.price = values.price);
+    formState.dirtyFields.category && (payload.category = values.category);
+    formState.dirtyFields.location && (payload.location = values.location);
+    formState.dirtyFields.duration && (payload.duration_minutes = values.duration);
+    formState.dirtyFields.maxGuests && (payload.max_guests = values.maxGuests);
+    formState.dirtyFields.availabilityType && (payload.availability_type = values.availabilityType);
+    formState.dirtyFields.includes &&
       (payload.includes = values.includes
         .filter((include) => include.value.length > 0)
         .map((include) => include.value));
@@ -144,71 +174,37 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
   };
 
   return (
-    <form className="tw-mt-4 tw-mb-10 tw-w-full" onSubmit={handleSubmit(updateListing)}>
-      <div className="tw-text-xl tw-font-semibold tw-mb-2">Listing Basics</div>
-      <Input className="tw-w-full tw-flex tw-mt-3" label="Name" {...register("name")} value={watch("name")} />
-      <FormError message={errors.name?.message} />
-      <TextArea
-        className="tw-w-full tw-flex tw-mt-3"
-        label="Description"
-        {...register("description")}
-        value={watch("description")}
-      />
-      <FormError message={errors.description?.message} />
-      <PriceInput
-        className="tw-w-full tw-flex tw-mt-3"
-        label="Price"
-        {...register("price", { valueAsNumber: true })}
-        value={watch("price")}
-      />
-      <FormError message={errors.price?.message} />
-      <Controller
-        name="category"
-        control={control}
-        render={({ field }) => (
-          <ComboInput
-            placeholder={"Category"}
-            className="tw-w-full tw-flex tw-mt-3"
-            label="Category"
-            value={watch("category")}
-            options={Category.options}
-            onChange={field.onChange}
-            getElementForDisplay={(value) => toTitleCase(value)}
-          />
-        )}
-      />
-      <FormError message={errors.category?.message} />
-      <Controller
-        name="location"
-        control={control}
-        render={({ field }) => (
-          <InlineMapSearch
-            label="Location"
-            hideIcon
-            className="tw-justify-start tw-mt-3 tw-mb-0"
-            key={listing.location}
-            onSelect={field.onChange}
-            initial={listing.location}
-          />
-        )}
-      />
-      <FormError message={errors.location?.message} />
-      <Input
-        type="number"
-        className="tw-w-full tw-flex tw-mt-3"
-        label="Duration (minutes)"
-        {...register("duration", { valueAsNumber: true })}
-        value={watch("duration")}
-      />
-      <FormError message={errors.duration?.message} />
-      <Input
-        type="number"
-        className="tw-w-full tw-flex tw-mt-3"
-        label="Max Guests"
-        {...register("maxGuests", { valueAsNumber: true })}
-        value={watch("maxGuests")}
-      />
-      <FormError message={errors.maxGuests?.message} />
+    <form className="tw-w-full tw-mt-2 tw-mb-32" onSubmit={handleSubmit(updateListing)}>
+      <Tab.Panels>
+        {[
+          <ListingDetails
+            register={register}
+            control={control}
+            formState={formState}
+            watch={watch}
+            listing={listing}
+          />,
+          <Images listing={listing} formState={formState} />,
+          <Includes register={register} control={control} formState={formState} />,
+          <Availability register={register} control={control} formState={formState} watch={watch} listing={listing} />,
+        ].map((panel, idx) => (
+          <Tab.Panel key={idx}>{panel}</Tab.Panel>
+        ))}
+      </Tab.Panels>
+    </form>
+  );
+};
+
+const Availability: React.FC<{
+  listing: Listing;
+  watch: UseFormWatch<EditListingSchemaType>;
+  register: UseFormRegister<EditListingSchemaType>;
+  control: Control<EditListingSchemaType>;
+  formState: FormState<EditListingSchemaType>;
+}> = ({ listing, watch, register, control, formState }) => {
+  return (
+    <>
+      <div className="tw-text-2xl tw-font-semibold tw-mb-2">Availability</div>
       <Controller
         name="availabilityType"
         control={control}
@@ -224,74 +220,161 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
           />
         )}
       />
-      <FormError message={errors.category?.message} />
-      <Button type="submit" className="tw-mt-6 tw-w-full sm:tw-w-32 tw-h-12 tw-ml-auto" disabled={!isDirty}>
-        {isSubmitting ? <Loading /> : "Save"}
+      <FormError message={formState.errors.availabilityType?.message} />
+      <Button type="submit" className="tw-mt-6 tw-w-full sm:tw-w-32 tw-h-12 tw-ml-auto" disabled={!formState.isDirty}>
+        {formState.isSubmitting ? <Loading /> : "Save"}
       </Button>
-      <FormError message={errors.root?.message} />
-      <Includes register={register} control={control} errors={errors} />
-      <Button type="submit" className="tw-mt-6 tw-w-full sm:tw-w-32 tw-h-12 tw-ml-auto" disabled={!isDirty}>
-        {isSubmitting ? <Loading /> : "Save"}
+      <FormError message={formState.errors.root?.message} />
+    </>
+  );
+};
+
+const ListingDetails: React.FC<{
+  listing: Listing;
+  watch: UseFormWatch<EditListingSchemaType>;
+  register: UseFormRegister<EditListingSchemaType>;
+  control: Control<EditListingSchemaType>;
+  formState: FormState<EditListingSchemaType>;
+}> = ({ listing, watch, register, control, formState }) => {
+  return (
+    <>
+      <div className="tw-text-2xl tw-font-semibold tw-mb-2">Listing Basics</div>
+      <Input className="tw-w-full tw-flex tw-mt-3" label="Name" {...register("name")} value={watch("name")} />
+      <FormError message={formState.errors.name?.message} />
+      <TextArea
+        className="tw-w-full tw-flex tw-mt-3"
+        label="Description"
+        {...register("description")}
+        value={watch("description")}
+      />
+      <FormError message={formState.errors.description?.message} />
+      <PriceInput
+        className="tw-w-full tw-flex tw-mt-3"
+        label="Price"
+        {...register("price", { valueAsNumber: true })}
+        value={watch("price")}
+      />
+      <FormError message={formState.errors.price?.message} />
+      <Controller
+        name="category"
+        control={control}
+        render={({ field }) => (
+          <ComboInput
+            placeholder={"Category"}
+            className="tw-w-full tw-flex tw-mt-3"
+            label="Category"
+            value={watch("category")}
+            options={Category.options}
+            onChange={field.onChange}
+            getElementForDisplay={(value) => toTitleCase(value)}
+          />
+        )}
+      />
+      <FormError message={formState.errors.category?.message} />
+      <Controller
+        name="location"
+        control={control}
+        render={({ field }) => (
+          <InlineMapSearch
+            label="Location"
+            hideIcon
+            className="tw-justify-start tw-mt-3 tw-mb-0"
+            key={listing.location}
+            onSelect={field.onChange}
+            initial={listing.location}
+          />
+        )}
+      />
+      <FormError message={formState.errors.location?.message} />
+      <Input
+        type="number"
+        className="tw-w-full tw-flex tw-mt-3"
+        label="Duration (minutes)"
+        {...register("duration", { valueAsNumber: true })}
+        value={watch("duration")}
+      />
+      <FormError message={formState.errors.duration?.message} />
+      <Input
+        type="number"
+        className="tw-w-full tw-flex tw-mt-3"
+        label="Max Guests"
+        {...register("maxGuests", { valueAsNumber: true })}
+        value={watch("maxGuests")}
+      />
+      <FormError message={formState.errors.maxGuests?.message} />
+      <Button type="submit" className="tw-mt-6 tw-w-full sm:tw-w-32 tw-h-12 tw-ml-auto" disabled={!formState.isDirty}>
+        {formState.isSubmitting ? <Loading /> : "Save"}
       </Button>
-      <FormError message={errors.root?.message} />
-      <Images listing={listing} />
-      <Button type="submit" className="tw-mt-6 tw-w-full sm:tw-w-32 tw-h-12 tw-ml-auto" disabled={!isDirty}>
-        {isSubmitting ? <Loading /> : "Save"}
-      </Button>
-      <FormError message={errors.root?.message} />
-    </form>
+      <FormError message={formState.errors.root?.message} />
+    </>
   );
 };
 
 const Includes: React.FC<{
   register: UseFormRegister<EditListingSchemaType>;
   control: Control<EditListingSchemaType>;
-  errors: FieldErrors<EditListingSchemaType>;
-}> = ({ register, control, errors }) => {
+  formState: FormState<EditListingSchemaType>;
+}> = ({ register, control, formState }) => {
   const { fields, append, remove } = useFieldArray({
     name: "includes",
     control,
   });
 
   return (
-    <div className="tw-flex tw-flex-col tw-mt-8">
-      <div className="tw-text-xl tw-font-semibold tw-mb-2">Included Amenities</div>
-      <div className="tw-flex tw-flex-col tw-gap-3">
-        {fields.map((field, idx) => (
-          <div key={field.id} className="last:tw-mb-5">
-            <div className="tw-flex tw-items-center">
-              <Input {...register(`includes.${idx}.value`)} value={field.value} />
-              <TrashIcon
-                className="tw-h-10 tw-rounded tw-ml-1 tw-p-2 tw-cursor-pointer hover:tw-bg-gray-100"
-                onClick={() => remove(idx)}
-              />
+    <>
+      <div className="tw-flex tw-flex-col">
+        <div className="tw-text-2xl tw-font-semibold tw-mb-2">Included Amenities</div>
+        <div className="tw-flex tw-flex-col tw-gap-3">
+          {fields.map((field, idx) => (
+            <div key={field.id} className="last:tw-mb-5">
+              <div className="tw-flex tw-items-center">
+                <Input {...register(`includes.${idx}.value`)} value={field.value} />
+                <TrashIcon
+                  className="tw-h-10 tw-rounded tw-ml-1 tw-p-2 tw-cursor-pointer hover:tw-bg-gray-100"
+                  onClick={() => remove(idx)}
+                />
+              </div>
+              <FormError message={formState.errors.includes?.[idx]?.value?.message} />
             </div>
-            <FormError message={errors.includes?.[idx]?.value?.message} />
-          </div>
-        ))}
+          ))}
+        </div>
+        <Button
+          className="tw-flex tw-items-center tw-justify-center tw-bg-white hover:tw-bg-slate-100 tw-text-black tw-font-medium tw-border tw-border-solid tw-border-black tw-py-2"
+          onClick={() => {
+            append({ value: "" });
+          }}
+        >
+          <PlusIcon className="tw-h-4 tw-mr-1.5" />
+          Add Included Item
+        </Button>
       </div>
-      <Button
-        className="tw-flex tw-items-center tw-justify-center tw-bg-white hover:tw-bg-slate-100 tw-text-black tw-font-medium tw-border tw-border-solid tw-border-black tw-py-2"
-        onClick={() => {
-          append({ value: "" });
-        }}
-      >
-        <PlusIcon className="tw-h-4 tw-mr-1.5" />
-        Add Included Item
+      <Button type="submit" className="tw-mt-6 tw-w-full sm:tw-w-32 tw-h-12 tw-ml-auto" disabled={!formState.isDirty}>
+        {formState.isSubmitting ? <Loading /> : "Save"}
       </Button>
-    </div>
+      <FormError message={formState.errors.root?.message} />
+    </>
   );
 };
 
-const Images: React.FC<{ listing: Listing }> = ({ listing }) => {
+const Images: React.FC<{ listing: Listing; formState: FormState<EditListingSchemaType> }> = ({
+  listing,
+  formState,
+}) => {
   return (
-    <DndProvider backend={HTML5Backend}>
-      <ImagesInner listing={listing} />
-    </DndProvider>
+    <>
+      <DndProvider backend={HTML5Backend}>
+        <ImagesInner listing={listing} />
+      </DndProvider>
+      <Button type="submit" className="tw-mt-6 tw-w-full sm:tw-w-32 tw-h-12 tw-ml-auto" disabled={!formState.isDirty}>
+        {formState.isSubmitting ? <Loading /> : "Save"}
+      </Button>
+      <FormError message={formState.errors.root?.message} />
+    </>
   );
 };
 
 const ImagesInner: React.FC<{ listing: Listing }> = ({ listing }) => {
+  const [error, setError] = useState<string | undefined>(undefined);
   const [images, setImages] = useState(listing.images);
   const newImageRef = useRef<HTMLInputElement | null>(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
@@ -346,14 +429,17 @@ const ImagesInner: React.FC<{ listing: Listing }> = ({ listing }) => {
 
         mutate({ GetListing, listingID: listing.id }, { ...listing, images: [...listing.images, listingImage] });
         setImages([...images, listingImage]);
-      } catch (e) {}
+        setError(undefined);
+      } catch (e) {
+        setError(forceErrorMessage(e));
+      }
     }
   };
 
   const [, drop] = useDrop(() => ({ accept: "card" }));
   return (
-    <div className="tw-mt-8">
-      <div className="tw-text-xl tw-font-semibold">Images</div>
+    <>
+      <div className="tw-text-2xl tw-font-semibold">Images</div>
       <div
         ref={drop}
         className="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-mt-3 tw-gap-4 sm:tw-gap-8 tw-justify-items-center"
@@ -402,7 +488,8 @@ const ImagesInner: React.FC<{ listing: Listing }> = ({ listing }) => {
           />
         </Modal>
       </div>
-    </div>
+      {error && <FormError message={error} />}
+    </>
   );
 };
 
