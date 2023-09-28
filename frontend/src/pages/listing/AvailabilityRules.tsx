@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { Controller, UseFormSetValue, useFieldArray, useForm } from "react-hook-form";
-import { SubmitResult, wrapHandleSubmit } from "src/components/form/MultiStep";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { Step, StepProps, WizardNavButtons, wrapHandleSubmit } from "src/components/form/MultiStep";
 import { RadioInput, TimeInput } from "src/components/input/Input";
 import { TimeSlotSchema } from "src/pages/listing/schema";
 import { useCreateAvailabilityRule, useUpdateAvailabilityRule } from "src/rpc/data";
@@ -13,7 +13,6 @@ import {
   AvailabilityType,
   AvailabilityTypeType,
 } from "src/rpc/types";
-import { mergeClasses } from "src/utils/twmerge";
 import { z } from "zod";
 
 const NewAvailabilityRuleSchema = z.object({
@@ -27,7 +26,6 @@ const NewAvailabilityRuleSchema = z.object({
 });
 
 type NewAvailabilityRuleSchemaType = z.infer<typeof NewAvailabilityRuleSchema>;
-type Step = { title: string; subtitle?: string; element: React.ReactElement };
 
 export const NewRuleForm: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
   const { mutate, isLoading } = useCreateAvailabilityRule();
@@ -40,11 +38,15 @@ export const NewRuleForm: React.FC<{ closeModal: () => void }> = ({ closeModal }
   const steps: Step[] = [
     {
       title: "What kind of rule do you want to create?",
-      element: <RuleTypeStep values={watch()} setCurrentStepNumber={setCurrentStepNumber} setValue={setValue} />,
+      element: (
+        <RuleTypeStep stepNumber={0} values={watch()} setCurrentStepNumber={setCurrentStepNumber} setValue={setValue} />
+      ),
     },
     {
       title: "Setup time slots for this rule.",
-      element: <TimeSlotStep values={watch()} setCurrentStepNumber={setCurrentStepNumber} setValue={setValue} />,
+      element: (
+        <TimeSlotStep stepNumber={1} values={watch()} setCurrentStepNumber={setCurrentStepNumber} setValue={setValue} />
+      ),
     },
   ];
   const currentStep = steps[currentStepNumber];
@@ -84,75 +86,20 @@ export const NewRuleForm: React.FC<{ closeModal: () => void }> = ({ closeModal }
   );
 };
 
-const WizardNavButtons: React.FC<{
-  submit: () => Promise<SubmitResult>;
-  isLastStep?: boolean;
-  canContinue: boolean;
-  currentStepNumber: number;
-  setCurrentStepNumber: (stepNumber: number) => void;
-}> = ({ submit, canContinue, isLastStep, currentStepNumber, setCurrentStepNumber }) => {
-  const isFirstStep = currentStepNumber === 0;
+const RuleTypeSchema = z.object({ type: AvailabilityRuleType });
+type RuleTypeSchemaType = z.infer<typeof RuleTypeSchema>;
 
-  const previousStep = () => {
-    if (!isFirstStep) {
-      setCurrentStepNumber(currentStepNumber - 1);
-    }
-  };
-
-  const nextStep = async () => {
-    if (!canContinue) {
-      return;
-    }
-
-    const result = await submit();
-    if (result.success) {
-      setCurrentStepNumber(currentStepNumber + 1);
-    } else {
-      // TODO: handle error
-    }
-  };
-
-  return (
-    <div
-      id="multistep-footer"
-      className={mergeClasses("tw-flex tw-mt-6", isFirstStep ? "tw-justify-end" : "tw-justify-between")}
-    >
-      <button
-        onClick={previousStep}
-        className={mergeClasses(
-          isFirstStep
-            ? "tw-hidden"
-            : "tw-flex tw-justify-center tw-py-2 tw-w-24 tw-font-medium tw-border tw-border-solid tw-border-black tw-rounded-3xl ",
-        )}
-      >
-        ←
-      </button>
-      <button
-        onClick={nextStep}
-        className={mergeClasses(
-          "tw-flex tw-justify-center tw-py-2 tw-w-28 tw-rounded-3xl tw-bg-black tw-text-white tw-font-medium",
-          !canContinue && "tw-cursor-not-allowed tw-bg-gray-400",
-        )}
-      >
-        {isLastStep ? "Submit" : "Continue"}
-      </button>
-    </div>
-  );
-};
-
-type StepProps = {
-  values: NewAvailabilityRuleSchemaType;
-  setCurrentStepNumber: (stepNumber: number) => void;
-  setValue: UseFormSetValue<NewAvailabilityRuleSchemaType>;
-};
-const RuleTypeStep: React.FC<StepProps> = ({ values, setCurrentStepNumber, setValue }) => {
-  const ruleTypeSchema = z.object({ type: AvailabilityRuleType });
-  type ruleTypeSchemaType = z.infer<typeof ruleTypeSchema>;
-  const { handleSubmit, control, watch, formState } = useForm<ruleTypeSchemaType>({
+const RuleTypeStep = ({
+  values,
+  stepNumber,
+  setCurrentStepNumber,
+  setValue,
+}: StepProps<NewAvailabilityRuleSchemaType>) => {
+  const { handleSubmit, control, watch, formState } = useForm<RuleTypeSchemaType>({
     mode: "onBlur",
-    resolver: zodResolver(ruleTypeSchema),
+    resolver: zodResolver(RuleTypeSchema),
     defaultValues: {
-      type: values.type,
+      type: values?.type,
     },
   });
 
@@ -174,23 +121,28 @@ const RuleTypeStep: React.FC<StepProps> = ({ values, setCurrentStepNumber, setVa
       />
       <WizardNavButtons
         submit={wrapHandleSubmit(handleSubmit, async (values) => {
-          setValue("type", values.type);
+          setValue && setValue("type", values.type);
           return { success: true };
         })}
         canContinue={formState.isValid}
-        currentStepNumber={0}
+        stepNumber={stepNumber}
         setCurrentStepNumber={setCurrentStepNumber}
       />
     </>
   );
 };
 
-const TimeSlotStep: React.FC<StepProps> = ({ setCurrentStepNumber, setValue }) => {
-  const timeSlotSchema = z.object({ time_slots: z.array(TimeSlotSchema) });
-  type timeSlotSchemaType = z.infer<typeof timeSlotSchema>;
-  const { handleSubmit, control, formState } = useForm<timeSlotSchemaType>({
+const TimeSlotInputSchema = z.object({ time_slots: z.array(TimeSlotSchema) });
+type TimeSlotInputType = z.infer<typeof TimeSlotInputSchema>;
+
+const TimeSlotStep: React.FC<StepProps<NewAvailabilityRuleSchemaType>> = ({
+  stepNumber,
+  setCurrentStepNumber,
+  setValue,
+}) => {
+  const { handleSubmit, control, formState } = useForm<TimeSlotInputType>({
     mode: "onBlur",
-    resolver: zodResolver(timeSlotSchema),
+    resolver: zodResolver(TimeSlotInputSchema),
   });
   const { fields } = useFieldArray({
     control,
@@ -202,11 +154,11 @@ const TimeSlotStep: React.FC<StepProps> = ({ setCurrentStepNumber, setValue }) =
       <TimeInput value={""} className="tw-mb-5" />
       <WizardNavButtons
         submit={wrapHandleSubmit(handleSubmit, async (values) => {
-          setValue("time_slots", values.time_slots);
+          setValue && setValue("time_slots", values.time_slots);
           return { success: true };
         })}
         canContinue={formState.isValid}
-        currentStepNumber={1}
+        stepNumber={stepNumber}
         setCurrentStepNumber={setCurrentStepNumber}
       />
     </>

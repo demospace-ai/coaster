@@ -10,11 +10,11 @@ import { Card } from "src/components/dnd/DragAndDrop";
 import {
   ErrorMessage,
   InputStep,
-  MultiStep,
   SelectorStep,
-  StepParams,
+  StepProps,
   SubmitResult,
   TextAreaStep,
+  WizardNavButtons,
   wrapHandleSubmit,
 } from "src/components/form/MultiStep";
 import mapPreview from "src/components/images/map-preview.webp";
@@ -39,63 +39,86 @@ import { z } from "zod";
 
 export const NewListing: React.FC = () => {
   const { listing, loading } = useDraftListing();
-  const navigate = useNavigate();
-  const initialStep = computeInitialStep(listing);
+  const initialStepNumber = computeInitialStep(listing);
 
   if (loading) {
     return <Loading />;
   }
 
+  return <NewListingInner initialStepNumber={initialStepNumber} />;
+};
+
+const NewListingInner: React.FC<{ initialStepNumber: number }> = ({ initialStepNumber }) => {
+  const { listing } = useDraftListing();
+  const [currentStepNumber, setCurrentStepNumber] = useState<number>(initialStepNumber);
+
+  const steps = [
+    {
+      element: CategoryStep,
+      title: "What kind of experience do you want to host?",
+    },
+    {
+      element: LocationStep,
+      title: "Where is your adventure located?",
+    },
+    {
+      element: NameStep,
+      title: "What do you want to call your adventure?",
+      subtitle: "Giving your trip a fun name can make you stand out!",
+    },
+    {
+      element: DescriptionStep,
+      title: "Create your description",
+      subtitle: "Share what makes your trip special.",
+    },
+    {
+      element: ImageStep,
+      title: "Add images",
+      subtitle: "Show off your trip with at least three images.",
+    },
+    {
+      element: PriceStep,
+      title: "Set a price",
+      subtitle: "You can change it anytime.",
+    },
+    {
+      element: DetailsStep,
+      title: "Provide a few final details",
+      subtitle: "Let your guests know what to expect.",
+    },
+    {
+      element: ReviewStep,
+      title: "Review your listing",
+      subtitle: "Here's what we'll show to guests. Make sure everything looks good.",
+    },
+  ];
+
+  const stepsHydrated = steps.map((step, idx) => ({
+    element: <step.element stepNumber={idx} values={listing} setCurrentStepNumber={setCurrentStepNumber} />,
+    title: step.title,
+    subtitle: step.subtitle,
+  }));
+
+  const currentStep = stepsHydrated[currentStepNumber];
+
   return (
     <div className="tw-w-full tw-flex tw-justify-center">
       <div className="tw-flex tw-px-8 sm:tw-px-0 tw-w-[500px] tw-min-h-[600px] tw-mt-10 tw-items-center tw-pb-24 tw-overflow-scroll">
-        <MultiStep
-          onComplete={() => {
-            navigate("/hosting");
-          }}
-          initialStepNumber={initialStep}
-          steps={[
-            { id: "category", elementFn: categoryStep, title: "What kind of experience do you want to host?" },
-            { id: "location", elementFn: locationStep, title: "Where is your adventure located?" },
-            {
-              id: "name",
-              elementFn: nameStep,
-              title: "What do you want to call your adventure?",
-              subtitle: "Giving your trip a fun name can make you stand out!",
-            },
-            {
-              id: "description",
-              elementFn: descriptionStep,
-              title: "Create your description",
-              subtitle: "Share what makes your trip special.",
-            },
-            {
-              id: "images",
-              elementFn: imageStep,
-              title: "Add images",
-              subtitle: "Show off your trip with at least three images.",
-            },
-            { id: "price", elementFn: priceStep, title: "Set a price", subtitle: "You can change it anytime." },
-            {
-              id: "details",
-              elementFn: detailsStep,
-              title: "Provide a few final details",
-              subtitle: "Let your guests know what to expect.",
-            },
-            {
-              id: "review",
-              elementFn: reviewStep,
-              title: "Review your listing",
-              subtitle: "Here's what we'll show to guests. Make sure everything looks good.",
-            },
-          ]}
-        />
+        <div className="tw-w-full">
+          <div className="tw-w-full tw-text-left tw-text-2xl sm:tw-text-3xl tw-font-bold tw-mb-3">
+            {currentStep.title}
+          </div>
+          {currentStep.subtitle && (
+            <div className="tw-w-full tw-text-left tw-text-base tw-text-gray-600 tw-mb-6">{currentStep.subtitle}</div>
+          )}
+          {currentStep.element}
+        </div>
       </div>
     </div>
   );
 };
 
-const locationStep = (params: StepParams) => {
+const LocationStep: React.FC<StepProps<{}>> = (props) => {
   const { listing } = useDraftListing();
   if (!listing) {
     return <Loading />;
@@ -103,30 +126,30 @@ const locationStep = (params: StepParams) => {
 
   return (
     <MapsWrapper loadingClass="tw-h-64 sm:tw-h-80">
-      <LocationStep {...params} listing={listing} />
+      <LocationStepInner {...props} listing={listing} />
     </MapsWrapper>
   );
 };
 
-const priceStep = (params: StepParams) => {
+const PriceStep: React.FC<StepProps<{}>> = (props) => {
   const { listing } = useDraftListing();
   if (!listing) {
     return <Loading />;
   }
 
-  return <PriceStep {...params} listing={listing} />;
+  return <PriceStepInner {...props} listing={listing} />;
 };
 
-const detailsStep = (params: StepParams) => {
+const DetailsStep: React.FC<StepProps<{}>> = (props) => {
   const { listing } = useDraftListing();
   if (!listing) {
     return <Loading />;
   }
 
-  return <DetailsStep {...params} listing={listing} />;
+  return <DetailsStepInner {...props} listing={listing} />;
 };
 
-const nameStep = (params: StepParams) => {
+const NameStep: React.FC<StepProps<{}>> = (props) => {
   const { listing } = useDraftListing();
   if (!listing) {
     return <Loading />;
@@ -134,7 +157,7 @@ const nameStep = (params: StepParams) => {
 
   return (
     <InputStep
-      {...params}
+      {...props}
       schema={NameSchema}
       existingData={listing.name}
       onSubmit={async (data: { value: string }) => {
@@ -148,7 +171,7 @@ const nameStep = (params: StepParams) => {
   );
 };
 
-const descriptionStep = (params: StepParams) => {
+const DescriptionStep: React.FC<StepProps<{}>> = (props) => {
   const { listing } = useDraftListing();
   if (!listing) {
     return <Loading />;
@@ -156,7 +179,7 @@ const descriptionStep = (params: StepParams) => {
 
   return (
     <TextAreaStep
-      {...params}
+      {...props}
       schema={DescriptionSchema}
       existingData={listing.description}
       onSubmit={async (data: { value: string }) => {
@@ -170,7 +193,7 @@ const descriptionStep = (params: StepParams) => {
   );
 };
 
-const categoryStep = (params: StepParams) => {
+const CategoryStep: React.FC<StepProps<{}>> = (props) => {
   const { listing, loading } = useDraftListing();
   if (loading) {
     return <Loading />;
@@ -178,7 +201,7 @@ const categoryStep = (params: StepParams) => {
 
   return (
     <SelectorStep
-      {...params}
+      {...props}
       schema={CategorySchema}
       existingData={listing?.category}
       // TODO: fix the typing issue for the onChange data parameter
@@ -197,7 +220,7 @@ const categoryStep = (params: StepParams) => {
   );
 };
 
-const imageStep = (params: StepParams) => {
+const ImageStep: React.FC<StepProps<{}>> = (props) => {
   const { listing } = useDraftListing();
   if (!listing) {
     return <Loading />;
@@ -205,20 +228,20 @@ const imageStep = (params: StepParams) => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <ImageStep key={JSON.stringify(listing.images)} {...params} listing={listing} />
+      <ImageStepInner key={JSON.stringify(listing.images)} {...props} listing={listing} />
     </DndProvider>
   );
 };
 
-const reviewStep = (params: StepParams) => {
+const ReviewStep: React.FC<StepProps<Listing>> = ({ stepNumber, setCurrentStepNumber }) => {
+  const navigate = useNavigate();
   const { listing } = useDraftListing();
   if (!listing) {
     return <Loading />;
   }
 
-  return params.renderLayout(
-    true,
-    () => (
+  return (
+    <>
       <div className="tw-flex tw-flex-col tw-items-center tw-pb-6">
         <div className="tw-p-8 tw-shadow-centered-md tw-rounded-xl tw-w-full sm:tw-w-96">
           <img
@@ -238,8 +261,21 @@ const reviewStep = (params: StepParams) => {
           </NavLink>
         </div>
       </div>
-    ),
-    () => updateListing(listing.id, { status: ListingStatus.Review }),
+      <WizardNavButtons
+        submit={async () => {
+          const result = await updateListing(listing.id, { status: ListingStatus.Review });
+          if (result.success) {
+            navigate("/listings");
+            return result;
+          } else {
+            return result;
+          }
+        }}
+        canContinue={true}
+        stepNumber={stepNumber}
+        setCurrentStepNumber={setCurrentStepNumber}
+      />
+    </>
   );
 };
 
@@ -251,29 +287,32 @@ type LocationParams = {
   listing: Listing;
 };
 
-const LocationStep: React.FC<StepParams & LocationParams> = ({ listing, renderLayout }) => {
+const LocationStepInner: React.FC<StepProps<{}> & LocationParams> = ({ stepNumber, setCurrentStepNumber, listing }) => {
   const { mutate, isLoading } = useUpdateListing(listing.id);
   const onSelect = useCallback((location: string) => mutate({ location }), []);
 
   const coordinates = listing.coordinates ? toGoogleCoordinates(listing.coordinates) : null;
 
-  return renderLayout(location !== undefined, () => (
-    <div className="tw-flex tw-flex-col tw-items-center">
-      <InlineMapSearch key={listing.location} onSelect={onSelect} initial={listing.location} />
-      {coordinates ? (
-        <MapComponent center={coordinates} zoom={12} marker={coordinates} />
-      ) : (
-        <>{isLoading ? <Loading /> : <img className="tw-rounded-lg" src={mapPreview} />}</>
-      )}
-    </div>
-  ));
+  return (
+    <>
+      <div className="tw-flex tw-flex-col tw-items-center">
+        <InlineMapSearch key={listing.location} onSelect={onSelect} initial={listing.location} />
+        {coordinates ? (
+          <MapComponent center={coordinates} zoom={12} marker={coordinates} />
+        ) : (
+          <>{isLoading ? <Loading /> : <img className="tw-rounded-lg" src={mapPreview} />}</>
+        )}
+      </div>
+      <WizardNavButtons canContinue={true} stepNumber={stepNumber} setCurrentStepNumber={setCurrentStepNumber} />
+    </>
+  );
 };
 
 type PriceParams = {
   listing: Listing;
 };
 
-const PriceStep: React.FC<StepParams & PriceParams> = ({ listing, renderLayout }) => {
+const PriceStepInner: React.FC<StepProps<{}> & PriceParams> = ({ stepNumber, setCurrentStepNumber, listing }) => {
   const formSchema = z.object({
     value: PriceSchema,
   });
@@ -298,9 +337,8 @@ const PriceStep: React.FC<StepParams & PriceParams> = ({ listing, renderLayout }
     return updateListing(listing.id, { price: data.value });
   };
 
-  return renderLayout(
-    isValid,
-    () => (
+  return (
+    <>
       <div className="tw-flex tw-flex-col tw-items-center tw-mb-6 tw-mx-0.5">
         <PriceInput
           className="tw-text-3xl tw-font-semibold tw-justify-center focus-within:tw-outline-2 focus-within:tw-outline-blue-700"
@@ -309,16 +347,21 @@ const PriceStep: React.FC<StepParams & PriceParams> = ({ listing, renderLayout }
         />
         <ErrorMessage error={errors.value} />
       </div>
-    ),
-    wrapHandleSubmit(handleSubmit, updatePrice),
+      <WizardNavButtons
+        submit={wrapHandleSubmit(handleSubmit, updatePrice)}
+        canContinue={true}
+        stepNumber={stepNumber}
+        setCurrentStepNumber={setCurrentStepNumber}
+      />
+    </>
   );
 };
 
-type ImageParams = {
+type ImageProps = {
   listing: Listing;
 };
 
-const ImageStep: React.FC<StepParams & ImageParams> = ({ renderLayout, listing }) => {
+const ImageStepInner: React.FC<StepProps<{}> & ImageProps> = ({ stepNumber, setCurrentStepNumber, listing }) => {
   const ref = useRef<HTMLInputElement | null>(null);
   const isValid = listing.images && listing.images.length > 2;
   const listingID = listing.id;
@@ -394,43 +437,46 @@ const ImageStep: React.FC<StepParams & ImageParams> = ({ renderLayout, listing }
     } catch (e) {}
   };
 
-  return renderLayout(isValid, () => (
-    <div className="tw-flex tw-flex-col tw-items-center tw-mb-6">
-      <button className="tw-flex tw-rounded-xl tw-bg-gray-200 tw-px-10 tw-py-3" onClick={() => ref.current?.click()}>
-        Add image
-      </button>
-      <input ref={ref} type="file" className="tw-flex tw-invisible" onChange={addImage} />
-      <div ref={drop} className="tw-grid tw-grid-cols-2 tw-gap-4 tw-justify-items-center tw-items-center">
-        {images.map((image) => (
-          <Card
-            key={image.id}
-            id={String(image.id)}
-            moveCard={moveCard}
-            findCard={findCard}
-            onDrop={updateImages}
-            className="tw-flex tw-relative tw-w-fit tw-h-fit"
-          >
-            <img
-              src={getGcsImageUrl(image)}
-              alt="preview-image"
-              className="tw-select-none tw-rounded-lg tw-cursor-grab"
-            />
-            <XMarkIcon
-              className="tw-w-8 tw-absolute tw-right-2 tw-top-2 tw-bg-gray-100 tw-p-1 tw-rounded-lg tw-opacity-[90%] tw-cursor-pointer hover:tw-opacity-100"
-              onClick={() => deleteImage(image.id)}
-            />
-          </Card>
-        ))}
+  return (
+    <>
+      <div className="tw-flex tw-flex-col tw-items-center tw-mb-6">
+        <button className="tw-flex tw-rounded-xl tw-bg-gray-200 tw-px-10 tw-py-3" onClick={() => ref.current?.click()}>
+          Add image
+        </button>
+        <input ref={ref} type="file" className="tw-flex tw-invisible" onChange={addImage} />
+        <div ref={drop} className="tw-grid tw-grid-cols-2 tw-gap-4 tw-justify-items-center tw-items-center">
+          {images.map((image) => (
+            <Card
+              key={image.id}
+              id={String(image.id)}
+              moveCard={moveCard}
+              findCard={findCard}
+              onDrop={updateImages}
+              className="tw-flex tw-relative tw-w-fit tw-h-fit"
+            >
+              <img
+                src={getGcsImageUrl(image)}
+                alt="preview-image"
+                className="tw-select-none tw-rounded-lg tw-cursor-grab"
+              />
+              <XMarkIcon
+                className="tw-w-8 tw-absolute tw-right-2 tw-top-2 tw-bg-gray-100 tw-p-1 tw-rounded-lg tw-opacity-[90%] tw-cursor-pointer hover:tw-opacity-100"
+                onClick={() => deleteImage(image.id)}
+              />
+            </Card>
+          ))}
+        </div>
       </div>
-    </div>
-  ));
+      <WizardNavButtons canContinue={isValid} stepNumber={stepNumber} setCurrentStepNumber={setCurrentStepNumber} />
+    </>
+  );
 };
 
 type DetailsParams = {
   listing: Listing;
 };
 
-const DetailsStep: React.FC<StepParams & DetailsParams> = ({ listing, renderLayout }) => {
+const DetailsStepInner: React.FC<StepProps<{}> & DetailsParams> = ({ stepNumber, setCurrentStepNumber, listing }) => {
   const formSchema = z.object({
     duration: DurationSchema,
     maxGuests: MaxGuestsSchema,
@@ -466,9 +512,8 @@ const DetailsStep: React.FC<StepParams & DetailsParams> = ({ listing, renderLayo
     return updateListing(listing.id, payload);
   };
 
-  return renderLayout(
-    isValid,
-    () => (
+  return (
+    <>
       <div className="tw-flex tw-flex-col tw-items-center tw-mb-6 tw-gap-1 tw-mx-0.5">
         <Input
           label="Duration (minutes)"
@@ -485,10 +530,15 @@ const DetailsStep: React.FC<StepParams & DetailsParams> = ({ listing, renderLayo
           {...register("maxGuests", { valueAsNumber: true })}
           value={watch("maxGuests")}
         />
-        <ErrorMessage error={errors.duration} />
+        <ErrorMessage error={errors.maxGuests} />
       </div>
-    ),
-    wrapHandleSubmit(handleSubmit, updateDetails),
+      <WizardNavButtons
+        submit={wrapHandleSubmit(handleSubmit, updateDetails)}
+        canContinue={isValid}
+        stepNumber={stepNumber}
+        setCurrentStepNumber={setCurrentStepNumber}
+      />
+    </>
   );
 };
 

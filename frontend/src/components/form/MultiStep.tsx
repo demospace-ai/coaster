@@ -1,126 +1,85 @@
 import { CheckCircleIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ReactElement, useCallback, useState } from "react";
-import { FieldError, FieldValues, UseFormHandleSubmit, useForm } from "react-hook-form";
+import { ReactElement, useState } from "react";
+import { FieldError, FieldValues, UseFormHandleSubmit, UseFormSetValue, useForm } from "react-hook-form";
 import { toTitleCase } from "src/utils/string";
 import { mergeClasses } from "src/utils/twmerge";
 import { ZodEnum, ZodString, z } from "zod";
 
-export const MultiStep: React.FC<MultiStepProps> = ({ initialStepNumber, steps, onComplete }) => {
-  const [currentStepNumber, setCurrentStepNumber] = useState<number>(initialStepNumber ? initialStepNumber : 0);
+export const WizardNavButtons: React.FC<{
+  submit?: () => Promise<SubmitResult>;
+  isLastStep?: boolean;
+  canContinue: boolean;
+  stepNumber: number;
+  setCurrentStepNumber: (stepNumber: number) => void;
+}> = ({ submit, canContinue, isLastStep, stepNumber, setCurrentStepNumber }) => {
+  const isFirstStep = stepNumber === 0;
 
-  const isFirstStep = currentStepNumber === 0;
-  const isLastStep = currentStepNumber === steps.length - 1;
-  const currentStep = steps[currentStepNumber];
+  const previousStep = () => {
+    if (!isFirstStep) {
+      setCurrentStepNumber(stepNumber - 1);
+    }
+  };
 
-  const renderForm = useCallback(currentStep.elementFn, [currentStep]);
+  const nextStep = async () => {
+    if (!canContinue) {
+      return;
+    }
 
-  const renderLayout = (
-    canContinue: boolean,
-    renderStep: () => ReactElement,
-    submit?: () => Promise<SubmitResult>,
-  ): ReactElement => {
-    const nextStep = async () => {
-      if (!canContinue) {
-        return;
-      }
+    if (!submit) {
+      setCurrentStepNumber(stepNumber + 1);
+      return;
+    }
 
-      if (!submit) {
-        if (isLastStep) {
-          onComplete();
-        } else {
-          setCurrentStepNumber(currentStepNumber + 1);
-        }
-        return;
-      }
-
-      const result = await submit();
-      if (result.success) {
-        if (isLastStep) {
-          onComplete();
-        } else {
-          setCurrentStepNumber(currentStepNumber + 1);
-        }
-      } else {
-        // TODO: handle error
-      }
-    };
-
-    const previousStep = () => {
-      if (!isFirstStep) {
-        setCurrentStepNumber(currentStepNumber - 1);
-      }
-    };
-
-    return (
-      <div className="tw-w-full">
-        <div className="tw-w-full tw-text-left tw-text-2xl sm:tw-text-3xl tw-font-bold tw-mb-3">
-          {currentStep.title}
-        </div>
-        {currentStep.subtitle && (
-          <div className="tw-w-full tw-text-left tw-text-base tw-text-gray-600 tw-mb-6">{currentStep.subtitle}</div>
-        )}
-        {renderStep()}
-        <div
-          id="multistep-footer"
-          className={mergeClasses("tw-flex tw-mt-6", isFirstStep ? "tw-justify-end" : "tw-justify-between")}
-        >
-          <button
-            onClick={previousStep}
-            className={mergeClasses(
-              isFirstStep
-                ? "tw-hidden"
-                : "tw-flex tw-justify-center tw-py-2 tw-w-24 tw-font-medium tw-border tw-border-solid tw-border-black tw-rounded-3xl ",
-            )}
-          >
-            ←
-          </button>
-          <button
-            onClick={nextStep}
-            className={mergeClasses(
-              "tw-flex tw-justify-center tw-py-2 tw-w-28 tw-rounded-3xl tw-bg-black tw-text-white tw-font-medium",
-              !canContinue && "tw-cursor-not-allowed tw-bg-gray-400",
-            )}
-          >
-            {isLastStep ? "Submit" : "Continue"}
-          </button>
-        </div>
-      </div>
-    );
+    const result = await submit();
+    if (result.success) {
+      setCurrentStepNumber(stepNumber + 1);
+    } else {
+      // TODO: handle error
+    }
   };
 
   return (
-    <>
-      {renderForm({
-        id: currentStep.id,
-        renderLayout: renderLayout,
-      })}
-    </>
+    <div
+      id="multistep-footer"
+      className={mergeClasses("tw-flex tw-mt-6", isFirstStep ? "tw-justify-end" : "tw-justify-between")}
+    >
+      <button
+        onClick={previousStep}
+        className={mergeClasses(
+          isFirstStep
+            ? "tw-hidden"
+            : "tw-flex tw-justify-center tw-py-2 tw-w-24 tw-font-medium tw-border tw-border-solid tw-border-black tw-rounded-3xl ",
+        )}
+      >
+        ←
+      </button>
+      <button
+        onClick={nextStep}
+        className={mergeClasses(
+          "tw-flex tw-justify-center tw-py-2 tw-w-28 tw-rounded-3xl tw-bg-black tw-text-white tw-font-medium",
+          !canContinue && "tw-cursor-not-allowed tw-bg-gray-400",
+        )}
+      >
+        {isLastStep ? "Submit" : "Continue"}
+      </button>
+    </div>
   );
 };
 
-export type MultiStepProps = {
-  initialStepNumber?: number;
-  steps: Step[];
-  onComplete: () => void;
-};
-
 export type Step = {
-  id: string;
-  elementFn: (params: StepParams) => ReactElement;
+  element: ReactElement;
   title: string;
   subtitle?: string;
 };
 
 export type SubmitResult = { success: boolean; error?: string }; // TODO: use discriminated union
 
-export type StepParams = {
-  id: string;
-  renderLayout: (
-    canContinue: boolean,
-    render: () => ReactElement,
-    submit?: () => Promise<SubmitResult>,
-  ) => ReactElement;
+export type StepProps<T extends FieldValues> = {
+  values: T | undefined;
+  stepNumber: number;
+  setCurrentStepNumber: (stepNumber: number) => void;
+  setValue?: UseFormSetValue<T>;
 };
 
 type InputProps = {
@@ -131,7 +90,13 @@ type InputProps = {
   placeholder?: string;
 };
 
-export const InputStep: React.FC<StepParams & InputProps> = ({ id, schema, existingData, onSubmit, renderLayout }) => {
+export const InputStep = <T extends FieldValues>({
+  stepNumber,
+  setCurrentStepNumber,
+  schema,
+  existingData,
+  onSubmit,
+}: StepProps<T> & InputProps) => {
   const formSchema = z.object({
     value: schema,
   });
@@ -147,12 +112,10 @@ export const InputStep: React.FC<StepParams & InputProps> = ({ id, schema, exist
     resolver: zodResolver(formSchema),
   });
 
-  return renderLayout(
-    isValid,
-    () => (
+  return (
+    <>
       <div className="tw-flex tw-flex-col tw-items-center">
         <input
-          key={id}
           type="text"
           className="tw-flex tw-py-3 tw-px-3 tw-w-full tw-outline-0 tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-text-base tw-justify-center focus-within:tw-border-2 focus-within:tw-border-blue-700 focus-within:tw-m-[-1px] focus-within:tw-px-[11px] tw-cursor-text"
           {...register("value", {
@@ -161,18 +124,23 @@ export const InputStep: React.FC<StepParams & InputProps> = ({ id, schema, exist
         />
         <ErrorMessage error={errors.value} />
       </div>
-    ),
-    onSubmit && wrapHandleSubmit(handleSubmit, onSubmit),
+      <WizardNavButtons
+        submit={wrapHandleSubmit(handleSubmit, onSubmit)}
+        canContinue={true}
+        stepNumber={stepNumber}
+        setCurrentStepNumber={setCurrentStepNumber}
+      />
+    </>
   );
 };
 
-export const TextAreaStep: React.FC<StepParams & InputProps> = ({
-  id,
+export const TextAreaStep = <T extends FieldValues>({
   schema,
   existingData,
   onSubmit,
-  renderLayout,
-}) => {
+  stepNumber,
+  setCurrentStepNumber,
+}: StepProps<T> & InputProps) => {
   const formSchema = z.object({
     value: schema,
   });
@@ -188,12 +156,10 @@ export const TextAreaStep: React.FC<StepParams & InputProps> = ({
     resolver: zodResolver(formSchema),
   });
 
-  return renderLayout(
-    isValid,
-    () => (
+  return (
+    <>
       <div className="tw-flex tw-flex-col tw-items-center">
         <textarea
-          key={id}
           className="tw-flex tw-py-3 tw-px-3 tw-w-full tw-outline-0 tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-text-base tw-justify-center focus-within:tw-border-2 focus-within:tw-border-blue-700 focus-within:tw-m-[-1px] focus-within:tw-px-[11px] tw-cursor-text"
           {...register("value", {
             onChange: () => clearErrors("value"),
@@ -201,8 +167,13 @@ export const TextAreaStep: React.FC<StepParams & InputProps> = ({
         />
         <ErrorMessage error={errors.value} />
       </div>
-    ),
-    onSubmit && wrapHandleSubmit(handleSubmit, onSubmit),
+      <WizardNavButtons
+        submit={wrapHandleSubmit(handleSubmit, onSubmit)}
+        canContinue={true}
+        stepNumber={stepNumber}
+        setCurrentStepNumber={setCurrentStepNumber}
+      />
+    </>
   );
 };
 
@@ -214,20 +185,19 @@ type SelectorProps = {
   placeholder?: string;
 };
 
-export const SelectorStep: React.FC<StepParams & SelectorProps> = ({
-  id,
+export const SelectorStep = <T extends FieldValues>({
   schema,
   existingData,
-  onSubmit,
+  stepNumber,
+  setCurrentStepNumber,
   onChange,
-  renderLayout,
-}) => {
+  onSubmit,
+}: StepProps<T> & SelectorProps) => {
   type schemaType = z.infer<typeof schema>;
   const [selected, setSelected] = useState<schemaType | null>(existingData || null);
-  return renderLayout(
-    selected !== null,
-    () => (
-      <div key={id} className="tw-flex tw-flex-col tw-items-center">
+  return (
+    <>
+      <div className="tw-flex tw-flex-col tw-items-center">
         {schema.options.map((option) => (
           <div
             key={option}
@@ -255,8 +225,13 @@ export const SelectorStep: React.FC<StepParams & SelectorProps> = ({
           </div>
         ))}
       </div>
-    ),
-    onSubmit && wrapSubmit(selected, selected !== null, onSubmit),
+      <WizardNavButtons
+        submit={wrapSubmit(selected, selected !== null, onSubmit)}
+        canContinue={true}
+        stepNumber={stepNumber}
+        setCurrentStepNumber={setCurrentStepNumber}
+      />
+    </>
   );
 };
 
@@ -264,8 +239,8 @@ export const ErrorMessage: React.FC<{ error: FieldError | undefined }> = ({ erro
   return (
     <div
       className={mergeClasses(
-        "tw-flex tw-transition-all tw-duration-100 tw-text-red-600 tw-mt-2 tw-w-full tw-text-xs tw-h-0",
-        error && "tw-h-2",
+        "tw-flex tw-transition-all tw-duration-100 tw-text-red-600 tw-mt-1 tw-w-full tw-text-xs tw-h-0",
+        error && "tw-h-2 tw-mb-3",
       )}
     >
       {error && (
@@ -281,23 +256,33 @@ export const ErrorMessage: React.FC<{ error: FieldError | undefined }> = ({ erro
 // Convenience function to ensure a remote caller of onSubmit can await the result of the function
 export function wrapHandleSubmit<T extends FieldValues>(
   handleSubmit: UseFormHandleSubmit<T>,
-  onSubmit: (data: T) => Promise<SubmitResult>,
+  onSubmit: ((data: T) => Promise<SubmitResult>) | undefined,
 ) {
   return async () => {
     let result = { success: true };
     await handleSubmit(async (data) => {
-      const innerResult = await onSubmit(data);
-      result = { ...innerResult };
+      if (onSubmit) {
+        const innerResult = await onSubmit(data);
+        result = { ...innerResult };
+      }
     })();
 
     return result;
   };
 }
 
-export const wrapSubmit = (value: any, isValid: boolean, onSubmit: (data: any) => Promise<SubmitResult>) => {
+export const wrapSubmit = (
+  value: any,
+  isValid: boolean,
+  onSubmit: ((data: any) => Promise<SubmitResult>) | undefined,
+) => {
   return async () => {
     if (isValid) {
-      return onSubmit(value);
+      if (onSubmit) {
+        return onSubmit(value);
+      } else {
+        return { success: true };
+      }
     } else {
       return { success: false, error: "" };
     }
