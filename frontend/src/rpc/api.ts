@@ -1,5 +1,7 @@
 import {
   AvailabilityRule,
+  AvailabilityRuleInput,
+  AvailabilityRuleUpdates,
   CheckSessionResponse,
   CreateUserRequest,
   CreateUserResponse,
@@ -61,6 +63,22 @@ export const UpdateListing: IEndpoint<ListingInput, Listing, { listingID: number
   name: "Update listing",
   method: "POST",
   path: "/listings/:listingID",
+};
+
+export const CreateAvailabilityRule: IEndpoint<AvailabilityRuleInput, AvailabilityRule> = {
+  name: "Create new availability rule",
+  method: "POST",
+  path: "/availability_rules",
+};
+
+export const UpdateAvailabilityRule: IEndpoint<
+  AvailabilityRuleUpdates,
+  AvailabilityRule,
+  { availabilityRuleID: number }
+> = {
+  name: "Update availability rule",
+  method: "POST",
+  path: "/availability_rules/:availabilityRuleID",
 };
 
 export const AddListingImage: IEndpoint<undefined, Image, { listingID: number }> = {

@@ -371,7 +371,6 @@ const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) => {
         }}
         clickToEscape={true}
         noContainer
-        darkBackground
       >
         <ImagesModal listing={listing} imageIndex={imageIndex} setImageIndex={setImageIndex} />
       </Modal>

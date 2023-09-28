@@ -23,6 +23,12 @@ import { InlineMapSearch } from "src/components/maps/Maps";
 import { Modal } from "src/components/modal/Modal";
 import { useShowToast } from "src/components/notifications/Notifications";
 import {
+  ExistingRuleForm,
+  NewRuleForm,
+  getAvailabilityRuleTypeDisplay,
+  getAvailabilityTypeDisplay,
+} from "src/pages/listing/AvailabilityRules";
+import {
   AvailabilityTypeSchema,
   CategorySchema,
   DescriptionSchema,
@@ -35,15 +41,7 @@ import {
 import { sendRequest } from "src/rpc/ajax";
 import { AddListingImage, DeleteListingImage, GetListing, UpdateListing, UpdateListingImages } from "src/rpc/api";
 import { useAvailabilityRules, useListing } from "src/rpc/data";
-import {
-  AvailabilityRuleType,
-  AvailabilityType,
-  AvailabilityTypeType,
-  Category,
-  Image,
-  Listing,
-  ListingInput,
-} from "src/rpc/types";
+import { AvailabilityRule, AvailabilityType, Category, Image, Listing, ListingInput } from "src/rpc/types";
 import { isProd } from "src/utils/env";
 import { forceErrorMessage } from "src/utils/errors";
 import { getGcsImageUrl } from "src/utils/images";
@@ -210,6 +208,8 @@ const Availability: React.FC<{
   control: Control<EditListingSchemaType>;
   formState: FormState<EditListingSchemaType>;
 }> = ({ listing, watch, control, formState }) => {
+  const [showRuleModal, setShowRuleModal] = useState(false);
+  const [existingRule, setExistingRule] = useState<AvailabilityRule | undefined>(undefined);
   const { availabilityRules } = useAvailabilityRules(listing.id);
   if (!availabilityRules) {
     return <Loading />;
@@ -220,6 +220,12 @@ const Availability: React.FC<{
 
   return (
     <>
+      <AvailabilityRuleModal
+        listing={listing}
+        show={showRuleModal}
+        closeModal={() => setShowRuleModal(false)}
+        existingRule={existingRule}
+      />
       <div className="tw-text-2xl tw-font-semibold tw-mb-2">Availability</div>
       <Controller
         name="availabilityType"
@@ -259,14 +265,30 @@ const Availability: React.FC<{
                 </td>
                 <td className={tableRowCell}>{getAvailabilityRuleTypeDisplay(rule.type)}</td>
                 <td className="tw-flex tw-items-center tw-justify-end tw-gap-8 tw-p-4 tw-ml-auto tw-pr-8">
-                  <button className="tw-font-medium tw-text-blue-600 hover:tw-text-blue-800">Edit</button>
+                  <button
+                    className="tw-font-medium tw-text-blue-600 hover:tw-text-blue-800"
+                    onClick={() => {
+                      setExistingRule(rule);
+                      setShowRuleModal(true);
+                    }}
+                  >
+                    Edit
+                  </button>
                   <TrashIcon className="tw-h-4 tw-cursor-pointer tw-stroke-red-500 hover:tw-stroke-red-800" />
                 </td>
               </tr>
             ))}
             <tr key="new-rule" className="tw-py-4">
               <td className="tw-p-4 tw-text-left">
-                <button className="tw-text-blue-600 tw-font-medium hover:tw-text-blue-800">+ Add rule</button>
+                <button
+                  className="tw-text-blue-600 tw-font-medium hover:tw-text-blue-800 tw-whitespace-nowrap"
+                  onClick={() => {
+                    setExistingRule(undefined);
+                    setShowRuleModal(true);
+                  }}
+                >
+                  + Add rule
+                </button>
               </td>
             </tr>
           </tbody>
@@ -277,6 +299,25 @@ const Availability: React.FC<{
       </Button>
       <FormError message={formState.errors.root?.message} />
     </>
+  );
+};
+
+interface AvailabilityRuleModalProps {
+  listing: Listing;
+  existingRule?: AvailabilityRule;
+  show: boolean;
+  closeModal: () => void;
+}
+
+const AvailabilityRuleModal: React.FC<AvailabilityRuleModalProps> = ({ listing, existingRule, show, closeModal }) => {
+  return (
+    <Modal show={show} close={closeModal}>
+      {existingRule ? (
+        <ExistingRuleForm existingRule={existingRule} closeModal={closeModal} />
+      ) : (
+        <NewRuleForm closeModal={closeModal} />
+      )}
+    </Modal>
   );
 };
 
@@ -524,20 +565,13 @@ const ImagesInner: React.FC<{ listing: Listing }> = ({ listing }) => {
           <input ref={newImageRef} type="file" className="tw-hidden tw-invisible" onChange={addImage} />
           <PlusIcon className="tw-h-12 tw-mx-auto tw-my-auto tw-text-gray-400 group-hover:tw-text-gray-600 tw-transition-all tw-duration-100" />
         </div>
-        <Modal
+        <DeleteModal
+          listing={listing}
+          imageID={imageToDelete}
+          setImages={setImages}
           show={showDeleteConfirmation}
-          close={() => {
-            setShowDeleteConfirmation(false);
-          }}
-          clickToEscape={true}
-        >
-          <DeleteModal
-            listing={listing}
-            imageID={imageToDelete}
-            setImages={setImages}
-            closeModal={() => setShowDeleteConfirmation(false)}
-          />
-        </Modal>
+          closeModal={() => setShowDeleteConfirmation(false)}
+        />
       </div>
       {error && <FormError message={error} />}
     </>
@@ -548,10 +582,11 @@ interface DeleteModalProps {
   listing: Listing;
   imageID: number | null;
   setImages: (images: Image[]) => void;
+  show: boolean;
   closeModal: () => void;
 }
 
-const DeleteModal: React.FC<DeleteModalProps> = ({ listing, imageID, setImages, closeModal }) => {
+const DeleteModal: React.FC<DeleteModalProps> = ({ listing, imageID, setImages, show, closeModal }) => {
   const [deleting, setDeleting] = useState(false);
   const deleteImage = async () => {
     setDeleting(true);
@@ -569,34 +604,18 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ listing, imageID, setImages, 
   };
 
   return (
-    <div className="tw-w-[320px] sm:tw-w-[420px] tw-px-8 sm:tw-px-12 tw-pb-10">
-      <div className="tw-text-center tw-w-full tw-text-xl tw-font-semibold tw-mb-5">Permanently delete this image?</div>
-      <Button
-        className="tw-flex tw-h-[52px] tw-items-center tw-justify-center tw-whitespace-nowrap tw-w-full"
-        onClick={deleteImage}
-      >
-        {deleting ? <Loading /> : "Delete"}
-      </Button>
-    </div>
+    <Modal show={show} close={closeModal} clickToEscape>
+      <div className="tw-w-[320px] sm:tw-w-[420px] tw-px-8 sm:tw-px-12 tw-pb-10">
+        <div className="tw-text-center tw-w-full tw-text-xl tw-font-semibold tw-mb-5">
+          Permanently delete this image?
+        </div>
+        <Button
+          className="tw-flex tw-h-[52px] tw-items-center tw-justify-center tw-whitespace-nowrap tw-w-full"
+          onClick={deleteImage}
+        >
+          {deleting ? <Loading /> : "Delete"}
+        </Button>
+      </div>
+    </Modal>
   );
 };
-
-function getAvailabilityTypeDisplay(value: AvailabilityTypeType) {
-  switch (value) {
-    case AvailabilityType.Enum.date:
-      return "Full day (customer just chooses a date)";
-    case AvailabilityType.Enum.datetime:
-      return "Date and time (customer chooses a date and time slot)";
-  }
-}
-
-function getAvailabilityRuleTypeDisplay(value: AvailabilityRuleType) {
-  switch (value) {
-    case AvailabilityRuleType.FixedDate:
-      return "Single Date";
-    case AvailabilityRuleType.FixedRange:
-      return "Fixed Range";
-    case AvailabilityRuleType.Recurring:
-      return "Recurring";
-  }
-}

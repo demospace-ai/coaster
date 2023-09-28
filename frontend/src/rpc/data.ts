@@ -2,6 +2,7 @@ import { useOnLoginSuccess } from "src/pages/login/actions";
 import { useDispatch } from "src/root/model";
 import { sendRequest } from "src/rpc/ajax";
 import {
+  CreateAvailabilityRule,
   CreateListing,
   GetAvailabilityRules,
   GetDraftListing,
@@ -10,11 +11,21 @@ import {
   GetListing,
   ResetPassword,
   SearchListings,
+  UpdateAvailabilityRule,
   UpdateListing,
   UpdateProfilePicture,
   UpdateUser,
 } from "src/rpc/api";
-import { AvailabilityRule, Listing, ListingInput, ResetPasswordRequest, User, UserUpdates } from "src/rpc/types";
+import {
+  AvailabilityRule,
+  AvailabilityRuleInput,
+  AvailabilityRuleUpdates,
+  Listing,
+  ListingInput,
+  ResetPasswordRequest,
+  User,
+  UserUpdates,
+} from "src/rpc/types";
 import { forceErrorMessage } from "src/utils/errors";
 import { Mutation, useMutation } from "src/utils/queryHelpers";
 import useSWR, { Fetcher, SWRConfiguration, mutate } from "swr";
@@ -103,6 +114,39 @@ export async function createListing(input: ListingInput) {
   } catch (e) {
     return { success: false, error: forceErrorMessage(e) };
   }
+}
+
+export function useUpdateAvailabilityRule(availabilityRuleID: number): Mutation<AvailabilityRuleUpdates> {
+  return useMutation<AvailabilityRule, AvailabilityRuleUpdates>(
+    (updates: AvailabilityRuleUpdates) => {
+      return sendRequest(UpdateAvailabilityRule, { pathParams: { availabilityRuleID }, payload: updates });
+    },
+    {
+      onSuccess: (availabilityRule: AvailabilityRule) => {
+        mutate({ GetAvailabilityRules }, (availabilityRules) =>
+          availabilityRules.map((existingRule: AvailabilityRule) => {
+            if (existingRule.id === availabilityRuleID) {
+              return availabilityRule;
+            }
+            return existingRule;
+          }),
+        );
+      },
+    },
+  );
+}
+
+export function useCreateAvailabilityRule(): Mutation<AvailabilityRuleInput> {
+  return useMutation<AvailabilityRule, AvailabilityRuleInput>(
+    (input: AvailabilityRuleInput) => {
+      return sendRequest(CreateAvailabilityRule, { payload: input });
+    },
+    {
+      onSuccess: (availabilityRule: AvailabilityRule) => {
+        mutate({ GetAvailabilityRules }, (availabilityRules) => [...availabilityRules, availabilityRule]);
+      },
+    },
+  );
 }
 
 export function useUpdateUser(onSuccess?: () => void): Mutation<UserUpdates> {

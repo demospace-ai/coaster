@@ -46,7 +46,7 @@ export interface AvailabilityRule {
   id: number;
   listing_id: number;
   name: string;
-  type: AvailabilityRuleType;
+  type: AvailabilityRuleTypeType;
   start_date: Date;
   end_date: Date;
   recurring_years: number[];
@@ -55,11 +55,8 @@ export interface AvailabilityRule {
   time_slots: TimeSlot[];
 }
 
-export enum AvailabilityRuleType {
-  FixedDate = "fixed_date",
-  FixedRange = "fixed_range",
-  Recurring = "recurring",
-}
+export const AvailabilityRuleType = z.enum(["fixed_date", "fixed_range", "recurring"]);
+export type AvailabilityRuleTypeType = z.infer<typeof AvailabilityRuleType>;
 
 export interface TimeSlot {
   id: number;
@@ -94,6 +91,32 @@ export interface ListingInput {
   max_guests?: number;
   includes?: string[];
   availability_type?: AvailabilityTypeType;
+}
+
+export interface AvailabilityRuleInput {
+  name: string;
+  type: AvailabilityRuleTypeType;
+  start_date?: Date;
+  end_date?: Date;
+  recurring_years?: number[];
+  recurring_months?: number[];
+  time_slots?: TimeSlotInput[];
+}
+
+export interface AvailabilityRuleUpdates {
+  name?: string;
+  type?: AvailabilityRuleTypeType;
+  start_date?: Date;
+  end_date?: Date;
+  recurring_years?: number[];
+  recurring_months?: number[];
+  time_slots?: TimeSlotInput[];
+}
+
+export interface TimeSlotInput {
+  day_of_week: number;
+  start_time?: Date;
+  capacity?: number;
 }
 
 export enum CancellationPolicy {

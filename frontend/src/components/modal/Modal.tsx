@@ -10,7 +10,7 @@ interface ModalProps {
   titleStyle?: string;
   clickToEscape?: boolean;
   noContainer?: boolean;
-  darkBackground?: boolean;
+  lightBackground?: boolean;
 }
 
 export const Modal: React.FC<ModalProps> = (props) => {
@@ -36,7 +36,7 @@ export const Modal: React.FC<ModalProps> = (props) => {
           className={classNames(
             "tw-fixed tw-overscroll-contain tw-top-0 tw-left-0 tw-h-full tw-w-full tw-z-50 tw-backdrop-blur-sm",
             showHideClassName,
-            props.darkBackground ? "tw-bg-black tw-bg-opacity-90" : "tw-bg-white tw-bg-opacity-50",
+            props.lightBackground ? "tw-bg-white tw-bg-opacity-50" : "tw-bg-black tw-bg-opacity-50",
           )}
           onClick={props.clickToEscape ? props.close : undefined}
         >
@@ -47,7 +47,7 @@ export const Modal: React.FC<ModalProps> = (props) => {
             </section>
           ) : (
             <section
-              className="tw-absolute tw-bg-white tw-flex tw-flex-col tw-top-[40%] tw-left-1/2 -tw-translate-x-1/2 -tw-translate-y-1/2 tw-rounded-lg tw-shadow-md"
+              className="tw-absolute tw-bg-white tw-flex tw-flex-col tw-top-[50%] sm:tw-top-[45%] tw-max-h-[85%] tw-left-1/2 -tw-translate-x-1/2 -tw-translate-y-1/2 tw-rounded-lg tw-shadow-md"
               onClick={(e) => e.stopPropagation()}
             >
               <div style={{ display: "flex" }}>

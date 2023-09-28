@@ -32,3 +32,9 @@ export const MaxGuestsSchema = z
 export const IncludesSchema = z.array(z.object({ value: z.string().nonempty("Included amenities cannot be empty") }));
 
 export const AvailabilityTypeSchema = AvailabilityType;
+
+export const TimeSlotSchema = z.object({
+  dayOfWeek: z.number().min(0).max(6),
+  startTime: z.date(),
+  capacity: z.number().min(1),
+});

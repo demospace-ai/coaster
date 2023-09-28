@@ -7,7 +7,7 @@ import { mergeClasses } from "src/utils/twmerge";
 import { ZodEnum, ZodString, z } from "zod";
 
 export const MultiStep: React.FC<MultiStepProps> = ({ initialStepNumber, steps, onComplete }) => {
-  const [currentStepNumber, setCurrentStepNumber] = useState<number>(initialStepNumber);
+  const [currentStepNumber, setCurrentStepNumber] = useState<number>(initialStepNumber ? initialStepNumber : 0);
 
   const isFirstStep = currentStepNumber === 0;
   const isLastStep = currentStepNumber === steps.length - 1;
@@ -100,7 +100,7 @@ export const MultiStep: React.FC<MultiStepProps> = ({ initialStepNumber, steps, 
 };
 
 export type MultiStepProps = {
-  initialStepNumber: number;
+  initialStepNumber?: number;
   steps: Step[];
   onComplete: () => void;
 };

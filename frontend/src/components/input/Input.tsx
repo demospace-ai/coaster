@@ -9,7 +9,7 @@ import {
   useInteractions,
   useRole,
 } from "@floating-ui/react";
-import { Combobox, Listbox, Transition } from "@headlessui/react";
+import { Combobox, Listbox, RadioGroup, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { AsYouType, CountryCode, getCountryCallingCode } from "libphonenumber-js";
@@ -187,7 +187,6 @@ export type DropdownInputProps = {
   placeholder: string;
   noOptionsString?: string;
   className?: string;
-  allowCustom?: boolean;
   label?: string;
   dropdownHeight?: string;
   nullable?: boolean;
@@ -778,5 +777,100 @@ export const PriceInput = forwardRef<HTMLInputElement, InputProps>((props, ref) 
         />
       </div>
     </div>
+  );
+});
+
+export const TimeInput = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
+  return (
+    <div className={mergeClasses("tw-flex tw-gap-1 tw-items-center", props.className)}>
+      <select className="tw-outline-none tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-p-1">
+        {Array.from(Array(12).keys()).map((hour) => (
+          <option key={hour}>{hour + 1}</option>
+        ))}
+      </select>
+      :
+      <select className="tw-outline-none tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-p-1">
+        {Array.from(Array(12).keys()).map((minute) => (
+          <option key={minute}>
+            {(minute * 5).toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false })}
+          </option>
+        ))}
+      </select>
+      <select className="tw-outline-none tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-p-1">
+        <option>AM</option>
+        <option>PM</option>
+      </select>
+    </div>
+  );
+});
+
+export type RadioInputProps = {
+  options: any[] | undefined;
+  value: any;
+  onChange: (...event: any[]) => void;
+  getElementForDisplay?: (option: any) => string | React.ReactElement;
+  getElementForDetail?: (option: any) => string | React.ReactElement;
+  className?: string;
+  valid?: boolean;
+  disabled?: boolean;
+  noBullet?: boolean;
+  useCheckmark?: boolean;
+};
+export const RadioInput = forwardRef<HTMLDivElement, RadioInputProps>((props, ref) => {
+  if (!props.options) {
+    return <Loading />;
+  }
+
+  return (
+    <RadioGroup value={props.value} onChange={props.onChange}>
+      <RadioGroup.Label className="tw-sr-only">Server size</RadioGroup.Label>
+      <div className="tw-space-y-2">
+        {props.options.map((option) => (
+          <RadioGroup.Option
+            key={option}
+            value={option}
+            className={({ checked }) =>
+              `${checked ? "tw-bg-slate-100" : "tw-bg-white"}
+              tw-relative tw-flex tw-cursor-pointer tw-rounded-lg tw-px-3 sm:tw-px-5 tw-py-4 tw-border tw-border-solid tw-border-slate-200 tw-outline-none`
+            }
+          >
+            {({ checked }) => (
+              <>
+                <div className="tw-flex tw-w-full tw-items-center tw-justify-between">
+                  <div className="tw-flex tw-items-center">
+                    {props.noBullet || (
+                      <span
+                        className={mergeClasses(
+                          checked ? "tw-bg-slate-600 tw-border-transparent" : "tw-bg-white tw-border-gray-300",
+                          "tw-mt-0.5 tw-mr-3 sm:tw-mr-5 tw-h-4 tw-w-4 tw-shrink-0 tw-cursor-pointer tw-rounded-full tw-border tw-flex tw-items-center tw-justify-center",
+                        )}
+                        aria-hidden="true"
+                      >
+                        <span className="tw-rounded-full tw-bg-white tw-w-1.5 tw-h-1.5" />
+                      </span>
+                    )}
+                    <div className="tw-text-sm">
+                      <RadioGroup.Label as="p" className="tw-font-semibold tw-text-gray-900">
+                        {props.getElementForDisplay ? props.getElementForDisplay(option) : option}
+                      </RadioGroup.Label>
+                      {props.getElementForDetail && (
+                        <RadioGroup.Description as="span" className="tw-text-gray-900">
+                          {props.getElementForDetail(option)}
+                        </RadioGroup.Description>
+                      )}
+                    </div>
+                  </div>
+                  {checked && props.useCheckmark && (
+                    <div className="tw-text-black">
+                      <CheckIcon className="tw-h-5 tw-w-5" />
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </RadioGroup.Option>
+        ))}
+      </div>
+    </RadioGroup>
   );
 });
