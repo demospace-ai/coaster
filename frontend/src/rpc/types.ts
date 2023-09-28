@@ -42,6 +42,33 @@ export interface Listing {
   images: Image[];
 }
 
+export interface AvailabilityRule {
+  id: number;
+  listing_id: number;
+  name: string;
+  type: AvailabilityRuleType;
+  start_date: Date;
+  end_date: Date;
+  recurring_years: number[];
+  recurring_months: number[];
+
+  time_slots: TimeSlot[];
+}
+
+export enum AvailabilityRuleType {
+  FixedDate = "fixed_date",
+  FixedRange = "fixed_range",
+  Recurring = "recurring",
+}
+
+export interface TimeSlot {
+  id: number;
+  availability_rule_id: number;
+  day_of_week: number;
+  start_time: Date;
+  capacity: number;
+}
+
 export interface Image {
   id: number;
   storage_id: string;

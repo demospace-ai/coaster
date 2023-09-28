@@ -1,4 +1,5 @@
 import {
+  AvailabilityRule,
   CheckSessionResponse,
   CreateUserRequest,
   CreateUserResponse,
@@ -84,6 +85,12 @@ export const GetFeaturedListings: IEndpoint<undefined, Listing[]> = {
   name: "Get featured listings",
   method: "GET",
   path: "/featured",
+};
+
+export const GetAvailabilityRules: IEndpoint<undefined, AvailabilityRule[]> = {
+  name: "Get availability rules",
+  method: "GET",
+  path: "/listings/:listingID/availability_rules",
 };
 
 export const GetHostedListings: IEndpoint<undefined, Listing[]> = {

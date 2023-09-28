@@ -20,6 +20,7 @@ type RuleAndTimes struct {
 func CreateAvailability(db *gorm.DB, availabilityInput input.AvailabilityRule) (*models.AvailabilityRule, error) {
 	availabilityRule := models.AvailabilityRule{
 		ListingID:       availabilityInput.ListingID,
+		Name:            availabilityInput.Name,
 		Type:            availabilityInput.Type,
 		StartDate:       availabilityInput.StartDate,
 		EndDate:         availabilityInput.EndDate,

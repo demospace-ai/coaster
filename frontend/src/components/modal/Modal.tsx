@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 
 interface ModalProps {
   show: boolean;
@@ -29,32 +30,39 @@ export const Modal: React.FC<ModalProps> = (props) => {
   const showHideClassName = props.show ? "tw-block" : "tw-hidden";
 
   return (
-    <div
-      className={classNames(
-        "tw-fixed tw-overscroll-contain tw-top-0 tw-left-0 tw-h-full tw-w-full tw-z-50 tw-backdrop-blur-sm",
-        showHideClassName,
-        props.darkBackground ? "tw-bg-black tw-bg-opacity-90" : "tw-bg-white tw-bg-opacity-50",
-      )}
-      onClick={props.clickToEscape ? props.close : undefined}
-    >
-      {props.noContainer ? (
-        <section>
-          <NoContainerModalCloseButton close={props.close} />
-          {props.children}
-        </section>
-      ) : (
-        <section
-          className="tw-absolute tw-bg-white tw-flex tw-flex-col tw-top-[40%] tw-left-1/2 -tw-translate-x-1/2 -tw-translate-y-1/2 tw-rounded-lg tw-shadow-md"
-          onClick={(e) => e.stopPropagation()}
+    <>
+      {createPortal(
+        <div
+          className={classNames(
+            "tw-fixed tw-overscroll-contain tw-top-0 tw-left-0 tw-h-full tw-w-full tw-z-50 tw-backdrop-blur-sm",
+            showHideClassName,
+            props.darkBackground ? "tw-bg-black tw-bg-opacity-90" : "tw-bg-white tw-bg-opacity-50",
+          )}
+          onClick={props.clickToEscape ? props.close : undefined}
         >
-          <div style={{ display: "flex" }}>
-            <div className={classNames("tw-inline tw-m-6 tw-mb-2 tw-select-none", props.titleStyle)}>{props.title}</div>
-            <ModalCloseButton close={props.close} />
-          </div>
-          {props.children}
-        </section>
+          {props.noContainer ? (
+            <section>
+              <NoContainerModalCloseButton close={props.close} />
+              {props.children}
+            </section>
+          ) : (
+            <section
+              className="tw-absolute tw-bg-white tw-flex tw-flex-col tw-top-[40%] tw-left-1/2 -tw-translate-x-1/2 -tw-translate-y-1/2 tw-rounded-lg tw-shadow-md"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div style={{ display: "flex" }}>
+                <div className={classNames("tw-inline tw-m-6 tw-mb-2 tw-select-none", props.titleStyle)}>
+                  {props.title}
+                </div>
+                <ModalCloseButton close={props.close} />
+              </div>
+              {props.children}
+            </section>
+          )}
+        </div>,
+        document.body,
       )}
-    </div>
+    </>
   );
 };
 

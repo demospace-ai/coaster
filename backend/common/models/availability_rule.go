@@ -17,6 +17,7 @@ const (
 
 type AvailabilityRule struct {
 	ListingID       int64                `json:"listing_id"`
+	Name            string               `json:"name"`
 	Type            AvailabilityRuleType `json:"type"`
 	StartDate       *database.Date       `json:"start_date"`                              // Can be null for recurring rules
 	EndDate         *database.Date       `json:"end_date"`                                // Can be null for recurring rules

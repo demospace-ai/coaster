@@ -34,8 +34,16 @@ import {
 } from "src/pages/listing/schema";
 import { sendRequest } from "src/rpc/ajax";
 import { AddListingImage, DeleteListingImage, GetListing, UpdateListing, UpdateListingImages } from "src/rpc/api";
-import { useListing } from "src/rpc/data";
-import { AvailabilityType, AvailabilityTypeType, Category, Image, Listing, ListingInput } from "src/rpc/types";
+import { useAvailabilityRules, useListing } from "src/rpc/data";
+import {
+  AvailabilityRuleType,
+  AvailabilityType,
+  AvailabilityTypeType,
+  Category,
+  Image,
+  Listing,
+  ListingInput,
+} from "src/rpc/types";
 import { isProd } from "src/utils/env";
 import { forceErrorMessage } from "src/utils/errors";
 import { getGcsImageUrl } from "src/utils/images";
@@ -95,7 +103,7 @@ export const EditListing: React.FC = () => {
           <Tab.Group>
             <div className="tw-relative tw-flex tw-items-center sm:tw-items-start tw-mb-3">
               <ChevronLeftIcon className="sm:tw-hidden tw-h-4" />
-              <Tab.List className="sm:tw-sticky sm:tw-top-32 tw-flex tw-flex-1 sm:tw-flex-col tw-space-x-1 tw-rounded-xl tw-p-1 tw-overflow-scroll tw-hide-scrollbar sm:tw-overflow-visible tw-gap-3 sm:tw-mr-[10vw]">
+              <Tab.List className="sm:tw-sticky sm:tw-top-32 tw-flex tw-flex-1 sm:tw-flex-col tw-rounded-xl tw-p-1 tw-overflow-scroll tw-hide-scrollbar sm:tw-overflow-visible tw-gap-3 sm:tw-mr-[10vw]">
                 {["Listing Details", "Images", "Included Amenities", "Availability"].map((section) => (
                   <Tab
                     key={section}
@@ -201,7 +209,15 @@ const Availability: React.FC<{
   register: UseFormRegister<EditListingSchemaType>;
   control: Control<EditListingSchemaType>;
   formState: FormState<EditListingSchemaType>;
-}> = ({ listing, watch, register, control, formState }) => {
+}> = ({ listing, watch, control, formState }) => {
+  const { availabilityRules } = useAvailabilityRules(listing.id);
+  if (!availabilityRules) {
+    return <Loading />;
+  }
+
+  const tableHeaderCell = "tw-w-1/6 tw-p-4";
+  const tableRowCell = "tw-p-4";
+
   return (
     <>
       <div className="tw-text-2xl tw-font-semibold tw-mb-2">Availability</div>
@@ -221,6 +237,41 @@ const Availability: React.FC<{
         )}
       />
       <FormError message={formState.errors.availabilityType?.message} />
+      <div className="tw-text-xl tw-font-medium tw-mt-8 tw-mb-4">Availability Rules</div>
+      <div className="tw-rounded-lg tw-border tw-border-solid tw-border-slate-200 tw-overflow-x-auto">
+        <table className="tw-w-full tw-text-left">
+          <thead>
+            <tr className="tw-w-full tw-border-b tw-border-solid tw-border-slate-200">
+              <th className={tableHeaderCell}>Rule Name</th>
+              <th className={tableHeaderCell}>Status</th>
+              <th className={tableHeaderCell}>Type</th>
+              <th className={tableHeaderCell}></th>
+            </tr>
+          </thead>
+          <tbody>
+            {availabilityRules.map((rule) => (
+              <tr key={rule.id} className="tw-py-4 tw-border-b tw-border-solid tw-border-slate-100">
+                <td className={tableRowCell}>{rule.name}</td>
+                <td className={tableRowCell}>
+                  <div className="tw-bg-green-100 tw-text-green-900 tw-rounded-lg tw-px-6 tw-py-0.5 tw-w-fit">
+                    Active
+                  </div>
+                </td>
+                <td className={tableRowCell}>{getAvailabilityRuleTypeDisplay(rule.type)}</td>
+                <td className="tw-flex tw-items-center tw-justify-end tw-gap-8 tw-p-4 tw-ml-auto tw-pr-8">
+                  <button className="tw-font-medium tw-text-blue-600 hover:tw-text-blue-800">Edit</button>
+                  <TrashIcon className="tw-h-4 tw-cursor-pointer tw-stroke-red-500 hover:tw-stroke-red-800" />
+                </td>
+              </tr>
+            ))}
+            <tr key="new-rule" className="tw-py-4">
+              <td className="tw-p-4 tw-text-left">
+                <button className="tw-text-blue-600 tw-font-medium hover:tw-text-blue-800">+ Add rule</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <Button type="submit" className="tw-mt-6 tw-w-full sm:tw-w-32 tw-h-12 tw-ml-auto" disabled={!formState.isDirty}>
         {formState.isSubmitting ? <Loading /> : "Save"}
       </Button>
@@ -536,5 +587,16 @@ function getAvailabilityTypeDisplay(value: AvailabilityTypeType) {
       return "Full day (customer just chooses a date)";
     case AvailabilityType.Enum.datetime:
       return "Date and time (customer chooses a date and time slot)";
+  }
+}
+
+function getAvailabilityRuleTypeDisplay(value: AvailabilityRuleType) {
+  switch (value) {
+    case AvailabilityRuleType.FixedDate:
+      return "Single Date";
+    case AvailabilityRuleType.FixedRange:
+      return "Fixed Range";
+    case AvailabilityRuleType.Recurring:
+      return "Recurring";
   }
 }

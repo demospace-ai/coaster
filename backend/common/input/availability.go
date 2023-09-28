@@ -15,6 +15,7 @@ type TimeSlot struct {
 
 type AvailabilityRule struct {
 	ListingID       int64                       `json:"listing_id" validate:"required"`
+	Name            string                      `json:"name" validate:"required"`
 	Type            models.AvailabilityRuleType `json:"type" validate:"required"`
 	StartDate       *database.Date              `json:"start_date"`
 	EndDate         *database.Date              `json:"end_date"`

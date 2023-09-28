@@ -3,6 +3,7 @@ import { useDispatch } from "src/root/model";
 import { sendRequest } from "src/rpc/ajax";
 import {
   CreateListing,
+  GetAvailabilityRules,
   GetDraftListing,
   GetFeaturedListings,
   GetHostedListings,
@@ -13,7 +14,7 @@ import {
   UpdateProfilePicture,
   UpdateUser,
 } from "src/rpc/api";
-import { Listing, ListingInput, ResetPasswordRequest, User, UserUpdates } from "src/rpc/types";
+import { AvailabilityRule, Listing, ListingInput, ResetPasswordRequest, User, UserUpdates } from "src/rpc/types";
 import { forceErrorMessage } from "src/utils/errors";
 import { Mutation, useMutation } from "src/utils/queryHelpers";
 import useSWR, { Fetcher, SWRConfiguration, mutate } from "swr";
@@ -56,6 +57,17 @@ export function useFeatured() {
   const fetcher: Fetcher<Listing[], {}> = () => sendRequest(GetFeaturedListings);
   const { data, mutate, error, isLoading, isValidating } = useSWR({ GetFeaturedListings }, fetcher);
   return { featured: data, mutate, error, loading: isLoading || isValidating };
+}
+
+export function useAvailabilityRules(listingID: number | undefined) {
+  const shouldFetch = listingID;
+  const fetcher: Fetcher<AvailabilityRule[], { listingID: number }> = (pathParams: { listingID: number }) =>
+    sendRequest(GetAvailabilityRules, { pathParams });
+  const { data, mutate, error, isLoading, isValidating } = useSWR(
+    shouldFetch ? { GetAvailabilityRules, listingID } : null,
+    fetcher,
+  );
+  return { availabilityRules: data, mutate, error, loading: isLoading || isValidating };
 }
 
 export function useUpdateListing(listingID: number): Mutation<ListingInput> {

@@ -96,6 +96,12 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			Pattern:     "/send_invite",
 			HandlerFunc: s.SendInvite,
 		},
+		{
+			Name:        "Get availability rules",
+			Method:      router.GET,
+			Pattern:     "/listings/{listingID}/availability_rules",
+			HandlerFunc: s.GetAvailabilityRules,
+		},
 	}
 }
 
