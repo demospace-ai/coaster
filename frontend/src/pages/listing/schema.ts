@@ -38,3 +38,5 @@ export const TimeSlotSchema = z.object({
   startTime: z.date(),
   capacity: z.number().min(1),
 });
+
+export type TimeSlotSchemaType = z.infer<typeof TimeSlotSchema>;

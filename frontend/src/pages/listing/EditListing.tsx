@@ -27,7 +27,7 @@ import {
   NewRuleForm,
   getAvailabilityRuleTypeDisplay,
   getAvailabilityTypeDisplay,
-} from "src/pages/listing/AvailabilityRules";
+} from "src/pages/listing/availability/AvailabilityRules";
 import {
   AvailabilityTypeSchema,
   CategorySchema,

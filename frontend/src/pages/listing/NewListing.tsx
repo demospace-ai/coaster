@@ -6,6 +6,7 @@ import { DndProvider, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useForm } from "react-hook-form";
 import { NavLink, useNavigate } from "react-router-dom";
+import { FormError } from "src/components/FormError";
 import { Card } from "src/components/dnd/DragAndDrop";
 import {
   ErrorMessage,
@@ -94,7 +95,13 @@ const NewListingInner: React.FC<{ initialStepNumber: number }> = ({ initialStepN
   ];
 
   const stepsHydrated = steps.map((step, idx) => ({
-    element: <step.element stepNumber={idx} values={listing} setCurrentStepNumber={setCurrentStepNumber} />,
+    element: (
+      <step.element
+        nextStep={() => setCurrentStepNumber(idx + 1)}
+        prevStep={() => setCurrentStepNumber(idx - 1)}
+        values={listing}
+      />
+    ),
     title: step.title,
     subtitle: step.subtitle,
   }));
@@ -233,7 +240,7 @@ const ImageStep: React.FC<StepProps<{}>> = (props) => {
   );
 };
 
-const ReviewStep: React.FC<StepProps<Listing>> = ({ stepNumber, setCurrentStepNumber }) => {
+const ReviewStep: React.FC<StepProps<Listing>> = ({ nextStep, prevStep }) => {
   const navigate = useNavigate();
   const { listing } = useDraftListing();
   if (!listing) {
@@ -262,18 +269,15 @@ const ReviewStep: React.FC<StepProps<Listing>> = ({ stepNumber, setCurrentStepNu
         </div>
       </div>
       <WizardNavButtons
-        submit={async () => {
+        isLastStep
+        canContinue={true}
+        nextStep={async () => {
           const result = await updateListing(listing.id, { status: ListingStatus.Review });
           if (result.success) {
             navigate("/listings");
-            return result;
-          } else {
-            return result;
           }
         }}
-        canContinue={true}
-        stepNumber={stepNumber}
-        setCurrentStepNumber={setCurrentStepNumber}
+        prevStep={prevStep}
       />
     </>
   );
@@ -287,7 +291,7 @@ type LocationParams = {
   listing: Listing;
 };
 
-const LocationStepInner: React.FC<StepProps<{}> & LocationParams> = ({ stepNumber, setCurrentStepNumber, listing }) => {
+const LocationStepInner: React.FC<StepProps<{}> & LocationParams> = ({ nextStep, prevStep, listing }) => {
   const { mutate, isLoading } = useUpdateListing(listing.id);
   const onSelect = useCallback((location: string) => mutate({ location }), []);
 
@@ -303,7 +307,7 @@ const LocationStepInner: React.FC<StepProps<{}> & LocationParams> = ({ stepNumbe
           <>{isLoading ? <Loading /> : <img className="tw-rounded-lg" src={mapPreview} />}</>
         )}
       </div>
-      <WizardNavButtons canContinue={true} stepNumber={stepNumber} setCurrentStepNumber={setCurrentStepNumber} />
+      <WizardNavButtons canContinue={coordinates !== null} nextStep={nextStep} prevStep={prevStep} />
     </>
   );
 };
@@ -312,7 +316,7 @@ type PriceParams = {
   listing: Listing;
 };
 
-const PriceStepInner: React.FC<StepProps<{}> & PriceParams> = ({ stepNumber, setCurrentStepNumber, listing }) => {
+const PriceStepInner: React.FC<StepProps<{}> & PriceParams> = ({ nextStep, prevStep, listing }) => {
   const formSchema = z.object({
     value: PriceSchema,
   });
@@ -321,6 +325,7 @@ const PriceStepInner: React.FC<StepProps<{}> & PriceParams> = ({ stepNumber, set
     watch,
     handleSubmit,
     register,
+    setError,
     formState: { errors, isValid },
   } = useForm<formSchemaType>({
     mode: "onBlur",
@@ -332,7 +337,7 @@ const PriceStepInner: React.FC<StepProps<{}> & PriceParams> = ({ stepNumber, set
   const updatePrice = async (data: { value: number }) => {
     if (data.value === listing.price) {
       // No API call needed if previous value was the same
-      return { success: true };
+      return { success: true, error: "" };
     }
     return updateListing(listing.id, { price: data.value });
   };
@@ -348,10 +353,14 @@ const PriceStepInner: React.FC<StepProps<{}> & PriceParams> = ({ stepNumber, set
         <ErrorMessage error={errors.value} />
       </div>
       <WizardNavButtons
-        submit={wrapHandleSubmit(handleSubmit, updatePrice)}
-        canContinue={true}
-        stepNumber={stepNumber}
-        setCurrentStepNumber={setCurrentStepNumber}
+        canContinue={isValid}
+        nextStep={wrapHandleSubmit(
+          handleSubmit,
+          updatePrice,
+          (error: string) => setError("value", { message: error }),
+          nextStep,
+        )}
+        prevStep={prevStep}
       />
     </>
   );
@@ -361,7 +370,7 @@ type ImageProps = {
   listing: Listing;
 };
 
-const ImageStepInner: React.FC<StepProps<{}> & ImageProps> = ({ stepNumber, setCurrentStepNumber, listing }) => {
+const ImageStepInner: React.FC<StepProps<{}> & ImageProps> = ({ nextStep, prevStep, listing }) => {
   const ref = useRef<HTMLInputElement | null>(null);
   const isValid = listing.images && listing.images.length > 2;
   const listingID = listing.id;
@@ -467,7 +476,7 @@ const ImageStepInner: React.FC<StepProps<{}> & ImageProps> = ({ stepNumber, setC
           ))}
         </div>
       </div>
-      <WizardNavButtons canContinue={isValid} stepNumber={stepNumber} setCurrentStepNumber={setCurrentStepNumber} />
+      <WizardNavButtons canContinue={isValid} nextStep={nextStep} prevStep={prevStep} />
     </>
   );
 };
@@ -476,7 +485,7 @@ type DetailsParams = {
   listing: Listing;
 };
 
-const DetailsStepInner: React.FC<StepProps<{}> & DetailsParams> = ({ stepNumber, setCurrentStepNumber, listing }) => {
+const DetailsStepInner: React.FC<StepProps<{}> & DetailsParams> = ({ nextStep, prevStep, listing }) => {
   const formSchema = z.object({
     duration: DurationSchema,
     maxGuests: MaxGuestsSchema,
@@ -486,6 +495,7 @@ const DetailsStepInner: React.FC<StepProps<{}> & DetailsParams> = ({ stepNumber,
     watch,
     handleSubmit,
     register,
+    setError,
     formState: { errors, isValid },
   } = useForm<formSchemaType>({
     mode: "onBlur",
@@ -532,11 +542,16 @@ const DetailsStepInner: React.FC<StepProps<{}> & DetailsParams> = ({ stepNumber,
         />
         <ErrorMessage error={errors.maxGuests} />
       </div>
+      <FormError message={errors.root?.message} />
       <WizardNavButtons
-        submit={wrapHandleSubmit(handleSubmit, updateDetails)}
         canContinue={isValid}
-        stepNumber={stepNumber}
-        setCurrentStepNumber={setCurrentStepNumber}
+        nextStep={wrapHandleSubmit(
+          handleSubmit,
+          updateDetails,
+          (error: string) => setError("root", { message: error }),
+          nextStep,
+        )}
+        prevStep={prevStep}
       />
     </>
   );
