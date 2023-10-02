@@ -116,14 +116,17 @@ export async function createListing(input: ListingInput) {
   }
 }
 
-export function useUpdateAvailabilityRule(availabilityRuleID: number): Mutation<AvailabilityRuleUpdates> {
+export function useUpdateAvailabilityRule(
+  listingID: number,
+  availabilityRuleID: number,
+): Mutation<AvailabilityRuleUpdates> {
   return useMutation<AvailabilityRule, AvailabilityRuleUpdates>(
     (updates: AvailabilityRuleUpdates) => {
-      return sendRequest(UpdateAvailabilityRule, { pathParams: { availabilityRuleID }, payload: updates });
+      return sendRequest(UpdateAvailabilityRule, { pathParams: { listingID, availabilityRuleID }, payload: updates });
     },
     {
       onSuccess: (availabilityRule: AvailabilityRule) => {
-        mutate({ GetAvailabilityRules }, (availabilityRules) =>
+        mutate({ GetAvailabilityRules, listingID }, (availabilityRules) =>
           availabilityRules.map((existingRule: AvailabilityRule) => {
             if (existingRule.id === availabilityRuleID) {
               return availabilityRule;
@@ -136,14 +139,31 @@ export function useUpdateAvailabilityRule(availabilityRuleID: number): Mutation<
   );
 }
 
-export function useCreateAvailabilityRule(): Mutation<AvailabilityRuleInput> {
+export async function createAvailabilityRule(
+  listingID: number,
+  input: AvailabilityRuleInput,
+  setLoading: (loading: boolean) => void,
+) {
+  try {
+    setLoading(true);
+    const availabilityRule = await sendRequest(CreateAvailabilityRule, { pathParams: { listingID }, payload: input });
+    mutate({ GetAvailabilityRules, listingID }, (availabilityRules) => [...availabilityRules, availabilityRule]);
+    setLoading(false);
+    return { success: true };
+  } catch (e) {
+    setLoading(false);
+    return { success: false, error: forceErrorMessage(e) };
+  }
+}
+
+export function useCreateAvailabilityRule(listingID: number): Mutation<AvailabilityRuleInput> {
   return useMutation<AvailabilityRule, AvailabilityRuleInput>(
     (input: AvailabilityRuleInput) => {
       return sendRequest(CreateAvailabilityRule, { payload: input });
     },
     {
       onSuccess: (availabilityRule: AvailabilityRule) => {
-        mutate({ GetAvailabilityRules }, (availabilityRules) => [...availabilityRules, availabilityRule]);
+        mutate({ GetAvailabilityRules, listingID }, (availabilityRules) => [...availabilityRules, availabilityRule]);
       },
     },
   );

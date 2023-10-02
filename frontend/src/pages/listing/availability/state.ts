@@ -1,6 +1,12 @@
 import { Dispatch, SetStateAction, useState } from "react";
 import { SingleDayTimeSlotSchema, TimeSlotSchema, TimeSlotSchemaType } from "src/pages/listing/schema";
-import { AvailabilityRuleType, AvailabilityRuleTypeType } from "src/rpc/types";
+import {
+  AvailabilityRuleType,
+  AvailabilityRuleTypeType,
+  AvailabilityType,
+  AvailabilityTypeType,
+  Listing,
+} from "src/rpc/types";
 import { z } from "zod";
 
 export const UpdateAvailabilityRuleSchema = z.object({
@@ -29,8 +35,11 @@ export const RecurringOptionsSchema = z.object({
 });
 export type RecurringOptionsSchemaType = z.infer<typeof RecurringOptionsSchema>;
 
-export const RuleTypeSchema = z.object({ type: AvailabilityRuleType });
-export type RuleTypeSchemaType = z.infer<typeof RuleTypeSchema>;
+export const InitialRuleStepSchema = z.object({
+  name: z.string().min(4, "Name must be at least 4 characters").max(100, "Name cannot be longer than 100 characters"),
+  type: AvailabilityRuleType,
+});
+export type InitialRuleStepSchemaType = z.infer<typeof InitialRuleStepSchema>;
 
 export const DateRangeSchema = z.object({
   start_date: z.date(),
@@ -39,7 +48,7 @@ export const DateRangeSchema = z.object({
 export type DateRangeSchemaType = z.infer<typeof DateRangeSchema>;
 
 export enum NewRuleStep {
-  RuleType = "RuleType",
+  InitialRuleStep = "Initial",
   DateRange = "DateRange",
   SingleDate = "SingleDate",
   Recurring = "Recurring",
@@ -48,6 +57,8 @@ export enum NewRuleStep {
 }
 
 export type NewAvailabilityRuleState = {
+  listingID: number;
+  availabilityType: AvailabilityTypeType;
   step: NewRuleStep;
   name: string | undefined;
   type: AvailabilityRuleTypeType | undefined;
@@ -58,9 +69,11 @@ export type NewAvailabilityRuleState = {
   time_slots: TimeSlotSchemaType[] | undefined;
 };
 
-export function useStateMachine(onComplete: () => void) {
+export function useStateMachine(onComplete: () => void, listing: Listing) {
   const [state, setState] = useState<NewAvailabilityRuleState>({
-    step: NewRuleStep.RuleType,
+    listingID: listing.id,
+    availabilityType: listing.availability_type,
+    step: NewRuleStep.InitialRuleStep,
     type: undefined,
     start_date: undefined,
     end_date: undefined,
@@ -72,7 +85,7 @@ export function useStateMachine(onComplete: () => void) {
 
   const prevStep = useBack(state, setState);
 
-  const nextStep = useNext(state, setState, onComplete);
+  const nextStep = useNext(state, setState, onComplete, listing.availability_type);
 
   return {
     state,
@@ -84,12 +97,12 @@ export function useStateMachine(onComplete: () => void) {
 
 const useBack = (state: NewAvailabilityRuleState, setState: Dispatch<SetStateAction<NewAvailabilityRuleState>>) => {
   switch (state.step) {
-    case NewRuleStep.RuleType:
+    case NewRuleStep.InitialRuleStep:
       return; // no back function means no back button
     case NewRuleStep.SingleDate:
     case NewRuleStep.DateRange:
     case NewRuleStep.Recurring:
-      return () => setState((prev) => ({ ...prev, step: NewRuleStep.RuleType }));
+      return () => setState((prev) => ({ ...prev, step: NewRuleStep.InitialRuleStep }));
     case NewRuleStep.TimeSlots:
     case NewRuleStep.SingleDayTimeSlots:
       return () => {
@@ -111,9 +124,10 @@ const useNext = (
   state: NewAvailabilityRuleState,
   setState: Dispatch<SetStateAction<NewAvailabilityRuleState>>,
   onComplete: () => void,
+  availabilityType: AvailabilityTypeType,
 ) => {
   switch (state.step) {
-    case NewRuleStep.RuleType:
+    case NewRuleStep.InitialRuleStep:
       return () => {
         switch (state.type) {
           case undefined:
@@ -127,10 +141,18 @@ const useNext = (
         }
       };
     case NewRuleStep.SingleDate:
-      return () => setState((prev) => ({ ...prev, step: NewRuleStep.SingleDayTimeSlots }));
+      if (availabilityType === AvailabilityType.Enum.date) {
+        return onComplete;
+      } else {
+        return () => setState((prev) => ({ ...prev, step: NewRuleStep.SingleDayTimeSlots }));
+      }
     case NewRuleStep.DateRange:
     case NewRuleStep.Recurring:
-      return () => setState((prev) => ({ ...prev, step: NewRuleStep.TimeSlots }));
+      if (availabilityType === AvailabilityType.Enum.date) {
+        return onComplete;
+      } else {
+        return () => setState((prev) => ({ ...prev, step: NewRuleStep.TimeSlots }));
+      }
     case NewRuleStep.TimeSlots:
     case NewRuleStep.SingleDayTimeSlots:
       return onComplete;

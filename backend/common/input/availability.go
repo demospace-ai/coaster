@@ -10,11 +10,10 @@ import (
 type TimeSlot struct {
 	DayOfWeek *time.Weekday  `json:"day_of_week"`
 	StartTime *database.Time `json:"start_time"`
-	Capacity  int            `json:"capacity" validate:"required"`
+	Capacity  int            `json:"capacity"`
 }
 
 type AvailabilityRule struct {
-	ListingID       int64                       `json:"listing_id" validate:"required"`
 	Name            string                      `json:"name" validate:"required"`
 	Type            models.AvailabilityRuleType `json:"type" validate:"required"`
 	StartDate       *database.Date              `json:"start_date"`
@@ -22,5 +21,5 @@ type AvailabilityRule struct {
 	RecurringYears  []int32                     `json:"recurring_years"`
 	RecurringMonths []int32                     `json:"recurring_months"`
 
-	TimeSlots []TimeSlot `json:"time_slots" validate:"required"`
+	TimeSlots []TimeSlot `json:"time_slots"`
 }

@@ -10,12 +10,12 @@ import { ZodEnum, ZodString, z } from "zod";
 
 export const WizardNavButtons: React.FC<{
   className?: string;
-  canContinue: boolean;
+  disabled?: boolean;
   nextStep: (() => void) | undefined;
   prevStep: (() => void) | undefined;
   isLastStep?: boolean;
   isLoading?: boolean;
-}> = ({ className, canContinue, isLastStep, isLoading, nextStep, prevStep }) => {
+}> = ({ className, disabled, isLastStep, isLoading, nextStep, prevStep }) => {
   return (
     <div
       id="multistep-footer"
@@ -33,11 +33,11 @@ export const WizardNavButtons: React.FC<{
       </button>
       <button
         onClick={() => {
-          canContinue && nextStep && nextStep();
+          !disabled && nextStep && nextStep();
         }}
         className={mergeClasses(
           "tw-flex tw-justify-center tw-py-2 tw-w-28 tw-rounded-3xl tw-bg-black tw-border tw-border-solid tw-border-black tw-text-white tw-font-medium",
-          !canContinue && "tw-cursor-not-allowed tw-bg-gray-400",
+          disabled && "tw-cursor-not-allowed tw-bg-gray-400 tw-border-gray-400",
         )}
       >
         {isLoading ? <Loading /> : isLastStep ? "Submit" : "Continue"}
@@ -85,7 +85,7 @@ export const InputStep = <T extends FieldValues>({
     clearErrors,
     register,
     setError,
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm<formSchemaType>({
     mode: "onBlur",
     defaultValues: { value: existingData },
@@ -105,7 +105,6 @@ export const InputStep = <T extends FieldValues>({
         <ErrorMessage error={errors.value} />
       </div>
       <WizardNavButtons
-        canContinue={isValid}
         nextStep={wrapHandleSubmit(
           handleSubmit,
           onSubmit,
@@ -134,7 +133,7 @@ export const TextAreaStep = <T extends FieldValues>({
     clearErrors,
     register,
     setError,
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm<formSchemaType>({
     mode: "onBlur",
     defaultValues: { value: existingData },
@@ -153,7 +152,6 @@ export const TextAreaStep = <T extends FieldValues>({
         <ErrorMessage error={errors.value} />
       </div>
       <WizardNavButtons
-        canContinue={isValid}
         nextStep={wrapHandleSubmit(
           handleSubmit,
           onSubmit,
@@ -184,8 +182,25 @@ export const SelectorStep = <T extends FieldValues>({
 }: StepProps<T> & SelectorProps) => {
   type schemaType = z.infer<typeof schema>;
   const [error, setError] = useState<string | undefined>(undefined);
-  const [selected, setSelected] = useState<schemaType | null>(existingData || null);
-  const isValid = selected !== null;
+  const [selected, setSelected] = useState<schemaType | undefined>(existingData || undefined);
+
+  const onSubmitWrapper = async () => {
+    if (selected !== undefined) {
+      if (onSubmit) {
+        const result = await onSubmit(selected);
+        if (result.success) {
+          nextStep && nextStep();
+        } else {
+          setError(result.error);
+        }
+      } else {
+        nextStep && nextStep();
+      }
+    } else {
+      setError("Please select an option.");
+    }
+  };
+
   return (
     <>
       <div className="tw-flex tw-flex-col tw-items-center">
@@ -198,7 +213,7 @@ export const SelectorStep = <T extends FieldValues>({
             )}
             onClick={async () => {
               if (option === selected) {
-                setSelected(null);
+                setSelected(undefined);
               } else {
                 setSelected(option);
                 if (onChange) {
@@ -217,11 +232,7 @@ export const SelectorStep = <T extends FieldValues>({
         ))}
       </div>
       <FormError message={error} />
-      <WizardNavButtons
-        canContinue={isValid}
-        nextStep={wrapSubmit(isValid, selected, onSubmit, setError, nextStep)}
-        prevStep={prevStep}
-      />
+      <WizardNavButtons nextStep={onSubmitWrapper} prevStep={prevStep} />
     </>
   );
 };
@@ -262,27 +273,4 @@ export function wrapHandleSubmit<T extends FieldValues>(
       nextStep && nextStep();
     }
   });
-}
-
-export function wrapSubmit(
-  isValid: boolean,
-  values: any,
-  onSubmit: ((values: any) => Promise<SubmitResult>) | undefined,
-  setError: (error: string | undefined) => void,
-  nextStep?: () => void,
-) {
-  return async () => {
-    if (isValid) {
-      if (onSubmit) {
-        const result = await onSubmit(values);
-        if (result.success) {
-          nextStep && nextStep();
-        } else {
-          setError(result.error);
-        }
-      } else {
-        nextStep && nextStep();
-      }
-    }
-  };
 }

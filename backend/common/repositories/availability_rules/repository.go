@@ -17,9 +17,9 @@ type RuleAndTimes struct {
 	TimeSlots []models.TimeSlot
 }
 
-func CreateAvailability(db *gorm.DB, availabilityInput input.AvailabilityRule) (*models.AvailabilityRule, error) {
+func CreateAvailability(db *gorm.DB, listingID int64, availabilityInput input.AvailabilityRule) (*models.AvailabilityRule, error) {
 	availabilityRule := models.AvailabilityRule{
-		ListingID:       availabilityInput.ListingID,
+		ListingID:       listingID,
 		Name:            availabilityInput.Name,
 		Type:            availabilityInput.Type,
 		StartDate:       availabilityInput.StartDate,
@@ -32,6 +32,8 @@ func CreateAvailability(db *gorm.DB, availabilityInput input.AvailabilityRule) (
 	if result.Error != nil {
 		return nil, errors.Wrap(result.Error, "(availability_rules.CreateAvailability)")
 	}
+
+	// TODO: validate based off listing availability type and rule type
 
 	for _, timeSlotInput := range availabilityInput.TimeSlots {
 		timeSlot := models.TimeSlot{

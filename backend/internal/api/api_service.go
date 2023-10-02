@@ -102,6 +102,12 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			Pattern:     "/listings/{listingID}/availability_rules",
 			HandlerFunc: s.GetAvailabilityRules,
 		},
+		{
+			Name:        "Create availability",
+			Method:      router.POST,
+			Pattern:     "/listings/{listingID}/availability_rules",
+			HandlerFunc: s.CreateAvailability,
+		},
 	}
 }
 

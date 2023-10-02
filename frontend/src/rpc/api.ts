@@ -65,20 +65,20 @@ export const UpdateListing: IEndpoint<ListingInput, Listing, { listingID: number
   path: "/listings/:listingID",
 };
 
-export const CreateAvailabilityRule: IEndpoint<AvailabilityRuleInput, AvailabilityRule> = {
+export const CreateAvailabilityRule: IEndpoint<AvailabilityRuleInput, AvailabilityRule, { listingID: number }> = {
   name: "Create new availability rule",
   method: "POST",
-  path: "/availability_rules",
+  path: "/listings/:listingID/availability_rules",
 };
 
 export const UpdateAvailabilityRule: IEndpoint<
   AvailabilityRuleUpdates,
   AvailabilityRule,
-  { availabilityRuleID: number }
+  { listingID: number; availabilityRuleID: number }
 > = {
   name: "Update availability rule",
   method: "POST",
-  path: "/availability_rules/:availabilityRuleID",
+  path: "/listings/:listingID/availability_rules/:availabilityRuleID",
 };
 
 export const AddListingImage: IEndpoint<undefined, Image, { listingID: number }> = {

@@ -270,7 +270,6 @@ const ReviewStep: React.FC<StepProps<Listing>> = ({ nextStep, prevStep }) => {
       </div>
       <WizardNavButtons
         isLastStep
-        canContinue={true}
         nextStep={async () => {
           const result = await updateListing(listing.id, { status: ListingStatus.Review });
           if (result.success) {
@@ -294,8 +293,15 @@ type LocationParams = {
 const LocationStepInner: React.FC<StepProps<{}> & LocationParams> = ({ nextStep, prevStep, listing }) => {
   const { mutate, isLoading } = useUpdateListing(listing.id);
   const onSelect = useCallback((location: string) => mutate({ location }), []);
-
   const coordinates = listing.coordinates ? toGoogleCoordinates(listing.coordinates) : null;
+  const [error, setError] = useState<string | undefined>(undefined);
+  const onSubmit = async () => {
+    if (coordinates !== undefined) {
+      nextStep && nextStep();
+    } else {
+      setError("Please select an location.");
+    }
+  };
 
   return (
     <>
@@ -307,7 +313,8 @@ const LocationStepInner: React.FC<StepProps<{}> & LocationParams> = ({ nextStep,
           <>{isLoading ? <Loading /> : <img className="tw-rounded-lg" src={mapPreview} />}</>
         )}
       </div>
-      <WizardNavButtons canContinue={coordinates !== null} nextStep={nextStep} prevStep={prevStep} />
+      <FormError message={error} />
+      <WizardNavButtons nextStep={onSubmit} prevStep={prevStep} />
     </>
   );
 };
@@ -353,7 +360,6 @@ const PriceStepInner: React.FC<StepProps<{}> & PriceParams> = ({ nextStep, prevS
         <ErrorMessage error={errors.value} />
       </div>
       <WizardNavButtons
-        canContinue={isValid}
         nextStep={wrapHandleSubmit(
           handleSubmit,
           updatePrice,
@@ -372,9 +378,9 @@ type ImageProps = {
 
 const ImageStepInner: React.FC<StepProps<{}> & ImageProps> = ({ nextStep, prevStep, listing }) => {
   const ref = useRef<HTMLInputElement | null>(null);
-  const isValid = listing.images && listing.images.length > 2;
   const listingID = listing.id;
   const [images, setImages] = useState(listing.images);
+  const [error, setError] = useState<string | undefined>(undefined);
 
   // TODO: validate size and type of file on frontend
 
@@ -446,6 +452,14 @@ const ImageStepInner: React.FC<StepProps<{}> & ImageProps> = ({ nextStep, prevSt
     } catch (e) {}
   };
 
+  const onSubmit = async () => {
+    if (listing.images && listing.images.length > 2) {
+      nextStep && nextStep();
+    } else {
+      setError("Please select at least 3 images.");
+    }
+  };
+
   return (
     <>
       <div className="tw-flex tw-flex-col tw-items-center tw-mb-6">
@@ -475,8 +489,9 @@ const ImageStepInner: React.FC<StepProps<{}> & ImageProps> = ({ nextStep, prevSt
             </Card>
           ))}
         </div>
+        <FormError message={error} />
       </div>
-      <WizardNavButtons canContinue={isValid} nextStep={nextStep} prevStep={prevStep} />
+      <WizardNavButtons nextStep={onSubmit} prevStep={prevStep} />
     </>
   );
 };
@@ -544,7 +559,6 @@ const DetailsStepInner: React.FC<StepProps<{}> & DetailsParams> = ({ nextStep, p
       </div>
       <FormError message={errors.root?.message} />
       <WizardNavButtons
-        canContinue={isValid}
         nextStep={wrapHandleSubmit(
           handleSubmit,
           updateDetails,

@@ -55,7 +55,9 @@ export interface AvailabilityRule {
   time_slots: TimeSlot[];
 }
 
-export const AvailabilityRuleType = z.enum(["fixed_date", "fixed_range", "recurring"]);
+export const AvailabilityRuleType = z.enum(["fixed_date", "fixed_range", "recurring"], {
+  required_error: "Please select an availability rule type.",
+});
 export type AvailabilityRuleTypeType = z.infer<typeof AvailabilityRuleType>;
 
 export interface TimeSlot {
@@ -114,8 +116,8 @@ export interface AvailabilityRuleUpdates {
 }
 
 export interface TimeSlotInput {
-  day_of_week: number;
-  start_time?: Date;
+  day_of_week?: number;
+  start_time: Date;
   capacity?: number;
 }
 

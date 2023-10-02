@@ -227,6 +227,7 @@ const Availability: React.FC<{
         existingRule={existingRule}
       />
       <div className="tw-text-2xl tw-font-semibold tw-mb-2">Availability</div>
+      {/** TODO: make sure the user knows that changing the availability type will disable all previous rules */}
       <Controller
         name="availabilityType"
         control={control}
@@ -313,9 +314,9 @@ const AvailabilityRuleModal: React.FC<AvailabilityRuleModalProps> = ({ listing, 
   return (
     <Modal show={show} close={closeModal}>
       {existingRule ? (
-        <ExistingRuleForm existingRule={existingRule} closeModal={closeModal} />
+        <ExistingRuleForm listing={listing} existingRule={existingRule} closeModal={closeModal} />
       ) : (
-        <NewRuleForm closeModal={closeModal} />
+        <NewRuleForm closeModal={closeModal} listing={listing} />
       )}
     </Modal>
   );

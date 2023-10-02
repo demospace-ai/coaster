@@ -37,6 +37,10 @@ module.exports = {
       width: {
         "100": "400px",
       },
+      screens: {
+        '3xl': '1600px',
+        '4xl': '2000px',
+      },
       keyframes: {
         "shimmer": {
           "100%": { "-webkit-mask-position": "left" }
