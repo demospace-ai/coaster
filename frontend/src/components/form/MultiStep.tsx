@@ -3,20 +3,23 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Dispatch, ReactElement, SetStateAction, useState } from "react";
 import { FieldError, FieldValues, UseFormHandleSubmit, useForm } from "react-hook-form";
 import { FormError } from "src/components/FormError";
+import { Loading } from "src/components/loading/Loading";
 import { toTitleCase } from "src/utils/string";
 import { mergeClasses } from "src/utils/twmerge";
 import { ZodEnum, ZodString, z } from "zod";
 
 export const WizardNavButtons: React.FC<{
+  className?: string;
   canContinue: boolean;
-  isLastStep?: boolean;
   nextStep: (() => void) | undefined;
   prevStep: (() => void) | undefined;
-}> = ({ canContinue, isLastStep, nextStep, prevStep }) => {
+  isLastStep?: boolean;
+  isLoading?: boolean;
+}> = ({ className, canContinue, isLastStep, isLoading, nextStep, prevStep }) => {
   return (
     <div
       id="multistep-footer"
-      className={mergeClasses("tw-flex tw-mt-6", !prevStep ? "tw-justify-end" : "tw-justify-between")}
+      className={mergeClasses("tw-flex tw-mt-6", !prevStep ? "tw-justify-end" : "tw-justify-between", className)}
     >
       <button
         onClick={prevStep}
@@ -29,13 +32,15 @@ export const WizardNavButtons: React.FC<{
         ←
       </button>
       <button
-        onClick={nextStep}
+        onClick={() => {
+          canContinue && nextStep && nextStep();
+        }}
         className={mergeClasses(
-          "tw-flex tw-justify-center tw-py-2 tw-w-28 tw-rounded-3xl tw-bg-black tw-text-white tw-font-medium",
+          "tw-flex tw-justify-center tw-py-2 tw-w-28 tw-rounded-3xl tw-bg-black tw-border tw-border-solid tw-border-black tw-text-white tw-font-medium",
           !canContinue && "tw-cursor-not-allowed tw-bg-gray-400",
         )}
       >
-        {isLastStep ? "Submit" : "Continue"}
+        {isLoading ? <Loading /> : isLastStep ? "Submit" : "Continue"}
       </button>
     </div>
   );
@@ -43,7 +48,7 @@ export const WizardNavButtons: React.FC<{
 
 export type Step = {
   element: ReactElement;
-  title: string;
+  title?: string;
   subtitle?: string;
 };
 

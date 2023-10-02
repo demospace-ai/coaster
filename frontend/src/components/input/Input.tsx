@@ -192,9 +192,12 @@ export type DropdownInputProps = {
   nullable?: boolean;
   valid?: boolean;
   disabled?: boolean;
+  multiple?: boolean;
+  closeOnSelect?: boolean;
 };
 
-export const DropdownInput: React.FC<DropdownInputProps> = (props) => {
+// TODO: use ref
+export const DropdownInput: React.FC<DropdownInputProps> = forwardRef((props, ref) => {
   const [open, setOpen] = useState(false);
 
   const { refs, floatingStyles, context } = useFloating<HTMLDivElement>({
@@ -227,10 +230,11 @@ export const DropdownInput: React.FC<DropdownInputProps> = (props) => {
 
   return (
     <Listbox
+      multiple={props.multiple}
       value={props.value}
       disabled={props.disabled}
       onChange={(e) => {
-        setOpen(false);
+        !props.multiple && setOpen(false);
         props.onChange(e);
       }}
     >
@@ -306,7 +310,7 @@ export const DropdownInput: React.FC<DropdownInputProps> = (props) => {
       </div>
     </Listbox>
   );
-};
+});
 
 type DropdownOptionsProps = {
   loading: boolean;
@@ -375,7 +379,8 @@ export type ComboInputProps = {
   disabled?: boolean;
 };
 
-export const ComboInput: React.FC<ComboInputProps> = (props) => {
+// TODO: use ref
+export const ComboInput: React.FC<ComboInputProps> = forwardRef((props, ref) => {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -524,7 +529,7 @@ export const ComboInput: React.FC<ComboInputProps> = (props) => {
       </div>
     </Combobox>
   );
-};
+});
 
 type ComboOptionsProps = {
   loading: boolean;
@@ -780,23 +785,74 @@ export const PriceInput = forwardRef<HTMLInputElement, InputProps>((props, ref) 
   );
 });
 
-export const TimeInput = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
+interface TimeInputProps extends InputHTMLAttributes<HTMLInputElement> {
+  date: Date; // Need explicit value prop to display label correctly
+  onDateChange: (date: Date) => void;
+  label?: string;
+  tooltip?: string;
+}
+
+export const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>((props, ref) => {
+  const date = props.date;
+  const [period, setPeriod] = useState<"AM" | "PM">(date.getHours() < 12 ? "AM" : "PM");
+
   return (
     <div className={mergeClasses("tw-flex tw-gap-1 tw-items-center", props.className)}>
-      <select className="tw-outline-none tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-p-1">
-        {Array.from(Array(12).keys()).map((hour) => (
-          <option key={hour}>{hour + 1}</option>
+      <select
+        className="tw-outline-none tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-p-1"
+        value={date.getHours() % 12}
+        onChange={(e) => {
+          if (period === "AM") {
+            if (e.target.value === "12") {
+              date.setHours(0);
+            } else {
+              date.setHours(parseInt(e.target.value));
+            }
+          } else {
+            if (e.target.value === "12") {
+              date.setHours(12);
+            } else {
+              date.setHours(parseInt(e.target.value) + 12);
+            }
+          }
+          props.onDateChange(date);
+        }}
+      >
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((hour) => (
+          <option key={hour} value={hour % 12}>
+            {hour}
+          </option>
         ))}
       </select>
       :
-      <select className="tw-outline-none tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-p-1">
+      <select
+        className="tw-outline-none tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-p-1"
+        value={date.getMinutes()}
+        onChange={(e) => {
+          date.setMinutes(parseInt(e.target.value));
+          props.onDateChange(date);
+        }}
+      >
         {Array.from(Array(12).keys()).map((minute) => (
           <option key={minute}>
             {(minute * 5).toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false })}
           </option>
         ))}
       </select>
-      <select className="tw-outline-none tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-p-1">
+      <select
+        className="tw-outline-none tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-p-1"
+        value={period}
+        onChange={(e) => {
+          if (e.target.value === "AM") {
+            setPeriod("AM");
+            date.setHours(date.getHours() % 12);
+          } else {
+            setPeriod("PM");
+            date.setHours((date.getHours() % 12) + 12);
+          }
+          props.onDateChange(date);
+        }}
+      >
         <option>AM</option>
         <option>PM</option>
       </select>

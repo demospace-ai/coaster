@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useState } from "react";
-import { TimeSlotSchema, TimeSlotSchemaType } from "src/pages/listing/schema";
+import { SingleDayTimeSlotSchema, TimeSlotSchema, TimeSlotSchemaType } from "src/pages/listing/schema";
 import { AvailabilityRuleType, AvailabilityRuleTypeType } from "src/rpc/types";
 import { z } from "zod";
 
@@ -18,6 +18,17 @@ export type UpdateAvailabilityRuleSchemaType = z.infer<typeof UpdateAvailability
 export const TimeSlotInputSchema = z.object({ time_slots: z.array(TimeSlotSchema) });
 export type TimeSlotInputType = z.infer<typeof TimeSlotInputSchema>;
 
+export const SingleDayTimeSlotInputSchema = z.object({ time_slots: z.array(SingleDayTimeSlotSchema) });
+export type SingleDayTimeSlotInputType = z.infer<typeof SingleDayTimeSlotInputSchema>;
+
+export const RecurringOptionsSchema = z.object({
+  recurring_years: z.array(
+    z.number().min(new Date().getFullYear(), "Enter a valid year").max(2100, "Enter a valid year"),
+  ),
+  recurring_months: z.array(z.number().min(1, "Enter a valid month").max(12, "Enter a valid month")),
+});
+export type RecurringOptionsSchemaType = z.infer<typeof RecurringOptionsSchema>;
+
 export const RuleTypeSchema = z.object({ type: AvailabilityRuleType });
 export type RuleTypeSchemaType = z.infer<typeof RuleTypeSchema>;
 
@@ -33,6 +44,7 @@ export enum NewRuleStep {
   SingleDate = "SingleDate",
   Recurring = "Recurring",
   TimeSlots = "TimeSlots",
+  SingleDayTimeSlots = "SingleDayTimeSlots",
 }
 
 export type NewAvailabilityRuleState = {
@@ -79,6 +91,7 @@ const useBack = (state: NewAvailabilityRuleState, setState: Dispatch<SetStateAct
     case NewRuleStep.Recurring:
       return () => setState((prev) => ({ ...prev, step: NewRuleStep.RuleType }));
     case NewRuleStep.TimeSlots:
+    case NewRuleStep.SingleDayTimeSlots:
       return () => {
         switch (state.type) {
           case undefined:
@@ -114,10 +127,12 @@ const useNext = (
         }
       };
     case NewRuleStep.SingleDate:
+      return () => setState((prev) => ({ ...prev, step: NewRuleStep.SingleDayTimeSlots }));
     case NewRuleStep.DateRange:
     case NewRuleStep.Recurring:
       return () => setState((prev) => ({ ...prev, step: NewRuleStep.TimeSlots }));
     case NewRuleStep.TimeSlots:
+    case NewRuleStep.SingleDayTimeSlots:
       return onComplete;
   }
 };

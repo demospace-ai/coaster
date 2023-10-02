@@ -36,7 +36,13 @@ export const AvailabilityTypeSchema = AvailabilityType;
 export const TimeSlotSchema = z.object({
   dayOfWeek: z.number().min(0).max(6),
   startTime: z.date(),
-  capacity: z.number().min(1),
+  capacity: z.number().min(1).optional(),
 });
 
 export type TimeSlotSchemaType = z.infer<typeof TimeSlotSchema>;
+
+export const SingleDayTimeSlotSchema = z.object({
+  dayOfWeek: z.number().min(0).max(6).optional(),
+  startTime: z.date(),
+  capacity: z.number().min(1).optional(),
+});
