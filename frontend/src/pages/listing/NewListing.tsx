@@ -33,7 +33,8 @@ import {
 import { sendRequest } from "src/rpc/ajax";
 import { AddListingImage, DeleteListingImage, GetDraftListing, GetListing, UpdateListingImages } from "src/rpc/api";
 import { createListing, updateListing, useDraftListing, useUpdateListing } from "src/rpc/data";
-import { CategoryType, Coordinates, Listing, ListingInput, ListingStatus } from "src/rpc/types";
+import { CategoryType, Coordinates, Image, Listing, ListingInput, ListingStatus } from "src/rpc/types";
+import { forceErrorMessage } from "src/utils/errors";
 import { getGcsImageUrl } from "src/utils/images";
 import { mutate } from "swr";
 import { z } from "zod";
@@ -110,7 +111,7 @@ const NewListingInner: React.FC<{ initialStepNumber: number }> = ({ initialStepN
 
   return (
     <div className="tw-w-full tw-flex tw-justify-center">
-      <div className="tw-flex tw-px-8 sm:tw-px-0 tw-w-[500px] tw-min-h-[600px] tw-mt-10 tw-items-center tw-pb-24 tw-overflow-scroll">
+      <div className="tw-flex tw-px-8 sm:tw-px-0 tw-w-[500px] tw-min-h-[600px] tw-mt-10 tw-items-center tw-pb-24">
         <div className="tw-w-full">
           <div className="tw-w-full tw-text-left tw-text-2xl sm:tw-text-3xl tw-font-bold tw-mb-3">
             {currentStep.title}
@@ -379,7 +380,7 @@ type ImageProps = {
 const ImageStepInner: React.FC<StepProps<{}> & ImageProps> = ({ nextStep, prevStep, listing }) => {
   const ref = useRef<HTMLInputElement | null>(null);
   const listingID = listing.id;
-  const [images, setImages] = useState(listing.images);
+  const [images, setImages] = useState<Image[]>(listing.images);
   const [error, setError] = useState<string | undefined>(undefined);
 
   // TODO: validate size and type of file on frontend
@@ -436,7 +437,9 @@ const ImageStepInner: React.FC<StepProps<{}> & ImageProps> = ({ nextStep, prevSt
         mutate({ GetDraftListing }, { ...listing, images: [...listing.images, listingImage] });
         mutate({ GetListing, listingID });
         setImages([...images, listingImage]);
-      } catch (e) {}
+      } catch (e) {
+        setError(forceErrorMessage(e));
+      }
     }
   };
 
@@ -453,7 +456,7 @@ const ImageStepInner: React.FC<StepProps<{}> & ImageProps> = ({ nextStep, prevSt
   };
 
   const onSubmit = async () => {
-    if (listing.images && listing.images.length > 2) {
+    if (images.length > 2) {
       nextStep && nextStep();
     } else {
       setError("Please select at least 3 images.");
@@ -489,7 +492,7 @@ const ImageStepInner: React.FC<StepProps<{}> & ImageProps> = ({ nextStep, prevSt
             </Card>
           ))}
         </div>
-        <FormError message={error} />
+        <FormError message={error} className="tw-mt-5" />
       </div>
       <WizardNavButtons nextStep={onSubmit} prevStep={prevStep} />
     </>
