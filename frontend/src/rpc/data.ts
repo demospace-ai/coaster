@@ -26,7 +26,7 @@ import {
   User,
   UserUpdates,
 } from "src/rpc/types";
-import { forceErrorMessage } from "src/utils/errors";
+import { HttpError, forceErrorMessage } from "src/utils/errors";
 import { Mutation, useMutation } from "src/utils/queryHelpers";
 import useSWR, { Fetcher, SWRConfiguration, mutate } from "swr";
 
@@ -48,7 +48,20 @@ export function useHostedListings() {
 }
 
 export function useDraftListing(opts?: SWRConfiguration) {
-  const fetcher: Fetcher<Listing, {}> = () => sendRequest(GetDraftListing);
+  const fetcher: Fetcher<Listing | undefined, {}> = async () => {
+    try {
+      const result = await sendRequest(GetDraftListing);
+      return result;
+    } catch (e) {
+      if (e instanceof HttpError) {
+        if (e.code === 404) {
+          // If there is no draft listing, just return undefined
+          return undefined;
+        }
+      }
+      throw e;
+    }
+  };
   const { data, mutate, error, isLoading } = useSWR({ GetDraftListing }, fetcher, opts);
   return { listing: data, mutate, error, loading: isLoading };
 }
@@ -98,7 +111,7 @@ export function useUpdateListing(listingID: number): Mutation<ListingInput> {
 export async function updateListing(listingID: number, updates: ListingInput) {
   try {
     const listing = await sendRequest(UpdateListing, { pathParams: { listingID }, payload: updates });
-    mutate({ GetDraftListing }, listing);
+    mutate({ GetDraftListing });
     mutate({ GetListing, listingID }, listing);
     return { success: true, error: "" };
   } catch (e) {
