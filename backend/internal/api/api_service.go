@@ -103,10 +103,16 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.GetAvailabilityRules,
 		},
 		{
-			Name:        "Create availability",
+			Name:        "Create availability rule",
 			Method:      router.POST,
 			Pattern:     "/listings/{listingID}/availability_rules",
 			HandlerFunc: s.CreateAvailability,
+		},
+		{
+			Name:        "Delete availability rule",
+			Method:      router.DELETE,
+			Pattern:     "/listings/{listingID}/availability_rules/{availabilityRuleID}",
+			HandlerFunc: s.DeleteAvailability,
 		},
 	}
 }

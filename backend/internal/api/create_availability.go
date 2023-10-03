@@ -24,12 +24,12 @@ func (s ApiService) CreateAvailability(auth auth.Authentication, w http.Response
 	vars := mux.Vars(r)
 	strListingId, ok := vars["listingID"]
 	if !ok {
-		return errors.Newf("(api.GetListing) missing listing ID from GetListing request URL: %s", r.URL.RequestURI())
+		return errors.Newf("(api.CreateAvailability) missing listing ID from CreateAvailability request URL: %s", r.URL.RequestURI())
 	}
 
 	listingID, err := strconv.ParseInt(strListingId, 10, 64)
 	if err != nil {
-		return errors.Wrap(err, "(api.GetListing)")
+		return errors.Wrap(err, "(api.CreateAvailability)")
 	}
 
 	decoder := json.NewDecoder(r.Body)
@@ -60,7 +60,7 @@ func (s ApiService) CreateAvailability(auth auth.Authentication, w http.Response
 		createAvailabilityRequest,
 	)
 	if err != nil {
-		return errors.Wrap(err, "(api.CreateAvailability) creating listing")
+		return errors.Wrap(err, "(api.CreateAvailability) creating availability rule")
 	}
 
 	return json.NewEncoder(w).Encode(availability)

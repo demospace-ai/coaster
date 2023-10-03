@@ -81,13 +81,23 @@ export const UpdateAvailabilityRule: IEndpoint<
   path: "/listings/:listingID/availability_rules/:availabilityRuleID",
 };
 
+export const DeleteAvailabilityRule: IEndpoint<
+  undefined,
+  undefined,
+  { listingID: number; availabilityRuleID: number }
+> = {
+  name: "Delete availability rule",
+  method: "DELETE",
+  path: "/listings/:listingID/availability_rules/:availabilityRuleID",
+};
+
 export const AddListingImage: IEndpoint<undefined, Image, { listingID: number }> = {
   name: "Add listing image",
   method: "POST",
   path: "/listings/:listingID/image",
 };
 
-export const DeleteListingImage: IEndpoint<undefined, Image, { listingID: number; imageID: number }> = {
+export const DeleteListingImage: IEndpoint<undefined, undefined, { listingID: number; imageID: number }> = {
   name: "Delete listing image",
   method: "DELETE",
   path: "/listings/:listingID/image/:imageID",

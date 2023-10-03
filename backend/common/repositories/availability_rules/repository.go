@@ -51,6 +51,19 @@ func CreateAvailability(db *gorm.DB, listingID int64, availabilityInput input.Av
 	return &availabilityRule, nil
 }
 
+func DeactivateAvailability(db *gorm.DB, listingID int64, availabilityRuleID int64) error {
+	currentTime := time.Now()
+	result := db.Table("availability_rules").
+		Where("availability_rules.id = ?", availabilityRuleID).
+		Where("availability_rules.listing_id = ?", listingID).
+		Update("deactivated_at", currentTime)
+	if result.Error != nil {
+		return errors.Wrap(result.Error, "(availability_rules.DeactivateAvailability)")
+	}
+
+	return nil
+}
+
 func LoadForListing(db *gorm.DB, listingID int64) ([]RuleAndTimes, error) {
 	var availabilityRules []models.AvailabilityRule
 	result := db.Table("availability_rules").

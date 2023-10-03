@@ -39,7 +39,15 @@ import {
   PriceSchema,
 } from "src/pages/listing/schema";
 import { sendRequest } from "src/rpc/ajax";
-import { AddListingImage, DeleteListingImage, GetListing, UpdateListing, UpdateListingImages } from "src/rpc/api";
+import {
+  AddListingImage,
+  DeleteAvailabilityRule,
+  DeleteListingImage,
+  GetAvailabilityRules,
+  GetListing,
+  UpdateListing,
+  UpdateListingImages,
+} from "src/rpc/api";
 import { useAvailabilityRules, useListing } from "src/rpc/data";
 import { AvailabilityRule, AvailabilityType, Category, Image, Listing, ListingInput } from "src/rpc/types";
 import { isProd } from "src/utils/env";
@@ -209,6 +217,7 @@ const Availability: React.FC<{
   formState: FormState<EditListingSchemaType>;
 }> = ({ listing, watch, control, formState }) => {
   const [showRuleModal, setShowRuleModal] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [existingRule, setExistingRule] = useState<AvailabilityRule | undefined>(undefined);
   const { availabilityRules } = useAvailabilityRules(listing.id);
   if (!availabilityRules) {
@@ -224,6 +233,12 @@ const Availability: React.FC<{
         listing={listing}
         show={showRuleModal}
         closeModal={() => setShowRuleModal(false)}
+        existingRule={existingRule}
+      />
+      <DeleteRuleModal
+        listing={listing}
+        show={showDeleteConfirmation}
+        closeModal={() => setShowDeleteConfirmation(false)}
         existingRule={existingRule}
       />
       <div className="tw-text-2xl tw-font-semibold tw-mb-2">Availability</div>
@@ -275,7 +290,13 @@ const Availability: React.FC<{
                   >
                     Edit
                   </button>
-                  <TrashIcon className="tw-h-4 tw-cursor-pointer tw-stroke-red-500 hover:tw-stroke-red-800" />
+                  <TrashIcon
+                    className="tw-h-4 tw-cursor-pointer tw-stroke-red-500 hover:tw-stroke-red-800"
+                    onClick={() => {
+                      setExistingRule(rule);
+                      setShowDeleteConfirmation(true);
+                    }}
+                  />
                 </td>
               </tr>
             ))}
@@ -318,6 +339,47 @@ const AvailabilityRuleModal: React.FC<AvailabilityRuleModalProps> = ({ listing, 
       ) : (
         <NewRuleForm closeModal={closeModal} listing={listing} />
       )}
+    </Modal>
+  );
+};
+
+const DeleteRuleModal: React.FC<AvailabilityRuleModalProps> = ({ listing, existingRule, show, closeModal }) => {
+  const [deleting, setDeleting] = useState(false);
+  if (!existingRule) {
+    // TODO: this should not happen
+    return <Loading />;
+  }
+
+  const deleteImage = async () => {
+    setDeleting(true);
+    try {
+      await sendRequest(DeleteAvailabilityRule, {
+        pathParams: { listingID: listing.id, availabilityRuleID: existingRule.id },
+      });
+
+      mutate({ GetAvailabilityRules, listingID: listing.id }, (availabilityRules) =>
+        availabilityRules.filter((existingRule: AvailabilityRule) => {
+          return existingRule.id !== existingRule.id;
+        }),
+      );
+      closeModal();
+    } catch (e) {}
+    setDeleting(false);
+  };
+
+  return (
+    <Modal show={show} close={closeModal}>
+      <div className="tw-w-[320px] sm:tw-w-[420px] tw-px-8 sm:tw-px-12 tw-pb-10">
+        <div className="tw-text-center tw-w-full tw-text-xl tw-font-medium tw-mb-5">
+          Permanently delete the availability rule <span className="tw-font-bold">{existingRule.name}</span>?
+        </div>
+        <Button
+          className="tw-flex tw-h-[52px] tw-items-center tw-justify-center tw-whitespace-nowrap tw-w-full"
+          onClick={deleteImage}
+        >
+          {deleting ? <Loading /> : "Delete"}
+        </Button>
+      </div>
     </Modal>
   );
 };
@@ -607,9 +669,7 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ listing, imageID, setImages, 
   return (
     <Modal show={show} close={closeModal} clickToEscape>
       <div className="tw-w-[320px] sm:tw-w-[420px] tw-px-8 sm:tw-px-12 tw-pb-10">
-        <div className="tw-text-center tw-w-full tw-text-xl tw-font-semibold tw-mb-5">
-          Permanently delete this image?
-        </div>
+        <div className="tw-text-center tw-w-full tw-text-xl tw-font-medium tw-mb-5">Permanently delete this image?</div>
         <Button
           className="tw-flex tw-h-[52px] tw-items-center tw-justify-center tw-whitespace-nowrap tw-w-full"
           onClick={deleteImage}
