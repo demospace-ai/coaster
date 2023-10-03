@@ -1,8 +1,8 @@
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, ReactElement, SetStateAction, useState } from "react";
 import { DateRange } from "react-day-picker";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { Controller, FieldArrayWithId, UseFormReturn, useFieldArray, useForm } from "react-hook-form";
 import { FormError } from "src/components/FormError";
 import { DateRangePicker } from "src/components/calendar/DatePicker";
 import { Step, StepProps, WizardNavButtons, wrapHandleSubmit } from "src/components/form/MultiStep";
@@ -22,7 +22,7 @@ import {
   UpdateAvailabilityRuleSchemaType,
   useStateMachine,
 } from "src/pages/listing/availability/state";
-import { TimeSlotSchemaType } from "src/pages/listing/schema";
+import { SingleDayTimeSlotSchemaType, TimeSlotSchemaType } from "src/pages/listing/schema";
 import { createAvailabilityRule, useUpdateAvailabilityRule } from "src/rpc/data";
 import {
   AvailabilityRule,
@@ -76,12 +76,6 @@ export const NewRuleForm: React.FC<{ closeModal: () => void; listing: Listing }>
         element: <SingleDayTimeSlotStep nextStep={nextStep} prevStep={prevStep} values={state} setValue={setState} />,
       };
       break;
-    case NewRuleStep.SingleDate: {
-      throw new Error("Not implemented yet: NewRuleStep.SingleDate case");
-    }
-    case NewRuleStep.TimeSlots: {
-      throw new Error("Not implemented yet: NewRuleStep.TimeSlots case");
-    }
   }
 
   return (
@@ -341,7 +335,7 @@ const RecurringStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
   };
 
   return (
-    <div className="tw-flex tw-flex-col tw-flex-grow tw-overflow-hidden ">
+    <div className="tw-flex tw-flex-col tw-flex-grow tw-overflow-hidden">
       <div className="tw-flex tw-flex-col tw-flex-grow tw-justify-start">
         <div className="tw-text-lg tw-font-medium tw-mb-1">Affected years</div>
         <div className="tw-mb-4">Select which year(s) this availability rule applies to.</div>
@@ -416,26 +410,36 @@ const RecurringStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
 };
 
 const TimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, setValue, nextStep, prevStep }) => {
+  const [isLoading, setLoading] = useState(false);
   const { handleSubmit, control, formState, setError } = useForm<TimeSlotInputType>({
     mode: "onBlur",
     resolver: zodResolver(TimeSlotInputSchema),
     defaultValues: {
-      time_slots: values?.time_slots,
+      time_slots: values?.time_slots as TimeSlotSchemaType[],
     },
   });
-  const { fields, update, append, remove } = useFieldArray({
+  const {
+    fields,
+    update: updateField,
+    append: appendField,
+    remove: removeField,
+  } = useFieldArray({
     control,
     name: "time_slots",
   });
   const { update: updateParent, append: appendParent, remove: removeParent } = useStateArray(setValue, "time_slots");
-  const [isLoading, setLoading] = useState(false);
-
-  const timeSlotMap: Map<number, { timeSlot: TimeSlotSchemaType; index: number; id: string }[]> = new Map();
-  fields.map((field, idx) => {
-    const existing = timeSlotMap.get(field.dayOfWeek) ?? [];
-    existing.push({ timeSlot: field, index: idx, id: field.id });
-    timeSlotMap.set(field.dayOfWeek, existing);
-  });
+  const update = (index: number, timeSlot: TimeSlotSchemaType) => {
+    updateField(index, timeSlot);
+    updateParent(index, timeSlot);
+  };
+  const append = (timeSlot: TimeSlotSchemaType) => {
+    appendField(timeSlot);
+    appendParent(timeSlot);
+  };
+  const remove = (index: number) => {
+    removeField(index);
+    removeParent(index);
+  };
 
   const onSubmit = async () => {
     const payload = {} as AvailabilityRuleInput;
@@ -475,48 +479,10 @@ const TimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, s
     return await createAvailabilityRule(values.listingID, payload, setLoading);
   };
 
-  const dayOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-
   return (
     <div className="tw-flex tw-flex-col tw-flex-grow tw-overflow-hidden">
       <div className="tw-divide-y tw-flex-grow tw-overflow-y-scroll tw-pr-4 tw-pb-10">
-        {[1, 2, 3, 4, 5, 6, 0].map((i) => {
-          const timeSlotFields = timeSlotMap.get(i) ?? [];
-          return (
-            <div key={i} className="tw-flex-col sm:tw-flex-row tw-flex tw-items-start tw-py-4">
-              <div className="tw-flex tw-shrink-0 tw-font-semibold tw-w-24 tw-mb-2 sm:tw-mb-0">{dayOfWeek[i]}</div>
-              <div className="tw-flex tw-flex-wrap tw-gap-x-2 tw-gap-y-4">
-                {timeSlotFields.map((field) => (
-                  <div key={field.id} className="tw-flex tw-items-center">
-                    <TimeInput
-                      date={field.timeSlot.startTime}
-                      onDateChange={(date) => {
-                        update(field.index, { ...field.timeSlot, startTime: date });
-                        updateParent(field.index, { ...field.timeSlot, startTime: date });
-                      }}
-                    />
-                    <XMarkIcon
-                      className="tw-ml-2 tw-h-5 tw-stroke-red-600 tw-cursor-pointer"
-                      onClick={() => {
-                        remove(field.index);
-                        removeParent(field.index);
-                      }}
-                    />
-                  </div>
-                ))}
-                <div
-                  className="tw-flex tw-items-center tw-font-medium tw-text-blue-600 tw-cursor-pointer"
-                  onClick={() => {
-                    append({ dayOfWeek: i, startTime: new Date("1970-01-01T10:00") });
-                    appendParent({ dayOfWeek: i, startTime: new Date("1970-01-01T10:00") });
-                  }}
-                >
-                  Add start time
-                </div>
-              </div>
-            </div>
-          );
-        })}
+        <WeekDayTimeSlotFields fields={fields} update={update} append={append} remove={remove} />
       </div>
       <WizardNavButtons
         isLastStep
@@ -539,19 +505,36 @@ const SingleDayTimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({
   nextStep,
   prevStep,
 }) => {
+  const [isLoading, setLoading] = useState(false);
   const { handleSubmit, control, formState, setError } = useForm<SingleDayTimeSlotInputType>({
     mode: "onBlur",
     resolver: zodResolver(SingleDayTimeSlotInputSchema),
     defaultValues: {
-      time_slots: values?.time_slots,
+      time_slots: values?.time_slots as SingleDayTimeSlotSchemaType[],
     },
   });
-  const { fields, update, append, remove } = useFieldArray({
+  const {
+    fields,
+    update: updateField,
+    append: appendField,
+    remove: removeField,
+  } = useFieldArray({
     control,
     name: "time_slots",
   });
   const { update: updateParent, append: appendParent, remove: removeParent } = useStateArray(setValue, "time_slots");
-  const [isLoading, setLoading] = useState(false);
+  const update = (index: number, timeSlot: SingleDayTimeSlotSchemaType) => {
+    updateField(index, timeSlot);
+    updateParent(index, timeSlot);
+  };
+  const append = (timeSlot: SingleDayTimeSlotSchemaType) => {
+    appendField(timeSlot);
+    appendParent(timeSlot);
+  };
+  const remove = (index: number) => {
+    removeField(index);
+    removeParent(index);
+  };
 
   const onSubmit = async () => {
     const payload = {} as AvailabilityRuleInput;
@@ -591,35 +574,7 @@ const SingleDayTimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({
     <div className="tw-flex tw-flex-col tw-flex-grow tw-overflow-hidden">
       <div className="tw-divide-y tw-flex-grow tw-overflow-y-scroll tw-pr-4 tw-pb-10">
         <div className="tw-flex-col sm:tw-flex-row tw-flex tw-items-start tw-py-4">
-          <div className="tw-flex tw-flex-wrap tw-gap-x-2 tw-gap-y-4">
-            {fields.map((field, idx) => (
-              <div key={field.id} className="tw-flex tw-items-center">
-                <TimeInput
-                  date={field.startTime}
-                  onDateChange={(date) => {
-                    update(idx, { ...field, startTime: date });
-                    updateParent(idx, { ...field, startTime: date });
-                  }}
-                />
-                <XMarkIcon
-                  className="tw-ml-2 tw-h-5 tw-stroke-red-600 tw-cursor-pointer"
-                  onClick={() => {
-                    remove(idx);
-                    removeParent(idx);
-                  }}
-                />
-              </div>
-            ))}
-            <div
-              className="tw-flex tw-items-center tw-font-medium tw-text-blue-600 tw-cursor-pointer"
-              onClick={() => {
-                append({ startTime: new Date("1970-01-01T10:00") });
-                appendParent({ startTime: new Date("1970-01-01T10:00") });
-              }}
-            >
-              Add start time
-            </div>
-          </div>
+          <SingleDayTimeSlotFields fields={fields} update={update} append={append} remove={remove} />
         </div>
       </div>
       <WizardNavButtons
@@ -637,13 +592,110 @@ const SingleDayTimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({
   );
 };
 
+type TimeSlotFieldsProps<T extends TimeSlotSchemaType | SingleDayTimeSlotSchemaType> = {
+  fields: FieldArrayWithId<{ time_slots: T[] }>[];
+  update: (index: number, timeSlot: T) => void;
+  append: (timeSlot: T) => void;
+  remove: (index: number) => void;
+};
+
+const WeekDayTimeSlotFields: React.FC<TimeSlotFieldsProps<TimeSlotSchemaType>> = ({
+  fields,
+  append,
+  update,
+  remove,
+}) => {
+  const timeSlotMap: Map<number, { timeSlot: TimeSlotSchemaType; index: number; id: string }[]> = new Map();
+  fields.map((field, idx) => {
+    const existing = timeSlotMap.get(field.dayOfWeek) ?? [];
+    existing.push({ timeSlot: field, index: idx, id: field.id });
+    timeSlotMap.set(field.dayOfWeek, existing);
+  });
+  const dayOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+  return (
+    <>
+      {[1, 2, 3, 4, 5, 6, 0].map((i) => {
+        const timeSlotFields = timeSlotMap.get(i) ?? [];
+        return (
+          <div key={i} className="tw-flex-col sm:tw-flex-row tw-flex tw-items-start tw-py-4">
+            <div className="tw-flex tw-shrink-0 tw-font-semibold tw-w-24 tw-mb-2 sm:tw-mb-0">{dayOfWeek[i]}</div>
+            <div className="tw-flex tw-flex-wrap tw-gap-x-2 tw-gap-y-4">
+              {timeSlotFields.map((field) => (
+                <div key={field.id} className="tw-flex tw-items-center">
+                  <TimeInput
+                    date={field.timeSlot.startTime}
+                    onDateChange={(date) => {
+                      update(field.index, { ...field.timeSlot, startTime: date });
+                    }}
+                  />
+                  <XMarkIcon
+                    className="tw-ml-2 tw-h-5 tw-stroke-red-600 tw-cursor-pointer"
+                    onClick={() => {
+                      remove(field.index);
+                    }}
+                  />
+                </div>
+              ))}
+              <div
+                className="tw-flex tw-items-center tw-font-medium tw-text-blue-600 tw-cursor-pointer"
+                onClick={() => {
+                  append({ type: "time_slots", dayOfWeek: i, startTime: new Date("1970-01-01T10:00") });
+                }}
+              >
+                Add start time
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </>
+  );
+};
+
+const SingleDayTimeSlotFields: React.FC<TimeSlotFieldsProps<SingleDayTimeSlotSchemaType>> = ({
+  fields,
+  append,
+  update,
+  remove,
+}) => {
+  return (
+    <div className="tw-flex tw-flex-wrap tw-gap-x-2 tw-gap-y-4">
+      {fields.map((field, idx) => (
+        <div key={field.id} className="tw-flex tw-items-center">
+          <TimeInput
+            date={field.startTime}
+            onDateChange={(date) => {
+              update(idx, { ...field, startTime: date });
+            }}
+          />
+          <XMarkIcon
+            className="tw-ml-2 tw-h-5 tw-stroke-red-600 tw-cursor-pointer"
+            onClick={() => {
+              remove(idx);
+            }}
+          />
+        </div>
+      ))}
+      <div
+        className="tw-flex tw-items-center tw-font-medium tw-text-blue-600 tw-cursor-pointer"
+        onClick={() => {
+          append({ type: "single_day_time_slots", startTime: new Date("1970-01-01T10:00") });
+        }}
+      >
+        Add start time
+      </div>
+    </div>
+  );
+};
+
 export const ExistingRuleForm: React.FC<{
   listing: Listing;
   existingRule: AvailabilityRule;
   closeModal: () => void;
 }> = ({ listing, existingRule, closeModal }) => {
   const { mutate, isLoading } = useUpdateAvailabilityRule(listing.id, existingRule.id);
-  const { handleSubmit, register, watch, formState, getFieldState } = useForm<UpdateAvailabilityRuleSchemaType>({
+  const form = useForm<UpdateAvailabilityRuleSchemaType>({
     mode: "onBlur",
     resolver: zodResolver(UpdateAvailabilityRuleSchema),
     defaultValues: {
@@ -658,12 +710,12 @@ export const ExistingRuleForm: React.FC<{
   });
 
   const updateAvailability = async (values: UpdateAvailabilityRuleSchemaType) => {
-    if (!formState.isDirty) {
+    if (!form.formState.isDirty) {
       return;
     }
 
     const payload = {} as AvailabilityRuleUpdates;
-    formState.dirtyFields.name && (payload.name = values.name);
+    form.formState.dirtyFields.name && (payload.name = values.name);
     // TODO
 
     try {
@@ -675,12 +727,69 @@ export const ExistingRuleForm: React.FC<{
     }
   };
 
+  var existingRuleForm: ReactElement;
+  switch (existingRule.type) {
+    case AvailabilityRuleType.Enum.fixed_date:
+      existingRuleForm = <FixedDateRuleUpdateForm availabilityType={listing.availability_type} form={form} />;
+      break;
+    case AvailabilityRuleType.Enum.fixed_range:
+      existingRuleForm = <FixedRangeRuleUpdateForm availabilityType={listing.availability_type} form={form} />;
+      break;
+    case AvailabilityRuleType.Enum.recurring:
+      existingRuleForm = <></>;
+      break;
+  }
+
   return (
     <div className="tw-flex tw-flex-col tw-w-[320px] sm:tw-w-[480px] md:tw-w-[640px] lg:tw-w-[900px] tw-h-[80vh] sm:tw-h-[70vh] 4xl:tw-h-[65vh] tw-px-8 sm:tw-px-12 tw-pb-10 tw-border-box">
       <div className="tw-text-left tw-w-full tw-text-2xl tw-font-semibold tw-mb-2">Update Availability Rule</div>
-      <div className="tw-flex tw-flex-col tw-w-full tw-flex-grow tw-overflow-hidden">
-        content goes here when we're ready to put the content into the page
-      </div>
+      <div className="tw-flex tw-flex-col tw-w-full tw-flex-grow tw-overflow-hidden">{existingRuleForm}</div>
+    </div>
+  );
+};
+
+const FixedDateRuleUpdateForm: React.FC<{
+  availabilityType: AvailabilityTypeType;
+  form: UseFormReturn<UpdateAvailabilityRuleSchemaType>;
+}> = ({ availabilityType, form }) => {
+  const { fields, update, append, remove } = useFieldArray({
+    control: form.control,
+    name: "time_slots",
+  });
+
+  return (
+    <div className="tw-divide-y tw-flex-grow tw-overflow-y-scroll tw-pr-4 tw-pb-10">
+      {availabilityType === AvailabilityType.Enum.datetime && (
+        <SingleDayTimeSlotFields
+          fields={fields as FieldArrayWithId<{ time_slots: SingleDayTimeSlotSchemaType[] }, "time_slots", "id">[]}
+          update={update}
+          append={append}
+          remove={remove}
+        />
+      )}
+    </div>
+  );
+};
+
+const FixedRangeRuleUpdateForm: React.FC<{
+  availabilityType: AvailabilityTypeType;
+  form: UseFormReturn<UpdateAvailabilityRuleSchemaType>;
+}> = ({ availabilityType, form }) => {
+  const { fields, update, append, remove } = useFieldArray({
+    control: form.control,
+    name: "time_slots",
+  });
+
+  return (
+    <div className="tw-divide-y tw-flex-grow tw-overflow-y-scroll tw-pr-4 tw-pb-10">
+      {availabilityType === AvailabilityType.Enum.datetime && (
+        <WeekDayTimeSlotFields
+          fields={fields as FieldArrayWithId<{ time_slots: TimeSlotSchemaType[] }, "time_slots", "id">[]}
+          update={update}
+          append={append}
+          remove={remove}
+        />
+      )}
     </div>
   );
 };

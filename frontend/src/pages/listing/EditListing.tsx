@@ -48,8 +48,16 @@ import {
   UpdateListing,
   UpdateListingImages,
 } from "src/rpc/api";
-import { useAvailabilityRules, useListing } from "src/rpc/data";
-import { AvailabilityRule, AvailabilityType, Category, Image, Listing, ListingInput } from "src/rpc/types";
+import { updateListing, useAvailabilityRules, useListing } from "src/rpc/data";
+import {
+  AvailabilityRule,
+  AvailabilityType,
+  AvailabilityTypeType,
+  Category,
+  Image,
+  Listing,
+  ListingInput,
+} from "src/rpc/types";
 import { isProd } from "src/utils/env";
 import { forceErrorMessage } from "src/utils/errors";
 import { getGcsImageUrl } from "src/utils/images";
@@ -200,7 +208,7 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
           />,
           <Images listing={listing} formState={formState} />,
           <Includes register={register} control={control} formState={formState} />,
-          <Availability register={register} control={control} formState={formState} watch={watch} listing={listing} />,
+          <Availability listing={listing} />,
         ].map((panel, idx) => (
           <Tab.Panel key={idx}>{panel}</Tab.Panel>
         ))}
@@ -209,20 +217,30 @@ const EditListingForm: React.FC<{ listing: Listing }> = ({ listing }) => {
   );
 };
 
-const Availability: React.FC<{
-  listing: Listing;
-  watch: UseFormWatch<EditListingSchemaType>;
-  register: UseFormRegister<EditListingSchemaType>;
-  control: Control<EditListingSchemaType>;
-  formState: FormState<EditListingSchemaType>;
-}> = ({ listing, watch, control, formState }) => {
+const Availability: React.FC<{ listing: Listing }> = ({ listing }) => {
+  const [error, setError] = useState<string | undefined>(undefined);
   const [showRuleModal, setShowRuleModal] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [existingRule, setExistingRule] = useState<AvailabilityRule | undefined>(undefined);
+  const [newAvailabilityType, setNewAvailabilityType] = useState<AvailabilityTypeType | undefined>(undefined);
+  const [showAvailabilityTypeConfirmation, setShowAvailabilityTypeConfirmation] = useState(false);
   const { availabilityRules } = useAvailabilityRules(listing.id);
   if (!availabilityRules) {
     return <Loading />;
   }
+
+  const updateAvailabilityType = (value: AvailabilityTypeType) => {
+    return updateListing(listing.id, { availability_type: value });
+  };
+
+  const onChangeAvailabilityType = (value: AvailabilityTypeType) => {
+    if (availabilityRules.length > 0) {
+      setNewAvailabilityType(value);
+      setShowAvailabilityTypeConfirmation(true);
+    } else {
+      updateAvailabilityType(value);
+    }
+  };
 
   const tableHeaderCell = "tw-w-1/6 tw-p-4";
   const tableRowCell = "tw-p-4";
@@ -241,24 +259,23 @@ const Availability: React.FC<{
         closeModal={() => setShowDeleteConfirmation(false)}
         existingRule={existingRule}
       />
-      <div className="tw-text-2xl tw-font-semibold tw-mb-2">Availability</div>
-      {/** TODO: make sure the user knows that changing the availability type will disable all previous rules */}
-      <Controller
-        name="availabilityType"
-        control={control}
-        render={({ field }) => (
-          <DropdownInput
-            placeholder={"Availability Type"}
-            className="tw-w-full tw-flex tw-mt-3"
-            label="Availability Type"
-            value={watch("availabilityType")}
-            options={AvailabilityType.options}
-            onChange={field.onChange}
-            getElementForDisplay={getAvailabilityTypeDisplay}
-          />
-        )}
+      <UpdateAvailabilityTypeModal
+        listing={listing}
+        show={showAvailabilityTypeConfirmation}
+        closeModal={() => setShowAvailabilityTypeConfirmation(false)}
+        newAvailabilityType={newAvailabilityType}
       />
-      <FormError message={formState.errors.availabilityType?.message} />
+      <div className="tw-text-2xl tw-font-semibold tw-mb-2">Availability</div>
+      <DropdownInput
+        placeholder={"Availability Type"}
+        className="tw-w-full tw-flex tw-mt-3"
+        label="Availability Type"
+        value={listing.availability_type}
+        options={AvailabilityType.options}
+        onChange={onChangeAvailabilityType}
+        getElementForDisplay={getAvailabilityTypeDisplay}
+      />
+      <FormError message={error} />
       <div className="tw-text-xl tw-font-medium tw-mt-8 tw-mb-4">Availability Rules</div>
       <div className="tw-rounded-lg tw-border tw-border-solid tw-border-slate-200 tw-overflow-x-auto">
         <table className="tw-w-full tw-text-left">
@@ -316,10 +333,6 @@ const Availability: React.FC<{
           </tbody>
         </table>
       </div>
-      <Button type="submit" className="tw-mt-6 tw-w-full sm:tw-w-32 tw-h-12 tw-ml-auto" disabled={!formState.isDirty}>
-        {formState.isSubmitting ? <Loading /> : "Save"}
-      </Button>
-      <FormError message={formState.errors.root?.message} />
     </>
   );
 };
@@ -346,8 +359,7 @@ const AvailabilityRuleModal: React.FC<AvailabilityRuleModalProps> = ({ listing, 
 const DeleteRuleModal: React.FC<AvailabilityRuleModalProps> = ({ listing, existingRule, show, closeModal }) => {
   const [deleting, setDeleting] = useState(false);
   if (!existingRule) {
-    // TODO: this should not happen
-    return <Loading />;
+    return;
   }
 
   const deleteImage = async () => {
@@ -378,6 +390,41 @@ const DeleteRuleModal: React.FC<AvailabilityRuleModalProps> = ({ listing, existi
           onClick={deleteImage}
         >
           {deleting ? <Loading /> : "Delete"}
+        </Button>
+      </div>
+    </Modal>
+  );
+};
+
+const UpdateAvailabilityTypeModal: React.FC<{
+  listing: Listing;
+  show: boolean;
+  closeModal: () => void;
+  newAvailabilityType: AvailabilityTypeType | undefined;
+}> = ({ listing, show, closeModal, newAvailabilityType }) => {
+  const [updating, setUpdating] = useState(false);
+  if (!newAvailabilityType) {
+    return;
+  }
+
+  const updateAvailabilityType = async () => {
+    setUpdating(true);
+    await updateListing(listing.id, { availability_type: newAvailabilityType });
+    setUpdating(false);
+  };
+
+  return (
+    <Modal show={show} close={closeModal}>
+      <div className="tw-w-[80vw] sm:tw-w-[600px] tw-px-8 sm:tw-px-12 tw-pb-10">
+        <div className="tw-text-center tw-w-full tw-text-base sm:tw-text-lg tw-mb-8">
+          Changing the availability type of this listing will <span className="tw-font-semibold">permanently</span>{" "}
+          delete all existing availability rules. Are you sure you want to continue?
+        </div>
+        <Button
+          className="tw-flex tw-h-[52px] tw-items-center tw-justify-center tw-whitespace-nowrap tw-w-full"
+          onClick={updateAvailabilityType}
+        >
+          {updating ? <Loading /> : "Continue"}
         </Button>
       </div>
     </Modal>

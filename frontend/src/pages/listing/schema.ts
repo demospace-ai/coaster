@@ -34,15 +34,19 @@ export const IncludesSchema = z.array(z.object({ value: z.string().nonempty("Inc
 export const AvailabilityTypeSchema = AvailabilityType;
 
 export const TimeSlotSchema = z.object({
-  dayOfWeek: z.number().min(0).max(6),
+  type: z.literal("time_slots"),
   startTime: z.date(),
+  dayOfWeek: z.number().min(0).max(6),
   capacity: z.number().min(1).optional(),
 });
 
 export type TimeSlotSchemaType = z.infer<typeof TimeSlotSchema>;
 
 export const SingleDayTimeSlotSchema = z.object({
-  dayOfWeek: z.number().min(0).max(6).optional(),
+  type: z.literal("single_day_time_slots"),
   startTime: z.date(),
+  dayOfWeek: z.number().optional(),
   capacity: z.number().min(1).optional(),
 });
+
+export type SingleDayTimeSlotSchemaType = z.infer<typeof SingleDayTimeSlotSchema>;

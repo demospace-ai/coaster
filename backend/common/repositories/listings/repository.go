@@ -7,6 +7,7 @@ import (
 	"go.fabra.io/server/common/geo"
 	"go.fabra.io/server/common/input"
 	"go.fabra.io/server/common/models"
+	"go.fabra.io/server/common/repositories/availability_rules"
 	"go.fabra.io/server/common/repositories/users"
 	"gorm.io/gorm"
 )
@@ -222,7 +223,13 @@ func UpdateListing(db *gorm.DB, listing *models.Listing, listingUpdates input.Li
 	}
 
 	if listingUpdates.AvailabilityType != nil {
-		listing.AvailabilityType = *listingUpdates.AvailabilityType
+		if listing.AvailabilityType != *listingUpdates.AvailabilityType {
+			listing.AvailabilityType = *listingUpdates.AvailabilityType
+			err := availability_rules.DeactivateAllForListing(db, listing.ID)
+			if err != nil {
+				return nil, errors.Wrap(err, "(listings.UpdateListing) deactivating availability rules")
+			}
+		}
 	}
 
 	// TODO: only admins can make the status published

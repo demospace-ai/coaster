@@ -40,7 +40,6 @@ func (s ApiService) DeleteAvailability(auth auth.Authentication, w http.Response
 
 	err = availability_rules.DeactivateAvailability(
 		s.db,
-		listingID,
 		availabilityRuleID,
 	)
 	if err != nil {

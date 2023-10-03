@@ -1,7 +1,6 @@
 package availability_rules
 
 import (
-	"fmt"
 	"time"
 
 	"go.fabra.io/server/common/errors"
@@ -51,17 +50,133 @@ func CreateAvailability(db *gorm.DB, listingID int64, availabilityInput input.Av
 	return &availabilityRule, nil
 }
 
-func DeactivateAvailability(db *gorm.DB, listingID int64, availabilityRuleID int64) error {
+func UpdateAvailability(db *gorm.DB, availabilityRule *models.AvailabilityRule, availabilityRuleUpdates input.AvailabilityRuleUpdates) (*RuleAndTimes, error) {
+	// We do not allow updating the availability rule type
+	if availabilityRuleUpdates.Name != nil {
+		availabilityRule.Name = *availabilityRuleUpdates.Name
+	}
+	if availabilityRuleUpdates.StartDate != nil {
+		availabilityRule.StartDate = availabilityRuleUpdates.StartDate
+	}
+	if availabilityRuleUpdates.EndDate != nil {
+		availabilityRule.EndDate = availabilityRuleUpdates.EndDate
+	}
+	if availabilityRuleUpdates.RecurringYears != nil {
+		availabilityRule.RecurringYears = availabilityRuleUpdates.RecurringYears
+	}
+	if availabilityRuleUpdates.RecurringMonths != nil {
+		availabilityRule.RecurringMonths = availabilityRuleUpdates.RecurringMonths
+	}
+
+	result := db.Save(&availabilityRule)
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(availability_rules.UpdateAvailability)")
+	}
+
+	if availabilityRuleUpdates.TimeSlots != nil {
+		err := db.Transaction(func(tx *gorm.DB) error {
+			result = tx.Table("time_slots").
+				Where("time_slots.availability_rule_id = ?", availabilityRule.ID).
+				Update("deactivated_at", time.Now())
+			if result.Error != nil {
+				return errors.Wrap(result.Error, "(availability_rules.UpdateAvailability) deactivating old time slots")
+			}
+
+			// TODO: validate based off listing availability type and rule type
+			for _, timeSlotInput := range availabilityRuleUpdates.TimeSlots {
+				timeSlot := models.TimeSlot{
+					AvailabilityRuleID: availabilityRule.ID,
+					DayOfWeek:          timeSlotInput.DayOfWeek,
+					StartTime:          timeSlotInput.StartTime,
+				}
+
+				result := tx.Create(&timeSlot)
+				if result.Error != nil {
+					return errors.Wrapf(result.Error, "(availability_rules.UpdateAvailability) creating time slot: %+v", timeSlot)
+				}
+			}
+
+			return nil
+		})
+		if err != nil {
+			return nil, errors.Wrap(err, "(availability_rules.UpdateAvailability) updating time slots")
+		}
+	}
+
+	timeSlots, err := LoadTimeSlotsForRule(db, availabilityRule.ID)
+	if err != nil {
+		return nil, errors.Wrap(err, "(availability_rules.UpdateAvailability) loading time slots")
+	}
+
+	return &RuleAndTimes{
+		AvailabilityRule: *availabilityRule,
+		TimeSlots:        timeSlots,
+	}, nil
+}
+
+func DeactivateAvailability(db *gorm.DB, availabilityRuleID int64) error {
 	currentTime := time.Now()
 	result := db.Table("availability_rules").
 		Where("availability_rules.id = ?", availabilityRuleID).
-		Where("availability_rules.listing_id = ?", listingID).
+		Update("deactivated_at", currentTime)
+	if result.Error != nil {
+		return errors.Wrap(result.Error, "(availability_rules.DeactivateAvailability)")
+	}
+
+	result = db.Table("time_slots").
+		Where("time_slots.availability_rule_id = ?", availabilityRuleID).
 		Update("deactivated_at", currentTime)
 	if result.Error != nil {
 		return errors.Wrap(result.Error, "(availability_rules.DeactivateAvailability)")
 	}
 
 	return nil
+}
+
+func DeactivateAllForListing(db *gorm.DB, listingID int64) error {
+	currentTime := time.Now()
+
+	return db.Transaction(func(tx *gorm.DB) error {
+		var availabilityRuleIDs []int64
+		result := tx.Table("availability_rules").
+			Select("availability_rules.id").
+			Where("availability_rules.listing_id = ?", listingID).
+			Where("availability_rules.deactivated_at IS NULL").
+			Find(&availabilityRuleIDs)
+		if result.Error != nil {
+			return errors.Wrapf(result.Error, "(availability_rules.DeactivateAllForListing) error for listingID %d", listingID)
+		}
+
+		result = tx.Table("availability_rules").
+			Where("availability_rules.id = ?", listingID).
+			Update("deactivated_at", currentTime)
+		if result.Error != nil {
+			return errors.Wrap(result.Error, "(availability_rules.DeactivateAllForListing)")
+		}
+
+		result = tx.Table("time_slots").
+			Where("time_slots.availability_rule_id IN ?", availabilityRuleIDs).
+			Update("deactivated_at", currentTime)
+		if result.Error != nil {
+			return errors.Wrap(result.Error, "(availability_rules.DeactivateAllForListing)")
+		}
+
+		return nil
+	})
+}
+
+func LoadByID(db *gorm.DB, availabilityRuleID int64) (*models.AvailabilityRule, error) {
+	var availabilityRule models.AvailabilityRule
+	result := db.Table("availability_rules").
+		Select("availability_rules.*").
+		Where("availability_rules.id = ?", availabilityRuleID).
+		Where("availability_rules.deactivated_at IS NULL").
+		Take(&availabilityRule)
+	if result.Error != nil {
+		return nil, errors.Wrapf(result.Error, "(availability_rules.LoadByID) error for availabilityRuleID %d", availabilityRuleID)
+	}
+
+	return &availabilityRule, nil
 }
 
 func LoadForListing(db *gorm.DB, listingID int64) ([]RuleAndTimes, error) {
@@ -237,7 +352,6 @@ func getMatchingMonths(rule RuleAndTimes, startDate time.Time, endDate time.Time
 		monthsToQuery[d.Month()] = true
 	}
 	if len(rule.RecurringMonths) == 0 {
-		fmt.Printf("hi")
 		// If no months are specified, then the rule applies to all months
 		for month := range monthsToQuery {
 			matchingMonths = append(matchingMonths, month)

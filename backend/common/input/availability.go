@@ -23,3 +23,14 @@ type AvailabilityRule struct {
 
 	TimeSlots []TimeSlot `json:"time_slots"`
 }
+
+type AvailabilityRuleUpdates struct {
+	// We do not allow updating the availability rule type
+	Name            *string        `json:"name,omitempty"`
+	StartDate       *database.Date `json:"start_date,omitempty"`
+	EndDate         *database.Date `json:"end_date,omitempty"`
+	RecurringYears  []int32        `json:"recurring_years,omitempty"`
+	RecurringMonths []int32        `json:"recurring_months,omitempty"`
+
+	TimeSlots []TimeSlot `json:"time_slots,omitempty"`
+}

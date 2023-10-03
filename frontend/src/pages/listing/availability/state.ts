@@ -1,5 +1,10 @@
 import { Dispatch, SetStateAction, useState } from "react";
-import { SingleDayTimeSlotSchema, TimeSlotSchema, TimeSlotSchemaType } from "src/pages/listing/schema";
+import {
+  SingleDayTimeSlotSchema,
+  SingleDayTimeSlotSchemaType,
+  TimeSlotSchema,
+  TimeSlotSchemaType,
+} from "src/pages/listing/schema";
 import {
   AvailabilityRuleType,
   AvailabilityRuleTypeType,
@@ -11,12 +16,12 @@ import { z } from "zod";
 
 export const UpdateAvailabilityRuleSchema = z.object({
   name: z.string().min(1),
-  type: AvailabilityRuleType,
+  type: AvailabilityRuleType.readonly(),
   start_date: z.date(),
   end_date: z.date(),
   recurring_years: z.array(z.number()),
   recurring_months: z.array(z.number()),
-  time_slots: z.array(TimeSlotSchema),
+  time_slots: z.array(z.union([TimeSlotSchema, SingleDayTimeSlotSchema])),
 });
 
 export type UpdateAvailabilityRuleSchemaType = z.infer<typeof UpdateAvailabilityRuleSchema>;
@@ -66,7 +71,7 @@ export type NewAvailabilityRuleState = {
   end_date: Date | undefined;
   recurring_years: number[] | undefined;
   recurring_months: number[] | undefined;
-  time_slots: TimeSlotSchemaType[] | undefined;
+  time_slots: TimeSlotSchemaType[] | SingleDayTimeSlotSchemaType[] | undefined;
 };
 
 export function useStateMachine(onComplete: () => void, listing: Listing) {
@@ -84,7 +89,6 @@ export function useStateMachine(onComplete: () => void, listing: Listing) {
   });
 
   const prevStep = useBack(state, setState);
-
   const nextStep = useNext(state, setState, onComplete, listing.availability_type);
 
   return {
@@ -126,6 +130,25 @@ const useNext = (
   onComplete: () => void,
   availabilityType: AvailabilityTypeType,
 ) => {
+  const resetState = () =>
+    setState((prev) => ({
+      listingID: prev.listingID,
+      availabilityType: prev.availabilityType,
+      step: NewRuleStep.InitialRuleStep,
+      type: undefined,
+      start_date: undefined,
+      end_date: undefined,
+      recurring_years: undefined,
+      recurring_months: undefined,
+      time_slots: undefined,
+      name: undefined,
+    }));
+
+  const onCompleteWrapped = () => {
+    resetState();
+    onComplete();
+  };
+
   switch (state.step) {
     case NewRuleStep.InitialRuleStep:
       return () => {
@@ -142,19 +165,19 @@ const useNext = (
       };
     case NewRuleStep.SingleDate:
       if (availabilityType === AvailabilityType.Enum.date) {
-        return onComplete;
+        return onCompleteWrapped;
       } else {
         return () => setState((prev) => ({ ...prev, step: NewRuleStep.SingleDayTimeSlots }));
       }
     case NewRuleStep.DateRange:
     case NewRuleStep.Recurring:
       if (availabilityType === AvailabilityType.Enum.date) {
-        return onComplete;
+        return onCompleteWrapped;
       } else {
         return () => setState((prev) => ({ ...prev, step: NewRuleStep.TimeSlots }));
       }
     case NewRuleStep.TimeSlots:
     case NewRuleStep.SingleDayTimeSlots:
-      return onComplete;
+      return onCompleteWrapped;
   }
 };
