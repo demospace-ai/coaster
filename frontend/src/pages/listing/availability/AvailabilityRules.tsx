@@ -447,6 +447,10 @@ const TimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, s
       return { success: false, error: "Something went wrong." };
     }
 
+    if (!values.name) {
+      return { success: false, error: "Make sure you've provided a name for your rule." };
+    }
+
     if (!values.type) {
       return { success: false, error: "Make sure you've selected a rule type." };
     }
@@ -455,6 +459,7 @@ const TimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, s
       return { success: false, error: "Please select at least one time slot." };
     }
 
+    payload.name = values.name;
     payload.type = values.type;
 
     switch (values.type) {
@@ -542,6 +547,10 @@ const SingleDayTimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({
       return { success: false, error: "Something went wrong." };
     }
 
+    if (!values.name) {
+      return { success: false, error: "Make sure you've provided a name for your rule." };
+    }
+
     if (!values.type) {
       return { success: false, error: "Make sure you've selected a rule type." };
     }
@@ -550,6 +559,7 @@ const SingleDayTimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({
       return { success: false, error: "Please select at least one time slot." };
     }
 
+    payload.name = values.name;
     payload.type = values.type;
 
     switch (values.type) {
@@ -705,7 +715,11 @@ export const ExistingRuleForm: React.FC<{
       end_date: existingRule?.end_date,
       recurring_years: existingRule?.recurring_years,
       recurring_months: existingRule?.recurring_months,
-      time_slots: existingRule?.time_slots,
+      time_slots: existingRule?.time_slots.map((ts) => ({
+        dayOfWeek: ts.day_of_week,
+        startTime: ts.start_time,
+        capacity: ts.capacity,
+      })),
     },
   });
 

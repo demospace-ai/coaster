@@ -108,7 +108,7 @@ func (s ApiService) filterByAvailability(unfiltered []listings.ListingDetails, s
 		}
 
 		for _, rule := range availabilityRules {
-			hasAvailability, err := rule.HasAvailabilityInRange(s.db, startDate, endDate)
+			hasAvailability, err := rule.HasAvailabilityInRange(s.db, startDate, endDate, listing.Listing)
 			if err != nil {
 				return nil, errors.Wrap(err, "(api.filterByAvailability) checking availability for rule")
 			}

@@ -1,0 +1,2 @@
+ALTER TABLE time_slots ALTER COLUMN start_time DROP NOT NULL;
+ALTER TABLE time_slots ALTER COLUMN capacity SET NOT NULL;

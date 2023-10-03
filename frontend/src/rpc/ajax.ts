@@ -84,5 +84,27 @@ export async function sendRequest<
   if (endpoint.noJson) {
     return response.text() as ResponseType;
   }
-  return response.json().catch(() => null);
+
+  const dateReviver = (key: string, value: any) => {
+    if (typeof value === "string" && /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ$/.test(value)) {
+      const d = new Date(value);
+      if (!isNaN(d.getTime())) {
+        return d;
+      }
+    }
+
+    if (typeof value === "string" && /^\d\d:\d\d:\d\d$/.test(value)) {
+      const d = new Date("1970-01-01T" + value);
+      if (!isNaN(d.getTime())) {
+        return d;
+      }
+    }
+
+    return value;
+  };
+
+  return response
+    .text()
+    .then((text) => JSON.parse(text, dateReviver))
+    .catch(() => null);
 }

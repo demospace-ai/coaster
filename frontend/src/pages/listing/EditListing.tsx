@@ -409,7 +409,12 @@ const UpdateAvailabilityTypeModal: React.FC<{
 
   const updateAvailabilityType = async () => {
     setUpdating(true);
-    await updateListing(listing.id, { availability_type: newAvailabilityType });
+    try {
+      await updateListing(listing.id, { availability_type: newAvailabilityType });
+
+      mutate({ GetAvailabilityRules, listingID: listing.id }, []);
+      closeModal();
+    } catch (e) {}
     setUpdating(false);
   };
 

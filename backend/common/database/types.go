@@ -47,7 +47,7 @@ func (date *Date) UnmarshalJSON(b []byte) error {
 }
 
 // Time is time data type.
-type Time time.Duration
+type Time time.Time
 
 // NewTime is a constructor for Time and returns new Time.
 func NewTime(hour, min, sec int) Time {
@@ -55,7 +55,7 @@ func NewTime(hour, min, sec int) Time {
 }
 
 func newTime(hour, min, sec int) Time {
-	return Time(time.Duration(hour)*time.Hour + time.Duration(min)*time.Minute + time.Duration(sec)*time.Second)
+	return Time(time.Date(0, 0, 0, hour, min, sec, 0, time.UTC))
 }
 
 // GormDataType returns gorm common data type. This type is used for the field's column type.
@@ -100,15 +100,15 @@ func (t Time) String() string {
 }
 
 func (t Time) hours() int {
-	return int(time.Duration(t).Truncate(time.Hour).Hours())
+	return time.Time(t).Hour()
 }
 
 func (t Time) minutes() int {
-	return int((time.Duration(t) % time.Hour).Truncate(time.Minute).Minutes())
+	return time.Time(t).Minute()
 }
 
 func (t Time) seconds() int {
-	return int((time.Duration(t) % time.Minute).Truncate(time.Second).Seconds())
+	return time.Time(t).Second()
 }
 
 // MarshalJSON implements json.Marshaler to convert Time to json serialization.

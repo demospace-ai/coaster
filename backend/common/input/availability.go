@@ -8,9 +8,9 @@ import (
 )
 
 type TimeSlot struct {
-	DayOfWeek *time.Weekday  `json:"day_of_week"`
-	StartTime *database.Time `json:"start_time"`
-	Capacity  int            `json:"capacity"`
+	StartTime database.Time `json:"start_time"`
+	DayOfWeek *time.Weekday `json:"day_of_week"`
+	Capacity  *int64        `json:"capacity"`
 }
 
 type AvailabilityRule struct {
