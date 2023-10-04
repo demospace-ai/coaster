@@ -29,7 +29,7 @@ func LoadByIDAndUser(db *gorm.DB, listingID int64, user *models.User) (*ListingD
 		return nil, errors.Wrapf(result.Error, "(listings.LoadByID) error for ID %d", listingID)
 	}
 
-	// Allow the owner to see their own listing even if it's not published
+	// Allow the owner to see their own listing regardless of status
 	if listing.Status != models.ListingStatusPublished {
 		if user == nil || (listing.UserID != user.ID && !user.IsAdmin) {
 			return nil, gorm.ErrRecordNotFound

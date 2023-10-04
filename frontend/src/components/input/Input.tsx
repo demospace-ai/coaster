@@ -774,7 +774,7 @@ export const PriceInput = forwardRef<HTMLInputElement, InputProps>((props, ref) 
           value={value ? value : ""}
           onWheel={(e) => e.currentTarget.blur()}
           className={mergeClasses(
-            "tw-flex tw-h-full tw-top-0 tw-right-0 tw-bg-transparent tw-absolute tw-text-right tw-text-inherit tw-py-4 tw-px-3 tw-w-full tw-outline-0 tw-hide-number-wheel",
+            "tw-absolute tw-top-0 tw-right-0 tw-flex tw-h-full tw-w-full tw-bg-transparent tw-text-transparent tw-caret-black tw-text-right tw-py-4 tw-px-3 tw-outline-0 tw-hide-number-wheel",
             label && "tw-mt-2 -tw-mb-2",
           )}
           onKeyDown={preventMinusAndPeriod}

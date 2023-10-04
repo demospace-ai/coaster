@@ -586,6 +586,7 @@ const ImagesInner: React.FC<{ listing: Listing }> = ({ listing }) => {
   const newImageRef = useRef<HTMLInputElement | null>(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [imageToDelete, setImageToDelete] = useState<number | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const findCard = useCallback(
     (id: string) => {
@@ -625,22 +626,29 @@ const ImagesInner: React.FC<{ listing: Listing }> = ({ listing }) => {
   };
 
   const addImage = async (e: FormEvent<HTMLInputElement>) => {
+    setUploading(true);
     if (e.currentTarget && e.currentTarget.files) {
-      const formData = new FormData();
-      formData.append("listing_image", e.currentTarget.files[0]);
-      try {
-        const listingImage = await sendRequest(AddListingImage, {
-          pathParams: { listingID: listing.id },
-          formData: formData,
-        });
+      for (const file of Array.from(e.currentTarget.files)) {
+        const formData = new FormData();
+        formData.append("listing_image", file);
+        try {
+          const listingImage = await sendRequest(AddListingImage, {
+            pathParams: { listingID: listing.id },
+            formData: formData,
+          });
 
-        mutate({ GetListing, listingID: listing.id }, { ...listing, images: [...listing.images, listingImage] });
-        setImages([...images, listingImage]);
-        setError(undefined);
-      } catch (e) {
-        setError(forceErrorMessage(e));
+          mutate({ GetListing, listingID: listing.id }, (prev) => ({
+            ...prev,
+            images: [...prev.images, listingImage],
+          }));
+          setImages((prev) => [...prev, listingImage]);
+          setError(undefined);
+        } catch (e) {
+          setError(forceErrorMessage(e));
+        }
       }
     }
+    setUploading(false);
   };
 
   const [, drop] = useDrop(() => ({ accept: "card" }));
@@ -667,6 +675,10 @@ const ImagesInner: React.FC<{ listing: Listing }> = ({ listing }) => {
             <XMarkIcon
               className="tw-w-8 tw-absolute tw-right-2 tw-top-2 tw-bg-gray-100 tw-p-1 tw-rounded-lg tw-opacity-80 tw-cursor-pointer hover:tw-opacity-100"
               onClick={() => {
+                if (images.length <= 3) {
+                  setError("You must have at least 3 images.");
+                  return;
+                }
                 setImageToDelete(image.id);
                 setShowDeleteConfirmation(true);
               }}
@@ -677,8 +689,12 @@ const ImagesInner: React.FC<{ listing: Listing }> = ({ listing }) => {
           className="tw-group tw-aspect-square tw-w-full tw-bg-gray-100 tw-rounded-lg tw-cursor-pointer tw-flex tw-justify-center tw-items-center"
           onClick={() => newImageRef.current?.click()}
         >
-          <input ref={newImageRef} type="file" className="tw-hidden tw-invisible" onChange={addImage} />
-          <PlusIcon className="tw-h-12 tw-mx-auto tw-my-auto tw-text-gray-400 group-hover:tw-text-gray-600 tw-transition-all tw-duration-100" />
+          <input ref={newImageRef} type="file" multiple className="tw-hidden tw-invisible" onChange={addImage} />
+          {uploading ? (
+            <Loading className="tw-h-12 tw-w-12 tw-mx-auto tw-my-auto" />
+          ) : (
+            <PlusIcon className="tw-h-12 tw-mx-auto tw-my-auto tw-text-gray-400 group-hover:tw-text-gray-600 tw-transition-all tw-duration-100" />
+          )}
         </div>
         <DeleteModal
           listing={listing}
@@ -688,7 +704,7 @@ const ImagesInner: React.FC<{ listing: Listing }> = ({ listing }) => {
           closeModal={() => setShowDeleteConfirmation(false)}
         />
       </div>
-      {error && <FormError message={error} />}
+      {error && <FormError message={error} className="tw-mt-2" />}
     </>
   );
 };

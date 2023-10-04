@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/errors"
+	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/repositories/listings"
 )
 
@@ -35,17 +36,26 @@ func (s ApiService) DeleteListingImage(auth auth.Authentication, w http.Response
 	}
 
 	// Make sure this user has ownership of this listing
-	if !auth.User.IsAdmin {
-		_, err = listings.LoadByIDAndUserID(s.db, auth.User.ID, listingID)
-		if err != nil {
-			return errors.Wrapf(err, "(api.DeleteListingImage) loading listing %d for user %d", listingID, auth.User.ID)
-		}
+	listing, err := listings.LoadByIDAndUser(s.db, listingID, auth.User)
+	if err != nil {
+		return errors.Wrapf(err, "(api.DeleteListingImage) loading listing %d for user %d", listingID, auth.User.ID)
 	}
 
 	// No need to update rank of other listings since the order stays the same
-	listingImage, err := listings.LoadListingImage(s.db, listingID, imageID)
-	if err != nil {
-		return errors.Wrapf(err, "(api.DeleteListingImage) loading image for listing %d", listingID)
+	if len(listing.Images) <= 3 && listing.Status != models.ListingStatusDraft {
+		return errors.NewCustomerVisibleError("You must have at least 3 images for your listing.")
+	}
+
+	var listingImage *models.ListingImage
+	for _, image := range listing.Images {
+		if image.ID == imageID {
+			listingImage = &image
+			break
+		}
+	}
+
+	if listingImage == nil {
+		return errors.NewCustomerVisibleError("Image not found.")
 	}
 
 	// TODO: do this transactionally or figure out something to handle failures

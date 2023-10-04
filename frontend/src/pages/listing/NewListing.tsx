@@ -382,6 +382,7 @@ const ImageStepInner: React.FC<StepProps<{}> & ImageProps> = ({ nextStep, prevSt
   const listingID = listing.id;
   const [images, setImages] = useState<Image[]>(listing.images);
   const [error, setError] = useState<string | undefined>(undefined);
+  const [uploading, setUploading] = useState<boolean>(false);
 
   // TODO: validate size and type of file on frontend
 
@@ -425,22 +426,26 @@ const ImageStepInner: React.FC<StepProps<{}> & ImageProps> = ({ nextStep, prevSt
   };
 
   const addImage = async (e: FormEvent<HTMLInputElement>) => {
+    setUploading(true);
     if (e.currentTarget && e.currentTarget.files) {
-      const formData = new FormData();
-      formData.append("listing_image", e.currentTarget.files[0]);
-      try {
-        const listingImage = await sendRequest(AddListingImage, {
-          pathParams: { listingID },
-          formData: formData,
-        });
+      for (const file of Array.from(e.currentTarget.files)) {
+        const formData = new FormData();
+        formData.append("listing_image", file);
+        try {
+          const listingImage = await sendRequest(AddListingImage, {
+            pathParams: { listingID },
+            formData: formData,
+          });
 
-        mutate({ GetDraftListing }, { ...listing, images: [...listing.images, listingImage] });
-        mutate({ GetListing, listingID });
-        setImages([...images, listingImage]);
-      } catch (e) {
-        setError(forceErrorMessage(e));
+          mutate({ GetDraftListing }, (prev) => ({ ...prev, images: [...prev.images, listingImage] }));
+          mutate({ GetListing, listingID }, (prev) => ({ ...prev, images: [...prev.images, listingImage] }));
+          setImages((prev) => [...prev, listingImage]);
+        } catch (e) {
+          setError(forceErrorMessage(e));
+        }
       }
     }
+    setUploading(false);
   };
 
   const deleteImage = async (imageID: number) => {
@@ -467,9 +472,9 @@ const ImageStepInner: React.FC<StepProps<{}> & ImageProps> = ({ nextStep, prevSt
     <>
       <div className="tw-flex tw-flex-col tw-items-center tw-mb-6">
         <button className="tw-flex tw-rounded-xl tw-bg-gray-200 tw-px-10 tw-py-3" onClick={() => ref.current?.click()}>
-          Add image
+          {uploading ? <Loading /> : "Add image"}
         </button>
-        <input ref={ref} type="file" className="tw-flex tw-invisible" onChange={addImage} />
+        <input ref={ref} type="file" multiple className="tw-flex tw-invisible" onChange={addImage} />
         <div ref={drop} className="tw-grid tw-grid-cols-2 tw-gap-4 tw-justify-items-center tw-items-center">
           {images.map((image) => (
             <Card
