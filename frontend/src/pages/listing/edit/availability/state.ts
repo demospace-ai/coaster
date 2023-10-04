@@ -59,7 +59,7 @@ export const RecurringOptionsSchema = z.object({
 export type RecurringOptionsSchemaType = z.infer<typeof RecurringOptionsSchema>;
 
 export const InitialRuleStepSchema = z.object({
-  name: z.string().min(4, "Name must be at least 4 characters").max(100, "Name cannot be longer than 100 characters"),
+  name: z.string().min(1, "Name must be at least 4 characters").max(100, "Name cannot be longer than 100 characters"),
   type: AvailabilityRuleType,
 });
 export type InitialRuleStepSchemaType = z.infer<typeof InitialRuleStepSchema>;
