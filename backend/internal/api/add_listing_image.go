@@ -56,8 +56,8 @@ func (s ApiService) AddListingImage(auth auth.Authentication, w http.ResponseWri
 	}
 	defer file.Close()
 
-	if (handler.Size / 1024) > 1024 {
-		return errors.NewBadRequest("Image must be less than 1MB")
+	if (handler.Size / 1024) > (1024 * 5) {
+		return errors.NewBadRequest("Image must be less than 5MB")
 	}
 
 	contentType := handler.Header.Get("Content-Type")
