@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { FormError } from "src/components/FormError";
@@ -23,6 +23,7 @@ import {
   SingleDayTimeSlotInputType,
   TimeSlotInputSchema,
   TimeSlotInputType,
+  useStateArray,
   useStateMachine,
 } from "src/pages/listing/edit/availability/state";
 import { SingleDayTimeSlotSchemaType, TimeSlotSchemaType } from "src/pages/listing/schema";
@@ -618,41 +619,4 @@ function getAvailabilityRuleTypeDetail(value: AvailabilityRuleTypeType) {
     case AvailabilityRuleType.Enum.recurring:
       return "Create a rule that applies to a recurring set of dates";
   }
-}
-
-// TODO: figure out the typings for this
-function useStateArray<T>(setValue: Dispatch<SetStateAction<T>> | undefined, name: keyof T) {
-  if (!setValue) {
-    return { update: () => {}, append: () => {}, remove: () => {} };
-  }
-
-  const update = (i: number, value: any) =>
-    setValue((prev) => {
-      const prevArray = prev[name] as any[];
-      const newArray = prevArray.map((prev, j) => {
-        if (i === j) {
-          return value;
-        } else {
-          // The rest haven't changed
-          return prev;
-        }
-      });
-      return { ...prev, [name]: newArray };
-    });
-
-  const append = (value: any) => {
-    setValue((prev) => {
-      const prevArray = (prev[name] as any[]) ?? [];
-      return { ...prev, [name]: [...prevArray, value] };
-    });
-  };
-
-  const remove = (i: number) =>
-    setValue((prev) => {
-      const prevArray = prev[name] as any[];
-      const newArray = prevArray.filter((_, j) => i !== j);
-      return { ...prev, [name]: newArray };
-    });
-
-  return { update, append, remove };
 }

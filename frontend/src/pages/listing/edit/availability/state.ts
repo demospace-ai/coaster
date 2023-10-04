@@ -199,3 +199,40 @@ const useNext = (
       return onCompleteWrapped;
   }
 };
+
+// TODO: figure out the typings for this so we can avoid the any[] cast
+export function useStateArray<T>(setValue: Dispatch<SetStateAction<T>> | undefined, name: keyof T) {
+  if (!setValue) {
+    return { update: () => {}, append: () => {}, remove: () => {} };
+  }
+
+  const update = (i: number, value: any) =>
+    setValue((prev) => {
+      const prevArray = prev[name] as any[];
+      const newArray = prevArray.map((prev, j) => {
+        if (i === j) {
+          return value;
+        } else {
+          // The rest haven't changed
+          return prev;
+        }
+      });
+      return { ...prev, [name]: newArray };
+    });
+
+  const append = (value: any) => {
+    setValue((prev) => {
+      const prevArray = (prev[name] as any[]) ?? [];
+      return { ...prev, [name]: [...prevArray, value] };
+    });
+  };
+
+  const remove = (i: number) =>
+    setValue((prev) => {
+      const prevArray = prev[name] as any[];
+      const newArray = prevArray.filter((_, j) => i !== j);
+      return { ...prev, [name]: newArray };
+    });
+
+  return { update, append, remove };
+}
