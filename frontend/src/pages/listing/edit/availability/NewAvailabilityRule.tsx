@@ -156,7 +156,7 @@ const SingleDateStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values,
   const showToast = useShowToast();
   const createAvailabilityRule = useCreateAvailabilityRule(values.listingID, {
     onSuccess: () => {
-      showToast("success", "Successfully created availability rule");
+      showToast("success", "Successfully created rule");
       nextStep && nextStep();
     },
   });
@@ -223,7 +223,7 @@ const DateRangeStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
   const showToast = useShowToast();
   const createAvailabilityRule = useCreateAvailabilityRule(values.listingID, {
     onSuccess: () => {
-      showToast("success", "Successfully created availability rule");
+      showToast("success", "Successfully created rule");
       nextStep && nextStep();
     },
   });
@@ -300,7 +300,7 @@ const RecurringStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
   const showToast = useShowToast();
   const createAvailabilityRule = useCreateAvailabilityRule(values.listingID, {
     onSuccess: () => {
-      showToast("success", "Successfully created availability rule");
+      showToast("success", "Successfully created rule");
       nextStep && nextStep();
     },
   });
@@ -412,7 +412,7 @@ const TimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, s
   const showToast = useShowToast();
   const createAvailabilityRule = useCreateAvailabilityRule(values.listingID, {
     onSuccess: () => {
-      showToast("success", "Successfully created availability rule");
+      showToast("success", "Successfully created rule");
       nextStep && nextStep();
     },
   });
@@ -516,7 +516,7 @@ const SingleDayTimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({
   const showToast = useShowToast();
   const createAvailabilityRule = useCreateAvailabilityRule(values.listingID, {
     onSuccess: () => {
-      showToast("success", "Successfully created availability rule");
+      showToast("success", "Successfully created rule");
       nextStep && nextStep();
     },
   });
@@ -629,22 +629,29 @@ function useStateArray<T>(setValue: Dispatch<SetStateAction<T>> | undefined, nam
   const update = (i: number, value: any) =>
     setValue((prev) => {
       const prevArray = prev[name] as any[];
-      prevArray[i] = value;
-      return { ...prev, [name]: prevArray };
+      const newArray = prevArray.map((prev, j) => {
+        if (i === j) {
+          return value;
+        } else {
+          // The rest haven't changed
+          return prev;
+        }
+      });
+      return { ...prev, [name]: newArray };
     });
 
-  const append = (value: any) =>
+  const append = (value: any) => {
     setValue((prev) => {
       const prevArray = (prev[name] as any[]) ?? [];
-      prevArray.push(value);
-      return { ...prev, [name]: prevArray };
+      return { ...prev, [name]: [...prevArray, value] };
     });
+  };
 
   const remove = (i: number) =>
     setValue((prev) => {
       const prevArray = prev[name] as any[];
-      prevArray.splice(i, 1);
-      return { ...prev, [name]: prevArray };
+      const newArray = prevArray.filter((_, j) => i !== j);
+      return { ...prev, [name]: newArray };
     });
 
   return { update, append, remove };
