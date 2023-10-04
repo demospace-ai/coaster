@@ -6,7 +6,7 @@ import { RequireAuth } from "src/components/auth/RequireAuth";
 import { Footer } from "src/components/footer/Footer";
 import { SupplierHeader } from "src/components/header/Header";
 import { LogoLoading } from "src/components/loading/LogoLoading";
-import { getToastContentFromDetails, Toast } from "src/components/notifications/Notifications";
+import { ToastPortal } from "src/components/notifications/Notifications";
 import { About } from "src/pages/about/About";
 import { Hosting } from "src/pages/hosting/Hosting";
 import { EditListingLayout } from "src/pages/listing/edit";
@@ -24,17 +24,14 @@ import { NotFound } from "src/pages/notfound/NotFound";
 import { Privacy } from "src/pages/privacy/Privacy";
 import { Terms } from "src/pages/privacy/Terms";
 import { Profile } from "src/pages/profile/Profile";
-import { useDispatch, useSelector } from "src/root/model";
+import { useSelector } from "src/root/model";
 
 let needsInit = true;
 
 const SupplierAppLayout: React.FC = () => {
   const start = useStart();
-  const dispatch = useDispatch();
   const loading = useSelector((state) => state.app.loading);
   const forbidden = useSelector((state) => state.app.forbidden);
-  const toast = useSelector((state) => state.app.toast);
-  const toastContent = getToastContentFromDetails(toast);
 
   const error = useCatchGlobalError();
   if (error) {
@@ -59,14 +56,7 @@ const SupplierAppLayout: React.FC = () => {
 
   return (
     <>
-      <div className="tw-z-20 tw-pointer-events-none tw-fixed tw-w-full tw-h-full">
-        <Toast
-          content={toastContent}
-          show={!!toast}
-          close={() => dispatch({ type: "toast", toast: undefined })}
-          duration={toast?.duration}
-        />
-      </div>
+      <ToastPortal />
       <div className="tw-flex tw-flex-col tw-flex-grow tw-bg-white">
         <SupplierHeader />
         <Outlet />

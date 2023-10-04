@@ -34,7 +34,7 @@ export const Modal: React.FC<ModalProps> = (props) => {
       {createPortal(
         <div
           className={classNames(
-            "tw-fixed tw-overscroll-contain tw-top-0 tw-left-0 tw-h-full tw-w-full tw-z-50 tw-backdrop-blur-sm",
+            "tw-fixed tw-overscroll-contain tw-top-0 tw-left-0 tw-h-full tw-w-full tw-z-50 tw-backdrop-blur-sm", // z-index is tied to Toast z-index (toast should be bigger)
             showHideClassName,
             props.lightBackground ? "tw-bg-white tw-bg-opacity-50" : "tw-bg-black tw-bg-opacity-50",
           )}

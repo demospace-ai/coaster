@@ -1,7 +1,8 @@
 import { Transition } from "@headlessui/react";
 import { CheckCircleIcon, InformationCircleIcon, XCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Fragment } from "react";
-import { useDispatch } from "src/root/model";
+import { createPortal } from "react-dom";
+import { useDispatch, useSelector } from "src/root/model";
 
 export interface ToastOptions {
   type: "error" | "success" | "info";
@@ -54,13 +55,13 @@ export const getToastContentFromDetails = (toast?: ToastOptions) => {
 
 export const useShowToast = (): ShowToastFunction => {
   const dispatch = useDispatch();
-  return (type: "success" | "error" | "info", content: string, duration?: number) => {
+  return (type: "success" | "error" | "info", content: string, duration: number = 2000) => {
     dispatch({ type: "toast", toast: { content, type, duration } });
   };
 };
 
 export const Toast: React.FC<ToastProps> = ({ content, show, duration, close }) => {
-  if (duration) {
+  if (duration && duration > 0) {
     setTimeout(() => {
       close();
     }, duration);
@@ -69,7 +70,10 @@ export const Toast: React.FC<ToastProps> = ({ content, show, duration, close }) 
   return (
     <>
       {/* Global notification live region, render this permanently at the end of the document */}
-      <div aria-live="assertive" className="tw-pointer-events-none tw-fixed tw-inset-0 tw-flex tw-p-6 tw-items-start">
+      <div
+        aria-live="assertive"
+        className="tw-z-[60] tw-pointer-events-none tw-fixed tw-inset-0 tw-flex tw-p-6 tw-items-start"
+      >
         <div className="tw-flex tw-w-full tw-flex-col tw-space-y-4 tw-items-end">
           {/* Notification panel, dynamically insert this into the live region when it needs to be displayed */}
           <Transition
@@ -104,6 +108,27 @@ export const Toast: React.FC<ToastProps> = ({ content, show, duration, close }) 
           </Transition>
         </div>
       </div>
+    </>
+  );
+};
+
+export const ToastPortal: React.FC = () => {
+  const dispatch = useDispatch();
+  const toast = useSelector((state) => state.app.toast);
+  const toastContent = getToastContentFromDetails(toast);
+
+  return (
+    <>
+      {createPortal(
+        // z-index is tied to Modal z-index (toast should be bigger)
+        <Toast
+          content={toastContent}
+          show={!!toast}
+          close={() => dispatch({ type: "toast", toast: undefined })}
+          duration={toast?.duration}
+        />,
+        document.body,
+      )}
     </>
   );
 };

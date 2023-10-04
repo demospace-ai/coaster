@@ -6,6 +6,7 @@ import { Button } from "src/components/button/Button";
 import { DateRangePicker, correctFromUTC, correctToUTC } from "src/components/calendar/DatePicker";
 import { DropdownInput, Input } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
+import { useShowToast } from "src/components/notifications/Notifications";
 import { SingleDayTimeSlotFields, WeekDayTimeSlotFields } from "src/pages/listing/edit/availability/AvailabilityRules";
 import {
   UpdateFixedDateRuleSchema,
@@ -29,8 +30,12 @@ export const ExistingRuleForm: React.FC<{
   existingRule: AvailabilityRule;
   closeModal: () => void;
 }> = ({ listing, existingRule, closeModal }) => {
+  const showToast = useShowToast();
   const updateAvailability = useUpdateAvailabilityRule(listing.id, existingRule.id, {
-    onSuccess: closeModal,
+    onSuccess: () => {
+      closeModal();
+      showToast("success", "Successfully updated availability rule");
+    },
   });
 
   var existingRuleForm: ReactElement;
@@ -77,6 +82,7 @@ const FixedDateRuleUpdateForm: React.FC<{
   existingRule: AvailabilityRule;
   updateAvailability: Mutation<AvailabilityRuleUpdates>;
 }> = ({ availabilityType, existingRule, updateAvailability }) => {
+  const showToast = useShowToast();
   const {
     control,
     watch,
@@ -104,6 +110,7 @@ const FixedDateRuleUpdateForm: React.FC<{
 
   const onSubmit = async (values: UpdateFixedDateRuleSchema) => {
     if (!isDirty) {
+      showToast("error", "No changes made");
       return;
     }
 
@@ -189,6 +196,7 @@ const FixedRangeRuleUpdateForm: React.FC<{
   existingRule: AvailabilityRule;
   updateAvailability: Mutation<AvailabilityRuleUpdates>;
 }> = ({ availabilityType, existingRule, updateAvailability }) => {
+  const showToast = useShowToast();
   const {
     control,
     watch,
@@ -220,6 +228,7 @@ const FixedRangeRuleUpdateForm: React.FC<{
 
   const onSubmit = async (values: UpdateFixedRangeRuleSchema) => {
     if (!isDirty) {
+      showToast("error", "No changes made");
       return;
     }
 
@@ -308,6 +317,7 @@ const RecurringRuleUpdateForm: React.FC<{
   existingRule: AvailabilityRule;
   updateAvailability: Mutation<AvailabilityRuleUpdates>;
 }> = ({ availabilityType, existingRule, updateAvailability }) => {
+  const showToast = useShowToast();
   const {
     control,
     watch,
@@ -337,6 +347,7 @@ const RecurringRuleUpdateForm: React.FC<{
 
   const onSubmit = async (values: UpdateRecurringRuleSchema) => {
     if (!isDirty) {
+      showToast("error", "No changes made");
       return;
     }
 

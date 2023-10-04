@@ -6,7 +6,7 @@ import { RequireAuth } from "src/components/auth/RequireAuth";
 import { Footer } from "src/components/footer/Footer";
 import { Header } from "src/components/header/Header";
 import { LogoLoading } from "src/components/loading/LogoLoading";
-import { Toast, getToastContentFromDetails } from "src/components/notifications/Notifications";
+import { ToastPortal, getToastContentFromDetails } from "src/components/notifications/Notifications";
 import { About } from "src/pages/about/About";
 import { Home } from "src/pages/home/Home";
 import { Listing } from "src/pages/listing/Listing";
@@ -54,14 +54,7 @@ const AppLayout: React.FC = () => {
 
   return (
     <>
-      <div className="tw-z-20 tw-pointer-events-none tw-fixed tw-w-full tw-h-full">
-        <Toast
-          content={toastContent}
-          show={!!toast}
-          close={() => dispatch({ type: "toast", toast: undefined })}
-          duration={toast?.duration}
-        />
-      </div>
+      <ToastPortal />
       <div className="tw-flex tw-flex-col tw-flex-grow tw-bg-white">
         <Header />
         <Outlet />
