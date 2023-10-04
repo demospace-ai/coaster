@@ -94,7 +94,7 @@ export async function sendRequest<
     }
 
     if (typeof value === "string" && /^\d\d:\d\d:\d\d$/.test(value)) {
-      const d = new Date("1970-01-01T" + value);
+      const d = new Date("1970-01-01T" + value + "Z");
       if (!isNaN(d.getTime())) {
         return d;
       }

@@ -55,7 +55,7 @@ func NewTime(hour, min, sec int) Time {
 }
 
 func newTime(hour, min, sec int) Time {
-	return Time(time.Date(0, 0, 0, hour, min, sec, 0, time.UTC))
+	return Time(time.Date(1970, 1, 1, hour, min, sec, 0, time.UTC))
 }
 
 // GormDataType returns gorm common data type. This type is used for the field's column type.
@@ -82,6 +82,12 @@ func (t *Time) Scan(src interface{}) error {
 func (t *Time) setFromString(str string) {
 	var h, m, s int
 	fmt.Sscanf(str, "%02d:%02d:%02d", &h, &m, &s)
+	*t = newTime(h, m, s)
+}
+
+func (t *Time) setFromJson(str string) {
+	var h, m, s int
+	fmt.Sscanf(str, "1970-01-01T%02d:%02d:%02d.000Z", &h, &m, &s)
 	*t = newTime(h, m, s)
 }
 
@@ -122,7 +128,7 @@ func (t *Time) UnmarshalJSON(data []byte) error {
 	if string(data) == "null" {
 		return nil
 	}
-	t.setFromString(strings.Trim(string(data), `"`))
+	t.setFromJson(strings.Trim(string(data), `"`))
 	return nil
 }
 

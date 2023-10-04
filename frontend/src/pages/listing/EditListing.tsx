@@ -348,9 +348,9 @@ const AvailabilityRuleModal: React.FC<AvailabilityRuleModalProps> = ({ listing, 
   return (
     <Modal show={show} close={closeModal}>
       {existingRule ? (
-        <ExistingRuleForm listing={listing} existingRule={existingRule} closeModal={closeModal} />
+        <ExistingRuleForm key={existingRule.id} listing={listing} existingRule={existingRule} closeModal={closeModal} />
       ) : (
-        <NewRuleForm closeModal={closeModal} listing={listing} />
+        <NewRuleForm listing={listing} closeModal={closeModal} />
       )}
     </Modal>
   );
