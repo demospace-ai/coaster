@@ -27,6 +27,16 @@ func CreateAvailability(db *gorm.DB, listingID int64, availabilityInput input.Av
 		RecurringMonths: availabilityInput.RecurringMonths,
 	}
 
+	// Use an empty list to mean "all" for recurring rules
+	if availabilityRule.Type == models.AvailabilityRuleTypeRecurring {
+		if availabilityRule.RecurringYears == nil {
+			availabilityRule.RecurringYears = []int32{}
+		}
+		if availabilityRule.RecurringMonths == nil {
+			availabilityRule.RecurringMonths = []int32{}
+		}
+	}
+
 	result := db.Create(&availabilityRule)
 	if result.Error != nil {
 		return nil, errors.Wrap(result.Error, "(availability_rules.CreateAvailability)")

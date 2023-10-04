@@ -19,7 +19,7 @@ export const WizardNavButtons: React.FC<{
   return (
     <div
       id="multistep-footer"
-      className={mergeClasses("tw-flex tw-mt-6", !prevStep ? "tw-justify-end" : "tw-justify-between", className)}
+      className={mergeClasses("tw-flex tw-mt-6 tw-mb-1", !prevStep ? "tw-justify-end" : "tw-justify-between", className)}
     >
       <button
         onClick={prevStep}

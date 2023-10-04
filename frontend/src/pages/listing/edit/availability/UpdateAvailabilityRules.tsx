@@ -312,8 +312,8 @@ const RecurringRuleUpdateForm: React.FC<{
     defaultValues: {
       name: existingRule.name,
       type: existingRule.type,
-      recurring_years: existingRule.recurring_years,
-      recurring_months: existingRule.recurring_months,
+      recurring_years: existingRule.recurring_years ?? [],
+      recurring_months: existingRule.recurring_months ?? [],
       time_slots: existingRule.time_slots.map((ts) => ({
         type: "time_slots",
         dayOfWeek: ts.day_of_week,

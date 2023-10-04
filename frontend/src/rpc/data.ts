@@ -164,7 +164,7 @@ export function useCreateAvailabilityRule(
 ): Mutation<AvailabilityRuleInput> {
   return useMutation<AvailabilityRule, AvailabilityRuleInput>(
     async (input: AvailabilityRuleInput) => {
-      return await sendRequest(CreateAvailabilityRule, { payload: input });
+      return await sendRequest(CreateAvailabilityRule, { pathParams: { listingID }, payload: input });
     },
     {
       onSuccess: (availabilityRule: AvailabilityRule) => {

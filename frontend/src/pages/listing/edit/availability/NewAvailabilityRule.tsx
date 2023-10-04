@@ -274,7 +274,7 @@ const DateRangeStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
 const RecurringStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, setValue, nextStep, prevStep }) => {
   const {
     control,
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm<RecurringOptionsSchemaType>({
     mode: "onBlur",
     resolver: zodResolver(RecurringOptionsSchema),
@@ -306,8 +306,8 @@ const RecurringStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
 
       payload.name = values.name;
       payload.type = values.type;
-      payload.recurring_years = values.recurring_years;
-      payload.recurring_months = values.recurring_months;
+      payload.recurring_years = values.recurring_years ?? [];
+      payload.recurring_months = values.recurring_months ?? [];
 
       createAvailabilityRule.mutate(payload);
     }
