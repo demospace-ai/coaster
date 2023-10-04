@@ -114,6 +114,12 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			Pattern:     "/listings/{listingID}/availability_rules/{availabilityRuleID}",
 			HandlerFunc: s.DeleteAvailability,
 		},
+		{
+			Name:        "Update availability rule",
+			Method:      router.PATCH,
+			Pattern:     "/listings/{listingID}/availability_rules/{availabilityRuleID}",
+			HandlerFunc: s.UpdateAvailability,
+		},
 	}
 }
 

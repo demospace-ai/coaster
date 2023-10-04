@@ -1,6 +1,7 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import * as React from "react";
 import { DayPicker, DayPickerProps } from "react-day-picker";
+import useWindowDimensions from "src/utils/window";
 
 export const DateRangePicker: React.FC<DayPickerProps> = ({
   className,
@@ -8,13 +9,17 @@ export const DateRangePicker: React.FC<DayPickerProps> = ({
   showOutsideDays = true,
   ...props
 }) => {
+  const { width } = useWindowDimensions();
+  const isMobile = width < 640;
+
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
       className={className}
+      numberOfMonths={props.numberOfMonths ? props.numberOfMonths : isMobile ? 1 : 2}
       classNames={{
         months: "tw-flex tw-flex-col sm:tw-flex-row tw-space-y-4 sm:tw-space-x-4 sm:tw-space-y-0",
-        month: "tw-space-y-4 tw-border-0 sm:tw-border tw-p-4 tw-rounded-lg",
+        month: "tw-space-y-4 tw-border-0 sm:tw-border sm:tw-p-4 tw-rounded-lg",
         caption: "tw-flex tw-justify-center tw-pt-1 tw-relative tw-items-center",
         caption_label: "tw-text-sm tw-font-medium",
         nav: "tw-space-x-1 tw-flex tw-items-center",

@@ -48,14 +48,27 @@ func (r Router) RunService(service ApiService) {
 
 // Exported for testing
 func (r Router) RegisterRoutes(service ApiService) {
+
+	methodMap := map[string][]Method{}
+	for _, route := range service.AuthenticatedRoutes() {
+		methodMap[route.Pattern] = append(methodMap[route.Pattern], route.Method)
+	}
+	for _, route := range service.UnauthenticatedRoutes() {
+		methodMap[route.Pattern] = append(methodMap[route.Pattern], route.Method)
+	}
+
+	for pattern, methods := range methodMap {
+		r.router.Handle(pattern, wrapCORSHandler(methods)).Methods("OPTIONS")
+	}
+
 	for _, route := range service.AuthenticatedRoutes() {
 		wrapped := r.wrapAuthenticatedRoute(route.HandlerFunc)
-		r.router.Handle(route.Pattern, wrapped).Methods(route.Method.String(), "OPTIONS")
+		r.router.Handle(route.Pattern, wrapped).Methods(route.Method.String())
 	}
 
 	for _, route := range service.UnauthenticatedRoutes() {
 		wrapped := r.wrapUnauthenticatedRoute(route.HandlerFunc)
-		r.router.Handle(route.Pattern, wrapped).Methods(route.Method.String(), "OPTIONS")
+		r.router.Handle(route.Pattern, wrapped).Methods(route.Method.String())
 	}
 
 	r.router.Use(CORSMiddleware)
@@ -148,11 +161,18 @@ func CORSMiddleware(next http.Handler) http.Handler {
 
 		w.Header().Set("Access-Control-Allow-Methods", strings.Join(methods, ","))
 
-		if req.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
-		} else {
-			next.ServeHTTP(w, req)
-		}
+		next.ServeHTTP(w, req)
+	})
+}
+
+func wrapCORSHandler(methods []Method) http.Handler {
+	methodStrings := []string{}
+	for _, method := range methods {
+		methodStrings = append(methodStrings, method.String())
+	}
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		w.Header().Set("Access-Control-Allow-Methods", strings.Join(methodStrings, ","))
+		w.WriteHeader(http.StatusOK)
 	})
 }
 

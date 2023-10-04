@@ -14,17 +14,35 @@ import {
 } from "src/rpc/types";
 import { z } from "zod";
 
-export const UpdateAvailabilityRuleSchema = z.object({
+export const UpdateFixedDateRuleSchema = z.object({
   name: z.string().min(1),
   type: AvailabilityRuleType.readonly(),
-  start_date: z.date(),
-  end_date: z.date(),
+  start_date: z.date({ required_error: "Please select a date for this rule." }),
+  time_slots: z.array(z.union([TimeSlotSchema, SingleDayTimeSlotSchema])),
+});
+export const UpdateFixedRangeRuleSchema = z.object({
+  name: z.string().min(1),
+  type: AvailabilityRuleType.readonly(),
+  date_range: z.object(
+    {
+      from: z.date(),
+      to: z.date(),
+    },
+    { required_error: "Please select a date range." },
+  ),
+  time_slots: z.array(z.union([TimeSlotSchema, SingleDayTimeSlotSchema])),
+});
+export const UpdateRecurringRuleSchema = z.object({
+  name: z.string().min(1),
+  type: AvailabilityRuleType.readonly(),
   recurring_years: z.array(z.number()),
   recurring_months: z.array(z.number()),
   time_slots: z.array(z.union([TimeSlotSchema, SingleDayTimeSlotSchema])),
 });
 
-export type UpdateAvailabilityRuleSchemaType = z.infer<typeof UpdateAvailabilityRuleSchema>;
+export type UpdateFixedRangeRuleSchema = z.infer<typeof UpdateFixedRangeRuleSchema>;
+export type UpdateFixedDateRuleSchema = z.infer<typeof UpdateFixedDateRuleSchema>;
+export type UpdateRecurringRuleSchema = z.infer<typeof UpdateRecurringRuleSchema>;
 
 export const TimeSlotInputSchema = z.object({ time_slots: z.array(TimeSlotSchema) });
 export type TimeSlotInputType = z.infer<typeof TimeSlotInputSchema>;

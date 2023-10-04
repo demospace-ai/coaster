@@ -23,11 +23,11 @@ import { InlineMapSearch } from "src/components/maps/Maps";
 import { Modal } from "src/components/modal/Modal";
 import { useShowToast } from "src/components/notifications/Notifications";
 import {
-  ExistingRuleForm,
   NewRuleForm,
   getAvailabilityRuleTypeDisplay,
   getAvailabilityTypeDisplay,
 } from "src/pages/listing/availability/AvailabilityRules";
+import { ExistingRuleForm } from "src/pages/listing/availability/UpdateAvailabilityRules";
 import {
   AvailabilityTypeSchema,
   CategorySchema,

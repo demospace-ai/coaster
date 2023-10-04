@@ -77,7 +77,7 @@ export const UpdateAvailabilityRule: IEndpoint<
   { listingID: number; availabilityRuleID: number }
 > = {
   name: "Update availability rule",
-  method: "POST",
+  method: "PATCH",
   path: "/listings/:listingID/availability_rules/:availabilityRuleID",
 };
 

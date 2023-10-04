@@ -1,8 +1,8 @@
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Dispatch, ReactElement, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { DateRange } from "react-day-picker";
-import { Controller, FieldArrayWithId, UseFormReturn, useFieldArray, useForm } from "react-hook-form";
+import { Controller, FieldArrayWithId, useFieldArray, useForm } from "react-hook-form";
 import { FormError } from "src/components/FormError";
 import { DateRangePicker } from "src/components/calendar/DatePicker";
 import { Step, StepProps, WizardNavButtons, wrapHandleSubmit } from "src/components/form/MultiStep";
@@ -18,23 +18,18 @@ import {
   SingleDayTimeSlotInputType,
   TimeSlotInputSchema,
   TimeSlotInputType,
-  UpdateAvailabilityRuleSchema,
-  UpdateAvailabilityRuleSchemaType,
   useStateMachine,
 } from "src/pages/listing/availability/state";
 import { SingleDayTimeSlotSchemaType, TimeSlotSchemaType } from "src/pages/listing/schema";
-import { createAvailabilityRule, useUpdateAvailabilityRule } from "src/rpc/data";
+import { createAvailabilityRule } from "src/rpc/data";
 import {
-  AvailabilityRule,
   AvailabilityRuleInput,
   AvailabilityRuleType,
   AvailabilityRuleTypeType,
-  AvailabilityRuleUpdates,
   AvailabilityType,
   AvailabilityTypeType,
   Listing,
 } from "src/rpc/types";
-import useWindowDimensions from "src/utils/window";
 
 export const NewRuleForm: React.FC<{ closeModal: () => void; listing: Listing }> = ({ closeModal, listing }) => {
   const { state, setState, nextStep, prevStep } = useStateMachine(closeModal, listing);
@@ -107,7 +102,7 @@ const InitialRuleStep = ({ values, setValue, nextStep, prevStep }: StepProps<New
 
   return (
     <div className="tw-flex tw-flex-col tw-flex-grow tw-overflow-hidden">
-      <div className="tw-flex tw-flex-col tw-flex-grow tw-justify-start">
+      <div className="tw-flex tw-flex-col tw-flex-grow tw-justify-start tw-overflow-y-scroll tw-pb-16">
         <div className="tw-text-lg tw-font-medium tw-mb-4">Provide a name for this rule</div>
         <Input
           {...nameProps}
@@ -116,7 +111,7 @@ const InitialRuleStep = ({ values, setValue, nextStep, prevStep }: StepProps<New
             setValue && setValue((prev) => ({ ...prev, name: e.target.value }));
           }}
           value={watch("name")}
-          className="tw-w-80"
+          className="tw-w-full sm:tw-w-80"
           placeholder="E.g. 2020 Summer Availability"
         />
         <FormError message={formState.errors.name?.message} />
@@ -154,9 +149,7 @@ const InitialRuleStep = ({ values, setValue, nextStep, prevStep }: StepProps<New
 const SingleDateStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, setValue, nextStep, prevStep }) => {
   const [selected, setSelected] = useState<Date | undefined>(values?.start_date);
   const [error, setError] = useState<string | undefined>(undefined);
-  const { width } = useWindowDimensions();
   const [isLoading, setLoading] = useState(false);
-  const isMobile = width < 640;
 
   const onSubmit = async () => {
     if (!values) {
@@ -200,7 +193,6 @@ const SingleDateStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values,
         <DateRangePicker
           mode="single"
           disabled={{ before: new Date() }}
-          numberOfMonths={isMobile ? 1 : 2}
           selected={selected}
           onSelect={setSelected}
           className="sm:tw-mb-5"
@@ -222,9 +214,7 @@ const DateRangeStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
     values?.start_date && values?.end_date ? { from: values.start_date, to: values.end_date } : undefined;
   const [selectedRange, setSelectedRange] = useState<DateRange | undefined>(initialValue);
   const [error, setError] = useState<string | undefined>(undefined);
-  const { width } = useWindowDimensions();
   const [isLoading, setLoading] = useState(false);
-  const isMobile = width < 640;
 
   const onSubmit = async () => {
     if (!values) {
@@ -265,12 +255,11 @@ const DateRangeStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
   };
 
   return (
-    <div className="tw-flex tw-flex-col tw-flex-grow sm:tw-mt-10">
-      <div className="tw-flex tw-flex-col tw-flex-grow tw-justify-start tw-items-center">
+    <div className="tw-flex tw-flex-col tw-flex-grow sm:tw-mt-10 tw-overflow-hidden">
+      <div className="tw-flex tw-flex-col tw-flex-grow tw-justify-start tw-items-center tw-overflow-y-scroll tw-pb-16">
         <DateRangePicker
           mode="range"
           disabled={{ before: new Date() }}
-          numberOfMonths={isMobile ? 1 : 2}
           selected={selectedRange}
           onSelect={setSelectedRange}
           className="sm:tw-mb-5"
@@ -582,7 +571,7 @@ const SingleDayTimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({
 
   return (
     <div className="tw-flex tw-flex-col tw-flex-grow tw-overflow-hidden">
-      <div className="tw-divide-y tw-flex-grow tw-overflow-y-scroll tw-pr-4 tw-pb-10">
+      <div className="tw-flex-grow tw-overflow-y-scroll tw-pr-4 tw-pb-10">
         <div className="tw-flex-col sm:tw-flex-row tw-flex tw-items-start tw-py-4">
           <SingleDayTimeSlotFields fields={fields} update={update} append={append} remove={remove} />
         </div>
@@ -609,7 +598,7 @@ type TimeSlotFieldsProps<T extends TimeSlotSchemaType | SingleDayTimeSlotSchemaT
   remove: (index: number) => void;
 };
 
-const WeekDayTimeSlotFields: React.FC<TimeSlotFieldsProps<TimeSlotSchemaType>> = ({
+export const WeekDayTimeSlotFields: React.FC<TimeSlotFieldsProps<TimeSlotSchemaType>> = ({
   fields,
   append,
   update,
@@ -663,7 +652,7 @@ const WeekDayTimeSlotFields: React.FC<TimeSlotFieldsProps<TimeSlotSchemaType>> =
   );
 };
 
-const SingleDayTimeSlotFields: React.FC<TimeSlotFieldsProps<SingleDayTimeSlotSchemaType>> = ({
+export const SingleDayTimeSlotFields: React.FC<TimeSlotFieldsProps<SingleDayTimeSlotSchemaType>> = ({
   fields,
   append,
   update,
@@ -695,115 +684,6 @@ const SingleDayTimeSlotFields: React.FC<TimeSlotFieldsProps<SingleDayTimeSlotSch
       >
         Add start time
       </div>
-    </div>
-  );
-};
-
-export const ExistingRuleForm: React.FC<{
-  listing: Listing;
-  existingRule: AvailabilityRule;
-  closeModal: () => void;
-}> = ({ listing, existingRule, closeModal }) => {
-  const { mutate, isLoading } = useUpdateAvailabilityRule(listing.id, existingRule.id);
-  const form = useForm<UpdateAvailabilityRuleSchemaType>({
-    mode: "onBlur",
-    resolver: zodResolver(UpdateAvailabilityRuleSchema),
-    defaultValues: {
-      name: existingRule?.name,
-      type: existingRule?.type,
-      start_date: existingRule?.start_date,
-      end_date: existingRule?.end_date,
-      recurring_years: existingRule?.recurring_years,
-      recurring_months: existingRule?.recurring_months,
-      time_slots: existingRule?.time_slots.map((ts) => ({
-        dayOfWeek: ts.day_of_week,
-        startTime: ts.start_time,
-        capacity: ts.capacity,
-      })),
-    },
-  });
-
-  const updateAvailability = async (values: UpdateAvailabilityRuleSchemaType) => {
-    if (!form.formState.isDirty) {
-      return;
-    }
-
-    const payload = {} as AvailabilityRuleUpdates;
-    form.formState.dirtyFields.name && (payload.name = values.name);
-    // TODO
-
-    try {
-      await mutate(payload);
-      // TODO: show toast?
-      closeModal();
-    } catch (e) {
-      //TODO
-    }
-  };
-
-  var existingRuleForm: ReactElement;
-  switch (existingRule.type) {
-    case AvailabilityRuleType.Enum.fixed_date:
-      existingRuleForm = <FixedDateRuleUpdateForm availabilityType={listing.availability_type} form={form} />;
-      break;
-    case AvailabilityRuleType.Enum.fixed_range:
-      existingRuleForm = <FixedRangeRuleUpdateForm availabilityType={listing.availability_type} form={form} />;
-      break;
-    case AvailabilityRuleType.Enum.recurring:
-      existingRuleForm = <></>;
-      break;
-  }
-
-  return (
-    <div className="tw-flex tw-flex-col tw-w-[320px] sm:tw-w-[480px] md:tw-w-[640px] lg:tw-w-[900px] tw-h-[80vh] sm:tw-h-[70vh] 4xl:tw-h-[65vh] tw-px-8 sm:tw-px-12 tw-pb-10 tw-border-box">
-      <div className="tw-text-left tw-w-full tw-text-2xl tw-font-semibold tw-mb-2">Update Availability Rule</div>
-      <div className="tw-flex tw-flex-col tw-w-full tw-flex-grow tw-overflow-hidden">{existingRuleForm}</div>
-    </div>
-  );
-};
-
-const FixedDateRuleUpdateForm: React.FC<{
-  availabilityType: AvailabilityTypeType;
-  form: UseFormReturn<UpdateAvailabilityRuleSchemaType>;
-}> = ({ availabilityType, form }) => {
-  const { fields, update, append, remove } = useFieldArray({
-    control: form.control,
-    name: "time_slots",
-  });
-
-  return (
-    <div className="tw-divide-y tw-flex-grow tw-overflow-y-scroll tw-pr-4 tw-pb-10">
-      {availabilityType === AvailabilityType.Enum.datetime && (
-        <SingleDayTimeSlotFields
-          fields={fields as FieldArrayWithId<{ time_slots: SingleDayTimeSlotSchemaType[] }, "time_slots", "id">[]}
-          update={update}
-          append={append}
-          remove={remove}
-        />
-      )}
-    </div>
-  );
-};
-
-const FixedRangeRuleUpdateForm: React.FC<{
-  availabilityType: AvailabilityTypeType;
-  form: UseFormReturn<UpdateAvailabilityRuleSchemaType>;
-}> = ({ availabilityType, form }) => {
-  const { fields, update, append, remove } = useFieldArray({
-    control: form.control,
-    name: "time_slots",
-  });
-
-  return (
-    <div className="tw-divide-y tw-flex-grow tw-overflow-y-scroll tw-pr-4 tw-pb-10">
-      {availabilityType === AvailabilityType.Enum.datetime && (
-        <WeekDayTimeSlotFields
-          fields={fields as FieldArrayWithId<{ time_slots: TimeSlotSchemaType[] }, "time_slots", "id">[]}
-          update={update}
-          append={append}
-          remove={remove}
-        />
-      )}
     </div>
   );
 };
