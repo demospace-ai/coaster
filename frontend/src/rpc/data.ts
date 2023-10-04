@@ -27,7 +27,7 @@ import {
   UserUpdates,
 } from "src/rpc/types";
 import { HttpError, forceErrorMessage } from "src/utils/errors";
-import { Mutation, useMutation } from "src/utils/queryHelpers";
+import { Mutation, MutationOpts, useMutation } from "src/utils/queryHelpers";
 import useSWR, { Fetcher, SWRConfiguration, mutate } from "swr";
 
 export function useListing(listingID: number | undefined) {
@@ -96,8 +96,8 @@ export function useAvailabilityRules(listingID: number | undefined) {
 
 export function useUpdateListing(listingID: number): Mutation<ListingInput> {
   return useMutation<Listing, ListingInput>(
-    (updates: ListingInput) => {
-      return sendRequest(UpdateListing, { pathParams: { listingID }, payload: updates });
+    async (updates: ListingInput) => {
+      return await sendRequest(UpdateListing, { pathParams: { listingID }, payload: updates });
     },
     {
       onSuccess: (listing: Listing) => {
@@ -132,10 +132,14 @@ export async function createListing(input: ListingInput) {
 export function useUpdateAvailabilityRule(
   listingID: number,
   availabilityRuleID: number,
+  opts?: MutationOpts<AvailabilityRuleUpdates>,
 ): Mutation<AvailabilityRuleUpdates> {
   return useMutation<AvailabilityRule, AvailabilityRuleUpdates>(
-    (updates: AvailabilityRuleUpdates) => {
-      return sendRequest(UpdateAvailabilityRule, { pathParams: { listingID, availabilityRuleID }, payload: updates });
+    async (updates: AvailabilityRuleUpdates) => {
+      return await sendRequest(UpdateAvailabilityRule, {
+        pathParams: { listingID, availabilityRuleID },
+        payload: updates,
+      });
     },
     {
       onSuccess: (availabilityRule: AvailabilityRule) => {
@@ -147,37 +151,27 @@ export function useUpdateAvailabilityRule(
             return existingRule;
           }),
         );
+        opts?.onSuccess && opts.onSuccess(availabilityRule);
       },
+      onError: opts?.onError,
     },
   );
 }
 
-export async function createAvailabilityRule(
+export function useCreateAvailabilityRule(
   listingID: number,
-  input: AvailabilityRuleInput,
-  setLoading: (loading: boolean) => void,
-) {
-  try {
-    setLoading(true);
-    const availabilityRule = await sendRequest(CreateAvailabilityRule, { pathParams: { listingID }, payload: input });
-    mutate({ GetAvailabilityRules, listingID }, (availabilityRules) => [...availabilityRules, availabilityRule]);
-    setLoading(false);
-    return { success: true };
-  } catch (e) {
-    setLoading(false);
-    return { success: false, error: forceErrorMessage(e) };
-  }
-}
-
-export function useCreateAvailabilityRule(listingID: number): Mutation<AvailabilityRuleInput> {
+  opts?: MutationOpts<AvailabilityRuleInput>,
+): Mutation<AvailabilityRuleInput> {
   return useMutation<AvailabilityRule, AvailabilityRuleInput>(
-    (input: AvailabilityRuleInput) => {
-      return sendRequest(CreateAvailabilityRule, { payload: input });
+    async (input: AvailabilityRuleInput) => {
+      return await sendRequest(CreateAvailabilityRule, { payload: input });
     },
     {
       onSuccess: (availabilityRule: AvailabilityRule) => {
         mutate({ GetAvailabilityRules, listingID }, (availabilityRules) => [...availabilityRules, availabilityRule]);
+        opts?.onSuccess && opts.onSuccess(availabilityRule);
       },
+      onError: opts?.onError,
     },
   );
 }
@@ -185,8 +179,8 @@ export function useCreateAvailabilityRule(listingID: number): Mutation<Availabil
 export function useUpdateUser(onSuccess?: () => void): Mutation<UserUpdates> {
   const dispatch = useDispatch();
   return useMutation<User, UserUpdates>(
-    (updates: UserUpdates) => {
-      return sendRequest(UpdateUser, { payload: updates });
+    async (updates: UserUpdates) => {
+      return await sendRequest(UpdateUser, { payload: updates });
     },
     {
       onSuccess: (user: User) => {
@@ -201,10 +195,10 @@ export function useUpdateProfilePicture(): Mutation<File> {
   const dispatch = useDispatch();
 
   return useMutation<User, File>(
-    (profilePicture: File) => {
+    async (profilePicture: File) => {
       const formData = new FormData();
       formData.append("profile_picture", profilePicture);
-      return sendRequest(UpdateProfilePicture, { formData });
+      return await sendRequest(UpdateProfilePicture, { formData });
     },
     {
       onSuccess: (user) => {
@@ -221,8 +215,8 @@ export function useResetPassword(): Mutation<ResetPasswordRequest> {
   const dispatch = useDispatch();
   const onLoginSuccess = useOnLoginSuccess();
   return useMutation<User, ResetPasswordRequest>(
-    (request: ResetPasswordRequest) => {
-      return sendRequest(ResetPassword, { payload: request });
+    async (request: ResetPasswordRequest) => {
+      return await sendRequest(ResetPassword, { payload: request });
     },
     {
       onSuccess: (user: User) => {

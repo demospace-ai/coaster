@@ -97,11 +97,7 @@ const NewListingInner: React.FC<{ initialStepNumber: number }> = ({ initialStepN
 
   const stepsHydrated = steps.map((step, idx) => ({
     element: (
-      <step.element
-        nextStep={() => setCurrentStepNumber(idx + 1)}
-        prevStep={() => setCurrentStepNumber(idx - 1)}
-        values={listing}
-      />
+      <step.element nextStep={() => setCurrentStepNumber(idx + 1)} prevStep={() => setCurrentStepNumber(idx - 1)} />
     ),
     title: step.title,
     subtitle: step.subtitle,
@@ -126,7 +122,7 @@ const NewListingInner: React.FC<{ initialStepNumber: number }> = ({ initialStepN
   );
 };
 
-const LocationStep: React.FC<StepProps<{}>> = (props) => {
+const LocationStep: React.FC<StepProps> = (props) => {
   const { listing } = useDraftListing();
   if (!listing) {
     return <Loading />;
@@ -139,7 +135,7 @@ const LocationStep: React.FC<StepProps<{}>> = (props) => {
   );
 };
 
-const PriceStep: React.FC<StepProps<{}>> = (props) => {
+const PriceStep: React.FC<StepProps> = (props) => {
   const { listing } = useDraftListing();
   if (!listing) {
     return <Loading />;
@@ -148,7 +144,7 @@ const PriceStep: React.FC<StepProps<{}>> = (props) => {
   return <PriceStepInner {...props} listing={listing} />;
 };
 
-const DetailsStep: React.FC<StepProps<{}>> = (props) => {
+const DetailsStep: React.FC<StepProps> = (props) => {
   const { listing } = useDraftListing();
   if (!listing) {
     return <Loading />;
@@ -157,7 +153,7 @@ const DetailsStep: React.FC<StepProps<{}>> = (props) => {
   return <DetailsStepInner {...props} listing={listing} />;
 };
 
-const NameStep: React.FC<StepProps<{}>> = (props) => {
+const NameStep: React.FC<StepProps> = (props) => {
   const { listing } = useDraftListing();
   if (!listing) {
     return <Loading />;
@@ -179,7 +175,7 @@ const NameStep: React.FC<StepProps<{}>> = (props) => {
   );
 };
 
-const DescriptionStep: React.FC<StepProps<{}>> = (props) => {
+const DescriptionStep: React.FC<StepProps> = (props) => {
   const { listing } = useDraftListing();
   if (!listing) {
     return <Loading />;
@@ -201,7 +197,7 @@ const DescriptionStep: React.FC<StepProps<{}>> = (props) => {
   );
 };
 
-const CategoryStep: React.FC<StepProps<{}>> = (props) => {
+const CategoryStep: React.FC<StepProps> = (props) => {
   const { listing, loading } = useDraftListing();
   if (loading) {
     return <Loading />;
@@ -228,7 +224,7 @@ const CategoryStep: React.FC<StepProps<{}>> = (props) => {
   );
 };
 
-const ImageStep: React.FC<StepProps<{}>> = (props) => {
+const ImageStep: React.FC<StepProps> = (props) => {
   const { listing } = useDraftListing();
   if (!listing) {
     return <Loading />;
@@ -241,7 +237,7 @@ const ImageStep: React.FC<StepProps<{}>> = (props) => {
   );
 };
 
-const ReviewStep: React.FC<StepProps<Listing>> = ({ nextStep, prevStep }) => {
+const ReviewStep: React.FC<StepProps> = ({ prevStep }) => {
   const navigate = useNavigate();
   const { listing } = useDraftListing();
   if (!listing) {
@@ -291,7 +287,7 @@ type LocationParams = {
   listing: Listing;
 };
 
-const LocationStepInner: React.FC<StepProps<{}> & LocationParams> = ({ nextStep, prevStep, listing }) => {
+const LocationStepInner: React.FC<StepProps & LocationParams> = ({ nextStep, prevStep, listing }) => {
   const { mutate, isLoading } = useUpdateListing(listing.id);
   const onSelect = useCallback((location: string) => mutate({ location }), []);
   const coordinates = listing.coordinates ? toGoogleCoordinates(listing.coordinates) : null;
@@ -324,7 +320,7 @@ type PriceParams = {
   listing: Listing;
 };
 
-const PriceStepInner: React.FC<StepProps<{}> & PriceParams> = ({ nextStep, prevStep, listing }) => {
+const PriceStepInner: React.FC<StepProps & PriceParams> = ({ nextStep, prevStep, listing }) => {
   const formSchema = z.object({
     value: PriceSchema,
   });
@@ -377,7 +373,7 @@ type ImageProps = {
   listing: Listing;
 };
 
-const ImageStepInner: React.FC<StepProps<{}> & ImageProps> = ({ nextStep, prevStep, listing }) => {
+const ImageStepInner: React.FC<StepProps & ImageProps> = ({ nextStep, prevStep, listing }) => {
   const ref = useRef<HTMLInputElement | null>(null);
   const listingID = listing.id;
   const [images, setImages] = useState<Image[]>(listing.images);
@@ -508,7 +504,7 @@ type DetailsParams = {
   listing: Listing;
 };
 
-const DetailsStepInner: React.FC<StepProps<{}> & DetailsParams> = ({ nextStep, prevStep, listing }) => {
+const DetailsStepInner: React.FC<StepProps & DetailsParams> = ({ nextStep, prevStep, listing }) => {
   const formSchema = z.object({
     duration: DurationSchema,
     maxGuests: MaxGuestsSchema,

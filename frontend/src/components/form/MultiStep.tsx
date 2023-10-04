@@ -54,12 +54,11 @@ export type Step = {
 
 export type SubmitResult = { success: boolean; error?: string }; // TODO: use discriminated union
 
-export type StepProps<T extends FieldValues> = {
-  values: T | undefined;
+export type StepProps<T extends FieldValues | undefined = undefined> = {
+  setValue?: Dispatch<SetStateAction<T>>;
   nextStep: (() => void) | undefined;
   prevStep: (() => void) | undefined;
-  setValue?: Dispatch<SetStateAction<T>>;
-};
+} & (T extends undefined ? { values?: never } : { values: T });
 
 type InputProps = {
   schema: ZodString;
@@ -69,7 +68,7 @@ type InputProps = {
   placeholder?: string;
 };
 
-export const InputStep = <T extends FieldValues>({
+export const InputStep = <T extends FieldValues | undefined>({
   schema,
   existingData,
   onSubmit,
@@ -117,7 +116,7 @@ export const InputStep = <T extends FieldValues>({
   );
 };
 
-export const TextAreaStep = <T extends FieldValues>({
+export const TextAreaStep = <T extends FieldValues | undefined>({
   schema,
   existingData,
   onSubmit,
@@ -172,7 +171,7 @@ type SelectorProps = {
   placeholder?: string;
 };
 
-export const SelectorStep = <T extends FieldValues>({
+export const SelectorStep = <T extends FieldValues | undefined>({
   schema,
   existingData,
   onChange,

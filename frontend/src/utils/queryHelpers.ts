@@ -13,9 +13,11 @@ export type Mutation<Args = any> = {
   reset: () => void;
 };
 
+export type MutationOpts<Data = any> = { onSuccess?: (data: Data) => void; onError?: (err: Error) => void };
+
 export function useMutation<Data = any | undefined, Args = any>(
   mutationFn: AsyncFunction<Data, Args>,
-  opts: { onSuccess?: (data: Data) => void; onError?: (err: Error) => void } = {
+  opts: MutationOpts<Data> = {
     onSuccess: () => {},
     onError: () => {},
   },

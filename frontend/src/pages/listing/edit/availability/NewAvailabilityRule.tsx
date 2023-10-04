@@ -4,7 +4,7 @@ import { DateRange } from "react-day-picker";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { FormError } from "src/components/FormError";
 import { DateRangePicker } from "src/components/calendar/DatePicker";
-import { Step, StepProps, WizardNavButtons, wrapHandleSubmit } from "src/components/form/MultiStep";
+import { Step, StepProps, WizardNavButtons } from "src/components/form/MultiStep";
 import { DropdownInput, Input, RadioInput } from "src/components/input/Input";
 import {
   SingleDayTimeSlotFields,
@@ -25,7 +25,7 @@ import {
   useStateMachine,
 } from "src/pages/listing/edit/availability/state";
 import { SingleDayTimeSlotSchemaType, TimeSlotSchemaType } from "src/pages/listing/schema";
-import { createAvailabilityRule } from "src/rpc/data";
+import { useCreateAvailabilityRule } from "src/rpc/data";
 import {
   AvailabilityRuleInput,
   AvailabilityRuleType,
@@ -150,9 +150,9 @@ const InitialRuleStep = ({ values, setValue, nextStep, prevStep }: StepProps<New
 };
 
 const SingleDateStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, setValue, nextStep, prevStep }) => {
-  const [selected, setSelected] = useState<Date | undefined>(values?.start_date);
+  const [selected, setSelected] = useState<Date | undefined>(values.start_date);
   const [error, setError] = useState<string | undefined>(undefined);
-  const [isLoading, setLoading] = useState(false);
+  const createAvailabilityRule = useCreateAvailabilityRule(values.listingID, { onSuccess: nextStep });
 
   const onSubmit = async () => {
     if (!values) {
@@ -181,12 +181,7 @@ const SingleDateStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values,
       payload.type = values.type;
       payload.start_date = selected;
 
-      const result = await createAvailabilityRule(values.listingID, payload, setLoading);
-      if (result.success) {
-        return nextStep && nextStep();
-      } else {
-        return setError(result.error);
-      }
+      createAvailabilityRule.mutate(payload);
     }
   };
 
@@ -202,10 +197,11 @@ const SingleDateStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values,
         />
       </div>
       <FormError message={error} />
+      <FormError message={createAvailabilityRule.error?.message} />
       <WizardNavButtons
         nextStep={onSubmit}
         prevStep={prevStep}
-        isLoading={isLoading}
+        isLoading={createAvailabilityRule.isLoading}
         isLastStep={values?.availabilityType === AvailabilityType.Enum.date}
       />
     </div>
@@ -217,7 +213,7 @@ const DateRangeStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
     values?.start_date && values?.end_date ? { from: values.start_date, to: values.end_date } : undefined;
   const [selectedRange, setSelectedRange] = useState<DateRange | undefined>(initialValue);
   const [error, setError] = useState<string | undefined>(undefined);
-  const [isLoading, setLoading] = useState(false);
+  const createAvailabilityRule = useCreateAvailabilityRule(values.listingID, { onSuccess: nextStep });
 
   const onSubmit = async () => {
     if (!values) {
@@ -248,12 +244,7 @@ const DateRangeStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
       payload.start_date = selectedRange.from;
       payload.end_date = selectedRange.to;
 
-      const result = await createAvailabilityRule(values.listingID, payload, setLoading);
-      if (result.success) {
-        return nextStep && nextStep();
-      } else {
-        return setError(result.error);
-      }
+      createAvailabilityRule.mutate(payload);
     }
   };
 
@@ -269,10 +260,11 @@ const DateRangeStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
         />
       </div>
       <FormError message={error} />
+      <FormError message={createAvailabilityRule.error?.message} />
       <WizardNavButtons
         nextStep={onSubmit}
         prevStep={prevStep}
-        isLoading={isLoading}
+        isLoading={createAvailabilityRule.isLoading}
         isLastStep={values?.availabilityType === AvailabilityType.Enum.date}
       />
     </div>
@@ -291,8 +283,8 @@ const RecurringStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
       recurring_months: values?.recurring_months ?? [],
     },
   });
-  const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
+  const createAvailabilityRule = useCreateAvailabilityRule(values.listingID, { onSuccess: nextStep });
 
   const onSubmit = async () => {
     if (!values) {
@@ -317,12 +309,7 @@ const RecurringStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
       payload.recurring_years = values.recurring_years;
       payload.recurring_months = values.recurring_months;
 
-      const result = await createAvailabilityRule(values.listingID, payload, setLoading);
-      if (result.success) {
-        return nextStep && nextStep();
-      } else {
-        return setError(result.error);
-      }
+      createAvailabilityRule.mutate(payload);
     }
   };
 
@@ -391,10 +378,11 @@ const RecurringStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
       </div>
       <FormError message={errors.recurring_months?.message} />
       <FormError message={error} />
+      <FormError message={createAvailabilityRule.error?.message} />
       <WizardNavButtons
         nextStep={onSubmit}
         prevStep={prevStep}
-        isLoading={isLoading}
+        isLoading={createAvailabilityRule.isLoading}
         isLastStep={values?.availabilityType === AvailabilityType.Enum.date}
       />
     </div>
@@ -402,8 +390,8 @@ const RecurringStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
 };
 
 const TimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, setValue, nextStep, prevStep }) => {
-  const [isLoading, setLoading] = useState(false);
-  const { handleSubmit, control, formState, setError } = useForm<TimeSlotInputType>({
+  const createAvailabilityRule = useCreateAvailabilityRule(values.listingID, { onSuccess: nextStep });
+  const { handleSubmit, control } = useForm<TimeSlotInputType>({
     mode: "onBlur",
     resolver: zodResolver(TimeSlotInputSchema),
     defaultValues: {
@@ -473,7 +461,7 @@ const TimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, s
       capacity: ts.capacity,
     }));
 
-    return await createAvailabilityRule(values.listingID, payload, setLoading);
+    createAvailabilityRule.mutate(payload);
   };
 
   return (
@@ -481,15 +469,11 @@ const TimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, s
       <div className="tw-divide-y tw-flex-grow tw-overflow-y-scroll tw-pr-4 tw-pb-10">
         <WeekDayTimeSlotFields fields={fields} update={update} append={append} remove={remove} />
       </div>
+      <FormError message={createAvailabilityRule.error?.message} />
       <WizardNavButtons
         isLastStep
-        isLoading={isLoading}
-        nextStep={wrapHandleSubmit(
-          handleSubmit,
-          onSubmit,
-          (error: string) => setError("time_slots", { message: error }),
-          nextStep,
-        )}
+        isLoading={createAvailabilityRule.isLoading}
+        nextStep={handleSubmit(onSubmit)}
         prevStep={prevStep}
       />
     </div>
@@ -502,8 +486,8 @@ const SingleDayTimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({
   nextStep,
   prevStep,
 }) => {
-  const [isLoading, setLoading] = useState(false);
-  const { handleSubmit, control, formState, setError } = useForm<SingleDayTimeSlotInputType>({
+  const createAvailabilityRule = useCreateAvailabilityRule(values.listingID, { onSuccess: nextStep });
+  const { handleSubmit, control } = useForm<SingleDayTimeSlotInputType>({
     mode: "onBlur",
     resolver: zodResolver(SingleDayTimeSlotInputSchema),
     defaultValues: {
@@ -569,7 +553,7 @@ const SingleDayTimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({
       capacity: ts.capacity,
     }));
 
-    return await createAvailabilityRule(values.listingID, payload, setLoading);
+    createAvailabilityRule.mutate(payload);
   };
 
   return (
@@ -579,15 +563,11 @@ const SingleDayTimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({
           <SingleDayTimeSlotFields fields={fields} update={update} append={append} remove={remove} />
         </div>
       </div>
+      <FormError message={createAvailabilityRule.error?.message} />
       <WizardNavButtons
         isLastStep
-        isLoading={isLoading}
-        nextStep={wrapHandleSubmit(
-          handleSubmit,
-          onSubmit,
-          (error: string) => setError("time_slots", { message: error }),
-          nextStep,
-        )}
+        isLoading={createAvailabilityRule.isLoading}
+        nextStep={handleSubmit(onSubmit)}
         prevStep={prevStep}
       />
     </div>

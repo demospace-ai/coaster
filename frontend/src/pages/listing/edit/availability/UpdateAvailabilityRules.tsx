@@ -4,8 +4,8 @@ import { Controller, FieldArrayWithId, useFieldArray, useForm } from "react-hook
 import { FormError } from "src/components/FormError";
 import { Button } from "src/components/button/Button";
 import { DateRangePicker } from "src/components/calendar/DatePicker";
-import { SubmitResult } from "src/components/form/MultiStep";
 import { DropdownInput, Input } from "src/components/input/Input";
+import { Loading } from "src/components/loading/Loading";
 import { SingleDayTimeSlotFields, WeekDayTimeSlotFields } from "src/pages/listing/edit/availability/AvailabilityRules";
 import {
   UpdateFixedDateRuleSchema,
@@ -13,8 +13,7 @@ import {
   UpdateRecurringRuleSchema,
 } from "src/pages/listing/edit/availability/state";
 import { SingleDayTimeSlotSchemaType, TimeSlotSchemaType } from "src/pages/listing/schema";
-import { sendRequest } from "src/rpc/ajax";
-import { UpdateAvailabilityRule } from "src/rpc/api";
+import { useUpdateAvailabilityRule } from "src/rpc/data";
 import {
   AvailabilityRule,
   AvailabilityRuleType,
@@ -23,26 +22,16 @@ import {
   AvailabilityTypeType,
   Listing,
 } from "src/rpc/types";
-import { forceErrorMessage } from "src/utils/errors";
+import { Mutation } from "src/utils/queryHelpers";
 
 export const ExistingRuleForm: React.FC<{
   listing: Listing;
   existingRule: AvailabilityRule;
   closeModal: () => void;
 }> = ({ listing, existingRule, closeModal }) => {
-  const updateAvailability = async (payload: AvailabilityRuleUpdates) => {
-    try {
-      await sendRequest(UpdateAvailabilityRule, {
-        pathParams: { listingID: listing.id, availabilityRuleID: existingRule.id },
-        payload,
-      });
-      // TODO: show toast?
-      closeModal();
-      return { success: true };
-    } catch (e) {
-      return { success: false, error: forceErrorMessage(e) };
-    }
-  };
+  const updateAvailability = useUpdateAvailabilityRule(listing.id, existingRule.id, {
+    onSuccess: closeModal,
+  });
 
   var existingRuleForm: ReactElement;
   switch (existingRule.type) {
@@ -86,15 +75,13 @@ export const ExistingRuleForm: React.FC<{
 const FixedDateRuleUpdateForm: React.FC<{
   availabilityType: AvailabilityTypeType;
   existingRule: AvailabilityRule;
-  updateAvailability: (payload: AvailabilityRuleUpdates) => Promise<SubmitResult>;
+  updateAvailability: Mutation<AvailabilityRuleUpdates>;
 }> = ({ availabilityType, existingRule, updateAvailability }) => {
   const {
     control,
     watch,
     handleSubmit,
     register,
-    setValue,
-    setError,
     formState: { isDirty, dirtyFields, errors },
   } = useForm<UpdateFixedDateRuleSchema>({
     mode: "onBlur",
@@ -137,10 +124,7 @@ const FixedDateRuleUpdateForm: React.FC<{
       }));
     }
 
-    const result = await updateAvailability(payload);
-    if (!result.success) {
-      return setError("root", { message: result.error });
-    }
+    updateAvailability.mutate(payload);
   };
 
   return (
@@ -187,9 +171,10 @@ const FixedDateRuleUpdateForm: React.FC<{
           </>
         )}
         <FormError message={errors.root?.message} className="tw-mt-1" />
+        <FormError message={updateAvailability.error?.message} className="tw-mt-1" />
       </div>
       <Button className="tw-mt-3 tw-w-48 tw-py-2" type="submit">
-        Submit
+        {updateAvailability.isLoading ? <Loading /> : "Submit"}
       </Button>
     </form>
   );
@@ -198,14 +183,13 @@ const FixedDateRuleUpdateForm: React.FC<{
 const FixedRangeRuleUpdateForm: React.FC<{
   availabilityType: AvailabilityTypeType;
   existingRule: AvailabilityRule;
-  updateAvailability: (payload: AvailabilityRuleUpdates) => Promise<SubmitResult>;
+  updateAvailability: Mutation<AvailabilityRuleUpdates>;
 }> = ({ availabilityType, existingRule, updateAvailability }) => {
   const {
     control,
     watch,
     handleSubmit,
     register,
-    setError,
     formState: { isDirty, dirtyFields, errors },
   } = useForm<UpdateFixedRangeRuleSchema>({
     mode: "onBlur",
@@ -253,10 +237,7 @@ const FixedRangeRuleUpdateForm: React.FC<{
       }));
     }
 
-    const result = await updateAvailability(payload);
-    if (!result.success) {
-      return setError("root", { message: result.error });
-    }
+    updateAvailability.mutate(payload);
   };
 
   return (
@@ -305,9 +286,10 @@ const FixedRangeRuleUpdateForm: React.FC<{
           </>
         )}
         <FormError message={errors.root?.message} className="tw-mt-1" />
+        <FormError message={updateAvailability.error?.message} className="tw-mt-1" />
       </div>
       <Button className="tw-mt-3 tw-w-48 tw-py-2" type="submit">
-        Submit
+        {updateAvailability.isLoading ? <Loading /> : "Submit"}
       </Button>
     </form>
   );
@@ -316,14 +298,13 @@ const FixedRangeRuleUpdateForm: React.FC<{
 const RecurringRuleUpdateForm: React.FC<{
   availabilityType: AvailabilityTypeType;
   existingRule: AvailabilityRule;
-  updateAvailability: (payload: AvailabilityRuleUpdates) => Promise<SubmitResult>;
+  updateAvailability: Mutation<AvailabilityRuleUpdates>;
 }> = ({ availabilityType, existingRule, updateAvailability }) => {
   const {
     control,
     watch,
     handleSubmit,
     register,
-    setError,
     formState: { isDirty, dirtyFields, errors },
   } = useForm<UpdateRecurringRuleSchema>({
     mode: "onBlur",
@@ -372,10 +353,7 @@ const RecurringRuleUpdateForm: React.FC<{
       }));
     }
 
-    const result = await updateAvailability(payload);
-    if (!result.success) {
-      return setError("root", { message: result.error });
-    }
+    updateAvailability.mutate(payload);
   };
 
   return (
@@ -463,9 +441,10 @@ const RecurringRuleUpdateForm: React.FC<{
           </>
         )}
         <FormError message={errors.root?.message} className="tw-mt-1" />
+        <FormError message={updateAvailability.error?.message} className="tw-mt-1" />
       </div>
       <Button className="tw-mt-3 tw-w-48 tw-py-2" type="submit">
-        Submit
+        {updateAvailability.isLoading ? <Loading /> : "Submit"}
       </Button>
     </form>
   );
