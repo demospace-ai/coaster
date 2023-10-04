@@ -1,15 +1,19 @@
 import { ErrorBoundary } from "@highlight-run/react";
 import React, { useEffect, useState } from "react";
-import { Outlet, Route, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
+import { createBrowserRouter, createRoutesFromElements, Outlet, Route } from "react-router-dom";
 import { useStart } from "src/app/actions";
 import { RequireAuth } from "src/components/auth/RequireAuth";
 import { Footer } from "src/components/footer/Footer";
 import { SupplierHeader } from "src/components/header/Header";
 import { LogoLoading } from "src/components/loading/LogoLoading";
-import { Toast, getToastContentFromDetails } from "src/components/notifications/Notifications";
+import { getToastContentFromDetails, Toast } from "src/components/notifications/Notifications";
 import { About } from "src/pages/about/About";
 import { Hosting } from "src/pages/hosting/Hosting";
-import { EditListing } from "src/pages/listing/EditListing";
+import { EditListingLayout } from "src/pages/listing/edit";
+import { Availability } from "src/pages/listing/edit/availability/AvailabilityRules";
+import { ListingDetails } from "src/pages/listing/edit/Details";
+import { Images } from "src/pages/listing/edit/Images";
+import { Includes } from "src/pages/listing/edit/Includes";
 import { Listings } from "src/pages/listing/Listings";
 import { NewListing } from "src/pages/listing/NewListing";
 import { CreatePassword } from "src/pages/login/CreatePassword";
@@ -100,7 +104,12 @@ export const supplierRouter = createBrowserRouter(
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/about" element={<About />} />
       <Route path="/terms" element={<Terms />} />
-      <Route path="/listings/:listingID/edit" element={<RequireAuth element={<EditListing />} />} />
+      <Route path="/listings/:listingID/edit" element={<RequireAuth element={<EditListingLayout />} />}>
+        <Route index element={<ListingDetails />} />
+        <Route path="images" element={<Images />} />
+        <Route path="includes" element={<Includes />} />
+        <Route path="availability" element={<Availability />} />
+      </Route>
       <Route path="/listings/new" element={<RequireAuth element={<NewListing />} />} />
       <Route path="/listings" element={<RequireAuth element={<Listings />} />} />
       <Route path="/profile" element={<RequireAuth element={<Profile />} />} />

@@ -6,12 +6,12 @@ import { Button } from "src/components/button/Button";
 import { DateRangePicker } from "src/components/calendar/DatePicker";
 import { SubmitResult } from "src/components/form/MultiStep";
 import { DropdownInput, Input } from "src/components/input/Input";
-import { SingleDayTimeSlotFields, WeekDayTimeSlotFields } from "src/pages/listing/availability/AvailabilityRules";
+import { SingleDayTimeSlotFields, WeekDayTimeSlotFields } from "src/pages/listing/edit/availability/AvailabilityRules";
 import {
   UpdateFixedDateRuleSchema,
   UpdateFixedRangeRuleSchema,
   UpdateRecurringRuleSchema,
-} from "src/pages/listing/availability/state";
+} from "src/pages/listing/edit/availability/state";
 import { SingleDayTimeSlotSchemaType, TimeSlotSchemaType } from "src/pages/listing/schema";
 import { sendRequest } from "src/rpc/ajax";
 import { UpdateAvailabilityRule } from "src/rpc/api";

@@ -1,12 +1,16 @@
-import { XMarkIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Dispatch, SetStateAction, useState } from "react";
 import { DateRange } from "react-day-picker";
-import { Controller, FieldArrayWithId, useFieldArray, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { FormError } from "src/components/FormError";
 import { DateRangePicker } from "src/components/calendar/DatePicker";
 import { Step, StepProps, WizardNavButtons, wrapHandleSubmit } from "src/components/form/MultiStep";
-import { DropdownInput, Input, RadioInput, TimeInput } from "src/components/input/Input";
+import { DropdownInput, Input, RadioInput } from "src/components/input/Input";
+import {
+  SingleDayTimeSlotFields,
+  WeekDayTimeSlotFields,
+  getAvailabilityRuleTypeDisplay,
+} from "src/pages/listing/edit/availability/AvailabilityRules";
 import {
   InitialRuleStepSchema,
   InitialRuleStepSchemaType,
@@ -19,7 +23,7 @@ import {
   TimeSlotInputSchema,
   TimeSlotInputType,
   useStateMachine,
-} from "src/pages/listing/availability/state";
+} from "src/pages/listing/edit/availability/state";
 import { SingleDayTimeSlotSchemaType, TimeSlotSchemaType } from "src/pages/listing/schema";
 import { createAvailabilityRule } from "src/rpc/data";
 import {
@@ -27,7 +31,6 @@ import {
   AvailabilityRuleType,
   AvailabilityRuleTypeType,
   AvailabilityType,
-  AvailabilityTypeType,
   Listing,
 } from "src/rpc/types";
 
@@ -590,123 +593,6 @@ const SingleDayTimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({
     </div>
   );
 };
-
-type TimeSlotFieldsProps<T extends TimeSlotSchemaType | SingleDayTimeSlotSchemaType> = {
-  fields: FieldArrayWithId<{ time_slots: T[] }>[];
-  update: (index: number, timeSlot: T) => void;
-  append: (timeSlot: T) => void;
-  remove: (index: number) => void;
-};
-
-export const WeekDayTimeSlotFields: React.FC<TimeSlotFieldsProps<TimeSlotSchemaType>> = ({
-  fields,
-  append,
-  update,
-  remove,
-}) => {
-  const timeSlotMap: Map<number, { timeSlot: TimeSlotSchemaType; index: number; id: string }[]> = new Map();
-  fields.map((field, idx) => {
-    const existing = timeSlotMap.get(field.dayOfWeek) ?? [];
-    existing.push({ timeSlot: field, index: idx, id: field.id });
-    timeSlotMap.set(field.dayOfWeek, existing);
-  });
-  const dayOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-
-  return (
-    <>
-      {[1, 2, 3, 4, 5, 6, 0].map((i) => {
-        const timeSlotFields = timeSlotMap.get(i) ?? [];
-        return (
-          <div key={i} className="tw-flex-col sm:tw-flex-row tw-flex tw-items-start tw-py-4">
-            <div className="tw-flex tw-shrink-0 tw-font-semibold tw-w-24 tw-mb-2 sm:tw-mb-0">{dayOfWeek[i]}</div>
-            <div className="tw-flex tw-flex-wrap tw-gap-x-2 tw-gap-y-4">
-              {timeSlotFields.map((field) => (
-                <div key={field.id} className="tw-flex tw-items-center">
-                  <TimeInput
-                    date={field.timeSlot.startTime}
-                    onDateChange={(date) => {
-                      update(field.index, { ...field.timeSlot, startTime: date });
-                    }}
-                  />
-                  <XMarkIcon
-                    className="tw-ml-2 tw-h-5 tw-stroke-red-600 tw-cursor-pointer"
-                    onClick={() => {
-                      remove(field.index);
-                    }}
-                  />
-                </div>
-              ))}
-              <div
-                className="tw-flex tw-items-center tw-font-medium tw-text-blue-600 tw-cursor-pointer"
-                onClick={() => {
-                  append({ type: "time_slots", dayOfWeek: i, startTime: new Date("1970-01-01T10:00") });
-                }}
-              >
-                Add start time
-              </div>
-            </div>
-          </div>
-        );
-      })}
-    </>
-  );
-};
-
-export const SingleDayTimeSlotFields: React.FC<TimeSlotFieldsProps<SingleDayTimeSlotSchemaType>> = ({
-  fields,
-  append,
-  update,
-  remove,
-}) => {
-  return (
-    <div className="tw-flex tw-flex-wrap tw-gap-x-2 tw-gap-y-4">
-      {fields.map((field, idx) => (
-        <div key={field.id} className="tw-flex tw-items-center">
-          <TimeInput
-            date={field.startTime}
-            onDateChange={(date) => {
-              update(idx, { ...field, startTime: date });
-            }}
-          />
-          <XMarkIcon
-            className="tw-ml-2 tw-h-5 tw-stroke-red-600 tw-cursor-pointer"
-            onClick={() => {
-              remove(idx);
-            }}
-          />
-        </div>
-      ))}
-      <div
-        className="tw-flex tw-items-center tw-font-medium tw-text-blue-600 tw-cursor-pointer"
-        onClick={() => {
-          append({ type: "single_day_time_slots", startTime: new Date("1970-01-01T10:00") });
-        }}
-      >
-        Add start time
-      </div>
-    </div>
-  );
-};
-
-export function getAvailabilityTypeDisplay(value: AvailabilityTypeType) {
-  switch (value) {
-    case AvailabilityType.Enum.date:
-      return "Full day (customer just chooses a date)";
-    case AvailabilityType.Enum.datetime:
-      return "Date and time (customer chooses a date and time slot)";
-  }
-}
-
-export function getAvailabilityRuleTypeDisplay(value: AvailabilityRuleTypeType) {
-  switch (value) {
-    case AvailabilityRuleType.Enum.fixed_date:
-      return "Single Date";
-    case AvailabilityRuleType.Enum.fixed_range:
-      return "Fixed Range";
-    case AvailabilityRuleType.Enum.recurring:
-      return "Recurring";
-  }
-}
 
 function getAvailabilityRuleTypeDetail(value: AvailabilityRuleTypeType) {
   switch (value) {
