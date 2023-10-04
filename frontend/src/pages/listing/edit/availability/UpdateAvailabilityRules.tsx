@@ -3,7 +3,7 @@ import { ReactElement } from "react";
 import { Controller, FieldArrayWithId, useFieldArray, useForm } from "react-hook-form";
 import { FormError } from "src/components/FormError";
 import { Button } from "src/components/button/Button";
-import { DateRangePicker } from "src/components/calendar/DatePicker";
+import { DateRangePicker, correctFromUTC, correctToUTC } from "src/components/calendar/DatePicker";
 import { DropdownInput, Input } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { SingleDayTimeSlotFields, WeekDayTimeSlotFields } from "src/pages/listing/edit/availability/AvailabilityRules";
@@ -89,11 +89,11 @@ const FixedDateRuleUpdateForm: React.FC<{
     defaultValues: {
       name: existingRule.name,
       type: existingRule.type,
-      start_date: existingRule.start_date,
+      start_date: correctFromUTC(existingRule.start_date),
       time_slots: existingRule.time_slots.map((ts) => ({
         type: "single_day_time_slots",
         startTime: ts.start_time,
-        capacity: ts.capacity,
+        capacity: ts.capacity ? ts.capacity : undefined,
       })),
     },
   });
@@ -113,7 +113,7 @@ const FixedDateRuleUpdateForm: React.FC<{
     }
 
     if (dirtyFields.start_date) {
-      payload.start_date = values.start_date;
+      payload.start_date = correctToUTC(values.start_date);
     }
 
     if (dirtyFields.time_slots) {
@@ -152,7 +152,10 @@ const FixedDateRuleUpdateForm: React.FC<{
                 defaultMonth={watch("start_date")}
                 disabled={{ before: new Date() }}
                 selected={watch("start_date")}
-                onSelect={field.onChange}
+                onSelect={(e) => {
+                  field.onChange(e);
+                  console.log(e);
+                }}
                 className="sm:tw-mb-5"
               />
             )}
@@ -168,6 +171,7 @@ const FixedDateRuleUpdateForm: React.FC<{
               append={append}
               remove={remove}
             />
+            <FormError message={errors.time_slots?.message} className="tw-mt-1" />
           </>
         )}
         <FormError message={errors.root?.message} className="tw-mt-1" />
@@ -198,14 +202,14 @@ const FixedRangeRuleUpdateForm: React.FC<{
       name: existingRule.name,
       type: existingRule.type,
       date_range: {
-        from: existingRule.start_date,
-        to: existingRule.end_date,
+        from: correctFromUTC(existingRule.start_date),
+        to: correctFromUTC(existingRule.end_date),
       },
       time_slots: existingRule.time_slots.map((ts) => ({
         type: "time_slots",
         dayOfWeek: ts.day_of_week,
         startTime: ts.start_time,
-        capacity: ts.capacity,
+        capacity: ts.capacity ? ts.capacity : undefined,
       })),
     },
   });
@@ -225,8 +229,8 @@ const FixedRangeRuleUpdateForm: React.FC<{
     }
 
     if (dirtyFields.date_range) {
-      payload.start_date = values.date_range.from;
-      payload.end_date = values.date_range.to;
+      payload.start_date = correctToUTC(values.date_range.from);
+      payload.end_date = correctToUTC(values.date_range.to);
     }
 
     if (dirtyFields.time_slots) {
@@ -262,10 +266,13 @@ const FixedRangeRuleUpdateForm: React.FC<{
             render={({ field }) => (
               <DateRangePicker
                 mode="range"
-                defaultMonth={watch("date_range.from")}
+                defaultMonth={watch("date_range").from}
                 disabled={{ before: new Date() }}
                 selected={watch("date_range")}
-                onSelect={field.onChange}
+                onSelect={(e) => {
+                  field.onChange(e ? e : {});
+                  console.log(e);
+                }}
                 className="sm:tw-mb-5"
               />
             )}
@@ -283,6 +290,7 @@ const FixedRangeRuleUpdateForm: React.FC<{
                 remove={remove}
               />
             </div>
+            <FormError message={errors.time_slots?.message} className="tw-mt-1" />
           </>
         )}
         <FormError message={errors.root?.message} className="tw-mt-1" />
@@ -318,7 +326,7 @@ const RecurringRuleUpdateForm: React.FC<{
         type: "time_slots",
         dayOfWeek: ts.day_of_week,
         startTime: ts.start_time,
-        capacity: ts.capacity,
+        capacity: ts.capacity ? ts.capacity : undefined,
       })),
     },
   });

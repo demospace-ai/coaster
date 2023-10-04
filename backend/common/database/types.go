@@ -87,6 +87,7 @@ func (t *Time) setFromString(str string) {
 
 func (t *Time) setFromJson(str string) {
 	var h, m, s int
+	// We expect input times to be formatted as ISO strings on Jan 1st 1970.
 	fmt.Sscanf(str, "1970-01-01T%02d:%02d:%02d.000Z", &h, &m, &s)
 	*t = newTime(h, m, s)
 }

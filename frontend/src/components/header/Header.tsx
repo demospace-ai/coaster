@@ -310,13 +310,24 @@ const SupplierLinks: React.FC = () => {
   return (
     <>
       <NavLink
-        className="tw-hidden lg:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
+        end
+        className={({ isActive }) =>
+          mergeClasses(
+            "tw-hidden lg:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100",
+            isActive && "tw-bg-gray-100",
+          )
+        }
         to="/"
       >
         Home
       </NavLink>
       <NavLink
-        className="tw-hidden lg:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
+        className={({ isActive }) =>
+          mergeClasses(
+            "tw-hidden lg:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100",
+            isActive && "tw-bg-gray-100",
+          )
+        }
         to="/listings"
       >
         Listings

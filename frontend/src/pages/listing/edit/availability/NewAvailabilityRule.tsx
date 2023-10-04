@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { DateRange } from "react-day-picker";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { FormError } from "src/components/FormError";
-import { DateRangePicker } from "src/components/calendar/DatePicker";
+import { DateRangePicker, correctToUTC } from "src/components/calendar/DatePicker";
 import { Step, StepProps, WizardNavButtons } from "src/components/form/MultiStep";
 import { DropdownInput, Input, RadioInput } from "src/components/input/Input";
 import {
@@ -179,7 +179,7 @@ const SingleDateStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values,
 
       payload.name = values.name;
       payload.type = values.type;
-      payload.start_date = selected;
+      payload.start_date = correctToUTC(selected);
 
       createAvailabilityRule.mutate(payload);
     }
@@ -241,8 +241,8 @@ const DateRangeStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
 
       payload.name = values.name;
       payload.type = values.type;
-      payload.start_date = selectedRange.from;
-      payload.end_date = selectedRange.to;
+      payload.start_date = correctToUTC(selectedRange.from);
+      payload.end_date = correctToUTC(selectedRange.to);
 
       createAvailabilityRule.mutate(payload);
     }
@@ -446,8 +446,8 @@ const TimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, s
       case AvailabilityRuleType.Enum.fixed_date:
         return { success: false, error: "Something went wrong." };
       case AvailabilityRuleType.Enum.fixed_range:
-        payload.start_date = values.start_date;
-        payload.end_date = values.end_date;
+        payload.start_date = correctToUTC(values.start_date);
+        payload.end_date = correctToUTC(values.end_date);
         break;
       case AvailabilityRuleType.Enum.recurring:
         payload.recurring_years = values.recurring_years;
@@ -540,7 +540,7 @@ const SingleDayTimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({
 
     switch (values.type) {
       case AvailabilityRuleType.Enum.fixed_date:
-        payload.start_date = values.start_date;
+        payload.start_date = correctToUTC(values.start_date);
         break;
       case AvailabilityRuleType.Enum.fixed_range:
       case AvailabilityRuleType.Enum.recurring:
