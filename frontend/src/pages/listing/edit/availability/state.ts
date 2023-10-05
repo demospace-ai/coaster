@@ -31,6 +31,7 @@ export const UpdateFixedRangeRuleSchema = z.object({
     { required_error: "Please select a date range." },
   ),
   time_slots: z.array(z.union([TimeSlotSchema, SingleDayTimeSlotSchema])),
+  recurring_days: z.array(z.number().min(0, "Enter a valid day").max(6, "Enter a valid day")),
 });
 export const UpdateRecurringRuleSchema = z.object({
   name: z.string().min(1),
@@ -38,6 +39,7 @@ export const UpdateRecurringRuleSchema = z.object({
   recurring_years: z.array(z.number()),
   recurring_months: z.array(z.number()),
   time_slots: z.array(z.union([TimeSlotSchema, SingleDayTimeSlotSchema])),
+  recurring_days: z.array(z.number().min(0, "Enter a valid day").max(6, "Enter a valid day")),
 });
 
 export type UpdateFixedRangeRuleSchema = z.infer<typeof UpdateFixedRangeRuleSchema>;
@@ -55,6 +57,7 @@ export const RecurringOptionsSchema = z.object({
     z.number().min(new Date().getFullYear(), "Enter a valid year").max(2100, "Enter a valid year"),
   ),
   recurring_months: z.array(z.number().min(1, "Enter a valid month").max(12, "Enter a valid month")),
+  recurring_days: z.array(z.number().min(0, "Enter a valid day").max(6, "Enter a valid day")),
 });
 export type RecurringOptionsSchemaType = z.infer<typeof RecurringOptionsSchema>;
 

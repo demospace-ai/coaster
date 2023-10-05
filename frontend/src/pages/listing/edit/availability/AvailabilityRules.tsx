@@ -22,6 +22,8 @@ import {
 } from "src/rpc/types";
 import { mutate } from "swr";
 
+export const DAY_OF_WEEK = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
 export const Availability: React.FC = () => {
   const { listing } = useListingContext();
   const [showRuleModal, setShowRuleModal] = useState(false);
@@ -72,7 +74,6 @@ export const Availability: React.FC = () => {
       />
       <div className="tw-text-2xl tw-font-semibold tw-mb-2">Availability</div>
       <DropdownInput
-        placeholder={"Availability Type"}
         className="tw-w-full tw-flex tw-mt-3"
         label="Availability Type"
         value={listing.availability_type}
@@ -150,7 +151,7 @@ interface AvailabilityRuleModalProps {
 
 const AvailabilityRuleModal: React.FC<AvailabilityRuleModalProps> = ({ listing, existingRule, show, closeModal }) => {
   return (
-    <Modal show={show} close={closeModal}>
+    <Modal show={show} close={closeModal} fff="1">
       {existingRule ? (
         <ExistingRuleForm key={existingRule.id} listing={listing} existingRule={existingRule} closeModal={closeModal} />
       ) : (
@@ -184,7 +185,7 @@ const DeleteRuleModal: React.FC<AvailabilityRuleModalProps> = ({ listing, existi
   };
 
   return (
-    <Modal show={show} close={closeModal}>
+    <Modal show={show} close={closeModal} fff="2">
       <div className="tw-flex tw-flex-col tw-items-center tw-w-[320px] sm:tw-w-[420px] tw-px-8 sm:tw-px-12 tw-pb-10">
         <div className="tw-text-center tw-w-full tw-text-xl tw-font-medium tw-mb-6">
           Permanently delete the availability rule <span className="tw-font-bold">{existingRule.name}</span>?
@@ -223,7 +224,7 @@ const UpdateAvailabilityTypeModal: React.FC<{
   };
 
   return (
-    <Modal show={show} close={closeModal}>
+    <Modal show={show} close={closeModal} fff="3">
       <div className="tw-w-[80vw] sm:tw-w-[600px] tw-px-8 sm:tw-px-12 tw-pb-10">
         <div className="tw-text-center tw-w-full tw-text-base sm:tw-text-lg tw-mb-8">
           Changing the availability type of this listing will <span className="tw-font-semibold">permanently</span>{" "}
@@ -259,7 +260,6 @@ export const WeekDayTimeSlotFields: React.FC<TimeSlotFieldsProps<TimeSlotSchemaT
     existing.push({ timeSlot: field, index: idx, id: field.id });
     timeSlotMap.set(field.dayOfWeek, existing);
   });
-  const dayOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
   return (
     <>
@@ -267,24 +267,30 @@ export const WeekDayTimeSlotFields: React.FC<TimeSlotFieldsProps<TimeSlotSchemaT
         const timeSlotFields = timeSlotMap.get(i) ?? [];
         return (
           <div key={i} className="tw-flex-col sm:tw-flex-row tw-flex tw-items-start tw-py-4">
-            <div className="tw-flex tw-shrink-0 tw-font-semibold tw-w-24 tw-mb-2 sm:tw-mb-0">{dayOfWeek[i]}</div>
+            <div className="tw-flex tw-shrink-0 tw-font-semibold tw-w-24 tw-mb-2 sm:tw-mb-0">{DAY_OF_WEEK[i]}</div>
             <div className="tw-flex tw-flex-wrap tw-gap-x-2 tw-gap-y-4">
-              {timeSlotFields.map((field) => (
-                <div key={field.id} className="tw-flex tw-items-center">
-                  <TimeInput
-                    date={field.timeSlot.startTime}
-                    onDateChange={(date) => {
-                      update(field.index, { ...field.timeSlot, startTime: date });
-                    }}
-                  />
-                  <XMarkIcon
-                    className="tw-ml-2 tw-h-5 tw-stroke-red-600 tw-cursor-pointer"
-                    onClick={() => {
-                      remove(field.index);
-                    }}
-                  />
-                </div>
-              ))}
+              {timeSlotFields.map((field) => {
+                if (field.timeSlot.startTime === undefined) {
+                  // TODO: this should never happen
+                  return;
+                }
+                return (
+                  <div key={field.id} className="tw-flex tw-items-center">
+                    <TimeInput
+                      date={field.timeSlot.startTime}
+                      onDateChange={(date) => {
+                        update(field.index, { ...field.timeSlot, startTime: date });
+                      }}
+                    />
+                    <XMarkIcon
+                      className="tw-ml-2 tw-h-5 tw-stroke-red-600 tw-cursor-pointer"
+                      onClick={() => {
+                        remove(field.index);
+                      }}
+                    />
+                  </div>
+                );
+              })}
               <div
                 className="tw-flex tw-items-center tw-font-medium tw-text-blue-600 tw-cursor-pointer"
                 onClick={() => {
@@ -309,22 +315,28 @@ export const SingleDayTimeSlotFields: React.FC<TimeSlotFieldsProps<SingleDayTime
 }) => {
   return (
     <div className="tw-flex tw-flex-wrap tw-gap-x-2 tw-gap-y-4">
-      {fields.map((field, idx) => (
-        <div key={field.id} className="tw-flex tw-items-center">
-          <TimeInput
-            date={field.startTime}
-            onDateChange={(date) => {
-              update(idx, { ...field, startTime: date });
-            }}
-          />
-          <XMarkIcon
-            className="tw-ml-2 tw-h-5 tw-stroke-red-600 tw-cursor-pointer"
-            onClick={() => {
-              remove(idx);
-            }}
-          />
-        </div>
-      ))}
+      {fields.map((field, idx) => {
+        if (field.startTime === undefined) {
+          // TODO: this should never happen
+          return;
+        }
+        return (
+          <div key={field.id} className="tw-flex tw-items-center">
+            <TimeInput
+              date={field.startTime}
+              onDateChange={(date) => {
+                update(idx, { ...field, startTime: date });
+              }}
+            />
+            <XMarkIcon
+              className="tw-ml-2 tw-h-5 tw-stroke-red-600 tw-cursor-pointer"
+              onClick={() => {
+                remove(idx);
+              }}
+            />
+          </div>
+        );
+      })}
       <div
         className="tw-flex tw-items-center tw-font-medium tw-text-blue-600 tw-cursor-pointer"
         onClick={() => {

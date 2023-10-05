@@ -1,4 +1,5 @@
 import {
+  FloatingPortal,
   autoUpdate,
   offset,
   shift,
@@ -184,7 +185,6 @@ export type DropdownInputProps = {
   onChange: (...event: any[]) => void;
   getElementForDisplay?: (option: any) => string | React.ReactElement;
   loading?: boolean;
-  placeholder: string;
   noOptionsString?: string;
   className?: string;
   label?: string;
@@ -281,32 +281,34 @@ export const DropdownInput: React.FC<DropdownInputProps> = forwardRef((props, re
             />
           </span>
         </Listbox.Button>
-        <div className="tw-relative tw-z-10" ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
-          <Transition
-            as={Fragment}
-            show={open}
-            enter="tw-transition tw-ease-out tw-duration-100"
-            enterFrom="tw-transform tw-opacity-0 tw-scale-95"
-            enterTo="tw-transform tw-opacity-100 tw-scale-100"
-            leave="tw-transition tw-ease-in tw-duration-100"
-            leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
-            leaveTo="tw-transform tw-opacity-0 tw-scale-95"
-          >
-            <Listbox.Options
-              className={mergeClasses(
-                "tw-absolute tw-z-20 tw-mt-1 tw-max-h-60 tw-min-w-full tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm tw-gap-1 tw-flex tw-flex-col",
-                props.dropdownHeight,
-              )}
+        <FloatingPortal root={document.body}>
+          <div className="tw-relative tw-z-[99]" ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
+            <Transition
+              as={Fragment}
+              show={open}
+              enter="tw-transition tw-ease-out tw-duration-100"
+              enterFrom="tw-transform tw-opacity-0 tw-scale-95"
+              enterTo="tw-transform tw-opacity-100 tw-scale-100"
+              leave="tw-transition tw-ease-in tw-duration-100"
+              leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
+              leaveTo="tw-transform tw-opacity-0 tw-scale-95"
             >
-              <DropdownOptions
-                loading={props.loading ? props.loading : false}
-                options={props.options}
-                noOptionsString={props.noOptionsString ? props.noOptionsString : "No options!"}
-                getElementForDisplay={getElementForDisplay}
-              />
-            </Listbox.Options>
-          </Transition>
-        </div>
+              <Listbox.Options
+                className={mergeClasses(
+                  "tw-absolute tw-z-20 tw-mt-1 tw-max-h-60 tw-min-w-full tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm tw-gap-1 tw-flex tw-flex-col",
+                  props.dropdownHeight,
+                )}
+              >
+                <DropdownOptions
+                  loading={props.loading ? props.loading : false}
+                  options={props.options}
+                  noOptionsString={props.noOptionsString ? props.noOptionsString : "No options!"}
+                  getElementForDisplay={getElementForDisplay}
+                />
+              </Listbox.Options>
+            </Transition>
+          </div>
+        </FloatingPortal>
       </div>
     </Listbox>
   );

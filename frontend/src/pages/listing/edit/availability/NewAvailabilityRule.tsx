@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { eachDayOfInterval } from "date-fns";
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
@@ -8,6 +9,7 @@ import { Step, StepProps, WizardNavButtons } from "src/components/form/MultiStep
 import { DropdownInput, Input, RadioInput } from "src/components/input/Input";
 import { useShowToast } from "src/components/notifications/Notifications";
 import {
+  DAY_OF_WEEK,
   SingleDayTimeSlotFields,
   WeekDayTimeSlotFields,
   getAvailabilityRuleTypeDisplay,
@@ -189,7 +191,7 @@ const SingleDateStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values,
       payload.type = values.type;
       payload.start_date = correctToUTC(selected);
 
-      // must send empty time slot for full day listings
+      // Must send empty time slot for full day listings
       payload.time_slots = [{}];
 
       createAvailabilityRule.mutate(payload);
@@ -222,6 +224,7 @@ const SingleDateStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values,
 const DateRangeStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, setValue, nextStep, prevStep }) => {
   const initialValue =
     values?.start_date && values?.end_date ? { from: values.start_date, to: values.end_date } : undefined;
+  const [recurringDays, setRecurringDays] = useState<number[]>([]);
   const [selectedRange, setSelectedRange] = useState<DateRange | undefined>(initialValue);
   const [error, setError] = useState<string | undefined>(undefined);
   const showToast = useShowToast();
@@ -261,8 +264,29 @@ const DateRangeStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
       payload.start_date = correctToUTC(selectedRange.from);
       payload.end_date = correctToUTC(selectedRange.to);
 
-      // TODO: let user choose which days of the week to repeat on
-      payload.time_slots = [{}]; // must send empty time slot for full day listings
+      // Must send empty time slot for full day listings
+      if (recurringDays.length == 0) {
+        const everyDay = eachDayOfInterval({
+          start: selectedRange.from,
+          end: selectedRange.to,
+        });
+
+        // Empty array means every day is available
+        if (everyDay.length >= 7) {
+          payload.time_slots = Array(7).map((i) => ({
+            day_of_week: i,
+          }));
+        } else {
+          // Only make time slots for the days in the interval
+          payload.time_slots = everyDay.map((d) => ({
+            day_of_week: d.getDay(),
+          }));
+        }
+      } else {
+        payload.time_slots = recurringDays.map((i) => ({
+          day_of_week: i,
+        }));
+      }
 
       createAvailabilityRule.mutate(payload);
     }
@@ -278,8 +302,36 @@ const DateRangeStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
           onSelect={setSelectedRange}
           className="sm:tw-mb-5"
         />
+        <FormError message={error} />
+        {values?.availabilityType === AvailabilityType.Enum.date && (
+          // Let the user select which days of the week to repeat on for full day listings
+          <div className="tw-flex tw-flex-col tw-w-full tw-mt-8">
+            <div className="tw-text-lg tw-font-medium tw-mb-1">Affected days of the week</div>
+            <div className="tw-mb-4">Select which days of the week this availability rule applies to.</div>
+            <DropdownInput
+              multiple
+              options={[1, 2, 3, 4, 5, 6, 0]}
+              value={recurringDays}
+              onChange={setRecurringDays}
+              className="tw-mb-5 tw-w-64 sm:tw-w-80"
+              getElementForDisplay={(value) => {
+                if (Array.isArray(value)) {
+                  if (value.length === 0) {
+                    return "Every day";
+                  }
+                  const sorted = value.sort((a, b) => a - b);
+                  if (sorted[0] == 0) {
+                    sorted.shift();
+                    sorted.push(0);
+                  }
+                  return sorted.map((v: number) => DAY_OF_WEEK[v]).join(", ");
+                }
+                return DAY_OF_WEEK[value];
+              }}
+            />
+          </div>
+        )}
       </div>
-      <FormError message={error} />
       <FormError message={createAvailabilityRule.error?.message} />
       <WizardNavButtons
         nextStep={onSubmit}
@@ -293,6 +345,7 @@ const DateRangeStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
 
 const RecurringStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, setValue, nextStep, prevStep }) => {
   const {
+    handleSubmit,
     control,
     formState: { errors },
   } = useForm<RecurringOptionsSchemaType>({
@@ -301,6 +354,7 @@ const RecurringStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
     defaultValues: {
       recurring_years: values?.recurring_years ?? [],
       recurring_months: values?.recurring_months ?? [],
+      recurring_days: [],
     },
   });
   const [error, setError] = useState<string | undefined>(undefined);
@@ -312,7 +366,7 @@ const RecurringStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
     },
   });
 
-  const onSubmit = async () => {
+  const onSubmit = async (formValues: RecurringOptionsSchemaType) => {
     if (!values) {
       return setError("Something went wrong.");
     }
@@ -335,8 +389,17 @@ const RecurringStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
       payload.recurring_years = values.recurring_years ?? [];
       payload.recurring_months = values.recurring_months ?? [];
 
-      // TODO: let user choose which days of the week to repeat on
-      payload.time_slots = [{}]; // must send empty time slot for full day listings
+      // Must send empty time slot for full day listings
+      if (formValues.recurring_days.length == 0) {
+        // Empty array means every day is available
+        payload.time_slots = Array(7).map((i) => ({
+          day_of_week: i,
+        }));
+      } else {
+        payload.time_slots = formValues.recurring_days.map((i) => ({
+          day_of_week: i,
+        }));
+      }
 
       createAvailabilityRule.mutate(payload);
     }
@@ -370,7 +433,6 @@ const RecurringStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
                 }
                 return value;
               }}
-              placeholder={"Select years to repeat on"}
             />
           )}
         />
@@ -400,16 +462,50 @@ const RecurringStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
                 }
                 return new Date(2010, value - 1, 1).toLocaleString("default", { month: "long" });
               }}
-              placeholder={"Select months to repeat on"}
             />
           )}
         />
+        {values?.availabilityType === AvailabilityType.Enum.date && (
+          // Let the user select which days of the week to repeat on for full day listings
+          <>
+            <div className="tw-text-lg tw-font-medium tw-mb-1">Affected days of the week</div>
+            <div className="tw-mb-4">Select which days of the week this availability rule applies to.</div>
+            <Controller
+              name="recurring_days"
+              control={control}
+              render={({ field }) => (
+                <DropdownInput
+                  multiple
+                  options={[1, 2, 3, 4, 5, 6, 0]}
+                  {...field}
+                  onChange={field.onChange}
+                  className="tw-mb-5 tw-w-64 sm:tw-w-80"
+                  getElementForDisplay={(value) => {
+                    if (Array.isArray(value)) {
+                      if (value.length === 0) {
+                        return "Every day";
+                      }
+                      const sorted = value.sort((a, b) => a - b);
+                      if (sorted[0] == 0) {
+                        sorted.shift();
+                        sorted.push(0);
+                      }
+                      return sorted.map((v: number) => DAY_OF_WEEK[v]).join(", ");
+                    }
+                    return DAY_OF_WEEK[value];
+                  }}
+                />
+              )}
+            />
+            <FormError message={errors.recurring_days?.message} className="tw-mt-1" />
+          </>
+        )}
       </div>
       <FormError message={errors.recurring_months?.message} />
       <FormError message={error} />
       <FormError message={createAvailabilityRule.error?.message} />
       <WizardNavButtons
-        nextStep={onSubmit}
+        nextStep={handleSubmit(onSubmit)}
         prevStep={prevStep}
         isLoading={createAvailabilityRule.isLoading}
         isLastStep={values?.availabilityType === AvailabilityType.Enum.date}

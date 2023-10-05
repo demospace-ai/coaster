@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
 interface ModalProps {
@@ -11,9 +11,11 @@ interface ModalProps {
   clickToEscape?: boolean;
   noContainer?: boolean;
   lightBackground?: boolean;
+  fff?: string;
 }
 
 export const Modal: React.FC<ModalProps> = (props) => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   useEffect(() => {
     const escFunction = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -28,6 +30,16 @@ export const Modal: React.FC<ModalProps> = (props) => {
   });
 
   const showHideClassName = props.show ? "tw-block" : "tw-hidden";
+
+  // Prevent scrolling of body when modal is open
+  useEffect(() => {
+    setIsOpen(props.show);
+    props.show && document.body.style.setProperty("overflow", "hidden");
+    if (isOpen) {
+      // Don't update the CSS if the modal was never open because another modal is controlling this
+      !props.show && document.body.style.setProperty("overflow", "unset");
+    }
+  }, [props.show]);
 
   return (
     <>

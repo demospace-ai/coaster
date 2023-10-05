@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { eachDayOfInterval } from "date-fns";
 import { ReactElement } from "react";
 import { Controller, FieldArrayWithId, useFieldArray, useForm } from "react-hook-form";
 import { FormError } from "src/components/FormError";
@@ -7,7 +8,11 @@ import { DateRangePicker, correctFromUTC, correctToUTC } from "src/components/ca
 import { DropdownInput, Input } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { useShowToast } from "src/components/notifications/Notifications";
-import { SingleDayTimeSlotFields, WeekDayTimeSlotFields } from "src/pages/listing/edit/availability/AvailabilityRules";
+import {
+  DAY_OF_WEEK,
+  SingleDayTimeSlotFields,
+  WeekDayTimeSlotFields,
+} from "src/pages/listing/edit/availability/AvailabilityRules";
 import {
   UpdateFixedDateRuleSchema,
   UpdateFixedRangeRuleSchema,
@@ -34,7 +39,7 @@ export const ExistingRuleForm: React.FC<{
   const updateAvailability = useUpdateAvailabilityRule(listing.id, existingRule.id, {
     onSuccess: () => {
       closeModal();
-      showToast("success", "Successfully updated availability rule");
+      showToast("success", "Successfully updated rule");
     },
   });
 
@@ -159,10 +164,7 @@ const FixedDateRuleUpdateForm: React.FC<{
                 defaultMonth={watch("start_date")}
                 disabled={{ before: new Date() }}
                 selected={watch("start_date")}
-                onSelect={(e) => {
-                  field.onChange(e);
-                  console.log(e);
-                }}
+                onSelect={field.onChange}
                 className="sm:tw-mb-5"
               />
             )}
@@ -216,9 +218,10 @@ const FixedRangeRuleUpdateForm: React.FC<{
       time_slots: existingRule.time_slots.map((ts) => ({
         type: "time_slots",
         dayOfWeek: ts.day_of_week,
-        startTime: ts.start_time,
+        startTime: ts.start_time ? ts.start_time : undefined,
         capacity: ts.capacity ? ts.capacity : undefined,
       })),
+      recurring_days: existingRule.time_slots.map((ts) => ts.day_of_week),
     },
   });
   const { fields, update, append, remove } = useFieldArray({
@@ -248,6 +251,32 @@ const FixedRangeRuleUpdateForm: React.FC<{
         start_time: ts.startTime,
         capacity: ts.capacity,
       }));
+    }
+
+    if (dirtyFields.recurring_days) {
+      // Must send empty time slot for full day listings
+      if (values.recurring_days.length == 0) {
+        const everyDay = eachDayOfInterval({
+          start: values.date_range.from,
+          end: values.date_range.to,
+        });
+
+        // Empty array means every day is available
+        if (everyDay.length >= 7) {
+          payload.time_slots = Array(7).map((i) => ({
+            day_of_week: i,
+          }));
+        } else {
+          // Only make time slots for the days in the interval
+          payload.time_slots = everyDay.map((d) => ({
+            day_of_week: d.getDay(),
+          }));
+        }
+      } else {
+        payload.time_slots = values.recurring_days.map((i) => ({
+          day_of_week: i,
+        }));
+      }
     }
 
     updateAvailability.mutate(payload);
@@ -280,7 +309,6 @@ const FixedRangeRuleUpdateForm: React.FC<{
                 selected={watch("date_range")}
                 onSelect={(e) => {
                   field.onChange(e ? e : {});
-                  console.log(e);
                 }}
                 className="sm:tw-mb-5"
               />
@@ -288,7 +316,7 @@ const FixedRangeRuleUpdateForm: React.FC<{
           />
         </div>
         <FormError message={errors.date_range?.message} />
-        {availabilityType === AvailabilityType.Enum.datetime && (
+        {availabilityType === AvailabilityType.Enum.datetime ? (
           <>
             <div className="tw-text-lg tw-font-semibold tw-mb-1 tw-mt-5">Time Slots</div>
             <div className="tw-divide-y">
@@ -301,6 +329,40 @@ const FixedRangeRuleUpdateForm: React.FC<{
             </div>
             <FormError message={errors.time_slots?.message} className="tw-mt-1" />
           </>
+        ) : (
+          // Let the user select which days of the week to repeat on for full day listings
+          <div className="tw-flex tw-flex-col tw-w-full tw-mt-1">
+            <div className="tw-text-lg tw-font-medium tw-mb-1">Affected days of the week</div>
+            <div className="tw-mb-4">Select which days of the week this availability rule applies to.</div>
+            <Controller
+              name="recurring_days"
+              control={control}
+              render={({ field }) => (
+                <DropdownInput
+                  multiple
+                  options={[1, 2, 3, 4, 5, 6, 0]}
+                  {...field}
+                  onChange={field.onChange}
+                  className="tw-mb-5 tw-w-64 sm:tw-w-80"
+                  getElementForDisplay={(value) => {
+                    if (Array.isArray(value)) {
+                      if (value.length === 0) {
+                        return "Every day";
+                      }
+                      const sorted = value.sort((a, b) => a - b);
+                      if (sorted[0] == 0) {
+                        sorted.shift();
+                        sorted.push(0);
+                      }
+                      return sorted.map((v: number) => DAY_OF_WEEK[v]).join(", ");
+                    }
+                    return DAY_OF_WEEK[value];
+                  }}
+                />
+              )}
+            />
+            <FormError message={errors.recurring_days?.message} className="tw-mt-1" />
+          </div>
         )}
         <FormError message={errors.root?.message} className="tw-mt-1" />
         <FormError message={updateAvailability.error?.message} className="tw-mt-1" />
@@ -335,9 +397,10 @@ const RecurringRuleUpdateForm: React.FC<{
       time_slots: existingRule.time_slots.map((ts) => ({
         type: "time_slots",
         dayOfWeek: ts.day_of_week,
-        startTime: ts.start_time,
+        startTime: ts.start_time ? ts.start_time : undefined,
         capacity: ts.capacity ? ts.capacity : undefined,
       })),
+      recurring_days: existingRule.time_slots.map((ts) => ts.day_of_week),
     },
   });
   const { fields, update, append, remove } = useFieldArray({
@@ -370,6 +433,20 @@ const RecurringRuleUpdateForm: React.FC<{
         start_time: ts.startTime,
         capacity: ts.capacity,
       }));
+    }
+
+    if (dirtyFields.recurring_days) {
+      // Must send empty time slot for full day listings
+      if (values.recurring_days.length == 0) {
+        // Empty array means every day is available
+        payload.time_slots = Array(7).map((i) => ({
+          day_of_week: i,
+        }));
+      } else {
+        payload.time_slots = values.recurring_days.map((i) => ({
+          day_of_week: i,
+        }));
+      }
     }
 
     updateAvailability.mutate(payload);
@@ -413,7 +490,6 @@ const RecurringRuleUpdateForm: React.FC<{
                 }
                 return value;
               }}
-              placeholder={"Select years to repeat on"}
             />
           )}
         />
@@ -442,11 +518,10 @@ const RecurringRuleUpdateForm: React.FC<{
                 }
                 return new Date(2010, value - 1, 1).toLocaleString("default", { month: "long" });
               }}
-              placeholder={"Select months to repeat on"}
             />
           )}
         />
-        {availabilityType === AvailabilityType.Enum.datetime && (
+        {availabilityType === AvailabilityType.Enum.datetime ? (
           <>
             <div className="tw-text-lg tw-font-semibold tw-mb-1 tw-mt-5">Time Slots</div>
             <div className="tw-divide-y">
@@ -458,6 +533,40 @@ const RecurringRuleUpdateForm: React.FC<{
               />
             </div>
           </>
+        ) : (
+          // Let the user select which days of the week to repeat on for full day listings
+          <div className="tw-flex tw-flex-col tw-w-full tw-mt-1">
+            <div className="tw-text-lg tw-font-medium tw-mb-1">Affected days of the week</div>
+            <div className="tw-mb-4">Select which days of the week this availability rule applies to.</div>
+            <Controller
+              name="recurring_days"
+              control={control}
+              render={({ field }) => (
+                <DropdownInput
+                  multiple
+                  options={[1, 2, 3, 4, 5, 6, 0]}
+                  {...field}
+                  onChange={field.onChange}
+                  className="tw-mb-5 tw-w-64 sm:tw-w-80"
+                  getElementForDisplay={(value) => {
+                    if (Array.isArray(value)) {
+                      if (value.length === 0) {
+                        return "Every day";
+                      }
+                      const sorted = value.sort((a, b) => a - b);
+                      if (sorted[0] == 0) {
+                        sorted.shift();
+                        sorted.push(0);
+                      }
+                      return sorted.map((v: number) => DAY_OF_WEEK[v]).join(", ");
+                    }
+                    return DAY_OF_WEEK[value];
+                  }}
+                />
+              )}
+            />
+            <FormError message={errors.recurring_days?.message} className="tw-mt-1" />
+          </div>
         )}
         <FormError message={errors.root?.message} className="tw-mt-1" />
         <FormError message={updateAvailability.error?.message} className="tw-mt-1" />
