@@ -45,24 +45,29 @@ export const NewRuleForm: React.FC<{ closeModal: () => void; listing: Listing }>
   switch (state.step) {
     case NewRuleStep.InitialRuleStep:
       currentStep = {
-        title: "Setup the basics for your new availability rule.",
+        title: (
+          <div className="sm:tw-pr-4">
+            Availability rules determine which days a customer can <i className="tw-font-medium">start</i> your trip.
+          </div>
+        ),
         element: <InitialRuleStep nextStep={nextStep} prevStep={prevStep} values={state} setValue={setState} />,
       };
       break;
     case NewRuleStep.SingleDate:
       currentStep = {
-        title: "Select a single date for the rule.",
+        title: "Select a date when customers can start your trip.",
         element: <SingleDateStep nextStep={nextStep} prevStep={prevStep} values={state} setValue={setState} />,
       };
       break;
     case NewRuleStep.DateRange:
       currentStep = {
-        title: "Select a date range for the rule.",
+        title: "Select a range of dates when customers can start your trip.",
         element: <DateRangeStep nextStep={nextStep} prevStep={prevStep} values={state} setValue={setState} />,
       };
       break;
     case NewRuleStep.Recurring:
       currentStep = {
+        title: "Choose when a customer can start your trip.",
         element: <RecurringStep nextStep={nextStep} prevStep={prevStep} values={state} setValue={setState} />,
       };
       break;
