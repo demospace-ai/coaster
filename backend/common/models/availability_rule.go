@@ -27,11 +27,12 @@ type AvailabilityRule struct {
 	BaseModel
 }
 
+// Even full day listings should have a time slot so that we can customize capacity if needed
 type TimeSlot struct {
-	AvailabilityRuleID int64         `json:"availability_rule_id"`
-	StartTime          database.Time `json:"start_time"`  // Always present because all day listings do not have time slots
-	Capacity           *int64        `json:"capacity"`    // Will use the listing's capacity if nil
-	DayOfWeek          *time.Weekday `json:"day_of_week"` // Can be nil for fixed date rules
+	AvailabilityRuleID int64          `json:"availability_rule_id"`
+	StartTime          *database.Time `json:"start_time"`  // Not present for all day listings
+	Capacity           *int64         `json:"capacity"`    // Will use the listing's capacity if nil
+	DayOfWeek          *time.Weekday  `json:"day_of_week"` // Can be nil for fixed date rules
 
 	BaseModel
 }

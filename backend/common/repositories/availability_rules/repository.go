@@ -37,6 +37,10 @@ func CreateAvailability(db *gorm.DB, listingID int64, availabilityInput input.Av
 		}
 	}
 
+	if len(availabilityInput.TimeSlots) == 0 {
+		return nil, errors.NewCustomerVisibleError("You must provide at least one time slot.")
+	}
+
 	result := db.Create(&availabilityRule)
 	if result.Error != nil {
 		return nil, errors.Wrap(result.Error, "(availability_rules.CreateAvailability)")

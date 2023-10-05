@@ -8,9 +8,9 @@ import (
 )
 
 type TimeSlot struct {
-	StartTime database.Time `json:"start_time"`
-	DayOfWeek *time.Weekday `json:"day_of_week"`
-	Capacity  *int64        `json:"capacity"`
+	StartTime *database.Time `json:"start_time"`
+	DayOfWeek *time.Weekday  `json:"day_of_week"`
+	Capacity  *int64         `json:"capacity"`
 }
 
 type AvailabilityRule struct {
@@ -21,7 +21,7 @@ type AvailabilityRule struct {
 	RecurringYears  []int32                     `json:"recurring_years"`
 	RecurringMonths []int32                     `json:"recurring_months"`
 
-	TimeSlots []TimeSlot `json:"time_slots"`
+	TimeSlots []TimeSlot `json:"time_slots" validate:"required"`
 }
 
 type AvailabilityRuleUpdates struct {
@@ -32,5 +32,5 @@ type AvailabilityRuleUpdates struct {
 	RecurringYears  []int32        `json:"recurring_years,omitempty"`
 	RecurringMonths []int32        `json:"recurring_months,omitempty"`
 
-	TimeSlots []TimeSlot `json:"time_slots,omitempty"`
+	TimeSlots []TimeSlot `json:"time_slots"`
 }

@@ -21,11 +21,11 @@ type AvailabilityRule struct {
 }
 
 type TimeSlot struct {
-	ID                 int64         `json:"id"`
-	AvailabilityRuleID int64         `json:"availability_rule_id"`
-	DayOfWeek          *time.Weekday `json:"day_of_week"`
-	StartTime          database.Time `json:"start_time"`
-	Capacity           *int64        `json:"capacity"`
+	ID                 int64          `json:"id"`
+	AvailabilityRuleID int64          `json:"availability_rule_id"`
+	DayOfWeek          *time.Weekday  `json:"day_of_week"`
+	StartTime          *database.Time `json:"start_time"`
+	Capacity           *int64         `json:"capacity"`
 }
 
 func ConvertAvailabilityRules(availabilityRules []availability_rules.RuleAndTimes) []AvailabilityRule {

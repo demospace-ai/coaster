@@ -116,7 +116,7 @@ export interface AvailabilityRuleUpdates {
 }
 
 export interface TimeSlotInput {
-  start_time: Date;
+  start_time?: Date;
   day_of_week?: number;
   capacity?: number;
 }

@@ -189,6 +189,9 @@ const SingleDateStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values,
       payload.type = values.type;
       payload.start_date = correctToUTC(selected);
 
+      // must send empty time slot for full day listings
+      payload.time_slots = [{}];
+
       createAvailabilityRule.mutate(payload);
     }
   };
@@ -257,6 +260,9 @@ const DateRangeStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
       payload.type = values.type;
       payload.start_date = correctToUTC(selectedRange.from);
       payload.end_date = correctToUTC(selectedRange.to);
+
+      // TODO: let user choose which days of the week to repeat on
+      payload.time_slots = [{}]; // must send empty time slot for full day listings
 
       createAvailabilityRule.mutate(payload);
     }
@@ -328,6 +334,9 @@ const RecurringStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
       payload.type = values.type;
       payload.recurring_years = values.recurring_years ?? [];
       payload.recurring_months = values.recurring_months ?? [];
+
+      // TODO: let user choose which days of the week to repeat on
+      payload.time_slots = [{}]; // must send empty time slot for full day listings
 
       createAvailabilityRule.mutate(payload);
     }
