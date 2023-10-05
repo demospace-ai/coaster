@@ -14,6 +14,21 @@ import {
 } from "src/rpc/types";
 import { z } from "zod";
 
+export const DateRangeSchema = z.object(
+  {
+    from: z.date(),
+    to: z.date(),
+  },
+  { required_error: "Please select a date range." },
+);
+export type DateRangeSchemaType = z.infer<typeof DateRangeSchema>;
+
+export const DateRangeFormSchema = z.object({
+  date_range: DateRangeSchema,
+});
+
+export type DateRangeFormSchemaType = z.infer<typeof DateRangeFormSchema>;
+
 export const UpdateFixedDateRuleSchema = z.object({
   name: z.string().min(1),
   type: AvailabilityRuleType.readonly(),
@@ -23,13 +38,7 @@ export const UpdateFixedDateRuleSchema = z.object({
 export const UpdateFixedRangeRuleSchema = z.object({
   name: z.string().min(1),
   type: AvailabilityRuleType.readonly(),
-  date_range: z.object(
-    {
-      from: z.date(),
-      to: z.date(),
-    },
-    { required_error: "Please select a date range." },
-  ),
+  date_range: DateRangeSchema,
   time_slots: z.array(z.union([TimeSlotSchema, SingleDayTimeSlotSchema])),
   recurring_days: z.array(z.number().min(0, "Enter a valid day").max(6, "Enter a valid day")),
 });
@@ -67,12 +76,6 @@ export const InitialRuleStepSchema = z.object({
 });
 export type InitialRuleStepSchemaType = z.infer<typeof InitialRuleStepSchema>;
 
-export const DateRangeSchema = z.object({
-  start_date: z.date(),
-  end_date: z.date(),
-});
-export type DateRangeSchemaType = z.infer<typeof DateRangeSchema>;
-
 export enum NewRuleStep {
   InitialRuleStep = "Initial",
   DateRange = "DateRange",
@@ -80,6 +83,7 @@ export enum NewRuleStep {
   Recurring = "Recurring",
   TimeSlots = "TimeSlots",
   SingleDayTimeSlots = "SingleDayTimeSlots",
+  Weekdays = "Weekdays",
 }
 
 export type NewAvailabilityRuleState = {
@@ -142,6 +146,8 @@ const useBack = (state: NewAvailabilityRuleState, setState: Dispatch<SetStateAct
             return setState((prev) => ({ ...prev, step: NewRuleStep.Recurring }));
         }
       };
+    case NewRuleStep.Weekdays:
+      return () => setState((prev) => ({ ...prev, step: NewRuleStep.DateRange }));
   }
 };
 
@@ -191,12 +197,18 @@ const useNext = (
         return () => setState((prev) => ({ ...prev, step: NewRuleStep.SingleDayTimeSlots }));
       }
     case NewRuleStep.DateRange:
+      if (availabilityType === AvailabilityType.Enum.date) {
+        return () => setState((prev) => ({ ...prev, step: NewRuleStep.Weekdays }));
+      } else {
+        return () => setState((prev) => ({ ...prev, step: NewRuleStep.TimeSlots }));
+      }
     case NewRuleStep.Recurring:
       if (availabilityType === AvailabilityType.Enum.date) {
         return onCompleteWrapped;
       } else {
         return () => setState((prev) => ({ ...prev, step: NewRuleStep.TimeSlots }));
       }
+    case NewRuleStep.Weekdays:
     case NewRuleStep.TimeSlots:
     case NewRuleStep.SingleDayTimeSlots:
       return onCompleteWrapped;

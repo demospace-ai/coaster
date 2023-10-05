@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { eachDayOfInterval } from "date-fns";
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
@@ -13,8 +12,11 @@ import {
   SingleDayTimeSlotFields,
   WeekDayTimeSlotFields,
   getAvailabilityRuleTypeDisplay,
+  getWeekdayOptionsForRange,
 } from "src/pages/listing/edit/availability/AvailabilityRules";
 import {
+  DateRangeFormSchema,
+  DateRangeFormSchemaType,
   InitialRuleStepSchema,
   InitialRuleStepSchemaType,
   NewAvailabilityRuleState,
@@ -81,6 +83,11 @@ export const NewRuleForm: React.FC<{ closeModal: () => void; listing: Listing }>
       currentStep = {
         title: "Setup time slots for this rule.",
         element: <SingleDayTimeSlotStep nextStep={nextStep} prevStep={prevStep} values={state} setValue={setState} />,
+      };
+      break;
+    case NewRuleStep.Weekdays:
+      currentStep = {
+        element: <WeekdaySelectionStep nextStep={nextStep} prevStep={prevStep} values={state} setValue={setState} />,
       };
       break;
   }
@@ -227,12 +234,61 @@ const SingleDateStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values,
 };
 
 const DateRangeStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, setValue, nextStep, prevStep }) => {
-  const initialValue =
-    values?.start_date && values?.end_date ? { from: values.start_date, to: values.end_date } : undefined;
-  const [recurringDays, setRecurringDays] = useState<number[]>([]);
-  const [selectedRange, setSelectedRange] = useState<DateRange | undefined>(initialValue);
-  const [error, setError] = useState<string | undefined>(undefined);
+  const {
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm<DateRangeFormSchemaType>({
+    mode: "onBlur",
+    resolver: zodResolver(DateRangeFormSchema),
+    defaultValues: {
+      date_range: {
+        from: values.start_date,
+        to: values.end_date,
+      },
+    },
+  });
+  values?.start_date && values?.end_date ? { from: values.start_date, to: values.end_date } : undefined;
+  const setSelectedRange = (selectedRange: DateRange | undefined) => {
+    setValue &&
+      setValue((prev) => ({
+        ...prev,
+        start_date: selectedRange?.from,
+        end_date: selectedRange?.to,
+      }));
+  };
+
+  return (
+    <div className="tw-flex tw-flex-col tw-flex-grow sm:tw-mt-10 tw-overflow-hidden">
+      <div className="tw-flex tw-flex-col tw-flex-grow tw-justify-start tw-items-center tw-overflow-y-scroll tw-pb-16">
+        <Controller
+          name="date_range"
+          control={control}
+          render={({ field }) => (
+            <DateRangePicker
+              mode="range"
+              disabled={{ before: new Date() }}
+              selected={field.value}
+              onSelect={(e) => {
+                field.onChange(e);
+                setSelectedRange(e);
+              }}
+              className="sm:tw-mb-5"
+            />
+          )}
+        />
+      </div>
+      <FormError message={errors.date_range?.message} />
+      <WizardNavButtons nextStep={handleSubmit(nextStep ? nextStep : () => {})} prevStep={prevStep} />
+    </div>
+  );
+};
+
+// This step lets the user select which days of the week to repeat on for full day listings
+const WeekdaySelectionStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, nextStep, prevStep }) => {
   const showToast = useShowToast();
+  const [error, setError] = useState<string | undefined>(undefined);
+  const [recurringDays, setRecurringDays] = useState<number[]>([]);
   const createAvailabilityRule = useCreateAvailabilityRule(values.listingID, {
     onSuccess: () => {
       showToast("success", "Successfully created rule");
@@ -240,103 +296,77 @@ const DateRangeStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
     },
   });
 
+  const options = getWeekdayOptionsForRange(values.start_date, values.end_date);
+
   const onSubmit = async () => {
     if (!values) {
       return setError("Something went wrong.");
     }
 
-    if (!selectedRange || !selectedRange.from || !selectedRange.to) {
+    const payload = {} as AvailabilityRuleInput;
+
+    if (!values.name) {
+      return setError("Make sure you've provided a name for your rule.");
+    }
+
+    if (!values.type) {
+      return setError("Make sure you've selected a rule type.");
+    }
+
+    if (!values.start_date || !values.end_date) {
       return setError("Please select a date range.");
     }
 
-    if (values.availabilityType === AvailabilityType.Enum.datetime) {
-      setValue && setValue((prev) => ({ ...prev, start_date: selectedRange.from }));
-      setValue && setValue((prev) => ({ ...prev, end_date: selectedRange.to }));
-      return nextStep && nextStep();
+    payload.name = values.name;
+    payload.type = values.type;
+    payload.start_date = correctToUTC(values.start_date);
+    payload.end_date = correctToUTC(values.end_date);
+
+    // Must send empty time slot for full day listings
+    if (recurringDays.length == 0) {
+      // Empty array means every day is available
+      payload.time_slots = options.map((i) => ({
+        day_of_week: i,
+      }));
     } else {
-      const payload = {} as AvailabilityRuleInput;
-
-      if (!values.name) {
-        return setError("Make sure you've provided a name for your rule.");
-      }
-
-      if (!values.type) {
-        return setError("Make sure you've selected a rule type.");
-      }
-
-      payload.name = values.name;
-      payload.type = values.type;
-      payload.start_date = correctToUTC(selectedRange.from);
-      payload.end_date = correctToUTC(selectedRange.to);
-
-      // Must send empty time slot for full day listings
-      if (recurringDays.length == 0) {
-        const everyDay = eachDayOfInterval({
-          start: selectedRange.from,
-          end: selectedRange.to,
-        });
-
-        // Empty array means every day is available
-        if (everyDay.length >= 7) {
-          payload.time_slots = Array(7).map((i) => ({
-            day_of_week: i,
-          }));
-        } else {
-          // Only make time slots for the days in the interval
-          payload.time_slots = everyDay.map((d) => ({
-            day_of_week: d.getDay(),
-          }));
-        }
-      } else {
-        payload.time_slots = recurringDays.map((i) => ({
-          day_of_week: i,
-        }));
-      }
-
-      createAvailabilityRule.mutate(payload);
+      payload.time_slots = recurringDays.map((i) => ({
+        day_of_week: i,
+      }));
     }
+
+    createAvailabilityRule.mutate(payload);
   };
 
   return (
-    <div className="tw-flex tw-flex-col tw-flex-grow sm:tw-mt-10 tw-overflow-hidden">
+    <div className="tw-flex tw-flex-col tw-flex-grow tw-mt-5 tw-overflow-hidden">
       <div className="tw-flex tw-flex-col tw-flex-grow tw-justify-start tw-items-center tw-overflow-y-scroll tw-pb-16">
-        <DateRangePicker
-          mode="range"
-          disabled={{ before: new Date() }}
-          selected={selectedRange}
-          onSelect={setSelectedRange}
-          className="sm:tw-mb-5"
-        />
-        <FormError message={error} />
-        {values?.availabilityType === AvailabilityType.Enum.date && (
-          // Let the user select which days of the week to repeat on for full day listings
-          <div className="tw-flex tw-flex-col tw-w-full tw-mt-8">
-            <div className="tw-text-lg tw-font-medium tw-mb-1">Affected days of the week</div>
-            <div className="tw-mb-4">Select which days of the week this availability rule applies to.</div>
-            <DropdownInput
-              multiple
-              options={[1, 2, 3, 4, 5, 6, 0]}
-              value={recurringDays}
-              onChange={setRecurringDays}
-              className="tw-mb-5 tw-w-64 sm:tw-w-80"
-              getElementForDisplay={(value) => {
-                if (Array.isArray(value)) {
-                  if (value.length === 0) {
-                    return "Every day";
-                  }
-                  const sorted = value.sort((a, b) => a - b);
-                  if (sorted[0] == 0) {
-                    sorted.shift();
-                    sorted.push(0);
-                  }
-                  return sorted.map((v: number) => DAY_OF_WEEK[v]).join(", ");
+        <div className="tw-flex tw-flex-col tw-w-full">
+          <div className="tw-text-lg tw-font-medium tw-mb-1">(Optional) Affected days of the week</div>
+          <div className="tw-mb-4">Select which days of the week within your range should be available.</div>
+          <DropdownInput
+            multiple
+            options={options}
+            value={recurringDays}
+            onChange={setRecurringDays}
+            className="tw-mb-5 tw-w-64 sm:tw-w-80"
+            getElementForDisplay={(value) => {
+              if (Array.isArray(value)) {
+                if (value.length === 0) {
+                  return "Every day in range";
                 }
-                return DAY_OF_WEEK[value];
-              }}
-            />
-          </div>
-        )}
+                const sorted = value.sort((a, b) => a - b);
+                if (sorted[0] == 0) {
+                  sorted.shift();
+                  sorted.push(0);
+                }
+                return sorted.map((v: number) => DAY_OF_WEEK[v]).join(", ");
+              }
+              return DAY_OF_WEEK[value];
+            }}
+          />
+        </div>
       </div>
+      <FormError message={error} />
       <FormError message={createAvailabilityRule.error?.message} />
       <WizardNavButtons
         nextStep={onSubmit}
@@ -412,7 +442,7 @@ const RecurringStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
 
   return (
     <div className="tw-flex tw-flex-col tw-flex-grow tw-overflow-hidden">
-      <div className="tw-flex tw-flex-col tw-flex-grow tw-justify-start">
+      <div className="tw-flex tw-flex-col tw-flex-grow tw-justify-start tw-overflow-scroll tw-pb-20">
         <div className="tw-text-lg tw-font-medium tw-mb-1">Affected years</div>
         <div className="tw-mb-4">Select which year(s) this availability rule applies to.</div>
         <Controller

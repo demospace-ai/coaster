@@ -12,6 +12,7 @@ import {
   DAY_OF_WEEK,
   SingleDayTimeSlotFields,
   WeekDayTimeSlotFields,
+  getWeekdayOptionsForRange,
 } from "src/pages/listing/edit/availability/AvailabilityRules";
 import {
   UpdateFixedDateRuleSchema,
@@ -229,6 +230,8 @@ const FixedRangeRuleUpdateForm: React.FC<{
     name: "time_slots",
   });
 
+  const options = getWeekdayOptionsForRange(watch("date_range").from, watch("date_range").to);
+
   const onSubmit = async (values: UpdateFixedRangeRuleSchema) => {
     if (!isDirty) {
       showToast("error", "No changes made");
@@ -262,16 +265,9 @@ const FixedRangeRuleUpdateForm: React.FC<{
         });
 
         // Empty array means every day is available
-        if (everyDay.length >= 7) {
-          payload.time_slots = Array(7).map((i) => ({
-            day_of_week: i,
-          }));
-        } else {
-          // Only make time slots for the days in the interval
-          payload.time_slots = everyDay.map((d) => ({
-            day_of_week: d.getDay(),
-          }));
-        }
+        payload.time_slots = options.map((i) => ({
+          day_of_week: i,
+        }));
       } else {
         payload.time_slots = values.recurring_days.map((i) => ({
           day_of_week: i,
@@ -340,7 +336,7 @@ const FixedRangeRuleUpdateForm: React.FC<{
               render={({ field }) => (
                 <DropdownInput
                   multiple
-                  options={[1, 2, 3, 4, 5, 6, 0]}
+                  options={options}
                   {...field}
                   onChange={field.onChange}
                   className="tw-mb-5 tw-w-64 sm:tw-w-80"

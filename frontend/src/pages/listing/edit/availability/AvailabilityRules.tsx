@@ -1,4 +1,5 @@
 import { TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { eachDayOfInterval } from "date-fns";
 import { useState } from "react";
 import { FieldArrayWithId } from "react-hook-form";
 import { Button } from "src/components/button/Button";
@@ -367,4 +368,21 @@ export function getAvailabilityRuleTypeDisplay(value: AvailabilityRuleTypeType) 
     case AvailabilityRuleType.Enum.recurring:
       return "Recurring";
   }
+}
+
+export function getWeekdayOptionsForRange(startDate: Date | undefined, endDate: Date | undefined): number[] {
+  let options = [1, 2, 3, 4, 5, 6, 0];
+  if (startDate === undefined || endDate === undefined) {
+    return options;
+  }
+  const everyDay = eachDayOfInterval({
+    start: startDate,
+    end: endDate,
+  });
+  if (everyDay.length < 7) {
+    // Only let user select days that fall within the range of dates they selected
+    options = options.filter((o) => everyDay.some((d) => d.getDay() === o));
+  }
+
+  return options;
 }
