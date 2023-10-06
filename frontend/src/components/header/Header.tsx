@@ -213,7 +213,7 @@ const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
                   leaveTo="tw-translate-x-full"
                 >
                   <Dialog.Panel className="tw-pointer-events-auto tw-w-screen tw-max-w-2xl">
-                    <div className="tw-flex tw-h-full tw-flex-col tw-overflow-y-scroll tw-bg-white tw-py-6 tw-shadow-xl">
+                    <div className="tw-flex tw-h-full tw-flex-col tw-overflow-y-auto tw-bg-white tw-py-6 tw-shadow-xl">
                       <div className="tw-px-4 sm:tw-px-6">
                         <div className="tw-flex tw-items-start tw-justify-between">
                           <div className="tw-ml-1 tw-flex tw-h-7 tw-items-center">

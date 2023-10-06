@@ -333,24 +333,24 @@ const ImagesModal: React.FC<{ listing: ListingType; imageIndex: number; setImage
   return (
     <div>
       <div className="tw-absolute tw-top-1/2 -tw-translate-y-1/2 tw-w-full tw-z-10">
-        <div className="tw-fixed tw-right-0 sm:tw-right-[10vw]">
-          <ChevronRightIcon
-            className="tw-h-10 tw-cursor-pointer tw-stroke-slate-300"
-            onClick={(e) => {
-              e.stopPropagation();
-              scrollForward();
-            }}
-          />
-        </div>
-        <div className="tw-fixed tw-left-0 sm:tw-left-[10vw]">
-          <ChevronLeftIcon
-            className="tw-h-10 tw-cursor-pointer tw-stroke-slate-300"
-            onClick={(e) => {
-              e.stopPropagation();
-              scrollBack();
-            }}
-          />
-        </div>
+        <button
+          className="tw-fixed tw-right-0 sm:tw-right-[10vw] sm:tw-p-10"
+          onClick={(e) => {
+            e.stopPropagation();
+            scrollForward();
+          }}
+        >
+          <ChevronRightIcon className="tw-h-10 tw-cursor-pointer tw-stroke-slate-300" />
+        </button>
+        <button
+          className="tw-fixed tw-left-0 sm:tw-left-[10vw] sm:tw-p-10"
+          onClick={(e) => {
+            e.stopPropagation();
+            scrollBack();
+          }}
+        >
+          <ChevronLeftIcon className="tw-h-10 tw-cursor-pointer tw-stroke-slate-300" />
+        </button>
       </div>
       <div
         ref={carouselRef}

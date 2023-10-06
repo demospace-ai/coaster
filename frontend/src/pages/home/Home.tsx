@@ -60,7 +60,7 @@ export const CategorySelector: React.FC = () => {
     "tw-flex tw-flex-col tw-items-center tw-cursor-pointer tw-select-none hover:tw-border-b-2 hover:-tw-mb-2 tw-pb-1 tw-border-solid tw-border-slate-700 tw-mx-1";
 
   return (
-    <div className="tw-mx-[-4px] tw-flex tw-w-full tw-overflow-scroll tw-pt-4 tw-pb-6">
+    <div className="tw-mx-[-4px] tw-flex tw-w-full tw-overflow-auto tw-pt-4 tw-pb-6">
       <div className="tw-flex tw-h-full tw-flex-1 tw-gap-8 tw-justify-between">
         <div className={categoryIcon}>
           <SkiingIcon className="tw-w-10 tw-h-10" />

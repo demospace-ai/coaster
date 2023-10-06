@@ -121,7 +121,7 @@ const InitialRuleStep = ({ values, setValue, nextStep, prevStep }: StepProps<New
 
   return (
     <div className="tw-flex tw-flex-col tw-flex-grow tw-overflow-hidden">
-      <div className="tw-flex tw-flex-col tw-flex-grow tw-justify-start tw-overflow-y-scroll tw-pb-16">
+      <div className="tw-flex tw-flex-col tw-flex-grow tw-justify-start tw-overflow-y-auto tw-pb-16">
         <div className="tw-text-lg tw-font-medium tw-mb-4">Provide a name for this rule</div>
         <Input
           {...nameProps}
@@ -260,7 +260,7 @@ const DateRangeStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
 
   return (
     <div className="tw-flex tw-flex-col tw-flex-grow sm:tw-mt-10 tw-overflow-hidden">
-      <div className="tw-flex tw-flex-col tw-flex-grow tw-justify-start tw-items-center tw-overflow-y-scroll tw-pb-16">
+      <div className="tw-flex tw-flex-col tw-flex-grow tw-justify-start tw-items-center tw-overflow-y-auto tw-pb-16">
         <Controller
           name="date_range"
           control={control}
@@ -339,7 +339,7 @@ const WeekdaySelectionStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ v
 
   return (
     <div className="tw-flex tw-flex-col tw-flex-grow tw-mt-5 tw-overflow-hidden">
-      <div className="tw-flex tw-flex-col tw-flex-grow tw-justify-start tw-items-center tw-overflow-y-scroll tw-pb-16">
+      <div className="tw-flex tw-flex-col tw-flex-grow tw-justify-start tw-items-center tw-overflow-y-auto tw-pb-16">
         <div className="tw-flex tw-flex-col tw-w-full">
           <div className="tw-text-lg tw-font-medium tw-mb-1">(Optional) Affected days of the week</div>
           <div className="tw-mb-4">Select which days of the week within your range should be available.</div>
@@ -442,7 +442,7 @@ const RecurringStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
 
   return (
     <div className="tw-flex tw-flex-col tw-flex-grow tw-overflow-hidden">
-      <div className="tw-flex tw-flex-col tw-flex-grow tw-justify-start tw-overflow-scroll tw-pb-20">
+      <div className="tw-flex tw-flex-col tw-flex-grow tw-justify-start tw-overflow-auto tw-pb-20">
         <div className="tw-text-lg tw-font-medium tw-mb-1">Affected years</div>
         <div className="tw-mb-4">Select which year(s) this availability rule applies to.</div>
         <Controller
@@ -633,7 +633,7 @@ const TimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, s
 
   return (
     <div className="tw-flex tw-flex-col tw-flex-grow tw-overflow-hidden">
-      <div className="tw-divide-y tw-flex-grow tw-overflow-y-scroll tw-pr-4 tw-pb-10">
+      <div className="tw-divide-y tw-flex-grow tw-overflow-y-auto tw-pr-4 tw-pb-10">
         <WeekDayTimeSlotFields fields={fields} update={update} append={append} remove={remove} />
       </div>
       <FormError message={error} />
@@ -733,7 +733,7 @@ const SingleDayTimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({
 
   return (
     <div className="tw-flex tw-flex-col tw-flex-grow tw-overflow-hidden">
-      <div className="tw-flex-grow tw-overflow-y-scroll tw-pr-4 tw-pb-10">
+      <div className="tw-flex-grow tw-overflow-y-auto tw-pr-4 tw-pb-10">
         <div className="tw-flex-col sm:tw-flex-row tw-flex tw-items-start tw-py-4">
           <SingleDayTimeSlotFields fields={fields} update={update} append={append} remove={remove} />
         </div>

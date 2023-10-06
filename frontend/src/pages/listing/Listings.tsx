@@ -16,7 +16,7 @@ export const Listings: React.FC = () => {
   }
 
   return (
-    <div className="tw-flex tw-justify-center tw-pt-6 tw-pb-24 tw-px-8 tw-overflow-scroll">
+    <div className="tw-flex tw-justify-center tw-pt-6 tw-pb-24 tw-px-8 tw-overflow-auto">
       <div className="tw-flex tw-flex-col sm:tw-max-w-3xl tw-w-full">
         <div className="tw-flex tw-flex-row tw-justify-between tw-w-full tw-mt-6 tw-mb-5">
           <div className="tw-font-bold tw-text-3xl">Your listings</div>

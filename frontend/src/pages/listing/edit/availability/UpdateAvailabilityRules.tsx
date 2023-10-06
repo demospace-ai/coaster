@@ -145,7 +145,7 @@ const FixedDateRuleUpdateForm: React.FC<{
       className="tw-flex tw-flex-col tw-flex-grow tw-items-center tw-overflow-hidden"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <div className="tw-flex tw-flex-col tw-w-full tw-flex-grow tw-overflow-y-scroll tw-pb-10 tw-mb-4">
+      <div className="tw-flex tw-flex-col tw-w-full tw-flex-grow tw-overflow-y-auto tw-pb-10 tw-mb-4">
         <div className="tw-text-lg tw-font-semibold tw-mb-1 tw-mt-5">Rule Name</div>
         <Input
           {...register("name")}
@@ -283,7 +283,7 @@ const FixedRangeRuleUpdateForm: React.FC<{
       className="tw-flex tw-flex-col tw-flex-grow tw-items-center tw-overflow-hidden"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <div className="tw-flex tw-flex-col tw-w-full tw-flex-grow tw-overflow-y-scroll tw-pb-10 tw-mb-4">
+      <div className="tw-flex tw-flex-col tw-w-full tw-flex-grow tw-overflow-y-auto tw-pb-10 tw-mb-4">
         <div className="tw-text-lg tw-font-semibold tw-mb-1 tw-mt-5">Rule Name</div>
         <Input
           {...register("name")}
@@ -453,7 +453,7 @@ const RecurringRuleUpdateForm: React.FC<{
       className="tw-flex tw-flex-col tw-flex-grow tw-items-center tw-overflow-hidden"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <div className="tw-flex tw-flex-col tw-w-full tw-flex-grow tw-overflow-y-scroll tw-pb-10 tw-mb-4">
+      <div className="tw-flex tw-flex-col tw-w-full tw-flex-grow tw-overflow-y-auto tw-pb-10 tw-mb-4">
         <div className="tw-text-lg tw-font-semibold tw-mb-1 tw-mt-5">Rule Name</div>
         <Input
           {...register("name")}

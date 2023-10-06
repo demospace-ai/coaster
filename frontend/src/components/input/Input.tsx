@@ -711,7 +711,7 @@ export const CountryCodePicker: React.FC<{ currentCode: CountryCode; setCode: (c
         >
           <Listbox.Options
             as="div"
-            className="tw-max-h-64 tw-overflow-scroll tw-bg-white tw-border tw-border-solid tw-border-slate-300 tw-rounded-md"
+            className="tw-max-h-64 tw-overflow-auto tw-bg-white tw-border tw-border-solid tw-border-slate-300 tw-rounded-md"
           >
             {CountryCodes.map((countryCode) => (
               <Listbox.Option

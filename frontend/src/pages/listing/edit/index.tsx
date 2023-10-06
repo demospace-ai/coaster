@@ -42,7 +42,7 @@ export const EditListingLayout: React.FC = () => {
         <div className="tw-flex tw-flex-col sm:tw-flex-row tw-mt-4 sm:tw-mt-8">
           <div className="tw-relative tw-flex tw-items-center sm:tw-items-start tw-mb-3">
             <ChevronLeftIcon className="sm:tw-hidden tw-h-4" />
-            <div className="sm:tw-sticky sm:tw-top-32 tw-flex tw-flex-1 sm:tw-flex-col tw-rounded-xl tw-p-1 tw-overflow-scroll tw-hide-scrollbar sm:tw-overflow-visible tw-gap-3 sm:tw-mr-[10vw]">
+            <div className="sm:tw-sticky sm:tw-top-32 tw-flex tw-flex-1 sm:tw-flex-col tw-rounded-xl tw-p-1 tw-overflow-auto tw-hide-scrollbar sm:tw-overflow-visible tw-gap-3 sm:tw-mr-[10vw]">
               <NavLink
                 end
                 key="details"
