@@ -1,4 +1,5 @@
 import {
+  FloatingFocusManager,
   FloatingPortal,
   autoUpdate,
   offset,
@@ -12,11 +13,12 @@ import {
 } from "@floating-ui/react";
 import { Combobox, Listbox, RadioGroup, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
-import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import { InformationCircleIcon, MinusCircleIcon, PlusCircleIcon, UserIcon } from "@heroicons/react/24/outline";
 import { AsYouType, CountryCode, getCountryCallingCode } from "libphonenumber-js";
 import React, {
   Fragment,
   InputHTMLAttributes,
+  ReactNode,
   TextareaHTMLAttributes,
   forwardRef,
   useImperativeHandle,
@@ -32,13 +34,14 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   value: string | number; // Need explicit value prop to display label correctly
   label?: string;
   tooltip?: string;
+  icon?: ReactNode;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
   const { id, disabled, className, label, tooltip, value, onBlur, onFocus, ...other } = props;
   const [focused, setFocused] = useState<boolean>(false);
   let classes = [
-    "tw-flex tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-md tw-py-[6px] tw-px-3 tw-w-full tw-box-border focus-within:tw-border-slate-400 tw-outline-none",
+    "tw-flex tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-md tw-py-[6px] tw-px-3 tw-w-full tw-box-border focus-within:tw-border-slate-400 tw-outline-none tw-items-center",
     !disabled && "hover:tw-border-slate-400 tw-cursor-text",
     disabled && "tw-bg-slate-50 tw-select-none tw-cursor-not-allowed",
     className,
@@ -63,6 +66,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
         inputRef.current?.focus();
       }}
     >
+      {props.icon && props.icon}
       <div className={mergeClasses("tw-relative tw-flex tw-flex-col tw-w-full", label && "tw-mt-3.5")}>
         {label && (
           <label
@@ -80,7 +84,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
           name={id}
           ref={inputRef}
           autoComplete={id}
-          className="tw-w-full tw-mt-0.5 tw-outline-none tw-ring-none tw-text-base disabled:tw-bg-slate-50 disabled:tw-select-none tw-cursor-[inherit] tw-hide-number-wheel"
+          className={mergeClasses(
+            "tw-w-full tw-outline-none tw-ring-none tw-text-base disabled:tw-bg-slate-50 disabled:tw-select-none tw-cursor-[inherit] tw-hide-number-wheel",
+            props.label && "tw-mt-0.5",
+          )}
           onKeyDown={onKeydown}
           onBlur={(e) => {
             setFocused(false);
@@ -932,3 +939,86 @@ export const RadioInput = forwardRef<HTMLDivElement, RadioInputProps>((props, re
     </RadioGroup>
   );
 });
+
+export const GuestNumberInput: React.FC<{
+  value: number;
+  setValue: (value: number) => void;
+  maxGuests?: number;
+  className?: string;
+}> = ({ value, setValue, maxGuests = 99, className }) => {
+  const [open, setOpen] = useState(false);
+
+  const { refs, floatingStyles, context } = useFloating({
+    open: open,
+    onOpenChange: setOpen,
+    middleware: [offset(10), shift()],
+    whileElementsMounted: autoUpdate,
+    placement: "bottom-end",
+  });
+
+  const click = useClick(context);
+  const dismiss = useDismiss(context);
+  const role = useRole(context);
+
+  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
+
+  return (
+    <>
+      <div
+        ref={refs.setReference}
+        {...getReferenceProps()}
+        className={mergeClasses(
+          "tw-flex tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-items-center tw-cursor-pointer",
+          className,
+        )}
+      >
+        <UserIcon className="tw-w-5 tw-ml-4 tw-mr-2" />
+        <button>{value}</button>
+      </div>
+      <Transition
+        show={open}
+        enter="tw-transition tw-ease-out tw-duration-100"
+        enterFrom="tw-transform tw-opacity-0 tw-scale-95"
+        enterTo="tw-transform tw-opacity-100 tw-scale-100"
+        leave="tw-transition tw-ease-in tw-duration-75"
+        leaveFrom="tw-transform tw-opacity-100 tw-scale-97"
+        leaveTo="tw-transform tw-opacity-0 tw-scale-95"
+      >
+        <FloatingFocusManager context={context}>
+          <div
+            ref={refs.setFloating}
+            style={floatingStyles}
+            {...getFloatingProps()}
+            className="tw-bg-white tw-rounded-lg tw-p-5 tw-border tw-border-solid tw-border-gray-200 tw-w-56 tw-shadow-md"
+          >
+            <div className="tw-flex tw-justify-between">
+              <span className="tw-whitespace-nowrap tw-select-none">Adults</span>
+              <div className="tw-flex tw-gap-3">
+                <MinusCircleIcon
+                  className={mergeClasses(
+                    "tw-w-6 tw-cursor-pointer tw-stroke-gray-500 hover:tw-stroke-black",
+                    value === 1 && "!tw-stroke-gray-300 tw-cursor-not-allowed",
+                  )}
+                  onClick={() => {
+                    setValue(Math.max(1, value - 1));
+                  }}
+                />
+
+                <span className="tw-flex tw-w-3 tw-justify-center tw-select-none">{value}</span>
+                <PlusCircleIcon
+                  className={mergeClasses(
+                    "tw-w-6 tw-cursor-pointer tw-stroke-gray-500 hover:tw-stroke-black",
+                    value === maxGuests && "!tw-stroke-gray-300 tw-cursor-not-allowed",
+                  )}
+                  onClick={() => {
+                    setValue(Math.min(maxGuests, value + 1));
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </FloatingFocusManager>
+      </Transition>
+    </>
+  );
+};

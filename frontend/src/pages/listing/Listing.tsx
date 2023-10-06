@@ -11,7 +11,9 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { BackButton, LinkButton } from "src/components/button/Button";
+import { DatePickerPopper } from "src/components/calendar/DatePicker";
 import { Callout } from "src/components/callouts/Callout";
+import { GuestNumberInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { Modal } from "src/components/modal/Modal";
 import { useShowToast } from "src/components/notifications/Notifications";
@@ -96,13 +98,25 @@ const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) => {
 };
 
 const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [guests, setGuests] = useState<number>(1);
+
   return (
     <div className="tw-hidden md:tw-flex tw-w-[40%]">
       <div className="tw-sticky tw-top-32 tw-flex tw-flex-col tw-px-8 tw-py-6 tw-w-full tw-h-fit tw-border tw-border-solid tw-border-gray-300 tw-rounded-xl tw-shadow-centered-sm">
-        <span className="tw-text-2xl tw-font-semibold tw-mb-3">Reserve your spot</span>
-        <span className="tw-mb-3">
-          <span className="tw-font-semibold">${listing.price}/person</span>
-        </span>
+        <div>
+          <span className="tw-text-2xl tw-font-semibold tw-mb-3">${listing.price}</span> per person
+        </div>
+        <div className="tw-flex tw-w-full tw-mt-3 tw-mb-5 tw-gap-2">
+          <DatePickerPopper
+            mode="single"
+            className="tw-w-3/4 tw-mr-2"
+            selected={startDate}
+            onSelect={setStartDate}
+            buttonClass="tw-w-full tw-h-12"
+          />
+          <GuestNumberInput value={guests} setValue={setGuests} maxGuests={listing.max_guests} className="tw-w-1/4" />
+        </div>
         <LinkButton
           className="tw-font-semibold tw-py-2 tw-mb-4"
           href={`mailto:${listing.host.email}?subject=Checking availability&body=Hi ${getHostName(
@@ -111,6 +125,9 @@ const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
         >
           Check Availability
         </LinkButton>
+        <div className="tw-w-full tw-text-center tw-text-sm tw-mb-4 tw-pb-3 tw-border-b tw-border-solid tw-border-gray-300">
+          You won't be charged yet
+        </div>
         <span className="tw-text-sm">
           *Likely to sell out: Based on Coaster's booking data and information from the provider, it seems likely this
           experience will sell out soon.

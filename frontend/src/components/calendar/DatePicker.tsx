@@ -1,6 +1,19 @@
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
-import * as React from "react";
+import {
+  FloatingFocusManager,
+  autoUpdate,
+  offset,
+  shift,
+  useClick,
+  useDismiss,
+  useFloating,
+  useInteractions,
+  useRole,
+} from "@floating-ui/react";
+import { Transition } from "@headlessui/react";
+import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { ReactNode, useState } from "react";
 import { DateRange, DayPicker, DayPickerProps } from "react-day-picker";
+import { mergeClasses } from "src/utils/twmerge";
 import useWindowDimensions from "src/utils/window";
 
 export const DateRangePicker: React.FC<DayPickerProps> = ({
@@ -47,6 +60,87 @@ export const DateRangePicker: React.FC<DayPickerProps> = ({
       }}
       {...props}
     />
+  );
+};
+
+export const DatePickerPopper: React.FC<DayPickerProps & { buttonClass?: string }> = ({
+  className,
+  classNames,
+  buttonClass,
+  showOutsideDays = true,
+  ...props
+}) => {
+  const [open, setOpen] = useState(false);
+
+  const { refs, floatingStyles, context } = useFloating({
+    open: open,
+    onOpenChange: setOpen,
+    middleware: [offset(10), shift()],
+    whileElementsMounted: autoUpdate,
+    placement: "bottom-start",
+  });
+
+  const click = useClick(context);
+  const dismiss = useDismiss(context);
+  const role = useRole(context);
+
+  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
+
+  let button: ReactNode;
+  switch (props.mode) {
+    case "range":
+      const range = correctFromUTCRange(props.selected);
+      button = (
+        <div className="tw-flex" ref={refs.setReference} {...getReferenceProps()}>
+          <button>{range.from?.toLocaleDateString()}</button>
+          <button>{range.to?.toLocaleDateString()}</button>
+        </div>
+      );
+      break;
+    case "single":
+      const date = correctFromUTC(props.selected);
+      button = (
+        <button
+          className={mergeClasses(
+            "tw-flex tw-relative tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-justify-start tw-items-center tw-cursor-pointer tw-font-medium",
+            buttonClass,
+          )}
+          ref={refs.setReference}
+          {...getReferenceProps()}
+        >
+          <CalendarIcon className="tw-w-5 tw-ml-4 tw-mr-3 -tw-mt-[1px]" />
+          {date ? date.toLocaleDateString() : "Select a date"}
+        </button>
+      );
+      break;
+    default:
+      break;
+  }
+
+  return (
+    <div className={className}>
+      {button}
+      <Transition
+        show={open}
+        enter="tw-transition tw-ease-out tw-duration-100"
+        enterFrom="tw-transform tw-opacity-0 tw-scale-95"
+        enterTo="tw-transform tw-opacity-100 tw-scale-100"
+        leave="tw-transition tw-ease-in tw-duration-75"
+        leaveFrom="tw-transform tw-opacity-100 tw-scale-97"
+        leaveTo="tw-transform tw-opacity-0 tw-scale-95"
+      >
+        <FloatingFocusManager context={context}>
+          <div
+            ref={refs.setFloating}
+            style={floatingStyles}
+            {...getFloatingProps()}
+            className="tw-bg-white tw-rounded-lg tw-shadow-md"
+          >
+            <DateRangePicker numberOfMonths={1} {...props} />
+          </div>
+        </FloatingFocusManager>
+      </Transition>
+    </div>
   );
 };
 
