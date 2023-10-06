@@ -11,8 +11,8 @@ import {
 } from "@floating-ui/react";
 import { Transition } from "@headlessui/react";
 import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
-import { ReactNode, useState } from "react";
-import { DateRange, DayPicker, DayPickerProps } from "react-day-picker";
+import { useState } from "react";
+import { DateRange, DayPicker, DayPickerProps, DayPickerSingleProps } from "react-day-picker";
 import { mergeClasses } from "src/utils/twmerge";
 import useWindowDimensions from "src/utils/window";
 
@@ -63,13 +63,12 @@ export const DateRangePicker: React.FC<DayPickerProps> = ({
   );
 };
 
-export const DatePickerPopper: React.FC<DayPickerProps & { buttonClass?: string }> = ({
-  className,
-  classNames,
-  buttonClass,
-  showOutsideDays = true,
-  ...props
-}) => {
+export const DatePickerPopper: React.FC<
+  Omit<DayPickerSingleProps, "mode" | "onSelect"> & {
+    buttonClass?: string;
+    onSelect: (selected: Date | undefined) => void;
+  }
+> = ({ className, classNames, buttonClass, onSelect, showOutsideDays = true, ...props }) => {
   const [open, setOpen] = useState(false);
 
   const { refs, floatingStyles, context } = useFloating({
@@ -86,40 +85,19 @@ export const DatePickerPopper: React.FC<DayPickerProps & { buttonClass?: string 
 
   const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
 
-  let button: ReactNode;
-  switch (props.mode) {
-    case "range":
-      const range = correctFromUTCRange(props.selected);
-      button = (
-        <div className="tw-flex" ref={refs.setReference} {...getReferenceProps()}>
-          <button>{range.from?.toLocaleDateString()}</button>
-          <button>{range.to?.toLocaleDateString()}</button>
-        </div>
-      );
-      break;
-    case "single":
-      const date = correctFromUTC(props.selected);
-      button = (
-        <button
-          className={mergeClasses(
-            "tw-flex tw-relative tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-justify-start tw-items-center tw-cursor-pointer tw-font-medium",
-            buttonClass,
-          )}
-          ref={refs.setReference}
-          {...getReferenceProps()}
-        >
-          <CalendarIcon className="tw-w-5 tw-ml-4 tw-mr-3 -tw-mt-[1px]" />
-          {date ? date.toLocaleDateString() : "Select a date"}
-        </button>
-      );
-      break;
-    default:
-      break;
-  }
-
   return (
     <div className={className}>
-      {button}
+      <button
+        className={mergeClasses(
+          "tw-flex tw-relative tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-justify-start tw-items-center tw-cursor-pointer tw-font-medium",
+          buttonClass,
+        )}
+        ref={refs.setReference}
+        {...getReferenceProps()}
+      >
+        <CalendarIcon className="tw-w-5 tw-ml-4 tw-mr-3 -tw-mt-[1px]" />
+        {props.selected ? props.selected.toLocaleDateString() : "Select a date"}
+      </button>
       <Transition
         show={open}
         enter="tw-transition tw-ease-out tw-duration-100"
@@ -136,7 +114,15 @@ export const DatePickerPopper: React.FC<DayPickerProps & { buttonClass?: string 
             {...getFloatingProps()}
             className="tw-bg-white tw-rounded-lg tw-shadow-md"
           >
-            <DateRangePicker numberOfMonths={1} {...props} />
+            <DateRangePicker
+              mode="single"
+              numberOfMonths={1}
+              onSelect={(e: Date | undefined) => {
+                setOpen(false);
+                onSelect && onSelect(e);
+              }}
+              {...props}
+            />
           </div>
         </FloatingFocusManager>
       </Transition>

@@ -109,7 +109,6 @@ const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
         </div>
         <div className="tw-flex tw-w-full tw-mt-3 tw-mb-5 tw-gap-2">
           <DatePickerPopper
-            mode="single"
             className="tw-w-3/4 tw-mr-2"
             selected={startDate}
             onSelect={setStartDate}
