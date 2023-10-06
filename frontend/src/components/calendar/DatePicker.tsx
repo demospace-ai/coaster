@@ -89,7 +89,7 @@ export const DatePickerPopper: React.FC<
     <div className={className}>
       <button
         className={mergeClasses(
-          "tw-flex tw-relative tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-justify-start tw-items-center tw-cursor-pointer tw-font-medium",
+          "tw-flex tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-justify-start tw-items-center tw-cursor-pointer tw-font-medium",
           buttonClass,
         )}
         ref={refs.setReference}

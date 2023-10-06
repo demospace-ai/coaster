@@ -994,26 +994,31 @@ export const GuestNumberInput: React.FC<{
             <div className="tw-flex tw-justify-between">
               <span className="tw-whitespace-nowrap tw-select-none">Adults</span>
               <div className="tw-flex tw-gap-3">
-                <MinusCircleIcon
-                  className={mergeClasses(
-                    "tw-w-6 tw-cursor-pointer tw-stroke-gray-500 hover:tw-stroke-black",
-                    value === 1 && "!tw-stroke-gray-300 tw-cursor-not-allowed",
-                  )}
+                <button
                   onClick={() => {
                     setValue(Math.max(1, value - 1));
                   }}
-                />
-
+                >
+                  <MinusCircleIcon
+                    className={mergeClasses(
+                      "tw-w-6 tw-cursor-pointer tw-stroke-gray-500 hover:tw-stroke-black",
+                      value === 1 && "!tw-stroke-gray-300 tw-cursor-not-allowed",
+                    )}
+                  />
+                </button>
                 <span className="tw-flex tw-w-3 tw-justify-center tw-select-none">{value}</span>
-                <PlusCircleIcon
-                  className={mergeClasses(
-                    "tw-w-6 tw-cursor-pointer tw-stroke-gray-500 hover:tw-stroke-black",
-                    value === maxGuests && "!tw-stroke-gray-300 tw-cursor-not-allowed",
-                  )}
+                <button
                   onClick={() => {
                     setValue(Math.min(maxGuests, value + 1));
                   }}
-                />
+                >
+                  <PlusCircleIcon
+                    className={mergeClasses(
+                      "tw-w-6 tw-cursor-pointer tw-stroke-gray-500 hover:tw-stroke-black",
+                      value === maxGuests && "!tw-stroke-gray-300 tw-cursor-not-allowed",
+                    )}
+                  />
+                </button>
               </div>
             </div>
           </div>

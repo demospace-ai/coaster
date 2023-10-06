@@ -107,7 +107,7 @@ const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
         <div>
           <span className="tw-text-2xl tw-font-semibold tw-mb-3">${listing.price}</span> per person
         </div>
-        <div className="tw-flex tw-w-full tw-mt-3 tw-mb-5 tw-gap-2">
+        <div className="tw-flex tw-w-full tw-mt-3 tw-mb-5">
           <DatePickerPopper
             className="tw-w-3/4 tw-mr-2"
             selected={startDate}
