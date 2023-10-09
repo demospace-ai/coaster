@@ -25,40 +25,40 @@ export const DateRangePicker: React.FC<DayPickerProps> = ({
   ...props
 }) => {
   const { width } = useWindowDimensions();
-  const isMobile = width < 640;
+  const isMobile = width < 768;
+  const numberOfMonths = props.numberOfMonths ? props.numberOfMonths : isMobile ? 1 : 2;
 
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      className={className}
-      numberOfMonths={props.numberOfMonths ? props.numberOfMonths : isMobile ? 1 : 2}
+      className={mergeClasses("tw-w-full", className)}
+      numberOfMonths={numberOfMonths}
       classNames={{
-        months: "tw-flex tw-flex-col sm:tw-flex-row tw-space-y-4 sm:tw-space-x-4 sm:tw-space-y-0",
-        month: "tw-space-y-4 tw-border-0 sm:tw-border sm:tw-p-4 tw-rounded-lg",
+        months: "tw-flex tw-flex-col sm:tw-flex-row tw-w-full tw-space-y-4 sm:tw-space-x-4 sm:tw-space-y-0",
+        month: "tw-flex tw-flex-col tw-w-full tw-space-y-4 tw-border-0 sm:tw-border sm:tw-p-4 tw-rounded-lg",
         caption: "tw-flex tw-justify-center tw-pt-1 tw-relative tw-items-center",
         caption_label: "tw-text-sm tw-font-medium",
         nav: "tw-space-x-1 tw-flex tw-items-center",
-        nav_button:
-          "hover:tw-bg-slate-500 hover:tw-text-white tw-h-6 tw-w-6 tw-bg-transparent tw-p-0 tw-opacity-50 hover:tw-opacity-100",
+        nav_button: "tw-h-6 tw-w-6 tw-bg-transparent tw-p-0 tw-opacity-50 hover:tw-opacity-100 tw-rounded-lg",
         nav_button_previous: "tw-absolute tw-left-1",
         nav_button_next: "tw-absolute tw-right-1",
         table: "tw-w-full tw-border-collapse tw-space-y-1",
         head_row: "tw-flex",
-        head_cell: "tw-text-slate-200 tw-rounded-md tw-w-9 tw-font-normal tw-text-sm",
+        head_cell: "tw-text-slate-200 tw-rounded-md tw-w-full tw-font-normal tw-text-sm",
         row: "tw-flex tw-w-full tw-mt-2",
-        cell: "tw-text-center tw-text-sm tw-p-0 tw-relative focus-within:tw-relative focus-within:tw-z-20",
-        day: "tw-h-9 tw-w-9 tw-p-0 tw-font-normal aria-selected:tw-opacity-100 hover:tw-bg-blue-500 hover:tw-text-white tw-rounded tw-flex tw-items-center tw-justify-center tw-cursor-pointer",
+        cell: "tw-w-full tw-aspect-square tw-text-center tw-text-sm tw-p-0 tw-relative focus-within:tw-relative focus-within:tw-z-20",
+        day: "tw-w-full tw-h-full tw-p-0 tw-font-normal aria-selected:tw-opacity-100 hover:tw-bg-blue-500 hover:tw-text-white tw-rounded tw-flex tw-items-center tw-justify-center tw-cursor-pointer",
         day_today: "tw-bg-slate-300 tw-text-black",
         day_selected: "!tw-bg-blue-600 tw-text-white hover:tw-bg-blue-500",
-        day_outside: "tw-text-slate-200 tw-opacity-50",
+        day_outside: "tw-text-slate-400 tw-opacity-50",
         day_disabled: "tw-text-slate-200 tw-opacity-50",
         day_range_middle: "aria-selected:!tw-bg-blue-500 aria-selected:tw-text-white",
         day_hidden: "tw-invisible",
         ...classNames,
       }}
       components={{
-        IconLeft: () => <ChevronLeftIcon className="h-4 w-4" />,
-        IconRight: () => <ChevronRightIcon className="h-4 w-4" />,
+        IconLeft: () => <ChevronLeftIcon />,
+        IconRight: () => <ChevronRightIcon />,
       }}
       {...props}
     />
@@ -110,15 +110,11 @@ export const DatePickerPopper: React.FC<
       </button>
       {isMounted && (
         <FloatingFocusManager context={context}>
-          <div
-            ref={refs.setFloating}
-            style={floatingStyles}
-            {...getFloatingProps()}
-            className="tw-bg-white tw-rounded-lg tw-shadow-md"
-          >
-            <div style={transitionStyles}>
+          <div ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
+            <div style={transitionStyles} className="tw-bg-white tw-rounded-lg tw-shadow-md">
               <DateRangePicker
                 mode="single"
+                className="tw-w-[320px]"
                 numberOfMonths={1}
                 onSelect={(e: Date | undefined) => {
                   setOpen(false);
@@ -176,8 +172,8 @@ export const DatePickerSlider: React.FC<
               leaveFrom="tw-translate-y-0"
               leaveTo="tw-translate-y-full"
             >
-              <Dialog.Panel className="tw-flex tw-flex-col tw-bg-white tw-rounded-xl tw-h-full tw-items-center tw-justify-start">
-                <div className="tw-p-6 tw-w-full">
+              <Dialog.Panel className="tw-flex tw-flex-col tw-bg-white tw-rounded-xl tw-h-full tw-items-center tw-justify-start tw-p-6 ">
+                <div className="tw-w-full tw-mb-4">
                   <button
                     className="tw-inline tw-ml-auto tw-mb-2 tw-bg-transparent tw-border-none tw-cursor-pointer tw-p-0"
                     onClick={(e) => {
@@ -189,14 +185,19 @@ export const DatePickerSlider: React.FC<
                 </div>
                 <DateRangePicker
                   mode="single"
+                  className="tw-w-full"
+                  // classNames={{
+                  //   day: "tw-w-10 tw-h-10",
+                  // }}
                   numberOfMonths={1}
                   onSelect={(e: Date | undefined) => {
                     onSelect && onSelect(e);
                   }}
                   {...props}
                 />
-                <div className="tw-mt-auto tw-p-6">
+                <div className="tw-flex tw-mt-auto tw-w-full tw-justify-end">
                   <Button
+                    className="tw-h-10 tw-w-28"
                     onClick={() => {
                       setOpen(false);
                     }}
