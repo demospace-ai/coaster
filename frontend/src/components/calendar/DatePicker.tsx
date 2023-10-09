@@ -10,9 +10,11 @@ import {
   useRole,
   useTransitionStyles,
 } from "@floating-ui/react";
-import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { Fragment, useState } from "react";
 import { DateRange, DayPicker, DayPickerProps, DayPickerSingleProps } from "react-day-picker";
+import { Button } from "src/components/button/Button";
 import { mergeClasses } from "src/utils/twmerge";
 import useWindowDimensions from "src/utils/window";
 
@@ -140,28 +142,6 @@ export const DatePickerSlider: React.FC<
 > = ({ className, classNames, buttonClass, onSelect, showOutsideDays = true, ...props }) => {
   const [open, setOpen] = useState(false);
 
-  const { refs, floatingStyles, context } = useFloating({
-    open: open,
-    onOpenChange: setOpen,
-    middleware: [shift()],
-    whileElementsMounted: autoUpdate,
-    placement: "top-start",
-  });
-
-  const click = useClick(context);
-  const dismiss = useDismiss(context);
-  const role = useRole(context);
-
-  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
-
-  const { isMounted, styles: transitionStyles } = useTransitionStyles(context, {
-    duration: 100,
-    initial: {
-      opacity: 0,
-      scale: "0.95",
-    },
-  });
-
   return (
     <div className={className}>
       <button
@@ -169,33 +149,66 @@ export const DatePickerSlider: React.FC<
           "tw-flex tw-justify-start tw-items-center tw-cursor-pointer tw-whitespace-nowrap tw-font-medium tw-underline",
           buttonClass,
         )}
-        ref={refs.setReference}
-        {...getReferenceProps()}
+        onClick={() => setOpen(true)}
       >
         {props.selected ? props.selected.toLocaleDateString() : "Select a date"}
       </button>
-      {isMounted && (
-        <FloatingFocusManager context={context}>
-          <div
-            ref={refs.setFloating}
-            style={floatingStyles}
-            {...getFloatingProps()}
-            className="tw-bg-white tw-rounded-lg tw-shadow-md tw-h-screen"
+      <Transition.Root show={open} as={Fragment}>
+        <Dialog onClose={setOpen} className="tw-relative tw-z-[100]">
+          <Transition.Child
+            as={Fragment}
+            enter="tw-transform tw-transition tw-ease-in-out tw-duration-500 sm:tw-duration-700"
+            enterFrom="tw-opacity-0"
+            enterTo="tw-opacity-100"
+            leave="tw-transform tw-transition tw-ease-in-out tw-duration-500 sm:tw-duration-700"
+            leaveFrom="tw-opacity-100"
+            leaveTo="tw-opacity-0"
           >
-            <div style={transitionStyles}>
-              <DateRangePicker
-                mode="single"
-                numberOfMonths={1}
-                onSelect={(e: Date | undefined) => {
-                  setOpen(false);
-                  onSelect && onSelect(e);
-                }}
-                {...props}
-              />
-            </div>
+            <div className="tw-fixed tw-inset-0 tw-backdrop-blur-sm tw-bg-black tw-bg-opacity-10" />
+          </Transition.Child>
+          <div className="tw-fixed tw-inset-x-0 tw-bottom-0 tw-h-[80vh]">
+            <Transition.Child
+              as={Fragment}
+              enter="tw-transform tw-transition tw-ease-in-out tw-duration-500 sm:tw-duration-700"
+              enterFrom="tw-translate-y-full"
+              enterTo="tw-translate-y-0"
+              leave="tw-transform tw-transition tw-ease-in-out tw-duration-500 sm:tw-duration-700"
+              leaveFrom="tw-translate-y-0"
+              leaveTo="tw-translate-y-full"
+            >
+              <Dialog.Panel className="tw-flex tw-flex-col tw-bg-white tw-rounded-xl tw-h-full tw-items-center tw-justify-start">
+                <div className="tw-p-6 tw-w-full">
+                  <button
+                    className="tw-inline tw-ml-auto tw-mb-2 tw-bg-transparent tw-border-none tw-cursor-pointer tw-p-0"
+                    onClick={(e) => {
+                      setOpen(false);
+                    }}
+                  >
+                    <XMarkIcon className="tw-h-5 tw-stroke-black" />
+                  </button>
+                </div>
+                <DateRangePicker
+                  mode="single"
+                  numberOfMonths={1}
+                  onSelect={(e: Date | undefined) => {
+                    onSelect && onSelect(e);
+                  }}
+                  {...props}
+                />
+                <div className="tw-mt-auto tw-p-6">
+                  <Button
+                    onClick={() => {
+                      setOpen(false);
+                    }}
+                  >
+                    Apply
+                  </Button>
+                </div>
+              </Dialog.Panel>
+            </Transition.Child>
           </div>
-        </FloatingFocusManager>
-      )}
+        </Dialog>
+      </Transition.Root>
     </div>
   );
 };

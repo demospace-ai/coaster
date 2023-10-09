@@ -181,7 +181,7 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ listing, imageID, setImages, 
   };
 
   return (
-    <Modal show={show} close={closeModal} clickToEscape>
+    <Modal show={show} close={closeModal}>
       <div className="tw-flex tw-flex-col tw-items-center tw-w-[320px] sm:tw-w-[420px] tw-px-8 sm:tw-px-12 tw-pb-10">
         <div className="tw-text-center tw-w-full tw-text-xl tw-font-medium tw-mb-6">Permanently delete this image?</div>
         <Button

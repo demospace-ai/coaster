@@ -143,7 +143,6 @@ export const ComingSoon: React.FC = () => {
           setShowWaitlist(false);
           clearErrors();
         }}
-        clickToEscape={true}
       >
         <div className="tw-w-[320px] sm:tw-w-[420px] tw-px-8 sm:tw-px-12 tw-pb-10">
           {joined ? (

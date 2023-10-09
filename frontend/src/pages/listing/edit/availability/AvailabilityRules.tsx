@@ -152,7 +152,7 @@ interface AvailabilityRuleModalProps {
 
 const AvailabilityRuleModal: React.FC<AvailabilityRuleModalProps> = ({ listing, existingRule, show, closeModal }) => {
   return (
-    <Modal show={show} close={closeModal} fff="1">
+    <Modal show={show} close={closeModal}>
       {existingRule ? (
         <ExistingRuleForm key={existingRule.id} listing={listing} existingRule={existingRule} closeModal={closeModal} />
       ) : (
@@ -186,7 +186,7 @@ const DeleteRuleModal: React.FC<AvailabilityRuleModalProps> = ({ listing, existi
   };
 
   return (
-    <Modal show={show} close={closeModal} fff="2">
+    <Modal show={show} close={closeModal}>
       <div className="tw-flex tw-flex-col tw-items-center tw-w-[320px] sm:tw-w-[420px] tw-px-8 sm:tw-px-12 tw-pb-10">
         <div className="tw-text-center tw-w-full tw-text-xl tw-font-medium tw-mb-6">
           Permanently delete the availability rule <span className="tw-font-bold">{existingRule.name}</span>?
@@ -225,7 +225,7 @@ const UpdateAvailabilityTypeModal: React.FC<{
   };
 
   return (
-    <Modal show={show} close={closeModal} fff="3">
+    <Modal show={show} close={closeModal}>
       <div className="tw-w-[80vw] sm:tw-w-[600px] tw-px-8 sm:tw-px-12 tw-pb-10">
         <div className="tw-text-center tw-w-full tw-text-base sm:tw-text-lg tw-mb-8">
           Changing the availability type of this listing will <span className="tw-font-semibold">permanently</span>{" "}
