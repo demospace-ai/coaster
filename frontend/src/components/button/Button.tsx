@@ -1,5 +1,4 @@
 import { TrashIcon } from "@heroicons/react/24/outline";
-import classNames from "classnames";
 import React, { forwardRef } from "react";
 import { NavLink, NavLinkProps, useNavigate } from "react-router-dom";
 import { mergeClasses } from "src/utils/twmerge";
@@ -38,8 +37,7 @@ export const LinkButton: React.FC<LinkButtonProps> = forwardRef<HTMLAnchorElemen
   const { href, className, children, ...remaining } = props;
 
   const buttonStyle = mergeClasses(
-    "tw-flex tw-items-center tw-justify-center tw-text-primary-text tw-bg-primary hover:tw-bg-primary-hover",
-    "tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition tw-select-none",
+    "tw-flex tw-items-center tw-justify-center tw-text-primary-text tw-bg-primary hover:tw-bg-primary-hover tw-tracking-[1px] tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-transition tw-select-none",
     props.className,
   );
   return (
@@ -55,9 +53,8 @@ type FormButtonProps = {
 };
 
 export const FormButton: React.FC<FormButtonProps> = (props) => {
-  const buttonStyle = classNames(
-    "tw-text-primary-text tw-bg-primary hover:tw-bg-primary-hover",
-    "tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition tw-select-none",
+  const buttonStyle = mergeClasses(
+    "tw-text-primary-text tw-bg-primary hover:tw-bg-primary-hover tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition tw-select-none",
     props.className,
   );
   return (
@@ -80,7 +77,7 @@ export const BackButton: React.FC<Partial<ButtonProps>> = (props) => {
 
   return (
     <div
-      className={classNames(
+      className={mergeClasses(
         "tw-cursor-pointer tw-select-none tw-text-sm tw-font-[500] hover:tw-text-slate-600 tw-w-fit",
         props.className,
       )}
@@ -94,7 +91,7 @@ export const BackButton: React.FC<Partial<ButtonProps>> = (props) => {
 export const NavButton: React.FC<NavLinkProps> = (props) => {
   return (
     <NavLink
-      className={classNames(
+      className={mergeClasses(
         "tw-bg-primary tw-text-white tw-rounded-md tw-block tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-font-bold tw-text-center tw-transition-colors hover:tw-bg-primary-hover tw-border tw-border-solid tw-border-primary-hover",
         props.className as string,
       )}

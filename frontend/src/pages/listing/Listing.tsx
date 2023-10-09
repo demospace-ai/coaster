@@ -81,7 +81,6 @@ const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) => {
 
 const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) => {
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
-  const [guests, setGuests] = useState<number>(1);
 
   return (
     <div className="tw-fixed lg:tw-hidden tw-z-20 tw-bottom-0 tw-left-0 tw-flex tw-items-center tw-justify-between tw-bg-white tw-border-t tw-border-solid tw-border-gray-300 tw-h-20 tw-w-full tw-px-4">
@@ -90,12 +89,12 @@ const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) => {
         <DatePickerSlider selected={startDate} onSelect={setStartDate} />
       </div>
       <LinkButton
-        className="tw-font-semibold tw-py-2"
+        className="tw-font-medium tw-tracking-[0.5px] tw-py-2"
         href={`mailto:${listing.host.email}?subject=Checking availability&body=Hi ${getHostName(
           listing.host,
         )}, I'm interested in booking your trip!`}
       >
-        Reserve
+        {startDate ? "Reserve" : "Check Availability"}
       </LinkButton>
     </div>
   );
@@ -126,12 +125,12 @@ const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
           />
         </div>
         <LinkButton
-          className="tw-font-semibold tw-py-2 tw-mb-4"
+          className="tw-font-medium tw-py-2 tw-mb-4 tw-tracking-[0.5px]"
           href={`mailto:${listing.host.email}?subject=Checking availability&body=Hi ${getHostName(
             listing.host,
           )}, I'm interested in booking your trip!`}
         >
-          Check Availability
+          {startDate ? "Reserve" : "Check Availability"}
         </LinkButton>
         <div className="tw-w-full tw-text-center tw-text-sm tw-mb-4 tw-pb-3 tw-border-b tw-border-solid tw-border-gray-300">
           You won't be charged yet

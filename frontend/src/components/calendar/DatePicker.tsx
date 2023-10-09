@@ -99,13 +99,13 @@ export const DatePickerPopper: React.FC<
     <div className={className}>
       <button
         className={mergeClasses(
-          "tw-flex tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-justify-start tw-items-center tw-cursor-pointer tw-font-medium tw-whitespace-nowrap",
+          "tw-flex tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-justify-start tw-items-center tw-cursor-pointer tw-whitespace-nowrap",
           buttonClass,
         )}
         ref={refs.setReference}
         {...getReferenceProps()}
       >
-        <CalendarIcon className="tw-w-5 tw-ml-4 tw-mr-3 -tw-mt-[1px]" />
+        <CalendarIcon className="tw-w-5 tw-ml-4 tw-mr-3 -tw-mt-[1.5px]" />
         {props.selected ? props.selected.toLocaleDateString() : "Select a date"}
       </button>
       {isMounted && (
