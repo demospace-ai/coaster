@@ -311,7 +311,8 @@ const FixedRangeRuleUpdateForm: React.FC<{
             )}
           />
         </div>
-        <FormError message={errors.date_range?.message} />
+        <FormError message={errors.date_range?.from?.message} />
+        <FormError className="tw-mb-3" message={errors.date_range?.to?.message} />
         {availabilityType === AvailabilityType.Enum.datetime ? (
           <>
             <div className="tw-text-lg tw-font-semibold tw-mb-1 tw-mt-5">Time Slots</div>

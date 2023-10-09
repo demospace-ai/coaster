@@ -11,7 +11,7 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { BackButton, LinkButton } from "src/components/button/Button";
-import { DatePickerPopper } from "src/components/calendar/DatePicker";
+import { DatePickerPopper, DatePickerSlider } from "src/components/calendar/DatePicker";
 import { Callout } from "src/components/callouts/Callout";
 import { GuestNumberInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
@@ -80,18 +80,22 @@ const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) => {
 };
 
 const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) => {
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [guests, setGuests] = useState<number>(1);
+
   return (
-    <div className="tw-fixed md:tw-hidden tw-z-20 tw-bottom-0 tw-left-0 tw-flex tw-items-center tw-justify-between tw-bg-white tw-border-t tw-border-solid tw-border-gray-300 tw-h-20 tw-w-full tw-px-4">
-      <span>
-        <span className="tw-font-bold">${listing.price}/person</span>
-      </span>
+    <div className="tw-fixed lg:tw-hidden tw-z-20 tw-bottom-0 tw-left-0 tw-flex tw-items-center tw-justify-between tw-bg-white tw-border-t tw-border-solid tw-border-gray-300 tw-h-20 tw-w-full tw-px-4">
+      <div>
+        <span className="tw-font-semibold">${listing.price}</span> per person
+        <DatePickerSlider selected={startDate} onSelect={setStartDate} />
+      </div>
       <LinkButton
-        className="tw-font-semibold tw-py-2 tw-mb-4"
+        className="tw-font-semibold tw-py-2"
         href={`mailto:${listing.host.email}?subject=Checking availability&body=Hi ${getHostName(
           listing.host,
         )}, I'm interested in booking your trip!`}
       >
-        Check Availability
+        Reserve
       </LinkButton>
     </div>
   );
@@ -102,7 +106,7 @@ const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
   const [guests, setGuests] = useState<number>(1);
 
   return (
-    <div className="tw-hidden md:tw-flex tw-w-[40%]">
+    <div className="tw-hidden lg:tw-flex tw-w-[40%] tw-min-w-[340px]">
       <div className="tw-sticky tw-top-32 tw-flex tw-flex-col tw-px-8 tw-py-6 tw-w-full tw-h-fit tw-border tw-border-solid tw-border-gray-300 tw-rounded-xl tw-shadow-centered-sm">
         <div>
           <span className="tw-text-2xl tw-font-semibold tw-mb-3">${listing.price}</span> per person
@@ -114,7 +118,12 @@ const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
             onSelect={setStartDate}
             buttonClass="tw-w-full tw-h-12"
           />
-          <GuestNumberInput value={guests} setValue={setGuests} maxGuests={listing.max_guests} className="tw-w-1/4" />
+          <GuestNumberInput
+            value={guests}
+            setValue={setGuests}
+            maxGuests={listing.max_guests}
+            className="tw-w-1/4 tw-min-w-[80px]"
+          />
         </div>
         <LinkButton
           className="tw-font-semibold tw-py-2 tw-mb-4"
@@ -332,9 +341,9 @@ const ImagesModal: React.FC<{ listing: ListingType; imageIndex: number; setImage
 
   return (
     <div>
-      <div className="tw-absolute tw-top-1/2 -tw-translate-y-1/2 tw-w-full tw-z-10">
+      <div className="tw-absolute tw-top-1/2 -tw-translate-y-1/2 tw-w-full tw-z-10 tw-flex tw-items-center">
         <button
-          className="tw-fixed tw-right-0 sm:tw-right-[10vw] sm:tw-p-10"
+          className="tw-fixed tw-right-0 sm:tw-right-[5vw] sm:tw-p-10"
           onClick={(e) => {
             e.stopPropagation();
             scrollForward();
@@ -343,7 +352,7 @@ const ImagesModal: React.FC<{ listing: ListingType; imageIndex: number; setImage
           <ChevronRightIcon className="tw-h-10 tw-cursor-pointer tw-stroke-slate-300" />
         </button>
         <button
-          className="tw-fixed tw-left-0 sm:tw-left-[10vw] sm:tw-p-10"
+          className="tw-fixed tw-left-0 sm:tw-left-[5vw] sm:tw-p-10"
           onClick={(e) => {
             e.stopPropagation();
             scrollBack();
@@ -358,7 +367,7 @@ const ImagesModal: React.FC<{ listing: ListingType; imageIndex: number; setImage
       >
         {listing.images.map((image) => (
           <div key={image.id} className="tw-flex tw-basis-full tw-snap-center tw-h-full">
-            <div className="tw-flex tw-w-screen sm:tw-w-[90vw] tw-px-10 tw-h-full tw-justify-center tw-items-center">
+            <div className="tw-flex tw-w-screen sm:tw-w-[90vw] tw-px-10 sm:tw-px-0 tw-h-full tw-justify-center tw-items-center">
               <img
                 className="tw-flex tw-max-h-full tw-object-contain tw-cursor-pointer tw-rounded-xl tw-overflow-hidden"
                 src={getGcsImageUrl(image)}
@@ -385,7 +394,6 @@ const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) => {
         close={() => {
           setShowImages(false);
         }}
-        clickToEscape={true}
         noContainer
       >
         <ImagesModal listing={listing} imageIndex={imageIndex} setImageIndex={setImageIndex} />

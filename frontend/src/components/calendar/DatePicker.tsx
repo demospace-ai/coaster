@@ -8,8 +8,8 @@ import {
   useFloating,
   useInteractions,
   useRole,
+  useTransitionStyles,
 } from "@floating-ui/react";
-import { Transition } from "@headlessui/react";
 import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import { DateRange, DayPicker, DayPickerProps, DayPickerSingleProps } from "react-day-picker";
@@ -85,11 +85,19 @@ export const DatePickerPopper: React.FC<
 
   const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
 
+  const { isMounted, styles: transitionStyles } = useTransitionStyles(context, {
+    duration: 100,
+    initial: {
+      opacity: 0,
+      scale: "0.95",
+    },
+  });
+
   return (
     <div className={className}>
       <button
         className={mergeClasses(
-          "tw-flex tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-justify-start tw-items-center tw-cursor-pointer tw-font-medium",
+          "tw-flex tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-justify-start tw-items-center tw-cursor-pointer tw-font-medium tw-whitespace-nowrap",
           buttonClass,
         )}
         ref={refs.setReference}
@@ -98,15 +106,7 @@ export const DatePickerPopper: React.FC<
         <CalendarIcon className="tw-w-5 tw-ml-4 tw-mr-3 -tw-mt-[1px]" />
         {props.selected ? props.selected.toLocaleDateString() : "Select a date"}
       </button>
-      <Transition
-        show={open}
-        enter="tw-transition tw-ease-out tw-duration-100"
-        enterFrom="tw-transform tw-opacity-0 tw-scale-95"
-        enterTo="tw-transform tw-opacity-100 tw-scale-100"
-        leave="tw-transition tw-ease-in tw-duration-75"
-        leaveFrom="tw-transform tw-opacity-100 tw-scale-97"
-        leaveTo="tw-transform tw-opacity-0 tw-scale-95"
-      >
+      {isMounted && (
         <FloatingFocusManager context={context}>
           <div
             ref={refs.setFloating}
@@ -114,18 +114,88 @@ export const DatePickerPopper: React.FC<
             {...getFloatingProps()}
             className="tw-bg-white tw-rounded-lg tw-shadow-md"
           >
-            <DateRangePicker
-              mode="single"
-              numberOfMonths={1}
-              onSelect={(e: Date | undefined) => {
-                setOpen(false);
-                onSelect && onSelect(e);
-              }}
-              {...props}
-            />
+            <div style={transitionStyles}>
+              <DateRangePicker
+                mode="single"
+                numberOfMonths={1}
+                onSelect={(e: Date | undefined) => {
+                  setOpen(false);
+                  onSelect && onSelect(e);
+                }}
+                {...props}
+              />
+            </div>
           </div>
         </FloatingFocusManager>
-      </Transition>
+      )}
+    </div>
+  );
+};
+
+export const DatePickerSlider: React.FC<
+  Omit<DayPickerSingleProps, "mode" | "onSelect"> & {
+    buttonClass?: string;
+    onSelect: (selected: Date | undefined) => void;
+  }
+> = ({ className, classNames, buttonClass, onSelect, showOutsideDays = true, ...props }) => {
+  const [open, setOpen] = useState(false);
+
+  const { refs, floatingStyles, context } = useFloating({
+    open: open,
+    onOpenChange: setOpen,
+    middleware: [shift()],
+    whileElementsMounted: autoUpdate,
+    placement: "top-start",
+  });
+
+  const click = useClick(context);
+  const dismiss = useDismiss(context);
+  const role = useRole(context);
+
+  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
+
+  const { isMounted, styles: transitionStyles } = useTransitionStyles(context, {
+    duration: 100,
+    initial: {
+      opacity: 0,
+      scale: "0.95",
+    },
+  });
+
+  return (
+    <div className={className}>
+      <button
+        className={mergeClasses(
+          "tw-flex tw-justify-start tw-items-center tw-cursor-pointer tw-whitespace-nowrap tw-font-medium tw-underline",
+          buttonClass,
+        )}
+        ref={refs.setReference}
+        {...getReferenceProps()}
+      >
+        {props.selected ? props.selected.toLocaleDateString() : "Select a date"}
+      </button>
+      {isMounted && (
+        <FloatingFocusManager context={context}>
+          <div
+            ref={refs.setFloating}
+            style={floatingStyles}
+            {...getFloatingProps()}
+            className="tw-bg-white tw-rounded-lg tw-shadow-md tw-h-screen"
+          >
+            <div style={transitionStyles}>
+              <DateRangePicker
+                mode="single"
+                numberOfMonths={1}
+                onSelect={(e: Date | undefined) => {
+                  setOpen(false);
+                  onSelect && onSelect(e);
+                }}
+                {...props}
+              />
+            </div>
+          </div>
+        </FloatingFocusManager>
+      )}
     </div>
   );
 };

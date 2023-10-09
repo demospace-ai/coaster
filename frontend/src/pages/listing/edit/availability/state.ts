@@ -16,8 +16,8 @@ import { z } from "zod";
 
 export const DateRangeSchema = z.object(
   {
-    from: z.date(),
-    to: z.date(),
+    from: z.date({ required_error: "Please select a start date." }),
+    to: z.date({ required_error: "Please select an end date." }),
   },
   { required_error: "Please select a date range." },
 );

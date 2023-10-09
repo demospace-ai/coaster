@@ -278,7 +278,8 @@ const DateRangeStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
           )}
         />
       </div>
-      <FormError message={errors.date_range?.message} />
+      <FormError message={errors.date_range?.from?.message} />
+      <FormError message={errors.date_range?.to?.message} />
       <WizardNavButtons nextStep={handleSubmit(nextStep ? nextStep : () => {})} prevStep={prevStep} />
     </div>
   );

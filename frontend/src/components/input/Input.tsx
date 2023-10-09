@@ -964,17 +964,17 @@ export const GuestNumberInput: React.FC<{
 
   return (
     <>
-      <div
+      <button
         ref={refs.setReference}
         {...getReferenceProps()}
         className={mergeClasses(
-          "tw-flex tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-items-center tw-cursor-pointer",
+          "tw-flex tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-items-center tw-cursor-pointer tw-px-4",
           className,
         )}
       >
-        <UserIcon className="tw-w-5 tw-ml-4 tw-mr-2" />
-        <button>{value}</button>
-      </div>
+        <UserIcon className="tw-w-5 tw-mr-1" />
+        <span className="tw-flex tw-flex-grow tw-justify-center tw-select-none">{value}</span>
+      </button>
       <Transition
         show={open}
         enter="tw-transition tw-ease-out tw-duration-100"
