@@ -36,7 +36,7 @@ func (s ApiService) DeleteListingImage(auth auth.Authentication, w http.Response
 	}
 
 	// Make sure this user has ownership of this listing
-	listing, err := listings.LoadByIDAndUser(s.db, listingID, auth.User)
+	listing, err := listings.LoadDetailsByIDAndUser(s.db, listingID, auth.User)
 	if err != nil {
 		return errors.Wrapf(err, "(api.DeleteListingImage) loading listing %d for user %d", listingID, auth.User.ID)
 	}

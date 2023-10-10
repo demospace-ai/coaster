@@ -28,7 +28,7 @@ func (s ApiService) GetListing(w http.ResponseWriter, r *http.Request) error {
 		return errors.Wrap(err, "(api.GetListing) unexpected authentication error")
 	}
 
-	listing, err := listings.LoadByIDAndUser(
+	listing, err := listings.LoadDetailsByIDAndUser(
 		s.db,
 		listingID,
 		auth.User,

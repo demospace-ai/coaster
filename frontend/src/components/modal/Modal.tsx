@@ -1,6 +1,7 @@
 import { Dialog } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
+import React from "react";
 import { createPortal } from "react-dom";
 
 interface ModalProps {
@@ -10,6 +11,7 @@ interface ModalProps {
   title?: string;
   description?: string;
   noContainer?: boolean;
+  clickToClose?: boolean;
 }
 
 export const Modal: React.FC<ModalProps> = (props) => {
@@ -22,21 +24,33 @@ export const Modal: React.FC<ModalProps> = (props) => {
       onClose={() => props.close && props.close()}
     >
       {props.noContainer ? (
-        <Dialog.Panel>
-          <NoContainerModalCloseButton close={props.close} />
-          {props.children}
-        </Dialog.Panel>
-      ) : (
-        <Dialog.Panel
-          className="tw-absolute tw-bg-white tw-flex tw-flex-col tw-top-[50%] sm:tw-top-[45%] tw-max-h-[85%] tw-left-1/2 -tw-translate-x-1/2 -tw-translate-y-1/2 tw-rounded-lg tw-shadow-md"
-          onClick={(e) => e.stopPropagation()}
-        >
+        props.clickToClose ? (
+          <Dialog.Panel>
+            <NoContainerModalCloseButton close={props.close} />
+            {props.children}
+          </Dialog.Panel>
+        ) : (
+          <div>
+            <NoContainerModalCloseButton close={props.close} />
+            {props.children}
+          </div>
+        )
+      ) : props.clickToClose ? (
+        <Dialog.Panel className="tw-absolute tw-bg-white tw-flex tw-flex-col tw-top-[50%] sm:tw-top-[45%] tw-max-h-[85%] tw-left-1/2 -tw-translate-x-1/2 -tw-translate-y-1/2 tw-rounded-lg tw-shadow-md">
           <div className="tw-flex">
             <div className="tw-inline tw-m-6 tw-mb-2 tw-select-none">{props.title}</div>
             <ModalCloseButton close={props.close} />
           </div>
           {props.children}
         </Dialog.Panel>
+      ) : (
+        <div className="tw-absolute tw-bg-white tw-flex tw-flex-col tw-top-[50%] sm:tw-top-[45%] tw-max-h-[85%] tw-left-1/2 -tw-translate-x-1/2 -tw-translate-y-1/2 tw-rounded-lg tw-shadow-md">
+          <div className="tw-flex">
+            <div className="tw-inline tw-m-6 tw-mb-2 tw-select-none">{props.title}</div>
+            <ModalCloseButton close={props.close} />
+          </div>
+          {props.children}
+        </div>
       )}
     </Dialog>,
     document.body,

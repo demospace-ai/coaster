@@ -18,7 +18,7 @@ import { Loading } from "src/components/loading/Loading";
 import { Modal } from "src/components/modal/Modal";
 import { useShowToast } from "src/components/notifications/Notifications";
 import { ProfilePicture } from "src/components/profile/ProfilePicture";
-import { useListing } from "src/rpc/data";
+import { useAvailability, useListing } from "src/rpc/data";
 import { Host, ListingStatus, Listing as ListingType } from "src/rpc/types";
 import { getGcsImageUrl } from "src/utils/images";
 import { toTitleCase } from "src/utils/string";
@@ -80,13 +80,33 @@ const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) => {
 };
 
 const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) => {
+  const [month, setMonth] = useState<Date>(new Date()); // TODO: this should be the current month
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const { availability, loading } = useAvailability(listing.id, month);
 
   return (
     <div className="tw-fixed lg:tw-hidden tw-z-20 tw-bottom-0 tw-left-0 tw-flex tw-items-center tw-justify-between tw-bg-white tw-border-t tw-border-solid tw-border-gray-300 tw-h-20 tw-w-full tw-px-4">
       <div>
         <span className="tw-font-semibold">${listing.price}</span> per person
-        <DatePickerSlider selected={startDate} onSelect={setStartDate} />
+        <DatePickerSlider
+          selected={startDate}
+          onSelect={setStartDate}
+          month={month}
+          onMonthChange={setMonth}
+          loading={loading}
+          disabled={(day: Date) => {
+            if (!availability) {
+              return true;
+            }
+
+            for (const date of availability) {
+              if (date.toDateString() === day.toDateString()) {
+                return false;
+              }
+            }
+            return true;
+          }}
+        />
       </div>
       <LinkButton
         className="tw-font-medium tw-tracking-[0.5px] tw-py-2"
@@ -101,8 +121,10 @@ const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) => {
 };
 
 const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
+  const [month, setMonth] = useState<Date>(new Date()); // TODO: this should be the current month
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [guests, setGuests] = useState<number>(1);
+  const { availability, loading } = useAvailability(listing.id, month);
 
   return (
     <div className="tw-hidden lg:tw-flex tw-w-[40%] tw-min-w-[340px]">
@@ -115,6 +137,21 @@ const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
             className="tw-w-3/4 tw-mr-2"
             selected={startDate}
             onSelect={setStartDate}
+            month={month}
+            onMonthChange={setMonth}
+            loading={loading}
+            disabled={(day: Date) => {
+              if (!availability) {
+                return true;
+              }
+
+              for (const date of availability) {
+                if (date.toDateString() === day.toDateString()) {
+                  return false;
+                }
+              }
+              return true;
+            }}
             buttonClass="tw-w-full tw-h-12"
           />
           <GuestNumberInput

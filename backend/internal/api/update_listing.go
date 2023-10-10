@@ -46,7 +46,7 @@ func (s ApiService) UpdateListing(auth auth.Authentication, w http.ResponseWrite
 	// Make sure this user has ownership of this listing if the user is not an admin
 	var listing *models.Listing
 	if auth.User.IsAdmin {
-		listingDetails, err := listings.LoadByIDAndUser(s.db, listingID, auth.User)
+		listingDetails, err := listings.LoadDetailsByIDAndUser(s.db, listingID, auth.User)
 		if err != nil {
 			return errors.Wrapf(err, "(api.UpdateListing) loading listing %d for user %d", listingID, auth.User.ID)
 		}

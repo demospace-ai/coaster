@@ -17,9 +17,6 @@ import (
 
 type CreateAvailabilityRequest = input.AvailabilityRule
 
-type CreateAvailabilityResponse struct {
-}
-
 func (s ApiService) CreateAvailability(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
 	strListingId, ok := vars["listingID"]

@@ -3,9 +3,9 @@ package views
 import (
 	"time"
 
+	"go.fabra.io/server/common/availability"
 	"go.fabra.io/server/common/database"
 	"go.fabra.io/server/common/models"
-	"go.fabra.io/server/common/repositories/availability_rules"
 )
 
 type AvailabilityRule struct {
@@ -28,7 +28,7 @@ type TimeSlot struct {
 	Capacity           *int64         `json:"capacity"`
 }
 
-func ConvertAvailabilityRules(availabilityRules []availability_rules.RuleAndTimes) []AvailabilityRule {
+func ConvertAvailabilityRules(availabilityRules []availability.RuleAndTimes) []AvailabilityRule {
 	converted := make([]AvailabilityRule, len(availabilityRules))
 	for i, availabilityRule := range availabilityRules {
 		converted[i] = AvailabilityRule{

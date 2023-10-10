@@ -4,6 +4,7 @@ import { sendRequest } from "src/rpc/ajax";
 import {
   CreateAvailabilityRule,
   CreateListing,
+  GetAvailability,
   GetAvailabilityRules,
   GetDraftListing,
   GetFeaturedListings,
@@ -39,6 +40,27 @@ export function useListing(listingID: number | undefined) {
     fetcher,
   );
   return { listing: data, mutate, error, loading: isLoading || isValidating };
+}
+
+export function useAvailability(listingID: number, month: Date) {
+  const startDate = new Date(month.getFullYear(), month.getMonth(), 1).toISOString().split("T")[0];
+  const endDate = new Date(month.getFullYear(), month.getMonth() + 1, 0).toISOString().split("T")[0];
+
+  const fetcher: Fetcher<Date[], { listingID: number; startDate: string; endDate: string }> = ({
+    listingID,
+    startDate,
+    endDate,
+  }) =>
+    sendRequest(GetAvailability, {
+      pathParams: { listingID },
+      queryParams: { start_date: startDate, end_date: endDate },
+    });
+
+  const { data, mutate, error, isLoading, isValidating } = useSWR(
+    { GetAvailability, listingID, startDate, endDate },
+    fetcher,
+  );
+  return { availability: data, mutate, error, loading: isLoading || isValidating };
 }
 
 export function useHostedListings() {

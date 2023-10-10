@@ -47,6 +47,17 @@ export const GetListing: IEndpoint<undefined, Listing, { listingID: number }> = 
   path: "/listings/:listingID",
 };
 
+export const GetAvailability: IEndpoint<
+  undefined,
+  Date[],
+  { listingID: number },
+  { start_date: string; end_date: string }
+> = {
+  name: "Get availability",
+  method: "GET",
+  path: "/listings/:listingID/availability",
+};
+
 export const GetDraftListing: IEndpoint<undefined, Listing> = {
   name: "Get draft listing",
   method: "GET",

@@ -15,6 +15,7 @@ import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon, XMarkIcon } from "@her
 import { Fragment, useState } from "react";
 import { DateRange, DayPicker, DayPickerProps, DayPickerSingleProps } from "react-day-picker";
 import { Button } from "src/components/button/Button";
+import { Loading } from "src/components/loading/Loading";
 import { mergeClasses } from "src/utils/twmerge";
 import useWindowDimensions from "src/utils/window";
 
@@ -51,7 +52,8 @@ export const DateRangePicker: React.FC<DayPickerProps> = ({
         day_today: "tw-bg-slate-300 tw-text-black",
         day_selected: "!tw-bg-blue-600 tw-text-white hover:tw-bg-blue-500",
         day_outside: "tw-text-slate-400 tw-opacity-50",
-        day_disabled: "tw-text-slate-200 tw-opacity-50",
+        day_disabled:
+          "tw-text-slate-400 tw-opacity-50 !tw-cursor-not-allowed hover:tw-bg-slate-200 hover:tw-text-slate-400",
         day_range_middle: "aria-selected:!tw-bg-blue-500 aria-selected:tw-text-white",
         day_hidden: "tw-invisible",
         ...classNames,
@@ -59,6 +61,7 @@ export const DateRangePicker: React.FC<DayPickerProps> = ({
       components={{
         IconLeft: () => <ChevronLeftIcon />,
         IconRight: () => <ChevronRightIcon />,
+        ...props.components,
       }}
       {...props}
     />
@@ -69,8 +72,9 @@ export const DatePickerPopper: React.FC<
   Omit<DayPickerSingleProps, "mode" | "onSelect"> & {
     buttonClass?: string;
     onSelect: (selected: Date | undefined) => void;
+    loading?: boolean;
   }
-> = ({ className, classNames, buttonClass, onSelect, showOutsideDays = true, ...props }) => {
+> = ({ className, classNames, buttonClass, onSelect, loading, showOutsideDays = true, ...props }) => {
   const [open, setOpen] = useState(false);
 
   const { refs, floatingStyles, context } = useFloating({
@@ -121,6 +125,7 @@ export const DatePickerPopper: React.FC<
                   onSelect && onSelect(e);
                 }}
                 {...props}
+                components={loading ? { Day: () => <Loading className="tw-opacity-30" /> } : {}}
               />
             </div>
           </div>
@@ -134,8 +139,9 @@ export const DatePickerSlider: React.FC<
   Omit<DayPickerSingleProps, "mode" | "onSelect"> & {
     buttonClass?: string;
     onSelect: (selected: Date | undefined) => void;
+    loading?: boolean;
   }
-> = ({ className, classNames, buttonClass, onSelect, showOutsideDays = true, ...props }) => {
+> = ({ className, classNames, buttonClass, onSelect, loading, showOutsideDays = true, ...props }) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -186,13 +192,11 @@ export const DatePickerSlider: React.FC<
                 <DateRangePicker
                   mode="single"
                   className="tw-w-full"
-                  // classNames={{
-                  //   day: "tw-w-10 tw-h-10",
-                  // }}
                   numberOfMonths={1}
                   onSelect={(e: Date | undefined) => {
                     onSelect && onSelect(e);
                   }}
+                  components={loading ? { Day: () => <Loading className="tw-opacity-30" /> } : {}}
                   {...props}
                 />
                 <div className="tw-flex tw-mt-auto tw-w-full tw-justify-end">

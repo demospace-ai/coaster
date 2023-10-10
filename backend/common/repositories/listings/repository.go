@@ -18,7 +18,7 @@ type ListingDetails struct {
 	Images []models.ListingImage
 }
 
-func LoadByIDAndUser(db *gorm.DB, listingID int64, user *models.User) (*ListingDetails, error) {
+func LoadDetailsByIDAndUser(db *gorm.DB, listingID int64, user *models.User) (*ListingDetails, error) {
 	var listing models.Listing
 	result := db.Table("listings").
 		Select("listings.*").
@@ -51,6 +51,27 @@ func LoadByIDAndUser(db *gorm.DB, listingID int64, user *models.User) (*ListingD
 		host,
 		images,
 	}, nil
+}
+
+func LoadByIDAndUser(db *gorm.DB, listingID int64, user *models.User) (*models.Listing, error) {
+	var listing models.Listing
+	result := db.Table("listings").
+		Select("listings.*").
+		Where("listings.id = ?", listingID).
+		Where("listings.deactivated_at IS NULL").
+		Take(&listing)
+	if result.Error != nil {
+		return nil, errors.Wrapf(result.Error, "(listings.LoadByID) error for ID %d", listingID)
+	}
+
+	// Allow the owner to see their own listing regardless of status
+	if listing.Status != models.ListingStatusPublished {
+		if user == nil || (listing.UserID != user.ID && !user.IsAdmin) {
+			return nil, gorm.ErrRecordNotFound
+		}
+	}
+
+	return &listing, nil
 }
 
 func LoadByIDAndUserID(db *gorm.DB, userID int64, listingID int64) (*models.Listing, error) {

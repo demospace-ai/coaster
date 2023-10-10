@@ -156,6 +156,12 @@ func (s ApiService) UnauthenticatedRoutes() []router.UnauthenticatedRoute {
 			HandlerFunc: s.GetListing,
 		},
 		{
+			Name:        "Get availability",
+			Method:      router.GET,
+			Pattern:     "/listings/{listingID}/availability",
+			HandlerFunc: s.GetAvailability,
+		},
+		{
 			Name:        "Check email",
 			Method:      router.GET,
 			Pattern:     "/email",

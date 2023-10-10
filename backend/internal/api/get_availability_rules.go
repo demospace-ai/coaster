@@ -26,7 +26,7 @@ func (s ApiService) GetAvailabilityRules(auth auth.Authentication, w http.Respon
 	}
 
 	// Check user has access to listing
-	_, err = listings.LoadByIDAndUser(
+	_, err = listings.LoadDetailsByIDAndUser(
 		s.db,
 		listingID,
 		auth.User,
