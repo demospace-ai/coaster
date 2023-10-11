@@ -33,13 +33,13 @@ export const UpdateFixedDateRuleSchema = z.object({
   name: z.string().min(1),
   type: AvailabilityRuleType.readonly(),
   start_date: z.date({ required_error: "Please select a date for this rule." }),
-  time_slots: z.array(z.union([TimeSlotSchema, SingleDayTimeSlotSchema])),
+  time_slots: z.array(z.discriminatedUnion("type", [TimeSlotSchema, SingleDayTimeSlotSchema])),
 });
 export const UpdateFixedRangeRuleSchema = z.object({
   name: z.string().min(1),
   type: AvailabilityRuleType.readonly(),
   date_range: DateRangeSchema,
-  time_slots: z.array(z.union([TimeSlotSchema, SingleDayTimeSlotSchema])),
+  time_slots: z.array(z.discriminatedUnion("type", [TimeSlotSchema, SingleDayTimeSlotSchema])),
   recurring_days: z.array(z.number().min(0, "Enter a valid day").max(6, "Enter a valid day")),
 });
 export const UpdateRecurringRuleSchema = z.object({
@@ -47,7 +47,7 @@ export const UpdateRecurringRuleSchema = z.object({
   type: AvailabilityRuleType.readonly(),
   recurring_years: z.array(z.number()),
   recurring_months: z.array(z.number()),
-  time_slots: z.array(z.union([TimeSlotSchema, SingleDayTimeSlotSchema])),
+  time_slots: z.array(z.discriminatedUnion("type", [TimeSlotSchema, SingleDayTimeSlotSchema])),
   recurring_days: z.array(z.number().min(0, "Enter a valid day").max(6, "Enter a valid day")),
 });
 

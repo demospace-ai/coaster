@@ -104,7 +104,8 @@ const FixedDateRuleUpdateForm: React.FC<{
       start_date: correctFromUTC(existingRule.start_date),
       time_slots: existingRule.time_slots.map((ts) => ({
         type: "single_day_time_slots",
-        startTime: ts.start_time,
+        startTime: ts.start_time ? ts.start_time : undefined,
+        dayOfWeek: ts.day_of_week ? ts.day_of_week : undefined,
         capacity: ts.capacity ? ts.capacity : undefined,
       })),
     },

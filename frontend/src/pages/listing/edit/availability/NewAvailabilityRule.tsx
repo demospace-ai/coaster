@@ -211,15 +211,9 @@ const SingleDateStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values,
   };
 
   return (
-    <div className="tw-flex tw-flex-col tw-flex-grow sm:tw-mt-10">
-      <div className="tw-flex tw-flex-col tw-flex-grow tw-justify-start tw-items-center">
-        <DateRangePicker
-          mode="single"
-          disabled={{ before: new Date() }}
-          selected={selected}
-          onSelect={setSelected}
-          className="sm:tw-mb-5"
-        />
+    <div className="tw-flex tw-flex-col tw-flex-grow sm:tw-mt-4">
+      <div className="tw-flex tw-flex-col tw-flex-grow tw-justify-start tw-items-center tw-overflow-y-auto">
+        <DateRangePicker mode="single" disabled={{ before: new Date() }} selected={selected} onSelect={setSelected} />
       </div>
       <FormError message={error} />
       <FormError message={createAvailabilityRule.error?.message} />
@@ -259,8 +253,8 @@ const DateRangeStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
   };
 
   return (
-    <div className="tw-flex tw-flex-col tw-flex-grow sm:tw-mt-10 tw-overflow-hidden">
-      <div className="tw-flex tw-flex-col tw-flex-grow tw-justify-start tw-items-center tw-overflow-y-auto tw-pb-16">
+    <div className="tw-flex tw-flex-col tw-flex-grow sm:tw-mt-4 tw-overflow-hidden">
+      <div className="tw-flex tw-flex-col tw-flex-grow tw-self-stretch tw-justify-start tw-items-center tw-overflow-y-auto">
         <Controller
           name="date_range"
           control={control}
@@ -273,7 +267,6 @@ const DateRangeStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
                 field.onChange(e);
                 setSelectedRange(e);
               }}
-              className="sm:tw-mb-5"
             />
           )}
         />
