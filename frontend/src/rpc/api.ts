@@ -14,6 +14,7 @@ import {
   LoginRequest,
   LoginResponse,
   OAuthProvider,
+  PayoutMethod,
   ResetPasswordRequest,
   SendInviteRequest,
   SendResetRequest,
@@ -136,6 +137,24 @@ export const GetHostedListings: IEndpoint<undefined, Listing[]> = {
   name: "Get hosted listings",
   method: "GET",
   path: "/listings/hosted",
+};
+
+export const GetPayoutMethods: IEndpoint<undefined, PayoutMethod[]> = {
+  name: "Get payout methods",
+  method: "GET",
+  path: "/payout_methods",
+};
+
+export const CreatePayoutMethod: IEndpoint<undefined, string> = {
+  name: "Create payout method",
+  method: "POST",
+  path: "/payout_methods",
+};
+
+export const GetStripeDashboardLink: IEndpoint<undefined, string> = {
+  name: "Get Stripe dashboard link",
+  method: "GET",
+  path: "/stripe_dashboard_link",
 };
 
 export const Login: IEndpoint<LoginRequest, LoginResponse> = {

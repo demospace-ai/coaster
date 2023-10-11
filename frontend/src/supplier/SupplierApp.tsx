@@ -8,6 +8,8 @@ import { SupplierHeader } from "src/components/header/Header";
 import { LogoLoading } from "src/components/loading/LogoLoading";
 import { ToastPortal } from "src/components/notifications/Notifications";
 import { About } from "src/pages/about/About";
+import { FinanceLayout } from "src/pages/finance";
+import { PayoutMethods, Payouts } from "src/pages/finance/Payouts";
 import { Hosting } from "src/pages/hosting/Hosting";
 import { EditListingLayout } from "src/pages/listing/edit";
 import { Availability } from "src/pages/listing/edit/availability/AvailabilityRules";
@@ -88,8 +90,10 @@ export const supplierRouter = createBrowserRouter(
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Login create />} />
-      <Route path="/reset_password" element={<ResetPassword />} />
-      <Route path="/create_password" element={<CreatePassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/create-password" element={<CreatePassword />} />
+      <Route path="/reset_password" element={<ResetPassword />} /> {/** TODO: Remove in November */}
+      <Route path="/create_password" element={<CreatePassword />} /> {/** TODO: Remove in November*/}
       <Route path="/invite" element={<RequireAuth element={<Invite />} />} />
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/about" element={<About />} />
@@ -103,6 +107,10 @@ export const supplierRouter = createBrowserRouter(
       <Route path="/listings/new" element={<RequireAuth element={<NewListing />} />} />
       <Route path="/listings" element={<RequireAuth element={<Listings />} />} />
       <Route path="/profile" element={<RequireAuth element={<Profile />} />} />
+      <Route path="/finance" element={<RequireAuth element={<FinanceLayout />} />}>
+        <Route index element={<Payouts />} />
+        <Route path="payout-methods" element={<PayoutMethods />} />
+      </Route>
       <Route path="/" element={<RequireAuth element={<Hosting />} />} />
       <Route path="*" element={<NotFound />} />
     </Route>,

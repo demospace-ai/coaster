@@ -120,6 +120,24 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			Pattern:     "/listings/{listingID}/availability_rules/{availabilityRuleID}",
 			HandlerFunc: s.UpdateAvailability,
 		},
+		{
+			Name:        "Get payout methods",
+			Method:      router.GET,
+			Pattern:     "/payout_methods",
+			HandlerFunc: s.GetPayoutMethods,
+		},
+		{
+			Name:        "Create payout method",
+			Method:      router.POST,
+			Pattern:     "/payout_methods",
+			HandlerFunc: s.CreatePayoutMethod,
+		},
+		{
+			Name:        "Get Stripe dashboard link",
+			Method:      router.GET,
+			Pattern:     "/stripe_dashboard_link",
+			HandlerFunc: s.GetStripeDashboardLink,
+		},
 	}
 }
 

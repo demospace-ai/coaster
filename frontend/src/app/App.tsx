@@ -86,8 +86,10 @@ export const router = createBrowserRouter(
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Login create />} />
-      <Route path="/reset_password" element={<ResetPassword />} />
-      <Route path="/create_password" element={<CreatePassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/create-password" element={<CreatePassword />} />
+      <Route path="/reset_password" element={<ResetPassword />} /> {/** TODO: Remove in November */}
+      <Route path="/create_password" element={<CreatePassword />} /> {/** TODO: Remove in November*/}
       <Route path="/invite" element={<RequireAuth element={<Invite />} />} />
       <Route path="/search" element={<Search />} />
       <Route path="/privacy" element={<Privacy />} />

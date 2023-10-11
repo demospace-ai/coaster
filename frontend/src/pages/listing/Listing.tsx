@@ -127,7 +127,7 @@ const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
   const { availability, loading } = useAvailability(listing.id, month);
 
   return (
-    <div className="tw-hidden lg:tw-flex tw-w-[40%] tw-min-w-[340px]">
+    <div className="tw-hidden lg:tw-flex tw-w-[40%] tw-min-w-[340px] tw-max-w-[400px]">
       <div className="tw-sticky tw-top-32 tw-flex tw-flex-col tw-px-8 tw-py-6 tw-w-full tw-h-fit tw-border tw-border-solid tw-border-gray-300 tw-rounded-xl tw-shadow-centered-sm">
         <div>
           <span className="tw-text-2xl tw-font-semibold tw-mb-3">${listing.price}</span> per person

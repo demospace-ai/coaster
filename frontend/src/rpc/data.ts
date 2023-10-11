@@ -4,12 +4,15 @@ import { sendRequest } from "src/rpc/ajax";
 import {
   CreateAvailabilityRule,
   CreateListing,
+  CreatePayoutMethod,
   GetAvailability,
   GetAvailabilityRules,
   GetDraftListing,
   GetFeaturedListings,
   GetHostedListings,
   GetListing,
+  GetPayoutMethods,
+  GetStripeDashboardLink,
   ResetPassword,
   SearchListings,
   UpdateAvailabilityRule,
@@ -23,6 +26,7 @@ import {
   AvailabilityRuleUpdates,
   Listing,
   ListingInput,
+  PayoutMethod,
   ResetPasswordRequest,
   User,
   UserUpdates,
@@ -67,6 +71,12 @@ export function useHostedListings() {
   const fetcher: Fetcher<Listing[], {}> = () => sendRequest(GetHostedListings);
   const { data, mutate, error, isLoading, isValidating } = useSWR({ GetHostedListings }, fetcher);
   return { hosted: data, mutate, error, loading: isLoading || isValidating };
+}
+
+export function usePayoutMethods() {
+  const fetcher: Fetcher<PayoutMethod[], {}> = () => sendRequest(GetPayoutMethods);
+  const { data, mutate, error, isLoading, isValidating } = useSWR({ GetPayoutMethods }, fetcher);
+  return { payoutMethods: data, mutate, error, loading: isLoading || isValidating };
 }
 
 export function useDraftListing(opts?: SWRConfiguration) {
@@ -154,7 +164,7 @@ export async function createListing(input: ListingInput) {
 export function useUpdateAvailabilityRule(
   listingID: number,
   availabilityRuleID: number,
-  opts?: MutationOpts<AvailabilityRuleUpdates>,
+  opts?: MutationOpts<AvailabilityRule>,
 ): Mutation<AvailabilityRuleUpdates> {
   return useMutation<AvailabilityRule, AvailabilityRuleUpdates>(
     async (updates: AvailabilityRuleUpdates) => {
@@ -180,9 +190,21 @@ export function useUpdateAvailabilityRule(
   );
 }
 
+export function useCreatePayoutMethod(opts?: MutationOpts<string>): Mutation<void> {
+  return useMutation<string, void>(async () => {
+    return await sendRequest(CreatePayoutMethod);
+  }, opts);
+}
+
+export function useGetStripeDashboardLink(opts?: MutationOpts<string>): Mutation<void> {
+  return useMutation<string, void>(async () => {
+    return await sendRequest(GetStripeDashboardLink);
+  }, opts);
+}
+
 export function useCreateAvailabilityRule(
   listingID: number,
-  opts?: MutationOpts<AvailabilityRuleInput>,
+  opts?: MutationOpts<AvailabilityRule>,
 ): Mutation<AvailabilityRuleInput> {
   return useMutation<AvailabilityRule, AvailabilityRuleInput>(
     async (input: AvailabilityRuleInput) => {

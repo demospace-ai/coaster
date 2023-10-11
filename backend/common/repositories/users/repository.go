@@ -109,13 +109,14 @@ func CreateUserFromEmail(db *gorm.DB, email string, firstName string, lastName s
 	passwordHashStr := string(passwordHash)
 
 	user := models.User{
-		Email:          email,
-		FirstName:      firstName,
-		LastName:       lastName,
-		HashedPassword: &passwordHashStr,
-		LoginMethod:    models.LoginMethodEmail,
-		IsHost:         false,
-		EmailVerified:  false,
+		Email:               email,
+		FirstName:           firstName,
+		LastName:            lastName,
+		HashedPassword:      &passwordHashStr,
+		LoginMethod:         models.LoginMethodEmail,
+		IsHost:              false,
+		EmailVerified:       false,
+		StripeAccountStatus: models.StripeAccountStatusIncomplete,
 	}
 
 	result := db.Create(&user)
@@ -128,12 +129,13 @@ func CreateUserFromEmail(db *gorm.DB, email string, firstName string, lastName s
 
 func CreateUserForExternalInfo(db *gorm.DB, externalUserInfo *oauth.ExternalUserInfo) (*models.User, error) {
 	user := models.User{
-		FirstName:         externalUserInfo.FirstName,
-		LastName:          externalUserInfo.LastName,
-		Email:             externalUserInfo.Email,
-		ProfilePictureURL: &externalUserInfo.ProfilePictureURL,
-		IsHost:            false,
-		EmailVerified:     true,
+		FirstName:           externalUserInfo.FirstName,
+		LastName:            externalUserInfo.LastName,
+		Email:               externalUserInfo.Email,
+		ProfilePictureURL:   &externalUserInfo.ProfilePictureURL,
+		IsHost:              false,
+		EmailVerified:       true,
+		StripeAccountStatus: models.StripeAccountStatusIncomplete,
 	}
 
 	result := db.Create(&user)
@@ -187,4 +189,24 @@ func JoinWaitlist(db *gorm.DB, email string) error {
 	}
 
 	return nil
+}
+
+func UpdateStripeStatus(db *gorm.DB, user *models.User, status models.StripeAccountStatus) (*models.User, error) {
+	user.StripeAccountStatus = status
+	result := db.Save(&user)
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(users.UpdateStripeStatus)")
+	}
+
+	return user, nil
+}
+
+func UpdateStripeAccountID(db *gorm.DB, user *models.User, stripeID string) (*models.User, error) {
+	user.StripeAccountID = &stripeID
+	result := db.Save(&user)
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(users.UpdateStripeAccountID)")
+	}
+
+	return user, nil
 }

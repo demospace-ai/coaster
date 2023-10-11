@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import { Loading } from "src/components/loading/Loading";
 import { useSelector } from "src/root/model";
 import { useHostedListings } from "src/rpc/data";
-import { ListingStatus } from "src/rpc/types";
+import { ListingStatus, StripeAccountStatus } from "src/rpc/types";
 import { mergeClasses } from "src/utils/twmerge";
 
 export const Hosting: React.FC = () => {
@@ -26,6 +26,7 @@ export const Hosting: React.FC = () => {
   const draft = hosted.find((listing) => listing.status === ListingStatus.Draft);
   const listingCreated = hosted && hosted.length > 0;
   const profileComplete = user && user.profile_picture_url;
+  const financeComplete = user && user.stripe_account_status === StripeAccountStatus.Complete;
 
   return (
     <div className="tw-flex tw-justify-center tw-pt-6 sm:tw-pt-12 tw-pb-24 tw-px-8 tw-overflow-auto">
@@ -62,10 +63,10 @@ export const Hosting: React.FC = () => {
           </div>
           Setup your profile to tell travelers about yourself
         </NavLink>
-        <a className={setupStep} target="_blank" rel="noreferrer">
+        <NavLink className={mergeClasses(setupStep, financeComplete && "tw-line-through")} to="/finance/payout-methods">
           <div className={stepNumber}>3</div>
-          Add your payment information (<span className="tw-italic">Coming soon</span>)
-        </a>
+          Add your payment information for payouts
+        </NavLink>
         <div className="tw-bg-white tw-shadow tw-border tw-border-slate-100 tw-border-solid tw-rounded-lg tw-mt-10">
           <div className="tw-px-4 tw-py-5 sm:tw-p-6">
             <h3 className="tw-text-base tw-font-medium tw-leading-6 tw-text-gray-900">Need help?</h3>

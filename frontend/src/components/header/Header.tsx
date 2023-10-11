@@ -332,6 +332,17 @@ const SupplierLinks: React.FC = () => {
       >
         Listings
       </NavLink>
+      <NavLink
+        className={({ isActive }) =>
+          mergeClasses(
+            "tw-hidden lg:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100",
+            isActive && "tw-bg-gray-100",
+          )
+        }
+        to="/finance"
+      >
+        Finance
+      </NavLink>
     </>
   );
 };

@@ -19,6 +19,34 @@ export interface SearchListingsResponse {
   listings: Listing[];
 }
 
+export type PayoutMethod =
+  | {
+      type: PayoutMethodType.BankAccount;
+      bank_account: BankPayoutMethod;
+    }
+  | {
+      type: PayoutMethodType.Card;
+      card: CardPayoutMethod;
+    };
+
+export interface BankPayoutMethod {
+  bank_name: string;
+  account_type: string;
+  last4: string;
+  currency: string;
+}
+
+export interface CardPayoutMethod {
+  brand: string;
+  last4: string;
+  currency: string;
+}
+
+export enum PayoutMethodType {
+  BankAccount = "bank_account",
+  Card = "card",
+}
+
 export interface Listing {
   id: number;
   name: string | undefined;
@@ -154,6 +182,12 @@ export interface User {
   profile_picture_url?: string;
   about?: string;
   is_host: boolean;
+  stripe_account_status: StripeAccountStatus;
+}
+
+export enum StripeAccountStatus {
+  Complete = "complete",
+  Incomplete = "incomplete",
 }
 
 export interface UserUpdates {
