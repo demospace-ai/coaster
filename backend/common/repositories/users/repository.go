@@ -117,6 +117,8 @@ func CreateUserFromEmail(db *gorm.DB, email string, firstName string, lastName s
 		IsHost:              false,
 		EmailVerified:       false,
 		StripeAccountStatus: models.StripeAccountStatusIncomplete,
+		Currency:            "USD", // TODO: allow other currencies
+		CommissionPercent:   15,    // TODO: allow other take rates
 	}
 
 	result := db.Create(&user)
@@ -136,6 +138,8 @@ func CreateUserForExternalInfo(db *gorm.DB, externalUserInfo *oauth.ExternalUser
 		IsHost:              false,
 		EmailVerified:       true,
 		StripeAccountStatus: models.StripeAccountStatusIncomplete,
+		Currency:            "USD", // TODO: allow other currencies
+		CommissionPercent:   15,    // TODO: allow other take rates
 	}
 
 	result := db.Create(&user)

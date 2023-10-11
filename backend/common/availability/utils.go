@@ -227,7 +227,7 @@ func (rule RuleAndTimes) HasAvailabilityInRangeRecurring(db *gorm.DB, startDate 
 }
 
 func (rule RuleAndTimes) HasCapacityForDay(db *gorm.DB, targetDate time.Time, timeSlot models.TimeSlot, listing models.Listing) (bool, error) {
-	bookings, err := bookings.LoadBookingsForTimeSlotAndDate(db, targetDate, timeSlot)
+	bookings, err := bookings.LoadBookingsForTimeAndDate(db, listing.ID, timeSlot.StartTime, targetDate)
 	if err != nil {
 		return false, errors.Wrap(err, "(availability.HasCapacityForDay) loading bookings")
 	}
@@ -240,7 +240,13 @@ func (rule RuleAndTimes) HasCapacityForDay(db *gorm.DB, targetDate time.Time, ti
 	if timeSlot.Capacity != nil {
 		capacity = *timeSlot.Capacity
 	}
-	remainingCapacity := capacity - int64(len(bookings))
+
+	usedCapacity := int64(0)
+	for _, booking := range bookings {
+		usedCapacity += booking.Guests
+	}
+
+	remainingCapacity := capacity - usedCapacity
 	return remainingCapacity > 0, nil
 }
 

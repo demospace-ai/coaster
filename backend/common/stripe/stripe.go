@@ -2,11 +2,13 @@ package stripe
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/stripe/stripe-go/v75"
 	"github.com/stripe/stripe-go/v75/client"
 	"go.fabra.io/server/common/application"
 	"go.fabra.io/server/common/errors"
+	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/secret"
 )
 
@@ -77,6 +79,55 @@ func CreateLoginLink(accountID string) (*string, error) {
 	return &result.URL, nil
 }
 
+func GetCheckoutLink(user *models.User, host *models.User, listing *models.Listing, booking *models.Booking) (*string, error) {
+	stripeApiKey, err := secret.FetchSecret(context.TODO(), getStripeApiKey())
+	if err != nil {
+		return nil, errors.Wrap(err, "(stripe.GetCheckoutLink) fetching secret")
+	}
+
+	sc := &client.API{}
+	sc.Init(*stripeApiKey, nil)
+
+	unitPrice := *listing.Price
+	commission := (booking.Guests * unitPrice) * (host.CommissionPercent / 100)
+
+	params := &stripe.CheckoutSessionParams{
+		Mode:              stripe.String(string(stripe.CheckoutSessionModePayment)),
+		ClientReferenceID: stripe.String(fmt.Sprintf("%d", listing.ID)),
+		CustomerEmail:     stripe.String(user.Email),
+		LineItems: []*stripe.CheckoutSessionLineItemParams{
+			{
+				PriceData: &stripe.CheckoutSessionLineItemPriceDataParams{
+					Currency:   stripe.String(host.Currency),
+					UnitAmount: stripe.Int64(unitPrice),
+					ProductData: &stripe.CheckoutSessionLineItemPriceDataProductDataParams{
+						Name: stripe.String(*listing.Name),
+					},
+				},
+				Quantity: stripe.Int64(booking.Guests),
+			},
+		},
+		PaymentIntentData: &stripe.CheckoutSessionPaymentIntentDataParams{
+			ApplicationFeeAmount: stripe.Int64(commission),
+			TransferData: &stripe.CheckoutSessionPaymentIntentDataTransferDataParams{
+				Destination: stripe.String(*host.StripeAccountID),
+			},
+		},
+		SuccessURL: stripe.String(getSuccessURL()),
+		CancelURL:  stripe.String(getCancelURL(listing)),
+		Metadata: map[string]string{
+			"booking_id": fmt.Sprintf("%d", booking.ID),
+		},
+	}
+
+	result, err := sc.CheckoutSessions.New(params)
+	if err != nil {
+		return nil, errors.Wrap(err, "(stripe.CreateCheckoutLink) creating login link")
+	}
+
+	return &result.URL, nil
+}
+
 func GetAccount(accountID string) (*stripe.Account, error) {
 	stripeApiKey, err := secret.FetchSecret(context.TODO(), getStripeApiKey())
 	if err != nil {
@@ -116,5 +167,21 @@ func getRefreshLink() string {
 		return "https://supplier.trycoaster.com/finance/payout-methods"
 	} else {
 		return "http://localhost:3000/finance/payout-methods"
+	}
+}
+
+func getSuccessURL() string {
+	if application.IsProd() {
+		return "https://trycoaster.com/reservations/success?session_id={CHECKOUT_SESSION_ID}"
+	} else {
+		return "http://localhost:3000/reservations/success?session_id={CHECKOUT_SESSION_ID}"
+	}
+}
+
+func getCancelURL(listing *models.Listing) string {
+	if application.IsProd() {
+		return fmt.Sprintf("https://trycoaster.com/listings/%d", listing.ID)
+	} else {
+		return fmt.Sprintf("http://localhost:3000/listings/%d", listing.ID)
 	}
 }

@@ -48,12 +48,12 @@ func (s ApiService) GetAvailability(w http.ResponseWriter, r *http.Request) erro
 
 	auth, err := s.authService.GetAuthentication(r)
 	if err != nil {
-		return errors.Wrap(err, "(api.GetListing) unexpected authentication error")
+		return errors.Wrap(err, "(api.GetAvailability) unexpected authentication error")
 	}
 
 	listing, err := listings.LoadByIDAndUser(s.db, listingID, auth.User)
 	if err != nil {
-		return errors.Wrap(err, "(api.GetListing) loading listing")
+		return errors.Wrap(err, "(api.GetAvailability) loading listing")
 	}
 
 	availableDays, err := availability_rules.LoadAvailabilityInRange(
@@ -63,7 +63,7 @@ func (s ApiService) GetAvailability(w http.ResponseWriter, r *http.Request) erro
 		endDate,
 	)
 	if err != nil {
-		return errors.Wrap(err, "(api.CreateAvailability) creating availability rule")
+		return errors.Wrap(err, "(api.GetAvailability) creating availability rule")
 	}
 
 	return json.NewEncoder(w).Encode(availableDays)

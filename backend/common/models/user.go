@@ -15,6 +15,8 @@ type User struct {
 	IsAdmin             bool                `json:"is_admin"`
 	StripeAccountID     *string             `json:"stripe_account_id"`
 	StripeAccountStatus StripeAccountStatus `json:"stripe_account_status"`
+	Currency            string              `json:"currency"`
+	CommissionPercent   int64               `json:"commission_percent"`
 
 	BaseModel
 }
