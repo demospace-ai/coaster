@@ -22,7 +22,7 @@ import useWindowDimensions from "src/utils/window";
 export const DateRangePicker: React.FC<DayPickerProps> = ({
   className,
   classNames,
-  showOutsideDays = true,
+  showOutsideDays = false,
   ...props
 }) => {
   const { width } = useWindowDimensions();
