@@ -42,9 +42,9 @@ func (rule RuleAndTimes) GetAvailabilityInRangeFixedDate(db *gorm.DB, startDate 
 			if hasCapacity {
 				var availableDay time.Time
 				if listing.AvailabilityType == models.AvailabilityTypeDateTime {
-					availableDay = combineDateAndTime(time.Time(*rule.StartDate), time.Time(startTime))
+					availableDay = combineDateAndTime(time.Time(*rule.StartDate), time.Time(*timeSlot.StartTime))
 				} else {
-					availableDay = d
+					availableDay = time.Time(*rule.StartDate)
 				}
 
 				availability = append(availability, availableDay)
