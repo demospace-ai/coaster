@@ -138,6 +138,12 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			Pattern:     "/stripe_dashboard_link",
 			HandlerFunc: s.GetStripeDashboardLink,
 		},
+		{
+			Name:        "Create checkout link",
+			Method:      router.POST,
+			Pattern:     "/checkout_link",
+			HandlerFunc: s.CreateCheckoutLink,
+		},
 	}
 }
 
@@ -214,6 +220,12 @@ func (s ApiService) UnauthenticatedRoutes() []router.UnauthenticatedRoute {
 			Method:      router.POST,
 			Pattern:     "/waitlist",
 			HandlerFunc: s.JoinWaitlist,
+		},
+		{
+			Name:        "Stripe Checkout Complete webhook",
+			Method:      router.POST,
+			Pattern:     "/webhooks/checkout_complete",
+			HandlerFunc: s.WebhookCheckoutComplete,
 		},
 	}
 }

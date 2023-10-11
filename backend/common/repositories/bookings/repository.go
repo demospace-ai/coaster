@@ -46,9 +46,10 @@ func LoadBookingsForTimeAndDate(db *gorm.DB, listingID int64, startTime *databas
 	return bookings, nil
 }
 
-func CreateBooking(db *gorm.DB, listingID int64, startDate time.Time, startTime *time.Time, numGuests int64) (*models.Booking, error) {
+func CreateBooking(db *gorm.DB, listingID int64, userID int64, startDate time.Time, startTime *time.Time, numGuests int64) (*models.Booking, error) {
 	booking := &models.Booking{
 		ListingID: listingID,
+		UserID:    userID,
 		StartDate: database.Date(startDate),
 		Guests:    numGuests,
 	}
@@ -65,9 +66,10 @@ func CreateBooking(db *gorm.DB, listingID int64, startDate time.Time, startTime 
 	return booking, nil
 }
 
-func CreateTemporaryBooking(db *gorm.DB, listingID int64, startDate time.Time, startTime *time.Time, numGuests int64) (*models.Booking, error) {
+func CreateTemporaryBooking(db *gorm.DB, listingID int64, userID int64, startDate time.Time, startTime *time.Time, numGuests int64) (*models.Booking, error) {
 	booking := &models.Booking{
 		ListingID: listingID,
+		UserID:    userID,
 		StartDate: database.Date(startDate),
 		Guests:    numGuests,
 		ExpiresAt: time.Now().Add(10 * time.Minute),
@@ -83,4 +85,15 @@ func CreateTemporaryBooking(db *gorm.DB, listingID int64, startDate time.Time, s
 	}
 
 	return booking, nil
+}
+
+func ConfirmBooking(db *gorm.DB, bookingID int64) error {
+	result := db.Table("bookings").
+		Where("id = ?", bookingID).
+		Update("expires_at", nil)
+	if result.Error != nil {
+		return errors.Wrap(result.Error, "(bookings.ConfirmBooking)")
+	}
+
+	return nil
 }

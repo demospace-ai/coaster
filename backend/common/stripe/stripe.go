@@ -2,10 +2,12 @@ package stripe
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/stripe/stripe-go/v75"
 	"github.com/stripe/stripe-go/v75/client"
+	"github.com/stripe/stripe-go/v75/webhook"
 	"go.fabra.io/server/common/application"
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/models"
@@ -14,6 +16,9 @@ import (
 
 const STRIPE_PROD_API_KEY_KEY = "projects/454026596701/secrets/stripe-api-key/versions/latest"
 const STRIPE_DEV_API_KEY_KEY = "projects/86315250181/secrets/stripe-dev-api-key/versions/latest"
+
+const STRIPE_PROD_ENDPOINT_SECRET_KEY = "projects/454026596701/secrets/stripe-endpoint-secret/versions/latest"
+const STRIPE_DEV_ENDPOINT_SECRET_KEY = "projects/86315250181/secrets/stripe-dev-endpoint-secret/versions/latest"
 
 func CreateAccount() (*string, error) {
 	stripeApiKey, err := secret.FetchSecret(context.TODO(), getStripeApiKey())
@@ -128,6 +133,30 @@ func GetCheckoutLink(user *models.User, host *models.User, listing *models.Listi
 	return &result.URL, nil
 }
 
+func VerifyWebhookRequest(payload []byte, signature string) (*stripe.Event, error) {
+	stripeEndpointSecret, err := secret.FetchSecret(context.TODO(), getStripeEndpointSecretKey())
+	if err != nil {
+		return nil, errors.Wrap(err, "(stripe.VerifyWebhookRequest) fetching secret")
+	}
+
+	event, err := webhook.ConstructEvent(payload, signature, *stripeEndpointSecret)
+	if err != nil {
+		return nil, errors.Wrap(err, "(stripe.VerifyWebhookRequest) verifying webhook request")
+	}
+
+	return &event, nil
+}
+
+func UnmarshallCheckoutComplete(event *stripe.Event) (*stripe.CheckoutSession, error) {
+	var checkoutSession stripe.CheckoutSession
+	err := json.Unmarshal(event.Data.Raw, &checkoutSession)
+	if err != nil {
+		return nil, errors.Wrap(err, "(stripe.UnmarshallCheckoutComplete) unmarshalling checkout session")
+	}
+
+	return &checkoutSession, nil
+}
+
 func GetAccount(accountID string) (*stripe.Account, error) {
 	stripeApiKey, err := secret.FetchSecret(context.TODO(), getStripeApiKey())
 	if err != nil {
@@ -151,6 +180,14 @@ func getStripeApiKey() string {
 		return STRIPE_PROD_API_KEY_KEY
 	} else {
 		return STRIPE_DEV_API_KEY_KEY
+	}
+}
+
+func getStripeEndpointSecretKey() string {
+	if application.IsProd() {
+		return STRIPE_PROD_ENDPOINT_SECRET_KEY
+	} else {
+		return STRIPE_DEV_ENDPOINT_SECRET_KEY
 	}
 }
 

@@ -13,63 +13,56 @@ import (
 	"go.fabra.io/server/common/stripe"
 )
 
-type CreateCheckoutRequest struct {
+type CreateCheckoutLinkRequest struct {
 	ListingID      int64   `json:"listing_id"`
 	StartDate      string  `json:"start_date"`
 	StartTime      *string `json:"start_time"`
 	NumberOfGuests int64   `json:"number_of_guests"`
 }
 
-func (s ApiService) CreateCheckout(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) CreateCheckoutLink(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	decoder := json.NewDecoder(r.Body)
-	var createCheckoutRequest CreateCheckoutRequest
-	err := decoder.Decode(&createCheckoutRequest)
+	var createCheckoutLinkRequest CreateCheckoutLinkRequest
+	err := decoder.Decode(&createCheckoutLinkRequest)
 	if err != nil {
-		return errors.Wrap(err, "(api.CreateCheckout) decoding request")
+		return errors.Wrap(err, "(api.CreateCheckoutLinkLink) decoding request")
 	}
 
 	validate := validator.New()
-	err = validate.Struct(createCheckoutRequest)
+	err = validate.Struct(createCheckoutLinkRequest)
 	if err != nil {
-		return errors.Wrap(err, "(api.CreateCheckout) validating request")
+		return errors.Wrap(err, "(api.CreateCheckoutLink) validating request")
 	}
 
-	// TODO: Check if the listing is still available for the date and time requested (time not needed for date-only listings)
-	// TODO: add date and time slot to the checkout link metadata so we can record this for the booking
-	// TODO: create a booking hold that expires in 10 minutes and check this when checking availability
-
-	// add expires field to bookings table, check this when loading listings
-	// add the booking ID to the checkout link metadata so on the completion webhook we can remove the expires value
-
-	listing, err := listings.LoadDetailsByIDAndUser(s.db, createCheckoutRequest.ListingID, auth.User)
+	listing, err := listings.LoadDetailsByIDAndUser(s.db, createCheckoutLinkRequest.ListingID, auth.User)
 	if err != nil {
-		return errors.Wrap(err, "(api.CreateCheckout) loading listing")
+		return errors.Wrap(err, "(api.CreateCheckoutLink) loading listing")
 	}
 
-	startDate, err := time.Parse(time.DateOnly, createCheckoutRequest.StartDate)
+	startDate, err := time.Parse(time.DateOnly, createCheckoutLinkRequest.StartDate)
 	if err != nil {
-		return errors.Wrap(err, "(api.CreateCheckout) parsing start date")
+		return errors.Wrap(err, "(api.CreateCheckoutLink) parsing start date")
 	}
 
 	var startTime *time.Time
-	if createCheckoutRequest.StartTime != nil {
-		parsedTime, err := time.Parse(time.TimeOnly, *createCheckoutRequest.StartTime)
+	if createCheckoutLinkRequest.StartTime != nil {
+		parsedTime, err := time.Parse(time.TimeOnly, *createCheckoutLinkRequest.StartTime)
 		if err != nil {
-			return errors.Wrap(err, "(api.CreateCheckout) parsing start time")
+			return errors.Wrap(err, "(api.CreateCheckoutLink) parsing start time")
 		}
 
 		startTime = &parsedTime
 	}
 
 	// Create the booking here
-	booking, err := bookings.CreateTemporaryBooking(s.db, listing.ID, startDate, startTime, createCheckoutRequest.NumberOfGuests)
+	booking, err := bookings.CreateTemporaryBooking(s.db, listing.ID, auth.User.ID, startDate, startTime, createCheckoutLinkRequest.NumberOfGuests)
 	if err != nil {
-		return errors.Wrap(err, "(api.CreateCheckout) creating temporary booking")
+		return errors.Wrap(err, "(api.CreateCheckoutLink) creating temporary booking")
 	}
 
 	checkoutLink, err := stripe.GetCheckoutLink(auth.User, listing.Host, &listing.Listing, booking)
 	if err != nil {
-		return errors.Wrap(err, "(api.CreateCheckout) error creating account link")
+		return errors.Wrap(err, "(api.CreateCheckoutLink) error creating account link")
 	}
 
 	return json.NewEncoder(w).Encode(*checkoutLink)
