@@ -53,8 +53,8 @@ export const PayoutMethods: React.FC = () => {
             </>
           ) : (
             <div className="tw-mt-2">
-              {payoutMethods.map((payoutMethod) => (
-                <div className="tw-flex tw-items-center">
+              {payoutMethods.map((payoutMethod, i) => (
+                <div className="tw-flex tw-items-center" key={i}>
                   {getPayoutMethodIcon(payoutMethod.type)}
                   <div className="tw-flex tw-flex-col">
                     <span className="tw-text-base tw-font-medium">{getPayoutMethodTypeDisplay(payoutMethod.type)}</span>
