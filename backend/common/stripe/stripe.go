@@ -11,7 +11,9 @@ import (
 	"github.com/stripe/stripe-go/v75/webhook"
 	"go.fabra.io/server/common/application"
 	"go.fabra.io/server/common/errors"
+	"go.fabra.io/server/common/images"
 	"go.fabra.io/server/common/models"
+	"go.fabra.io/server/common/repositories/listings"
 	"go.fabra.io/server/common/secret"
 )
 
@@ -85,7 +87,7 @@ func CreateLoginLink(accountID string) (*string, error) {
 	return &result.URL, nil
 }
 
-func GetCheckoutLink(user *models.User, host *models.User, listing *models.Listing, booking *models.Booking) (*string, error) {
+func GetCheckoutLink(user *models.User, listing *listings.ListingDetails, booking *models.Booking) (*string, error) {
 	stripeApiKey, err := secret.FetchSecret(context.TODO(), getStripeApiKey())
 	if err != nil {
 		return nil, errors.Wrap(err, "(stripe.GetCheckoutLink) fetching secret")
@@ -95,8 +97,8 @@ func GetCheckoutLink(user *models.User, host *models.User, listing *models.Listi
 	sc.Init(*stripeApiKey, nil)
 
 	unitPrice := *listing.Price * 100
-	commission := booking.Guests * unitPrice * host.CommissionPercent // No need to divide percent by 100 because Stripe uses cents and we use dollars
-	expiresAt := time.Now().Add(35 * time.Minute).Unix()              // Stripe minimum is 30 minutes
+	commission := booking.Guests * unitPrice * listing.Host.CommissionPercent // No need to divide percent by 100 because Stripe uses cents and we use dollars
+	expiresAt := time.Now().Add(35 * time.Minute).Unix()                      // Stripe minimum is 30 minutes
 
 	params := &stripe.CheckoutSessionParams{
 		Mode:              stripe.String(string(stripe.CheckoutSessionModePayment)),
@@ -105,10 +107,14 @@ func GetCheckoutLink(user *models.User, host *models.User, listing *models.Listi
 		LineItems: []*stripe.CheckoutSessionLineItemParams{
 			{
 				PriceData: &stripe.CheckoutSessionLineItemPriceDataParams{
-					Currency:   stripe.String(host.Currency),
+					Currency:   stripe.String(listing.Host.Currency),
 					UnitAmount: stripe.Int64(unitPrice),
 					ProductData: &stripe.CheckoutSessionLineItemPriceDataProductDataParams{
 						Name: stripe.String(*listing.Name),
+						Images: []*string{
+							stripe.String(images.GetGcsImageUrl(listing.Images[0].StorageID)),
+						},
+						Description: stripe.String("You won't be charged until this reservation is confirmed by the trip provider."),
 					},
 				},
 				Quantity: stripe.Int64(booking.Guests),
@@ -117,11 +123,12 @@ func GetCheckoutLink(user *models.User, host *models.User, listing *models.Listi
 		PaymentIntentData: &stripe.CheckoutSessionPaymentIntentDataParams{
 			ApplicationFeeAmount: stripe.Int64(commission),
 			TransferData: &stripe.CheckoutSessionPaymentIntentDataTransferDataParams{
-				Destination: stripe.String(*host.StripeAccountID),
+				Destination: stripe.String(*listing.Host.StripeAccountID),
 			},
+			CaptureMethod: stripe.String(string(stripe.PaymentIntentCaptureMethodManual)),
 		},
 		SuccessURL: stripe.String(getSuccessURL()),
-		CancelURL:  stripe.String(getCancelURL(listing)),
+		CancelURL:  stripe.String(getCancelURL(listing.ID)),
 		ExpiresAt:  &expiresAt,
 		Metadata: map[string]string{
 			"booking_id": fmt.Sprintf("%d", booking.ID),
@@ -218,10 +225,10 @@ func getSuccessURL() string {
 	}
 }
 
-func getCancelURL(listing *models.Listing) string {
+func getCancelURL(listingID int64) string {
 	if application.IsProd() {
-		return fmt.Sprintf("https://trycoaster.com/listings/%d", listing.ID)
+		return fmt.Sprintf("https://trycoaster.com/listings/%d", listingID)
 	} else {
-		return fmt.Sprintf("http://localhost:3000/listings/%d", listing.ID)
+		return fmt.Sprintf("http://localhost:3000/listings/%d", listingID)
 	}
 }

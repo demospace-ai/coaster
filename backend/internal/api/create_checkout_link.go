@@ -91,7 +91,7 @@ func (s ApiService) CreateCheckoutLink(auth auth.Authentication, w http.Response
 		return errors.Wrap(err, "(api.CreateCheckoutLink) creating temporary booking")
 	}
 
-	checkoutLink, err := stripe.GetCheckoutLink(auth.User, listing.Host, &listing.Listing, booking)
+	checkoutLink, err := stripe.GetCheckoutLink(auth.User, listing, booking)
 	if err != nil {
 		return errors.Wrap(err, "(api.CreateCheckoutLink) error creating account link")
 	}
