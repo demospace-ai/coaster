@@ -1,6 +1,6 @@
 import { ErrorBoundary } from "@highlight-run/react";
 import React, { useEffect, useState } from "react";
-import { createBrowserRouter, createRoutesFromElements, Outlet, Route } from "react-router-dom";
+import { Outlet, Route, ScrollRestoration, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
 import { useStart } from "src/app/actions";
 import { RequireAuth } from "src/components/auth/RequireAuth";
 import { Footer } from "src/components/footer/Footer";
@@ -11,13 +11,13 @@ import { About } from "src/pages/about/About";
 import { FinanceLayout } from "src/pages/finance";
 import { PayoutMethods, Payouts } from "src/pages/finance/Payouts";
 import { Hosting } from "src/pages/hosting/Hosting";
+import { NewListing } from "src/pages/listing/NewListing";
+import { YourListings } from "src/pages/listing/YourListings";
 import { EditListingLayout } from "src/pages/listing/edit";
-import { Availability } from "src/pages/listing/edit/availability/AvailabilityRules";
 import { ListingDetails } from "src/pages/listing/edit/Details";
 import { Images } from "src/pages/listing/edit/Images";
 import { Includes } from "src/pages/listing/edit/Includes";
-import { Listings } from "src/pages/listing/Listings";
-import { NewListing } from "src/pages/listing/NewListing";
+import { Availability } from "src/pages/listing/edit/availability/AvailabilityRules";
 import { CreatePassword } from "src/pages/login/CreatePassword";
 import { Invite } from "src/pages/login/Invite";
 import { Login, Unauthorized } from "src/pages/login/Login";
@@ -59,7 +59,8 @@ const SupplierAppLayout: React.FC = () => {
   return (
     <>
       <ToastPortal />
-      <div className="tw-flex tw-flex-col tw-flex-grow tw-bg-white">
+      <ScrollRestoration />
+      <div className="tw-flex tw-flex-col tw-flex-grow">
         <SupplierHeader />
         <Outlet />
         <Footer />
@@ -105,7 +106,7 @@ export const supplierRouter = createBrowserRouter(
         <Route path="availability" element={<Availability />} />
       </Route>
       <Route path="/listings/new" element={<RequireAuth element={<NewListing />} />} />
-      <Route path="/listings" element={<RequireAuth element={<Listings />} />} />
+      <Route path="/listings" element={<RequireAuth element={<YourListings />} />} />
       <Route path="/profile" element={<RequireAuth element={<Profile />} />} />
       <Route path="/finance" element={<RequireAuth element={<FinanceLayout />} />}>
         <Route index element={<Payouts />} />

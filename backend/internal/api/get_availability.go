@@ -67,7 +67,7 @@ func (s ApiService) GetAvailability(w http.ResponseWriter, r *http.Request) erro
 		endDate,
 	)
 	if err != nil {
-		return errors.Wrap(err, "(api.GetAvailability) creating availability rule")
+		return errors.Wrap(err, "(api.GetAvailability) loading availability")
 	}
 
 	// Any active temporary bookings the user has are considered available for that user

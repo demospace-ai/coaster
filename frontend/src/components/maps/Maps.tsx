@@ -69,7 +69,7 @@ export const MapSearch: React.FC<{ onSubmit?: (input: string) => void }> = (prop
       />
       <div
         className={mergeClasses(
-          "tw-absolute tw-z-10 tw-left-0 tw-top-0 tw-w-[100vw] tw-h-[100vh] tw-bg-black/10 tw-backdrop-blur-sm tw-invisible tw-transition-all tw-duration-100",
+          "tw-absolute tw-z-10 tw-left-0 tw-top-0 tw-w-full tw-h-[100vh] tw-bg-black/10 tw-backdrop-blur-sm tw-invisible tw-transition-all tw-duration-100",
           open && "tw-visible",
         )}
       />

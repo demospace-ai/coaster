@@ -17,30 +17,37 @@ import { DateRange, DayPicker, DayPickerProps, DayPickerSingleProps } from "reac
 import { Button } from "src/components/button/Button";
 import { Loading } from "src/components/loading/Loading";
 import { mergeClasses } from "src/utils/twmerge";
-import useWindowDimensions from "src/utils/window";
+import { useIsMobile } from "src/utils/window";
 
 export const DateRangePicker: React.FC<DayPickerProps> = ({
   className,
-  classNames,
+  classNames = {},
   showOutsideDays = false,
   ...props
 }) => {
-  const { width } = useWindowDimensions();
-  const isMobile = width < 768;
+  const isMobile = useIsMobile();
   const numberOfMonths = props.numberOfMonths ? props.numberOfMonths : isMobile ? 1 : 2;
+
+  const { month, nav_button, caption, ...rest } = classNames;
 
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      className={mergeClasses("tw-w-full", className)}
+      className={mergeClasses("tw-w-full tw-select-none", className)}
       numberOfMonths={numberOfMonths}
       classNames={{
         months: "tw-flex tw-flex-col sm:tw-flex-row tw-w-full tw-space-y-4 sm:tw-space-x-4 sm:tw-space-y-0",
-        month: "tw-flex tw-flex-col tw-w-full tw-space-y-4 tw-border-0 sm:tw-border sm:tw-p-4 tw-rounded-lg",
-        caption: "tw-flex tw-justify-center tw-pt-1 tw-relative tw-items-center",
+        month: mergeClasses(
+          "tw-flex tw-flex-col tw-w-full tw-space-y-4 tw-border-0 sm:tw-border sm:tw-p-4 tw-rounded-lg",
+          month,
+        ),
+        caption: mergeClasses("tw-flex tw-justify-center tw-pt-1 tw-relative tw-items-center", caption),
         caption_label: "tw-text-sm tw-font-medium",
         nav: "tw-space-x-1 tw-flex tw-items-center",
-        nav_button: "tw-h-6 tw-w-6 tw-bg-transparent tw-p-0 tw-opacity-50 hover:tw-opacity-100 tw-rounded-lg",
+        nav_button: mergeClasses(
+          "tw-h-6 tw-w-6 tw-bg-transparent tw-p-0 tw-opacity-50 hover:tw-opacity-100 tw-rounded-lg",
+          nav_button,
+        ),
         nav_button_previous: "tw-absolute tw-left-1",
         nav_button_next: "tw-absolute tw-right-1",
         table: "tw-w-full tw-border-collapse tw-space-y-1",
@@ -56,7 +63,7 @@ export const DateRangePicker: React.FC<DayPickerProps> = ({
           "tw-text-slate-400 tw-opacity-50 !tw-cursor-not-allowed hover:tw-bg-slate-200 hover:tw-text-slate-400",
         day_range_middle: "aria-selected:!tw-bg-blue-500 aria-selected:tw-text-white",
         day_hidden: "tw-invisible",
-        ...classNames,
+        ...rest,
       }}
       components={{
         IconLeft: () => <ChevronLeftIcon />,

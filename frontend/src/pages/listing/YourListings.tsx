@@ -3,7 +3,7 @@ import { Loading } from "src/components/loading/Loading";
 import { useHostedListings } from "src/rpc/data";
 import { Listing } from "src/rpc/types";
 
-export const Listings: React.FC = () => {
+export const YourListings: React.FC = () => {
   const { hosted, error } = useHostedListings();
   const navigate = useNavigate();
 

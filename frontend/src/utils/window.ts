@@ -27,3 +27,7 @@ export default function useWindowDimensions(): WindowDimensions {
 
   return windowDimensions;
 }
+
+export function useIsMobile(): boolean {
+  return useWindowDimensions().width < 768;
+}

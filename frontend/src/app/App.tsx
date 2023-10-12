@@ -1,12 +1,19 @@
 import { ErrorBoundary } from "@highlight-run/react";
 import { useEffect, useState } from "react";
-import { Outlet, Route, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
+import {
+  Outlet,
+  Route,
+  ScrollRestoration,
+  createBrowserRouter,
+  createRoutesFromElements,
+  useLocation,
+} from "react-router-dom";
 import { useStart } from "src/app/actions";
 import { RequireAuth } from "src/components/auth/RequireAuth";
 import { Footer } from "src/components/footer/Footer";
 import { Header } from "src/components/header/Header";
 import { LogoLoading } from "src/components/loading/LogoLoading";
-import { ToastPortal, getToastContentFromDetails } from "src/components/notifications/Notifications";
+import { ToastPortal } from "src/components/notifications/Notifications";
 import { About } from "src/pages/about/About";
 import { Home } from "src/pages/home/Home";
 import { Listing } from "src/pages/listing/Listing";
@@ -19,17 +26,16 @@ import { Privacy } from "src/pages/privacy/Privacy";
 import { Terms } from "src/pages/privacy/Terms";
 import { Profile } from "src/pages/profile/Profile";
 import { Search } from "src/pages/search/Search";
-import { useDispatch, useSelector } from "src/root/model";
+import { useSelector } from "src/root/model";
 
 let needsInit = true;
 
 const AppLayout: React.FC = () => {
   const start = useStart();
-  const dispatch = useDispatch();
   const loading = useSelector((state) => state.app.loading);
   const forbidden = useSelector((state) => state.app.forbidden);
-  const toast = useSelector((state) => state.app.toast);
-  const toastContent = getToastContentFromDetails(toast);
+  const location = useLocation();
+  const isHome = location.pathname === "/";
 
   const error = useCatchGlobalError();
   if (error) {
@@ -55,7 +61,8 @@ const AppLayout: React.FC = () => {
   return (
     <>
       <ToastPortal />
-      <div className="tw-flex tw-flex-col tw-flex-grow tw-bg-white">
+      <ScrollRestoration />
+      <div className="tw-flex tw-flex-col tw-flex-grow tw-items-center">
         <Header />
         <Outlet />
         <Footer />

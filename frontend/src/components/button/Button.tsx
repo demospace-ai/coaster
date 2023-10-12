@@ -1,22 +1,19 @@
 import { TrashIcon } from "@heroicons/react/24/outline";
-import React, { forwardRef } from "react";
+import React, { InputHTMLAttributes, MouseEvent, MouseEventHandler, forwardRef } from "react";
 import { NavLink, NavLinkProps, useNavigate } from "react-router-dom";
 import { mergeClasses } from "src/utils/twmerge";
 
-type ButtonProps = {
-  onClick?: () => void;
-  className?: string;
-  children: React.ReactNode;
-  disabled?: boolean;
+interface ButtonProps extends InputHTMLAttributes<HTMLButtonElement> {
+  onClick?: MouseEventHandler<HTMLButtonElement> | (() => void);
   type?: "button" | "submit" | "reset";
-};
+}
 
 export const Button: React.FC<ButtonProps> = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
   const { onClick, type = "button", className, children, ...remaining } = props;
 
   const buttonStyle = mergeClasses(
-    "tw-text-primary-text tw-bg-primary hover:tw-bg-primary-hover",
-    "tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition tw-select-none",
+    "tw-text-white tw-bg-blue-950 hover:tw-bg-blue-900",
+    "tw-py-1 tw-px-4 tw-cursor-pointer tw-font-semibold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition tw-select-none",
     props.disabled && "tw-text-slate-600 tw-bg-slate-300 hover:tw-bg-slate-300 tw-cursor-not-allowed",
     props.className,
   );
@@ -37,7 +34,7 @@ export const LinkButton: React.FC<LinkButtonProps> = forwardRef<HTMLAnchorElemen
   const { href, className, children, ...remaining } = props;
 
   const buttonStyle = mergeClasses(
-    "tw-flex tw-items-center tw-justify-center tw-text-primary-text tw-bg-primary hover:tw-bg-primary-hover tw-tracking-[1px] tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-transition tw-select-none",
+    "tw-flex tw-items-center tw-justify-center tw-text-white tw-bg-blue-950 hover:tw-bg-blue-900tw-tracking-[1px] tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-transition tw-select-none",
     props.className,
   );
   return (
@@ -54,7 +51,7 @@ type FormButtonProps = {
 
 export const FormButton: React.FC<FormButtonProps> = (props) => {
   const buttonStyle = mergeClasses(
-    "tw-text-primary-text tw-bg-primary hover:tw-bg-primary-hover tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition tw-select-none",
+    "tw-text-white tw-bg-blue-950 hover:tw-bg-blue-900 tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-tracking-[1px] tw-transition tw-select-none",
     props.className,
   );
   return (
@@ -64,12 +61,12 @@ export const FormButton: React.FC<FormButtonProps> = (props) => {
   );
 };
 
-export const BackButton: React.FC<Partial<ButtonProps>> = (props) => {
+export const BackButton: React.FC<InputHTMLAttributes<HTMLDivElement>> = (props) => {
   const navigate = useNavigate();
 
-  const onClick = () => {
+  const onClick = (e: MouseEvent<HTMLDivElement>) => {
     if (props.onClick) {
-      props.onClick();
+      props.onClick(e);
     } else {
       navigate(-1);
     }
@@ -92,28 +89,13 @@ export const NavButton: React.FC<NavLinkProps> = (props) => {
   return (
     <NavLink
       className={mergeClasses(
-        "tw-bg-primary tw-text-white tw-rounded-md tw-block tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-font-bold tw-text-center tw-transition-colors hover:tw-bg-primary-hover tw-border tw-border-solid tw-border-primary-hover",
+        "tw-text-white tw-bg-blue-950 hover:tw-bg-blue-900 tw-rounded-md tw-block tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer tw-font-bold tw-text-center tw-transition-colors tw-border tw-border-solid",
         props.className as string,
       )}
       to={props.to}
     >
       {props.children}
     </NavLink>
-  );
-};
-
-export const DivButton: React.FC<ButtonProps> = (props) => {
-  return (
-    <div
-      className={props.className}
-      tabIndex={0}
-      onClick={props.onClick}
-      onKeyDown={(event: React.KeyboardEvent<HTMLDivElement>) => {
-        if (event.key === "Enter") props.onClick?.();
-      }}
-    >
-      {props.children}
-    </div>
   );
 };
 

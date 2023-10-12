@@ -41,18 +41,20 @@ export const Listing: React.FC = () => {
   }
 
   return (
-    <div className="tw-flex tw-flex-col tw-px-5 tw-pt-5 sm:tw-pt-12 tw-pb-32 sm:tw-px-[5rem] lg:tw-px-[10rem] lg:tw-max-w-[90rem] lg:tw-mx-auto tw-text-base">
-      <BackButton className="tw-mr-auto tw-mb-4" />
-      {listing.status !== ListingStatus.Published && (
-        <Callout content={"Not published - under review"} className="tw-border tw-border-yellow-400 tw-mb-4" />
-      )}
-      <ListingHeader listing={listing} />
-      <ListingImages listing={listing} />
-      <div className="tw-flex tw-mt-8 sm:tw-mt-12">
-        <ListingDetails listing={listing} />
-        <BookingPanel listing={listing} />
+    <div className="tw-flex tw-px-5 sm:tw-px-20">
+      <div className="tw-flex tw-flex-col tw-pt-5 sm:tw-pt-12 tw-pb-32 tw-text-base tw-w-full tw-max-w-[1280px]">
+        <BackButton className="tw-mr-auto tw-mb-4" />
+        {listing.status !== ListingStatus.Published && (
+          <Callout content={"Not published - under review"} className="tw-border tw-border-yellow-400 tw-mb-4" />
+        )}
+        <ListingHeader listing={listing} />
+        <ListingImages listing={listing} />
+        <div className="tw-flex tw-mt-8 sm:tw-mt-12">
+          <ListingDetails listing={listing} />
+          <BookingPanel listing={listing} />
+        </div>
+        <ReserveFooter listing={listing} />
       </div>
-      <ReserveFooter listing={listing} />
     </div>
   );
 };
@@ -213,7 +215,7 @@ const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
   };
 
   return (
-    <div className="tw-hidden lg:tw-flex tw-w-[40%] tw-min-w-[340px] tw-max-w-[400px]">
+    <div className="tw-hidden lg:tw-flex tw-w-[400px] tw-min-w-[400px] tw-max-w-[400px]">
       <div className="tw-sticky tw-top-32 tw-flex tw-flex-col tw-px-8 tw-py-6 tw-w-full tw-h-fit tw-border tw-border-solid tw-border-gray-300 tw-rounded-xl tw-shadow-centered-sm">
         <div>
           <span className="tw-text-2xl tw-font-semibold tw-mb-3">${listing.price}</span> per person
@@ -287,7 +289,7 @@ const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
 
 const ListingDetails: React.FC<{ listing: ListingType }> = ({ listing }) => {
   return (
-    <div className="tw-flex tw-flex-col tw-w-full md:tw-w-[60%] md:tw-mr-16">
+    <div className="tw-flex tw-flex-col tw-w-full md:tw-mr-16">
       <HostOverview listing={listing} />
       <QuickInfo listing={listing} />
       <Description listing={listing} />
@@ -528,7 +530,7 @@ const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) => {
   const [showImages, setShowImages] = useState(false);
 
   return (
-    <div className="tw-flex tw-max-h-[50vh] tw-min-h-[50vh] tw-rounded-xl tw-overflow-clip">
+    <div className="tw-flex tw-max-h-[560px] tw-rounded-xl tw-overflow-clip">
       <Modal
         show={showImages}
         close={() => {
@@ -538,9 +540,9 @@ const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) => {
       >
         <ImagesModal listing={listing} imageIndex={imageIndex} setImageIndex={setImageIndex} />
       </Modal>
-      <div className="tw-relative tw-flex tw-w-full sm:tw-w-3/4 sm:tw-mr-2">
+      <div className="tw-relative tw-flex tw-w-full sm:tw-w-2/3 sm:tw-mr-2">
         <img
-          className="tw-w-full tw-max-h-full tw-aspect-square tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
+          className="tw-w-full tw-aspect-square tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
           src={listing.images.length > 0 ? getGcsImageUrl(listing.images[0]) : "TODO"}
           onClick={() => {
             setImageIndex(0);
@@ -554,7 +556,7 @@ const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) => {
           See all images →
         </div>
       </div>
-      <div className="tw-relative tw-flex-col tw-w-1/4 tw-gap-2 tw-hidden sm:tw-flex">
+      <div className="tw-relative tw-flex-col tw-w-1/3 tw-gap-2 tw-hidden sm:tw-flex">
         <img
           className="tw-h-1/2 tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
           src={listing.images.length > 1 ? getGcsImageUrl(listing.images[1]) : "TODO"}

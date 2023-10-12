@@ -1,41 +1,41 @@
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import { ArrowRightOnRectangleIcon, Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Loading } from "src/components/loading/Loading";
-import { MapSearch } from "src/components/maps/Maps";
 import { ProfilePicture } from "src/components/profile/ProfilePicture";
+import { SearchBarHeader } from "src/components/search/SearchBar";
 import { useLogout } from "src/pages/login/actions";
 import { useSelector } from "src/root/model";
 import { mergeClasses } from "src/utils/twmerge";
 
-const pagesWithoutHeader = ["", "about", "terms", "privacy"];
-
 export const Header: React.FC = () => {
-  const navigate = useNavigate();
   const location = useLocation();
-  const path = location.pathname.split("/")[1];
+  const isHome = location.pathname === "/";
+  const [scrollPosition, setScrollPosition] = useState(0);
 
-  // TODO: launch
-  if (pagesWithoutHeader.includes(path)) {
-    return (
-      <div className="tw-absolute tw-flex tw-z-10 tw-w-full tw-mt-4 tw-justify-center">
-        <NavLink
-          className="tw-w-fit tw-my-auto tw-max-w-[150px] tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-tracking-[-0.5px] tw-mt-[-2px] tw-font-extrabold tw-font-[Lateef] tw-text-[48px]"
-          to="/"
-        >
-          Coaster
-        </NavLink>
-      </div>
-    );
-  }
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollPosition(window.scrollY);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <div className="tw-sticky tw-z-10 tw-top-0 tw-flex tw-box-border tw-max-h-[72px] tw-min-h-[72px] sm:tw-max-h-[96px] sm:tw-min-h-[96px] tw-w-full tw-px-4 sm:tw-px-20 tw-py-3 tw-items-center tw-justify-between tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white">
-      <LogoLink />
-      <MapSearch onSubmit={(location) => navigate("/search?location=" + location)} />
-      <ProfileDropdown />
+    <div
+      className={mergeClasses(
+        "tw-sticky tw-z-10 tw-top-0 tw-flex tw-box-border tw-max-h-[72px] tw-min-h-[72px] sm:tw-max-h-[96px] sm:tw-min-h-[96px] tw-w-full tw-px-4 sm:tw-px-20 tw-py-3 tw-items-center tw-justify-center tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white",
+        isHome && "tw-bg-[#efedea] tw-border-[#d3d1ce]",
+        isHome && scrollPosition < 20 && "tw-border-none",
+      )}
+    >
+      <div className="tw-flex tw-w-full tw-max-w-[1280px] tw-items-center">
+        <LogoLink />
+        <SearchBarHeader show={!isHome || scrollPosition > 300} /> {/** Pass "show" here so modal is always rendered */}
+        <ProfileDropdown />
+      </div>
     </div>
   );
 };
@@ -54,15 +54,21 @@ const LogoLink: React.FC = () => {
 };
 
 const ProfileDropdown: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
-  const user = useSelector((state) => state.login.user);
   const isAuthenticated = useSelector((state) => state.login.authenticated);
-
-  const hostAppLink = getSwitchToHostingLink(user?.is_host);
+  const location = useLocation();
+  const isHome = location.pathname === "/";
 
   return (
     <div className="tw-flex sm:tw-flex-[0.5_0.5_0%] lg:tw-flex-1 tw-justify-end">
       <div className="tw-hidden lg:tw-flex">
-        {!onHostApp && hostAppLink}
+        {!onHostApp && (
+          <SwitchToHostingLink
+            className={mergeClasses(
+              "tw-hidden xl:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm",
+              isHome ? "hover:tw-bg-[#dfdfdc]" : "hover:tw-bg-gray-100",
+            )}
+          />
+        )}
         <div className="tw-flex tw-flex-col tw-justify-center">
           {isAuthenticated ? <SignedInMenu onHostApp={onHostApp} /> : <SignedOutMenu />}
         </div>
@@ -85,11 +91,6 @@ const SignedInMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
     // Should never happen
     return <Loading />;
   }
-  const hostAppLink = (
-    <div className="tw-flex xl:tw-hidden tw-m-2 tw-pt-2">
-      <Menu.Item>{getSwitchToHostingLink(user?.is_host)}</Menu.Item>
-    </div>
-  );
 
   return (
     <Menu as="div">
@@ -97,7 +98,7 @@ const SignedInMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
         <>
           <Menu.Button
             className={classNames(
-              "tw-cursor-pointer tw-select-none tw-flex tw-items-center tw-rounded-full tw-bg-white tw-border tw-border-solid tw-border-gray-300 tw-px-2 tw-py-1.5 hover:tw-shadow-md tw-ease-in-out tw-transition-all",
+              "tw-cursor-pointer tw-select-none tw-flex tw-items-center tw-rounded-full tw-border tw-border-solid tw-border-gray-300 tw-px-2 tw-py-1.5 hover:tw-shadow-md tw-ease-in-out tw-transition-all",
               open && "tw-shadow-md",
             )}
           >
@@ -146,7 +147,13 @@ const SignedInMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
                   </NavLink>
                 </Menu.Item>
               </div>
-              {!onHostApp && hostAppLink}
+              {!onHostApp && (
+                <div className="tw-flex xl:tw-hidden tw-m-2 tw-pt-2">
+                  <Menu.Item>
+                    <SwitchToHostingLink className={navItem} />
+                  </Menu.Item>
+                </div>
+              )}
               <div className="tw-m-2 tw-pt-2">
                 <Menu.Item>
                   <div className={menuItem} onClick={logout}>
@@ -193,7 +200,6 @@ const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
   const [open, setOpen] = useState(false);
   const buttonStyle =
     "tw-flex tw-justify-center tw-py-2 tw-w-full tw-cursor-pointer tw-select-none tw-whitespace-nowrap tw-rounded-3xl sm:tw-font-semibold tw-text-base tw-bg-gray-100 hover:tw-bg-gray-200";
-  const hostAppLink = getSwitchToHostingLink(user?.is_host, () => setOpen(false));
 
   return (
     <>
@@ -249,10 +255,10 @@ const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
                                 </NavLink>
                               </>
                             ) : (
-                              hostAppLink
+                              <SwitchToHostingLink className={navItem} onClick={() => setOpen(false)} />
                             )}
                             <div
-                              className={mergeClasses(buttonStyle, "tw-mt-10")}
+                              className={navItem}
                               onClick={() => {
                                 logout();
                                 setOpen(false);
@@ -347,22 +353,14 @@ const SupplierLinks: React.FC = () => {
   );
 };
 
-const getSwitchToHostingLink = (isHost: boolean | undefined, onClick?: () => void) => {
-  return isHost ? (
-    <a
-      className="tw-hidden xl:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
-      href="https://supplier.trycoaster.com"
-      onClick={onClick}
-    >
-      Switch to hosting
-    </a>
-  ) : (
-    <a
-      className="tw-hidden xl:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
-      href="https://supplier.trycoaster.com/listings/new"
-      onClick={onClick}
-    >
-      List your experience
-    </a>
+const SwitchToHostingLink: React.FC<{ onClick?: () => void; className?: string }> = (props) => {
+  const user = useSelector((state) => state.login.user);
+
+  const link = user?.is_host ? "https://supplier.trycoaster.com" : "https://supplier.trycoaster.com/listings/new";
+  const text = user?.is_host ? "Switch to hosting" : "List your experience";
+  return (
+    <div className={props.className} onClick={props.onClick}>
+      <a href={link}>{text}</a>
+    </div>
   );
 };
