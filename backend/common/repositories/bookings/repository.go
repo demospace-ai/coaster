@@ -46,6 +46,29 @@ func LoadBookingsForTimeAndDate(db *gorm.DB, listingID int64, startTime *databas
 	return bookings, nil
 }
 
+func LoadTemporaryBookingsForUser(db *gorm.DB, listingID int64, userID int64) ([]models.Booking, error) {
+	var bookings []models.Booking
+
+	result := db.Table("bookings").
+		Select("bookings.*").
+		Where("bookings.listing_id = ?", listingID).
+		Where("bookings.user_id = ?", userID).
+		Where("bookings.expires_at >= ?", time.Now()).
+		Where("bookings.deactivated_at IS NULL").
+		Find(&bookings)
+
+	if result.Error != nil {
+		// Not guaranteed to have any time slots for a rule so just return an empty slice
+		if errors.IsRecordNotFound(result.Error) {
+			return []models.Booking{}, nil
+		} else {
+			return nil, errors.Wrap(result.Error, "(availability_rules.LoadTemporaryBookingsForUser)")
+		}
+	}
+
+	return bookings, nil
+}
+
 func CreateBooking(db *gorm.DB, listingID int64, userID int64, startDate time.Time, startTime *time.Time, numGuests int64) (*models.Booking, error) {
 	booking := &models.Booking{
 		ListingID: listingID,
@@ -93,6 +116,17 @@ func ConfirmBooking(db *gorm.DB, bookingID int64) error {
 		Update("expires_at", nil)
 	if result.Error != nil {
 		return errors.Wrap(result.Error, "(bookings.ConfirmBooking)")
+	}
+
+	return nil
+}
+
+func DeactivateBooking(db *gorm.DB, bookingID int64) error {
+	result := db.Table("bookings").
+		Where("id = ?", bookingID).
+		Update("deactivated_at", time.Now())
+	if result.Error != nil {
+		return errors.Wrap(result.Error, "(bookings.DeactivateBooking)")
 	}
 
 	return nil

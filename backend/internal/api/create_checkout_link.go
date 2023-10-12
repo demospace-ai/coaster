@@ -12,6 +12,7 @@ import (
 	"go.fabra.io/server/common/repositories/bookings"
 	"go.fabra.io/server/common/repositories/listings"
 	"go.fabra.io/server/common/stripe"
+	"go.fabra.io/server/common/timeutils"
 )
 
 type CreateCheckoutLinkRequest struct {
@@ -53,6 +54,19 @@ func (s ApiService) CreateCheckoutLink(auth auth.Authentication, w http.Response
 		}
 
 		if rulePasses {
+			hasCapacity = true
+			break
+		}
+	}
+
+	// If the user has a temporary booking for this date/time, they can still book it by creating a new session
+	temporaryBookings, err := bookings.LoadTemporaryBookingsForUser(s.db, listing.ID, auth.User.ID)
+	if err != nil {
+		return errors.Wrap(err, "(api.CreateCheckoutLink) loading temporary bookings")
+	}
+
+	for _, booking := range temporaryBookings {
+		if booking.StartDate.ToTime().Equal(createCheckoutLinkRequest.StartDate.ToTime()) && timeutils.TimesMatch(booking.StartTime.ToTimePtr(), createCheckoutLinkRequest.StartTime.ToTimePtr()) {
 			hasCapacity = true
 			break
 		}

@@ -9,7 +9,9 @@ import (
 	"github.com/gorilla/mux"
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/repositories/availability_rules"
+	"go.fabra.io/server/common/repositories/bookings"
 	"go.fabra.io/server/common/repositories/listings"
+	"go.fabra.io/server/common/timeutils"
 )
 
 type GetAvailabilityResponse struct {
@@ -64,6 +66,20 @@ func (s ApiService) GetAvailability(w http.ResponseWriter, r *http.Request) erro
 	)
 	if err != nil {
 		return errors.Wrap(err, "(api.GetAvailability) creating availability rule")
+	}
+
+	// Any active temporary bookings the user has are considered available for that user
+	temporaryBookings, err := bookings.LoadTemporaryBookingsForUser(s.db, listing.ID, auth.User.ID)
+	if err != nil {
+		return errors.Wrap(err, "(api.GetAvailability) loading temporary bookings")
+	}
+
+	for _, booking := range temporaryBookings {
+		if booking.StartTime != nil {
+			availableDays = append(availableDays, timeutils.CombineDateAndTime(booking.StartDate.ToTime(), (*booking.StartTime).ToTime()))
+		} else {
+			availableDays = append(availableDays, booking.StartDate.ToTime())
+		}
 	}
 
 	return json.NewEncoder(w).Encode(availableDays)

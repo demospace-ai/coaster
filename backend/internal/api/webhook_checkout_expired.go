@@ -10,26 +10,25 @@ import (
 	stripeutils "go.fabra.io/server/common/stripe"
 )
 
-func (s ApiService) WebhookCheckoutComplete(w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) WebhookCheckoutExpired(w http.ResponseWriter, r *http.Request) error {
 	signature := r.Header.Get("Stripe-Signature")
 	payload, err := io.ReadAll(r.Body)
 	if err != nil {
-		return errors.Wrap(err, "(api.WebhookCheckoutComplete) reading request body")
+		return errors.Wrap(err, "(api.WebhookCheckoutExpired) reading request body")
 	}
 
 	event, err := stripeutils.VerifyWebhookRequest(payload, signature)
 	if err != nil {
-		return errors.Wrap(err, "(api.WebhookCheckoutComplete) verifying webhook request")
+		return errors.Wrap(err, "(api.WebhookCheckoutExpired) verifying webhook request")
 	}
 
-	// TODO: handle checkout.session.async_payment_succeeded and checkout.session.async_payment_failed
-	if event.Type != "checkout.session.completed" {
+	if event.Type != "checkout.session.expired" {
 		return errors.Newf("Unexpected event type: %v", event.Type)
 	}
 
 	checkoutSession, err := stripeutils.UnmarshallCheckoutSession(event)
 	if err != nil {
-		return errors.Wrap(err, "(api.WebhookCheckoutComplete) unmarshalling checkout session")
+		return errors.Wrap(err, "(api.WebhookCheckoutExpired) unmarshalling checkout session")
 	}
 
 	strBookingID := checkoutSession.Metadata["booking_id"]
@@ -39,12 +38,12 @@ func (s ApiService) WebhookCheckoutComplete(w http.ResponseWriter, r *http.Reque
 
 	bookingID, err := strconv.ParseInt(strBookingID, 10, 64)
 	if err != nil {
-		return errors.Wrap(err, "(api.WebhookCheckoutComplete) converting booking ID to int")
+		return errors.Wrap(err, "(api.WebhookCheckoutExpired) converting booking ID to int")
 	}
 
-	err = bookings.ConfirmBooking(s.db, bookingID)
+	err = bookings.DeactivateBooking(s.db, bookingID)
 	if err != nil {
-		return errors.Wrap(err, "(api.WebhookCheckoutComplete) confirming booking")
+		return errors.Wrap(err, "(api.WebhookCheckoutExpired) confirming booking")
 	}
 
 	return nil

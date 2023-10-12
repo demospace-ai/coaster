@@ -95,6 +95,7 @@ func GetCheckoutLink(user *models.User, host *models.User, listing *models.Listi
 
 	unitPrice := *listing.Price * 100
 	commission := booking.Guests * unitPrice * host.CommissionPercent // No need to divide percent by 100 because Stripe uses cents and we use dollars
+	expiresAt := booking.ExpiresAt.Unix()
 
 	params := &stripe.CheckoutSessionParams{
 		Mode:              stripe.String(string(stripe.CheckoutSessionModePayment)),
@@ -120,6 +121,7 @@ func GetCheckoutLink(user *models.User, host *models.User, listing *models.Listi
 		},
 		SuccessURL: stripe.String(getSuccessURL()),
 		CancelURL:  stripe.String(getCancelURL(listing)),
+		ExpiresAt:  &expiresAt,
 		Metadata: map[string]string{
 			"booking_id": fmt.Sprintf("%d", booking.ID),
 		},
@@ -147,7 +149,7 @@ func VerifyWebhookRequest(payload []byte, signature string) (*stripe.Event, erro
 	return &event, nil
 }
 
-func UnmarshallCheckoutComplete(event *stripe.Event) (*stripe.CheckoutSession, error) {
+func UnmarshallCheckoutSession(event *stripe.Event) (*stripe.CheckoutSession, error) {
 	var checkoutSession stripe.CheckoutSession
 	err := json.Unmarshal(event.Data.Raw, &checkoutSession)
 	if err != nil {

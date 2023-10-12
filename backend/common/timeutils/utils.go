@@ -113,3 +113,8 @@ func TimesMatch(t1 *time.Time, t2 *time.Time) bool {
 
 	return t1.Hour() == t2.Hour() && t1.Minute() == t2.Minute() && t1.Second() == t2.Second()
 }
+
+
+func CombineDateAndTime(date time.Time, timeValue time.Time) time.Time {
+	return time.Date(date.Year(), date.Month(), date.Day(), timeValue.Hour(), timeValue.Minute(), timeValue.Second(), 0, time.UTC)
+}

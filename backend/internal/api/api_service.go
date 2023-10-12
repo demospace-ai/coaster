@@ -227,5 +227,11 @@ func (s ApiService) UnauthenticatedRoutes() []router.UnauthenticatedRoute {
 			Pattern:     "/webhooks/checkout_complete",
 			HandlerFunc: s.WebhookCheckoutComplete,
 		},
+		{
+			Name:        "Stripe checkout expired webhook",
+			Method:      router.POST,
+			Pattern:     "/webhooks/checkout_expired",
+			HandlerFunc: s.WebhookCheckoutExpired,
+		},
 	}
 }
