@@ -3,6 +3,7 @@ import { useDispatch } from "src/root/model";
 import { sendRequest } from "src/rpc/ajax";
 import {
   CreateAvailabilityRule,
+  CreateCheckoutLink,
   CreateListing,
   CreatePayoutMethod,
   GetAvailability,
@@ -24,6 +25,7 @@ import {
   AvailabilityRule,
   AvailabilityRuleInput,
   AvailabilityRuleUpdates,
+  CreateCheckoutLinkRequest,
   Listing,
   ListingInput,
   PayoutMethod,
@@ -199,6 +201,12 @@ export function useCreatePayoutMethod(opts?: MutationOpts<string>): Mutation<voi
 export function useGetStripeDashboardLink(opts?: MutationOpts<string>): Mutation<void> {
   return useMutation<string, void>(async () => {
     return await sendRequest(GetStripeDashboardLink);
+  }, opts);
+}
+
+export function useCreateCheckoutLink(opts?: MutationOpts<string>): Mutation<CreateCheckoutLinkRequest> {
+  return useMutation<string, CreateCheckoutLinkRequest>(async (payload) => {
+    return await sendRequest(CreateCheckoutLink, { payload });
   }, opts);
 }
 

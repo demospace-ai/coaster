@@ -93,8 +93,8 @@ func GetCheckoutLink(user *models.User, host *models.User, listing *models.Listi
 	sc := &client.API{}
 	sc.Init(*stripeApiKey, nil)
 
-	unitPrice := *listing.Price
-	commission := (booking.Guests * unitPrice) * (host.CommissionPercent / 100)
+	unitPrice := *listing.Price * 100
+	commission := booking.Guests * unitPrice * host.CommissionPercent // No need to divide percent by 100 because Stripe uses cents and we use dollars
 
 	params := &stripe.CheckoutSessionParams{
 		Mode:              stripe.String(string(stripe.CheckoutSessionModePayment)),

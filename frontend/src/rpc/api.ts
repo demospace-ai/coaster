@@ -3,6 +3,7 @@ import {
   AvailabilityRuleInput,
   AvailabilityRuleUpdates,
   CheckSessionResponse,
+  CreateCheckoutLinkRequest,
   CreateUserRequest,
   CreateUserResponse,
   EmailLoginRequest,
@@ -155,6 +156,12 @@ export const GetStripeDashboardLink: IEndpoint<undefined, string> = {
   name: "Get Stripe dashboard link",
   method: "GET",
   path: "/stripe_dashboard_link",
+};
+
+export const CreateCheckoutLink: IEndpoint<CreateCheckoutLinkRequest, string> = {
+  name: "Create Checkout link",
+  method: "POST",
+  path: "/checkout_link",
 };
 
 export const Login: IEndpoint<LoginRequest, LoginResponse> = {

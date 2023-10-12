@@ -123,6 +123,13 @@ export interface ListingInput {
   availability_type?: AvailabilityTypeType;
 }
 
+export interface CreateCheckoutLinkRequest {
+  listing_id: number;
+  start_date: Date;
+  start_time?: Date;
+  number_of_guests: number;
+}
+
 export interface AvailabilityRuleInput {
   name: string;
   type: AvailabilityRuleTypeType;

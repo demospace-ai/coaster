@@ -222,7 +222,7 @@ func (s ApiService) UnauthenticatedRoutes() []router.UnauthenticatedRoute {
 			HandlerFunc: s.JoinWaitlist,
 		},
 		{
-			Name:        "Stripe Checkout Complete webhook",
+			Name:        "Stripe checkout complete webhook",
 			Method:      router.POST,
 			Pattern:     "/webhooks/checkout_complete",
 			HandlerFunc: s.WebhookCheckoutComplete,

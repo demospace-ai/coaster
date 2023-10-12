@@ -1,3 +1,4 @@
+import { RadioGroup } from "@headlessui/react";
 import { CheckBadgeIcon } from "@heroicons/react/20/solid";
 import {
   ArrowUpOnSquareIcon,
@@ -9,19 +10,22 @@ import {
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
-import { BackButton, LinkButton } from "src/components/button/Button";
-import { DatePickerPopper, DatePickerSlider } from "src/components/calendar/DatePicker";
+import { useNavigate, useParams } from "react-router-dom";
+import { BackButton, Button, LinkButton } from "src/components/button/Button";
+import { DatePickerPopper, DatePickerSlider, correctToUTC } from "src/components/calendar/DatePicker";
 import { Callout } from "src/components/callouts/Callout";
 import { GuestNumberInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { Modal } from "src/components/modal/Modal";
 import { useShowToast } from "src/components/notifications/Notifications";
 import { ProfilePicture } from "src/components/profile/ProfilePicture";
-import { useAvailability, useListing } from "src/rpc/data";
-import { Host, ListingStatus, Listing as ListingType } from "src/rpc/types";
+import { useSelector } from "src/root/model";
+import { useAvailability, useCreateCheckoutLink, useListing } from "src/rpc/data";
+import { AvailabilityType, Host, ListingStatus, Listing as ListingType } from "src/rpc/types";
+import { ToTimeOnly } from "src/utils/date";
 import { getGcsImageUrl } from "src/utils/images";
 import { toTitleCase } from "src/utils/string";
+import { mergeClasses } from "src/utils/twmerge";
 import useWindowDimensions from "src/utils/window";
 
 export const Listing: React.FC = () => {
@@ -82,7 +86,51 @@ const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) => {
 const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) => {
   const [month, setMonth] = useState<Date>(new Date()); // TODO: this should be the current month
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [startTime, setStartTime] = useState<Date | undefined>(undefined);
+  const [guests, setGuests] = useState<number>(1);
   const { availability, loading } = useAvailability(listing.id, month);
+  const isAuthenticated = useSelector((state) => state.login.authenticated);
+  const navigate = useNavigate();
+  const createCheckoutLink = useCreateCheckoutLink({
+    onSuccess: (link) => {
+      window.location.href = link;
+    },
+  });
+
+  // TODO: where do you pick number of guests and start time on mobile??
+
+  const timeSlotMap = getTimeSlotMap(availability);
+  const timeSlots = startDate ? timeSlotMap.get(startDate.toLocaleDateString()) : undefined;
+
+  const tryToReserve = () => {
+    if (isAuthenticated) {
+      const utcDate = correctToUTC(startDate);
+      if (utcDate == undefined) {
+        // TODO: show error
+        return;
+      }
+
+      var timeOnly = undefined;
+      if (listing.availability_type === AvailabilityType.Enum.datetime) {
+        if (startTime == undefined) {
+          // TODO: show error
+          return;
+        }
+        timeOnly = ToTimeOnly(startTime);
+      }
+
+      const payload = {
+        listing_id: listing.id,
+        start_date: utcDate,
+        start_time: timeOnly,
+        number_of_guests: guests,
+      };
+
+      createCheckoutLink.mutate(payload);
+    } else {
+      navigate("/login");
+    }
+  };
 
   return (
     <div className="tw-fixed lg:tw-hidden tw-z-20 tw-bottom-0 tw-left-0 tw-flex tw-items-center tw-justify-between tw-bg-white tw-border-t tw-border-solid tw-border-gray-300 tw-h-20 tw-w-full tw-px-4">
@@ -108,14 +156,12 @@ const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) => {
           }}
         />
       </div>
-      <LinkButton
+      <Button
         className="tw-font-medium tw-tracking-[0.5px] tw-py-2"
-        href={`mailto:${listing.host.email}?subject=Checking availability&body=Hi ${getHostName(
-          listing.host,
-        )}, I'm interested in booking your trip!`}
+        disabled={!startDate || (listing.availability_type === AvailabilityType.Enum.datetime && !startTime)}
       >
-        {startDate ? "Reserve" : "Check Availability"}
-      </LinkButton>
+        {createCheckoutLink.isLoading ? <Loading /> : "Reserve"}
+      </Button>
     </div>
   );
 };
@@ -123,8 +169,49 @@ const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) => {
 const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
   const [month, setMonth] = useState<Date>(new Date()); // TODO: this should be the current month
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [startTime, setStartTime] = useState<Date | undefined>(undefined);
   const [guests, setGuests] = useState<number>(1);
   const { availability, loading } = useAvailability(listing.id, month);
+  const isAuthenticated = useSelector((state) => state.login.authenticated);
+  const navigate = useNavigate();
+  const createCheckoutLink = useCreateCheckoutLink({
+    onSuccess: (link) => {
+      window.location.href = link;
+    },
+  });
+
+  const timeSlotMap = getTimeSlotMap(availability);
+  const timeSlots = startDate ? timeSlotMap.get(startDate.toLocaleDateString()) : undefined;
+
+  const tryToReserve = () => {
+    if (isAuthenticated) {
+      const utcDate = correctToUTC(startDate);
+      if (utcDate == undefined) {
+        // TODO: show error
+        return;
+      }
+
+      var timeOnly = undefined;
+      if (listing.availability_type === AvailabilityType.Enum.datetime) {
+        if (startTime == undefined) {
+          // TODO: show error
+          return;
+        }
+        timeOnly = ToTimeOnly(startTime);
+      }
+
+      const payload = {
+        listing_id: listing.id,
+        start_date: utcDate,
+        start_time: timeOnly,
+        number_of_guests: guests,
+      };
+
+      createCheckoutLink.mutate(payload);
+    } else {
+      navigate("/login");
+    }
+  };
 
   return (
     <div className="tw-hidden lg:tw-flex tw-w-[40%] tw-min-w-[340px] tw-max-w-[400px]">
@@ -161,14 +248,35 @@ const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
             className="tw-w-1/4 tw-min-w-[80px]"
           />
         </div>
-        <LinkButton
+        {listing.availability_type === AvailabilityType.Enum.datetime && timeSlots != undefined && (
+          <RadioGroup
+            value={startTime ? startTime : null}
+            onChange={setStartTime}
+            className="tw-flex tw-columns-3 tw-justify-start tw-gap-3 tw-mb-5"
+          >
+            {timeSlots.map((timeSlot) => (
+              <RadioGroup.Option
+                key={timeSlot.toLocaleTimeString()}
+                value={timeSlot}
+                className={({ checked }) =>
+                  mergeClasses(
+                    "tw-px-2 tw-py-1 tw-cursor-pointer tw-rounded-lg tw-border tw-border-solid tw-border-gray-300",
+                    checked && "tw-bg-blue-100",
+                  )
+                }
+              >
+                {timeSlot.toLocaleTimeString()}
+              </RadioGroup.Option>
+            ))}
+          </RadioGroup>
+        )}
+        <Button
           className="tw-font-medium tw-py-2 tw-mb-4 tw-tracking-[0.5px]"
-          href={`mailto:${listing.host.email}?subject=Checking availability&body=Hi ${getHostName(
-            listing.host,
-          )}, I'm interested in booking your trip!`}
+          disabled={!startDate || (listing.availability_type === AvailabilityType.Enum.datetime && !startTime)}
+          onClick={tryToReserve}
         >
-          {startDate ? "Reserve" : "Check Availability"}
-        </LinkButton>
+          {createCheckoutLink.isLoading ? <Loading /> : "Reserve"}
+        </Button>
         <div className="tw-w-full tw-text-center tw-text-sm tw-mb-4 tw-pb-3 tw-border-b tw-border-solid tw-border-gray-300">
           You won't be charged yet
         </div>
@@ -533,4 +641,20 @@ const getHostName = (host: Host) => {
   } else {
     return "Unknown";
   }
+};
+
+const getTimeSlotMap = (availability: Date[] | undefined) => {
+  const timeSlotMap = new Map<string, Date[]>();
+  if (availability) {
+    for (const date of availability) {
+      const dateString = date.toLocaleDateString();
+      const existing = timeSlotMap.get(dateString);
+      if (existing) {
+        existing.push(date);
+      } else {
+        timeSlotMap.set(dateString, [date]);
+      }
+    }
+  }
+  return timeSlotMap;
 };

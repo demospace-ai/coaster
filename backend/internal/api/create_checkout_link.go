@@ -3,21 +3,22 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-	"time"
 
 	"github.com/go-playground/validator"
 	"go.fabra.io/server/common/auth"
+	"go.fabra.io/server/common/database"
 	"go.fabra.io/server/common/errors"
+	"go.fabra.io/server/common/repositories/availability_rules"
 	"go.fabra.io/server/common/repositories/bookings"
 	"go.fabra.io/server/common/repositories/listings"
 	"go.fabra.io/server/common/stripe"
 )
 
 type CreateCheckoutLinkRequest struct {
-	ListingID      int64   `json:"listing_id"`
-	StartDate      string  `json:"start_date"`
-	StartTime      *string `json:"start_time"`
-	NumberOfGuests int64   `json:"number_of_guests"`
+	ListingID      int64          `json:"listing_id"`
+	StartDate      database.Date  `json:"start_date"`
+	StartTime      *database.Time `json:"start_time"`
+	NumberOfGuests int64          `json:"number_of_guests"`
 }
 
 func (s ApiService) CreateCheckoutLink(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
@@ -39,23 +40,29 @@ func (s ApiService) CreateCheckoutLink(auth auth.Authentication, w http.Response
 		return errors.Wrap(err, "(api.CreateCheckoutLink) loading listing")
 	}
 
-	startDate, err := time.Parse(time.DateOnly, createCheckoutLinkRequest.StartDate)
+	availabilityRules, err := availability_rules.LoadForListing(s.db, listing.ID)
 	if err != nil {
-		return errors.Wrap(err, "(api.CreateCheckoutLink) parsing start date")
+		return errors.Wrap(err, "(api.CreateCheckoutLink) loading availability rules")
 	}
 
-	var startTime *time.Time
-	if createCheckoutLinkRequest.StartTime != nil {
-		parsedTime, err := time.Parse(time.TimeOnly, *createCheckoutLinkRequest.StartTime)
+	hasCapacity := false
+	for _, rule := range availabilityRules {
+		rulePasses, err := rule.HasAvailabilityForTarget(s.db, createCheckoutLinkRequest.StartDate.ToTime(), createCheckoutLinkRequest.StartTime.ToTimePtr(), listing.Listing)
 		if err != nil {
-			return errors.Wrap(err, "(api.CreateCheckoutLink) parsing start time")
+			return errors.Wrap(err, "(api.CreateCheckoutLink) checking availability rule")
 		}
 
-		startTime = &parsedTime
+		if rulePasses {
+			hasCapacity = true
+			break
+		}
 	}
 
-	// Create the booking here
-	booking, err := bookings.CreateTemporaryBooking(s.db, listing.ID, auth.User.ID, startDate, startTime, createCheckoutLinkRequest.NumberOfGuests)
+	if !hasCapacity {
+		return errors.NewCustomerVisibleError("This listing is not available for the selected date and time.")
+	}
+
+	booking, err := bookings.CreateTemporaryBooking(s.db, listing.ID, auth.User.ID, createCheckoutLinkRequest.StartDate.ToTime(), createCheckoutLinkRequest.StartTime.ToTimePtr(), createCheckoutLinkRequest.NumberOfGuests)
 	if err != nil {
 		return errors.Wrap(err, "(api.CreateCheckoutLink) creating temporary booking")
 	}

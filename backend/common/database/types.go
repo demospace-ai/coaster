@@ -25,6 +25,15 @@ func (date Date) Value() (driver.Value, error) {
 	return time.Date(y, m, d, 0, 0, 0, 0, time.Time(date).Location()), nil
 }
 
+func (d Date) ToTime() time.Time {
+	return time.Time(d)
+}
+
+func (d *Date) ToTimePtr() *time.Time {
+	tptr := time.Time(*d)
+	return &tptr
+}
+
 // GormDataType gorm common data type
 func (Date) GormDataType() string {
 	return "DATE"
@@ -61,6 +70,15 @@ func newTime(hour, min, sec int) Time {
 // GormDataType returns gorm common data type. This type is used for the field's column type.
 func (Time) GormDataType() string {
 	return "TIME"
+}
+
+func (t Time) ToTime() time.Time {
+	return time.Time(t)
+}
+
+func (t *Time) ToTimePtr() *time.Time {
+	tptr := time.Time(*t)
+	return &tptr
 }
 
 // Scan implements sql.Scanner interface and scans value into Time,

@@ -101,3 +101,15 @@ func FirstDayOfWeekInMonth(year int, month time.Month, dayOfWeek time.Weekday) t
 	}
 	return day
 }
+
+func TimesMatch(t1 *time.Time, t2 *time.Time) bool {
+	if t1 == nil && t2 == nil {
+		return true
+	}
+
+	if t1 == nil || t2 == nil {
+		return false
+	}
+
+	return t1.Hour() == t2.Hour() && t1.Minute() == t2.Minute() && t1.Second() == t2.Second()
+}

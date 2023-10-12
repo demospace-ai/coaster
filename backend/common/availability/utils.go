@@ -18,23 +18,23 @@ type RuleAndTimes struct {
 func (rule RuleAndTimes) GetAvailabilityInRange(db *gorm.DB, startDate time.Time, endDate time.Time, listing models.Listing) ([]time.Time, error) {
 	switch rule.Type {
 	case models.AvailabilityRuleTypeFixedDate:
-		return rule.GetAvailabilityInRangeFixedDate(db, startDate, endDate, listing)
+		return rule.getAvailabilityInRangeFixedDate(db, startDate, endDate, listing)
 	case models.AvailabilityRuleTypeFixedRange:
-		return rule.GetAvailabilityInRangeFixedRange(db, startDate, endDate, listing)
+		return rule.getAvailabilityInRangeFixedRange(db, startDate, endDate, listing)
 	case models.AvailabilityRuleTypeRecurring:
-		return rule.GetAvailabilityInRangeRecurring(db, startDate, endDate, listing)
+		return rule.getAvailabilityInRangeRecurring(db, startDate, endDate, listing)
 	default:
 		// TODO: this should never happen
 		return nil, errors.Newf("(availability.GetAvailabilityForMonth) Unknown availability rule type: %s", rule.Type)
 	}
 }
 
-func (rule RuleAndTimes) GetAvailabilityInRangeFixedDate(db *gorm.DB, startDate time.Time, endDate time.Time, listing models.Listing) ([]time.Time, error) {
+func (rule RuleAndTimes) getAvailabilityInRangeFixedDate(db *gorm.DB, startDate time.Time, endDate time.Time, listing models.Listing) ([]time.Time, error) {
 	var availability []time.Time
 	if timeutils.BetweenOrEqual(time.Time(*rule.StartDate), startDate, endDate) {
 		for _, timeSlot := range rule.TimeSlots {
 			// All the time slots will be for this single fixed date, so check if any have availability
-			hasCapacity, err := rule.HasCapacityForDay(db, time.Time(*rule.StartDate), timeSlot, listing)
+			hasCapacity, err := rule.HasCapacityForValidDay(db, time.Time(*rule.StartDate), timeSlot, listing)
 			if err != nil {
 				return nil, errors.Wrap(err, "(availability.GetAvailabilityInRangeFixedDate)")
 			}
@@ -56,7 +56,7 @@ func (rule RuleAndTimes) GetAvailabilityInRangeFixedDate(db *gorm.DB, startDate 
 }
 
 // True if any of the available dates are between the start and end date
-func (rule RuleAndTimes) GetAvailabilityInRangeFixedRange(db *gorm.DB, startDate time.Time, endDate time.Time, listing models.Listing) ([]time.Time, error) {
+func (rule RuleAndTimes) getAvailabilityInRangeFixedRange(db *gorm.DB, startDate time.Time, endDate time.Time, listing models.Listing) ([]time.Time, error) {
 	availabilityMap := make(map[time.Time]bool)
 
 	// Can have multiple time slots per day of the week
@@ -68,7 +68,7 @@ func (rule RuleAndTimes) GetAvailabilityInRangeFixedRange(db *gorm.DB, startDate
 	for d := time.Time(*rule.StartDate); !d.After(time.Time(*rule.EndDate)); d = d.AddDate(0, 0, 1) {
 		if timeutils.BetweenOrEqual(d, startDate, endDate) {
 			for _, timeSlot := range timeSlotMap[d.Weekday()] {
-				hasCapacity, err := rule.HasCapacityForDay(db, d, timeSlot, listing)
+				hasCapacity, err := rule.HasCapacityForValidDay(db, d, timeSlot, listing)
 				if err != nil {
 					return nil, errors.Wrap(err, "(availability.GetAvailabilityInRangeFixedRange)")
 				}
@@ -96,7 +96,7 @@ func (rule RuleAndTimes) GetAvailabilityInRangeFixedRange(db *gorm.DB, startDate
 	return availability, nil
 }
 
-func (rule RuleAndTimes) GetAvailabilityInRangeRecurring(db *gorm.DB, startDate time.Time, endDate time.Time, listing models.Listing) ([]time.Time, error) {
+func (rule RuleAndTimes) getAvailabilityInRangeRecurring(db *gorm.DB, startDate time.Time, endDate time.Time, listing models.Listing) ([]time.Time, error) {
 	availabilityMap := make(map[time.Time]bool)
 
 	// Generate the list of matching years/months to check since the rule may span infinite years
@@ -109,7 +109,7 @@ func (rule RuleAndTimes) GetAvailabilityInRangeRecurring(db *gorm.DB, startDate 
 				// Increment by 7 days to get all the days of the week in the month
 				for d := timeutils.FirstDayOfWeekInMonth(int(year), month, *timeSlot.DayOfWeek); d.Month() == month; d = d.AddDate(0, 0, 7) {
 					if timeutils.BetweenOrEqual(d, startDate, endDate) {
-						hasCapacity, err := rule.HasCapacityForDay(db, d, timeSlot, listing)
+						hasCapacity, err := rule.HasCapacityForValidDay(db, d, timeSlot, listing)
 						if err != nil {
 							return nil, errors.Wrap(err, "(availability.GetAvailabilityInRangeRecurring)")
 						}
@@ -142,11 +142,11 @@ func (rule RuleAndTimes) GetAvailabilityInRangeRecurring(db *gorm.DB, startDate 
 func (rule RuleAndTimes) HasAvailabilityInRange(db *gorm.DB, startDate time.Time, endDate time.Time, listing models.Listing) (bool, error) {
 	switch rule.Type {
 	case models.AvailabilityRuleTypeFixedDate:
-		return rule.HasAvailabilityInRangeFixedDate(db, startDate, endDate, listing)
+		return rule.hasAvailabilityInRangeFixedDate(db, startDate, endDate, listing)
 	case models.AvailabilityRuleTypeFixedRange:
-		return rule.HasAvailabilityInRangeFixedRange(db, startDate, endDate, listing)
+		return rule.hasAvailabilityInRangeFixedRange(db, startDate, endDate, listing)
 	case models.AvailabilityRuleTypeRecurring:
-		return rule.HasAvailabilityInRangeRecurring(db, startDate, endDate, listing)
+		return rule.hasAvailabilityInRangeRecurring(db, startDate, endDate, listing)
 	default:
 		// TODO: this should never happen
 		return false, errors.Newf("(availability.HasAvailabilityInRange) Unknown availability rule type: %s", rule.Type)
@@ -154,11 +154,11 @@ func (rule RuleAndTimes) HasAvailabilityInRange(db *gorm.DB, startDate time.Time
 }
 
 // True if the available date is between the start and end date
-func (rule RuleAndTimes) HasAvailabilityInRangeFixedDate(db *gorm.DB, startDate time.Time, endDate time.Time, listing models.Listing) (bool, error) {
+func (rule RuleAndTimes) hasAvailabilityInRangeFixedDate(db *gorm.DB, startDate time.Time, endDate time.Time, listing models.Listing) (bool, error) {
 	if timeutils.BetweenOrEqual(time.Time(*rule.StartDate), startDate, endDate) {
 		for _, timeSlot := range rule.TimeSlots {
 			// All the time slots will be for this single fixed date, so check if any have availability
-			hasCapacity, err := rule.HasCapacityForDay(db, time.Time(*rule.StartDate), timeSlot, listing)
+			hasCapacity, err := rule.HasCapacityForValidDay(db, time.Time(*rule.StartDate), timeSlot, listing)
 			if err != nil {
 				return false, errors.Wrap(err, "(availability.HasAvailabilityInRangeRecurring)")
 			}
@@ -173,7 +173,7 @@ func (rule RuleAndTimes) HasAvailabilityInRangeFixedDate(db *gorm.DB, startDate 
 }
 
 // True if any of the available dates are between the start and end date
-func (rule RuleAndTimes) HasAvailabilityInRangeFixedRange(db *gorm.DB, startDate time.Time, endDate time.Time, listing models.Listing) (bool, error) {
+func (rule RuleAndTimes) hasAvailabilityInRangeFixedRange(db *gorm.DB, startDate time.Time, endDate time.Time, listing models.Listing) (bool, error) {
 	// Can have multiple time slots per day of the week
 	timeSlotMap := make(map[time.Weekday][]models.TimeSlot)
 	for _, timeSlot := range rule.TimeSlots {
@@ -183,7 +183,7 @@ func (rule RuleAndTimes) HasAvailabilityInRangeFixedRange(db *gorm.DB, startDate
 	for d := time.Time(*rule.StartDate); !d.After(time.Time(*rule.EndDate)); d = d.AddDate(0, 0, 1) {
 		if timeutils.BetweenOrEqual(d, startDate, endDate) {
 			for _, timeSlot := range timeSlotMap[d.Weekday()] {
-				hasCapacity, err := rule.HasCapacityForDay(db, d, timeSlot, listing)
+				hasCapacity, err := rule.HasCapacityForValidDay(db, d, timeSlot, listing)
 				if err != nil {
 					return false, errors.Wrap(err, "(availability.HasAvailabilityInRangeRecurring)")
 				}
@@ -198,7 +198,7 @@ func (rule RuleAndTimes) HasAvailabilityInRangeFixedRange(db *gorm.DB, startDate
 	return false, nil
 }
 
-func (rule RuleAndTimes) HasAvailabilityInRangeRecurring(db *gorm.DB, startDate time.Time, endDate time.Time, listing models.Listing) (bool, error) {
+func (rule RuleAndTimes) hasAvailabilityInRangeRecurring(db *gorm.DB, startDate time.Time, endDate time.Time, listing models.Listing) (bool, error) {
 	// Generate the list of matching years/months to check since the rule may span infinite years
 	matchingYears := getMatchingYears(rule, startDate, endDate)
 	matchingMonths := getMatchingMonths(rule, startDate, endDate)
@@ -209,7 +209,7 @@ func (rule RuleAndTimes) HasAvailabilityInRangeRecurring(db *gorm.DB, startDate 
 				// Increment by 7 days to get all the days of the week in the month
 				for d := timeutils.FirstDayOfWeekInMonth(int(year), month, *timeSlot.DayOfWeek); d.Month() == month; d = d.AddDate(0, 0, 7) {
 					if timeutils.BetweenOrEqual(d, startDate, endDate) {
-						hasCapacity, err := rule.HasCapacityForDay(db, d, timeSlot, listing)
+						hasCapacity, err := rule.HasCapacityForValidDay(db, d, timeSlot, listing)
 						if err != nil {
 							return false, errors.Wrap(err, "(availability.HasAvailabilityInRangeRecurring)")
 						}
@@ -226,7 +226,96 @@ func (rule RuleAndTimes) HasAvailabilityInRangeRecurring(db *gorm.DB, startDate 
 	return false, nil
 }
 
-func (rule RuleAndTimes) HasCapacityForDay(db *gorm.DB, targetDate time.Time, timeSlot models.TimeSlot, listing models.Listing) (bool, error) {
+func (rule RuleAndTimes) HasAvailabilityForTarget(db *gorm.DB, targetDate time.Time, targetTime *time.Time, listing models.Listing) (bool, error) {
+	switch rule.Type {
+	case models.AvailabilityRuleTypeFixedDate:
+		return rule.hasAvailabilityForTargetFixedDate(db, targetDate, targetTime, listing)
+	case models.AvailabilityRuleTypeFixedRange:
+		return rule.hasAvailabilityForTargetFixedRange(db, targetDate, targetTime, listing)
+	case models.AvailabilityRuleTypeRecurring:
+		return rule.hasAvailabilityForTargetRecurring(db, targetDate, targetTime, listing)
+	default:
+		// TODO: this should never happen
+		return false, errors.Newf("(availability.HasAvailabilityForTarget) Unknown availability rule type: %s", rule.Type)
+	}
+}
+
+// True if the available date is between the start and end date
+func (rule RuleAndTimes) hasAvailabilityForTargetFixedDate(db *gorm.DB, targetDate time.Time, targetTime *time.Time, listing models.Listing) (bool, error) {
+	if time.Time(*rule.StartDate).Equal(targetDate) {
+		for _, timeSlot := range rule.TimeSlots {
+			// This will match for date-only listings since they will both be nil
+			if timeutils.TimesMatch(targetTime, timeSlot.StartTime.ToTimePtr()) {
+				hasCapacity, err := rule.HasCapacityForValidDay(db, targetDate, timeSlot, listing)
+				if err != nil {
+					return false, errors.Wrap(err, "(availability.hasAvailabilityForTargetFixedDate)")
+				}
+
+				if hasCapacity {
+					return true, nil
+				}
+			}
+		}
+	}
+
+	return false, nil
+}
+
+// True if any of the available dates are between the start and end date
+func (rule RuleAndTimes) hasAvailabilityForTargetFixedRange(db *gorm.DB, targetDate time.Time, targetTime *time.Time, listing models.Listing) (bool, error) {
+	// Can have multiple time slots per day of the week
+	timeSlotMap := make(map[time.Weekday][]models.TimeSlot)
+	for _, timeSlot := range rule.TimeSlots {
+		timeSlotMap[*timeSlot.DayOfWeek] = append(timeSlotMap[*timeSlot.DayOfWeek], timeSlot)
+	}
+
+	if timeutils.BetweenOrEqual(targetDate, time.Time(*rule.StartDate), time.Time(*rule.EndDate)) {
+		for _, timeSlot := range timeSlotMap[targetDate.Weekday()] {
+			// This will match for date-only listings since they will both be nil
+			if timeutils.TimesMatch(targetTime, timeSlot.StartTime.ToTimePtr()) {
+				hasCapacity, err := rule.HasCapacityForValidDay(db, targetDate, timeSlot, listing)
+				if err != nil {
+					return false, errors.Wrap(err, "(availability.hasAvailabilityForTargetFixedRange)")
+				}
+
+				if hasCapacity {
+					return true, nil
+				}
+			}
+		}
+	}
+
+	return false, nil
+}
+
+func (rule RuleAndTimes) hasAvailabilityForTargetRecurring(db *gorm.DB, targetDate time.Time, targetTime *time.Time, listing models.Listing) (bool, error) {
+	if !rule.matchesMonth(targetDate) || !rule.matchesYear(targetDate) {
+		return false, nil
+	}
+
+	for _, timeSlot := range rule.TimeSlots {
+		if *timeSlot.DayOfWeek != targetDate.Weekday() {
+			continue
+		}
+
+		// This will match for date-only listings since they will both be nil
+		if timeutils.TimesMatch(targetTime, timeSlot.StartTime.ToTimePtr()) {
+			hasCapacity, err := rule.HasCapacityForValidDay(db, targetDate, timeSlot, listing)
+			if err != nil {
+				return false, errors.Wrap(err, "(availability.hasAvailabilityForTargetRecurring)")
+			}
+
+			if hasCapacity {
+				return true, nil
+			}
+		}
+	}
+
+	return false, nil
+}
+
+// Assumes that the date has already been checked to match the rule
+func (rule RuleAndTimes) HasCapacityForValidDay(db *gorm.DB, targetDate time.Time, timeSlot models.TimeSlot, listing models.Listing) (bool, error) {
 	bookings, err := bookings.LoadBookingsForTimeAndDate(db, listing.ID, timeSlot.StartTime, targetDate)
 	if err != nil {
 		return false, errors.Wrap(err, "(availability.HasCapacityForDay) loading bookings")
@@ -250,6 +339,34 @@ func (rule RuleAndTimes) HasCapacityForDay(db *gorm.DB, targetDate time.Time, ti
 	return remainingCapacity > 0, nil
 }
 
+func (rule RuleAndTimes) matchesYear(targetDate time.Time) bool {
+	if len(rule.RecurringYears) == 0 {
+		return true
+	} else {
+		for _, year := range rule.RecurringYears {
+			if int(year) == targetDate.Year() {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+func (rule RuleAndTimes) matchesMonth(targetDate time.Time) bool {
+	if len(rule.RecurringMonths) == 0 {
+		return true
+	} else {
+		for _, month := range rule.RecurringMonths {
+			if int(month) == int(targetDate.Month()) {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
 func getMatchingYears(rule RuleAndTimes, startDate time.Time, endDate time.Time) []int {
 	var matchingYears []int
 	if len(rule.RecurringYears) == 0 {
@@ -259,7 +376,7 @@ func getMatchingYears(rule RuleAndTimes, startDate time.Time, endDate time.Time)
 		}
 	} else {
 		yearsToQuery := make(map[int]bool)
-		for year := startDate.Year(); year < endDate.Year(); year++ {
+		for year := startDate.Year(); year <= endDate.Year(); year++ {
 			yearsToQuery[year] = true
 		}
 		for _, year := range rule.RecurringYears {
