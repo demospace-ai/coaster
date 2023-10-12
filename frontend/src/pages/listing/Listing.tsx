@@ -12,7 +12,7 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { BackButton, Button, LinkButton } from "src/components/button/Button";
-import { DatePickerPopper, DatePickerSlider, correctToUTC } from "src/components/calendar/DatePicker";
+import { DatePickerPopper, DatePickerSlider, correctFromUTC, correctToUTC } from "src/components/calendar/DatePicker";
 import { Callout } from "src/components/callouts/Callout";
 import { GuestNumberInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
@@ -101,6 +101,7 @@ const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) => {
 
   const timeSlotMap = getTimeSlotMap(availability);
   const timeSlots = startDate ? timeSlotMap.get(startDate.toLocaleDateString()) : undefined;
+  const correctedAvailability: Date[] = availability ? availability.map((date) => correctFromUTC(date)) : [];
 
   const tryToReserve = () => {
     if (isAuthenticated) {
@@ -143,11 +144,7 @@ const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) => {
           onMonthChange={setMonth}
           loading={loading}
           disabled={(day: Date) => {
-            if (!availability) {
-              return true;
-            }
-
-            for (const date of availability) {
+            for (const date of correctedAvailability) {
               if (date.toDateString() === day.toDateString()) {
                 return false;
               }
@@ -182,6 +179,7 @@ const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
 
   const timeSlotMap = getTimeSlotMap(availability);
   const timeSlots = startDate ? timeSlotMap.get(startDate.toLocaleDateString()) : undefined;
+  const correctedAvailability: Date[] = availability ? availability.map((date) => correctFromUTC(date)) : [];
 
   const tryToReserve = () => {
     if (isAuthenticated) {
@@ -228,11 +226,7 @@ const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
             onMonthChange={setMonth}
             loading={loading}
             disabled={(day: Date) => {
-              if (!availability) {
-                return true;
-              }
-
-              for (const date of availability) {
+              for (const date of correctedAvailability) {
                 if (date.toDateString() === day.toDateString()) {
                   return false;
                 }

@@ -4,7 +4,7 @@ import { ReactElement } from "react";
 import { Controller, FieldArrayWithId, useFieldArray, useForm } from "react-hook-form";
 import { FormError } from "src/components/FormError";
 import { Button } from "src/components/button/Button";
-import { DateRangePicker, correctFromUTC, correctToUTC } from "src/components/calendar/DatePicker";
+import { DateRangePicker, correctToUTC, tryCorrectFromUTC } from "src/components/calendar/DatePicker";
 import { DropdownInput, Input } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { useShowToast } from "src/components/notifications/Notifications";
@@ -101,7 +101,7 @@ const FixedDateRuleUpdateForm: React.FC<{
     defaultValues: {
       name: existingRule.name,
       type: existingRule.type,
-      start_date: correctFromUTC(existingRule.start_date),
+      start_date: tryCorrectFromUTC(existingRule.start_date),
       time_slots: existingRule.time_slots.map((ts) => ({
         type: "single_day_time_slots",
         startTime: ts.start_time ? ts.start_time : undefined,
@@ -214,8 +214,8 @@ const FixedRangeRuleUpdateForm: React.FC<{
       name: existingRule.name,
       type: existingRule.type,
       date_range: {
-        from: correctFromUTC(existingRule.start_date),
-        to: correctFromUTC(existingRule.end_date),
+        from: tryCorrectFromUTC(existingRule.start_date),
+        to: tryCorrectFromUTC(existingRule.end_date),
       },
       time_slots: existingRule.time_slots.map((ts) => ({
         type: "time_slots",

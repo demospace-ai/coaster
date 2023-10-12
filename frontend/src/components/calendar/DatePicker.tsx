@@ -227,16 +227,20 @@ export function correctFromUTCRange(dateRange: DateRange | undefined) {
   }
 
   return {
-    from: correctFromUTC(dateRange.from),
-    to: correctFromUTC(dateRange.to),
+    from: tryCorrectFromUTC(dateRange.from),
+    to: tryCorrectFromUTC(dateRange.to),
   };
 }
 
-export function correctFromUTC(date: Date | undefined): Date | undefined {
+export function tryCorrectFromUTC(date: Date | undefined): Date | undefined {
   if (!date) {
     return undefined;
   }
 
+  return correctFromUTC(date);
+}
+
+export function correctFromUTC(date: Date): Date {
   return new Date(date.getTime() + date.getTimezoneOffset() * 60000);
 }
 
