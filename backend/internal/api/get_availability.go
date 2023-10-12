@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"sort"
 	"strconv"
 	"time"
 
@@ -58,7 +59,8 @@ func (s ApiService) GetAvailability(w http.ResponseWriter, r *http.Request) erro
 		return errors.Wrap(err, "(api.GetAvailability) loading listing")
 	}
 
-	availableDays, err := availability_rules.LoadAvailabilityInRange(
+	// TODO: return the capacity on each available date, and add the capacity for each booking
+	availability, err := availability_rules.LoadAvailabilityInRange(
 		s.db,
 		*listing,
 		startDate,
@@ -76,11 +78,27 @@ func (s ApiService) GetAvailability(w http.ResponseWriter, r *http.Request) erro
 
 	for _, booking := range temporaryBookings {
 		if booking.StartTime != nil {
-			availableDays = append(availableDays, timeutils.CombineDateAndTime(booking.StartDate.ToTime(), (*booking.StartTime).ToTime()))
+			availability = append(availability, timeutils.CombineDateAndTime(booking.StartDate.ToTime(), (*booking.StartTime).ToTime()))
 		} else {
-			availableDays = append(availableDays, booking.StartDate.ToTime())
+			availability = append(availability, booking.StartDate.ToTime())
 		}
 	}
 
-	return json.NewEncoder(w).Encode(availableDays)
+	uniqueMap := make(map[time.Time]bool)
+	for _, slot := range availability {
+		uniqueMap[slot] = true
+	}
+
+	uniqueAvailability := make([]time.Time, len(uniqueMap))
+	i := 0
+	for slot := range uniqueMap {
+		uniqueAvailability[i] = slot
+		i++
+	}
+
+	sort.Slice(uniqueAvailability, func(i, j int) bool {
+		return uniqueAvailability[i].Before(uniqueAvailability[j])
+	})
+
+	return json.NewEncoder(w).Encode(uniqueAvailability)
 }

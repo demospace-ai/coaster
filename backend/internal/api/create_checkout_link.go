@@ -41,7 +41,6 @@ func (s ApiService) CreateCheckoutLink(auth auth.Authentication, w http.Response
 		return errors.Wrap(err, "(api.CreateCheckoutLink) loading listing")
 	}
 
-	// If the user has a temporary booking for this date/time, re-use that booking's checkout link
 	temporaryBookings, err := bookings.LoadTemporaryBookingsForUser(s.db, listing.ID, auth.User.ID)
 	if err != nil {
 		return errors.Wrap(err, "(api.CreateCheckoutLink) loading temporary bookings")
@@ -49,10 +48,22 @@ func (s ApiService) CreateCheckoutLink(auth auth.Authentication, w http.Response
 
 	for _, booking := range temporaryBookings {
 		if booking.StartDate.ToTime().Equal(createCheckoutLinkRequest.StartDate.ToTime()) && timeutils.TimesMatch(booking.StartTime.ToTimePtr(), createCheckoutLinkRequest.StartTime.ToTimePtr()) {
-			return json.NewEncoder(w).Encode(*booking.CheckoutLink)
+			if booking.Guests != createCheckoutLinkRequest.NumberOfGuests {
+				// TODO: there is a chance that someone else grabs the availability between the time we release the hold and create the new one
+				// Previous booking had a different quantity, release the hold and create a new one
+				err = bookings.DeactivateBooking(s.db, booking.ID)
+				if err != nil {
+					return errors.Wrap(err, "(api.CreateCheckoutLink) updating number of guests")
+				}
+				break
+			} else {
+				// If the user has an active hold for this date/time/numGuests, just re-use the checkout link
+				return json.NewEncoder(w).Encode(*booking.CheckoutLink)
+			}
 		}
 	}
 
+	// Availability check must happen after we release any temporary holds this user had above
 	availabilityRules, err := availability_rules.LoadForListing(s.db, listing.ID)
 	if err != nil {
 		return errors.Wrap(err, "(api.CreateCheckoutLink) loading availability rules")

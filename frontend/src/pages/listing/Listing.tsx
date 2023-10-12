@@ -144,6 +144,7 @@ const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) => {
           onMonthChange={setMonth}
           loading={loading}
           disabled={(day: Date) => {
+            // TODO: this should account for the capacity and number of guests selected
             for (const date of correctedAvailability) {
               if (date.toDateString() === day.toDateString()) {
                 return false;
@@ -226,6 +227,7 @@ const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
             onMonthChange={setMonth}
             loading={loading}
             disabled={(day: Date) => {
+              // TODO: this should account for the capacity and number of guests selected
               for (const date of correctedAvailability) {
                 if (date.toDateString() === day.toDateString()) {
                   return false;
