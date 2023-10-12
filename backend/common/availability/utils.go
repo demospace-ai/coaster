@@ -1,7 +1,6 @@
 package availability
 
 import (
-	"fmt"
 	"time"
 
 	"go.fabra.io/server/common/errors"
@@ -68,10 +67,7 @@ func (rule RuleAndTimes) getAvailabilityInRangeFixedRange(db *gorm.DB, startDate
 
 	for d := time.Time(*rule.StartDate); !d.After(time.Time(*rule.EndDate)); d = d.AddDate(0, 0, 1) {
 		if timeutils.BetweenOrEqual(d, startDate, endDate) {
-			fmt.Printf("Checking %s\n", d.String())
-			fmt.Printf("Time slots: %+v\n", timeSlotMap[d.Weekday()])
 			for _, timeSlot := range timeSlotMap[d.Weekday()] {
-				fmt.Printf("Checking time slot %s\n", timeSlot.StartTime.String())
 				hasCapacity, err := rule.HasCapacityForValidDay(db, d, timeSlot, listing)
 				if err != nil {
 					return nil, errors.Wrap(err, "(availability.GetAvailabilityInRangeFixedRange)")
