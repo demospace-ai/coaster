@@ -41,6 +41,18 @@ func (s ApiService) CreateCheckoutLink(auth auth.Authentication, w http.Response
 		return errors.Wrap(err, "(api.CreateCheckoutLink) loading listing")
 	}
 
+	// If the user has a temporary booking for this date/time, re-use that booking's checkout link
+	temporaryBookings, err := bookings.LoadTemporaryBookingsForUser(s.db, listing.ID, auth.User.ID)
+	if err != nil {
+		return errors.Wrap(err, "(api.CreateCheckoutLink) loading temporary bookings")
+	}
+
+	for _, booking := range temporaryBookings {
+		if booking.StartDate.ToTime().Equal(createCheckoutLinkRequest.StartDate.ToTime()) && timeutils.TimesMatch(booking.StartTime.ToTimePtr(), createCheckoutLinkRequest.StartTime.ToTimePtr()) {
+			return json.NewEncoder(w).Encode(*booking.CheckoutLink)
+		}
+	}
+
 	availabilityRules, err := availability_rules.LoadForListing(s.db, listing.ID)
 	if err != nil {
 		return errors.Wrap(err, "(api.CreateCheckoutLink) loading availability rules")
@@ -59,19 +71,6 @@ func (s ApiService) CreateCheckoutLink(auth auth.Authentication, w http.Response
 		}
 	}
 
-	// If the user has a temporary booking for this date/time, they can still book it by creating a new session
-	temporaryBookings, err := bookings.LoadTemporaryBookingsForUser(s.db, listing.ID, auth.User.ID)
-	if err != nil {
-		return errors.Wrap(err, "(api.CreateCheckoutLink) loading temporary bookings")
-	}
-
-	for _, booking := range temporaryBookings {
-		if booking.StartDate.ToTime().Equal(createCheckoutLinkRequest.StartDate.ToTime()) && timeutils.TimesMatch(booking.StartTime.ToTimePtr(), createCheckoutLinkRequest.StartTime.ToTimePtr()) {
-			hasCapacity = true
-			break
-		}
-	}
-
 	if !hasCapacity {
 		return errors.NewCustomerVisibleError("This listing is not available for the selected date and time.")
 	}
@@ -84,6 +83,12 @@ func (s ApiService) CreateCheckoutLink(auth auth.Authentication, w http.Response
 	checkoutLink, err := stripe.GetCheckoutLink(auth.User, listing.Host, &listing.Listing, booking)
 	if err != nil {
 		return errors.Wrap(err, "(api.CreateCheckoutLink) error creating account link")
+	}
+
+	// TODO: Adding this after creating the booking is kind of ugly, is there a better way?
+	err = bookings.AddCheckoutLink(s.db, booking, *checkoutLink)
+	if err != nil {
+		return errors.Wrap(err, "(api.CreateCheckoutLink) adding checkout link")
 	}
 
 	return json.NewEncoder(w).Encode(*checkoutLink)

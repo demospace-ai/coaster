@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/stripe/stripe-go/v75"
 	"github.com/stripe/stripe-go/v75/client"
@@ -95,7 +96,7 @@ func GetCheckoutLink(user *models.User, host *models.User, listing *models.Listi
 
 	unitPrice := *listing.Price * 100
 	commission := booking.Guests * unitPrice * host.CommissionPercent // No need to divide percent by 100 because Stripe uses cents and we use dollars
-	expiresAt := booking.ExpiresAt.Unix()
+	expiresAt := time.Now().Add(35 * time.Minute).Unix()              // Stripe minimum is 30 minutes
 
 	params := &stripe.CheckoutSessionParams{
 		Mode:              stripe.String(string(stripe.CheckoutSessionModePayment)),

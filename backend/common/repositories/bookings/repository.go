@@ -110,6 +110,16 @@ func CreateTemporaryBooking(db *gorm.DB, listingID int64, userID int64, startDat
 	return booking, nil
 }
 
+func AddCheckoutLink(db *gorm.DB, booking *models.Booking, checkoutLink string) error {
+	booking.CheckoutLink = &checkoutLink
+	result := db.Save(booking)
+	if result.Error != nil {
+		return errors.Wrap(result.Error, "(bookings.AddCheckoutLink)")
+	}
+
+	return nil
+}
+
 func ConfirmBooking(db *gorm.DB, bookingID int64) error {
 	result := db.Table("bookings").
 		Where("id = ?", bookingID).
