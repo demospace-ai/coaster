@@ -30,6 +30,10 @@ func (d Date) ToTime() time.Time {
 }
 
 func (d *Date) ToTimePtr() *time.Time {
+	if d == nil {
+		return nil
+	}
+
 	tptr := time.Time(*d)
 	return &tptr
 }
@@ -77,6 +81,10 @@ func (t Time) ToTime() time.Time {
 }
 
 func (t *Time) ToTimePtr() *time.Time {
+	if t == nil {
+		return nil
+	}
+
 	tptr := time.Time(*t)
 	return &tptr
 }
