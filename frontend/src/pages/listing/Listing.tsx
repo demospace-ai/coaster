@@ -157,7 +157,7 @@ const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) => {
         />
       </div>
       <Button
-        className="tw-font-medium tw-tracking-[0.5px] tw-py-2"
+        className="tw-font-medium tw-tracking-[0.5px] tw-h-10"
         disabled={!startDate || (listing.availability_type === AvailabilityType.Enum.datetime && !startTime)}
       >
         {createCheckoutLink.isLoading ? <Loading /> : "Reserve"}
@@ -271,7 +271,7 @@ const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
           </RadioGroup>
         )}
         <Button
-          className="tw-font-medium tw-py-2 tw-mb-4 tw-tracking-[0.5px]"
+          className="tw-font-medium tw-mb-4 tw-tracking-[0.5px] tw-h-10"
           disabled={!startDate || (listing.availability_type === AvailabilityType.Enum.datetime && !startTime)}
           onClick={tryToReserve}
         >
