@@ -55,9 +55,9 @@ export const CategorySelector: React.FC = () => {
 
   const setScroll = () => {
     if (categorySelectorRef.current) {
-      setShowBack(categorySelectorRef.current.scrollLeft >= 10);
+      setShowBack(categorySelectorRef.current.scrollLeft >= 20);
       setShowForward(
-        categorySelectorRef.current.scrollWidth - categorySelectorRef.current.scrollLeft - 10 >=
+        categorySelectorRef.current.scrollWidth - categorySelectorRef.current.scrollLeft - 20 >=
           categorySelectorRef.current.clientWidth,
       );
     }
@@ -79,9 +79,10 @@ export const CategorySelector: React.FC = () => {
     <div className="tw-relative tw-flex tw-w-full">
       <div className="tw-absolute tw-top-1/2 -tw-translate-y-1/2 tw-w-full tw-h-full tw-flex tw-items-center tw-pointer-events-none">
         <div
-          className="tw-fixed tw-left-0 tw-pr-10 tw-flex tw-items-center tw-h-full tw-transition-opacity tw-pointer-events-auto"
+          className="tw-fixed tw-left-0 tw-pr-10 tw-flex tw-items-center tw-overflow-hidden tw-transition-opacity tw-pointer-events-auto"
           style={{
             opacity: showBack ? "100" : "0",
+            height: showBack ? "100%" : "0",
             backgroundImage: "linear-gradient(to left, rgb(255 255 255/0), #efedea 40px)",
           }}
         >
@@ -96,9 +97,10 @@ export const CategorySelector: React.FC = () => {
           </button>
         </div>
         <div
-          className="tw-fixed tw-right-0 tw-pl-10 tw-flex tw-items-center tw-h-full tw-pointer-events-auto"
+          className="tw-fixed tw-right-0 tw-pl-10 tw-flex tw-items-center tw-overflow-hidden tw-transition-opacity tw-duration-100 tw-pointer-events-auto"
           style={{
             opacity: showForward ? "100" : "0",
+            height: showForward ? "100%" : "0",
             backgroundImage: "linear-gradient(to right, rgb(255 255 255/0), #efedea 40px)",
           }}
         >

@@ -8,6 +8,7 @@ import { ProfilePicture } from "src/components/profile/ProfilePicture";
 import { SearchBarHeader } from "src/components/search/SearchBar";
 import { useLogout } from "src/pages/login/actions";
 import { useSelector } from "src/root/model";
+import { isProd } from "src/utils/env";
 import { mergeClasses } from "src/utils/twmerge";
 
 export const Header: React.FC = () => {
@@ -356,7 +357,8 @@ const SupplierLinks: React.FC = () => {
 const SwitchToHostingLink: React.FC<{ onClick?: () => void; className?: string }> = (props) => {
   const user = useSelector((state) => state.login.user);
 
-  const link = user?.is_host ? "https://supplier.trycoaster.com" : "https://supplier.trycoaster.com/listings/new";
+  const baseLink = isProd() ? "https://supplier.trycoaster.com" : "http://localhost:3030";
+  const link = user?.is_host ? baseLink : baseLink + "/listings/new";
   const text = user?.is_host ? "Switch to hosting" : "List your experience";
   return (
     <div className={props.className} onClick={props.onClick}>

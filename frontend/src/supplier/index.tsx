@@ -16,12 +16,10 @@ if (isProd()) {
   rudderanalytics.load("2Va8vvJ85DejVV7jncdVenC6smB", "https://trycoasterlyoh.dataplane.rudderstack.com");
   H.init("6glrn57g", {
     serviceName: "frontend-app",
-    tracingOrigins: ["localhost", "api.trycoaster.com"],
+    tracingOrigins: ["api.trycoaster.com"],
     networkRecording: {
       enabled: true,
       recordHeadersAndBody: true,
-      networkHeadersToRedact: ["X-LINK-TOKEN"],
-      networkBodyKeysToRedact: ["link_token"],
     },
   });
 } else {
@@ -30,8 +28,6 @@ if (isProd()) {
     networkRecording: {
       enabled: true,
       recordHeadersAndBody: true,
-      networkHeadersToRedact: ["X-LINK-TOKEN"],
-      networkBodyKeysToRedact: ["link_token"],
     },
   });
 }
