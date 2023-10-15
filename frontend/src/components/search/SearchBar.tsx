@@ -6,7 +6,7 @@ import {
   PlusCircleIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { Fragment, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import { DateRange } from "react-day-picker";
 import { Button } from "src/components/button/Button";
 import { DateRangePicker } from "src/components/calendar/DatePicker";
@@ -75,14 +75,13 @@ const SearchModal: React.FC<{ open: boolean; close: () => void }> = ({ open, clo
   const [categories, setCategories] = useState<CategoryType[]>([]);
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [numberOfGuests, setNumberOfGuests] = useState(0);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
-  const search = () => {
-
-  };
+  const search = () => {};
 
   return (
     <Transition.Root show={open} as={Fragment}>
-      <Dialog onClose={close} className="tw-relative tw-z-[100]">
+      <Dialog onClose={close} className="tw-relative tw-z-[100]" initialFocus={buttonRef}>
         <Transition.Child
           as={Fragment}
           enter="tw-transform tw-transition tw-ease-in-out tw-duration-500 sm:tw-duration-100"
@@ -242,7 +241,11 @@ const SearchModal: React.FC<{ open: boolean; close: () => void }> = ({ open, clo
                 >
                   Clear all
                 </button>
-                <Button className="tw-h-10 tw-text-base tw-flex tw-flex-row tw-items-center tw-pr-5" onClick={search}>
+                <Button
+                  className="tw-h-10 tw-text-base tw-flex tw-flex-row tw-items-center tw-pr-5"
+                  onClick={search}
+                  ref={buttonRef}
+                >
                   <MagnifyingGlassIcon className="tw-h-5 tw-mr-1.5 tw-stroke-2" />
                   Search
                 </Button>

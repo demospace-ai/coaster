@@ -1,5 +1,5 @@
 import { TrashIcon } from "@heroicons/react/24/outline";
-import React, { InputHTMLAttributes, MouseEvent, MouseEventHandler, forwardRef } from "react";
+import React, { InputHTMLAttributes, MouseEvent, MouseEventHandler, Ref, forwardRef } from "react";
 import { NavLink, NavLinkProps, useNavigate } from "react-router-dom";
 import { mergeClasses } from "src/utils/twmerge";
 
@@ -8,7 +8,10 @@ interface ButtonProps extends InputHTMLAttributes<HTMLButtonElement> {
   type?: "button" | "submit" | "reset";
 }
 
-export const Button: React.FC<ButtonProps> = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
+export const Button: React.FC<ButtonProps & { ref?: Ref<HTMLButtonElement> }> = forwardRef<
+  HTMLButtonElement,
+  ButtonProps
+>((props, ref) => {
   const { onClick, type = "button", className, children, ...remaining } = props;
 
   const buttonStyle = mergeClasses(
