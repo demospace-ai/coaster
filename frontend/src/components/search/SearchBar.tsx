@@ -28,7 +28,7 @@ export const SearchBar: React.FC<{ className: string }> = (props) => {
         onClick={() => setOpen(true)}
       >
         <MagnifyingGlassIcon className="tw-ml-3 sm:tw-ml-2 tw-h-6 sm:tw-h-7 tw-stroke-gray-600" />
-        <div className="tw-ml-1 sm:tw-ml-0 tw-w-full tw-bg-transparent tw-px-2 tw-text-gray-900 tw-text-base tw-select-none tw-cursor-pointer">
+        <div className="tw-w-full tw-bg-transparent tw-px-2 tw-text-gray-700 tw-text-lg tw-select-none tw-cursor-pointer">
           Search trips
         </div>
         <div className="tw-hidden tw-px-5 sm:tw-flex tw-items-center tw-rounded-[99px] tw-h-full tw-bg-blue-950 tw-text-white tw-font-medium">
@@ -93,7 +93,7 @@ const SearchModal: React.FC<{ open: boolean; close: () => void }> = ({ open, clo
         >
           <div className="tw-fixed tw-inset-0 tw-bg-black tw-bg-opacity-30" />
         </Transition.Child>
-        <div className="tw-fixed tw-inset-x-0 tw-bottom-0 tw-h-[90vh] sm:tw-h-screen">
+        <div className="tw-fixed tw-inset-x-0 tw-bottom-0 tw-h-[90svh] sm:tw-h-screen">
           <Transition.Child
             as={Fragment}
             enter="tw-transform tw-transition tw-ease-in-out tw-duration-500 sm:tw-ease-in sm:tw-duration-100"
@@ -103,7 +103,7 @@ const SearchModal: React.FC<{ open: boolean; close: () => void }> = ({ open, clo
             leaveFrom="tw-translate-y-0 sm:tw-scale-100"
             leaveTo="tw-translate-y-full sm:tw-scale-95"
           >
-            <Dialog.Panel className="sm:tw-absolute sm:sm:tw-top-[48%] tw-w-screen sm:tw-w-[500px] sm:tw-max-h-[70vh] sm:tw-left-1/2 sm:-tw-translate-x-1/2 sm:-tw-translate-y-1/2 tw-flex tw-flex-col tw-bg-white tw-shadow-md tw-rounded-xl tw-h-full tw-items-center tw-justify-start tw-overflow-clip">
+            <Dialog.Panel className="sm:tw-absolute sm:sm:tw-top-[48%] tw-w-screen sm:tw-w-[500px] sm:tw-max-h-[70vh] sm:tw-left-1/2 sm:-tw-translate-x-1/2 sm:-tw-translate-y-1/2 tw-flex tw-flex-col tw-bg-white tw-shadow-md tw-rounded-t-xl sm:tw-rounded-xl tw-h-full tw-items-center tw-justify-start tw-overflow-clip">
               <div className="tw-flex tw-w-full tw-items-center tw-justify-between tw-p-6">
                 <span className="tw-text-lg tw-font-semibold">Search</span>
                 <button
