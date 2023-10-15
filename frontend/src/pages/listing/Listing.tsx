@@ -483,9 +483,9 @@ const ImagesModal: React.FC<{ listing: ListingType; imageIndex: number; setImage
 
   return (
     <div>
-      <div className="tw-absolute tw-top-1/2 -tw-translate-y-1/2 tw-w-full tw-z-10 tw-flex tw-items-center">
+      <div className="tw-absolute tw-w-full tw-h-screen tw-z-10 tw-flex tw-items-center">
         <button
-          className="tw-fixed tw-right-0 sm:tw-right-[5vw] sm:tw-p-10"
+          className="tw-fixed tw-right-0 sm:tw-right-[5vw] sm:tw-p-10 tw-rounded-full hover:tw-bg-black hover:tw-bg-opacity-20 tw-transition-colors"
           onClick={(e) => {
             e.stopPropagation();
             scrollForward();
@@ -494,7 +494,7 @@ const ImagesModal: React.FC<{ listing: ListingType; imageIndex: number; setImage
           <ChevronRightIcon className="tw-h-10 tw-cursor-pointer tw-stroke-slate-300" />
         </button>
         <button
-          className="tw-fixed tw-left-0 sm:tw-left-[5vw] sm:tw-p-10"
+          className="tw-fixed tw-left-0 sm:tw-left-[5vw] sm:tw-p-10 tw-rounded-full hover:tw-bg-black hover:tw-bg-opacity-20 tw-transition-colors"
           onClick={(e) => {
             e.stopPropagation();
             scrollBack();
