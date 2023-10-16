@@ -258,11 +258,13 @@ export const Category = z.enum([
   "windsurf",
   "yoga",
   "wakeboard",
+  "snorkeling",
   "outdoors",
   "buggying",
   "efoiling",
   "snowmobile",
   "safari",
+  "hunting",
 ]);
 export type CategoryType = z.infer<typeof Category>;
 

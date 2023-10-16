@@ -20,13 +20,13 @@ const (
 	CategoryDiving       ListingCategory = "diving"
 	CategorySnorkeling   ListingCategory = "snorkeling"
 	CategorySafari       ListingCategory = "safari"
-	CategorySup          ListingCategory = "paddleboarding"
-	CategoryKiteBoarding ListingCategory = "kiteboarding"
-	CategoryWindSurfing  ListingCategory = "windsurfing"
+	CategorySup          ListingCategory = "sup"
+	CategoryKiteBoarding ListingCategory = "kitesurf"
+	CategoryWindSurfing  ListingCategory = "windsurf"
 	CategoryKayaking     ListingCategory = "kayaking"
 	CategoryBuggying     ListingCategory = "buggying"
 	CategoryEfoiling     ListingCategory = "efoiling"
-	CategoryKiteFoiling  ListingCategory = "kitefoiling"
+	CategoryKiteFoiling  ListingCategory = "kitefoil"
 	CategoryHunting      ListingCategory = "hunting"
 )
 
