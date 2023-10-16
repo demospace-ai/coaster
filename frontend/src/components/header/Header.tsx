@@ -1,3 +1,4 @@
+import { autoUpdate, offset, useClick, useDismiss, useFloating, useInteractions, useRole } from "@floating-ui/react";
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import { ArrowRightOnRectangleIcon, Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
@@ -88,6 +89,21 @@ const SignedInMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
   const navItem =
     "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded hover:tw-bg-slate-200 tw-w-full";
 
+  const [open, setOpen] = useState(false);
+  const { refs, floatingStyles, context } = useFloating<HTMLDivElement>({
+    open,
+    onOpenChange: setOpen,
+    middleware: [offset(4)],
+    placement: "bottom-end",
+    whileElementsMounted: autoUpdate,
+  });
+  const click = useClick(context, {
+    keyboardHandlers: false,
+  });
+  const dismiss = useDismiss(context);
+  const role = useRole(context);
+  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
+
   if (!user) {
     // Should never happen
     return <Loading />;
@@ -98,6 +114,8 @@ const SignedInMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
       {({ open }) => (
         <>
           <Menu.Button
+            ref={refs.setReference}
+            {...getReferenceProps()}
             className={classNames(
               "tw-cursor-pointer tw-select-none tw-flex tw-items-center tw-rounded-full tw-border tw-border-solid tw-border-gray-300 tw-px-2 tw-py-1.5 hover:tw-shadow-md tw-ease-in-out tw-transition-all",
               open && "tw-shadow-md",
@@ -106,65 +124,70 @@ const SignedInMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
             <Bars3Icon className="tw-w-5 tw-h-5 tw-mr-2" />
             <ProfilePicture url={user.profile_picture_url} name={user.first_name} className="tw-w-7 tw-h-7" />
           </Menu.Button>
-          <Transition
-            as={Fragment}
-            enter="tw-transition tw-ease-out tw-duration-100"
-            enterFrom="tw-transform tw-opacity-0 tw-scale-95"
-            enterTo="tw-transform tw-opacity-100 tw-scale-100"
-            leave="tw-transition tw-ease-in tw-duration-75"
-            leaveFrom="tw-transform tw-opacity-100 tw-scale-97"
-            leaveTo="tw-transform tw-opacity-0 tw-scale-95"
-          >
-            <Menu.Items className="tw-absolute tw-origin-top-right tw-z-10 tw-divide-y tw-right-20 tw-mt-2 tw-mr-2 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none tw-w-64">
-              <div className="tw-m-2">
-                <p className="tw-px-1 tw-pt-2 tw-pb-1 tw-text-xs tw-uppercase">Signed in as</p>
-                <Menu.Item>
-                  <NavLink className={menuItem} to="/profile">
-                    <ProfilePicture
-                      url={user.profile_picture_url}
-                      name={user.first_name}
-                      className="tw-w-7 tw-h-7 tw-mr-3"
-                    />
-                    <div className="tw-flex tw-flex-col">
-                      <p className="tw-truncate tw-text-sm tw-font-semibold tw-text-slate-900">
-                        {user?.first_name} {user?.last_name}
-                      </p>
-                      <p className="tw-truncate tw-text-sm tw-text-slate-900">{user?.email}</p>
-                    </div>
-                  </NavLink>
-                </Menu.Item>
-              </div>
-              <div className="tw-flex tw-flex-col tw-m-2 tw-pt-2">
-                <Menu.Item>
-                  <NavLink className={navItem} to="/profile">
-                    View profile
-                  </NavLink>
-                </Menu.Item>
-              </div>
-              <div className="tw-flex tw-flex-col tw-m-2 tw-pt-2">
-                <Menu.Item>
-                  <NavLink className={navItem} to="/invite">
-                    Invite friends
-                  </NavLink>
-                </Menu.Item>
-              </div>
-              {!onHostApp && (
-                <div className="tw-flex xl:tw-hidden tw-m-2 tw-pt-2">
+          <div ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
+            <Transition
+              as={Fragment}
+              enter="tw-transition tw-ease-out tw-duration-100"
+              enterFrom="tw-transform tw-opacity-0 tw-scale-95"
+              enterTo="tw-transform tw-opacity-100 tw-scale-100"
+              leave="tw-transition tw-ease-in tw-duration-75"
+              leaveFrom="tw-transform tw-opacity-100 tw-scale-97"
+              leaveTo="tw-transform tw-opacity-0 tw-scale-95"
+            >
+              <Menu.Items
+                static
+                className="tw-z-10 tw-divide-y tw-mt-2 tw-mr-2 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none tw-w-64"
+              >
+                <div className="tw-m-2">
+                  <p className="tw-px-1 tw-pt-2 tw-pb-1 tw-text-xs tw-uppercase">Signed in as</p>
                   <Menu.Item>
-                    <SwitchToHostingLink className={navItem} />
+                    <NavLink className={menuItem} to="/profile">
+                      <ProfilePicture
+                        url={user.profile_picture_url}
+                        name={user.first_name}
+                        className="tw-w-7 tw-h-7 tw-mr-3"
+                      />
+                      <div className="tw-flex tw-flex-col">
+                        <p className="tw-truncate tw-text-sm tw-font-semibold tw-text-slate-900">
+                          {user?.first_name} {user?.last_name}
+                        </p>
+                        <p className="tw-truncate tw-text-sm tw-text-slate-900">{user?.email}</p>
+                      </div>
+                    </NavLink>
                   </Menu.Item>
                 </div>
-              )}
-              <div className="tw-m-2 tw-pt-2">
-                <Menu.Item>
-                  <div className={menuItem} onClick={logout}>
-                    <ArrowRightOnRectangleIcon className="tw-h-4 tw-inline tw-mr-2 tw-stroke-2" />
-                    Logout
+                <div className="tw-flex tw-flex-col tw-m-2 tw-pt-2">
+                  <Menu.Item>
+                    <NavLink className={navItem} to="/profile">
+                      View profile
+                    </NavLink>
+                  </Menu.Item>
+                </div>
+                <div className="tw-flex tw-flex-col tw-m-2 tw-pt-2">
+                  <Menu.Item>
+                    <NavLink className={navItem} to="/invite">
+                      Invite friends
+                    </NavLink>
+                  </Menu.Item>
+                </div>
+                {!onHostApp && (
+                  <div className="tw-flex xl:tw-hidden tw-m-2 tw-pt-2">
+                    <Menu.Item>
+                      <SwitchToHostingLink className={navItem} />
+                    </Menu.Item>
                   </div>
-                </Menu.Item>
-              </div>
-            </Menu.Items>
-          </Transition>
+                )}
+                <div className="tw-flex tw-flex-col tw-m-2 tw-py-2">
+                  <Menu.Item>
+                    <div className={navItem} onClick={logout}>
+                      <ArrowRightOnRectangleIcon className="tw-h-4 tw-inline tw-mr-2 tw-stroke-2" />
+                      Logout
+                    </div>
+                  </Menu.Item>
+                </div>
+              </Menu.Items>
+            </Transition>
+          </div>
         </>
       )}
     </Menu>

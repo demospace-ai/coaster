@@ -78,6 +78,12 @@ export const UpdateListing: IEndpoint<ListingInput, Listing, { listingID: number
   path: "/listings/:listingID",
 };
 
+export const DeleteListing: IEndpoint<undefined, undefined, { listingID: number }> = {
+  name: "Delete listing",
+  method: "DELETE",
+  path: "/listings/:listingID",
+};
+
 export const CreateAvailabilityRule: IEndpoint<AvailabilityRuleInput, AvailabilityRule, { listingID: number }> = {
   name: "Create new availability rule",
   method: "POST",

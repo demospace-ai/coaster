@@ -281,6 +281,16 @@ func CreateListingImage(db *gorm.DB, listingID int64, storageID string, rank int
 	return &listingImage, nil
 }
 
+func DeleteListing(db *gorm.DB, listing *models.Listing) error {
+	currentTime := time.Now()
+	result := db.Model(listing).Update("deactivated_at", currentTime)
+	if result.Error != nil {
+		return errors.Wrap(result.Error, "(listings.DeleteListing)")
+	}
+
+	return nil
+}
+
 func DeleteListingImage(db *gorm.DB, listingImage *models.ListingImage) error {
 	currentTime := time.Now()
 	result := db.Model(listingImage).Update("deactivated_at", currentTime)
