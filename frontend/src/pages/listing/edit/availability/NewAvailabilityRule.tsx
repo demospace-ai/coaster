@@ -211,7 +211,7 @@ const SingleDateStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values,
   };
 
   return (
-    <div className="tw-flex tw-flex-col tw-flex-grow sm:tw-mt-4">
+    <div className="tw-flex tw-flex-col tw-flex-grow sm:tw-mt-4 tw-overflow-hidden">
       <div className="tw-flex tw-flex-col tw-flex-grow tw-justify-start tw-items-center tw-overflow-y-auto">
         <DateRangePicker mode="single" disabled={{ before: new Date() }} selected={selected} onSelect={setSelected} />
       </div>
