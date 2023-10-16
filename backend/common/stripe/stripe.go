@@ -32,7 +32,12 @@ func CreateAccount() (*string, error) {
 	sc := &client.API{}
 	sc.Init(*stripeApiKey, nil)
 
-	params := &stripe.AccountParams{Type: stripe.String(string(stripe.AccountTypeExpress))}
+	params := &stripe.AccountParams{
+		Type: stripe.String(string(stripe.AccountTypeExpress)),
+		Capabilities: &stripe.AccountCapabilitiesParams{
+			Transfers: &stripe.AccountCapabilitiesTransfersParams{Requested: stripe.Bool(true)},
+		},
+	}
 	result, err := sc.Accounts.New(params)
 	if err != nil {
 		return nil, errors.Wrap(err, "(stripe.CreateAccount) creating account")
@@ -205,7 +210,7 @@ func getReturnLink() string {
 	if application.IsProd() {
 		return "https://supplier.trycoaster.com/finance/payout-methods"
 	} else {
-		return "http://localhost:3000/finance/payout-methods"
+		return "http://localhost:3030/finance/payout-methods"
 	}
 }
 
@@ -213,7 +218,7 @@ func getRefreshLink() string {
 	if application.IsProd() {
 		return "https://supplier.trycoaster.com/finance/payout-methods"
 	} else {
-		return "http://localhost:3000/finance/payout-methods"
+		return "http://localhost:3030/finance/payout-methods"
 	}
 }
 
