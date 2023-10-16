@@ -2,8 +2,6 @@ import { Category, CategoryType } from "src/rpc/types";
 import { toTitleCase } from "src/utils/string";
 
 export const EXCLUDED_CATEGORIES: CategoryType[] = [
-  Category.Values.kitefoil,
-  Category.Values.efoiling,
   Category.Values.buggying,
   Category.Values.outdoors,
   Category.Values.safari,
