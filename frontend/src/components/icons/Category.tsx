@@ -5,6 +5,8 @@ export const EXCLUDED_CATEGORIES: CategoryType[] = [
   Category.Values.buggying,
   Category.Values.outdoors,
   Category.Values.safari,
+  Category.Values.snorkeling,
+  Category.Values.hunting,
 ];
 
 type IconProps = {
