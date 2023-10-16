@@ -30,6 +30,9 @@ export const MaxGuestsSchema = z
   .max(100, "The maximum number of guests is 100.");
 
 export const IncludesSchema = z.array(z.object({ value: z.string().nonempty("Included amenities cannot be empty") }));
+export const NotIncludedSchema = z.array(
+  z.object({ value: z.string().nonempty("Not included amenities cannot be empty") }),
+);
 
 export const AvailabilityTypeSchema = AvailabilityType;
 

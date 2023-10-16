@@ -19,6 +19,7 @@ type Listing struct {
 	MaxGuests        *int64                     `json:"max_guests"`
 	Highlights       []string                   `json:"highlights"`
 	Includes         []string                   `json:"includes"`
+	NotIncluded      []string                   `json:"not_included"`
 	Status           models.ListingStatus       `json:"status"`
 	AvailabilityType models.AvailabilityType    `json:"availability_type"`
 
@@ -74,6 +75,7 @@ func ConvertListing(listing listings.ListingDetails) Listing {
 		MaxGuests:        listing.MaxGuests,
 		Highlights:       listing.Highlights,
 		Includes:         listing.Includes,
+		NotIncluded:      listing.NotIncluded,
 		Status:           listing.Status,
 		AvailabilityType: listing.AvailabilityType,
 

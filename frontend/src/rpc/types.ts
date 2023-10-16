@@ -61,6 +61,7 @@ export interface Listing {
   max_guests: number | undefined;
   highlights: string[] | undefined;
   includes: string[] | undefined;
+  not_included: string[] | undefined;
   languages: string[] | undefined;
   status: ListingStatus;
   availability_type: AvailabilityTypeType;
@@ -120,6 +121,7 @@ export interface ListingInput {
   duration_minutes?: number;
   max_guests?: number;
   includes?: string[];
+  not_included?: string[];
   availability_type?: AvailabilityTypeType;
 }
 

@@ -294,6 +294,7 @@ const ListingDetails: React.FC<{ listing: ListingType }> = ({ listing }) => {
       <QuickInfo listing={listing} />
       <Description listing={listing} />
       {listing.includes && listing.includes.length > 0 && <Included listing={listing} />}
+      {listing.not_included && listing.not_included.length > 0 && <NotIncluded listing={listing} />}
       <HostDetails listing={listing} />
     </div>
   );
@@ -343,6 +344,19 @@ const Included: React.FC<{ listing: ListingType }> = ({ listing }) => {
       <ul className="tw-list-disc tw-list-inside tw-mt-1">
         {listing.includes?.map((included) => (
           <li key={included}>{included}</li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+const NotIncluded: React.FC<{ listing: ListingType }> = ({ listing }) => {
+  return (
+    <div className="tw-pb-6 tw-border-b tw-border-solid tw-border-gray-300">
+      <div className="tw-mt-5 tw-font-semibold">Not Included</div>
+      <ul className="tw-list-disc tw-list-inside tw-mt-1">
+        {listing.not_included?.map((notIncluded) => (
+          <li key={notIncluded}>{notIncluded}</li>
         ))}
       </ul>
     </div>

@@ -7,7 +7,7 @@ import { Input } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
 import { useShowToast } from "src/components/notifications/Notifications";
 import { useListingContext } from "src/pages/listing/edit";
-import { IncludesSchema } from "src/pages/listing/schema";
+import { IncludesSchema, NotIncludedSchema } from "src/pages/listing/schema";
 import { sendRequest } from "src/rpc/ajax";
 import { UpdateListing } from "src/rpc/api";
 import { ListingInput } from "src/rpc/types";
@@ -15,6 +15,7 @@ import { z } from "zod";
 
 const EditListingIncludesSchema = z.object({
   includes: IncludesSchema,
+  not_included: NotIncludedSchema,
 });
 
 type EditListingIncludesSchemaType = z.infer<typeof EditListingIncludesSchema>;
@@ -43,6 +44,11 @@ export const Includes: React.FC = () => {
         .filter((include) => include.value.length > 0)
         .map((include) => include.value));
 
+    formState.dirtyFields.not_included &&
+      (payload.not_included = values.not_included
+        .filter((not_included) => not_included.value.length > 0)
+        .map((not_included) => not_included.value));
+
     try {
       await sendRequest(UpdateListing, {
         pathParams: { listingID: listing.id },
@@ -57,8 +63,21 @@ export const Includes: React.FC = () => {
     }
   };
 
-  const { fields, append, remove } = useFieldArray({
+  const {
+    fields: included,
+    append: appendIncluded,
+    remove: removeIncluded,
+  } = useFieldArray({
     name: "includes",
+    control,
+  });
+
+  const {
+    fields: notIncluded,
+    append: appendNotIncluded,
+    remove: removeNotIncluded,
+  } = useFieldArray({
+    name: "not_included",
     control,
   });
 
@@ -67,13 +86,13 @@ export const Includes: React.FC = () => {
       <div className="tw-flex tw-flex-col">
         <div className="tw-text-2xl tw-font-semibold tw-mb-2">Included Amenities</div>
         <div className="tw-flex tw-flex-col tw-gap-3">
-          {fields.map((field, idx) => (
+          {included.map((field, idx) => (
             <div key={field.id} className="last:tw-mb-5">
               <div className="tw-flex tw-items-center">
                 <Input {...register(`includes.${idx}.value`)} value={field.value} />
                 <TrashIcon
                   className="tw-h-10 tw-rounded tw-ml-1 tw-p-2 tw-cursor-pointer hover:tw-bg-gray-100"
-                  onClick={() => remove(idx)}
+                  onClick={() => removeIncluded(idx)}
                 />
               </div>
               <FormError message={formState.errors.includes?.[idx]?.value?.message} />
@@ -83,11 +102,37 @@ export const Includes: React.FC = () => {
         <Button
           className="tw-flex tw-items-center tw-justify-center tw-bg-white hover:tw-bg-slate-100 tw-text-black tw-font-medium tw-border tw-border-solid tw-border-black tw-py-2"
           onClick={() => {
-            append({ value: "" });
+            appendIncluded({ value: "" });
           }}
         >
           <PlusIcon className="tw-h-4 tw-mr-1.5" />
           Add Included Item
+        </Button>
+      </div>
+      <div className="tw-flex tw-flex-col tw-mt-10">
+        <div className="tw-text-2xl tw-font-semibold tw-mb-2">Not Included</div>
+        <div className="tw-flex tw-flex-col tw-gap-3">
+          {notIncluded.map((field, idx) => (
+            <div key={field.id} className="last:tw-mb-5">
+              <div className="tw-flex tw-items-center">
+                <Input {...register(`not_included.${idx}.value`)} value={field.value} />
+                <TrashIcon
+                  className="tw-h-10 tw-rounded tw-ml-1 tw-p-2 tw-cursor-pointer hover:tw-bg-gray-100"
+                  onClick={() => removeNotIncluded(idx)}
+                />
+              </div>
+              <FormError message={formState.errors.not_included?.[idx]?.value?.message} />
+            </div>
+          ))}
+        </div>
+        <Button
+          className="tw-flex tw-items-center tw-justify-center tw-bg-white hover:tw-bg-slate-100 tw-text-black tw-font-medium tw-border tw-border-solid tw-border-black tw-py-2"
+          onClick={() => {
+            appendNotIncluded({ value: "" });
+          }}
+        >
+          <PlusIcon className="tw-h-4 tw-mr-1.5" />
+          Add not Included Item
         </Button>
       </div>
       <Button type="submit" className="tw-mt-6 tw-w-full sm:tw-w-32 tw-h-12 tw-ml-auto" disabled={!formState.isDirty}>

@@ -67,8 +67,9 @@ type Listing struct {
 	Cancellation     ListingCancellation `json:"cancellation"`
 	DurationMinutes  *int64              `json:"duration_minutes"`
 	MaxGuests        *int64              `json:"max_guests"`
-	Highlights       pq.StringArray      `json:"highlights" gorm:"type:varchar(128)[]"`
-	Includes         pq.StringArray      `json:"includes" gorm:"type:varchar(128)[]"`
+	Highlights       pq.StringArray      `json:"highlights" gorm:"type:varchar(160)[]"`
+	Includes         pq.StringArray      `json:"includes" gorm:"type:varchar(160)[]"`
+	NotIncluded      pq.StringArray      `json:"not_included" gorm:"type:varchar(160)[]"`
 	AvailabilityType AvailabilityType    `json:"availability_type"`
 
 	BaseModel

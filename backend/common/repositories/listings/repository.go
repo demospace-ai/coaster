@@ -186,6 +186,7 @@ func CreateListing(
 		Cancellation:     models.ListingCancellationFlexible,
 		Highlights:       []string{},
 		Includes:         []string{},
+		NotIncluded:      []string{},
 		AvailabilityType: models.AvailabilityTypeDate,
 	}
 
@@ -241,6 +242,10 @@ func UpdateListing(db *gorm.DB, listing *models.Listing, listingUpdates input.Li
 
 	if listingUpdates.Includes != nil {
 		listing.Includes = listingUpdates.Includes
+	}
+
+	if listingUpdates.NotIncluded != nil {
+		listing.NotIncluded = listingUpdates.NotIncluded
 	}
 
 	if listingUpdates.AvailabilityType != nil {

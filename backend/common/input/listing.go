@@ -19,6 +19,7 @@ type Listing struct {
 	MaxGuests        *int64                      `json:"max_guests"`
 	Highlights       []string                    `json:"highlights"`
 	Includes         []string                    `json:"includes"`
+	NotIncluded      []string                    `json:"not_included"`
 	AvailabilityType *models.AvailabilityType    `json:"availability_type"`
 }
 
