@@ -161,12 +161,12 @@ const SearchBarDropdown: React.FC<{ className?: string; header?: boolean; show?:
             <Transition
               as={Fragment}
               show={open}
-              enter="tw-transition tw-ease-out tw-duration-100"
-              enterFrom="tw-transform tw-opacity-0 tw-scale-80"
-              enterTo="tw-transform tw-opacity-100 tw-scale-100"
-              leave="tw-transition tw-ease-in tw-duration-100"
-              leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
-              leaveTo="tw-transform tw-opacity-0 tw-scale-0"
+              enter="tw-transition tw-ease-out tw-duration-100 tw-origin-top"
+              enterFrom="tw-transform tw-opacity-0 tw-scale-y-80"
+              enterTo="tw-transform tw-opacity-100 tw-scale-y-100"
+              leave="tw-transition tw-ease-in tw-duration-100 tw-origin-top"
+              leaveFrom="tw-transform tw-opacity-100 tw-scale-y-100"
+              leaveTo="tw-transform tw-opacity-0 tw-scale-y-0"
             >
               <div className="tw-flex tw-flex-col tw-w-full tw-max-h-96 tw-rounded-2xl tw-overflow-hidden tw-bg-white tw-text-black tw-shadow-lg">
                 <div
