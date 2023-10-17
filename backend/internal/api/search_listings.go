@@ -8,6 +8,7 @@ import (
 
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/maps"
+	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/repositories/availability_rules"
 	"go.fabra.io/server/common/repositories/listings"
 	"go.fabra.io/server/common/views"
@@ -16,14 +17,35 @@ import (
 func (s ApiService) SearchListings(w http.ResponseWriter, r *http.Request) error {
 	locationParam := r.URL.Query().Get("location")
 	radiusParam := r.URL.Query().Get("radius")
-	filteredByLocation, err := s.filterByLocation(locationParam, radiusParam)
-	if err != nil {
-		return errors.Wrap(err, "(api.SearchListings) getting listings filtered by location")
+	categoryParam := r.URL.Query().Get("categories")
+
+	var filteredListings []listings.ListingDetails
+	var err error
+	if len(locationParam) > 0 {
+		filteredListings, err = s.loadByLocation(locationParam, radiusParam)
+		if err != nil {
+			return errors.Wrap(err, "(api.SearchListings) loading listings filtered by location")
+		}
+
+		filteredListings, err = s.filterByCategory(filteredListings, categoryParam)
+		if err != nil {
+			return errors.Wrap(err, "(api.SearchListings) filtering listings by category")
+		}
+	} else if len(categoryParam) > 0 {
+		filteredListings, err = s.loadByCategory(categoryParam)
+		if err != nil {
+			return errors.Wrap(err, "(api.SearchListings) loading listings filtered by category")
+		}
+	} else {
+		filteredListings, err = listings.LoadFeatured(s.db)
+		if err != nil {
+			return errors.Wrap(err, "(api.SearchListings) getting featured listings")
+		}
 	}
 
 	startDateParam := r.URL.Query().Get("start_date")
 	endDateParam := r.URL.Query().Get("end_date")
-	filteredListings, err := s.filterByAvailability(filteredByLocation, startDateParam, endDateParam)
+	filteredListings, err = s.filterByAvailability(filteredListings, startDateParam, endDateParam)
 	if err != nil {
 		return errors.Wrap(err, "(api.SearchListings) getting listings filtered by availability")
 	}
@@ -31,37 +53,77 @@ func (s ApiService) SearchListings(w http.ResponseWriter, r *http.Request) error
 	return json.NewEncoder(w).Encode(views.ConvertListings(filteredListings))
 }
 
-func (s ApiService) filterByLocation(locationParam string, radiusParam string) ([]listings.ListingDetails, error) {
-	if len(locationParam) == 0 {
-		return listings.LoadFeatured(s.db)
+func (s ApiService) loadByLocation(locationParam string, radiusParam string) ([]listings.ListingDetails, error) {
+	var radius int64
+	var err error
+	if len(radiusParam) > 0 {
+		radius, err = strconv.ParseInt(radiusParam, 10, 64)
+		if err != nil {
+			return nil, errors.Wrap(err, "(api.getListingsForLocation) converting radius")
+		}
 	} else {
-		var radius int64
-		var err error
-		if len(radiusParam) > 0 {
-			radius, err = strconv.ParseInt(radiusParam, 10, 64)
-			if err != nil {
-				return nil, errors.Wrap(err, "(api.getListingsForLocation) converting radius")
-			}
-		} else {
-			radius = 100_000 // 100km default radius
-		}
-
-		location, err := maps.GetLocationFromQuery(locationParam)
-		if err != nil {
-			return nil, errors.Wrap(err, "(api.getListingsForLocation) getting location from query")
-		}
-
-		coordinates, err := maps.GetCoordinatesFromLocation(*location)
-		if err != nil {
-			return nil, errors.Wrap(err, "(api.getListingsForLocation) getting coordinates from location")
-		}
-
-		return listings.LoadListingsWithinRadius(
-			s.db,
-			*coordinates,
-			radius,
-		)
+		radius = 100_000 // 100km default radius
 	}
+
+	location, err := maps.GetLocationFromQuery(locationParam)
+	if err != nil {
+		return nil, errors.Wrap(err, "(api.getListingsForLocation) getting location from query")
+	}
+
+	coordinates, err := maps.GetCoordinatesFromLocation(*location)
+	if err != nil {
+		return nil, errors.Wrap(err, "(api.getListingsForLocation) getting coordinates from location")
+	}
+
+	return listings.LoadListingsWithinRadius(
+		s.db,
+		*coordinates,
+		radius,
+	)
+}
+
+func (s ApiService) loadByCategory(categoryParam string) ([]listings.ListingDetails, error) {
+	var categories []models.ListingCategory
+	err := json.Unmarshal([]byte(categoryParam), &categories)
+	if err != nil {
+		return nil, errors.Wrap(err, "(api.filterByCategory) unmarshalling categories")
+	}
+
+	if len(categories) == 0 {
+		return listings.LoadFeatured(s.db)
+	}
+
+	return listings.LoadListingsByCategory(
+		s.db,
+		categories,
+	)
+}
+
+func (s ApiService) filterByCategory(unfiltered []listings.ListingDetails, categoryParam string) ([]listings.ListingDetails, error) {
+	var categories []models.ListingCategory
+	err := json.Unmarshal([]byte(categoryParam), &categories)
+	if err != nil {
+		return nil, errors.Wrap(err, "(api.filterByCategory) unmarshalling categories")
+	}
+
+	if len(categories) == 0 {
+		return unfiltered, nil
+	}
+
+	var filteredByCategory []listings.ListingDetails
+	for _, listing := range unfiltered {
+		if listing.Category == nil {
+			continue
+		}
+
+		for _, category := range categories {
+			if *listing.Category == category {
+				filteredByCategory = append(filteredByCategory, listing)
+			}
+		}
+	}
+
+	return filteredByCategory, nil
 }
 
 func (s ApiService) filterByAvailability(unfiltered []listings.ListingDetails, startDateParam string, endDateParam string) ([]listings.ListingDetails, error) {

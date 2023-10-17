@@ -416,3 +416,37 @@ func LoadFeatured(db *gorm.DB) ([]ListingDetails, error) {
 
 	return listingsAndImages, nil
 }
+
+func LoadListingsByCategory(db *gorm.DB, categories []models.ListingCategory) ([]ListingDetails, error) {
+	var listings []models.Listing
+	result := db.Table("listings").
+		Select("listings.*").
+		Where("listings.status = ?", models.ListingStatusPublished).
+		Where("listings.category IN ?", categories).
+		Where("listings.deactivated_at IS NULL").
+		Find(&listings)
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(listings.LoadListingsByCategory)")
+	}
+
+	listingsAndImages := make([]ListingDetails, len(listings))
+	for i, listing := range listings {
+		images, err := LoadImagesForListing(db, listing.ID)
+		if err != nil {
+			return nil, errors.Wrap(err, "(listings.LoadListingsByCategory) getting images")
+		}
+
+		host, err := users.LoadUserByID(db, listing.UserID)
+		if err != nil {
+			return nil, errors.Wrap(err, "(listings.LoadListingsByCategory) getting host")
+		}
+
+		listingsAndImages[i] = ListingDetails{
+			listing,
+			host,
+			images,
+		}
+	}
+
+	return listingsAndImages, nil
+}

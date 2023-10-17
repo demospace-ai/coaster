@@ -1,26 +1,34 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { NavLink, useSearchParams } from "react-router-dom";
+import { getCategoryForDisplay } from "src/components/icons/Category";
 import { Loading } from "src/components/loading/Loading";
 import { useSearch } from "src/rpc/data";
-import { Listing } from "src/rpc/types";
+import { CategoryType, Listing } from "src/rpc/types";
 import { getGcsImageUrl } from "src/utils/images";
 import { toUndefined } from "src/utils/undefined";
 
 export const Search: React.FC = () => {
   const [searchParams] = useSearchParams();
   const location = searchParams.get("location");
-  const { listings } = useSearch(toUndefined(location));
+  const categories = searchParams.get("categories");
+  const { listings } = useSearch(toUndefined(location), toUndefined(categories));
 
   if (!listings) {
     return <Loading />;
+  }
+
+  var categoriesParsed = [];
+  if (categories) {
+    categoriesParsed = JSON.parse(categories);
   }
 
   return (
     <div className="tw-flex tw-px-5 sm:tw-px-20">
       <div className="tw-flex tw-flex-col tw-items-center tw-pt-5 sm:tw-pt-8 tw-pb-24 tw-w-full tw-max-w-[1280px]">
         <div className="tw-font-bold tw-text-xl tw-w-full tw-text-center sm:tw-text-left">
-          {listings.length} results for {location}
+          {listings.length} results for{" "}
+          {categoriesParsed.map((category: CategoryType) => `"${getCategoryForDisplay(category)}"`).join(", ")}
         </div>
         <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-3 xl:tw-grid-cols-4 2xl:tw-grid-cols-5 tw-mt-2 sm:tw-mt-4 tw-mb-5 tw-font-bold tw-text-3xl tw-gap-10 tw-w-full">
           {listings.map((listing: Listing) => (

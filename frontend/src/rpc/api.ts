@@ -37,7 +37,12 @@ export const CheckSession: IEndpoint<undefined, CheckSessionResponse> = {
   path: "/check_session",
 };
 
-export const SearchListings: IEndpoint<undefined, Listing[], undefined, { location?: string; radius?: number }> = {
+export const SearchListings: IEndpoint<
+  undefined,
+  Listing[],
+  undefined,
+  { location?: string; radius?: number; categories?: string }
+> = {
   name: "Search listings",
   method: "GET",
   path: "/listings",

@@ -100,12 +100,22 @@ export function useDraftListing(opts?: SWRConfiguration) {
   return { listing: data, mutate, error, loading: isLoading };
 }
 
-export function useSearch(location: string | undefined) {
-  const shouldFetch = location;
-  const fetcher: Fetcher<Listing[], { location: string }> = (queryParams: { location: string }) =>
-    sendRequest(SearchListings, { queryParams });
+export function useSearch(location: string | undefined, categories: string | undefined) {
+  const shouldFetch = location || categories;
+  const fetcher: Fetcher<Listing[], { location?: string; categories?: string }> = ({ location, categories }) => {
+    const queryParams: { location?: string; categories?: string } = {};
+    if (location) {
+      queryParams.location = location;
+    }
+
+    if (categories) {
+      queryParams.categories = categories;
+    }
+
+    return sendRequest(SearchListings, { queryParams });
+  };
   const { data, mutate, error, isLoading, isValidating } = useSWR(
-    shouldFetch ? { SearchListings, location } : null,
+    shouldFetch ? { SearchListings, location, categories } : null,
     fetcher,
   );
   return { listings: data, mutate, error, loading: isLoading || isValidating };

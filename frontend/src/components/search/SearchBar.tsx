@@ -13,6 +13,7 @@ import { Dialog, Disclosure, Listbox, Transition } from "@headlessui/react";
 import { ChevronUpIcon, MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Fragment, useRef, useState } from "react";
 import { DateRange } from "react-day-picker";
+import { useNavigate } from "react-router-dom";
 import { Button } from "src/components/button/Button";
 import { getCategoryForDisplay, getCategoryIcon, getSearchableCategories } from "src/components/icons/Category";
 import { CategoryType } from "src/rpc/types";
@@ -77,6 +78,10 @@ const SearchBarModal: React.FC<{ className?: string; header?: boolean; show?: bo
 const SearchBarDropdown: React.FC<{ className?: string; header?: boolean; show?: boolean }> = (props) => {
   const [query, setQuery] = useState<string>("");
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+  const search = (category: CategoryType) => {
+    navigate(`/search?categories=["${category}"]`);
+  };
   const listRef = useRef<Array<HTMLElement | null>>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -97,9 +102,7 @@ const SearchBarDropdown: React.FC<{ className?: string; header?: boolean; show?:
     placement: "bottom-end",
     whileElementsMounted: autoUpdate,
   });
-  const click = useClick(context, {
-    toggle: false,
-  });
+  const click = useClick(context);
   const dismiss = useDismiss(context);
   const role = useRole(context);
   const listNav = useListNavigation(context, {
@@ -144,7 +147,17 @@ const SearchBarDropdown: React.FC<{ className?: string; header?: boolean; show?:
             className="tw-w-full tw-bg-transparent tw-pl-4 tw-placeholder-gray-700 tw-text-base tw-select-none tw-cursor-pointer tw-outline-none"
             placeholder="Choose a category"
           />
-          <div className="tw-relative tw-z-[1]" ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
+          <form
+            className="tw-relative tw-z-[1]"
+            ref={refs.setFloating}
+            style={floatingStyles}
+            {...getFloatingProps()}
+            onSubmit={() => {
+              if (activeIndex) {
+                search(filteredCategories[activeIndex]);
+              }
+            }}
+          >
             <Transition
               as={Fragment}
               show={open}
@@ -155,8 +168,16 @@ const SearchBarDropdown: React.FC<{ className?: string; header?: boolean; show?:
               leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
               leaveTo="tw-transform tw-opacity-0 tw-scale-0"
             >
-              <div className="tw-flex tw-flex-col tw-w-full tw-h-96 tw-max-h-96 tw-rounded-2xl tw-overflow-hidden tw-bg-white tw-text-black tw-shadow-lg">
-                <div className="tw-pl-4 tw-pt-4 tw-pb-2 tw-font-semibold">Choose your adventure</div>
+              <div className="tw-flex tw-flex-col tw-w-full tw-max-h-96 tw-rounded-2xl tw-overflow-hidden tw-bg-white tw-text-black tw-shadow-lg">
+                <div
+                  className="tw-pl-4 tw-pt-4 tw-pb-2 tw-font-semibold"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                  }}
+                >
+                  Choose your adventure
+                </div>
                 <div className="tw-flex tw-flex-col tw-gap-2 tw-overflow-auto tw-overscroll-contain tw-p-2 tw-text-sm">
                   {filteredCategories.map((category, idx) => (
                     <div
@@ -166,6 +187,7 @@ const SearchBarDropdown: React.FC<{ className?: string; header?: boolean; show?:
                         "tw-flex tw-flex-row tw-items-center tw-gap-3 tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 hover:tw-bg-slate-50 tw-rounded-lg",
                         idx === activeIndex && "tw-bg-slate-100",
                       )}
+                      onClick={() => search(category)}
                     >
                       {getCategoryIcon(category, "tw-h-14 tw-w-14 tw-p-3 tw-bg-gray-100 tw-rounded-lg")}
                       <span className="tw-font-medium">{getCategoryForDisplay(category)}</span>
@@ -174,7 +196,7 @@ const SearchBarDropdown: React.FC<{ className?: string; header?: boolean; show?:
                 </div>
               </div>
             </Transition>
-          </div>
+          </form>
           {!props.header && (
             <div className="tw-hidden tw-px-5 sm:tw-flex tw-items-center tw-rounded-[99px] tw-h-full tw-bg-blue-950 tw-text-white tw-text-base tw-font-medium">
               Search
@@ -187,12 +209,16 @@ const SearchBarDropdown: React.FC<{ className?: string; header?: boolean; show?:
 };
 
 const SearchModal: React.FC<{ open: boolean; close: () => void }> = ({ open, close }) => {
+  const navigate = useNavigate();
   const [categories, setCategories] = useState<CategoryType[]>([]);
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [numberOfGuests, setNumberOfGuests] = useState(0);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  const search = () => {};
+  const search = () => {
+    navigate(`/search?categories=${JSON.stringify(categories)}`);
+    close();
+  };
 
   return (
     <Transition.Root show={open} as={Fragment}>
