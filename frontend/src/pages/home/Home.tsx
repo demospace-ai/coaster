@@ -1,19 +1,16 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
-import React, { useRef, useState } from "react";
+import React, { Dispatch, SetStateAction, useRef, useState } from "react";
 import { getCategoryForDisplay, getCategoryIcon, getSearchableCategories } from "src/components/icons/Category";
 import Hero from "src/components/images/hero.webp";
 import { Loading } from "src/components/loading/Loading";
 import { SearchBar } from "src/components/search/SearchBar";
 import { SearchResult } from "src/pages/search/Search";
 import { useFeatured } from "src/rpc/data";
-import { Listing } from "src/rpc/types";
+import { CategoryType, Listing } from "src/rpc/types";
+import { mergeClasses } from "src/utils/twmerge";
 
 export const Home: React.FC = () => {
-  const { featured } = useFeatured();
-
-  if (!featured) {
-    return <Loading />;
-  }
+  const [category, setCategory] = useState<CategoryType | undefined>(undefined);
 
   return (
     <div className="tw-flex tw-bg-[#efedea] tw-w-full tw-h-full tw-justify-center tw-px-5 sm:tw-px-20">
@@ -33,25 +30,45 @@ export const Home: React.FC = () => {
           <SearchBar className="tw-mt-4" />
         </div>
         <div className="tw-text-2xl tw-font-semibold tw-w-full tw-mb-2">Explore by Category</div>
-        <CategorySelector />
-        <div>
-          <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-3 xl:tw-grid-cols-4 tw-mt-1 sm:tw-mt-4 tw-mb-5 tw-font-bold tw-text-3xl tw-gap-5 sm:tw-gap-10 tw-w-full">
-            {featured?.map((listing: Listing) => (
-              <SearchResult key={listing.id} listing={listing} />
-            ))}
-          </div>
-        </div>
+        <CategorySelector selected={category} setSelected={setCategory} />
+        <Featured category={category} />
       </div>
     </div>
   );
 };
 
-export const CategorySelector: React.FC = () => {
+const Featured: React.FC<{ category: CategoryType | undefined }> = ({ category }) => {
+  const { featured } = useFeatured(category ? `["${category}"]` : undefined);
+
+  if (!featured) {
+    return (
+      <div className="tw-h-[800px] tw-pt-32">
+        {/** Needed so scrollbar always remains visible */}
+        <Loading />
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-3 xl:tw-grid-cols-4 tw-mt-1 sm:tw-mt-4 tw-mb-5 tw-font-bold tw-text-3xl tw-gap-5 sm:tw-gap-10 tw-w-full">
+        {featured?.map((listing: Listing) => (
+          <SearchResult key={listing.id} listing={listing} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export const CategorySelector: React.FC<{
+  selected: CategoryType | undefined;
+  setSelected: Dispatch<SetStateAction<CategoryType | undefined>>;
+}> = ({ selected, setSelected }) => {
   const [showBack, setShowBack] = useState(false);
   const [showForward, setShowForward] = useState(true);
   const categorySelectorRef = useRef<HTMLDivElement>(null);
   const categoryIcon =
-    "tw-flex tw-flex-col tw-justify-center tw-items-center tw-cursor-pointer tw-select-none tw-box-border tw-pb-2 tw-border-b-2 tw-border-solid tw-border-transparent hover:tw-border-slate-700";
+    "tw-flex tw-flex-col tw-justify-center tw-items-center tw-cursor-pointer tw-select-none tw-box-border tw-pb-2 tw-border-b-2 tw-border-solid tw-border-transparent hover:tw-border-slate-400";
 
   const setScroll = () => {
     if (categorySelectorRef.current) {
@@ -122,7 +139,14 @@ export const CategorySelector: React.FC = () => {
       >
         <div className="tw-flex tw-h-full tw-flex-1 tw-gap-12 tw-px-2 tw-justify-between tw-pr-10">
           {getSearchableCategories().map((category) => (
-            <div className={categoryIcon} key={category}>
+            <div
+              className={mergeClasses(
+                categoryIcon,
+                category == selected && "tw-border-slate-900 hover:tw-border-slate-900",
+              )}
+              key={category}
+              onClick={() => setSelected(category)}
+            >
               {getCategoryIcon(category)}
               <span className="tw-text-xs tw-font-medium tw-mt-1 sm:tw-mt-2">{getCategoryForDisplay(category)}</span>
             </div>

@@ -133,7 +133,7 @@ export const UpdateListingImages: IEndpoint<{ images: Image[] }, undefined, { li
   path: "/listings/:listingID/images",
 };
 
-export const GetFeaturedListings: IEndpoint<undefined, Listing[]> = {
+export const GetFeaturedListings: IEndpoint<undefined, Listing[], undefined, { categories?: string }> = {
   name: "Get featured listings",
   method: "GET",
   path: "/featured",

@@ -100,7 +100,7 @@ export function useDraftListing(opts?: SWRConfiguration) {
   return { listing: data, mutate, error, loading: isLoading };
 }
 
-export function useSearch(location: string | undefined, categories: string | undefined) {
+export function useSearch(location?: string, categories?: string) {
   const shouldFetch = location || categories;
   const fetcher: Fetcher<Listing[], { location?: string; categories?: string }> = ({ location, categories }) => {
     const queryParams: { location?: string; categories?: string } = {};
@@ -121,9 +121,16 @@ export function useSearch(location: string | undefined, categories: string | und
   return { listings: data, mutate, error, loading: isLoading || isValidating };
 }
 
-export function useFeatured() {
-  const fetcher: Fetcher<Listing[], {}> = () => sendRequest(GetFeaturedListings);
-  const { data, mutate, error, isLoading, isValidating } = useSWR({ GetFeaturedListings }, fetcher);
+export function useFeatured(categories?: string) {
+  const fetcher: Fetcher<Listing[], { categories?: string }> = ({ categories }) => {
+    const queryParams: { categories?: string } = {};
+    if (categories) {
+      queryParams.categories = categories;
+    }
+
+    return sendRequest(GetFeaturedListings, { queryParams });
+  };
+  const { data, mutate, error, isLoading, isValidating } = useSWR({ GetFeaturedListings, categories }, fetcher);
   return { featured: data, mutate, error, loading: isLoading || isValidating };
 }
 
