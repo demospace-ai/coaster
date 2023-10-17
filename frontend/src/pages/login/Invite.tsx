@@ -117,7 +117,7 @@ const InviteForm: React.FC<{ setDone: (done: boolean) => void }> = ({ setDone })
         Add another
       </Button>
       <Button type="submit" className="tw-mt-4 tw-w-40 tw-h-10">
-        {isLoading ? <Loading /> : "Send invites"}
+        {isLoading ? <Loading light /> : "Send invites"}
       </Button>
       <FormError message={submitError?.message} />
     </form>
