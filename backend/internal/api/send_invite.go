@@ -118,7 +118,7 @@ func (s ApiService) sendInvite(email string, sender *models.User) error {
 		})
 
 		var plain bytes.Buffer
-		SEND_INVITE_PLAIN_TEMPLATE.Execute(&html, SendInviteTemplateArgs{
+		SEND_INVITE_PLAIN_TEMPLATE.Execute(&plain, SendInviteTemplateArgs{
 			SenderName: senderName,
 			Email:      email,
 			Domain:     domain,

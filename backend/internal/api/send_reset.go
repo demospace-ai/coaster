@@ -75,7 +75,7 @@ func (s ApiService) SendReset(w http.ResponseWriter, r *http.Request) error {
 	})
 
 	var plain bytes.Buffer
-	SEND_RESET_PLAIN_TEMPLATE.Execute(&html, ResetTemplateArgs{
+	SEND_RESET_PLAIN_TEMPLATE.Execute(&plain, ResetTemplateArgs{
 		FirstName:        user.FirstName,
 		Token:            token.Token,
 		DestinationParam: destinationParam,
