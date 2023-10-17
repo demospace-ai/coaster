@@ -103,7 +103,7 @@ const SearchModal: React.FC<{ open: boolean; close: () => void }> = ({ open, clo
             leaveFrom="tw-translate-y-0 sm:tw-scale-100"
             leaveTo="tw-translate-y-full sm:tw-scale-95"
           >
-            <Dialog.Panel className="sm:tw-absolute sm:sm:tw-top-[48%] tw-w-screen sm:tw-w-[500px] sm:tw-max-h-[70vh] sm:tw-left-1/2 sm:-tw-translate-x-1/2 sm:-tw-translate-y-1/2 tw-flex tw-flex-col tw-bg-white tw-shadow-md tw-rounded-t-xl sm:tw-rounded-xl tw-h-full tw-items-center tw-justify-start tw-overflow-clip">
+            <Dialog.Panel className="sm:tw-absolute sm:sm:tw-top-[48%] tw-w-screen sm:tw-w-[500px] sm:tw-h-[70vh] sm:tw-max-h-[700px] sm:tw-left-1/2 sm:-tw-translate-x-1/2 sm:-tw-translate-y-1/2 tw-flex tw-flex-col tw-bg-white tw-shadow-md tw-rounded-t-xl sm:tw-rounded-xl tw-h-full tw-items-center tw-justify-start tw-overflow-clip">
               <div className="tw-flex tw-w-full tw-items-center tw-justify-between tw-p-6">
                 <span className="tw-text-lg tw-font-semibold">Search</span>
                 <button

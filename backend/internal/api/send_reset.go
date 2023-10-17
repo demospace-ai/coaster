@@ -74,7 +74,15 @@ func (s ApiService) SendReset(w http.ResponseWriter, r *http.Request) error {
 		Domain:           domain,
 	})
 
-	err = emails.SendEmail("Coaster Support <support@mail.trycoaster.com>", "support@trycoaster.com", []string{sendResetRequest.Email}, "Reset your password", html.String())
+	var plain bytes.Buffer
+	SEND_RESET_PLAIN_TEMPLATE.Execute(&html, ResetTemplateArgs{
+		FirstName:        user.FirstName,
+		Token:            token.Token,
+		DestinationParam: destinationParam,
+		Domain:           domain,
+	})
+
+	err = emails.SendEmail("Coaster Support <support@mail.trycoaster.com>", "support@trycoaster.com", []string{sendResetRequest.Email}, "Reset your password", html.String(), plain.String())
 	if err != nil {
 		return errors.Wrap(err, "(api.SendReset) sending email")
 	}
@@ -116,4 +124,15 @@ const SEND_RESET_TEMPLATE_STRING = `
   </body>
 
 </html>
+`
+
+var SEND_RESET_PLAIN_TEMPLATE = template.Must(template.New("send_reset_plain").Parse(SEND_RESET_PLAIN_TEMPLATE_STRING))
+
+const SEND_RESET_PLAIN_TEMPLATE_STRING = `
+	Hi {{.FirstName}},
+
+	Someone recently requested a password change for your Coaster account. If this was you, you can set a new password here: {{.Domain}}/reset-password?token={{.Token}}{{if ne .DestinationParam ""}}&{{.DestinationParam}}{{end}}
+	
+	If you don't want to change your password or didn't request this, just ignore and delete this message.
+	To keep your account secure, please don't forward this email to anyone.
 `

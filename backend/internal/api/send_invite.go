@@ -97,7 +97,15 @@ func (s ApiService) sendInvite(email string, sender *models.User) error {
 			Domain:     domain,
 		})
 
-		err = emails.SendEmail("Coaster Support <support@mail.trycoaster.com>", "support@trycoaster.com", []string{email}, "Welcome to Coaster", html.String())
+		var plain bytes.Buffer
+		SEND_CREATE_PASSWORD_PLAIN_TEMPLATE.Execute(&plain, SendCreatePasswordTemplateArgs{
+			SenderName: senderName,
+			FirstName:  user.FirstName,
+			Token:      token.Token,
+			Domain:     domain,
+		})
+
+		err = emails.SendEmail("Coaster Support <support@mail.trycoaster.com>", "support@trycoaster.com", []string{email}, "Welcome to Coaster", html.String(), plain.String())
 		if err != nil {
 			return errors.Wrap(err, "(api.sendInvite) sending existing user email")
 		}
@@ -109,7 +117,14 @@ func (s ApiService) sendInvite(email string, sender *models.User) error {
 			Domain:     domain,
 		})
 
-		err = emails.SendEmail("Coaster Support <support@mail.trycoaster.com>", "support@trycoaster.com", []string{email}, "You're invited to Coaster", html.String())
+		var plain bytes.Buffer
+		SEND_INVITE_PLAIN_TEMPLATE.Execute(&html, SendInviteTemplateArgs{
+			SenderName: senderName,
+			Email:      email,
+			Domain:     domain,
+		})
+
+		err = emails.SendEmail("Coaster Support <support@mail.trycoaster.com>", "support@trycoaster.com", []string{email}, "You're invited to Coaster", html.String(), plain.String())
 		if err != nil {
 			return errors.Wrap(err, "(api.sendInvite) sending email")
 		}
@@ -154,6 +169,17 @@ const SEND_INVITE_TEMPLATE_STRING = `
 </html>
 `
 
+var SEND_INVITE_PLAIN_TEMPLATE = template.Must(template.New("send_invite_plain").Parse(SEND_INVITE_PLAIN_TEMPLATE_STRING))
+
+const SEND_INVITE_PLAIN_TEMPLATE_STRING = `
+	Hi {{.FirstName}},
+
+	{{.SenderName}} is inviting you to join Coaster, the best way to plan adventure travel. You can create an account here: {{.Domain}}/signup?email={{.Email}}&destination=profile
+	
+	If you don't want to create an account, just ignore and delete this message.
+	To keep your account secure, please don't forward this email to anyone.
+`
+
 var SEND_CREATE_PASSWORD_TEMPLATE = template.Must(template.New("send_create_password").Parse(SEND_CREATE_PASSWORD_TEMPLATE_STRING))
 
 const SEND_CREATE_PASSWORD_TEMPLATE_STRING = `
@@ -188,4 +214,15 @@ const SEND_CREATE_PASSWORD_TEMPLATE_STRING = `
   </body>
 
 </html>
+`
+
+var SEND_CREATE_PASSWORD_PLAIN_TEMPLATE = template.Must(template.New("send_create_password_plain").Parse(SEND_CREATE_PASSWORD_PLAIN_TEMPLATE_STRING))
+
+const SEND_CREATE_PASSWORD_PLAIN_TEMPLATE_STRING = `
+	Hi {{.FirstName}},
+
+	{{.SenderName}} is inviting you to join Coaster. You can setup your account here: {{.Domain}}/create-password?token={{.Token}}&destination=profile
+	
+	If you weren't expecting this email, just ignore and delete this message.
+	To keep your account secure, please don't forward this email to anyone.
 `
