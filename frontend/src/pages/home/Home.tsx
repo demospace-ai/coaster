@@ -1,12 +1,12 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import React, { useRef, useState } from "react";
-import { EXCLUDED_CATEGORIES, getCategoryForDisplay, getCategoryIcon } from "src/components/icons/Category";
+import { getCategoryForDisplay, getCategoryIcon, getSearchableCategories } from "src/components/icons/Category";
 import Hero from "src/components/images/hero.webp";
 import { Loading } from "src/components/loading/Loading";
 import { SearchBar } from "src/components/search/SearchBar";
 import { SearchResult } from "src/pages/search/Search";
 import { useFeatured } from "src/rpc/data";
-import { Category, Listing } from "src/rpc/types";
+import { Listing } from "src/rpc/types";
 
 export const Home: React.FC = () => {
   const { featured } = useFeatured();
@@ -121,14 +121,12 @@ export const CategorySelector: React.FC = () => {
         onScroll={setScroll}
       >
         <div className="tw-flex tw-h-full tw-flex-1 tw-gap-12 tw-px-2 tw-justify-between tw-pr-10">
-          {Object.values(Category.Values)
-            .filter((category) => !EXCLUDED_CATEGORIES.includes(category))
-            .map((category) => (
-              <div className={categoryIcon} key={category}>
-                {getCategoryIcon(category)}
-                <span className="tw-text-xs tw-font-medium tw-mt-1 sm:tw-mt-2">{getCategoryForDisplay(category)}</span>
-              </div>
-            ))}
+          {getSearchableCategories().map((category) => (
+            <div className={categoryIcon} key={category}>
+              {getCategoryIcon(category)}
+              <span className="tw-text-xs tw-font-medium tw-mt-1 sm:tw-mt-2">{getCategoryForDisplay(category)}</span>
+            </div>
+          ))}
         </div>
       </div>
     </div>

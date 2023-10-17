@@ -1,7 +1,8 @@
 import { Category, CategoryType } from "src/rpc/types";
 import { toTitleCase } from "src/utils/string";
+import { mergeClasses } from "src/utils/twmerge";
 
-export const EXCLUDED_CATEGORIES: CategoryType[] = [
+const EXCLUDED_CATEGORIES: CategoryType[] = [
   Category.Values.buggying,
   Category.Values.outdoors,
   Category.Values.safari,
@@ -394,43 +395,47 @@ export function getCategoryForDisplay(category: CategoryType): string {
   return category === Category.Enum.sup ? "SUP" : toTitleCase(category);
 }
 
-export function getCategoryIcon(category: CategoryType) {
+export function getCategoryIcon(category: CategoryType, className?: string) {
   switch (category) {
     case Category.Values.camping:
-      return <CampingIcon className="tw-w-10 tw-h-10" />;
+      return <CampingIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.climbing:
-      return <ClimbingIcon className="tw-w-10 tw-h-10" />;
+      return <ClimbingIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.cycling:
-      return <CyclingIcon className="tw-w-10 tw-h-10" />;
+      return <CyclingIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.diving:
-      return <DivingIcon className="tw-h-10 tw-w-10" />;
+      return <DivingIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.fishing:
-      return <FishingIcon className="tw-w-10 tw-h-10" />;
+      return <FishingIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.hiking:
-      return <HikingIcon className="tw-w-10 tw-h-10" />;
+      return <HikingIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.kayaking:
-      return <KayakIcon className="tw-h-10 tw-w-10" />;
+      return <KayakIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.snowmobile:
-      return <SnowmobileIcon className="tw-h-10 tw-w-10" />;
+      return <SnowmobileIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.surfing:
-      return <SurfingIcon className="tw-w-10 tw-h-10" />;
+      return <SurfingIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.skiing:
-      return <SkiingIcon className="tw-w-10 tw-h-10" />;
+      return <SkiingIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.yoga:
-      return <YogaIcon className="tw-h-10 tw-w-10" />;
+      return <YogaIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.boating:
-      return <BoatingIcon className="tw-h-10 tw-w-10" />;
+      return <BoatingIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.wakeboard:
-      return <WakeboardingIcon className="tw-h-10 tw-w-10" />;
+      return <WakeboardingIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.kitesurf:
-      return <KitesurfingIcon className="tw-h-10 tw-w-10" />;
+      return <KitesurfingIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.sup:
-      return <PaddleboardingIcon className="tw-h-10 tw-w-10" />;
+      return <PaddleboardingIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.windsurf:
-      return <WindsurfingIcon className="tw-h-10 tw-w-10" />;
+      return <WindsurfingIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.wingfoil:
-      return <WingfoilIcon className="tw-h-10 tw-w-10" />;
+      return <WingfoilIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     default:
       return <></>;
   }
+}
+
+export function getSearchableCategories(): CategoryType[] {
+  return Object.values(Category.Values).filter((category) => !EXCLUDED_CATEGORIES.includes(category));
 }

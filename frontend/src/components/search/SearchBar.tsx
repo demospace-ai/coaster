@@ -1,73 +1,188 @@
-import { Dialog, Disclosure, Listbox, Transition } from "@headlessui/react";
 import {
-  ChevronUpIcon,
-  MagnifyingGlassIcon,
-  MinusCircleIcon,
-  PlusCircleIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+  autoUpdate,
+  offset,
+  size,
+  useClick,
+  useDismiss,
+  useFloating,
+  useInteractions,
+  useListNavigation,
+  useRole,
+} from "@floating-ui/react";
+import { Dialog, Disclosure, Listbox, Transition } from "@headlessui/react";
+import { ChevronUpIcon, MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Fragment, useRef, useState } from "react";
 import { DateRange } from "react-day-picker";
 import { Button } from "src/components/button/Button";
-import { DateRangePicker } from "src/components/calendar/DatePicker";
-import { EXCLUDED_CATEGORIES, getCategoryForDisplay, getCategoryIcon } from "src/components/icons/Category";
-import { Category, CategoryType } from "src/rpc/types";
+import { getCategoryForDisplay, getCategoryIcon, getSearchableCategories } from "src/components/icons/Category";
+import { CategoryType } from "src/rpc/types";
 import { mergeClasses } from "src/utils/twmerge";
+import { useIsMobile } from "src/utils/window";
 
 export const SearchBar: React.FC<{ className: string }> = (props) => {
-  const [open, setOpen] = useState(false);
+  const isMobile = useIsMobile();
 
-  return (
-    <>
-      <SearchModal open={open} close={() => setOpen(false)} />
-      <div
-        className={mergeClasses(
-          "tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[640px] tw-h-14 tw-bg-white tw-shadow-dark-sm tw-p-1.5 tw-rounded-[99px] tw-cursor-pointer",
-          props.className,
-        )}
-        onClick={() => setOpen(true)}
-      >
-        <MagnifyingGlassIcon className="tw-ml-3 sm:tw-ml-2 tw-h-6 sm:tw-h-7 tw-stroke-gray-600" />
-        <div className="tw-w-full tw-bg-transparent tw-px-2 tw-text-gray-700 tw-text-lg tw-select-none tw-cursor-pointer">
-          Search trips
-        </div>
-        <div className="tw-hidden tw-px-5 sm:tw-flex tw-items-center tw-rounded-[99px] tw-h-full tw-bg-blue-950 tw-text-white tw-font-medium">
-          Search
-        </div>
-      </div>
-    </>
-  );
+  if (isMobile) {
+    return <SearchBarModal {...props} show />;
+  } else {
+    return <SearchBarDropdown {...props} show />;
+  }
 };
 
 export const SearchBarHeader: React.FC<{ show?: boolean; className?: string }> = (props) => {
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return <SearchBarModal {...props} header />;
+  } else {
+    return <SearchBarDropdown {...props} header />;
+  }
+};
+
+const SearchBarModal: React.FC<{ className?: string; header?: boolean; show?: boolean }> = (props) => {
   const [open, setOpen] = useState(false);
 
   return (
     <>
       <SearchModal open={open} close={() => setOpen(false)} />
-      {props.show && (
-        <>
+      {props.show &&
+        (props.header ? (
           <MagnifyingGlassIcon
-            className="tw-flex sm:tw-hidden tw-cursor-pointer tw-ml-3 tw-w-6 tw-text-gray-500"
+            className="tw-flex tw-cursor-pointer tw-ml-3 tw-w-6 tw-text-gray-500"
             onClick={() => {
               setOpen(true);
             }}
           />
+        ) : (
           <div
             className={mergeClasses(
-              "tw-hidden sm:tw-flex tw-flex-row tw-items-center tw-bg-white tw-ring-1 tw-ring-slate-300 tw-w-[25vw] tw-rounded-[99px] tw-cursor-pointer",
+              "tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[640px] tw-h-14 tw-bg-white tw-shadow-dark-sm tw-p-1.5 tw-rounded-[99px] tw-cursor-pointer",
               props.className,
             )}
             onClick={() => setOpen(true)}
           >
-            <MagnifyingGlassIcon className="tw-ml-4 tw-w-5 tw-text-gray-500" />
-            <div className="tw-ml-0.5 tw-w-full tw-bg-transparent tw-px-2 tw-py-3 sm:tw-py-2.5 tw-text-gray-600 tw-text-base tw-select-none tw-cursor-pointer">
+            <MagnifyingGlassIcon className="tw-ml-3 sm:tw-ml-2 tw-h-6 sm:tw-h-7 tw-stroke-gray-600" />
+            <div className="tw-w-full tw-bg-transparent tw-px-2 tw-text-gray-700 tw-text-lg tw-select-none tw-cursor-pointer">
               Search trips
             </div>
+            <div className="tw-hidden tw-px-5 sm:tw-flex tw-items-center tw-rounded-[99px] tw-h-full tw-bg-blue-950 tw-text-white tw-text-base tw-font-medium">
+              Search
+            </div>
           </div>
-        </>
-      )}
+        ))}
     </>
+  );
+};
+
+const SearchBarDropdown: React.FC<{ className?: string; header?: boolean; show?: boolean }> = (props) => {
+  const [query, setQuery] = useState<string>("");
+  const [open, setOpen] = useState(false);
+  const listRef = useRef<Array<HTMLElement | null>>([]);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const { refs, floatingStyles, context } = useFloating<HTMLDivElement>({
+    open,
+    onOpenChange: setOpen,
+    middleware: [
+      offset(10),
+      size({
+        apply({ rects, elements }) {
+          Object.assign(elements.floating.style, {
+            width: `${rects.reference.width}px`,
+          });
+        },
+        padding: 10,
+      }),
+    ],
+    placement: "bottom-end",
+    whileElementsMounted: autoUpdate,
+  });
+  const click = useClick(context, {
+    toggle: false,
+  });
+  const dismiss = useDismiss(context);
+  const role = useRole(context);
+  const listNav = useListNavigation(context, {
+    listRef,
+    activeIndex,
+    onNavigate: setActiveIndex,
+    virtual: true,
+    loop: true,
+  });
+  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role, listNav]);
+
+  const filteredCategories = getSearchableCategories().filter((category) => {
+    if (query.length <= 0) {
+      return true;
+    } else {
+      return category.toLowerCase().includes(query.toLowerCase());
+    }
+  });
+
+  return (
+    props.show && (
+      <>
+        <div
+          className={mergeClasses(
+            props.header
+              ? "tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[400px] tw-h-9 tw-bg-white tw-ring-1 tw-ring-slate-300 tw-rounded-[99px]"
+              : "tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[400px] tw-h-14 tw-bg-white tw-shadow-dark-sm tw-p-1.5 tw-rounded-[99px]",
+            props.className,
+          )}
+          ref={refs.setReference}
+          {...getReferenceProps({
+            onClick: () => {
+              inputRef.current?.focus();
+            },
+          })}
+        >
+          {props.header && <MagnifyingGlassIcon className="tw-ml-4 tw-h-5 -tw-mr-1.5 tw-stroke-gray-600" />}
+          <input
+            ref={inputRef}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="tw-w-full tw-bg-transparent tw-pl-4 tw-placeholder-gray-700 tw-text-base tw-select-none tw-cursor-pointer tw-outline-none"
+            placeholder="Choose a category"
+          />
+          <div className="tw-relative tw-z-[1]" ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
+            <Transition
+              as={Fragment}
+              show={open}
+              enter="tw-transition tw-ease-out tw-duration-100"
+              enterFrom="tw-transform tw-opacity-0 tw-scale-80"
+              enterTo="tw-transform tw-opacity-100 tw-scale-100"
+              leave="tw-transition tw-ease-in tw-duration-100"
+              leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
+              leaveTo="tw-transform tw-opacity-0 tw-scale-0"
+            >
+              <div className="tw-flex tw-flex-col tw-w-full tw-h-96 tw-max-h-96 tw-rounded-2xl tw-overflow-hidden tw-bg-white tw-text-black tw-shadow-lg">
+                <div className="tw-pl-4 tw-pt-4 tw-pb-2 tw-font-semibold">Choose your adventure</div>
+                <div className="tw-flex tw-flex-col tw-gap-2 tw-overflow-auto tw-overscroll-contain tw-p-2 tw-text-sm">
+                  {filteredCategories.map((category, idx) => (
+                    <div
+                      key={category}
+                      ref={(node) => (listRef.current[idx] = node)}
+                      className={mergeClasses(
+                        "tw-flex tw-flex-row tw-items-center tw-gap-3 tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 hover:tw-bg-slate-50 tw-rounded-lg",
+                        idx === activeIndex && "tw-bg-slate-100",
+                      )}
+                    >
+                      {getCategoryIcon(category, "tw-h-14 tw-w-14 tw-p-3 tw-bg-gray-100 tw-rounded-lg")}
+                      <span className="tw-font-medium">{getCategoryForDisplay(category)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Transition>
+          </div>
+          {!props.header && (
+            <div className="tw-hidden tw-px-5 sm:tw-flex tw-items-center tw-rounded-[99px] tw-h-full tw-bg-blue-950 tw-text-white tw-text-base tw-font-medium">
+              Search
+            </div>
+          )}
+        </div>
+      </>
+    )
   );
 };
 
@@ -130,38 +245,36 @@ const SearchModal: React.FC<{ open: boolean; close: () => void }> = ({ open, clo
                           className={`${open && "tw-rotate-180 tw-transform"} tw-h-5 tw-w-5 tw-text-slate-500`}
                         />
                       </Disclosure.Button>
-                      <Disclosure.Panel className="tw-max-h-[280px] sm:tw-max-h-[300px] tw-overflow-auto">
+                      <Disclosure.Panel className="tw-overflow-auto">
                         <Listbox as="div" value={categories} onChange={setCategories} multiple>
                           <Listbox.Options
                             static
                             className="tw-grid tw-grid-flow-row-dense tw-grid-cols-3 sm:tw-grid-cols-4 tw-py-5 tw-gap-5 sm:tw-gap-6"
                           >
-                            {Object.values(Category.Values)
-                              .filter((category) => !EXCLUDED_CATEGORIES.includes(category))
-                              .map((category) => (
-                                <Listbox.Option key={category} value={category}>
-                                  {({ selected }) => (
-                                    <div
-                                      className={mergeClasses(
-                                        "tw-flex tw-flex-col tw-justify-center tw-items-center tw-cursor-pointer tw-select-none tw-p-2 tw-rounded-lg",
-                                        selected && "tw-bg-slate-100",
-                                      )}
-                                    >
-                                      {getCategoryIcon(category)}
-                                      <span className="tw-text-xs tw-font-medium tw-mt-1 sm:tw-mt-2">
-                                        {getCategoryForDisplay(category)}
-                                      </span>
-                                    </div>
-                                  )}
-                                </Listbox.Option>
-                              ))}
+                            {getSearchableCategories().map((category) => (
+                              <Listbox.Option key={category} value={category}>
+                                {({ selected }) => (
+                                  <div
+                                    className={mergeClasses(
+                                      "tw-flex tw-flex-col tw-justify-center tw-items-center tw-cursor-pointer tw-select-none tw-p-2 tw-rounded-lg",
+                                      selected && "tw-bg-slate-100",
+                                    )}
+                                  >
+                                    {getCategoryIcon(category)}
+                                    <span className="tw-text-xs tw-font-medium tw-mt-1 sm:tw-mt-2">
+                                      {getCategoryForDisplay(category)}
+                                    </span>
+                                  </div>
+                                )}
+                              </Listbox.Option>
+                            ))}
                           </Listbox.Options>
                         </Listbox>
                       </Disclosure.Panel>
                     </div>
                   )}
                 </Disclosure>
-                <Disclosure>
+                {/* <Disclosure>
                   {({ open }) => (
                     <div className="tw-rounded-lg tw-px-4 tw-pt-4 tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-divide-y">
                       <Disclosure.Button className="tw-flex tw-w-full tw-pb-4 tw-rounded-lg tw-justify-between tw-text-left tw-text-base tw-font-medium focus:tw-outline-none">
@@ -228,7 +341,7 @@ const SearchModal: React.FC<{ open: boolean; close: () => void }> = ({ open, clo
                       </Disclosure.Panel>
                     </div>
                   )}
-                </Disclosure>
+                </Disclosure> */}
               </div>
               <div className="tw-flex tw-justify-between tw-w-full tw-border-t tw-border-solid tw-border-slate-200 tw-px-6 tw-py-4 tw-mt-auto">
                 <button
