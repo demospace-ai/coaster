@@ -97,7 +97,7 @@ const SEND_RESET_TEMPLATE_STRING = `
   <body style="background-color:#f6f9fc;padding:10px 0">
     <table align="center" role="presentation" cellSpacing="0" cellPadding="0" border="0" width="100%" style="max-width:37.5em;background-color:#ffffff;border:1px solid #f0f0f0;padding:45px">
       <tr style="width:100%">
-        <td>
+        <td><img alt="Coaster" src="https://www.trycoaster.com/long-logo.png" height="40" style="display:block;outline:none;border:none;text-decoration:none" />
           <table align="center" border="0" cellPadding="0" cellSpacing="0" role="presentation" width="100%">
             <tbody>
               <tr>
