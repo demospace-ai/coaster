@@ -10,11 +10,9 @@ import {
   useRole,
   useTransitionStyles,
 } from "@floating-ui/react";
-import { Dialog, Transition } from "@headlessui/react";
-import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { Fragment, useState } from "react";
+import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { useState } from "react";
 import { DateRange, DayPicker, DayPickerProps, DayPickerSingleProps } from "react-day-picker";
-import { Button } from "src/components/button/Button";
 import { Loading } from "src/components/loading/Loading";
 import { mergeClasses } from "src/utils/twmerge";
 import { useIsMobile } from "src/utils/window";
@@ -138,89 +136,6 @@ export const DatePickerPopper: React.FC<
           </div>
         </FloatingFocusManager>
       )}
-    </div>
-  );
-};
-
-export const DatePickerSlider: React.FC<
-  Omit<DayPickerSingleProps, "mode" | "onSelect"> & {
-    buttonClass?: string;
-    onSelect: (selected: Date | undefined) => void;
-    loading?: boolean;
-  }
-> = ({ className, classNames, buttonClass, onSelect, loading, showOutsideDays = true, ...props }) => {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div className={className}>
-      <button
-        className={mergeClasses(
-          "tw-flex tw-justify-start tw-items-center tw-cursor-pointer tw-whitespace-nowrap tw-font-medium tw-underline",
-          buttonClass,
-        )}
-        onClick={() => setOpen(true)}
-      >
-        {props.selected ? props.selected.toLocaleDateString() : "Select a date"}
-      </button>
-      <Transition.Root show={open} as={Fragment}>
-        <Dialog onClose={setOpen} className="tw-relative tw-z-[100]">
-          <Transition.Child
-            as={Fragment}
-            enter="tw-transform tw-transition tw-ease-in-out tw-duration-500 sm:tw-duration-700"
-            enterFrom="tw-opacity-0"
-            enterTo="tw-opacity-100"
-            leave="tw-transform tw-transition tw-ease-in-out tw-duration-500 sm:tw-duration-700"
-            leaveFrom="tw-opacity-100"
-            leaveTo="tw-opacity-0"
-          >
-            <div className="tw-fixed tw-inset-0 tw-backdrop-blur-sm tw-bg-black tw-bg-opacity-10" />
-          </Transition.Child>
-          <div className="tw-fixed tw-inset-x-0 tw-bottom-0 tw-h-[80vh]">
-            <Transition.Child
-              as={Fragment}
-              enter="tw-transform tw-transition tw-ease-in-out tw-duration-500 sm:tw-duration-700"
-              enterFrom="tw-translate-y-full"
-              enterTo="tw-translate-y-0"
-              leave="tw-transform tw-transition tw-ease-in-out tw-duration-500 sm:tw-duration-700"
-              leaveFrom="tw-translate-y-0"
-              leaveTo="tw-translate-y-full"
-            >
-              <Dialog.Panel className="tw-flex tw-flex-col tw-bg-white tw-rounded-xl tw-h-full tw-items-center tw-justify-start tw-p-6 ">
-                <div className="tw-w-full tw-mb-4">
-                  <button
-                    className="tw-inline tw-ml-auto tw-mb-2 tw-bg-transparent tw-border-none tw-cursor-pointer tw-p-0"
-                    onClick={(e) => {
-                      setOpen(false);
-                    }}
-                  >
-                    <XMarkIcon className="tw-h-5 tw-stroke-black" />
-                  </button>
-                </div>
-                <DateRangePicker
-                  mode="single"
-                  className="tw-w-full"
-                  numberOfMonths={1}
-                  onSelect={(e: Date | undefined) => {
-                    onSelect && onSelect(e);
-                  }}
-                  components={loading ? { Day: () => <Loading className="tw-opacity-30" /> } : {}}
-                  {...props}
-                />
-                <div className="tw-flex tw-mt-auto tw-w-full tw-justify-end">
-                  <Button
-                    className="tw-h-10 tw-w-28"
-                    onClick={() => {
-                      setOpen(false);
-                    }}
-                  >
-                    Apply
-                  </Button>
-                </div>
-              </Dialog.Panel>
-            </Transition.Child>
-          </div>
-        </Dialog>
-      </Transition.Root>
     </div>
   );
 };

@@ -1,18 +1,22 @@
-import { RadioGroup } from "@headlessui/react";
+import { Dialog, Disclosure, RadioGroup, Transition } from "@headlessui/react";
 import { CheckBadgeIcon } from "@heroicons/react/20/solid";
 import {
   ArrowUpOnSquareIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  ChevronUpIcon,
   ClockIcon,
   GlobeAltIcon,
+  MinusCircleIcon,
+  PlusCircleIcon,
   StarIcon,
   UserGroupIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { BackButton, Button, LinkButton } from "src/components/button/Button";
-import { DatePickerPopper, DatePickerSlider, correctFromUTC, correctToUTC } from "src/components/calendar/DatePicker";
+import { DatePickerPopper, DateRangePicker, correctFromUTC, correctToUTC } from "src/components/calendar/DatePicker";
 import { Callout } from "src/components/callouts/Callout";
 import { GuestNumberInput } from "src/components/input/Input";
 import { Loading } from "src/components/loading/Loading";
@@ -86,10 +90,29 @@ const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) => {
 };
 
 const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) => {
+  return (
+    <div className="tw-fixed lg:tw-hidden tw-z-20 tw-bottom-0 tw-left-0 tw-flex tw-items-center tw-justify-between tw-bg-white tw-border-t tw-border-solid tw-border-gray-300 tw-h-20 tw-w-full tw-px-4">
+      <div className="tw-flex tw-flex-col">
+        <div>
+          <span className="tw-font-semibold">${listing.price}</span> per person
+        </div>
+        <div>/ {getDuration(listing)}</div>
+      </div>
+      <ReserveSlider listing={listing} />
+    </div>
+  );
+};
+
+const ReserveSlider: React.FC<{
+  listing: ListingType;
+  className?: string;
+  buttonClass?: string;
+}> = ({ listing, className, buttonClass }) => {
+  const [open, setOpen] = useState(false);
   const [month, setMonth] = useState<Date>(new Date()); // TODO: this should be the current month
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
-  const [startTime, setStartTime] = useState<Date | undefined>(undefined);
-  const [guests, setGuests] = useState<number>(1);
+  const [startTime, setStartTime] = useState<Date | null>(null);
+  const [numGuests, setNumGuests] = useState<number>(0);
   const { availability, loading } = useAvailability(listing.id, month);
   const isAuthenticated = useSelector((state) => state.login.authenticated);
   const navigate = useNavigate();
@@ -98,12 +121,6 @@ const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) => {
       window.location.href = link;
     },
   });
-
-  // TODO: where do you pick number of guests and start time on mobile??
-
-  const timeSlotMap = getTimeSlotMap(availability);
-  const timeSlots = startDate ? timeSlotMap.get(startDate.toLocaleDateString()) : undefined;
-  const correctedAvailability: Date[] = availability ? availability.map((date) => correctFromUTC(date)) : [];
 
   const tryToReserve = () => {
     if (isAuthenticated) {
@@ -126,42 +143,208 @@ const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) => {
         listing_id: listing.id,
         start_date: utcDate,
         start_time: timeOnly,
-        number_of_guests: guests,
+        number_of_guests: numGuests,
       };
 
       createCheckoutLink.mutate(payload);
     } else {
+      // TODO: login modal and reserve after login
       navigate("/login");
     }
   };
 
+  const timeSlotMap = getTimeSlotMap(availability);
+  const timeSlots = startDate ? timeSlotMap.get(startDate.toLocaleDateString()) : undefined;
+  const correctedAvailability: Date[] = availability ? availability.map((date) => correctFromUTC(date)) : [];
+
   return (
-    <div className="tw-fixed lg:tw-hidden tw-z-20 tw-bottom-0 tw-left-0 tw-flex tw-items-center tw-justify-between tw-bg-white tw-border-t tw-border-solid tw-border-gray-300 tw-h-20 tw-w-full tw-px-4">
-      <div>
-        <span className="tw-font-semibold">${listing.price}</span> per person
-        <DatePickerSlider
-          selected={startDate}
-          onSelect={setStartDate}
-          month={month}
-          onMonthChange={setMonth}
-          loading={loading}
-          disabled={(day: Date) => {
-            // TODO: this should account for the capacity and number of guests selected
-            for (const date of correctedAvailability) {
-              if (date.toDateString() === day.toDateString()) {
-                return false;
-              }
-            }
-            return true;
-          }}
-        />
-      </div>
-      <Button
-        className="tw-font-medium tw-tracking-[0.5px] tw-h-10"
-        disabled={!startDate || (listing.availability_type === AvailabilityType.Enum.datetime && !startTime)}
-      >
-        {createCheckoutLink.isLoading ? <Loading /> : "Reserve"}
+    <div className={className}>
+      <Button className="tw-font-medium tw-tracking-[0.5px] tw-h-10" onClick={() => setOpen(true)}>
+        View availability
       </Button>
+      <Transition.Root show={open} as={Fragment}>
+        <Dialog onClose={setOpen} className="tw-relative tw-z-[100]">
+          <Transition.Child
+            as={Fragment}
+            enter="tw-transform tw-transition tw-ease-in-out tw-duration-500 sm:tw-duration-700"
+            enterFrom="tw-opacity-0"
+            enterTo="tw-opacity-100"
+            leave="tw-transform tw-transition tw-ease-in-out tw-duration-500 sm:tw-duration-700"
+            leaveFrom="tw-opacity-100"
+            leaveTo="tw-opacity-0"
+          >
+            <div className="tw-fixed tw-inset-0 tw-backdrop-blur-sm tw-bg-black tw-bg-opacity-10" />
+          </Transition.Child>
+          <div className="tw-fixed tw-inset-x-0 tw-bottom-0 tw-h-[80vh]">
+            <Transition.Child
+              as={Fragment}
+              enter="tw-transform tw-transition tw-ease-in-out tw-duration-500 sm:tw-duration-700"
+              enterFrom="tw-translate-y-full"
+              enterTo="tw-translate-y-0"
+              leave="tw-transform tw-transition tw-ease-in-out tw-duration-500 sm:tw-duration-700"
+              leaveFrom="tw-translate-y-0"
+              leaveTo="tw-translate-y-full"
+            >
+              <Dialog.Panel className="tw-flex tw-flex-col tw-bg-white tw-rounded-xl tw-h-full tw-w-full tw-items-center tw-justify-start tw-p-6">
+                <div className="tw-flex tw-w-full tw-mb-4">
+                  <span className="tw-font-semibold tw-text-lg">Select options</span>
+                  <button
+                    className="tw-inline tw-ml-auto tw-mb-2 tw-bg-transparent tw-border-none tw-cursor-pointer tw-p-0"
+                    onClick={(e) => {
+                      setOpen(false);
+                    }}
+                  >
+                    <XMarkIcon className="tw-h-5 tw-stroke-black" />
+                  </button>
+                </div>
+                <div className="tw-flex tw-flex-col tw-overflow-scroll tw-w-full tw-h-full tw-pb-10 tw-gap-3">
+                  <Disclosure>
+                    {({ open, close }) => (
+                      <div className="tw-w-full tw-rounded-lg tw-px-4 tw-pt-4 tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-divide-y">
+                        <Disclosure.Button className="tw-flex tw-w-full tw-pb-4 tw-rounded-lg tw-justify-between tw-text-left tw-text-base tw-font-medium focus:tw-outline-none">
+                          <span>{startDate ? startDate.toLocaleDateString() : "Choose start date"}</span>
+                          <ChevronUpIcon
+                            className={`${open && "tw-rotate-180 tw-transform"} tw-h-5 tw-w-5 tw-text-slate-500`}
+                          />
+                        </Disclosure.Button>
+                        <Disclosure.Panel className="tw-flex tw-flex-col tw-w-full tw-items-center tw-pb-4 sm:tw-pb-0">
+                          <DateRangePicker
+                            mode="single"
+                            disabled={(day: Date) => {
+                              // TODO: this should account for the capacity and number of guests selected
+                              for (const date of correctedAvailability) {
+                                if (date.toDateString() === day.toDateString()) {
+                                  return false;
+                                }
+                              }
+                              return true;
+                            }}
+                            numberOfMonths={1}
+                            month={month}
+                            onMonthChange={setMonth}
+                            className="tw-mt-3 sm:tw-mt-0"
+                            classNames={{
+                              month: "sm:tw-border-0",
+                            }}
+                            selected={startDate}
+                            onSelect={(e) => {
+                              setStartDate(e);
+                              close();
+                            }}
+                            components={loading ? { Day: () => <Loading className="tw-opacity-30" /> } : {}}
+                          />
+                        </Disclosure.Panel>
+                      </div>
+                    )}
+                  </Disclosure>
+                  {true && (
+                    <Disclosure>
+                      {({ open, close }) => (
+                        <div className="tw-w-full tw-rounded-lg tw-px-4 tw-pt-4 tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-divide-y">
+                          <Disclosure.Button
+                            className="tw-flex tw-w-full tw-pb-4 tw-rounded-lg tw-justify-between tw-text-left tw-text-base tw-font-medium focus:tw-outline-none"
+                            disabled={timeSlots === undefined}
+                          >
+                            {timeSlots === undefined ? (
+                              <span className="tw-cursor-disabled tw-text-gray-500">Pick a date first</span>
+                            ) : (
+                              <span>{startTime ? startTime.toLocaleTimeString() : "Choose start time"}</span>
+                            )}
+                            <ChevronUpIcon
+                              className={`${open && "tw-rotate-180 tw-transform"} tw-h-5 tw-w-5 tw-text-slate-500`}
+                            />
+                          </Disclosure.Button>
+                          <Disclosure.Panel className="tw-flex tw-flex-col tw-w-full tw-items-center tw-pb-4 sm:tw-pb-0">
+                            {timeSlots != undefined && (
+                              <RadioGroup
+                                value={startTime ? startTime : null}
+                                onChange={(e) => {
+                                  setStartTime(e);
+                                  close();
+                                }}
+                                className="tw-flex tw-columns-3 tw-justify-start tw-gap-3 tw-mt-4"
+                              >
+                                {timeSlots.map((timeSlot) => (
+                                  <RadioGroup.Option
+                                    key={timeSlot.toLocaleTimeString()}
+                                    value={timeSlot}
+                                    className={({ checked }) =>
+                                      mergeClasses(
+                                        "tw-px-3 tw-py-2 tw-cursor-pointer tw-rounded-lg tw-border tw-border-solid tw-border-gray-300",
+                                        checked && "tw-bg-blue-100",
+                                      )
+                                    }
+                                  >
+                                    {timeSlot.toLocaleTimeString()}
+                                  </RadioGroup.Option>
+                                ))}
+                              </RadioGroup>
+                            )}
+                          </Disclosure.Panel>
+                        </div>
+                      )}
+                    </Disclosure>
+                  )}
+                  <Disclosure>
+                    {({ open }) => (
+                      <div className="tw-w-full tw-rounded-lg tw-px-4 tw-pt-4 tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-divide-y">
+                        <Disclosure.Button className="tw-flex tw-w-full tw-pb-4 tw-rounded-lg tw-justify-between tw-text-left tw-text-base tw-font-medium focus:tw-outline-none">
+                          <span>{numGuests ? numGuests + " travelers" : "Add travelers"}</span>
+                          <ChevronUpIcon
+                            className={`${open && "tw-rotate-180 tw-transform"} tw-h-5 tw-w-5 tw-text-slate-500`}
+                          />
+                        </Disclosure.Button>
+                        <Disclosure.Panel>
+                          <div className="tw-flex tw-justify-between tw-py-5">
+                            <span className="tw-text-base tw-whitespace-nowrap tw-select-none">Adults</span>
+                            <div className="tw-flex tw-gap-3">
+                              <button
+                                onClick={() => {
+                                  setNumGuests(Math.max(0, numGuests - 1));
+                                }}
+                              >
+                                <MinusCircleIcon
+                                  className={mergeClasses(
+                                    "tw-w-6 tw-cursor-pointer tw-stroke-gray-500 hover:tw-stroke-black",
+                                    numGuests === 0 && "!tw-stroke-gray-300 tw-cursor-not-allowed",
+                                  )}
+                                />
+                              </button>
+                              <span className="tw-flex tw-w-3 tw-justify-center tw-select-none">{numGuests}</span>
+                              <button
+                                onClick={() => {
+                                  setNumGuests(numGuests + 1);
+                                }}
+                              >
+                                <PlusCircleIcon className="tw-w-6 tw-cursor-pointer tw-stroke-gray-500 hover:tw-stroke-black" />
+                              </button>
+                            </div>
+                          </div>
+                        </Disclosure.Panel>
+                      </div>
+                    )}
+                  </Disclosure>
+                </div>
+                <div className="tw-flex tw-mt-auto tw-w-full tw-justify-end">
+                  <Button
+                    className="tw-h-10 tw-w-28"
+                    onClick={() => {
+                      tryToReserve();
+                    }}
+                    disabled={
+                      !startDate ||
+                      (listing.availability_type === AvailabilityType.Enum.datetime && !startTime) ||
+                      numGuests === 0
+                    }
+                  >
+                    {createCheckoutLink.isLoading ? <Loading light /> : "Reserve"}
+                  </Button>
+                </div>
+              </Dialog.Panel>
+            </Transition.Child>
+          </div>
+        </Dialog>
+      </Transition.Root>
     </div>
   );
 };
@@ -210,6 +393,7 @@ const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
 
       createCheckoutLink.mutate(payload);
     } else {
+      // TODO: login modal and reserve after login
       navigate("/login");
     }
   };
@@ -273,7 +457,7 @@ const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
           disabled={!startDate || (listing.availability_type === AvailabilityType.Enum.datetime && !startTime)}
           onClick={tryToReserve}
         >
-          {createCheckoutLink.isLoading ? <Loading /> : "Reserve"}
+          {createCheckoutLink.isLoading ? <Loading light /> : "Reserve"}
         </Button>
         <div className="tw-w-full tw-text-center tw-text-sm tw-mb-4 tw-pb-3 tw-border-b tw-border-solid tw-border-gray-300">
           You won't be charged yet
