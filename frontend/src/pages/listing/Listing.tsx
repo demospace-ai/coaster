@@ -188,7 +188,7 @@ const ReserveSlider: React.FC<{
         View availability
       </Button>
       <Transition.Root show={open} as={Fragment}>
-        <Dialog onClose={setOpen} className="tw-relative tw-z-[100]">
+        <Dialog onClose={setOpen} className="tw-relative tw-z-40">
           <Transition.Child
             as={Fragment}
             enter="tw-transform tw-transition tw-ease-in-out tw-duration-500 sm:tw-duration-700"
