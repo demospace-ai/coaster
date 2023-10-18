@@ -8,7 +8,7 @@ import {
   createRoutesFromElements,
   useLocation,
 } from "react-router-dom";
-import { useStart } from "src/app/actions";
+import { useCheckSession } from "src/app/actions";
 import { RequireAuth } from "src/components/auth/RequireAuth";
 import { Footer } from "src/components/footer/Footer";
 import { Header } from "src/components/header/Header";
@@ -19,7 +19,8 @@ import { Home } from "src/pages/home/Home";
 import { Listing } from "src/pages/listing/Listing";
 import { CreatePassword } from "src/pages/login/CreatePassword";
 import { Invite } from "src/pages/login/Invite";
-import { Login, Unauthorized } from "src/pages/login/Login";
+import { Login, LoginModal, Unauthorized } from "src/pages/login/Login";
+import { OAuthCallback } from "src/pages/login/OAuthCallback";
 import { ResetPassword } from "src/pages/login/ResetPassword";
 import { NotFound } from "src/pages/notfound/NotFound";
 import { Privacy } from "src/pages/privacy/Privacy";
@@ -31,7 +32,7 @@ import { useSelector } from "src/root/model";
 let needsInit = true;
 
 const AppLayout: React.FC = () => {
-  const start = useStart();
+  const start = useCheckSession();
   const loading = useSelector((state) => state.app.loading);
   const forbidden = useSelector((state) => state.app.forbidden);
   const location = useLocation();
@@ -60,6 +61,7 @@ const AppLayout: React.FC = () => {
 
   return (
     <>
+      <LoginModal />
       <ToastPortal />
       <ScrollRestoration />
       <div className="tw-flex tw-flex-col tw-flex-grow tw-items-center">
@@ -89,23 +91,26 @@ function useCatchGlobalError() {
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route element={<AppLayout />} errorElement={<ErrorBoundary showDialog />}>
-      <Route path="/unauthorized" element={<Unauthorized />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Login create />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/create-password" element={<CreatePassword />} />
-      <Route path="/reset_password" element={<ResetPassword />} /> {/** TODO: Remove in November */}
-      <Route path="/create_password" element={<CreatePassword />} /> {/** TODO: Remove in November*/}
-      <Route path="/invite" element={<RequireAuth element={<Invite />} />} />
-      <Route path="/search" element={<Search />} />
-      <Route path="/privacy" element={<Privacy />} />
-      <Route path="/about" element={<About />} />
-      <Route path="/terms" element={<Terms />} />
-      <Route path="/listings/:listingID" element={<Listing />} />
-      <Route path="/profile" element={<RequireAuth element={<Profile />} />} />
-      <Route path="/" element={<Home />} />
-      <Route path="*" element={<NotFound />} />
-    </Route>,
+    <>
+      <Route element={<AppLayout />} errorElement={<ErrorBoundary showDialog />}>
+        <Route path="/unauthorized" element={<Unauthorized />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Login create />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/create-password" element={<CreatePassword />} />
+        <Route path="/reset_password" element={<ResetPassword />} /> {/** TODO: Remove in November */}
+        <Route path="/create_password" element={<CreatePassword />} /> {/** TODO: Remove in November*/}
+        <Route path="/invite" element={<RequireAuth element={<Invite />} />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/listings/:listingID" element={<Listing />} />
+        <Route path="/profile" element={<RequireAuth element={<Profile />} />} />
+        <Route path="/" element={<Home />} />
+        <Route path="*" element={<NotFound />} />
+      </Route>
+      <Route path="/oauth_callback/" element={<OAuthCallback />} />
+    </>,
   ),
 );

@@ -5,7 +5,7 @@ import { sendRequest } from "src/rpc/ajax";
 import { CheckSession } from "src/rpc/api";
 import { consumeError, HttpError } from "src/utils/errors";
 
-export function useStart() {
+export function useCheckSession() {
   const dispatch = useDispatch();
   const onLoginSuccess = useOnLoginSuccess();
 

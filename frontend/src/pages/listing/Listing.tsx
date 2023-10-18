@@ -14,7 +14,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { BackButton, Button, LinkButton } from "src/components/button/Button";
 import { DatePickerPopper, DateRangePicker, correctFromUTC, correctToUTC } from "src/components/calendar/DatePicker";
 import { Callout } from "src/components/callouts/Callout";
@@ -23,7 +23,7 @@ import { Loading } from "src/components/loading/Loading";
 import { Modal } from "src/components/modal/Modal";
 import { useShowToast } from "src/components/notifications/Notifications";
 import { ProfilePicture } from "src/components/profile/ProfilePicture";
-import { useSelector } from "src/root/model";
+import { useDispatch, useSelector } from "src/root/model";
 import { useAvailability, useCreateCheckoutLink, useListing } from "src/rpc/data";
 import { Availability, AvailabilityType, Host, ListingStatus, Listing as ListingType } from "src/rpc/types";
 import { ToTimeOnly } from "src/utils/date";
@@ -115,7 +115,7 @@ const ReserveSlider: React.FC<{
   const [numGuests, setNumGuests] = useState<number>(0);
   const { availability, loading } = useAvailability(listing.id, month);
   const isAuthenticated = useSelector((state) => state.login.authenticated);
-  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const createCheckoutLink = useCreateCheckoutLink({
     onSuccess: (link) => {
       window.location.href = link;
@@ -158,8 +158,7 @@ const ReserveSlider: React.FC<{
 
       createCheckoutLink.mutate(payload);
     } else {
-      // TODO: login modal and reserve after login
-      navigate("/login");
+      dispatch({ type: "login.open" });
     }
   };
 
@@ -392,13 +391,14 @@ const ReserveSlider: React.FC<{
 };
 
 const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
+  const [showModal, setShowModal] = useState(true);
   const [month, setMonth] = useState<Date>(new Date()); // TODO: this should be the current month
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [startTime, setStartTime] = useState<Availability | null>(null);
   const [guests, setGuests] = useState<number>(1);
   const { availability, loading } = useAvailability(listing.id, month);
   const isAuthenticated = useSelector((state) => state.login.authenticated);
-  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const createCheckoutLink = useCreateCheckoutLink({
     onSuccess: (link) => {
       window.location.href = link;
@@ -459,8 +459,7 @@ const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
 
       createCheckoutLink.mutate(payload);
     } else {
-      // TODO: login modal and reserve after login
-      navigate("/login");
+      dispatch({ type: "login.open" });
     }
   };
 
@@ -909,7 +908,7 @@ const getDateToTimeSlotMap = (availability: Availability[] | undefined) => {
   const timeSlotMap = new Map<string, Availability[]>();
   if (availability) {
     for (const slot of availability) {
-      const dateString = slot.datetime.toLocaleDateString();
+      const dateString = correctFromUTC(slot.datetime).toLocaleDateString();
       const existing = timeSlotMap.get(dateString);
       if (existing) {
         existing.push(slot);

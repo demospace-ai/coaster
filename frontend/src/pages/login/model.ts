@@ -3,10 +3,14 @@ import { User } from "src/rpc/types";
 const INITIAL_LOGIN_STATE: LoginState = {
   authenticated: false,
   error: null,
+  modalOpen: false,
+  create: false,
 };
 
 export interface LoginState {
   authenticated: boolean;
+  modalOpen: boolean;
+  create: boolean;
   user?: User;
   email?: string;
   error: string | null;
@@ -31,6 +35,12 @@ export type LoginAction =
   | {
       type: "login.error";
       error: string | null;
+    }
+  | {
+      type: "login.open";
+    }
+  | {
+      type: "login.close";
     };
 
 export function loginReducer(state: LoginState = INITIAL_LOGIN_STATE, action: LoginAction): LoginState {
@@ -53,6 +63,16 @@ export function loginReducer(state: LoginState = INITIAL_LOGIN_STATE, action: Lo
       return {
         ...state,
         error: action.error,
+      };
+    case "login.open":
+      return {
+        ...state,
+        modalOpen: true,
+      };
+    case "login.close":
+      return {
+        ...state,
+        modalOpen: false,
       };
     default:
       return state;

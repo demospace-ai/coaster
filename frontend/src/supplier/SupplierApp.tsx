@@ -1,7 +1,7 @@
 import { ErrorBoundary } from "@highlight-run/react";
 import React, { useEffect, useState } from "react";
 import { Outlet, Route, ScrollRestoration, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
-import { useStart } from "src/app/actions";
+import { useCheckSession } from "src/app/actions";
 import { RequireAuth } from "src/components/auth/RequireAuth";
 import { Footer } from "src/components/footer/Footer";
 import { SupplierHeader } from "src/components/header/Header";
@@ -31,7 +31,7 @@ import { useSelector } from "src/root/model";
 let needsInit = true;
 
 const SupplierAppLayout: React.FC = () => {
-  const start = useStart();
+  const start = useCheckSession();
   const loading = useSelector((state) => state.app.loading);
   const forbidden = useSelector((state) => state.app.forbidden);
 

@@ -67,47 +67,49 @@ func (s ApiService) GetAvailability(w http.ResponseWriter, r *http.Request) erro
 		return errors.Wrap(err, "(api.GetAvailability) loading availability")
 	}
 
-	uniqueMap := make(map[time.Time]int64)
+	availabilityMap := make(map[time.Time]int64)
 	for _, slot := range availability {
-		uniqueMap[slot.DateTime] = slot.Capacity
+		availabilityMap[slot.DateTime] = slot.Capacity
 	}
 
-	// Any active temporary bookings the user has are considered available for that user
-	temporaryBookings, err := bookings.LoadTemporaryBookingsForUser(s.db, listing.ID, auth.User.ID)
-	if err != nil {
-		return errors.Wrap(err, "(api.GetAvailability) loading temporary bookings")
-	}
-
-	for _, booking := range temporaryBookings {
-		var bookingDateTime time.Time
-		if booking.StartTime != nil {
-			bookingDateTime = timeutils.CombineDateAndTime(booking.StartDate.ToTime(), (*booking.StartTime).ToTime())
-		} else {
-			bookingDateTime = booking.StartDate.ToTime()
+	if auth.User != nil {
+		// Any active temporary bookings the user has are considered available for that user
+		temporaryBookings, err := bookings.LoadTemporaryBookingsForUser(s.db, listing.ID, auth.User.ID)
+		if err != nil {
+			return errors.Wrap(err, "(api.GetAvailability) loading temporary bookings")
 		}
 
-		// Add the capacity of the temporary booking this user has to the existing capacity
-		capacity, ok := uniqueMap[bookingDateTime]
-		if ok {
-			uniqueMap[bookingDateTime] = capacity + booking.Guests
-		} else {
-			uniqueMap[bookingDateTime] = booking.Guests
+		for _, booking := range temporaryBookings {
+			var bookingDateTime time.Time
+			if booking.StartTime != nil {
+				bookingDateTime = timeutils.CombineDateAndTime(booking.StartDate.ToTime(), (*booking.StartTime).ToTime())
+			} else {
+				bookingDateTime = booking.StartDate.ToTime()
+			}
+
+			// Add the capacity of the temporary booking this user has to the existing capacity
+			capacity, ok := availabilityMap[bookingDateTime]
+			if ok {
+				availabilityMap[bookingDateTime] = capacity + booking.Guests
+			} else {
+				availabilityMap[bookingDateTime] = booking.Guests
+			}
 		}
 	}
 
-	uniqueAvailability := make([]availability_lib.Availability, len(uniqueMap))
+	availabilityList := make([]availability_lib.Availability, len(availabilityMap))
 	i := 0
-	for datetime, capacity := range uniqueMap {
-		uniqueAvailability[i] = availability_lib.Availability{
+	for datetime, capacity := range availabilityMap {
+		availabilityList[i] = availability_lib.Availability{
 			DateTime: datetime,
 			Capacity: capacity,
 		}
 		i++
 	}
 
-	sort.Slice(uniqueAvailability, func(i, j int) bool {
-		return uniqueAvailability[i].DateTime.Before(uniqueAvailability[j].DateTime)
+	sort.Slice(availabilityList, func(i, j int) bool {
+		return availabilityList[i].DateTime.Before(availabilityList[j].DateTime)
 	})
 
-	return json.NewEncoder(w).Encode(uniqueAvailability)
+	return json.NewEncoder(w).Encode(availabilityList)
 }
