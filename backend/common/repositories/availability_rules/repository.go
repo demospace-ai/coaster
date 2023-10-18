@@ -234,21 +234,21 @@ func LoadTimeSlotsForRule(db *gorm.DB, availabilityRuleID int64) ([]models.TimeS
 	return timeSlots, nil
 }
 
-func LoadAvailabilityInRange(db *gorm.DB, listing models.Listing, startDate time.Time, endDate time.Time) ([]time.Time, error) {
+func LoadAvailabilityInRange(db *gorm.DB, listing models.Listing, startDate time.Time, endDate time.Time) ([]availability.Availability, error) {
 	// Loop through each availability rule and compute the availability for this month then merge
 	rules, err := LoadForListing(db, listing.ID)
 	if err != nil {
 		return nil, errors.Wrap(err, "(availability_rules.LoadAvailableDaysInRange)")
 	}
 
-	var availableDays []time.Time
+	var availability []availability.Availability
 	for _, rule := range rules {
-		availableDaysForRule, err := rule.GetAvailabilityInRange(db, startDate, endDate, listing)
+		availabilityForRule, err := rule.GetAvailabilityInRange(db, startDate, endDate, listing)
 		if err != nil {
 			return nil, errors.Wrap(err, "(availability_rules.LoadAvailableDaysInRange)")
 		}
-		availableDays = append(availableDays, availableDaysForRule...)
+		availability = append(availability, availabilityForRule...)
 	}
 
-	return availableDays, nil
+	return availability, nil
 }

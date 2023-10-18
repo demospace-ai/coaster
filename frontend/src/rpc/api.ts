@@ -1,4 +1,5 @@
 import {
+  Availability,
   AvailabilityRule,
   AvailabilityRuleInput,
   AvailabilityRuleUpdates,
@@ -56,7 +57,7 @@ export const GetListing: IEndpoint<undefined, Listing, { listingID: number }> = 
 
 export const GetAvailability: IEndpoint<
   undefined,
-  Date[],
+  Availability[],
   { listingID: number },
   { start_date: string; end_date: string }
 > = {

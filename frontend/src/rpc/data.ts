@@ -22,6 +22,7 @@ import {
   UpdateUser,
 } from "src/rpc/api";
 import {
+  Availability,
   AvailabilityRule,
   AvailabilityRuleInput,
   AvailabilityRuleUpdates,
@@ -52,7 +53,7 @@ export function useAvailability(listingID: number, month: Date) {
   const startDate = new Date(month.getFullYear(), month.getMonth(), 1).toISOString().split("T")[0];
   const endDate = new Date(month.getFullYear(), month.getMonth() + 1, 0).toISOString().split("T")[0];
 
-  const fetcher: Fetcher<Date[], { listingID: number; startDate: string; endDate: string }> = ({
+  const fetcher: Fetcher<Availability[], { listingID: number; startDate: string; endDate: string }> = ({
     listingID,
     startDate,
     endDate,

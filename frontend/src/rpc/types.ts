@@ -132,6 +132,11 @@ export interface CreateCheckoutLinkRequest {
   number_of_guests: number;
 }
 
+export interface Availability {
+  datetime: Date;
+  capacity: number;
+}
+
 export interface AvailabilityRuleInput {
   name: string;
   type: AvailabilityRuleTypeType;

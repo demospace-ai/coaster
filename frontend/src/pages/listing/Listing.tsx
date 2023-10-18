@@ -25,7 +25,7 @@ import { useShowToast } from "src/components/notifications/Notifications";
 import { ProfilePicture } from "src/components/profile/ProfilePicture";
 import { useSelector } from "src/root/model";
 import { useAvailability, useCreateCheckoutLink, useListing } from "src/rpc/data";
-import { AvailabilityType, Host, ListingStatus, Listing as ListingType } from "src/rpc/types";
+import { Availability, AvailabilityType, Host, ListingStatus, Listing as ListingType } from "src/rpc/types";
 import { ToTimeOnly } from "src/utils/date";
 import { getGcsImageUrl } from "src/utils/images";
 import { toTitleCase } from "src/utils/string";
@@ -111,7 +111,7 @@ const ReserveSlider: React.FC<{
   const [open, setOpen] = useState(false);
   const [month, setMonth] = useState<Date>(new Date()); // TODO: this should be the current month
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
-  const [startTime, setStartTime] = useState<Date | null>(null);
+  const [startTime, setStartTime] = useState<Availability | null>(null);
   const [numGuests, setNumGuests] = useState<number>(0);
   const { availability, loading } = useAvailability(listing.id, month);
   const isAuthenticated = useSelector((state) => state.login.authenticated);
@@ -136,7 +136,17 @@ const ReserveSlider: React.FC<{
           // TODO: show error
           return;
         }
-        timeOnly = ToTimeOnly(startTime);
+        timeOnly = ToTimeOnly(startTime.datetime);
+      }
+
+      if (!bookingSlot) {
+        // TODO: this should not happen
+        return;
+      }
+
+      if (numGuests > bookingSlot.capacity) {
+        // TODO: show error
+        return;
       }
 
       const payload = {
@@ -153,9 +163,25 @@ const ReserveSlider: React.FC<{
     }
   };
 
-  const timeSlotMap = getTimeSlotMap(availability);
-  const timeSlots = startDate ? timeSlotMap.get(startDate.toLocaleDateString()) : undefined;
-  const correctedAvailability: Date[] = availability ? availability.map((date) => correctFromUTC(date)) : [];
+  const dateToTimeSlotMap = getDateToTimeSlotMap(availability);
+  const timeSlots = startDate ? dateToTimeSlotMap.get(startDate.toLocaleDateString()) : undefined;
+  const correctedAvailability: Date[] = availability ? availability.map((slot) => correctFromUTC(slot.datetime)) : [];
+
+  var bookingSlot: Availability | null = null;
+  if (listing.availability_type === AvailabilityType.Enum.datetime) {
+    bookingSlot = startTime;
+  } else if (startDate !== undefined) {
+    const slots = dateToTimeSlotMap.get(startDate.toLocaleDateString());
+
+    if (slots === undefined || slots.length === 0) {
+      // TODO: this should not happen
+    } else {
+      // Date-only listings should only have a single time slot per day
+      bookingSlot = slots[0];
+    }
+  }
+
+  const maxGuests = bookingSlot ? bookingSlot.capacity : listing.max_guests ? listing.max_guests : 99;
 
   return (
     <div className={className}>
@@ -237,7 +263,7 @@ const ReserveSlider: React.FC<{
                       </div>
                     )}
                   </Disclosure>
-                  {true && (
+                  {listing.availability_type === AvailabilityType.Enum.datetime && (
                     <Disclosure>
                       {({ open, close }) => (
                         <div className="tw-w-full tw-rounded-lg tw-px-4 tw-pt-4 tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-divide-y">
@@ -248,7 +274,7 @@ const ReserveSlider: React.FC<{
                             {timeSlots === undefined ? (
                               <span className="tw-cursor-disabled tw-text-gray-500">Pick a date first</span>
                             ) : (
-                              <span>{startTime ? startTime.toLocaleTimeString() : "Choose start time"}</span>
+                              <span>{startTime ? startTime.datetime.toLocaleTimeString() : "Choose start time"}</span>
                             )}
                             <ChevronUpIcon
                               className={`${open && "tw-rotate-180 tw-transform"} tw-h-5 tw-w-5 tw-text-slate-500`}
@@ -266,7 +292,7 @@ const ReserveSlider: React.FC<{
                               >
                                 {timeSlots.map((timeSlot) => (
                                   <RadioGroup.Option
-                                    key={timeSlot.toLocaleTimeString()}
+                                    key={timeSlot.datetime.toLocaleTimeString()}
                                     value={timeSlot}
                                     className={({ checked }) =>
                                       mergeClasses(
@@ -275,7 +301,7 @@ const ReserveSlider: React.FC<{
                                       )
                                     }
                                   >
-                                    {timeSlot.toLocaleTimeString()}
+                                    {timeSlot.datetime.toLocaleTimeString()}
                                   </RadioGroup.Option>
                                 ))}
                               </RadioGroup>
@@ -288,8 +314,19 @@ const ReserveSlider: React.FC<{
                   <Disclosure>
                     {({ open }) => (
                       <div className="tw-w-full tw-rounded-lg tw-px-4 tw-pt-4 tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-divide-y">
-                        <Disclosure.Button className="tw-flex tw-w-full tw-pb-4 tw-rounded-lg tw-justify-between tw-text-left tw-text-base tw-font-medium focus:tw-outline-none">
-                          <span>{numGuests ? numGuests + " travelers" : "Add travelers"}</span>
+                        <Disclosure.Button
+                          className="tw-flex tw-w-full tw-pb-4 tw-rounded-lg tw-justify-between tw-text-left tw-text-base tw-font-medium focus:tw-outline-none"
+                          disabled={bookingSlot === null}
+                        >
+                          {bookingSlot === null ? (
+                            listing.availability_type === AvailabilityType.Enum.datetime ? (
+                              <span className="tw-cursor-disabled tw-text-gray-500">Pick a time first</span>
+                            ) : (
+                              <span className="tw-cursor-disabled tw-text-gray-500">Pick a date first</span>
+                            )
+                          ) : (
+                            <span>{numGuests ? numGuests + " travelers" : "Add travelers"}</span>
+                          )}
                           <ChevronUpIcon
                             className={`${open && "tw-rotate-180 tw-transform"} tw-h-5 tw-w-5 tw-text-slate-500`}
                           />
@@ -305,7 +342,7 @@ const ReserveSlider: React.FC<{
                               >
                                 <MinusCircleIcon
                                   className={mergeClasses(
-                                    "tw-w-6 tw-cursor-pointer tw-stroke-gray-500 hover:tw-stroke-black",
+                                    "tw-w-6 tw-cursor-pointer tw-stroke-gray-700 hover:tw-stroke-black",
                                     numGuests === 0 && "!tw-stroke-gray-300 tw-cursor-not-allowed",
                                   )}
                                 />
@@ -313,10 +350,15 @@ const ReserveSlider: React.FC<{
                               <span className="tw-flex tw-w-3 tw-justify-center tw-select-none">{numGuests}</span>
                               <button
                                 onClick={() => {
-                                  setNumGuests(numGuests + 1);
+                                  setNumGuests(Math.min(maxGuests, numGuests + 1));
                                 }}
                               >
-                                <PlusCircleIcon className="tw-w-6 tw-cursor-pointer tw-stroke-gray-500 hover:tw-stroke-black" />
+                                <PlusCircleIcon
+                                  className={mergeClasses(
+                                    "tw-w-6 tw-cursor-pointer tw-stroke-gray-700 hover:tw-stroke-black",
+                                    numGuests === maxGuests && "!tw-stroke-gray-300 tw-cursor-not-allowed",
+                                  )}
+                                />
                               </button>
                             </div>
                           </div>
@@ -352,7 +394,7 @@ const ReserveSlider: React.FC<{
 const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
   const [month, setMonth] = useState<Date>(new Date()); // TODO: this should be the current month
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
-  const [startTime, setStartTime] = useState<Date | undefined>(undefined);
+  const [startTime, setStartTime] = useState<Availability | null>(null);
   const [guests, setGuests] = useState<number>(1);
   const { availability, loading } = useAvailability(listing.id, month);
   const isAuthenticated = useSelector((state) => state.login.authenticated);
@@ -363,9 +405,23 @@ const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
     },
   });
 
-  const timeSlotMap = getTimeSlotMap(availability);
-  const timeSlots = startDate ? timeSlotMap.get(startDate.toLocaleDateString()) : undefined;
-  const correctedAvailability: Date[] = availability ? availability.map((date) => correctFromUTC(date)) : [];
+  const dateToTimeSlotMap = getDateToTimeSlotMap(availability);
+  const timeSlots = startDate ? dateToTimeSlotMap.get(startDate.toLocaleDateString()) : undefined;
+  const correctedAvailability: Date[] = availability ? availability.map((slot) => correctFromUTC(slot.datetime)) : [];
+
+  var bookingSlot: Availability | null = null;
+  if (listing.availability_type === AvailabilityType.Enum.datetime) {
+    bookingSlot = startTime;
+  } else if (startDate !== undefined) {
+    const slots = dateToTimeSlotMap.get(startDate.toLocaleDateString());
+
+    if (slots === undefined || slots.length === 0) {
+      // TODO: this should not happen
+    } else {
+      // Date-only listings should only have a single time slot per day
+      bookingSlot = slots[0];
+    }
+  }
 
   const tryToReserve = () => {
     if (isAuthenticated) {
@@ -381,7 +437,17 @@ const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
           // TODO: show error
           return;
         }
-        timeOnly = ToTimeOnly(startTime);
+        timeOnly = ToTimeOnly(startTime.datetime);
+      }
+
+      if (!bookingSlot) {
+        // TODO: this should not happen
+        return;
+      }
+
+      if (guests > bookingSlot.capacity) {
+        // TODO: show error
+        return;
       }
 
       const payload = {
@@ -426,7 +492,7 @@ const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
           <GuestNumberInput
             value={guests}
             setValue={setGuests}
-            maxGuests={listing.max_guests}
+            maxGuests={bookingSlot ? bookingSlot.capacity : listing.max_guests}
             className="tw-w-1/4 tw-min-w-[80px]"
           />
         </div>
@@ -438,7 +504,7 @@ const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
           >
             {timeSlots.map((timeSlot) => (
               <RadioGroup.Option
-                key={timeSlot.toLocaleTimeString()}
+                key={timeSlot.datetime.toLocaleTimeString()}
                 value={timeSlot}
                 className={({ checked }) =>
                   mergeClasses(
@@ -447,7 +513,7 @@ const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
                   )
                 }
               >
-                {timeSlot.toLocaleTimeString()}
+                {timeSlot.datetime.toLocaleTimeString()}
               </RadioGroup.Option>
             ))}
           </RadioGroup>
@@ -839,16 +905,16 @@ const getHostName = (host: Host) => {
   }
 };
 
-const getTimeSlotMap = (availability: Date[] | undefined) => {
-  const timeSlotMap = new Map<string, Date[]>();
+const getDateToTimeSlotMap = (availability: Availability[] | undefined) => {
+  const timeSlotMap = new Map<string, Availability[]>();
   if (availability) {
-    for (const date of availability) {
-      const dateString = date.toLocaleDateString();
+    for (const slot of availability) {
+      const dateString = slot.datetime.toLocaleDateString();
       const existing = timeSlotMap.get(dateString);
       if (existing) {
-        existing.push(date);
+        existing.push(slot);
       } else {
-        timeSlotMap.set(dateString, [date]);
+        timeSlotMap.set(dateString, [slot]);
       }
     }
   }

@@ -8,16 +8,13 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	availability_lib "go.fabra.io/server/common/availability"
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/repositories/availability_rules"
 	"go.fabra.io/server/common/repositories/bookings"
 	"go.fabra.io/server/common/repositories/listings"
 	"go.fabra.io/server/common/timeutils"
 )
-
-type GetAvailabilityResponse struct {
-	AvailableDays []time.Time `json:"available_days"`
-}
 
 func (s ApiService) GetAvailability(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
@@ -70,6 +67,11 @@ func (s ApiService) GetAvailability(w http.ResponseWriter, r *http.Request) erro
 		return errors.Wrap(err, "(api.GetAvailability) loading availability")
 	}
 
+	uniqueMap := make(map[time.Time]int64)
+	for _, slot := range availability {
+		uniqueMap[slot.DateTime] = slot.Capacity
+	}
+
 	// Any active temporary bookings the user has are considered available for that user
 	temporaryBookings, err := bookings.LoadTemporaryBookingsForUser(s.db, listing.ID, auth.User.ID)
 	if err != nil {
@@ -77,27 +79,34 @@ func (s ApiService) GetAvailability(w http.ResponseWriter, r *http.Request) erro
 	}
 
 	for _, booking := range temporaryBookings {
+		var bookingDateTime time.Time
 		if booking.StartTime != nil {
-			availability = append(availability, timeutils.CombineDateAndTime(booking.StartDate.ToTime(), (*booking.StartTime).ToTime()))
+			bookingDateTime = timeutils.CombineDateAndTime(booking.StartDate.ToTime(), (*booking.StartTime).ToTime())
 		} else {
-			availability = append(availability, booking.StartDate.ToTime())
+			bookingDateTime = booking.StartDate.ToTime()
+		}
+
+		// Add the capacity of the temporary booking this user has to the existing capacity
+		capacity, ok := uniqueMap[bookingDateTime]
+		if ok {
+			uniqueMap[bookingDateTime] = capacity + booking.Guests
+		} else {
+			uniqueMap[bookingDateTime] = booking.Guests
 		}
 	}
 
-	uniqueMap := make(map[time.Time]bool)
-	for _, slot := range availability {
-		uniqueMap[slot] = true
-	}
-
-	uniqueAvailability := make([]time.Time, len(uniqueMap))
+	uniqueAvailability := make([]availability_lib.Availability, len(uniqueMap))
 	i := 0
-	for slot := range uniqueMap {
-		uniqueAvailability[i] = slot
+	for datetime, capacity := range uniqueMap {
+		uniqueAvailability[i] = availability_lib.Availability{
+			DateTime: datetime,
+			Capacity: capacity,
+		}
 		i++
 	}
 
 	sort.Slice(uniqueAvailability, func(i, j int) bool {
-		return uniqueAvailability[i].Before(uniqueAvailability[j])
+		return uniqueAvailability[i].DateTime.Before(uniqueAvailability[j].DateTime)
 	})
 
 	return json.NewEncoder(w).Encode(uniqueAvailability)
