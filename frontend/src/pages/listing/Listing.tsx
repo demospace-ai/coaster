@@ -746,24 +746,24 @@ const ImagesModal: React.FC<{ listing: ListingType; imageIndex: number; setImage
 
   return (
     <div>
-      <div className="tw-absolute tw-w-full tw-h-screen tw-z-10 tw-flex tw-items-center">
+      <div className="tw-absolute tw-w-full tw-h-screen tw-z-10 tw-flex tw-items-center tw-pointer-events-none">
         <button
-          className="tw-fixed tw-right-0 sm:tw-right-[5vw] sm:tw-p-10 tw-rounded-full hover:tw-bg-black hover:tw-bg-opacity-20 tw-transition-colors"
+          className="tw-fixed tw-right-1 sm:tw-right-[5vw] sm:tw-p-10 tw-rounded-full hover:tw-bg-black hover:tw-bg-opacity-20 tw-transition-colors tw-pointer-events-auto"
           onClick={(e) => {
             e.stopPropagation();
             scrollForward();
           }}
         >
-          <ChevronRightIcon className="tw-h-10 tw-cursor-pointer tw-stroke-slate-300" />
+          <ChevronRightIcon className="tw-h-8 sm:tw-h-10 tw-cursor-pointer tw-stroke-slate-300" />
         </button>
         <button
-          className="tw-fixed tw-left-0 sm:tw-left-[5vw] sm:tw-p-10 tw-rounded-full hover:tw-bg-black hover:tw-bg-opacity-20 tw-transition-colors"
+          className="tw-fixed tw-left-1 sm:tw-left-[5vw] sm:tw-p-10 tw-rounded-full hover:tw-bg-black hover:tw-bg-opacity-20 tw-transition-colors tw-pointer-events-auto"
           onClick={(e) => {
             e.stopPropagation();
             scrollBack();
           }}
         >
-          <ChevronLeftIcon className="tw-h-10 tw-cursor-pointer tw-stroke-slate-300" />
+          <ChevronLeftIcon className="tw-h-8 sm:tw-h-10 tw-cursor-pointer tw-stroke-slate-300" />
         </button>
       </div>
       <div
