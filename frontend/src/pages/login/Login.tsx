@@ -60,9 +60,7 @@ export const Login: React.FC<{ create?: boolean }> = ({ create }) => {
   let loginContent;
   switch (step) {
     case LoginStep.Start:
-      loginContent = (
-        <StartContent create={create} setStep={setStep} email={email} setEmail={setEmail} destination={destination} />
-      );
+      loginContent = <StartContent create={create} setStep={setStep} email={email} setEmail={setEmail} />;
       break;
     case LoginStep.EmailCreate:
       loginContent = <EmailSignup email={email} reset={reset} />;
@@ -71,7 +69,7 @@ export const Login: React.FC<{ create?: boolean }> = ({ create }) => {
       loginContent = <EmailLoginForm email={email} reset={reset} />;
       break;
     case LoginStep.GoogleLogin:
-      loginContent = <GoogleLogin email={email} reset={reset} destination={destination} />;
+      loginContent = <GoogleLogin email={email} reset={reset} />;
       break;
     case LoginStep.SendReset:
       loginContent = <SendResetForm reset={reset} destination={destination} />;
@@ -121,14 +119,7 @@ export const LoginModal: React.FC<{ create?: boolean }> = ({ create }) => {
   switch (step) {
     case LoginStep.Start:
       loginContent = (
-        <StartContent
-          create={create}
-          setStep={setStep}
-          email={email}
-          setEmail={setEmail}
-          destination={destination}
-          closeModal={closeModal}
-        />
+        <StartContent create={create} setStep={setStep} email={email} setEmail={setEmail} closeModal={closeModal} />
       );
       break;
     case LoginStep.EmailCreate:
@@ -138,7 +129,7 @@ export const LoginModal: React.FC<{ create?: boolean }> = ({ create }) => {
       loginContent = <EmailLoginForm email={email} reset={reset} closeModal={closeModal} />;
       break;
     case LoginStep.GoogleLogin:
-      loginContent = <GoogleLogin email={email} reset={reset} destination={destination} closeModal={closeModal} />;
+      loginContent = <GoogleLogin email={email} reset={reset} closeModal={closeModal} />;
       break;
     case LoginStep.SendReset:
       loginContent = <SendResetForm reset={reset} destination={destination} />;
@@ -210,9 +201,8 @@ const StartContent: React.FC<{
   setStep: (step: LoginStep) => void;
   email?: string;
   setEmail: (email: string) => void;
-  destination: string;
   closeModal?: () => void;
-}> = ({ create, setStep, email, setEmail, destination, closeModal }) => {
+}> = ({ create, setStep, email, setEmail, closeModal }) => {
   const loginError = useSelector((state) => state.login.error);
   const checkSession = useCheckSession();
   const [loading, setLoading] = useState<boolean>(false);
@@ -227,11 +217,13 @@ const StartContent: React.FC<{
           break;
       }
     };
+    const y = window.outerHeight / 2 + window.screenY - 300;
+    const x = window.outerWidth / 2 + window.screenX - 240;
     window.addEventListener("message", handleMessage, false);
     window.open(
-      getEndpointUrl(OAuthRedirect, { provider: OAuthProvider.Google, destination }),
+      getEndpointUrl(OAuthRedirect, { provider: OAuthProvider.Google }),
       "google-oauth",
-      "height=600,width=480",
+      `height=600,width=480 top=${y} left=${x}`,
     );
   };
 
@@ -542,10 +534,9 @@ const EmailSignup: React.FC<{ reset: () => void; email?: string; closeModal?: ()
   );
 };
 
-const GoogleLogin: React.FC<{ reset: () => void; email?: string; destination: string; closeModal?: () => void }> = ({
+const GoogleLogin: React.FC<{ reset: () => void; email?: string; closeModal?: () => void }> = ({
   email,
   reset,
-  destination,
   closeModal,
 }) => {
   const checkSession = useCheckSession();
@@ -561,11 +552,13 @@ const GoogleLogin: React.FC<{ reset: () => void; email?: string; destination: st
           break;
       }
     };
+    const y = window.outerHeight / 2 + window.screenY - 300;
+    const x = window.outerWidth / 2 + window.screenX - 240;
     window.addEventListener("message", handleMessage, false);
     window.open(
-      getEndpointUrl(OAuthRedirect, { provider: OAuthProvider.Google, destination }),
+      getEndpointUrl(OAuthRedirect, { provider: OAuthProvider.Google }),
       "google-oauth",
-      "height=600,width=480",
+      `height=600,width=480 top=${y} left=${x}`,
     );
   };
 

@@ -194,7 +194,7 @@ export const OAuthRedirect: IEndpoint<
   undefined,
   undefined,
   undefined,
-  { provider: OAuthProvider; destination: string }
+  { provider: OAuthProvider; destination?: string }
 > = {
   name: "OAuth Redirect",
   method: "GET",

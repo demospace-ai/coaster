@@ -23,7 +23,7 @@ func (s ApiService) OAuthLogin(w http.ResponseWriter, r *http.Request) error {
 	state := r.URL.Query().Get("state")
 	code := r.URL.Query().Get("code")
 
-	provider, destination, err := oauth.ValidateState(state)
+	provider, _, err := oauth.ValidateState(state)
 	if err != nil {
 		return errors.Wrap(err, "(api.OAuthLogin)")
 	}
@@ -59,12 +59,12 @@ func (s ApiService) OAuthLogin(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	auth.AddSessionCookie(w, *sessionToken)
-	http.Redirect(w, r, getOauthSuccessRedirect(*destination), http.StatusFound)
+	http.Redirect(w, r, getOauthSuccessRedirect(), http.StatusFound)
 
 	return nil
 }
 
-func getOauthSuccessRedirect(destination string) string {
+func getOauthSuccessRedirect() string {
 	if application.IsProd() {
 		return "https://www.trycoaster.com/oauth_callback"
 	} else {
