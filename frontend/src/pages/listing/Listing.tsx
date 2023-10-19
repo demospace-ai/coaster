@@ -158,7 +158,7 @@ const ReserveSlider: React.FC<{
 
       createCheckoutLink.mutate(payload);
     } else {
-      dispatch({ type: "login.open" });
+      dispatch({ type: "login.openLogin" });
     }
   };
 
@@ -459,7 +459,7 @@ const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
 
       createCheckoutLink.mutate(payload);
     } else {
-      dispatch({ type: "login.open" });
+      dispatch({ type: "login.openLogin" });
     }
   };
 

@@ -3,12 +3,12 @@ import { Dialog, Menu, Transition } from "@headlessui/react";
 import { ArrowRightOnRectangleIcon, Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import React, { Fragment, useEffect, useState } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { Loading } from "src/components/loading/Loading";
 import { ProfilePicture } from "src/components/profile/ProfilePicture";
 import { SearchBarHeader } from "src/components/search/SearchBar";
 import { useLogout } from "src/pages/login/actions";
-import { useSelector } from "src/root/model";
+import { useDispatch, useSelector } from "src/root/model";
 import { isProd } from "src/utils/env";
 import { mergeClasses } from "src/utils/twmerge";
 
@@ -196,7 +196,7 @@ const SignedInMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
 
 const SignedOutMenu: React.FC = () => {
   const location = useLocation();
-  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const currentPath = encodeURIComponent(location.pathname.substring(1) + location.search);
   const buttonStyle =
     "tw-flex tw-justify-center tw-py-2 tw-w-28 tw-cursor-pointer tw-select-none tw-whitespace-nowrap tw-rounded-3xl sm:tw-font-semibold tw-text-base tw-bg-gray-100 hover:tw-bg-gray-200";
@@ -204,11 +204,11 @@ const SignedOutMenu: React.FC = () => {
     <div className="tw-flex tw-gap-3">
       <div
         className={mergeClasses(buttonStyle, "tw-text-white tw-bg-gray-900 hover:tw-bg-gray-800")}
-        onClick={() => navigate(`/signup?destination=${currentPath}`)}
+        onClick={() => dispatch({ type: "login.openSignup" })}
       >
         Sign up
       </div>
-      <div className={buttonStyle} onClick={() => navigate(`/login?destination=${currentPath}`)}>
+      <div className={buttonStyle} onClick={() => dispatch({ type: "login.openLogin" })}>
         Log in
       </div>
     </div>
@@ -216,7 +216,7 @@ const SignedOutMenu: React.FC = () => {
 };
 
 const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
-  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const isAuthenticated = useSelector((state) => state.login.authenticated);
   const user = useSelector((state) => state.login.user);
   const logout = useLogout();
@@ -296,7 +296,7 @@ const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
                             <div
                               className={mergeClasses(buttonStyle, "tw-text-white tw-bg-gray-900 hover:tw-bg-gray-800")}
                               onClick={() => {
-                                navigate("/signup");
+                                dispatch({ type: "login.openSignup" });
                                 setOpen(false);
                               }}
                             >
@@ -305,7 +305,7 @@ const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
                             <div
                               className={buttonStyle}
                               onClick={() => {
-                                navigate("/login");
+                                dispatch({ type: "login.openLogin" });
                                 setOpen(false);
                               }}
                             >

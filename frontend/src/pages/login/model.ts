@@ -37,7 +37,10 @@ export type LoginAction =
       error: string | null;
     }
   | {
-      type: "login.open";
+      type: "login.openLogin";
+    }
+  | {
+      type: "login.openSignup";
     }
   | {
       type: "login.close";
@@ -64,10 +67,17 @@ export function loginReducer(state: LoginState = INITIAL_LOGIN_STATE, action: Lo
         ...state,
         error: action.error,
       };
-    case "login.open":
+    case "login.openLogin":
       return {
         ...state,
         modalOpen: true,
+        create: false,
+      };
+    case "login.openSignup":
+      return {
+        ...state,
+        modalOpen: true,
+        create: true,
       };
     case "login.close":
       return {

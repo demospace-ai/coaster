@@ -99,8 +99,9 @@ export const Login: React.FC<{ create?: boolean }> = ({ create }) => {
   );
 };
 
-export const LoginModal: React.FC<{ create?: boolean }> = ({ create }) => {
+export const LoginModal: React.FC = () => {
   const modalOpen = useSelector((state) => state.login.modalOpen);
+  const create = useSelector((state) => state.login.create);
   const dispatch = useDispatch();
   const closeModal = () => dispatch({ type: "login.close" });
   const [step, setStep] = useState<LoginStep>(LoginStep.Start);
@@ -154,25 +155,25 @@ export const LoginModal: React.FC<{ create?: boolean }> = ({ create }) => {
         )}
         onClose={() => closeModal()}
       >
-        <Transition.Child
-          as={Fragment}
-          enter="tw-ease-in tw-duration-100"
-          enterFrom="tw-scale-95"
-          enterTo="tw-scale-100"
-          leave="tw-ease-in tw-duration-200"
-          leaveFrom="tw-scale-100"
-          leaveTo="tw-scale-95"
-        >
-          <div className="tw-flex tw-h-full tw-w-full tw-items-center tw-justify-center">
-            <button
-              className="tw-flex tw-absolute tw-z-20 tw-top-4 sm:tw-top-8 tw-right-4 sm:tw-right-8 tw-bg-transparent tw-border-none tw-cursor-pointer tw-p-0 tw-justify-center tw-items-center"
-              onClick={(e) => {
-                e.preventDefault();
-                closeModal();
-              }}
-            >
-              <XMarkIcon className="tw-h-6 tw-stroke-black" />
-            </button>
+        <div className="tw-flex tw-h-full tw-w-full tw-items-center tw-justify-center">
+          <button
+            className="tw-flex tw-absolute tw-z-20 tw-top-4 sm:tw-top-8 tw-right-4 sm:tw-right-8 tw-bg-transparent tw-border-none tw-cursor-pointer tw-p-0 tw-justify-center tw-items-center"
+            onClick={(e) => {
+              e.preventDefault();
+              closeModal();
+            }}
+          >
+            <XMarkIcon className="tw-h-6 tw-stroke-black" />
+          </button>
+          <Transition.Child
+            as={Fragment}
+            enter="tw-ease-in tw-duration-100"
+            enterFrom="tw-scale-95"
+            enterTo="tw-scale-100"
+            leave="tw-ease-in tw-duration-200"
+            leaveFrom="tw-scale-100"
+            leaveTo="tw-scale-95"
+          >
             <Dialog.Panel className="tw-flex tw-flex-col tw-h-full sm:tw-h-auto tw-max-w-[400px] tw-pt-28 sm:tw-pt-12 tw-pb-10 tw-px-8 sm:tw-rounded-lg sm:tw-shadow-md tw-bg-white tw-items-center sm:-tw-mt-20">
               <img src={longlogo} className="tw-h-8 tw-select-none tw-mb-4" alt="coaster logo" />
               <div className="tw-flex tw-flex-col tw-items-center tw-my-2 tw-w-full">{loginContent}</div>
@@ -188,8 +189,8 @@ export const LoginModal: React.FC<{ create?: boolean }> = ({ create }) => {
                 .
               </div>
             </Dialog.Panel>
-          </div>
-        </Transition.Child>
+          </Transition.Child>
+        </div>
       </Dialog>
     </Transition>,
     document.body,
