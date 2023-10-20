@@ -172,7 +172,7 @@ const SEND_INVITE_TEMPLATE_STRING = `
 var SEND_INVITE_PLAIN_TEMPLATE = template.Must(template.New("send_invite_plain").Parse(SEND_INVITE_PLAIN_TEMPLATE_STRING))
 
 const SEND_INVITE_PLAIN_TEMPLATE_STRING = `
-	Hi {{.FirstName}},
+	Hi there!
 
 	{{.SenderName}} is inviting you to join Coaster, the best way to plan adventure travel. You can create an account here: {{.Domain}}/signup?email={{.Email}}&destination=profile
 	
