@@ -47,6 +47,7 @@ export const SearchListings: IEndpoint<
   name: "Search listings",
   method: "GET",
   path: "/listings",
+  track: true,
 };
 
 export const GetListing: IEndpoint<undefined, Listing, { listingID: number }> = {
@@ -76,24 +77,28 @@ export const CreateListing: IEndpoint<ListingInput, Listing> = {
   name: "Create new listing",
   method: "POST",
   path: "/listings",
+  track: true,
 };
 
 export const UpdateListing: IEndpoint<ListingInput, Listing, { listingID: number }> = {
   name: "Update listing",
   method: "POST",
   path: "/listings/:listingID",
+  track: true,
 };
 
 export const DeleteListing: IEndpoint<undefined, undefined, { listingID: number }> = {
   name: "Delete listing",
   method: "DELETE",
   path: "/listings/:listingID",
+  track: true,
 };
 
 export const CreateAvailabilityRule: IEndpoint<AvailabilityRuleInput, AvailabilityRule, { listingID: number }> = {
   name: "Create new availability rule",
   method: "POST",
   path: "/listings/:listingID/availability_rules",
+  track: true,
 };
 
 export const UpdateAvailabilityRule: IEndpoint<
@@ -104,6 +109,7 @@ export const UpdateAvailabilityRule: IEndpoint<
   name: "Update availability rule",
   method: "PATCH",
   path: "/listings/:listingID/availability_rules/:availabilityRuleID",
+  track: true,
 };
 
 export const DeleteAvailabilityRule: IEndpoint<
@@ -114,24 +120,28 @@ export const DeleteAvailabilityRule: IEndpoint<
   name: "Delete availability rule",
   method: "DELETE",
   path: "/listings/:listingID/availability_rules/:availabilityRuleID",
+  track: true,
 };
 
 export const AddListingImage: IEndpoint<undefined, Image, { listingID: number }> = {
   name: "Add listing image",
   method: "POST",
   path: "/listings/:listingID/image",
+  track: true,
 };
 
 export const DeleteListingImage: IEndpoint<undefined, undefined, { listingID: number; imageID: number }> = {
   name: "Delete listing image",
   method: "DELETE",
   path: "/listings/:listingID/image/:imageID",
+  track: true,
 };
 
 export const UpdateListingImages: IEndpoint<{ images: Image[] }, undefined, { listingID: number }> = {
   name: "Update listing images",
   method: "PATCH",
   path: "/listings/:listingID/images",
+  track: true,
 };
 
 export const GetFeaturedListings: IEndpoint<undefined, Listing[], undefined, { categories?: string }> = {
@@ -162,6 +172,7 @@ export const CreatePayoutMethod: IEndpoint<undefined, string> = {
   name: "Create payout method",
   method: "POST",
   path: "/payout_methods",
+  track: true,
 };
 
 export const GetStripeDashboardLink: IEndpoint<undefined, string> = {
