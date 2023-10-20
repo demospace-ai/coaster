@@ -30,7 +30,7 @@ export const Search: React.FC = () => {
           {listings.length} results for{" "}
           {categoriesParsed.map((category: CategoryType) => `"${getCategoryForDisplay(category)}"`).join(", ")}
         </div>
-        <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-3 xl:tw-grid-cols-4 2xl:tw-grid-cols-5 tw-mt-5 tw-mb-5 tw-font-bold tw-text-3xl tw-gap-10 tw-w-full">
+        <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-3 xl:tw-grid-cols-4 tw-mt-5 tw-mb-5 tw-font-bold tw-text-3xl tw-gap-10 tw-w-full">
           {listings.map((listing: Listing) => (
             <SearchResult key={listing.id} listing={listing} />
           ))}
