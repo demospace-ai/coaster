@@ -36,7 +36,7 @@ export const Login: React.FC<{ create?: boolean }> = ({ create }) => {
   const [searchParams] = useSearchParams();
   const destination = searchParams.get("destination") ?? "";
   const emailParam = searchParams.get("email");
-  const initialEmail = emailParam ? decodeURIComponent(emailParam) : undefined;
+  const initialEmail = emailParam ? atob(emailParam) : undefined;
   const navigate = useNavigate();
   const [email, setEmail] = useState<string | undefined>(initialEmail);
 

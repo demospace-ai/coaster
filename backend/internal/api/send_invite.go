@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -110,17 +111,18 @@ func (s ApiService) sendInvite(email string, sender *models.User) error {
 			return errors.Wrap(err, "(api.sendInvite) sending existing user email")
 		}
 	} else {
+		encodedEmail := base64.StdEncoding.EncodeToString([]byte(email))
 		var html bytes.Buffer
 		SEND_INVITE_TEMPLATE.Execute(&html, SendInviteTemplateArgs{
 			SenderName: senderName,
-			Email:      email,
+			Email:      encodedEmail,
 			Domain:     domain,
 		})
 
 		var plain bytes.Buffer
 		SEND_INVITE_PLAIN_TEMPLATE.Execute(&plain, SendInviteTemplateArgs{
 			SenderName: senderName,
-			Email:      email,
+			Email:      encodedEmail,
 			Domain:     domain,
 		})
 
@@ -156,7 +158,6 @@ const SEND_INVITE_TEMPLATE_STRING = `
                   <p style="font-size:16px;line-height:26px;margin:16px 0;font-family:&#x27;Open Sans&#x27;, &#x27;HelveticaNeue-Light&#x27;, &#x27;Helvetica Neue Light&#x27;, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, &#x27;Lucida Grande&#x27;, sans-serif;font-weight:300;color:#404040">Hi there!</p>
                   <p style="font-size:16px;line-height:26px;margin:16px 0;font-family:&#x27;Open Sans&#x27;, &#x27;HelveticaNeue-Light&#x27;, &#x27;Helvetica Neue Light&#x27;, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, &#x27;Lucida Grande&#x27;, sans-serif;font-weight:300;color:#404040">{{.SenderName}} is inviting you to join Coaster, the best way to plan adventure travel! You can create an account here:</p><a href="{{.Domain}}/signup?email={{.Email}}&destination=profile" target="_blank" style="background-color:#3673aa;border-radius:4px;color:#fff;font-family:&#x27;Open Sans&#x27;, &#x27;Helvetica Neue&#x27;, Arial;font-size:15px;text-decoration:none;text-align:center;display:inline-block;width:210px;padding:0px 0px;line-height:100%;max-width:100%"><span><!--[if mso]><i style="letter-spacing: undefinedpx;mso-font-width:-100%;mso-text-raise:0" hidden>&nbsp;</i><![endif]--></span><span style="background-color:#3673aa;border-radius:4px;color:#fff;font-family:&#x27;Open Sans&#x27;, &#x27;Helvetica Neue&#x27;, Arial;font-size:15px;text-decoration:none;text-align:center;display:inline-block;width:210px;padding:14px 7px;max-width:100%;line-height:120%;text-transform:none;mso-padding-alt:0px;mso-text-raise:0">Join Coaster</span><span><!--[if mso]><i style="letter-spacing: undefinedpx;mso-font-width:-100%" hidden>&nbsp;</i><![endif]--></span></a>
                   <p style="font-size:16px;line-height:26px;margin:16px 0;font-family:&#x27;Open Sans&#x27;, &#x27;HelveticaNeue-Light&#x27;, &#x27;Helvetica Neue Light&#x27;, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, &#x27;Lucida Grande&#x27;, sans-serif;font-weight:300;color:#404040">If you don&#x27;t want to create an account, just ignore and delete this message.</p>
-                  <p style="font-size:16px;line-height:26px;margin:16px 0;font-family:&#x27;Open Sans&#x27;, &#x27;HelveticaNeue-Light&#x27;, &#x27;Helvetica Neue Light&#x27;, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, &#x27;Lucida Grande&#x27;, sans-serif;font-weight:300;color:#404040">To keep your account secure, please don&#x27;t forward this email to anyone.</p>
                 </td>
               </tr>
             </tbody>
@@ -164,6 +165,7 @@ const SEND_INVITE_TEMPLATE_STRING = `
         </td>
       </tr>
     </table>
+		<div style="width:100%; text-align:center; color:#404040; margin-top:12px">Coaster, 2261 Market Street STE 5450, San Francisco, CA 94114</div>
   </body>
 
 </html>
@@ -177,7 +179,8 @@ const SEND_INVITE_PLAIN_TEMPLATE_STRING = `
 	{{.SenderName}} is inviting you to join Coaster, the best way to plan adventure travel. You can create an account here: {{.Domain}}/signup?email={{.Email}}&destination=profile
 	
 	If you don't want to create an account, just ignore and delete this message.
-	To keep your account secure, please don't forward this email to anyone.
+
+	Coaster, 2261 Market Street STE 5450, San Francisco, CA 94114
 `
 
 var SEND_CREATE_PASSWORD_TEMPLATE = template.Must(template.New("send_create_password").Parse(SEND_CREATE_PASSWORD_TEMPLATE_STRING))
@@ -211,6 +214,7 @@ const SEND_CREATE_PASSWORD_TEMPLATE_STRING = `
         </td>
       </tr>
     </table>
+		<div style="width:100%; text-align:center; color:#404040; margin-top:12px">Coaster, 2261 Market Street STE 5450, San Francisco, CA 94114</div>
   </body>
 
 </html>
@@ -225,4 +229,6 @@ const SEND_CREATE_PASSWORD_PLAIN_TEMPLATE_STRING = `
 	
 	If you weren't expecting this email, just ignore and delete this message.
 	To keep your account secure, please don't forward this email to anyone.
+
+	Coaster, 2261 Market Street STE 5450, San Francisco, CA 94114
 `

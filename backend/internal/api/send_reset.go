@@ -121,6 +121,7 @@ const SEND_RESET_TEMPLATE_STRING = `
         </td>
       </tr>
     </table>
+		<div style="width:100%; text-align:center; color:#404040; margin-top:12px">Coaster, 2261 Market Street STE 5450, San Francisco, CA 94114</div>
   </body>
 
 </html>
@@ -135,4 +136,6 @@ const SEND_RESET_PLAIN_TEMPLATE_STRING = `
 	
 	If you don't want to change your password or didn't request this, just ignore and delete this message.
 	To keep your account secure, please don't forward this email to anyone.
+
+	Coaster, 2261 Market Street STE 5450, San Francisco, CA 94114
 `
