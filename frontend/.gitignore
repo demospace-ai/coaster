@@ -6,9 +6,9 @@
 *.log
 /build/
 /.vscode/
-/docs/.vitepress/cache
-/packages/vite/LICENSE
 dist
 dist-ssr
 node_modules
 .eslintcache
+.turbo
+.next

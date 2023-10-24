@@ -1,9 +1,0 @@
-runtime: nodejs20
-
-handlers:
-- url: /(.*\..+)$
-  static_files: \1
-  upload: (.*\..+)$
-- url: /.*
-  static_files: index.html
-  upload: index.html

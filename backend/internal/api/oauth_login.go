@@ -66,8 +66,8 @@ func (s ApiService) OAuthLogin(w http.ResponseWriter, r *http.Request) error {
 
 func getOauthSuccessRedirect() string {
 	if application.IsProd() {
-		return "https://www.trycoaster.com/oauth_callback"
+		return "https://www.trycoaster.com/oauth-callback"
 	} else {
-		return "http://localhost:3000/oauth_callback"
+		return "http://localhost:3000/oauth-callback"
 	}
 }
