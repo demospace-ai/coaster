@@ -1,0 +1,26 @@
+{
+  "name": "@coaster/rpc",
+  "version": "1.0.0",
+  "types": "index.ts",
+  "exports:":{
+    ".client":"./client.ts",
+    ".common":"./common.ts",
+    ".server":"./server.ts"
+  },
+  "scripts": {
+    "lint": "eslint \"**/*.ts*\""
+  },
+  "dependencies": {
+    "@coaster/utils":"*",
+    "@coaster/state":"*",
+    "highlight.run": "^7.5.5",
+    "next": "^13.4.19",
+    "swr": "^2.2.4"
+  },
+  "devDependencies": {
+    "@coaster/eslint-config": "*",
+    "@coaster/tsconfig": "*",
+    "eslint": "^7.32.0",
+    "typescript": "^4.5.2"
+  }
+}
