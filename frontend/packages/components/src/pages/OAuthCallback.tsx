@@ -1,9 +1,9 @@
 "use client";
 
+import { useUserContext } from "@coaster/components/src/auth/UserProviderClient";
+import { Loading } from "@coaster/components/src/loading/Loading";
+import { MessageType } from "@coaster/components/src/login/message";
 import { useEffect } from "react";
-import { useUserContext } from "../auth/UserProviderClient";
-import { Loading } from "../loading/Loading";
-import { MessageType } from "../login/message";
 
 export const OAuthCallback = () => {
   const user = useUserContext();

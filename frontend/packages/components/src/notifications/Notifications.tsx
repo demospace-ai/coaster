@@ -1,10 +1,10 @@
 "use client";
 
-import { ToastOptions, useDispatch, useSelector } from "@coaster/state";
+import { Portal } from "@coaster/components/src/portal/Portal";
+import { RootState, ToastOptions, useDispatch, useSelector } from "@coaster/state";
 import { Transition } from "@headlessui/react";
 import { CheckCircleIcon, InformationCircleIcon, XCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Fragment, ReactNode } from "react";
-import { Portal } from "../portal/Portal";
 
 type ToastProps = {
   content: React.ReactNode;
@@ -110,7 +110,7 @@ export const Toast: React.FC<ToastProps> = ({ content, show, duration, close }) 
 
 export const ToastPortal: React.FC = () => {
   const dispatch = useDispatch();
-  const toast = useSelector((state) => state.app.toast);
+  const toast = useSelector((state: RootState) => state.app.toast);
   const toastContent = getToastContentFromDetails(toast);
 
   return (

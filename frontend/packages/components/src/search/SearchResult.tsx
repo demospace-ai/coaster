@@ -1,10 +1,10 @@
 "use client";
 
-import { Listing } from "@coaster/rpc";
-import { getGcsImageUrl } from "@coaster/utils";
+import { getGcsImageUrl } from "@coaster/components/src/images/utils";
+import { NavLink } from "@coaster/components/src/link/Link";
+import { Listing } from "@coaster/rpc/common";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { NavLink } from "../link/Link";
 
 export const SearchResult: React.FC<{ listing: Listing }> = ({ listing }) => {
   return (

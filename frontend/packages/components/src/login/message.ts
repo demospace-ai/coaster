@@ -1,4 +1,4 @@
-import { User } from "@coaster/rpc";
+import { User } from "@coaster/rpc/common";
 
 export enum MessageType {
   Done = "done",

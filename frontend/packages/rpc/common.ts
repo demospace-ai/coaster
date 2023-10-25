@@ -1,3 +1,3 @@
-export * from "./src/ajax";
-export * from "./src/api";
-export * from "./src/types";
+export * from "@coaster/rpc/src/ajax";
+export * from "@coaster/rpc/src/api";
+export * from "@coaster/rpc/src/types";

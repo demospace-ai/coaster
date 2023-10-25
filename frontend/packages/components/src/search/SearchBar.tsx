@@ -1,6 +1,11 @@
 "use client";
 
-import { CategoryType } from "@coaster/rpc";
+import {
+  getCategoryForDisplay,
+  getCategoryIcon,
+  getSearchableCategories,
+} from "@coaster/components/src/icons/Category";
+import { CategoryType } from "@coaster/rpc/common";
 import { mergeClasses } from "@coaster/utils";
 import {
   autoUpdate,
@@ -17,7 +22,6 @@ import { Dialog, Transition } from "@headlessui/react";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
 import { Fragment, useRef, useState } from "react";
-import { getCategoryForDisplay, getCategoryIcon, getSearchableCategories } from "../icons/Category";
 
 export const SearchBar: React.FC<{ className: string }> = (props) => {
   return (

@@ -2,7 +2,6 @@
 
 import { AppAction, AppState, LoginAction, LoginState, appReducer, loginReducer } from "@coaster/state";
 import { configureStore } from "@reduxjs/toolkit";
-import { Dispatch } from "react";
 import { createSelectorHook, useDispatch as useReactDispatch } from "react-redux";
 import { combineReducers } from "redux";
 
@@ -13,8 +12,8 @@ export interface RootState {
   login: LoginState;
 }
 
-export const useDispatch = () => useReactDispatch<Dispatch<RootAction>>();
-export const useSelector = createSelectorHook<RootState>();
+export const useDispatch = () => useReactDispatch();
+export const useSelector = createSelectorHook();
 
 export function createStore() {
   const rootReducer = combineReducers({ app: appReducer, login: loginReducer });

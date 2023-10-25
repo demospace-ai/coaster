@@ -1,10 +1,10 @@
 "use client";
 
+import { Portal } from "@coaster/components/src/portal/Portal";
 import { mergeClasses } from "@coaster/utils";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import React, { Fragment } from "react";
-import { Portal } from "../portal/Portal";
 
 interface ModalProps {
   show: boolean;

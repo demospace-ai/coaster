@@ -1,6 +1,10 @@
 "use client";
 
 import { LongLogo } from "@coaster/assets";
+import { Button } from "@coaster/components/src/button/Button";
+import { FormError } from "@coaster/components/src/error/FormError";
+import { Input } from "@coaster/components/src/input/Input";
+import { Loading } from "@coaster/components/src/loading/Loading";
 import { SendInvite, SendInviteRequest, sendRequest } from "@coaster/rpc/common";
 import { useMutation } from "@coaster/utils";
 import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
@@ -8,10 +12,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
-import { Button } from "../button/Button";
-import { FormError } from "../error/FormError";
-import { Input } from "../input/Input";
-import { Loading } from "../loading/Loading";
 
 export const Invite: React.FC = () => {
   const [done, setDone] = useState(false);

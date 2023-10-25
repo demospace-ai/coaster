@@ -1,17 +1,24 @@
 "use client";
 
 import { LongLogo } from "@coaster/assets";
-import { useDispatch, useSelector } from "@coaster/state";
+import {
+  EmailLoginForm,
+  EmailSignup,
+  GoogleLogin,
+  LoginStep,
+  SendResetForm,
+  StartContent,
+} from "@coaster/components/src/login/LoginSteps";
+import { RootState, useDispatch, useSelector } from "@coaster/state";
 import { mergeClasses } from "@coaster/utils";
 import { Dialog, Portal, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useSearchParams } from "next/navigation";
 import { Fragment, useState } from "react";
-import { EmailLoginForm, EmailSignup, GoogleLogin, LoginStep, SendResetForm, StartContent } from "./LoginSteps";
 
 export const LoginModal: React.FC = () => {
-  const modalOpen = useSelector((state) => state.login.modalOpen);
-  const create = useSelector((state) => state.login.create);
+  const modalOpen = useSelector((state: RootState) => state.login.modalOpen);
+  const create = useSelector((state: RootState) => state.login.create);
   const dispatch = useDispatch();
   const closeModal = () => dispatch({ type: "login.close" });
   const [step, setStep] = useState<LoginStep>(LoginStep.Start);
