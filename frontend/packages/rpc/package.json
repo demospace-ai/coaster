@@ -13,14 +13,14 @@
   "dependencies": {
     "@coaster/utils":"*",
     "@coaster/state":"*",
-    "highlight.run": "^7.5.5",
-    "next": "^13.4.19",
+    "highlight.run": "^8.0.1",
+    "next": "^13.5.6",
     "swr": "^2.2.4"
   },
   "devDependencies": {
     "eslint-config-custom": "*",
     "@coaster/tsconfig": "*",
-    "eslint": "^7.32.0",
-    "typescript": "^4.5.2"
+    "eslint": "^8.52.0",
+    "typescript": "^5.2.2"
   }
 }
