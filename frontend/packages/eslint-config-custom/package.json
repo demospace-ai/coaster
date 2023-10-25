@@ -1,5 +1,5 @@
 {
-  "name": "@coaster/eslint-config",
+  "name": "eslint-config-custom",
   "license": "MIT",
   "version": "1.0.0",
   "private": true,

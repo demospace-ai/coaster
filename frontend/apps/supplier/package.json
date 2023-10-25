@@ -22,7 +22,6 @@
     "@highlight-run/react": "^3.2.1",
     "@hookform/resolvers": "^3.3.1",
     "date-fns": "^2.30.0",
-    "eslint-config-react-app": "^7.0.1",
     "highlight.run": "^7.5.5",
     "immutability-helper": "^3.1.1",
     "libphonenumber-js": "^1.10.45",
@@ -40,7 +39,7 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@coaster/eslint-config": "*",
+    "eslint-config-custom": "*",
     "@coaster/tsconfig": "*",
     "@coaster/tailwind-config": "*",
     "@next/eslint-plugin-next": "^13.4.19",
