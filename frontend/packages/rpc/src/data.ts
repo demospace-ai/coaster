@@ -27,10 +27,12 @@ export async function getUserServer() {
 }
 
 export async function getListingServer(listingID: number): Promise<Listing> {
-  return sendRequest(GetListing, { pathParams: { listingID } });
+  const cookieString = cookies().toString();
+  return sendRequest(GetListing, { pathParams: { listingID }, extraHeaders: [["Cookie", cookieString]] });
 }
 
 export async function search(location: string | undefined, categories: string | undefined): Promise<Listing[]> {
+  const cookieString = cookies().toString();
   const queryParams: { location?: string; categories?: string } = {};
   if (location) {
     queryParams.location = location;
@@ -40,13 +42,15 @@ export async function search(location: string | undefined, categories: string | 
     queryParams.categories = categories;
   }
 
-  return sendRequest(SearchListings, { queryParams });
+  return sendRequest(SearchListings, { queryParams, extraHeaders: [["Cookie", cookieString]] });
 }
 
 export async function getHostedListingsServer() {
-  return sendRequest(GetHostedListings);
+  const cookieString = cookies().toString();
+  return sendRequest(GetHostedListings, { extraHeaders: [["Cookie", cookieString]] });
 }
 
 export async function getFeaturedServer(): Promise<Listing[]> {
-  return sendRequest(GetFeaturedListings);
+  const cookieString = cookies().toString();
+  return sendRequest(GetFeaturedListings, { extraHeaders: [["Cookie", cookieString]] });
 }
