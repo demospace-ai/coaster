@@ -461,8 +461,9 @@ const useOpenGooglePopup = (
   setLoginError: (error: string) => void,
   closeModal?: () => void,
 ) => {
+  const onLoginSuccess = useOnLoginSuccess();
+
   return useCallback(() => {
-    const onLoginSuccess = useOnLoginSuccess();
     const handleMessage = async (event: MessageEvent<LoginMessage>) => {
       switch (event.data.type) {
         case MessageType.Done:

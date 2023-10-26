@@ -16,7 +16,7 @@ import update from "immutability-helper";
 import { FormEvent, useCallback, useRef, useState } from "react";
 import { DndProvider, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { useListingContext } from "supplier/app/(pages)/listings/[listingID]/edit/context";
+import { useListingContext } from "supplier/app/(pages)/(authenticated)/listings/[listingID]/edit/context";
 import { mutate } from "swr";
 
 export default function Images() {

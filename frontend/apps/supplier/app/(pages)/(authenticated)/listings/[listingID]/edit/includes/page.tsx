@@ -5,8 +5,11 @@ import { ListingInput, UpdateListing, sendRequest } from "@coaster/rpc/common";
 import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFieldArray, useForm } from "react-hook-form";
-import { useListingContext } from "supplier/app/(pages)/listings/[listingID]/edit/context";
-import { IncludesSchema, NotIncludedSchema } from "supplier/app/(pages)/listings/[listingID]/edit/schema";
+import { useListingContext } from "supplier/app/(pages)/(authenticated)/listings/[listingID]/edit/context";
+import {
+  IncludesSchema,
+  NotIncludedSchema,
+} from "supplier/app/(pages)/(authenticated)/listings/[listingID]/edit/schema";
 import { z } from "zod";
 
 const EditListingIncludesSchema = z.object({

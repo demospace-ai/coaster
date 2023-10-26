@@ -73,7 +73,7 @@ export async function sendRequest<
   }
 
   // TODO: how should we record events for server-side requests?
-  if (typeof window !== "undefined" && endpoint.track) {
+  if (typeof window !== "undefined" && isProd() && endpoint.track) {
     (window as any).rudderanalytics.track(`${endpoint.name}`);
   }
 

@@ -14,7 +14,6 @@ export * from "./src/icons/Category";
 export * from "./src/icons/Github";
 export * from "./src/icons/Google";
 export * from "./src/icons/Icons";
-export * from "./src/images/Image";
 export * from "./src/input/Input";
 export * from "./src/input/types";
 export * from "./src/link/Link";

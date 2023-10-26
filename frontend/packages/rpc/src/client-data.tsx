@@ -284,7 +284,7 @@ export function useUpdateUser(onSuccess?: () => void): Mutation<UserUpdates> {
     },
     {
       onSuccess: (user: User) => {
-        mutate(CheckSession, user);
+        mutate({ CheckSession }, user);
         onSuccess && onSuccess();
       },
     },
@@ -302,7 +302,7 @@ export function useUpdateProfilePicture(): Mutation<File> {
     },
     {
       onSuccess: (user) => {
-        mutate(CheckSession, user);
+        mutate({ CheckSession }, user);
       },
       onError: (e) => {
         dispatch({
@@ -321,7 +321,7 @@ export function useResetPassword(): Mutation<ResetPasswordRequest> {
     },
     {
       onSuccess: (user: User) => {
-        mutate(CheckSession, user);
+        mutate({ CheckSession }, user);
       },
     },
   );
@@ -329,7 +329,7 @@ export function useResetPassword(): Mutation<ResetPasswordRequest> {
 
 export function useOnLoginSuccess() {
   return useCallback(async (user: User) => {
-    mutate(CheckSession, user);
+    mutate({ CheckSession }, user);
     identifyUser(user);
   }, []);
 }
@@ -351,9 +351,11 @@ export function useLogout() {
   const dispatch = useDispatch();
 
   return useCallback(async () => {
-    (window as any).rudderanalytics.reset();
-
     await sendRequest(Logout);
-    mutate(CheckSession);
+    if (isProd()) {
+      (window as any).rudderanalytics.reset();
+    }
+
+    mutate({ CheckSession }, undefined);
   }, [dispatch]);
 }

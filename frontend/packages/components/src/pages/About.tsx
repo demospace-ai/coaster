@@ -1,11 +1,10 @@
 import { Founders } from "@coaster/assets";
-import { Image } from "../images/Image";
 
 export const About: React.FC = () => {
   return (
     <div className="tw-flex tw-items-center tw-justify-center tw-py-24 sm:tw-py-32">
       <div className="tw-flex tw-flex-col tw-items-center tw-max-w-[300px] sm:tw-max-w-[600px]">
-        <Image
+        <img
           className="tw-rounded-xl tw-mb-5 sm:tw-mb-8 tw-max-w-[80%] sm:tw-max-w-xs"
           src={Founders.src}
           alt="The founders of Coaster"
