@@ -591,6 +591,7 @@ export const ImagesModal: React.FC<{
           <div key={image.id} className="tw-flex tw-basis-full tw-snap-center tw-h-full">
             <div className="tw-flex tw-w-screen sm:tw-w-[90vw] tw-px-10 sm:tw-px-0 tw-h-full tw-justify-center tw-items-center">
               <img
+                alt="Listing image"
                 className="tw-flex tw-max-h-full tw-object-contain tw-cursor-pointer tw-rounded-xl tw-overflow-hidden"
                 src={getGcsImageUrl(image.storage_id)}
                 onClick={(e) => {
@@ -622,6 +623,7 @@ export const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) =
       </Modal>
       <div className="tw-relative tw-flex tw-w-full sm:tw-w-2/3 sm:tw-mr-2">
         <img
+          alt="Main listing image"
           className="tw-w-full tw-aspect-square tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
           src={listing.images.length > 0 ? getGcsImageUrl(listing.images[0].storage_id) : "TODO"}
           onClick={() => {
@@ -638,6 +640,7 @@ export const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) =
       </div>
       <div className="tw-relative tw-flex-col tw-w-1/3 tw-gap-2 tw-hidden sm:tw-flex">
         <img
+          alt="Listing image 2"
           className="tw-h-1/2 tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
           src={listing.images.length > 1 ? getGcsImageUrl(listing.images[1].storage_id) : "TODO"}
           onClick={() => {
@@ -646,6 +649,7 @@ export const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) =
           }}
         />
         <img
+          alt="Listing image 3"
           className="tw-h-1/2 tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
           src={listing.images.length > 2 ? getGcsImageUrl(listing.images[2].storage_id) : "TODO"}
           onClick={() => {

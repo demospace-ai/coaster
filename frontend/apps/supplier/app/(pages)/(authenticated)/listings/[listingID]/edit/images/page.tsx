@@ -110,6 +110,7 @@ const ImagesInner: React.FC<{ listing: Listing }> = ({ listing }) => {
             className="tw-relative tw-w-fit"
           >
             <img
+              alt="Listing image"
               className="tw-aspect-square tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-transition-all tw-duration-100 tw-rounded-lg tw-cursor-grab"
               src={listing.images.length > 0 ? getGcsImageUrl(image.storage_id) : "TODO"}
             />

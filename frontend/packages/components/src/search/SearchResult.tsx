@@ -112,6 +112,7 @@ const SearchListingImages: React.FC<{ listing: Listing }> = ({ listing }) => {
         {listing.images.map((image) => (
           <img
             key={image.id}
+            alt="Listing image"
             tabIndex={-1}
             className="tw-flex-none tw-w-full tw-h-full tw-bg-gray-100 tw-object-cover tw-snap-center tw-snap-always tw-cursor-pointer"
             src={getGcsImageUrl(image.storage_id)}

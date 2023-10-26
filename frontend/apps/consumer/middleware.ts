@@ -34,10 +34,6 @@ export const config = {
 };
 
 export const createRouteMatcher = (routes: string[]) => {
-  const matchers = routes.map((route) => {
-    const reg = pathToRegexp(route);
-    console.log(reg);
-    return reg;
-  });
+  const matchers = routes.map((route) => pathToRegexp(route));
   return (req: NextRequest) => matchers.some((matcher) => matcher.test(req.nextUrl.pathname));
 };
