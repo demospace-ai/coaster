@@ -20,6 +20,7 @@ import {
   WizardNavButtons,
   wrapHandleSubmit,
 } from "@coaster/components/client";
+import { createListing, updateListing, useDraftListing, useUpdateListing } from "@coaster/rpc/client";
 import {
   AddListingImage,
   CategoryType,
@@ -32,12 +33,8 @@ import {
   ListingInput,
   ListingStatus,
   UpdateListingImages,
-  createListing,
   sendRequest,
-  updateListing,
-  useDraftListing,
-  useUpdateListing,
-} from "@coaster/rpc";
+} from "@coaster/rpc/common";
 import { forceErrorMessage, getGcsImageUrl } from "@coaster/utils";
 import { EyeIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -267,7 +264,7 @@ const ReviewStep: React.FC<StepProps> = ({ prevStep }) => {
       <div className="tw-flex tw-flex-col tw-items-center tw-pb-6">
         <div className="tw-p-8 tw-shadow-centered-md tw-rounded-xl tw-w-full sm:tw-w-96">
           <img
-            src={getGcsImageUrl(listing.images[0])}
+            src={getGcsImageUrl(listing.images[0].storage_id)}
             alt="preview-cover"
             className="tw-rounded-lg tw-aspect-square tw-object-cover"
           />
@@ -500,7 +497,7 @@ const ImageStepInner: React.FC<StepProps & ImageProps> = ({ nextStep, prevStep, 
               className="tw-flex tw-relative tw-w-fit tw-h-fit"
             >
               <img
-                src={getGcsImageUrl(image)}
+                src={getGcsImageUrl(image.storage_id)}
                 alt="preview-image"
                 className="tw-select-none tw-rounded-lg tw-cursor-grab"
               />

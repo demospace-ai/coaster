@@ -9,7 +9,7 @@ import {
   Listing,
   UpdateListingImages,
   sendRequest,
-} from "@coaster/rpc/server";
+} from "@coaster/rpc/common";
 import { forceErrorMessage, getGcsImageUrl } from "@coaster/utils";
 import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import update from "immutability-helper";
@@ -118,7 +118,7 @@ const ImagesInner: React.FC<{ listing: Listing }> = ({ listing }) => {
           >
             <img
               className="tw-aspect-square tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-transition-all tw-duration-100 tw-rounded-lg tw-cursor-grab"
-              src={listing.images.length > 0 ? getGcsImageUrl(image) : "TODO"}
+              src={listing.images.length > 0 ? getGcsImageUrl(image.storage_id) : "TODO"}
             />
             <XMarkIcon
               className="tw-w-8 tw-absolute tw-right-2 tw-top-2 tw-bg-gray-100 tw-p-1 tw-rounded-lg tw-opacity-80 tw-cursor-pointer hover:tw-opacity-100"

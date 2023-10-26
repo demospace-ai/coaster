@@ -1,6 +1,6 @@
 "use client";
 
-import { Listing } from "@coaster/rpc";
+import { Listing } from "@coaster/rpc/common";
 import { getGcsImageUrl } from "@coaster/utils";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -114,7 +114,7 @@ const SearchListingImages: React.FC<{ listing: Listing }> = ({ listing }) => {
             key={image.id}
             tabIndex={-1}
             className="tw-flex-none tw-w-full tw-h-full tw-bg-gray-100 tw-object-cover tw-snap-center tw-snap-always tw-cursor-pointer"
-            src={getGcsImageUrl(image)}
+            src={getGcsImageUrl(image.storage_id)}
           />
         ))}
       </div>

@@ -1,8 +1,8 @@
 "use client";
 
 import { Loading, SearchResult, getCategoryForDisplay } from "@coaster/components/client";
-import type { CategoryType, Listing } from "@coaster/rpc";
-import { useSearch } from "@coaster/rpc";
+import { useSearch } from "@coaster/rpc/client";
+import type { CategoryType, Listing } from "@coaster/rpc/common";
 import { toUndefined } from "@coaster/utils";
 import { useSearchParams } from "next/navigation";
 
