@@ -135,8 +135,8 @@ const SearchBarDropdown: React.FC<{
       <div
         className={mergeClasses(
           props.header
-            ? "tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[400px] tw-h-9 tw-bg-white tw-ring-1 tw-ring-slate-300 tw-rounded-[99px]"
-            : "tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[400px] tw-h-14 tw-bg-white tw-shadow-dark-sm tw-p-1.5 tw-rounded-[99px]",
+            ? "tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[400px] tw-h-9 tw-bg-white tw-ring-1 tw-ring-slate-300 tw-rounded-[99px] tw-cursor-pointer"
+            : "tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[400px] tw-h-14 tw-bg-white tw-shadow-dark-sm tw-p-1.5 tw-rounded-[99px] tw-cursor-pointer",
           props.className,
         )}
         ref={refs.setReference}
@@ -151,7 +151,7 @@ const SearchBarDropdown: React.FC<{
           ref={inputRef}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="tw-w-full tw-bg-transparent tw-pl-4 tw-placeholder-gray-700 tw-text-base tw-select-none tw-cursor-pointer tw-outline-none"
+          className="tw-w-full tw-bg-transparent tw-pl-4 tw-placeholder-gray-700 tw-text-base tw-select-none tw-cursor-text tw-outline-none"
           placeholder="Choose a category"
         />
         <form
