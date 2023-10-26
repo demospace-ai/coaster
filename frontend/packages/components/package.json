@@ -1,6 +1,7 @@
 {
   "name": "@coaster/components",
   "version": "1.0.0",
+  "sideEffects": false,
   "types": "./index.ts",
   "exports": {
     "./client": "./client.ts",

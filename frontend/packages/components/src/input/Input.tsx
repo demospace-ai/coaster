@@ -17,7 +17,6 @@ import {
 import { Combobox, Listbox, RadioGroup, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { InformationCircleIcon, MinusCircleIcon, PlusCircleIcon, UserIcon } from "@heroicons/react/24/outline";
-import { AsYouType, CountryCode, getCountryCallingCode } from "libphonenumber-js";
 import React, {
   Fragment,
   InputHTMLAttributes,
@@ -30,7 +29,6 @@ import React, {
 } from "react";
 import { Loading } from "../loading/Loading";
 import { Tooltip } from "../tooltip/Tooltip";
-import { CountryCodes } from "./types";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   value: string | number; // Need explicit value prop to display label correctly
@@ -624,115 +622,6 @@ const ComboOptions: React.FC<ComboOptionsProps> = (props) => {
       </>
     );
   }
-};
-
-const getFormatted = (code: CountryCode, value: string | undefined) => {
-  const ayt = new AsYouType(code);
-  ayt.input(value ? (value as string) : "");
-  const national = ayt.getNationalNumber();
-
-  return new AsYouType(code).input(national);
-};
-
-const isLetterKey = (key: string) => {
-  if (key.length > 1) return false;
-  const lower = key.toLowerCase();
-  return lower >= "a" && lower <= "z";
-};
-
-export const PhoneInput = forwardRef<HTMLInputElement, InputProps & { wrapperClass: string }>((props, ref) => {
-  const { onChange, type, wrapperClass, value, ...other } = props;
-  const [code, setCode] = useState<CountryCode>("US");
-
-  const updatePhoneNumber = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const phoneNumber = event.target.value;
-    const asyoutype = new AsYouType(code);
-    asyoutype.input(phoneNumber);
-    const formatted = String(asyoutype.getNumberValue());
-    onChange && onChange({ ...event, target: { ...event.target, value: formatted } });
-  };
-
-  const formatted = getFormatted(code, value as string | undefined);
-
-  return (
-    <div className={mergeClasses("tw-flex", wrapperClass)}>
-      <CountryCodePicker currentCode={code} setCode={setCode} />
-      <Input
-        ref={ref}
-        type="tel"
-        {...other}
-        value={formatted}
-        onChange={updatePhoneNumber}
-        onKeyDown={(e) => {
-          if (isLetterKey(e.key) && !e.metaKey) {
-            e.preventDefault();
-          }
-        }}
-      />
-    </div>
-  );
-});
-
-export const CountryCodePicker: React.FC<{
-  currentCode: CountryCode;
-  setCode: (code: CountryCode) => void;
-}> = ({ currentCode, setCode }) => {
-  const [open, setOpen] = useState(false);
-  const { refs, floatingStyles, context } = useFloating({
-    open: open,
-    onOpenChange: setOpen,
-    middleware: [offset(4)],
-    whileElementsMounted: autoUpdate,
-  });
-  const click = useClick(context, {
-    keyboardHandlers: false,
-  });
-  const dismiss = useDismiss(context);
-  const role = useRole(context);
-  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
-
-  return (
-    <Listbox value={currentCode} onChange={setCode}>
-      <Listbox.Button
-        className="tw-flex tw-whitespace-normal tw-items-center tw-py-[6px] tw-px-4 tw-mr-1 tw-border tw-border-solid tw-border-slate-300 tw-cursor-pointer tw-select-none tw-rounded-md"
-        onClick={() => setOpen(!open)}
-        ref={refs.setReference}
-        {...getReferenceProps()}
-      >
-        +{getCountryCallingCode(currentCode)}
-      </Listbox.Button>
-      <div ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
-        <Transition
-          as={Fragment}
-          enter="tw-transition tw-ease-out tw-duration-100"
-          enterFrom="tw-transform tw-opacity-0 tw-scale-95"
-          enterTo="tw-transform tw-opacity-100 tw-scale-100"
-          leave="tw-transition tw-ease-in tw-duration-75"
-          leaveFrom="tw-transform tw-opacity-100 tw-scale-97"
-          leaveTo="tw-transform tw-opacity-0 tw-scale-95"
-        >
-          <Listbox.Options
-            as="div"
-            className="tw-max-h-64 tw-overflow-auto tw-bg-white tw-border tw-border-solid tw-border-slate-300 tw-rounded-md"
-          >
-            {CountryCodes.map((countryCode) => (
-              <Listbox.Option
-                as="div"
-                key={countryCode}
-                className="tw-flex tw-items-center tw-justify-center hover:tw-bg-slate-100 tw-py-2 tw-px-3 tw-cursor-pointer tw-gap-2"
-                value={countryCode}
-              >
-                <CheckIcon className="tw-hidden ui-selected:tw-flex tw-h-4" />
-                <div className="tw-flex tw-justify-center tw-items-center">
-                  {countryCode} (+{getCountryCallingCode(countryCode)})
-                </div>
-              </Listbox.Option>
-            ))}
-          </Listbox.Options>
-        </Transition>
-      </div>
-    </Listbox>
-  );
 };
 
 export const PriceInput = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
