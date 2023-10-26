@@ -1,9 +1,9 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 
-	"go.fabra.io/server/common/application"
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/oauth"
@@ -23,7 +23,7 @@ func (s ApiService) OAuthLogin(w http.ResponseWriter, r *http.Request) error {
 	state := r.URL.Query().Get("state")
 	code := r.URL.Query().Get("code")
 
-	provider, _, err := oauth.ValidateState(state)
+	provider, origin, err := oauth.ValidateState(state)
 	if err != nil {
 		return errors.Wrap(err, "(api.OAuthLogin)")
 	}
@@ -59,15 +59,11 @@ func (s ApiService) OAuthLogin(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	auth.AddSessionCookie(w, *sessionToken)
-	http.Redirect(w, r, getOauthSuccessRedirect(), http.StatusFound)
+	http.Redirect(w, r, getOauthSuccessRedirect(*origin), http.StatusFound)
 
 	return nil
 }
 
-func getOauthSuccessRedirect() string {
-	if application.IsProd() {
-		return "https://www.trycoaster.com/oauth-callback"
-	} else {
-		return "http://localhost:3000/oauth-callback"
-	}
+func getOauthSuccessRedirect(origin string) string {
+	return fmt.Sprintf("%s/oauth-callback", origin)
 }

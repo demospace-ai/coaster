@@ -22,8 +22,8 @@ const GOOGLE_DEVELOPMENT_CLIENT_ID = "86315250181-v19knnmf486fb5nebm2b47hu454abv
 const GOOGLE_DEVELOPMENT_SECRET_KEY = "projects/86315250181/secrets/google-dev-client-secret/versions/latest"
 
 type StateClaims struct {
-	Destination string        `json:"destination"`
-	Provider    OauthProvider `json:"provider"`
+	Origin   string        `json:"origin"`
+	Provider OauthProvider `json:"provider"`
 	jwt.RegisteredClaims
 }
 
@@ -90,7 +90,7 @@ func FetchGoogleInfo(code string) (*ExternalUserInfo, error) {
 	}, nil
 }
 
-func GetOauthRedirect(destination string, strProvider string) (*string, error) {
+func GetOauthRedirect(origin string, strProvider string) (*string, error) {
 	provider := getOAuthProvider(strProvider)
 
 	var oauthConf *oauth2.Config
@@ -107,7 +107,7 @@ func GetOauthRedirect(destination string, strProvider string) (*string, error) {
 	}
 
 	token := jwt.NewWithClaims(crypto.SigningMethodKMSHS256, StateClaims{
-		destination,
+		origin,
 		provider,
 		jwt.RegisteredClaims{
 			IssuedAt: jwt.NewNumericDate(time.Now()),
@@ -142,7 +142,7 @@ func ValidateState(state string) (*OauthProvider, *string, error) {
 		return nil, nil, errors.Newf("token invalid: %v", token.Raw)
 	}
 
-	return &claims.Provider, &claims.Destination, nil
+	return &claims.Provider, &claims.Origin, nil
 }
 
 func getGoogleSecretKey() string {

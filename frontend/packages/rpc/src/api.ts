@@ -201,12 +201,7 @@ export const Logout: IEndpoint<undefined, undefined> = {
   track: true,
 };
 
-export const OAuthRedirect: IEndpoint<
-  undefined,
-  undefined,
-  undefined,
-  { provider: OAuthProvider; destination?: string }
-> = {
+export const OAuthRedirect: IEndpoint<undefined, undefined, undefined, { provider: OAuthProvider; origin: string }> = {
   name: "OAuth Redirect",
   method: "GET",
   path: "/oauth_redirect",
