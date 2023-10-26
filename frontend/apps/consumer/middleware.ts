@@ -14,6 +14,7 @@ const publicPaths = [
   "/reset-password",
   "/create-password",
   "/unauthorized",
+  "/oauth-callback",
 ];
 
 export async function middleware(request: NextRequest) {
