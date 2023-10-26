@@ -38,6 +38,7 @@ export * from "./src/pages/Terms";
 export * from "./src/pages/Unauthorized";
 export * from "./src/portal/Portal";
 export * from "./src/profile/ProfilePicture";
+export * from "./src/provider/StoreProvider";
 export * from "./src/rudder/RudderInit";
 export * from "./src/search/SearchBar";
 export * from "./src/search/SearchResult";

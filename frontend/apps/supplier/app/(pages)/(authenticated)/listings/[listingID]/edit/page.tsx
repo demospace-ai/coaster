@@ -11,7 +11,8 @@ import {
   TextArea,
   useShowToast,
 } from "@coaster/components/client";
-import { Category, ListingInput, UpdateListing, sendRequest } from "@coaster/rpc/common";
+import { UpdateListing, sendRequest } from "@coaster/rpc/common";
+import { Category, ListingInput } from "@coaster/types";
 import { toTitleCase } from "@coaster/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";

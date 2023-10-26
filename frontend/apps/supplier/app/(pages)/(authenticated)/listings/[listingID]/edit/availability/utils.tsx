@@ -1,10 +1,5 @@
 import { TimeInput } from "@coaster/components/client";
-import {
-  AvailabilityRuleType,
-  AvailabilityRuleTypeType,
-  AvailabilityType,
-  AvailabilityTypeType,
-} from "@coaster/rpc/common";
+import { AvailabilityRuleType, AvailabilityRuleTypeType, AvailabilityType, AvailabilityTypeType } from "@coaster/types";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { eachDayOfInterval } from "date-fns";
 import { FieldArrayWithId } from "react-hook-form";

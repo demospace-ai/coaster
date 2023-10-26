@@ -1,7 +1,8 @@
 "use client";
 
 import { Button, FormError, Input, Loading, useShowToast } from "@coaster/components/client";
-import { ListingInput, UpdateListing, sendRequest } from "@coaster/rpc/common";
+import { UpdateListing, sendRequest } from "@coaster/rpc/common";
+import { ListingInput } from "@coaster/types";
 import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFieldArray, useForm } from "react-hook-form";

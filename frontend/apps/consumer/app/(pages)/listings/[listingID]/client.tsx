@@ -12,8 +12,8 @@ import {
   useShowToast,
 } from "@coaster/components/client";
 import { useAvailability, useCreateCheckoutLink } from "@coaster/rpc/client";
-import { Availability, AvailabilityType, Listing as ListingType, User } from "@coaster/rpc/common";
 import { useDispatch } from "@coaster/state";
+import { Availability, AvailabilityType, Listing as ListingType, User } from "@coaster/types";
 import { ToTimeOnly, getGcsImageUrl, mergeClasses, toTitleCase, useWindowDimensions } from "@coaster/utils";
 import { Dialog, Disclosure, RadioGroup, Transition } from "@headlessui/react";
 import {

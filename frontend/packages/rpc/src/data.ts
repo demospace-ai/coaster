@@ -1,9 +1,9 @@
+import { Listing } from "@coaster/types";
 import { HttpError } from "@coaster/utils";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { sendRequest } from "./ajax";
 import { CheckSession, GetFeaturedListings, GetHostedListings, GetListing, SearchListings } from "./api";
-import { Listing } from "./types";
 
 export async function getUserServer() {
   const cookieString = cookies().toString();

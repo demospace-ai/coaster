@@ -1,7 +1,8 @@
 "use client";
 
 import { identifyUser } from "@coaster/rpc/client";
-import { CheckSession, User, sendRequest } from "@coaster/rpc/common";
+import { CheckSession, sendRequest } from "@coaster/rpc/common";
+import { User } from "@coaster/types";
 import { HttpError, consumeError } from "@coaster/utils";
 import { redirect } from "next/navigation";
 import { createContext, useContext, useEffect } from "react";
@@ -47,5 +48,7 @@ export const UserProviderClient: React.FC<{ initialUser: User | undefined; child
   }, []);
 
   const { user } = useUser(initialUser);
+  console.log("logged out" + JSON.stringify(user));
+
   return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
 };

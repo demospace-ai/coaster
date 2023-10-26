@@ -22,7 +22,7 @@ import {
   SendResetRequest,
   User,
   UserUpdates,
-} from "./types";
+} from "@coaster/types";
 
 export interface IEndpoint<RequestType, ResponseType, PathParams = {}, QueryParams = {}> {
   name: string;

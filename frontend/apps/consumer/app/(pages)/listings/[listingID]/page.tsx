@@ -1,6 +1,6 @@
 import { BackButton, Callout, LinkButton, ProfilePicture } from "@coaster/components/client";
-import { ListingStatus, Listing as ListingType, User } from "@coaster/rpc/common";
 import { getListingServer, getUserServer } from "@coaster/rpc/server";
+import { ListingStatus, Listing as ListingType, User } from "@coaster/types";
 import { CheckBadgeIcon } from "@heroicons/react/20/solid";
 import { ClockIcon, GlobeAltIcon, StarIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import {

@@ -1,5 +1,5 @@
 {
   "extends": "@coaster/tsconfig/react-library.json",
-  "include": ["."],
+  "include": [".", "../types/types.ts"],
   "exclude": ["dist", "build", "node_modules"]
 }

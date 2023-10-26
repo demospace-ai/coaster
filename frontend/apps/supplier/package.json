@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@coaster/types":"*",
     "@coaster/assets": "*",
     "@coaster/components": "*",
     "@coaster/rpc": "*",

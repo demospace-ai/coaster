@@ -5,13 +5,12 @@ import {
   CheckEmail,
   CreateUser,
   EmailLogin,
-  LoginMethod,
-  OAuthProvider,
   OAuthRedirect,
   SendReset,
   getEndpointUrl,
   sendRequest,
 } from "@coaster/rpc/common";
+import { LoginMethod, OAuthProvider } from "@coaster/types";
 import { mergeClasses } from "@coaster/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useState } from "react";

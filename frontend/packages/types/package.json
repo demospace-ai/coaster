@@ -1,0 +1,12 @@
+{
+  "name": "@coaster/types",
+  "version": "1.0.0",
+  "main": "./types.ts",
+  "types": "./types.ts",
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "zod": "*"
+  }
+}

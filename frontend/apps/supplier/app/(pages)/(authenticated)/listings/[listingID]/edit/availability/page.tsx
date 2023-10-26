@@ -2,15 +2,8 @@
 
 import { Button, DropdownInput, Loading, Modal } from "@coaster/components/client";
 import { updateListing, useAvailabilityRules } from "@coaster/rpc/client";
-import {
-  AvailabilityRule,
-  AvailabilityType,
-  AvailabilityTypeType,
-  DeleteAvailabilityRule,
-  GetAvailabilityRules,
-  Listing,
-  sendRequest,
-} from "@coaster/rpc/common";
+import { DeleteAvailabilityRule, GetAvailabilityRules, sendRequest } from "@coaster/rpc/common";
+import { AvailabilityRule, AvailabilityType, AvailabilityTypeType, Listing } from "@coaster/types";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { ReactNode, useState } from "react";
 import { NewRuleForm } from "supplier/app/(pages)/(authenticated)/listings/[listingID]/edit/availability/NewAvailabilityRule";

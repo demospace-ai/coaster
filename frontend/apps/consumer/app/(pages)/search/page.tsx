@@ -1,6 +1,6 @@
 import { SearchResult, getCategoryForDisplay } from "@coaster/components/client";
-import { type CategoryType, type Listing } from "@coaster/rpc/common";
 import { search } from "@coaster/rpc/server";
+import { type CategoryType, type Listing } from "@coaster/types";
 
 export default async function Search({ searchParams }: { searchParams: { [key: string]: string | undefined } }) {
   const location = searchParams["location"];

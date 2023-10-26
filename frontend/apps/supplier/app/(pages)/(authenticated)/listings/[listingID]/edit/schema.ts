@@ -1,4 +1,4 @@
-import { AvailabilityType, Category } from "@coaster/rpc/common";
+import { AvailabilityType, Category } from "@coaster/types";
 import { z } from "zod";
 
 export const CategorySchema = Category;

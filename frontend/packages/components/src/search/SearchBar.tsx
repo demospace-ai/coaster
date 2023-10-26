@@ -1,6 +1,6 @@
 "use client";
 
-import { CategoryType } from "@coaster/rpc/common";
+import { CategoryType } from "@coaster/types";
 import { mergeClasses } from "@coaster/utils";
 import {
   autoUpdate,

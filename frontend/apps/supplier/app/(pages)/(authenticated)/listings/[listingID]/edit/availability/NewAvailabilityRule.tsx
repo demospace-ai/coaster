@@ -19,7 +19,7 @@ import {
   AvailabilityRuleTypeType,
   AvailabilityType,
   Listing,
-} from "@coaster/rpc/common";
+} from "@coaster/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { DateRange } from "react-day-picker";

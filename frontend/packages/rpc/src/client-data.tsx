@@ -1,6 +1,19 @@
 "use client";
 
 import { useDispatch } from "@coaster/state";
+import {
+  Availability,
+  AvailabilityRule,
+  AvailabilityRuleInput,
+  AvailabilityRuleUpdates,
+  CreateCheckoutLinkRequest,
+  Listing,
+  ListingInput,
+  PayoutMethod,
+  ResetPasswordRequest,
+  User,
+  UserUpdates,
+} from "@coaster/types";
 import { HttpError, Mutation, MutationOpts, forceErrorMessage, isProd, useMutation } from "@coaster/utils";
 import { H } from "highlight.run";
 import { useCallback } from "react";
@@ -28,19 +41,6 @@ import {
   UpdateProfilePicture,
   UpdateUser,
 } from "./api";
-import {
-  Availability,
-  AvailabilityRule,
-  AvailabilityRuleInput,
-  AvailabilityRuleUpdates,
-  CreateCheckoutLinkRequest,
-  Listing,
-  ListingInput,
-  PayoutMethod,
-  ResetPasswordRequest,
-  User,
-  UserUpdates,
-} from "./types";
 
 export function useListing(listingID: number | undefined, initialData?: Listing) {
   const shouldFetch = listingID;
@@ -356,6 +356,7 @@ export function useLogout() {
       (window as any).rudderanalytics.reset();
     }
 
+    console.log("Logging out");
     mutate({ CheckSession }, undefined);
   }, [dispatch]);
 }

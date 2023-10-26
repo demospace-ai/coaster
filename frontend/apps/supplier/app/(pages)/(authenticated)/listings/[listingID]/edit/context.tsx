@@ -1,7 +1,7 @@
 "use client";
 
 import { useListing } from "@coaster/rpc/client";
-import { Listing } from "@coaster/rpc/common";
+import { Listing } from "@coaster/types";
 import { createContext, useContext } from "react";
 
 const ListingContext = createContext<Listing | null>(null);

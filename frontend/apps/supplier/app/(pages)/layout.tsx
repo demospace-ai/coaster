@@ -1,9 +1,17 @@
-import { ErrorBoundary, Footer, LoginModal, SupplierHeader, ToastPortal } from "@coaster/components/client";
-import { StoreProvider } from "@coaster/state";
+import {
+  ErrorBoundary,
+  Footer,
+  LoginModal,
+  StoreProvider,
+  SupplierHeader,
+  ToastPortal,
+} from "@coaster/components/client";
+import { getUserServer } from "@coaster/rpc/server";
 
-export default function PageLayout({ children }: { children: React.ReactNode }) {
+export default async function PageLayout({ children }: { children: React.ReactNode }) {
+  const user = await getUserServer();
   return (
-    <StoreProvider>
+    <StoreProvider initialUser={user}>
       <ErrorBoundary>
         <LoginModal />
         <ToastPortal />

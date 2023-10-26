@@ -17,7 +17,7 @@ import {
   AvailabilityType,
   AvailabilityTypeType,
   Listing,
-} from "@coaster/rpc/common";
+} from "@coaster/types";
 import { Mutation } from "@coaster/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { eachDayOfInterval } from "date-fns";

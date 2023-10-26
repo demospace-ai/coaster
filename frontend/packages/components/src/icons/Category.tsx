@@ -1,4 +1,4 @@
-import { Category, CategoryType } from "@coaster/rpc/common";
+import { Category, CategoryType } from "@coaster/types";
 import { mergeClasses, toTitleCase } from "@coaster/utils";
 
 const EXCLUDED_CATEGORIES: CategoryType[] = [

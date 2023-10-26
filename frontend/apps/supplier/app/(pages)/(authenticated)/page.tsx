@@ -2,7 +2,7 @@
 
 import { Loading, NavLink, useUserContext } from "@coaster/components/client";
 import { useHostedListings } from "@coaster/rpc/client";
-import { ListingStatus, StripeAccountStatus } from "@coaster/rpc/common";
+import { ListingStatus, StripeAccountStatus } from "@coaster/types";
 import { mergeClasses } from "@coaster/utils";
 import { CalendarDaysIcon, CheckIcon, ClockIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
 

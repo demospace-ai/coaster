@@ -1,11 +1,15 @@
+import { User } from "@coaster/types";
+
 const INITIAL_LOGIN_STATE: LoginState = {
   modalOpen: false,
   create: false,
+  user: undefined,
 };
 
 export interface LoginState {
   modalOpen: boolean;
   create: boolean;
+  user: User | undefined;
 }
 
 export type LoginAction =

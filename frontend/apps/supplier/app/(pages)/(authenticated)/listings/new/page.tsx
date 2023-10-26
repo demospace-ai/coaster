@@ -23,18 +23,13 @@ import {
 import { createListing, updateListing, useDraftListing, useUpdateListing } from "@coaster/rpc/client";
 import {
   AddListingImage,
-  CategoryType,
-  Coordinates,
   DeleteListingImage,
   GetDraftListing,
   GetListing,
-  Image,
-  Listing,
-  ListingInput,
-  ListingStatus,
   UpdateListingImages,
   sendRequest,
 } from "@coaster/rpc/common";
+import { CategoryType, Coordinates, Image, Listing, ListingInput, ListingStatus } from "@coaster/types";
 import { forceErrorMessage, getGcsImageUrl } from "@coaster/utils";
 import { EyeIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";

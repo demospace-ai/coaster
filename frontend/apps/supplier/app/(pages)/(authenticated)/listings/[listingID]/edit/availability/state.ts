@@ -4,7 +4,7 @@ import {
   AvailabilityType,
   AvailabilityTypeType,
   Listing,
-} from "@coaster/rpc/common";
+} from "@coaster/types";
 import { Dispatch, SetStateAction, useState } from "react";
 import {
   SingleDayTimeSlotSchema,

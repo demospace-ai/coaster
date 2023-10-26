@@ -1,7 +1,7 @@
 "use client";
 
 import { useUpdateProfilePicture, useUpdateUser } from "@coaster/rpc/client";
-import { UserUpdates } from "@coaster/rpc/common";
+import { UserUpdates } from "@coaster/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { redirect } from "next/navigation";
 import { FormEvent, useRef } from "react";

@@ -1,5 +1,5 @@
 import { correctFromUTC } from "@coaster/components/client";
-import { Availability, Host, Listing as ListingType } from "@coaster/rpc/common";
+import { Availability, Host, Listing as ListingType } from "@coaster/types";
 
 export const getMaxGuests = (listing: ListingType) => {
   if (listing.max_guests) {

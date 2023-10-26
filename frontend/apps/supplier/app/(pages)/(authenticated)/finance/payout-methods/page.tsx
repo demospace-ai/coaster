@@ -2,7 +2,7 @@
 
 import { Button, Loading } from "@coaster/components/client";
 import { useCreatePayoutMethod, useGetStripeDashboardLink, usePayoutMethods } from "@coaster/rpc/client";
-import { PayoutMethod, PayoutMethodType } from "@coaster/rpc/common";
+import { PayoutMethod, PayoutMethodType } from "@coaster/types";
 import { BuildingLibraryIcon, CreditCardIcon } from "@heroicons/react/24/outline";
 
 export default function PayoutMethods() {

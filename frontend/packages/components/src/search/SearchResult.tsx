@@ -1,6 +1,6 @@
 "use client";
 
-import { Listing } from "@coaster/rpc/common";
+import { Listing } from "@coaster/types";
 import { getGcsImageUrl } from "@coaster/utils";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useCallback, useEffect, useRef, useState } from "react";
