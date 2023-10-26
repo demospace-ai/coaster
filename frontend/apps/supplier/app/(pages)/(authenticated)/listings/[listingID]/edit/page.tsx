@@ -15,7 +15,7 @@ import { Category, ListingInput, UpdateListing, sendRequest } from "@coaster/rpc
 import { toTitleCase } from "@coaster/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { useListingContext } from "supplier/app/(pages)/listings/[listingID]/edit/context";
+import { useListingContext } from "supplier/app/(pages)/(authenticated)/listings/[listingID]/edit/context";
 import {
   AvailabilityTypeSchema,
   CategorySchema,
@@ -24,7 +24,7 @@ import {
   MaxGuestsSchema,
   NameSchema,
   PriceSchema,
-} from "supplier/app/(pages)/listings/[listingID]/edit/schema";
+} from "supplier/app/(pages)/(authenticated)/listings/[listingID]/edit/schema";
 import { z } from "zod";
 
 const EditListingDetailsSchema = z.object({

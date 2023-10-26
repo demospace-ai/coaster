@@ -27,14 +27,17 @@ import {
   UpdateFixedDateRuleSchema,
   UpdateFixedRangeRuleSchema,
   UpdateRecurringRuleSchema,
-} from "supplier/app/(pages)/listings/[listingID]/edit/availability/state";
+} from "supplier/app/(pages)/(authenticated)/listings/[listingID]/edit/availability/state";
 import {
   DAY_OF_WEEK,
   SingleDayTimeSlotFields,
   WeekDayTimeSlotFields,
   getWeekdayOptionsForRange,
-} from "supplier/app/(pages)/listings/[listingID]/edit/availability/utils";
-import { SingleDayTimeSlotSchemaType, TimeSlotSchemaType } from "supplier/app/(pages)/listings/[listingID]/edit/schema";
+} from "supplier/app/(pages)/(authenticated)/listings/[listingID]/edit/availability/utils";
+import {
+  SingleDayTimeSlotSchemaType,
+  TimeSlotSchemaType,
+} from "supplier/app/(pages)/(authenticated)/listings/[listingID]/edit/schema";
 
 export const ExistingRuleForm: React.FC<{
   listing: Listing;

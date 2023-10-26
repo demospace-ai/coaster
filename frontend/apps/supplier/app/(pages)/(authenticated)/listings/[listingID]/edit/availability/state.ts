@@ -11,7 +11,7 @@ import {
   SingleDayTimeSlotSchemaType,
   TimeSlotSchema,
   TimeSlotSchemaType,
-} from "supplier/app/(pages)/listings/[listingID]/edit/schema";
+} from "supplier/app/(pages)/(authenticated)/listings/[listingID]/edit/schema";
 import { z } from "zod";
 
 export const DateRangeSchema = z.object(
