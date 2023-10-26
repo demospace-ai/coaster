@@ -67,7 +67,7 @@ const ProfileDropdown: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
   const isHome = pathname === "/";
 
   return (
-    <div className="tw-flex sm:tw-flex-[0.5_0.5_0%] lg:tw-flex-1 tw-justify-end">
+    <div className="tw-flex tw-shrink-0 tw-justify-end">
       <div className="tw-hidden lg:tw-flex">
         {!onHostApp && (
           <SwitchToHostingLink

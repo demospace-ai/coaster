@@ -336,10 +336,10 @@ export function useOnLoginSuccess() {
 
 export function identifyUser(user: User) {
   if (isProd()) {
-    // rudderanalytics.identify(user.id.toString(), {
-    //   name: `${user.first_name} ${user.last_name}`,
-    //   email: user.email,
-    // });
+    (window as any).rudderanalytics.identify(user.id.toString(), {
+      name: `${user.first_name} ${user.last_name}`,
+      email: user.email,
+    });
 
     H.identify(user.email, {
       id: user.id.toString(),
@@ -351,7 +351,7 @@ export function useLogout() {
   const dispatch = useDispatch();
 
   return useCallback(async () => {
-    // rudderanalytics.reset();
+    (window as any).rudderanalytics.reset();
 
     await sendRequest(Logout);
     mutate(CheckSession);

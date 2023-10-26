@@ -1,9 +1,10 @@
 "use client";
 
+import { identifyUser } from "@coaster/rpc/client";
 import { CheckSession, User, sendRequest } from "@coaster/rpc/common";
 import { HttpError, consumeError } from "@coaster/utils";
 import { redirect } from "next/navigation";
-import { createContext, useContext } from "react";
+import { createContext, useContext, useEffect } from "react";
 import useSWR, { Fetcher } from "swr";
 
 // Intentionally not exported. Server components should use getUser and client components should use useUserContext
@@ -38,6 +39,13 @@ export const UserProviderClient: React.FC<{ initialUser: User | undefined; child
   initialUser,
   children,
 }) => {
+  // We only call identify once for the initial user
+  useEffect(() => {
+    if (initialUser) {
+      identifyUser(initialUser);
+    }
+  }, []);
+
   const { user } = useUser(initialUser);
   return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
 };

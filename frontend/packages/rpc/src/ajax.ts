@@ -72,8 +72,9 @@ export async function sendRequest<
     throw new HttpError(response.status, response.statusText, errorMessage);
   }
 
-  if (endpoint.track) {
-    // rudderanalytics.track(`${endpoint.name}`);
+  // TODO: how should we record events for server-side requests?
+  if (typeof window !== "undefined" && endpoint.track) {
+    (window as any).rudderanalytics.track(`${endpoint.name}`);
   }
 
   // TODO: clean this up

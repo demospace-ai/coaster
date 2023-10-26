@@ -1,9 +1,9 @@
+import { RudderInit } from "@coaster/components/client";
+import { UserProvider } from "@coaster/components/server";
 import { isProd, worksans } from "@coaster/utils";
 import { HighlightInit } from "@highlight-run/next/client";
-import type { Metadata } from "next";
-
-import { UserProvider } from "@coaster/components/server";
 import "consumer/app/global.css";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Coaster",
@@ -27,6 +27,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           recordHeadersAndBody: true,
           urlBlocklist: [],
         }}
+      />
+      <RudderInit
+        writeKey="2Va8vvJ85DejVV7jncdVenC6smB"
+        dataPlaneUrl="https://trycoasterlyoh.dataplane.rudderstack.com"
       />
       <html lang="en" className={worksans.className}>
         <body>
