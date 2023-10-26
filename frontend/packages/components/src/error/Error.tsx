@@ -1,4 +1,4 @@
-import { forceError } from "@coaster/utils";
+import { forceError } from "@coaster/utils/common";
 
 export const ErrorDisplay: React.FC<{
   error: Error | unknown | string | null;

@@ -1,5 +1,5 @@
 import { Listing } from "@coaster/types";
-import { HttpError } from "@coaster/utils";
+import { HttpError } from "@coaster/utils/common";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { sendRequest } from "./ajax";

@@ -1,6 +1,6 @@
 "use client";
 
-import { mergeClasses } from "@coaster/utils";
+import { mergeClasses } from "@coaster/utils/common";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 

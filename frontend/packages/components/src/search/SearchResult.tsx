@@ -1,7 +1,7 @@
 "use client";
 
 import { Listing } from "@coaster/types";
-import { getGcsImageUrl } from "@coaster/utils";
+import { getGcsImageUrl } from "@coaster/utils/common";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { NavLink } from "../link/Link";

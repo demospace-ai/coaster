@@ -1,4 +1,4 @@
-import { HttpError, isProd } from "@coaster/utils";
+import { HttpError, isProd } from "@coaster/utils/common";
 import { compile } from "path-to-regexp";
 import { IEndpoint } from "./api";
 

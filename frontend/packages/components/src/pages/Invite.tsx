@@ -3,7 +3,7 @@
 import { LongLogo } from "@coaster/assets";
 import { SendInvite, sendRequest } from "@coaster/rpc/common";
 import { SendInviteRequest } from "@coaster/types";
-import { useMutation } from "@coaster/utils";
+import { useMutation } from "@coaster/utils/client";
 import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";

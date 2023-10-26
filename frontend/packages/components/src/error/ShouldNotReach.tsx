@@ -1,6 +1,6 @@
 "use client";
 
-import { consumeError } from "@coaster/utils";
+import { consumeError } from "@coaster/utils/client";
 import { useEffect } from "react";
 
 /** Use this to render things that should never be rendered. Like fallback states in switch statements. */

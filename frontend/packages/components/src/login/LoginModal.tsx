@@ -2,7 +2,7 @@
 
 import { LongLogo } from "@coaster/assets";
 import { RootState, useDispatch, useSelector } from "@coaster/state";
-import { mergeClasses } from "@coaster/utils";
+import { mergeClasses } from "@coaster/utils/common";
 import { Dialog, Portal, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useSearchParams } from "next/navigation";

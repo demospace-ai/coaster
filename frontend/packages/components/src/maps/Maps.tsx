@@ -1,6 +1,6 @@
 "use client";
 
-import { isProd, mergeClasses } from "@coaster/utils";
+import { isProd, mergeClasses } from "@coaster/utils/common";
 import {
   autoUpdate,
   flip,

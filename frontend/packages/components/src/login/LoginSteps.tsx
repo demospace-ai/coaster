@@ -3,6 +3,7 @@
 import { useOnLoginSuccess } from "@coaster/rpc/client";
 import {
   CheckEmail,
+  CheckSession,
   CreateUser,
   EmailLogin,
   OAuthRedirect,
@@ -11,7 +12,7 @@ import {
   sendRequest,
 } from "@coaster/rpc/common";
 import { LoginMethod, OAuthProvider } from "@coaster/types";
-import { mergeClasses } from "@coaster/utils";
+import { mergeClasses } from "@coaster/utils/common";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -462,18 +463,26 @@ const useOpenGooglePopup = (
 ) => {
   const onLoginSuccess = useOnLoginSuccess();
 
+  // Not exported because everywhere else should use getUserServer or useUserContext
+  // We do this because the redirect to the OAuth callback page cannot directly fetch the user
+  // because browsers do not send cookies on redirects from foreign referrers with SameSite=Strict
+  const checkSession = async () => {
+    const checkSessionResponse = await sendRequest(CheckSession);
+    return checkSessionResponse.user;
+  };
+
   return useCallback(() => {
     const handleMessage = async (event: MessageEvent<LoginMessage>) => {
-      switch (event.data.type) {
-        case MessageType.Done:
-          if (event.data.user) {
-            window.removeEventListener("message", handleMessage);
-            setLoading(true);
-            await onLoginSuccess(event.data.user);
-            closeModal && closeModal();
-          } else {
-            setLoginError("Failed to login with Google.");
-          }
+      if (event.data.type === MessageType.Done) {
+        try {
+          window.removeEventListener("message", handleMessage);
+          setLoading(true);
+          const user = await checkSession();
+          await onLoginSuccess(user);
+          closeModal && closeModal();
+        } catch (e) {
+          setLoginError("Failed to login with Google.");
+        }
       }
     };
     const y = window.outerHeight / 2 + window.screenY - 300;

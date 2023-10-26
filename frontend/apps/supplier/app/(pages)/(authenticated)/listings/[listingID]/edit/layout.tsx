@@ -1,6 +1,6 @@
 import { NavLink } from "@coaster/components/client";
 import { getListingServer } from "@coaster/rpc/server";
-import { isProd } from "@coaster/utils";
+import { isProd } from "@coaster/utils/common";
 import { ChevronLeftIcon, ChevronRightIcon, EyeIcon } from "@heroicons/react/24/outline";
 import { ListingContextProvider } from "supplier/app/(pages)/(authenticated)/listings/[listingID]/edit/context";
 

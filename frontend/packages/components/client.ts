@@ -29,6 +29,7 @@ export * from "./src/pages/About";
 export * from "./src/pages/CreatePassword";
 export * from "./src/pages/Invite";
 export * from "./src/pages/NotFound";
+export * from "./src/pages/OAuthCallback";
 export * from "./src/pages/Privacy";
 export * from "./src/pages/Profile";
 export * from "./src/pages/ResetPassword";

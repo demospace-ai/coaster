@@ -2,7 +2,7 @@
 
 import { useLogout, useUserContext } from "@coaster/rpc/client";
 import { useDispatch } from "@coaster/state";
-import { isProd, lateef, mergeClasses } from "@coaster/utils";
+import { isProd, lateef, mergeClasses } from "@coaster/utils/common";
 import { autoUpdate, offset, useClick, useDismiss, useFloating, useInteractions, useRole } from "@floating-ui/react";
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import { ArrowRightOnRectangleIcon, Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";

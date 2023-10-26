@@ -1,6 +1,5 @@
 import { ErrorBoundary, RudderInit } from "@coaster/components/client";
-import { UserProvider } from "@coaster/components/server";
-import { isProd, worksans } from "@coaster/utils";
+import { isProd, worksans } from "@coaster/utils/common";
 import { HighlightInit } from "@highlight-run/next/client";
 import "consumer/app/global.css";
 import type { Metadata } from "next";
@@ -35,9 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <html lang="en" className={worksans.className}>
         <body>
           <div id="root" className="tw-w-full tw-h-full tw-flex tw-flex-col">
-            <ErrorBoundary>
-              <UserProvider>{children}</UserProvider>
-            </ErrorBoundary>
+            <ErrorBoundary>{children}</ErrorBoundary>
           </div>
         </body>
       </html>

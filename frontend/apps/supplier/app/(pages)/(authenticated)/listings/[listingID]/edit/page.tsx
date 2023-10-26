@@ -13,7 +13,7 @@ import {
 } from "@coaster/components/client";
 import { UpdateListing, sendRequest } from "@coaster/rpc/common";
 import { Category, ListingInput } from "@coaster/types";
-import { toTitleCase } from "@coaster/utils";
+import { toTitleCase } from "@coaster/utils/common";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { useListingContext } from "supplier/app/(pages)/(authenticated)/listings/[listingID]/edit/context";

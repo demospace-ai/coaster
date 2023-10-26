@@ -1,8 +1,11 @@
 {
   "name": "@coaster/utils",
   "version": "1.0.0",
-  "main": "./index.ts",
   "types": "./index.ts",
+  "exports": {
+    "./common": "./common.ts",
+    "./client": "./client.ts"
+  },
   "scripts": {
     "lint": "eslint \"**/*.ts*\""
   },

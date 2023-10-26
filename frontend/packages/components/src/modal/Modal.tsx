@@ -1,6 +1,6 @@
 "use client";
 
-import { mergeClasses } from "@coaster/utils";
+import { mergeClasses } from "@coaster/utils/common";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import React, { Fragment } from "react";

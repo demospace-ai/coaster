@@ -9,7 +9,7 @@ import {
 } from "@coaster/components/client";
 import { useFeatured } from "@coaster/rpc/client";
 import { CategoryType, Listing } from "@coaster/types";
-import { mergeClasses } from "@coaster/utils";
+import { mergeClasses } from "@coaster/utils/common";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { Dispatch, SetStateAction, useRef, useState } from "react";
 

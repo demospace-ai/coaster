@@ -3,7 +3,7 @@
 import { Button, Card, FormError, Loading, Modal } from "@coaster/components/client";
 import { AddListingImage, DeleteListingImage, GetListing, UpdateListingImages, sendRequest } from "@coaster/rpc/common";
 import { Image, Listing } from "@coaster/types";
-import { forceErrorMessage, getGcsImageUrl } from "@coaster/utils";
+import { forceErrorMessage, getGcsImageUrl } from "@coaster/utils/common";
 import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import update from "immutability-helper";
 import { FormEvent, useCallback, useRef, useState } from "react";

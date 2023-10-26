@@ -14,7 +14,8 @@ import {
 import { useAvailability, useCreateCheckoutLink } from "@coaster/rpc/client";
 import { useDispatch } from "@coaster/state";
 import { Availability, AvailabilityType, Listing as ListingType, User } from "@coaster/types";
-import { ToTimeOnly, getGcsImageUrl, mergeClasses, toTitleCase, useWindowDimensions } from "@coaster/utils";
+import { useWindowDimensions } from "@coaster/utils/client";
+import { ToTimeOnly, getGcsImageUrl, mergeClasses, toTitleCase } from "@coaster/utils/common";
 import { Dialog, Disclosure, RadioGroup, Transition } from "@headlessui/react";
 import {
   ArrowUpOnSquareIcon,

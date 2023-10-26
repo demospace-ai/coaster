@@ -1,18 +1,10 @@
 "use client";
 
-import { mergeClasses, toTitleCase } from "@coaster/utils";
-import {
-  CheckCircleIcon,
-  ExclamationCircleIcon,
-} from "@heroicons/react/24/outline";
+import { mergeClasses, toTitleCase } from "@coaster/utils/common";
+import { CheckCircleIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Dispatch, ReactElement, SetStateAction, useState } from "react";
-import {
-  FieldError,
-  FieldValues,
-  UseFormHandleSubmit,
-  useForm,
-} from "react-hook-form";
+import { FieldError, FieldValues, UseFormHandleSubmit, useForm } from "react-hook-form";
 import { ZodEnum, ZodString, z } from "zod";
 import { FormError } from "../error/FormError";
 import { Loading } from "../loading/Loading";
@@ -31,7 +23,7 @@ export const WizardNavButtons: React.FC<{
       className={mergeClasses(
         "tw-flex tw-mt-6 tw-mb-1",
         !prevStep ? "tw-justify-end" : "tw-justify-between",
-        className
+        className,
       )}
     >
       <button
@@ -39,7 +31,7 @@ export const WizardNavButtons: React.FC<{
         className={mergeClasses(
           !prevStep
             ? "tw-hidden"
-            : "tw-flex tw-justify-center tw-py-2 tw-w-24 tw-font-medium tw-border tw-border-solid tw-border-black tw-rounded-3xl "
+            : "tw-flex tw-justify-center tw-py-2 tw-w-24 tw-font-medium tw-border tw-border-solid tw-border-black tw-rounded-3xl ",
         )}
       >
         ←
@@ -50,7 +42,7 @@ export const WizardNavButtons: React.FC<{
         }}
         className={mergeClasses(
           "tw-flex tw-justify-center tw-py-2 tw-w-28 tw-rounded-3xl tw-bg-black tw-border tw-border-solid tw-border-black tw-text-white tw-font-medium",
-          disabled && "tw-cursor-not-allowed tw-bg-gray-400 tw-border-gray-400"
+          disabled && "tw-cursor-not-allowed tw-bg-gray-400 tw-border-gray-400",
         )}
       >
         {isLoading ? <Loading /> : isLastStep ? "Submit" : "Continue"}
@@ -121,7 +113,7 @@ export const InputStep = <T extends FieldValues | undefined>({
           handleSubmit,
           onSubmit,
           (error: string) => setError("value", { message: error }),
-          nextStep
+          nextStep,
         )}
         prevStep={prevStep}
       />
@@ -168,7 +160,7 @@ export const TextAreaStep = <T extends FieldValues | undefined>({
           handleSubmit,
           onSubmit,
           (error: string) => setError("value", { message: error }),
-          nextStep
+          nextStep,
         )}
         prevStep={prevStep}
       />
@@ -194,9 +186,7 @@ export const SelectorStep = <T extends FieldValues | undefined>({
 }: StepProps<T> & SelectorProps) => {
   type schemaType = z.infer<typeof schema>;
   const [error, setError] = useState<string | undefined>(undefined);
-  const [selected, setSelected] = useState<schemaType | undefined>(
-    existingData || undefined
-  );
+  const [selected, setSelected] = useState<schemaType | undefined>(existingData || undefined);
 
   const onSubmitWrapper = async () => {
     if (selected !== undefined) {
@@ -223,7 +213,7 @@ export const SelectorStep = <T extends FieldValues | undefined>({
             key={option}
             className={mergeClasses(
               "tw-flex tw-justify-between tw-items-center tw-w-full tw-min-h-[56px] tw-px-4 tw-my-1 tw-rounded-lg tw-border tw-border-solid tw-border-gray-300 sm:hover:tw-border-black tw-cursor-pointer tw-select-none",
-              option === selected && "tw-border-black"
+              option === selected && "tw-border-black",
             )}
             onClick={async () => {
               if (option === selected) {
@@ -251,14 +241,12 @@ export const SelectorStep = <T extends FieldValues | undefined>({
   );
 };
 
-export const ErrorMessage: React.FC<{ error: FieldError | undefined }> = ({
-  error,
-}) => {
+export const ErrorMessage: React.FC<{ error: FieldError | undefined }> = ({ error }) => {
   return (
     <div
       className={mergeClasses(
         "tw-flex tw-transition-all tw-duration-100 tw-text-red-600 tw-mt-1 tw-w-full tw-text-xs tw-h-0",
-        error && "tw-h-2 tw-mb-3"
+        error && "tw-h-2 tw-mb-3",
       )}
     >
       {error && (
@@ -275,7 +263,7 @@ export function wrapHandleSubmit<T extends FieldValues>(
   handleSubmit: UseFormHandleSubmit<T>,
   onSubmit: ((values: T) => Promise<SubmitResult>) | undefined,
   setError: (error: string) => void,
-  nextStep?: () => void
+  nextStep?: () => void,
 ) {
   return handleSubmit(async (values: T) => {
     if (onSubmit) {

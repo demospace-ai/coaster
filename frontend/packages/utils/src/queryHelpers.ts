@@ -1,7 +1,7 @@
 "use client";
 
-import { consumeError } from "@coaster/utils";
 import { useState } from "react";
+import { consumeError } from "./client-error";
 
 type AsyncFunction<Data, Args> = (variables: Args) => Promise<Data>;
 

@@ -1,4 +1,4 @@
-import { isProd } from "@coaster/utils";
+import { isProd } from "./env";
 
 export function getGcsImageUrl(storageID: string) {
   const bucketName = isProd() ? "user-images-bucket-us" : "dev-user-images-bucket";

@@ -1,7 +1,16 @@
-import { getUserServer } from "@coaster/rpc/server";
-import { OAuthCallbackInner } from "./OAuthCallback.client";
+"use client";
+
+import { useEffect } from "react";
+import { Loading } from "../loading/Loading";
+import { MessageType } from "../login/message";
 
 export async function OAuthCallback() {
-  const user = await getUserServer();
-  return <OAuthCallbackInner user={user} />;
+  useEffect(() => {
+    if (window.opener) {
+      window.opener.postMessage({ type: MessageType.Done });
+      window.close();
+    }
+  }, []);
+
+  return <Loading />;
 }

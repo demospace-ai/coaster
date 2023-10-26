@@ -1,6 +1,7 @@
 "use client";
 
-import { mergeClasses, useIsMobile } from "@coaster/utils";
+import { useIsMobile } from "@coaster/utils/client";
+import { mergeClasses } from "@coaster/utils/common";
 import {
   FloatingFocusManager,
   autoUpdate,

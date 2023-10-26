@@ -1,4 +1,4 @@
-import { mergeClasses } from "@coaster/utils";
+import { mergeClasses } from "@coaster/utils/common";
 
 export const ProfilePicture: React.FC<{
   url: string | undefined;

@@ -3,7 +3,7 @@
 import { Button, Loading, Modal } from "@coaster/components/client";
 import { DeleteListing, GetHostedListings, sendRequest } from "@coaster/rpc/common";
 import { Listing } from "@coaster/types";
-import { mergeClasses } from "@coaster/utils";
+import { mergeClasses } from "@coaster/utils/common";
 import { autoUpdate, offset, useClick, useDismiss, useFloating, useInteractions, useRole } from "@floating-ui/react";
 import { Menu, Transition } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";

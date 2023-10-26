@@ -30,7 +30,7 @@ import {
   sendRequest,
 } from "@coaster/rpc/common";
 import { CategoryType, Coordinates, Image, Listing, ListingInput, ListingStatus } from "@coaster/types";
-import { forceErrorMessage, getGcsImageUrl } from "@coaster/utils";
+import { forceErrorMessage, getGcsImageUrl } from "@coaster/utils/common";
 import { EyeIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import update from "immutability-helper";

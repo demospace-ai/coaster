@@ -1,7 +1,7 @@
 "use client";
 
 import { CategoryType } from "@coaster/types";
-import { mergeClasses } from "@coaster/utils";
+import { mergeClasses } from "@coaster/utils/common";
 import {
   autoUpdate,
   offset,

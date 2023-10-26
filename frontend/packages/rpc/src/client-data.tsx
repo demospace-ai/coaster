@@ -14,7 +14,8 @@ import {
   User,
   UserUpdates,
 } from "@coaster/types";
-import { HttpError, Mutation, MutationOpts, forceErrorMessage, isProd, useMutation } from "@coaster/utils";
+import { Mutation, MutationOpts, useMutation } from "@coaster/utils/client";
+import { HttpError, forceErrorMessage, isProd } from "@coaster/utils/common";
 import { H } from "highlight.run";
 import { Dispatch, SetStateAction, createContext, useCallback, useContext, useEffect, useState } from "react";
 import useSWR, { Fetcher, SWRConfiguration, mutate } from "swr";

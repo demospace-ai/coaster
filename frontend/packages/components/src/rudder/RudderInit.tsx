@@ -1,6 +1,6 @@
 "use client";
 
-import { isProd } from "@coaster/utils";
+import { isProd } from "@coaster/utils/common";
 import { RudderAnalytics } from "@rudderstack/analytics-js";
 import { useEffect } from "react";
 

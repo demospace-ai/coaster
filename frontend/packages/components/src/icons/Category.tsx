@@ -1,5 +1,5 @@
 import { Category, CategoryType } from "@coaster/types";
-import { mergeClasses, toTitleCase } from "@coaster/utils";
+import { mergeClasses, toTitleCase } from "@coaster/utils/common";
 
 const EXCLUDED_CATEGORIES: CategoryType[] = [
   Category.Values.buggying,
