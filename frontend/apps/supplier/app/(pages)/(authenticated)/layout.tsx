@@ -1,9 +1,11 @@
-import { getUserServer } from "@coaster/rpc/server";
+"use client";
+
+import { useUserContext } from "@coaster/rpc/client";
 import { redirect } from "next/navigation";
 
-export default async function RequireAuth({ children }: { children: React.ReactNode }) {
-  const user = await getUserServer();
-  console.log("user", user);
+export default function RequireAuth({ children }: { children: React.ReactNode }) {
+  // TODO: this doesn't work
+  const { user } = useUserContext();
   if (!user) {
     redirect("/login");
   }
