@@ -1,6 +1,5 @@
 "use client";
 
-import { Loading } from "@coaster/components/src/loading/Loading";
 import { mergeClasses, useIsMobile } from "@coaster/utils";
 import {
   FloatingFocusManager,
@@ -17,6 +16,7 @@ import {
 import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import { DateRange, DayPicker, DayPickerProps, DayPickerSingleProps } from "react-day-picker";
+import { Loading } from "../loading/Loading";
 export const DateRangePicker: React.FC<DayPickerProps> = ({
   className,
   classNames = {},

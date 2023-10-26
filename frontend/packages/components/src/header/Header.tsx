@@ -1,10 +1,5 @@
 "use client";
 
-import { useUserContext } from "@coaster/components/src/auth/UserProviderClient";
-import { NavLink } from "@coaster/components/src/link/Link";
-import { Loading } from "@coaster/components/src/loading/Loading";
-import { ProfilePicture } from "@coaster/components/src/profile/ProfilePicture";
-import { SearchBarHeader } from "@coaster/components/src/search/SearchBar";
 import { useLogout } from "@coaster/rpc/client";
 import { useDispatch } from "@coaster/state";
 import { isProd, lateef, mergeClasses } from "@coaster/utils";
@@ -14,6 +9,11 @@ import { ArrowRightOnRectangleIcon, Bars3Icon, XMarkIcon } from "@heroicons/reac
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { Fragment, useEffect, useState } from "react";
+import { useUserContext } from "../auth/UserProviderClient";
+import { NavLink } from "../link/Link";
+import { Loading } from "../loading/Loading";
+import { ProfilePicture } from "../profile/ProfilePicture";
+import { SearchBarHeader } from "../search/SearchBar";
 
 export const Header: React.FC = () => {
   const pathname = usePathname();

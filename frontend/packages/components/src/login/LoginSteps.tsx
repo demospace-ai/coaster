@@ -1,12 +1,5 @@
 "use client";
 
-import { Button } from "@coaster/components/src/button/Button";
-import { FormError } from "@coaster/components/src/error/FormError";
-import { GoogleIcon } from "@coaster/components/src/icons/Google";
-import { Input } from "@coaster/components/src/input/Input";
-import { NavLink } from "@coaster/components/src/link/Link";
-import { Loading } from "@coaster/components/src/loading/Loading";
-import { LoginMessage, MessageType } from "@coaster/components/src/login/message";
 import { useOnLoginSuccess } from "@coaster/rpc/client";
 import {
   CheckEmail,
@@ -24,6 +17,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { Button } from "../button/Button";
+import { FormError } from "../error/FormError";
+import { GoogleIcon } from "../icons/Google";
+import { Input } from "../input/Input";
+import { NavLink } from "../link/Link";
+import { Loading } from "../loading/Loading";
+import { LoginMessage, MessageType } from "./message";
 
 export enum LoginStep {
   Start = "start",

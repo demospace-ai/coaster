@@ -1,10 +1,10 @@
 "use client";
 
-import { Portal } from "@coaster/components/src/portal/Portal";
 import { RootState, ToastOptions, useDispatch, useSelector } from "@coaster/state";
 import { Transition } from "@headlessui/react";
 import { CheckCircleIcon, InformationCircleIcon, XCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Fragment, ReactNode } from "react";
+import { Portal } from "../portal/Portal";
 
 type ToastProps = {
   content: React.ReactNode;

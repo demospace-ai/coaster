@@ -1,5 +1,5 @@
 import { Founders } from "@coaster/assets";
-import { Image } from "@coaster/components/src/images/Image";
+import { Image } from "../images/Image";
 
 export const About: React.FC = () => {
   return (

@@ -4,7 +4,6 @@ module.exports = {
   rules: {
     "@typescript-eslint/switch-exhaustiveness-check": "error",
     "@typescript-eslint/quotes": ["error", "double"],
-    "unicorn/filename-case": "off",
     "no-restricted-imports": ["error", {
       "patterns": [".*"]
     }],

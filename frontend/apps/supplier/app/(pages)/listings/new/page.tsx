@@ -20,8 +20,6 @@ import {
   WizardNavButtons,
   wrapHandleSubmit,
 } from "@coaster/components/client";
-import { getGcsImageUrl } from "@coaster/components/server";
-import { createListing, updateListing, useDraftListing, useUpdateListing } from "@coaster/rpc/client";
 import {
   AddListingImage,
   CategoryType,
@@ -34,9 +32,13 @@ import {
   ListingInput,
   ListingStatus,
   UpdateListingImages,
+  createListing,
   sendRequest,
-} from "@coaster/rpc/common";
-import { forceErrorMessage } from "@coaster/utils";
+  updateListing,
+  useDraftListing,
+  useUpdateListing,
+} from "@coaster/rpc";
+import { forceErrorMessage, getGcsImageUrl } from "@coaster/utils";
 import { EyeIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import update from "immutability-helper";

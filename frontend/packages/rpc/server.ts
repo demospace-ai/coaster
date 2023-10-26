@@ -1,1 +1,1 @@
-export * from "@coaster/rpc/src/data";
+export * from "./src/data";

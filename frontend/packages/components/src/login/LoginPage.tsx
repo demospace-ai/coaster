@@ -1,17 +1,10 @@
 "use client";
 
 import { LongLogo } from "@coaster/assets";
-import { useUserContext } from "@coaster/components/src/auth/UserProviderClient";
-import {
-  EmailLoginForm,
-  EmailSignup,
-  GoogleLogin,
-  LoginStep,
-  SendResetForm,
-  StartContent,
-} from "@coaster/components/src/login/LoginSteps";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useUserContext } from "../auth/UserProviderClient";
+import { EmailLoginForm, EmailSignup, GoogleLogin, LoginStep, SendResetForm, StartContent } from "./LoginSteps";
 
 export const LoginPage: React.FC<{ create?: boolean }> = ({ create }) => {
   const user = useUserContext();

@@ -1,17 +1,17 @@
 "use client";
 
 import { LongLogo } from "@coaster/assets";
-import { useUserContext } from "@coaster/components/src/auth/UserProviderClient";
-import { Button } from "@coaster/components/src/button/Button";
-import { FormError } from "@coaster/components/src/error/FormError";
-import { Input } from "@coaster/components/src/input/Input";
-import { Loading } from "@coaster/components/src/loading/Loading";
 import { useResetPassword } from "@coaster/rpc/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useUserContext } from "../auth/UserProviderClient";
+import { Button } from "../button/Button";
+import { FormError } from "../error/FormError";
+import { Input } from "../input/Input";
+import { Loading } from "../loading/Loading";
 
 const ResetPasswordFormSchema = z
   .object({

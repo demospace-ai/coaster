@@ -1,6 +1,5 @@
 "use client";
 
-import { Loading } from "@coaster/components/src/loading/Loading";
 import { isProd, mergeClasses } from "@coaster/utils";
 import {
   autoUpdate,
@@ -19,6 +18,7 @@ import { Transition } from "@headlessui/react";
 import { MagnifyingGlassIcon, MapPinIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { usePathname, useSearchParams } from "next/navigation";
 import { FormEvent, Fragment, HTMLProps, ReactElement, useEffect, useRef, useState } from "react";
+import { Loading } from "../loading/Loading";
 
 const PRODUCTION_MAPS_KEY = "AIzaSyC5eBlci7ImDnJ0TRhT5uUq1LsKdxJOZP8";
 const DEVELOPMENT_MAPS_KEY = "AIzaSyD5BH5C_jcdkqpt3PnzEbgRfTv_0Lx6Huw";

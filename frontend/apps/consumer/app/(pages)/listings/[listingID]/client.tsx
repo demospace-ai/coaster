@@ -11,11 +11,10 @@ import {
   correctToUTC,
   useShowToast,
 } from "@coaster/components/client";
-import { getGcsImageUrl } from "@coaster/components/server";
 import { useAvailability, useCreateCheckoutLink } from "@coaster/rpc/client";
 import { Availability, AvailabilityType, Listing as ListingType, User } from "@coaster/rpc/common";
 import { useDispatch } from "@coaster/state";
-import { ToTimeOnly, mergeClasses, toTitleCase, useWindowDimensions } from "@coaster/utils";
+import { ToTimeOnly, getGcsImageUrl, mergeClasses, toTitleCase, useWindowDimensions } from "@coaster/utils";
 import { Dialog, Disclosure, RadioGroup, Transition } from "@headlessui/react";
 import {
   ArrowUpOnSquareIcon,

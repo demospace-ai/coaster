@@ -1,7 +1,6 @@
 "use client";
 
 import { Button, Card, FormError, Loading, Modal } from "@coaster/components/client";
-import { getGcsImageUrl } from "@coaster/components/server";
 import {
   AddListingImage,
   DeleteListingImage,
@@ -10,8 +9,8 @@ import {
   Listing,
   UpdateListingImages,
   sendRequest,
-} from "@coaster/rpc/common";
-import { forceErrorMessage } from "@coaster/utils";
+} from "@coaster/rpc/server";
+import { forceErrorMessage, getGcsImageUrl } from "@coaster/utils";
 import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import update from "immutability-helper";
 import { FormEvent, useCallback, useRef, useState } from "react";

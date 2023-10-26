@@ -1,5 +1,5 @@
 import { LongLogo, Mail } from "@coaster/assets";
-import { NavLink } from "@coaster/components/src/link/Link";
+import { NavLink } from "../link/Link";
 
 export const Unauthorized: React.FC = () => {
   return (

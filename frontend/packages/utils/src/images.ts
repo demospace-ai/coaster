@@ -1,4 +1,4 @@
-import { Image } from "@coaster/rpc/common";
+import { Image } from "@coaster/rpc";
 import { isProd } from "@coaster/utils";
 
 export function getGcsImageUrl(image: Image) {

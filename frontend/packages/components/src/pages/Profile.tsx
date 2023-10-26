@@ -1,12 +1,5 @@
 "use client";
 
-import { useUserContext } from "@coaster/components/src/auth/UserProviderClient";
-import { Button } from "@coaster/components/src/button/Button";
-import { FormError } from "@coaster/components/src/error/FormError";
-import { Input, TextArea } from "@coaster/components/src/input/Input";
-import { Loading } from "@coaster/components/src/loading/Loading";
-import { useShowToast } from "@coaster/components/src/notifications/Notifications";
-import { ProfilePicture } from "@coaster/components/src/profile/ProfilePicture";
 import { useUpdateProfilePicture, useUpdateUser } from "@coaster/rpc/client";
 import { UserUpdates } from "@coaster/rpc/common";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,6 +7,13 @@ import { redirect } from "next/navigation";
 import { FormEvent, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useUserContext } from "../auth/UserProviderClient";
+import { Button } from "../button/Button";
+import { FormError } from "../error/FormError";
+import { Input, TextArea } from "../input/Input";
+import { Loading } from "../loading/Loading";
+import { useShowToast } from "../notifications/Notifications";
+import { ProfilePicture } from "../profile/ProfilePicture";
 
 const ProfileFormSchema = z
   .object({

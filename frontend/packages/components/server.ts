@@ -1,3 +1,2 @@
-export * from "@coaster/components/src/auth/RequireAuth";
-export * from "@coaster/components/src/auth/UserProvider";
-export * from "@coaster/components/src/images/utils";
+export * from "./src/auth/RequireAuth";
+export * from "./src/auth/UserProvider";
