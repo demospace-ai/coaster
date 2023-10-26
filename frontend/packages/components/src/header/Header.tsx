@@ -46,7 +46,7 @@ export const Header: React.FC = () => {
 
 const LogoLink: React.FC = () => {
   return (
-    <div className="tw-flex tw-flex-1 tw-flex-row tw-h-fit tw-box-border tw-w-fit">
+    <div className="tw-flex tw-flex-1 tw-flex-row tw-h-fit tw-box-border tw-w-fit tw-cursor-pointer">
       <Link
         className={mergeClasses(
           lateef.className,
