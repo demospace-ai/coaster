@@ -2,7 +2,7 @@ import { HttpError } from "@coaster/utils";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { sendRequest } from "./ajax";
-import { CheckSession, GetListing, SearchListings } from "./api";
+import { CheckSession, GetFeaturedListings, GetHostedListings, GetListing, SearchListings } from "./api";
 import { Listing } from "./types";
 
 export async function getUserServer() {
@@ -26,7 +26,7 @@ export async function getUserServer() {
   }
 }
 
-export async function getListingServer(listingID: number): Promise<Listing | undefined> {
+export async function getListingServer(listingID: number): Promise<Listing> {
   return sendRequest(GetListing, { pathParams: { listingID } });
 }
 
@@ -41,4 +41,12 @@ export async function search(location: string | undefined, categories: string | 
   }
 
   return sendRequest(SearchListings, { queryParams });
+}
+
+export async function getHostedListingsServer() {
+  return sendRequest(GetHostedListings);
+}
+
+export async function getFeaturedServer(): Promise<Listing[]> {
+  return sendRequest(GetFeaturedListings);
 }

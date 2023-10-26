@@ -188,6 +188,11 @@ export const ReserveSlider: React.FC<{
                             mode="single"
                             disabled={(day: Date) => {
                               // TODO: this should account for the capacity and number of guests selected
+                              const today = new Date();
+                              if (day < today) {
+                                return false;
+                              }
+
                               for (const date of correctedAvailability) {
                                 if (date.toDateString() === day.toDateString()) {
                                   return false;
@@ -428,6 +433,10 @@ export const BookingPanel: React.FC<{ user: User | undefined; listing: ListingTy
             loading={loading}
             disabled={(day: Date) => {
               // TODO: this should account for the capacity and number of guests selected
+              const today = new Date();
+              if (day < today) {
+                return false;
+              }
               for (const date of correctedAvailability) {
                 if (date.toDateString() === day.toDateString()) {
                   return false;

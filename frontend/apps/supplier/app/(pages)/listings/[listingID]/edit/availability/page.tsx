@@ -10,7 +10,7 @@ import {
   GetAvailabilityRules,
   Listing,
   sendRequest,
-} from "@coaster/rpc/server";
+} from "@coaster/rpc/common";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { ReactNode, useState } from "react";
 import { NewRuleForm } from "supplier/app/(pages)/listings/[listingID]/edit/availability/NewAvailabilityRule";

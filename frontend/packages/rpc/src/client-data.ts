@@ -137,7 +137,7 @@ export function useSearch(location?: string, categories?: string) {
   return { listings: data, mutate, error, loading: isLoading || isValidating };
 }
 
-export function useFeatured(categories?: string) {
+export function useFeatured(categories?: string, initialData?: Listing[]) {
   const fetcher: Fetcher<Listing[], { categories?: string }> = ({ categories }) => {
     const queryParams: { categories?: string } = {};
     if (categories) {
@@ -146,7 +146,9 @@ export function useFeatured(categories?: string) {
 
     return sendRequest(GetFeaturedListings, { queryParams });
   };
-  const { data, mutate, error, isLoading, isValidating } = useSWR({ GetFeaturedListings, categories }, fetcher);
+  const { data, mutate, error, isLoading, isValidating } = useSWR({ GetFeaturedListings, categories }, fetcher, {
+    fallbackData: initialData,
+  });
   return { featured: data, mutate, error, loading: isLoading || isValidating };
 }
 

@@ -1,3 +1,5 @@
+"use client";
+
 import { useListing } from "@coaster/rpc/client";
 import { Listing } from "@coaster/rpc/common";
 import { createContext, useContext } from "react";
