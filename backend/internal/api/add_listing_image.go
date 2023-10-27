@@ -77,6 +77,8 @@ func (s ApiService) AddListingImage(auth auth.Authentication, w http.ResponseWri
 		return errors.Wrap(err, "(api.AddListingImage) decoding image config")
 	}
 
+	file.Seek(0, io.SeekStart)
+
 	client, err := storage.NewClient(context.TODO())
 	if err != nil {
 		return errors.Wrap(err, "(api.AddListingImage) opening storage client")

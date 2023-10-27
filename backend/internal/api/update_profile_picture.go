@@ -44,6 +44,8 @@ func (s ApiService) UpdateProfilePicture(auth auth.Authentication, w http.Respon
 		return errors.Wrap(err, "(api.AddListingImage) decoding image config")
 	}
 
+	file.Seek(0, io.SeekStart)
+
 	client, err := storage.NewClient(context.TODO())
 	if err != nil {
 		return errors.Wrap(err, "(api.UpdateProfilePicture) opening storage client")
