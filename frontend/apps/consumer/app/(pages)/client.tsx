@@ -90,6 +90,7 @@ const CategorySelector: React.FC<{
         >
           <button
             className="tw-p-1 tw-rounded-full tw-bg-white tw-border tw-border-solid tw-border-slate-300"
+            aria-label="Scroll category back"
             onClick={(e) => {
               e.stopPropagation();
               scrollBack();
@@ -108,6 +109,7 @@ const CategorySelector: React.FC<{
         >
           <button
             className="tw-p-1 tw-rounded-full tw-bg-white tw-border tw-border-solid tw-border-slate-300"
+            aria-label="Scroll category forward"
             onClick={(e) => {
               e.stopPropagation();
               scrollForward();
@@ -130,6 +132,7 @@ const CategorySelector: React.FC<{
                 category == selected && "tw-border-slate-900 hover:tw-border-slate-900",
               )}
               key={category}
+              aria-label={getCategoryForDisplay(category)}
               onClick={() => setSelected(category)}
             >
               {getCategoryIcon(category)}
