@@ -4,8 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"image"
 	"io"
 	"net/http"
+
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
+
+	_ "golang.org/x/image/webp"
 
 	"cloud.google.com/go/storage"
 	"github.com/google/uuid"
@@ -32,6 +39,11 @@ func (s ApiService) UpdateProfilePicture(auth auth.Authentication, w http.Respon
 		return errors.NewBadRequestf("Unsupported image type: %s", contentType)
 	}
 
+	imageCfg, _, err := image.DecodeConfig(file)
+	if err != nil {
+		return errors.Wrap(err, "(api.AddListingImage) decoding image config")
+	}
+
 	client, err := storage.NewClient(context.TODO())
 	if err != nil {
 		return errors.Wrap(err, "(api.UpdateProfilePicture) opening storage client")
@@ -53,7 +65,7 @@ func (s ApiService) UpdateProfilePicture(auth auth.Authentication, w http.Respon
 	}
 
 	// TODO: do this transactionally or figure out something to handle failures
-	user, err := users.UpdateProfilePicture(s.db, auth.User, getProfilePictureURL(storageID))
+	user, err := users.UpdateProfilePicture(s.db, auth.User, getProfilePictureURL(storageID), imageCfg.Width, imageCfg.Height)
 	if err != nil {
 		return errors.Wrap(err, "(api.UpdateProfilePicture) saving listing image details to DB")
 	}

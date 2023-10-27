@@ -78,6 +78,8 @@ type ListingImage struct {
 	ListingID int64  `json:"listing_id"`
 	StorageID string `json:"storage_id"`
 	Rank      int    `json:"rank"` // TODO: use lexorank for this
+	Width     int    `json:"width"`
+	Height    int    `json:"height"`
 
 	BaseModel
 }

@@ -90,8 +90,10 @@ func UpdateUser(db *gorm.DB, user *models.User, updates input.UserUpdates) (*mod
 	return user, nil
 }
 
-func UpdateProfilePicture(db *gorm.DB, user *models.User, profilePictureUrl string) (*models.User, error) {
+func UpdateProfilePicture(db *gorm.DB, user *models.User, profilePictureUrl string, width int, height int) (*models.User, error) {
 	user.ProfilePictureURL = &profilePictureUrl
+	user.ProfilePictureWidth = &width
+	user.ProfilePictureHeight = &height
 
 	result := db.Save(user)
 	if result.Error != nil {
@@ -176,7 +178,7 @@ func GetOrCreateForExternalInfo(db *gorm.DB, externalUserInfo *oauth.ExternalUse
 }
 
 func SetIsHost(db *gorm.DB, userID int64, isHost bool) error {
-	result := db.Model(&models.User{}).Where("id = ?", userID).Update("is_host", isHost)
+	result := db.Table("users").Where("id = ?", userID).Update("is_host", isHost)
 	if result.Error != nil {
 		return errors.Wrap(result.Error, "(users.SetIsHost)")
 	}

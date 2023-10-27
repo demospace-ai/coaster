@@ -11,10 +11,17 @@ import {
 } from "consumer/app/(pages)/listings/[listingID]/client";
 import { getDuration, getHostName, getMaxGuests } from "consumer/app/(pages)/listings/[listingID]/utils";
 
+export async function generateMetadata({ params }: { params: { listingID: string } }) {
+  const listing = await getListingServer(Number(params.listingID));
+  return {
+    title: listing.name,
+  };
+}
+
 export default async function Listing({ params }: { params: { listingID: string } }) {
   const user = await getUserServer();
 
-  const listingID = Number(params?.listingID);
+  const listingID = Number(params.listingID);
   if (Number.isNaN(listingID)) {
     // Sometimes the value of listingID is TODO
     return <div>Something unexpected happened.</div>;

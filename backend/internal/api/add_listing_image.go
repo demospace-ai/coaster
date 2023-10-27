@@ -3,9 +3,16 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"image"
 	"io"
 	"net/http"
 	"strconv"
+
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
+
+	_ "golang.org/x/image/webp"
 
 	"cloud.google.com/go/storage"
 	"github.com/google/uuid"
@@ -17,7 +24,7 @@ import (
 	"go.fabra.io/server/common/views"
 )
 
-var SUPPORTED_IMAGE_TYPES = map[string]bool{"image/jpeg": true, "image/png": true, "image/gif": true, "image/svg+xml": true, "image/webp": true}
+var SUPPORTED_IMAGE_TYPES = map[string]bool{"image/jpeg": true, "image/png": true, "image/gif": true, "image/webp": true}
 
 func (s ApiService) AddListingImage(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
@@ -65,6 +72,11 @@ func (s ApiService) AddListingImage(auth auth.Authentication, w http.ResponseWri
 		return errors.NewBadRequestf("Unsupported image type: %s", contentType)
 	}
 
+	imageCfg, _, err := image.DecodeConfig(file)
+	if err != nil {
+		return errors.Wrap(err, "(api.AddListingImage) decoding image config")
+	}
+
 	client, err := storage.NewClient(context.TODO())
 	if err != nil {
 		return errors.Wrap(err, "(api.AddListingImage) opening storage client")
@@ -91,6 +103,8 @@ func (s ApiService) AddListingImage(auth auth.Authentication, w http.ResponseWri
 		listingID,
 		storageID,
 		maxRank+1,
+		imageCfg.Width,
+		imageCfg.Height,
 	)
 	if err != nil {
 		return errors.Wrap(err, "(api.AddListingImage) saving listing image details to DB")

@@ -276,11 +276,13 @@ func UpdateListing(db *gorm.DB, listing *models.Listing, listingUpdates input.Li
 	return listing, nil
 }
 
-func CreateListingImage(db *gorm.DB, listingID int64, storageID string, rank int) (*models.ListingImage, error) {
+func CreateListingImage(db *gorm.DB, listingID int64, storageID string, rank int, width int, height int) (*models.ListingImage, error) {
 	listingImage := models.ListingImage{
 		ListingID: listingID,
 		StorageID: storageID,
 		Rank:      rank,
+		Width:     width,
+		Height:    height,
 	}
 
 	result := db.Create(&listingImage)
