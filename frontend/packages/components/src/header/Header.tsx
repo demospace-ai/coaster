@@ -340,23 +340,23 @@ export const SupplierHeader: React.FC = () => {
 
 const SupplierLinks: React.FC = () => {
   return (
-    <div className="tw-flex tw-w-full tw-justify-center">
+    <div className="tw-hidden sm:tw-flex tw-w-full tw-justify-center">
       <NavLink
-        className="tw-hidden lg:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
+        className="tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
         activeClassName="tw-bg-gray-100"
         href="/"
       >
         Home
       </NavLink>
       <NavLink
-        className="tw-hidden lg:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
+        className="tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
         activeClassName="tw-bg-gray-100"
         href="/listings"
       >
         Listings
       </NavLink>
       <NavLink
-        className="tw-hidden lg:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
+        className="tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
         activeClassName="tw-bg-gray-100"
         href="/finance"
       >

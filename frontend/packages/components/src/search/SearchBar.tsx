@@ -15,6 +15,7 @@ import {
 } from "@floating-ui/react";
 import { Dialog, Transition } from "@headlessui/react";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Fragment, useRef, useState } from "react";
 import { getCategoryForDisplay, getCategoryIcon, getSearchableCategories } from "../icons/Category";
@@ -190,18 +191,18 @@ const SearchBarDropdown: React.FC<{
               </div>
               <div className="tw-flex tw-flex-col tw-gap-2 tw-overflow-auto tw-overscroll-contain tw-p-2 tw-text-sm">
                 {filteredCategories.map((category, idx) => (
-                  <div
+                  <Link
                     key={category}
                     ref={(node) => (listRef.current[idx] = node)}
                     className={mergeClasses(
                       "tw-flex tw-flex-row tw-items-center tw-gap-3 tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 hover:tw-bg-slate-50 tw-rounded-lg",
                       idx === activeIndex && "tw-bg-slate-100",
                     )}
-                    onClick={() => search(category)}
+                    href={`/search?categories=["${category}"]`}
                   >
                     {getCategoryIcon(category, "tw-h-14 tw-w-14 tw-p-3 tw-bg-gray-100 tw-rounded-lg")}
                     <span className="tw-font-medium">{getCategoryForDisplay(category)}</span>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -222,11 +223,6 @@ const SearchBarDropdown: React.FC<{
 const SearchModal: React.FC<{ open: boolean; close: () => void }> = ({ open, close }) => {
   const router = useRouter();
   const buttonRef = useRef<HTMLButtonElement>(null);
-
-  const search = (category: CategoryType) => {
-    router.push(`/search?categories=["${category}"]`);
-    close();
-  };
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -268,14 +264,14 @@ const SearchModal: React.FC<{ open: boolean; close: () => void }> = ({ open, clo
               <div className="tw-flex tw-flex-col tw-w-full tw-gap-2 tw-p-6 tw-pt-0 tw-overflow-auto tw-h-full">
                 <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-3 sm:tw-grid-cols-4 tw-py-5 tw-gap-5 sm:tw-gap-6">
                   {getSearchableCategories().map((category) => (
-                    <div key={category} onClick={() => search(category)}>
+                    <Link key={category} href={`/search?categories=["${category}"]`} onClick={() => close()}>
                       <div className="tw-flex tw-flex-col tw-justify-center tw-items-center tw-cursor-pointer tw-select-none tw-p-2 tw-rounded-lg">
                         {getCategoryIcon(category)}
                         <span className="tw-text-xs tw-font-medium tw-mt-1 sm:tw-mt-2">
                           {getCategoryForDisplay(category)}
                         </span>
                       </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
                 {/* <Disclosure>

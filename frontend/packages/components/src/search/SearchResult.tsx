@@ -3,12 +3,12 @@
 import { Listing } from "@coaster/types";
 import { getGcsImageUrl } from "@coaster/utils/common";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { NavLink } from "../link/Link";
 
 export const SearchResult: React.FC<{ listing: Listing }> = ({ listing }) => {
   return (
-    <NavLink
+    <Link
       className="tw-flex tw-flex-col tw-text-base tw-font-medium tw-cursor-pointer tw-text-ellipsis"
       href={`/listings/${listing.id}`}
     >
@@ -20,7 +20,7 @@ export const SearchResult: React.FC<{ listing: Listing }> = ({ listing }) => {
       <span className="tw-mt-2 sm:tw-mt-3 tw-font-bold tw-text-lg">{listing.name}</span>
       <span>{listing.location}</span>
       <span>${listing.price}</span>
-    </NavLink>
+    </Link>
   );
 };
 
