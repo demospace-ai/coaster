@@ -71,8 +71,8 @@ const SearchListingImages: React.FC<{ listing: Listing }> = ({ listing }) => {
   // Use effect to attach to the scrollend event rather than just every scroll
   useEffect(() => {
     if (carouselRef.current) {
-      carouselRef.current.addEventListener("scrollend", handleScroll);
-      carouselRef.current.addEventListener("touchend", handleScroll);
+      carouselRef.current.addEventListener("scrollend", handleScroll, { passive: true });
+      carouselRef.current.addEventListener("touchend", handleScroll, { passive: true });
       setWidth(carouselRef.current.clientWidth);
     }
     return () => {

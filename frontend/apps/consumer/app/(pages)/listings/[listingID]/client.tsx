@@ -545,15 +545,15 @@ export const ImagesModal: React.FC<{
   );
 
   useEffect(() => {
-    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown, { passive: true });
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
   // Use effect to attach to the scrollend event rather than just every scroll
   useEffect(() => {
     if (carouselRef.current) {
-      carouselRef.current.addEventListener("scrollend", handleScroll);
-      carouselRef.current.addEventListener("touchend", handleScroll);
+      carouselRef.current.addEventListener("scrollend", handleScroll, { passive: true });
+      carouselRef.current.addEventListener("touchend", handleScroll, { passive: true });
     }
     return () => {
       carouselRef.current?.removeEventListener("scrollend", handleScroll);

@@ -487,7 +487,7 @@ const useOpenGooglePopup = (
     };
     const y = window.outerHeight / 2 + window.screenY - 300;
     const x = window.outerWidth / 2 + window.screenX - 240;
-    window.addEventListener("message", handleMessage, false);
+    window.addEventListener("message", handleMessage);
     window.open(
       getEndpointUrl(OAuthRedirect, { provider: OAuthProvider.Google, origin: window.location.origin }),
       "google-oauth",
