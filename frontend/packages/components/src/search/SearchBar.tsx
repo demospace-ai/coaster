@@ -155,7 +155,7 @@ const SearchBarDropdown: React.FC<{
           placeholder="Choose a category"
         />
         <form
-          className="tw-relative tw-z-[1]"
+          className="tw-relative"
           ref={refs.setFloating}
           style={floatingStyles}
           {...getFloatingProps()}
