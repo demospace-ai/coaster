@@ -31,15 +31,19 @@ type Listing struct {
 type Image struct {
 	ID        int64  `json:"id"`
 	StorageID string `json:"storage_id"`
+	Width     int    `json:"width"`
+	Height    int    `json:"height"`
 }
 
 type Host struct {
-	ID                int64   `json:"id"`
-	FirstName         string  `json:"first_name"`
-	LastName          string  `json:"last_name"`
-	Email             string  `json:"email"`
-	ProfilePictureURL *string `json:"profile_picture_url"`
-	About             *string `json:"about"`
+	ID                   int64   `json:"id"`
+	FirstName            string  `json:"first_name"`
+	LastName             string  `json:"last_name"`
+	Email                string  `json:"email"`
+	ProfilePictureURL    *string `json:"profile_picture_url"`
+	ProfilePictureWidth  *int    `json:"profile_picture_width"`
+	ProfilePictureHeight *int    `json:"profile_picture_height"`
+	About                *string `json:"about"`
 }
 
 type Coordinates struct {
@@ -88,12 +92,14 @@ func ConvertListing(listing listings.ListingDetails) Listing {
 func ConvertHost(user *models.User) Host {
 	// TODO: prevent email when email is not verified
 	return Host{
-		ID:                user.ID,
-		FirstName:         user.FirstName,
-		LastName:          user.LastName,
-		Email:             user.Email,
-		ProfilePictureURL: user.ProfilePictureURL,
-		About:             user.About,
+		ID:                   user.ID,
+		FirstName:            user.FirstName,
+		LastName:             user.LastName,
+		Email:                user.Email,
+		ProfilePictureURL:    user.ProfilePictureURL,
+		ProfilePictureWidth:  user.ProfilePictureWidth,
+		ProfilePictureHeight: user.ProfilePictureHeight,
+		About:                user.About,
 	}
 }
 
@@ -103,6 +109,8 @@ func ConvertImages(images []models.ListingImage) []Image {
 		converted[i] = Image{
 			ID:        image.ID,
 			StorageID: image.StorageID,
+			Width:     image.Width,
+			Height:    image.Height,
 		}
 	}
 
