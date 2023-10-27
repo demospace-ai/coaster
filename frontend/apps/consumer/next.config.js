@@ -13,6 +13,12 @@ module.exports = withBundleAnalyzer({
         port: "",
         pathname: "/dev-user-images-bucket/**",
       },
+      {
+        protocol: "https",
+        hostname: "storage.googleapis.com",
+        port: "",
+        pathname: "/user-images-bucket-us/**",
+      },
     ],
   },
   experimental:{
