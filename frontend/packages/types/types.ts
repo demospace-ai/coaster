@@ -246,6 +246,11 @@ export interface EmailLoginResponse {
   user: User;
 }
 
+export interface ListingMetadata {
+  id: number;
+  updated_at: Date;
+}
+
 export const Category = z.enum([
   "surfing",
   "fishing",

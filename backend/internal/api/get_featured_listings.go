@@ -10,10 +10,6 @@ import (
 	"go.fabra.io/server/common/views"
 )
 
-type GetFeaturedListingsResponse struct {
-	Listings []views.Listing `json:"listings"`
-}
-
 func (s ApiService) GetFeaturedListings(w http.ResponseWriter, r *http.Request) error {
 	categoryParam := r.URL.Query().Get("categories")
 
@@ -22,7 +18,7 @@ func (s ApiService) GetFeaturedListings(w http.ResponseWriter, r *http.Request) 
 	if len(categoryParam) > 0 {
 		listingDetails, err = s.loadFeaturedByCategory(categoryParam)
 		if err != nil {
-			return errors.Wrap(err, "(api.SearchListings) loading listings filtered by category")
+			return errors.Wrap(err, "(api.GetFeaturedListings) loading listings filtered by category")
 		}
 	} else {
 		listingDetails, err = listings.LoadFeatured(s.db)
@@ -38,7 +34,7 @@ func (s ApiService) loadFeaturedByCategory(categoryParam string) ([]listings.Lis
 	var categories []models.ListingCategory
 	err := json.Unmarshal([]byte(categoryParam), &categories)
 	if err != nil {
-		return nil, errors.Wrap(err, "(api.filterByCategory) unmarshalling categories")
+		return nil, errors.Wrap(err, "(api.loadFeaturedByCategory) unmarshalling categories")
 	}
 
 	if len(categories) == 0 {

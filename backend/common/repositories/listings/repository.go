@@ -18,6 +18,11 @@ type ListingDetails struct {
 	Images []models.ListingImage
 }
 
+type ListingMetadata struct {
+	ID        int64     `json:"id"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
 func LoadDetailsByIDAndUser(db *gorm.DB, listingID int64, user *models.User) (*ListingDetails, error) {
 	var listing models.Listing
 	result := db.Table("listings").
@@ -484,4 +489,18 @@ func LoadFeaturedListingsByCategory(db *gorm.DB, categories []models.ListingCate
 	}
 
 	return listingsAndImages, nil
+}
+
+func LoadAllPublishedMetadata(db *gorm.DB) ([]ListingMetadata, error) {
+	var listingMetadataList []ListingMetadata
+	result := db.Table("listings").
+		Select("listings.id", "listings.updated_at").
+		Where("listings.status = ?", models.ListingStatusPublished).
+		Where("listings.deactivated_at IS NULL").
+		Find(&listingMetadataList)
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(listings.LoadAllPublishedIDs)")
+	}
+
+	return listingMetadataList, nil
 }

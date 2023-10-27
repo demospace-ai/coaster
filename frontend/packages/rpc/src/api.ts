@@ -12,6 +12,7 @@ import {
   Image,
   Listing,
   ListingInput,
+  ListingMetadata,
   LoginMethod,
   LoginRequest,
   LoginResponse,
@@ -245,8 +246,8 @@ export const SendInvite: IEndpoint<SendInviteRequest, undefined> = {
   path: "/send_invite",
 };
 
-export const JoinWaitlist: IEndpoint<{ email: string }, undefined> = {
-  name: "Join waitlist",
-  method: "POST",
-  path: "/waitlist",
+export const GetAllListingMetadata: IEndpoint<undefined, ListingMetadata[]> = {
+  name: "Get all listing metadata",
+  method: "GET",
+  path: "/listing_metadata",
 };
