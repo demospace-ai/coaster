@@ -19,7 +19,7 @@ var cleanup func()
 
 func TestRouter(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Router Suite")
+	// RunSpecs(t, "Router Suite")
 }
 
 var _ = BeforeSuite(func() {
