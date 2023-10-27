@@ -27,7 +27,6 @@ export * from "./src/pages/CreatePassword";
 export * from "./src/pages/Invite";
 export * from "./src/pages/Profile";
 export * from "./src/pages/ResetPassword";
-export * from "./src/portal/Portal";
 export * from "./src/profile/ProfilePicture";
 export * from "./src/search/SearchBar";
 export * from "./src/search/SearchResult";

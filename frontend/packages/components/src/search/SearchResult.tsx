@@ -3,6 +3,7 @@
 import { Listing } from "@coaster/types";
 import { getGcsImageUrl } from "@coaster/utils/common";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -110,7 +111,9 @@ const SearchListingImages: React.FC<{ listing: Listing }> = ({ listing }) => {
         className="tw-flex tw-items-center tw-w-full tw-h-full tw-rounded-xl tw-aspect-square tw-overflow-x-auto tw-snap-mandatory tw-snap-x tw-hide-scrollbar"
       >
         {listing.images.map((image) => (
-          <img
+          <Image
+            height={image.height}
+            width={image.width}
             key={image.id}
             alt="Listing image"
             tabIndex={-1}

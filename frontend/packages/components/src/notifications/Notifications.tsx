@@ -1,10 +1,9 @@
 "use client";
 
 import { RootState, ToastOptions, useDispatch, useSelector } from "@coaster/state";
-import { Transition } from "@headlessui/react";
+import { Portal, Transition } from "@headlessui/react";
 import { CheckCircleIcon, InformationCircleIcon, XCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Fragment, ReactNode } from "react";
-import { Portal } from "../portal/Portal";
 
 type ToastProps = {
   content: React.ReactNode;
@@ -65,13 +64,11 @@ export const Toast: React.FC<ToastProps> = ({ content, show, duration, close }) 
 
   return (
     <>
-      {/* Global notification live region, render this permanently at the end of the document */}
       <div
         aria-live="assertive"
         className="tw-z-[60] tw-pointer-events-none tw-fixed tw-inset-0 tw-flex tw-p-6 tw-items-start" // z-index is tied to Modal z-index (toast should be bigger)
       >
         <div className="tw-flex tw-w-full tw-flex-col tw-space-y-4 tw-items-end">
-          {/* Notification panel, dynamically insert this into the live region when it needs to be displayed */}
           <Transition
             show={show}
             as={Fragment}

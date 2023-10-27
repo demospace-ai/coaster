@@ -67,7 +67,7 @@ const ReserveFooter: React.FC<{ user: User | undefined; listing: ListingType }> 
 
 const ListingDetails: React.FC<{ listing: ListingType }> = ({ listing }) => {
   return (
-    <div className="tw-flex tw-flex-col tw-w-full md:tw-mr-16">
+    <div className="tw-flex tw-flex-col tw-w-full lg:tw-mr-16">
       <HostOverview listing={listing} />
       <QuickInfo listing={listing} />
       <Description listing={listing} />

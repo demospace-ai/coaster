@@ -100,6 +100,8 @@ export interface TimeSlot {
 export interface Image {
   id: number;
   storage_id: string;
+  width: number;
+  height: number;
 }
 
 export interface Host {

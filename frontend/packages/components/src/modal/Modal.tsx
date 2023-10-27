@@ -4,7 +4,6 @@ import { mergeClasses } from "@coaster/utils/common";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import React, { Fragment } from "react";
-import { Portal } from "../portal/Portal";
 
 interface ModalProps {
   show: boolean;
@@ -18,7 +17,7 @@ interface ModalProps {
 
 export const Modal: React.FC<ModalProps> = (props) => {
   return (
-    <Portal>
+    <>
       <Transition
         appear
         show={props.show}
@@ -77,7 +76,7 @@ export const Modal: React.FC<ModalProps> = (props) => {
           </Transition.Child>
         </Dialog>
       </Transition>
-    </Portal>
+    </>
   );
 };
 

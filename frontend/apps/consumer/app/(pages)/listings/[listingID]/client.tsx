@@ -5,7 +5,6 @@ import {
   DatePickerPopper,
   DateRangePicker,
   GuestNumberInput,
-  Modal,
   correctFromUTC,
   correctToUTC,
   useShowToast,
@@ -13,7 +12,7 @@ import {
 import { Loading } from "@coaster/components/common";
 import { useAvailability, useCreateCheckoutLink } from "@coaster/rpc/client";
 import { useDispatch } from "@coaster/state";
-import { Availability, AvailabilityType, Listing as ListingType, User } from "@coaster/types";
+import { Availability, AvailabilityType, Image as ListingImage, Listing as ListingType, User } from "@coaster/types";
 import { useWindowDimensions } from "@coaster/utils/client";
 import { ToTimeOnly, getGcsImageUrl, mergeClasses, toTitleCase } from "@coaster/utils/common";
 import { Dialog, Disclosure, RadioGroup, Transition } from "@headlessui/react";
@@ -27,6 +26,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { getDateToTimeSlotMap } from "consumer/app/(pages)/listings/[listingID]/utils";
+import Image from "next/image";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 
 export const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) => {
@@ -496,40 +496,30 @@ export const BookingPanel: React.FC<{ user: User | undefined; listing: ListingTy
 };
 
 export const ImagesModal: React.FC<{
+  show: boolean;
+  close: () => void;
   listing: ListingType;
-  imageIndex: number;
-  setImageIndex: (index: number) => void;
-}> = ({ listing, imageIndex, setImageIndex }) => {
-  const [scrolledToIndex, setScrolledToIndex] = useState(0);
+}> = ({ show, close, listing }) => {
+  const [imageIndex, setImageIndex] = useState(0);
   const { width } = useWindowDimensions();
   const carouselRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (scrolledToIndex !== imageIndex) {
-      setScrolledToIndex(imageIndex);
-      carouselRef.current?.scrollTo({ left: width * imageIndex, behavior: "smooth" });
-    }
-  }, [imageIndex]);
 
   const handleScroll = useCallback(() => {
     if (carouselRef.current) {
       const newIndex = Math.round(carouselRef.current.scrollLeft / width);
       setImageIndex(newIndex);
-      setScrolledToIndex(newIndex);
     }
-  }, []);
+  }, [width]);
 
   const scrollForward = () => {
     const newIndex = (imageIndex + 1) % listing.images.length;
     setImageIndex(newIndex);
-    setScrolledToIndex(newIndex);
     carouselRef.current?.scrollTo({ left: width * newIndex, behavior: "smooth" });
   };
 
   const scrollBack = () => {
     const newIndex = (imageIndex - 1) % listing.images.length;
     setImageIndex(newIndex);
-    setScrolledToIndex(newIndex);
     carouselRef.current?.scrollTo({ left: width * newIndex, behavior: "smooth" });
   };
 
@@ -562,101 +552,140 @@ export const ImagesModal: React.FC<{
   }, [carouselRef, handleScroll]);
 
   return (
-    <div>
-      <div className="tw-absolute tw-w-full tw-h-screen tw-z-10 tw-flex tw-items-center tw-pointer-events-none">
-        <button
-          className="tw-fixed tw-right-1 sm:tw-right-[5vw] sm:tw-p-10 tw-rounded-full hover:tw-bg-black hover:tw-bg-opacity-20 tw-transition-colors tw-pointer-events-auto"
-          onClick={(e) => {
-            e.stopPropagation();
-            scrollForward();
-          }}
-        >
-          <ChevronRightIcon className="tw-h-8 sm:tw-h-10 tw-cursor-pointer tw-stroke-slate-300" />
-        </button>
-        <button
-          className="tw-fixed tw-left-1 sm:tw-left-[5vw] sm:tw-p-10 tw-rounded-full hover:tw-bg-black hover:tw-bg-opacity-20 tw-transition-colors tw-pointer-events-auto"
-          onClick={(e) => {
-            e.stopPropagation();
-            scrollBack();
-          }}
-        >
-          <ChevronLeftIcon className="tw-h-8 sm:tw-h-10 tw-cursor-pointer tw-stroke-slate-300" />
-        </button>
-      </div>
-      <div
-        ref={carouselRef}
-        className="tw-absolute tw-left-1/2 -tw-translate-x-1/2 tw-flex tw-pt-[10vh] tw-h-[90vh] tw-w-screen sm:tw-w-[90vw] tw-overflow-x-auto tw-snap-mandatory tw-snap-x tw-items-center tw-hide-scrollbar"
+    <>
+      <Transition
+        show={show}
+        as={Fragment}
+        enter="tw-ease-in tw-duration-150"
+        enterFrom="tw-opacity-0"
+        enterTo="tw-opacity-100"
+        leave="tw-ease-in tw-duration-200"
+        leaveFrom="tw-opacity-100"
+        leaveTo="tw-opacity-0"
       >
-        {listing.images.map((image) => (
-          <div key={image.id} className="tw-flex tw-basis-full tw-snap-center tw-h-full">
-            <div className="tw-flex tw-w-screen sm:tw-w-[90vw] tw-px-10 sm:tw-px-0 tw-h-full tw-justify-center tw-items-center">
-              <img
-                alt="Listing image"
-                className="tw-flex tw-max-h-full tw-object-contain tw-cursor-pointer tw-rounded-xl tw-overflow-hidden"
-                src={getGcsImageUrl(image.storage_id)}
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+        <Dialog
+          className={mergeClasses(
+            "tw-fixed tw-z-50 tw-overscroll-contain tw-top-0 tw-left-0 tw-h-full tw-w-full tw-backdrop-blur-sm tw-bg-black tw-bg-opacity-50", // z-index is tied to Toast z-index (toast should be bigger)
+          )}
+          onClose={close}
+        >
+          <button
+            className="tw-flex tw-absolute tw-z-20 tw-top-4 sm:tw-top-8 tw-right-4 sm:tw-right-8 tw-bg-transparent tw-border-none tw-cursor-pointer tw-p-0 tw-justify-center tw-items-center"
+            onClick={(e) => {
+              e.preventDefault();
+              close();
+            }}
+          >
+            <XMarkIcon className="tw-h-10 tw-stroke-white" />
+          </button>
+          <Transition.Child
+            as={Fragment}
+            enter="tw-ease-in tw-duration-100"
+            enterFrom="tw-scale-95"
+            enterTo="tw-scale-100"
+            leave="tw-ease-in tw-duration-200"
+            leaveFrom="tw-scale-100"
+            leaveTo="tw-scale-95"
+          >
+            <Dialog.Panel>
+              <div className="tw-absolute tw-w-full tw-h-screen tw-z-10 tw-flex tw-items-center tw-pointer-events-none">
+                <button
+                  className="tw-fixed tw-right-1 sm:tw-right-[5vw] sm:tw-p-10 tw-rounded-full hover:tw-bg-black hover:tw-bg-opacity-20 tw-transition-colors tw-pointer-events-auto"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    scrollForward();
+                  }}
+                >
+                  <ChevronRightIcon className="tw-h-8 sm:tw-h-10 tw-cursor-pointer tw-stroke-slate-300" />
+                </button>
+                <button
+                  className="tw-fixed tw-left-1 sm:tw-left-[5vw] sm:tw-p-10 tw-rounded-full hover:tw-bg-black hover:tw-bg-opacity-20 tw-transition-colors tw-pointer-events-auto"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    scrollBack();
+                  }}
+                >
+                  <ChevronLeftIcon className="tw-h-8 sm:tw-h-10 tw-cursor-pointer tw-stroke-slate-300" />
+                </button>
+              </div>
+              <div
+                ref={carouselRef}
+                className="tw-absolute tw-left-1/2 -tw-translate-x-1/2 tw-flex tw-pt-[10vh] tw-h-[90vh] tw-w-screen sm:tw-w-[90vw] tw-overflow-x-auto tw-snap-mandatory tw-snap-x tw-items-center tw-hide-scrollbar"
+              >
+                {listing.images.map((image) => (
+                  <div key={image.id} className="tw-flex tw-basis-full tw-snap-center tw-h-full">
+                    <div className="tw-relative tw-block tw-w-screen sm:tw-w-[90vw] tw-px-10 sm:tw-px-0 tw-h-full">
+                      <Image
+                        alt="Listing image"
+                        className="!tw-w-fit !tw-left-1/2 -tw-translate-x-1/2 tw-object-contain tw-cursor-pointer tw-rounded-xl tw-overflow-hidden"
+                        src={getGcsImageUrl(image.storage_id)}
+                        fill
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Dialog.Panel>
+          </Transition.Child>
+        </Dialog>
+      </Transition>
+    </>
   );
 };
 
 export const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) => {
-  const [imageIndex, setImageIndex] = useState(0);
   const [showImages, setShowImages] = useState(false);
 
   return (
-    <div className="tw-flex tw-max-h-[560px] tw-rounded-xl tw-overflow-clip">
-      <Modal
+    <div className="tw-flex tw-aspect-square tw-h-full sm:tw-h-[560px] tw-max-h-[560px] tw-rounded-xl tw-overflow-clip">
+      <ImagesModal
         show={showImages}
         close={() => {
           setShowImages(false);
         }}
-        noContainer
-      >
-        <ImagesModal listing={listing} imageIndex={imageIndex} setImageIndex={setImageIndex} />
-      </Modal>
-      <div className="tw-relative tw-flex tw-w-full sm:tw-w-2/3 sm:tw-mr-2">
-        <img
+        listing={listing}
+      />
+      <div className="tw-relative tw-flex tw-w-full lg:tw-w-2/3 tw-h-full lg:tw-mr-2">
+        <NullableImage
           alt="Main listing image"
-          className="tw-w-full tw-aspect-square tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
-          src={listing.images.length > 0 ? getGcsImageUrl(listing.images[0].storage_id) : "TODO"}
+          priority
+          className="tw-w-full tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
+          image={listing.images[0]}
           onClick={() => {
-            setImageIndex(0);
             setShowImages(true);
           }}
         />
         <div
-          className="tw-absolute tw-bottom-4 tw-left-1/2 -tw-translate-x-1/2 tw-flex sm:tw-hidden tw-bg-white hover:tw-bg-slate-200 tw-cursor-pointer tw-rounded-3xl tw-border tw-border-black tw-border-solid tw-px-3 tw-text-sm tw-font-medium tw-py-1 tw-w-fit tw-mt-4"
+          className="tw-absolute tw-bottom-4 tw-left-1/2 -tw-translate-x-1/2 tw-flex sm:tw-hidden tw-bg-white hover:tw-bg-slate-200 tw-cursor-pointer tw-rounded-3xl tw-border tw-border-black tw-border-solid tw-px-3 tw-text-sm tw-font-medium tw-py-1 tw-w-fit tw-mt-4 tw-whitespace-nowrap"
           onClick={() => setShowImages(true)}
         >
           See all images →
         </div>
       </div>
-      <div className="tw-relative tw-flex-col tw-w-1/3 tw-gap-2 tw-hidden sm:tw-flex">
-        <img
-          alt="Listing image 2"
-          className="tw-h-1/2 tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
-          src={listing.images.length > 1 ? getGcsImageUrl(listing.images[1].storage_id) : "TODO"}
-          onClick={() => {
-            setImageIndex(1);
-            setShowImages(true);
-          }}
-        />
-        <img
-          alt="Listing image 3"
-          className="tw-h-1/2 tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
-          src={listing.images.length > 2 ? getGcsImageUrl(listing.images[2].storage_id) : "TODO"}
-          onClick={() => {
-            setImageIndex(2);
-            setShowImages(true);
-          }}
-        />
+      <div className="tw-relative tw-flex-col tw-w-1/3 tw-gap-2 tw-hidden lg:tw-flex">
+        <div className="tw-relative tw-block tw-h-1/2 tw-w-full tw-bg-gray-100">
+          <NullableImage
+            alt="Listing image 2"
+            className="tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
+            image={listing.images[1]}
+            onClick={() => {
+              setShowImages(true);
+            }}
+          />
+        </div>
+        <div className="tw-relative tw-block tw-h-1/2 tw-w-full tw-bg-gray-100">
+          <NullableImage
+            alt="Listing image 3"
+            className="tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
+            image={listing.images[2]}
+            onClick={() => {
+              setShowImages(true);
+            }}
+          />
+        </div>
         <div
           className="tw-absolute tw-bottom-3 tw-right-3 tw-bg-white hover:tw-bg-slate-200 tw-cursor-pointer tw-rounded-3xl tw-border tw-border-black tw-border-solid tw-px-3 tw-text-sm tw-font-medium tw-py-1"
           onClick={() => setShowImages(true)}
@@ -666,4 +695,18 @@ export const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) =
       </div>
     </div>
   );
+};
+
+const NullableImage: React.FC<{
+  alt: string;
+  image: ListingImage | undefined;
+  priority?: boolean;
+  className?: string;
+  onClick?: () => void;
+}> = ({ image, ...props }) => {
+  if (image) {
+    return <Image {...props} src={getGcsImageUrl(image.storage_id)} fill />;
+  } else {
+    return <div></div>;
+  }
 };
