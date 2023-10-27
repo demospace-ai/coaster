@@ -72,13 +72,6 @@ export async function sendRequest<
     throw new HttpError(response.status, response.statusText, errorMessage);
   }
 
-  // TODO: clean this up
-  // not all AJAX requests have a response. the ones that do will be formatted as JSON
-  // so just catch any error from trying to fetch the json and do nothing with it
-  if (endpoint.noJson) {
-    return response.text() as ResponseType;
-  }
-
   const dateReviver = (key: string, value: any) => {
     if (typeof value === "string" && /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ$/.test(value)) {
       const d = new Date(value);

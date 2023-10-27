@@ -126,6 +126,8 @@ func CreateUserFromEmail(db *gorm.DB, email string, firstName string, lastName s
 		return nil, errors.Wrap(result.Error, "(users.CreateUserFromEmail) creating user")
 	}
 
+	events.TrackSignup(user.ID, fmt.Sprintf("%s %s", user.FirstName, user.LastName), user.Email)
+
 	return &user, nil
 }
 
