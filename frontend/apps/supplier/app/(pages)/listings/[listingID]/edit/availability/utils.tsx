@@ -3,10 +3,7 @@ import { AvailabilityRuleType, AvailabilityRuleTypeType, AvailabilityType, Avail
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { eachDayOfInterval } from "date-fns";
 import { FieldArrayWithId } from "react-hook-form";
-import {
-  SingleDayTimeSlotSchemaType,
-  TimeSlotSchemaType,
-} from "supplier/app/(pages)/(authenticated)/listings/[listingID]/edit/schema";
+import { SingleDayTimeSlotSchemaType, TimeSlotSchemaType } from "supplier/app/(pages)/listings/[listingID]/edit/schema";
 
 export const DAY_OF_WEEK = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 

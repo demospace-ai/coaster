@@ -1,7 +1,7 @@
 import { NavLink } from "@coaster/components/client";
 import { getHostedListingsServer } from "@coaster/rpc/server";
 import { Listing } from "@coaster/types";
-import { ListingMenu } from "supplier/app/(pages)/(authenticated)/listings/client";
+import { ListingMenu } from "supplier/app/(pages)/listings/client";
 
 export default async function YourListings() {
   const hosted = await getHostedListingsServer();

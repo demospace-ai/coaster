@@ -1,4 +1,4 @@
-import { ErrorBoundary, RudderInit } from "@coaster/components/client";
+import { ErrorBoundary } from "@coaster/components/client";
 import { isProd, worksans } from "@coaster/utils/common";
 import { HighlightInit } from "@highlight-run/next/client";
 import type { Metadata } from "next";
@@ -26,10 +26,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           recordHeadersAndBody: true,
           urlBlocklist: [],
         }}
-      />
-      <RudderInit
-        writeKey="2Va8vvJ85DejVV7jncdVenC6smB"
-        dataPlaneUrl="https://trycoasterlyoh.dataplane.rudderstack.com"
       />
       <html lang="en" className={worksans.className}>
         <body>

@@ -1,18 +1,19 @@
 "use client";
 
-import { Button, DropdownInput, Loading, Modal } from "@coaster/components/client";
+import { Button, DropdownInput, Modal } from "@coaster/components/client";
+import { Loading } from "@coaster/components/common";
 import { updateListing, useAvailabilityRules } from "@coaster/rpc/client";
 import { DeleteAvailabilityRule, GetAvailabilityRules, sendRequest } from "@coaster/rpc/common";
 import { AvailabilityRule, AvailabilityType, AvailabilityTypeType, Listing } from "@coaster/types";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { ReactNode, useState } from "react";
-import { NewRuleForm } from "supplier/app/(pages)/(authenticated)/listings/[listingID]/edit/availability/NewAvailabilityRule";
-import { ExistingRuleForm } from "supplier/app/(pages)/(authenticated)/listings/[listingID]/edit/availability/UpdateAvailabilityRules";
+import { NewRuleForm } from "supplier/app/(pages)/listings/[listingID]/edit/availability/NewAvailabilityRule";
+import { ExistingRuleForm } from "supplier/app/(pages)/listings/[listingID]/edit/availability/UpdateAvailabilityRules";
 import {
   getAvailabilityRuleTypeDisplay,
   getAvailabilityTypeDisplay,
-} from "supplier/app/(pages)/(authenticated)/listings/[listingID]/edit/availability/utils";
-import { useListingContext } from "supplier/app/(pages)/(authenticated)/listings/[listingID]/edit/context";
+} from "supplier/app/(pages)/listings/[listingID]/edit/availability/utils";
+import { useListingContext } from "supplier/app/(pages)/listings/[listingID]/edit/context";
 import { mutate } from "swr";
 
 export default function Availability(): ReactNode {

@@ -8,7 +8,6 @@ import {
   InlineMapSearch,
   Input,
   InputStep,
-  Loading,
   MapComponent,
   MapsWrapper,
   NavLink,
@@ -20,6 +19,7 @@ import {
   WizardNavButtons,
   wrapHandleSubmit,
 } from "@coaster/components/client";
+import { Loading } from "@coaster/components/common";
 import { createListing, updateListing, useDraftListing, useUpdateListing } from "@coaster/rpc/client";
 import {
   AddListingImage,
@@ -46,7 +46,7 @@ import {
   MaxGuestsSchema,
   NameSchema,
   PriceSchema,
-} from "supplier/app/(pages)/(authenticated)/listings/[listingID]/edit/schema";
+} from "supplier/app/(pages)/listings/[listingID]/edit/schema";
 import { mutate } from "swr";
 import { z } from "zod";
 

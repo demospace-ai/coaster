@@ -72,11 +72,6 @@ export async function sendRequest<
     throw new HttpError(response.status, response.statusText, errorMessage);
   }
 
-  // TODO: how should we record events for server-side requests?
-  if (typeof window !== "undefined" && isProd() && endpoint.track) {
-    (window as any).rudderanalytics.track(`${endpoint.name}`);
-  }
-
   // TODO: clean this up
   // not all AJAX requests have a response. the ones that do will be formatted as JSON
   // so just catch any error from trying to fetch the json and do nothing with it

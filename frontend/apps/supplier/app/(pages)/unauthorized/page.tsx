@@ -1,4 +1,4 @@
-import { Unauthorized } from "@coaster/components/client";
+import { Unauthorized } from "@coaster/components/common";
 
 export default function UnauthorizedPage() {
   return <Unauthorized />;

@@ -5,12 +5,12 @@ import {
   DatePickerPopper,
   DateRangePicker,
   GuestNumberInput,
-  Loading,
   Modal,
   correctFromUTC,
   correctToUTC,
   useShowToast,
 } from "@coaster/components/client";
+import { Loading } from "@coaster/components/common";
 import { useAvailability, useCreateCheckoutLink } from "@coaster/rpc/client";
 import { useDispatch } from "@coaster/state";
 import { Availability, AvailabilityType, Listing as ListingType, User } from "@coaster/types";

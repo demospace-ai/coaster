@@ -1,4 +1,4 @@
-import { About } from "@coaster/components/client";
+import { About } from "@coaster/components/common";
 
 export default function AboutPage() {
   return <About />;

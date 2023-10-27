@@ -1,4 +1,4 @@
-import { Terms } from "@coaster/components/client";
+import { Terms } from "@coaster/components/common";
 
 export default function TermsPage() {
   return <Terms />;

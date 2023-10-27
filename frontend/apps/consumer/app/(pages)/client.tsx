@@ -1,12 +1,12 @@
 "use client";
 
 import {
-  Loading,
   SearchResult,
   getCategoryForDisplay,
   getCategoryIcon,
   getSearchableCategories,
 } from "@coaster/components/client";
+import { Loading } from "@coaster/components/common";
 import { useFeatured } from "@coaster/rpc/client";
 import { CategoryType, Listing } from "@coaster/types";
 import { mergeClasses } from "@coaster/utils/common";

@@ -1,6 +1,7 @@
 "use client";
 
-import { Loading, NavLink } from "@coaster/components/client";
+import { NavLink } from "@coaster/components/client";
+import { Loading } from "@coaster/components/common";
 import { useHostedListings, useUserContext } from "@coaster/rpc/client";
 import { ListingStatus, StripeAccountStatus } from "@coaster/types";
 import { mergeClasses } from "@coaster/utils/common";
