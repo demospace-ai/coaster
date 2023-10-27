@@ -231,7 +231,7 @@ const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
     <>
       <Bars3Icon className="tw-flex lg:tw-hidden tw-w-7 tw-ml-4" onClick={() => setOpen(true)} />
       <Transition.Root show={open} as={Fragment}>
-        <Dialog as="div" className="tw-relative tw-z-10" onClose={setOpen}>
+        <Dialog as="div" className="tw-relative tw-z-30" onClose={setOpen}>
           <div className="tw-fixed tw-inset-0 tw-overflow-hidden">
             <div className="tw-absolute tw-inset-0 tw-overflow-hidden">
               <div className="tw-pointer-events-none tw-fixed tw-inset-y-0 tw-right-0 tw-flex tw-max-w-full tw-pl-10 sm:tw-pl-16">
