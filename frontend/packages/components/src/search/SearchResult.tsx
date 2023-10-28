@@ -1,7 +1,7 @@
 "use client";
 
 import { Listing } from "@coaster/types";
-import { getGcsImageUrl } from "@coaster/utils/common";
+import { getGcsImageUrl, mergeClasses } from "@coaster/utils/common";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import Link from "next/link";
@@ -27,32 +27,19 @@ export const SearchResult: React.FC<{ listing: Listing }> = ({ listing }) => {
 
 const SearchListingImages: React.FC<{ listing: Listing }> = ({ listing }) => {
   const [imageIndex, setImageIndex] = useState(0);
-  const [scrolledToIndex, setScrolledToIndex] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
-
-  useEffect(() => {
-    if (scrolledToIndex !== imageIndex) {
-      setScrolledToIndex(imageIndex);
-      carouselRef.current?.scrollTo({
-        left: width * imageIndex,
-        behavior: "smooth",
-      });
-    }
-  }, [imageIndex]);
 
   const handleScroll = useCallback(() => {
     if (carouselRef.current) {
       const newIndex = Math.round(carouselRef.current.scrollLeft / width);
       setImageIndex(newIndex);
-      setScrolledToIndex(newIndex);
     }
   }, [width]);
 
   const scrollForward = () => {
     const newIndex = (imageIndex + 1) % listing.images.length;
     setImageIndex(newIndex);
-    setScrolledToIndex(newIndex);
     carouselRef.current?.scrollTo({
       left: width * newIndex,
       behavior: "smooth",
@@ -62,7 +49,6 @@ const SearchListingImages: React.FC<{ listing: Listing }> = ({ listing }) => {
   const scrollBack = () => {
     const newIndex = (imageIndex - 1) % listing.images.length;
     setImageIndex(newIndex);
-    setScrolledToIndex(newIndex);
     carouselRef.current?.scrollTo({
       left: width * newIndex,
       behavior: "smooth",
@@ -84,40 +70,53 @@ const SearchListingImages: React.FC<{ listing: Listing }> = ({ listing }) => {
 
   return (
     <div className="tw-relative tw-group tw-select-none">
-      <div className="tw-absolute tw-flex tw-h-full tw-w-full tw-items-center group-hover:tw-opacity-100 tw-opacity-0 tw-transition-all tw-duration-200 tw-pointer-events-none">
-        <div className="tw-absolute tw-right-2 tw-pointer-events-auto">
-          <ChevronRightIcon
-            className="tw-h-8 tw-cursor-pointer tw-stroke-slate-800 tw-p-2 tw-bg-white tw-rounded-full tw-opacity-90 hover:tw-opacity-100 hover:tw-scale-105 tw-transition-all tw-duration-100"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              scrollForward();
-            }}
-          />
+      <div className="tw-absolute tw-flex tw-h-full tw-w-full tw-justify-center tw-items-center tw-transition-all tw-duration-200 tw-pointer-events-none tw-z-10">
+        <div className="tw-flex tw-items-center group-hover:tw-opacity-100 tw-opacity-0">
+          <div className="tw-absolute tw-right-2 tw-pointer-events-auto">
+            <ChevronRightIcon
+              className="tw-h-8 tw-cursor-pointer tw-stroke-slate-800 tw-p-2 tw-bg-white tw-rounded-full tw-opacity-80 hover:tw-opacity-100 hover:tw-scale-105 tw-transition-all tw-duration-100"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                scrollForward();
+              }}
+            />
+          </div>
+          <div className="tw-absolute tw-left-2 tw-pointer-events-auto">
+            <ChevronLeftIcon
+              className="tw-h-8 tw-cursor-pointer tw-stroke-slate-800 tw-p-2 tw-bg-white tw-rounded-full tw-opacity-80 hover:tw-opacity-100 hover:tw-scale-105 tw-transition-all tw-duration-100"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                scrollBack();
+              }}
+            />
+          </div>
         </div>
-        <div className="tw-absolute tw-left-2 tw-pointer-events-auto">
-          <ChevronLeftIcon
-            className="tw-h-8 tw-cursor-pointer tw-stroke-slate-800 tw-p-2 tw-bg-white tw-rounded-full tw-opacity-90 hover:tw-opacity-100 hover:tw-scale-105 tw-transition-all tw-duration-100"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              scrollBack();
-            }}
-          />
+        <div className="tw-absolute tw-flex tw-gap-1 tw-bottom-2 sm:tw-bottom-1 tw-pointer-events-auto tw-opacity-100">
+          {listing.images.map((_, idx) => (
+            <div
+              className={mergeClasses(
+                "tw-text-2xl tw-text-white tw-opacity-50",
+                idx === imageIndex && "tw-opacity-100",
+              )}
+            >
+              •
+            </div>
+          ))}
         </div>
       </div>
       <div
         ref={carouselRef}
-        className="tw-flex tw-items-center tw-w-full tw-h-full tw-rounded-xl tw-aspect-square tw-overflow-x-auto tw-snap-mandatory tw-snap-x tw-hide-scrollbar"
+        className="tw-relative tw-flex tw-items-center tw-w-full tw-h-full tw-rounded-xl tw-aspect-square tw-overflow-x-auto tw-snap-mandatory tw-snap-x tw-hide-scrollbar tw-z-0"
       >
         {listing.images.map((image) => (
           <Image
-            height={image.height}
-            width={image.width}
+            fill
             key={image.id}
             alt="Listing image"
             tabIndex={-1}
-            className="tw-flex-none tw-w-full tw-h-full tw-bg-gray-100 tw-object-cover tw-snap-center tw-snap-always tw-cursor-pointer"
+            className="tw-flex-none !tw-static tw-object-cover tw-snap-center tw-snap-always tw-cursor-pointer"
             src={getGcsImageUrl(image.storage_id)}
           />
         ))}

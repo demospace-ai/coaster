@@ -3,10 +3,11 @@
 import { Button, Card, FormError, Modal } from "@coaster/components/client";
 import { Loading } from "@coaster/components/common";
 import { AddListingImage, DeleteListingImage, GetListing, UpdateListingImages, sendRequest } from "@coaster/rpc/common";
-import { Image, Listing } from "@coaster/types";
+import { Image as ImageType, Listing } from "@coaster/types";
 import { forceErrorMessage, getGcsImageUrl } from "@coaster/utils/common";
 import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import update from "immutability-helper";
+import Image from "next/image";
 import { FormEvent, useCallback, useRef, useState } from "react";
 import { DndProvider, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -99,7 +100,7 @@ const ImagesInner: React.FC<{ listing: Listing }> = ({ listing }) => {
       <div className="tw-text-2xl tw-font-semibold">Images</div>
       <div
         ref={drop}
-        className="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-mt-3 tw-gap-4 sm:tw-gap-8 tw-justify-items-center"
+        className="tw-w-full tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-mt-3 tw-gap-4 sm:tw-gap-8 tw-justify-items-center"
       >
         {images.map((image) => (
           <Card
@@ -108,12 +109,13 @@ const ImagesInner: React.FC<{ listing: Listing }> = ({ listing }) => {
             moveCard={moveCard}
             findCard={findCard}
             onDrop={updateImages}
-            className="tw-relative tw-w-fit"
+            className="tw-relative tw-w-full tw-aspect-square"
           >
-            <img
+            <Image
+              fill
               alt="Listing image"
               className="tw-aspect-square tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-transition-all tw-duration-100 tw-rounded-lg tw-cursor-grab"
-              src={listing.images.length > 0 ? getGcsImageUrl(image.storage_id) : "TODO"}
+              src={getGcsImageUrl(image.storage_id)}
             />
             <XMarkIcon
               className="tw-w-8 tw-absolute tw-right-2 tw-top-2 tw-bg-gray-100 tw-p-1 tw-rounded-lg tw-opacity-80 tw-cursor-pointer hover:tw-opacity-100"
@@ -155,7 +157,7 @@ const ImagesInner: React.FC<{ listing: Listing }> = ({ listing }) => {
 interface DeleteModalProps {
   listing: Listing;
   imageID: number | null;
-  setImages: (images: Image[]) => void;
+  setImages: (images: ImageType[]) => void;
   show: boolean;
   closeModal: () => void;
 }

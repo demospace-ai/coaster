@@ -5,6 +5,22 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
 module.exports = withBundleAnalyzer({
   reactStrictMode: true,
   transpilePackages: ["components, rpc, utils"],
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "storage.googleapis.com",
+        port: "",
+        pathname: "/dev-user-images-bucket/**",
+      },
+      {
+        protocol: "https",
+        hostname: "storage.googleapis.com",
+        port: "",
+        pathname: "/user-images-bucket-us/**",
+      },
+    ],
+  },
   experimental:{
     optimizePackageImports: [
       "@coaster/components/client",
