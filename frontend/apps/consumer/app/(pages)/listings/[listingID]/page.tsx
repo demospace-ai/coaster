@@ -1,6 +1,7 @@
 import { BackButton, Callout, LinkButton, ProfilePicture } from "@coaster/components/client";
 import { getListingServer, getUserServer } from "@coaster/rpc/server";
 import { ListingStatus, Listing as ListingType, User } from "@coaster/types";
+import { isProd } from "@coaster/utils/common";
 import { CheckBadgeIcon } from "@heroicons/react/20/solid";
 import { ClockIcon, GlobeAltIcon, StarIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import {
@@ -15,6 +16,7 @@ export async function generateMetadata({ params }: { params: { listingID: string
   const listing = await getListingServer(Number(params.listingID));
   return {
     title: listing ? listing.name : "Listing not found",
+    metadataBase: isProd() ? "https://trycoaster.com" : "http://localhost:3000",
   };
 }
 
