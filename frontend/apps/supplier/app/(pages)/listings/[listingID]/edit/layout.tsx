@@ -2,6 +2,7 @@ import { NavLink } from "@coaster/components/client";
 import { getListingServer } from "@coaster/rpc/server";
 import { isProd } from "@coaster/utils/common";
 import { ChevronLeftIcon, ChevronRightIcon, EyeIcon } from "@heroicons/react/24/outline";
+import { cookies } from "next/headers";
 import { ListingContextProvider } from "supplier/app/(pages)/listings/[listingID]/edit/context";
 
 export default async function EditListingLayout({
@@ -11,7 +12,7 @@ export default async function EditListingLayout({
   children: React.ReactNode;
   params: { listingID: string };
 }) {
-  const listing = await getListingServer(Number(params.listingID));
+  const listing = await getListingServer(Number(params.listingID), cookies().toString());
   if (!listing) {
     return <div>Something unexpected happened.</div>;
   }
