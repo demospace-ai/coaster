@@ -23,6 +23,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  if (request.nextUrl.pathname.includes("opengraph-image")) {
+    return NextResponse.next();
+  }
+
   const user = await getUserServer();
   if (!user) {
     return NextResponse.redirect(new URL("/login", request.url));
