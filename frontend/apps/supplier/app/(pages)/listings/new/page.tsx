@@ -30,7 +30,7 @@ import {
   sendRequest,
 } from "@coaster/rpc/common";
 import { CategoryType, Coordinates, Image, Listing, ListingInput, ListingStatus } from "@coaster/types";
-import { forceErrorMessage, getGcsImageUrl } from "@coaster/utils/common";
+import { forceErrorMessage, getGcsImageUrl, isProd } from "@coaster/utils/common";
 import { EyeIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import update from "immutability-helper";
@@ -268,7 +268,11 @@ const ReviewStep: React.FC<StepProps> = ({ prevStep }) => {
           <div className="tw-mt-1">${listing.price} / person</div>
           <NavLink
             className="tw-flex tw-w-fit tw-items-center tw-gap-1 tw-mt-1 tw-text-blue-600"
-            href={`/listings/${listing.id}`}
+            href={
+              isProd()
+                ? `https://www.trycoaster.com/listings/${listing.id}/preview`
+                : `http://localhost:3000/listings/${listing.id}/preview`
+            }
           >
             See full preview
             <EyeIcon className="tw-h-4" />
