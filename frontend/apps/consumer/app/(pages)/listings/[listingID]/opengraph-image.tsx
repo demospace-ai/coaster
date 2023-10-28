@@ -1,45 +1,52 @@
-import { getListingServer } from "@coaster/rpc/server";
-import { getGcsImageUrl } from "@coaster/utils/common";
 import { ImageResponse } from "next/server";
 
+// Route segment config
 export const runtime = "edge";
 
-export async function generateImageMetadata({ params }: { params: { listingID: string } }) {
-  const listing = await getListingServer(Number(params.listingID));
-  if (!listing || !listing.name || listing.images.length < 1) {
-    return undefined;
-  }
+// Image metadata
+export const alt = "Coaster - Find your next adventure";
+export const size = {
+  width: 1200,
+  height: 630,
+};
 
-  return {
-    alt: listing.name,
-    size: {
-      width: 1200,
-      height: 630,
-    },
-    contentType: "image/png",
-  };
-}
+export const contentType = "image/png";
 
-export default async function OpengraphImage({ params }: { params: { listingID: string } }) {
-  const listing = await getListingServer(Number(params.listingID));
-  if (!listing || !listing.name || listing.images.length < 1) {
-    return undefined;
-  }
+// Image generation
+export default async function Image() {
+  // Font
+  const interSemiBold = fetch(new URL("./Inter-SemiBold.ttf", import.meta.url)).then((res) => res.arrayBuffer());
 
   return new ImageResponse(
     (
-      <img
-        width="1200"
-        height="630"
-        src={getGcsImageUrl(listing.images[0].storage_id)}
+      // ImageResponse JSX element
+      <div
         style={{
-          objectFit: "cover",
+          fontSize: 128,
+          background: "white",
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
-      />
+      >
+        Coaster - Find your next adventure
+      </div>
     ),
+    // ImageResponse options
     {
-      width: 1200,
-      height: 630,
+      // For convenience, we can re-use the exported opengraph-image
+      // size config to also set the ImageResponse's width and height.
+      ...size,
+      fonts: [
+        {
+          name: "Inter",
+          data: await interSemiBold,
+          style: "normal",
+          weight: 400,
+        },
+      ],
     },
   );
 }
