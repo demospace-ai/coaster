@@ -9,14 +9,16 @@ export function NavLink({
   className,
   activeClassName,
   children,
+  fullMatch = true,
 }: {
   href: string;
   className?: string;
   activeClassName?: string;
   children: React.ReactNode;
+  fullMatch?: boolean;
 }) {
   const pathname = usePathname();
-  const isActive = pathname === href;
+  const isActive = fullMatch ? pathname === href : pathname.startsWith(href);
 
   return (
     <Link href={href} className={mergeClasses(className, isActive && activeClassName)}>

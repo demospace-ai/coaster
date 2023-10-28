@@ -354,6 +354,7 @@ const SupplierLinks: React.FC = () => {
         className="tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
         activeClassName="tw-bg-gray-100"
         href="/listings"
+        fullMatch={false}
       >
         Listings
       </NavLink>
@@ -361,6 +362,7 @@ const SupplierLinks: React.FC = () => {
         className="tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
         activeClassName="tw-bg-gray-100"
         href="/finance"
+        fullMatch={false}
       >
         Finance
       </NavLink>
