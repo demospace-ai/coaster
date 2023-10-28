@@ -29,7 +29,7 @@ export const Featured: React.FC<{ initialData: Listing[] }> = ({ initialData }) 
   return (
     <>
       <CategorySelector selected={category} setSelected={setCategory} />
-      <div>
+      <div className="tw-w-full">
         <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-3 xl:tw-grid-cols-4 tw-mt-1 sm:tw-mt-4 tw-mb-5 tw-font-bold tw-text-3xl tw-gap-5 sm:tw-gap-10 tw-w-full">
           {featured?.map((listing: Listing) => <SearchResult key={listing.id} listing={listing} />)}
         </div>
