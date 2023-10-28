@@ -10,7 +10,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 export const SearchResult: React.FC<{ listing: Listing }> = ({ listing }) => {
   return (
     <Link
-      className="tw-flex tw-flex-col tw-text-base tw-font-medium tw-cursor-pointer tw-text-ellipsis"
+      className="tw-flex tw-flex-col tw-shrink-0 tw-text-base tw-font-medium tw-cursor-pointer tw-text-ellipsis"
       href={`/listings/${listing.id}`}
     >
       {/* TODO: when adding wishlist functionality, uncomment this
