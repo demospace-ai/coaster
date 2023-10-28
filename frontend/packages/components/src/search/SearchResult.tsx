@@ -12,6 +12,8 @@ export const SearchResult: React.FC<{ listing: Listing }> = ({ listing }) => {
     <Link
       className="tw-flex tw-flex-col tw-w-full tw-aspect-square tw-text-base tw-font-medium tw-cursor-pointer tw-text-ellipsis"
       href={`/listings/${listing.id}`}
+      target="_blank"
+      rel="noreferrer"
     >
       {/* TODO: when adding wishlist functionality, uncomment this
             <div className="tw-absolute tw-right-3 tw-top-3 tw-justify-center tw-items-center tw-flex tw-w-6 tw-h-6">
