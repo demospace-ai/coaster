@@ -10,7 +10,6 @@ import {
   InputStep,
   MapComponent,
   MapsWrapper,
-  NavLink,
   PriceInput,
   SelectorStep,
   StepProps,
@@ -34,6 +33,7 @@ import { forceErrorMessage, getGcsImageUrl, isProd } from "@coaster/utils/common
 import { EyeIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import update from "immutability-helper";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useCallback, useRef, useState } from "react";
 import { DndProvider, useDrop } from "react-dnd";
@@ -266,17 +266,19 @@ const ReviewStep: React.FC<StepProps> = ({ prevStep }) => {
           <div className="tw-mt-4 tw-font-bold tw-text-xl">{listing.name}</div>
           <div className="tw-mt-1 tw-font-medium">{listing.location}</div>
           <div className="tw-mt-1">${listing.price} / person</div>
-          <NavLink
+          <Link
             className="tw-flex tw-w-fit tw-items-center tw-gap-1 tw-mt-1 tw-text-blue-600"
             href={
               isProd()
                 ? `https://www.trycoaster.com/listings/${listing.id}/preview`
                 : `http://localhost:3000/listings/${listing.id}/preview`
             }
+            target="_blank"
+            rel="noreferrer"
           >
             See full preview
             <EyeIcon className="tw-h-4" />
-          </NavLink>
+          </Link>
         </div>
       </div>
       <WizardNavButtons

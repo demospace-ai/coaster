@@ -3,6 +3,7 @@ import { getListingServer } from "@coaster/rpc/server";
 import { isProd } from "@coaster/utils/common";
 import { ChevronLeftIcon, ChevronRightIcon, EyeIcon } from "@heroicons/react/24/outline";
 import { cookies } from "next/headers";
+import Link from "next/link";
 import { ListingContextProvider } from "supplier/app/(pages)/listings/[listingID]/edit/context";
 
 export default async function EditListingLayout({
@@ -24,7 +25,7 @@ export default async function EditListingLayout({
           <div className="tw-font-semibold sm:tw-font-bold tw-text-3xl sm:tw-text-4xl tw-hyphens-auto">
             Edit Listing
           </div>
-          <a
+          <Link
             className="tw-flex tw-items-center tw-gap-1 tw-text-blue-600 tw-border tw-border-solid tw-border-blue-600 tw-px-3 tw-py-1 tw-rounded-lg"
             href={
               isProd()
@@ -36,7 +37,7 @@ export default async function EditListingLayout({
           >
             See preview
             <EyeIcon className="tw-h-4" />
-          </a>
+          </Link>
         </div>
         <div className="tw-flex tw-flex-col sm:tw-flex-row tw-mt-4 sm:tw-mt-8">
           <div className="tw-relative tw-flex tw-items-center sm:tw-items-start tw-mb-3">
