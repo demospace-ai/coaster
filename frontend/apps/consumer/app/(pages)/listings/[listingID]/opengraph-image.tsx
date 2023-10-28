@@ -2,6 +2,8 @@ import { getListingServer } from "@coaster/rpc/server";
 import { getGcsImageUrl } from "@coaster/utils/common";
 import { ImageResponse } from "next/server";
 
+export const runtime = "edge";
+
 export async function generateImageMetadata({ params }: { params: { listingID: string } }) {
   const listing = await getListingServer(Number(params.listingID));
   if (!listing || !listing.name || listing.images.length < 1) {
