@@ -1,18 +1,23 @@
 import { mergeClasses } from "@coaster/utils/common";
+import Image from "next/image";
 
 export const ProfilePicture: React.FC<{
   url: string | undefined;
   name: string;
   className?: string;
+  width: number;
+  height: number;
   onClick?: () => void;
-}> = ({ url, name, className, onClick }) => {
+}> = ({ url, name, width, height, className, onClick }) => {
   return (
     <>
       {url ? (
-        <img
+        <Image
+          width={width}
+          height={height}
           src={url}
           className={mergeClasses(
-            "tw-rounded-full tw-select-none tw-flex tw-items-center tw-justify-center tw-object-cover",
+            "tw-aspect-square tw-rounded-full tw-select-none tw-flex tw-items-center tw-justify-center tw-object-cover",
             className,
           )}
           referrerPolicy="no-referrer"

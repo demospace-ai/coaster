@@ -127,7 +127,12 @@ const SignedInMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
             )}
           >
             <Bars3Icon className="tw-w-5 tw-h-5 tw-mr-2" />
-            <ProfilePicture url={user.profile_picture_url} name={user.first_name} className="tw-w-7 tw-h-7" />
+            <ProfilePicture
+              url={user.profile_picture_url}
+              name={user.first_name}
+              width={28}
+              height={28}
+            />
           </Menu.Button>
           <div ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
             <Transition
@@ -150,7 +155,9 @@ const SignedInMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
                       <ProfilePicture
                         url={user.profile_picture_url}
                         name={user.first_name}
-                        className="tw-w-7 tw-h-7 tw-mr-3"
+                        className="tw-mr-3"
+                        width={28}
+                        height={28}
                       />
                       <div className="tw-flex tw-flex-col">
                         <p className="tw-truncate tw-text-sm tw-font-semibold tw-text-slate-900">

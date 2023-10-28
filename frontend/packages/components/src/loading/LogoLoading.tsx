@@ -1,13 +1,14 @@
 import { Logo } from "@coaster/assets";
+import Image from "next/image";
 
 export const LogoLoading: React.FC = () => {
   return (
-    <img
+    <Image
       src={Logo.src}
+      width={144}
+      height={144}
       className="
         tw-m-auto
-        tw-w-36
-        tw-h-36
         tw-justify-center
         tw-items-center
         tw-rounded

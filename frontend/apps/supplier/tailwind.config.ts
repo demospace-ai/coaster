@@ -1,5 +1,3 @@
-// tailwind config is required for editor support
-
 import sharedConfig from "@coaster/tailwind-config";
 import type { Config } from "tailwindcss";
 

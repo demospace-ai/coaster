@@ -5,6 +5,7 @@ import { RootState, useDispatch, useSelector } from "@coaster/state";
 import { mergeClasses } from "@coaster/utils/common";
 import { Dialog, Portal, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { Fragment, useState } from "react";
 import { EmailLoginForm, EmailSignup, GoogleLogin, LoginStep, SendResetForm, StartContent } from "./LoginSteps";
@@ -86,7 +87,13 @@ export const LoginModal: React.FC = () => {
               leaveTo="tw-scale-95"
             >
               <Dialog.Panel className="tw-flex tw-flex-col tw-h-full sm:tw-h-auto tw-max-w-[400px] tw-pt-28 sm:tw-pt-12 tw-pb-10 tw-px-8 sm:tw-rounded-lg sm:tw-shadow-md tw-bg-white tw-items-center sm:-tw-mt-20">
-                <img src={LongLogo.src} className="tw-h-8 tw-select-none tw-mb-4" alt="coaster logo" />
+                <Image
+                  width={200}
+                  height={32}
+                  src={LongLogo.src}
+                  className="tw-select-none tw-mb-4"
+                  alt="coaster logo"
+                />
                 <div className="tw-flex tw-flex-col tw-items-center tw-my-2 tw-w-full">{loginContent}</div>
                 <div className="tw-text-xs tw-text-center tw-mt-4 tw-text-slate-800 tw-select-none tw-mx-8 sm:tw-mx-0">
                   By continuing you agree to Coaster's{" "}

@@ -108,7 +108,9 @@ export const Profile: React.FC = () => {
           {user?.profile_picture_url ? (
             <ProfilePicture
               url={user.profile_picture_url}
-              className="tw-w-24 tw-h-24 tw-cursor-pointer"
+              className="tw-cursor-pointer"
+              width={96}
+              height={96}
               name={user.first_name}
               onClick={() => imageInputRef.current?.click()}
             />
