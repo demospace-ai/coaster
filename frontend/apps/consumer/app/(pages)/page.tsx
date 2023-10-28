@@ -6,6 +6,10 @@ import Image from "next/image";
 
 export const dynamic = "force-static";
 
+export const viewport = {
+  themeColor: "#efedea",
+};
+
 export default async function Page() {
   const featured = await getFeaturedServer();
 
