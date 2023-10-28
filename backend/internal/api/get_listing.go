@@ -34,7 +34,11 @@ func (s ApiService) GetListing(w http.ResponseWriter, r *http.Request) error {
 		auth.User,
 	)
 	if err != nil {
-		return errors.Wrap(err, "(api.GetListing) loading listing")
+		if errors.IsRecordNotFound(err) {
+			return errors.NotFound
+		} else {
+			return errors.Wrap(err, "(api.GetListing) loading listing")
+		}
 	}
 
 	return json.NewEncoder(w).Encode(views.ConvertListing(*listing))

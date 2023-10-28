@@ -14,7 +14,7 @@ import { getDuration, getHostName, getMaxGuests } from "consumer/app/(pages)/lis
 export async function generateMetadata({ params }: { params: { listingID: string } }) {
   const listing = await getListingServer(Number(params.listingID));
   return {
-    title: listing.name,
+    title: listing ? listing.name : "Listing not found",
   };
 }
 

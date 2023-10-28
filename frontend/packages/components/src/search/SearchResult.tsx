@@ -101,6 +101,7 @@ const SearchListingImages: React.FC<{ listing: Listing }> = ({ listing }) => {
         <div className="tw-absolute tw-flex tw-gap-1 tw-bottom-2 sm:tw-bottom-1 tw-pointer-events-auto tw-opacity-100 tw-max-w-[100px] tw-overflow-auto tw-hide-scrollbar">
           {listing.images.map((_, idx) => (
             <div
+              key={idx}
               ref={indicatorRefs[idx]}
               className={mergeClasses(
                 "tw-text-2xl tw-text-white tw-opacity-50",

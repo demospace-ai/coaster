@@ -7,7 +7,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Coaster",
   description: "Coaster - Curated adventures",
-  themeColor: "#efedea",
+  themeColor: "#ffffff",
   viewport: "width=device-width, initial-scale=1, maximum-scale=1",
 };
 
