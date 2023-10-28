@@ -5,10 +5,12 @@ import { notFound } from "next/navigation";
 import { sendRequest } from "./ajax";
 import { GetFeaturedListings, GetHostedListings, GetListing, SearchListings } from "./api";
 
-export async function getListingServer(listingID: number): Promise<Listing | undefined> {
+export async function getListingServer(listingID: number, cookieString?: string): Promise<Listing | undefined> {
+  const extraHeaders: [string, string][] = cookieString ? [["Cookie", cookieString]] : [];
   try {
     const response = await sendRequest(GetListing, {
       pathParams: { listingID },
+      extraHeaders,
     });
     return response;
   } catch (e) {

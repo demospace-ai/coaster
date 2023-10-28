@@ -16,7 +16,7 @@ const publicPaths = [
   "/oauth-callback",
 ];
 
-export async function middleware(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const isPublicRoute = createRouteMatcher(publicPaths);
   if (isPublicRoute(request)) {
     return NextResponse.next();

@@ -27,8 +27,8 @@ export default async function EditListingLayout({
             className="tw-flex tw-items-center tw-gap-1 tw-text-blue-600 tw-border tw-border-solid tw-border-blue-600 tw-px-3 tw-py-1 tw-rounded-lg"
             href={
               isProd()
-                ? `https://www.trycoaster.com/listings/${listing.id}`
-                : `http://localhost:3000/listings/${listing.id}`
+                ? `https://www.trycoaster.com/listings/${listing.id}/preview`
+                : `http://localhost:3000/listings/${listing.id}/preview`
             }
             target="_blank"
             rel="noreferrer"

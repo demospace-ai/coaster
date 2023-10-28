@@ -11,6 +11,7 @@ import { useFeatured } from "@coaster/rpc/client";
 import { CategoryType, Listing } from "@coaster/types";
 import { mergeClasses } from "@coaster/utils/common";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import dynamic from "next/dynamic";
 import { Dispatch, SetStateAction, useRef, useState } from "react";
 
 export const Featured: React.FC<{ initialData: Listing[] }> = ({ initialData }) => {
@@ -143,4 +144,10 @@ const CategorySelector: React.FC<{
       </div>
     </div>
   );
+};
+
+export const DynamicLoginModal: React.FC = () => {
+  const LoginModal = dynamic(() => import("@coaster/components/client").then((mod) => mod.LoginModal));
+
+  return <LoginModal />;
 };

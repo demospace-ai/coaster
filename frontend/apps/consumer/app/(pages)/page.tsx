@@ -4,6 +4,8 @@ import { getFeaturedServer } from "@coaster/rpc/server";
 import { Featured } from "consumer/app/(pages)/client";
 import Image from "next/image";
 
+export const dynamic = "force-static";
+
 export default async function Page() {
   const featured = await getFeaturedServer();
 
