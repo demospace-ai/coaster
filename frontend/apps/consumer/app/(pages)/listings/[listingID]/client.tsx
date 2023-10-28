@@ -10,7 +10,7 @@ import {
   useShowToast,
 } from "@coaster/components/client";
 import { Loading } from "@coaster/components/common";
-import { useAvailability, useCreateCheckoutLink } from "@coaster/rpc/client";
+import { useAvailability, useCreateCheckoutLink, useUserContext } from "@coaster/rpc/client";
 import { useDispatch } from "@coaster/state";
 import { Availability, AvailabilityType, Image as ListingImage, Listing as ListingType, User } from "@coaster/types";
 import { useWindowDimensions } from "@coaster/utils/client";
@@ -25,7 +25,7 @@ import {
   PlusCircleIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { getDateToTimeSlotMap } from "consumer/app/(pages)/listings/[listingID]/utils";
+import { getDateToTimeSlotMap, getDuration } from "consumer/app/(pages)/listings/[listingID]/utils";
 import Image from "next/image";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 
@@ -347,7 +347,23 @@ export const ReserveSlider: React.FC<{
   );
 };
 
-export const BookingPanel: React.FC<{ user: User | undefined; listing: ListingType }> = ({ user, listing }) => {
+export const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) => {
+  const user = useUserContext();
+  return (
+    <div className="tw-fixed lg:tw-hidden tw-z-20 tw-bottom-0 tw-left-0 tw-flex tw-items-center tw-justify-between tw-bg-white tw-border-t tw-border-solid tw-border-gray-300 tw-h-20 tw-w-full tw-px-4">
+      <div className="tw-flex tw-flex-col">
+        <div>
+          <span className="tw-font-semibold">${listing.price}</span> per person
+        </div>
+        <div>/ {getDuration(listing)}</div>
+      </div>
+      <ReserveSlider user={user} listing={listing} />
+    </div>
+  );
+};
+
+export const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
+  const user = useUserContext();
   const [month, setMonth] = useState<Date>(new Date()); // TODO: this should be the current month
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [startTime, setStartTime] = useState<Availability | null>(null);

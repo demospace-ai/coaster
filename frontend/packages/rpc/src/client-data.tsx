@@ -14,13 +14,15 @@ import {
   User,
   UserUpdates,
 } from "@coaster/types";
-import { Mutation, MutationOpts, useMutation } from "@coaster/utils/client";
+import { Mutation, MutationOpts, consumeError, useMutation } from "@coaster/utils/client";
 import { HttpError, forceErrorMessage, isProd } from "@coaster/utils/common";
 import { H } from "highlight.run";
-import { Dispatch, SetStateAction, createContext, useCallback, useContext, useEffect, useState } from "react";
+import { redirect } from "next/navigation";
+import { createContext, useCallback, useContext } from "react";
 import useSWR, { Fetcher, SWRConfiguration, mutate } from "swr";
 import { sendRequest } from "./ajax";
 import {
+  CheckSession,
   CreateAvailabilityRule,
   CreateCheckoutLink,
   CreateListing,
@@ -44,25 +46,37 @@ import {
 
 // TODO: this isn't the right place for this so reorganize later
 // We use context so that we can populate the initial user from the server-side fetch
-const UserContext = createContext<{ user: User | undefined; setUser: Dispatch<SetStateAction<User | undefined>> }>({
-  user: undefined,
-  setUser: () => undefined,
-});
+const UserContext = createContext<User | undefined>(undefined);
 export const useUserContext = () => useContext(UserContext);
-export const UserProviderClient: React.FC<{ initialUser: User | undefined; children: React.ReactNode }> = ({
-  initialUser,
-  children,
-}) => {
-  const [user, setUser] = useState<User | undefined>(initialUser);
-  // We only call identify once for the initial user
-  useEffect(() => {
-    if (initialUser) {
-      identifyUser(initialUser);
-    }
-  }, []);
+export const UserProviderClient: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user } = useUser();
 
-  return <UserContext.Provider value={{ user, setUser }}>{children}</UserContext.Provider>;
+  return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
 };
+
+function useUser() {
+  const fetcher: Fetcher<User | undefined, {}> = async () => {
+    try {
+      const response = await sendRequest(CheckSession);
+      return response.user;
+    } catch (e) {
+      if (e instanceof HttpError) {
+        if (e.code === 403) {
+          redirect("/unauthorized");
+        } else if (e.code === 401) {
+          return undefined;
+        }
+      }
+
+      // This is an unexpected error, so report it
+      consumeError(e);
+      return undefined;
+    }
+  };
+
+  const { data, mutate, error, isLoading, isValidating } = useSWR({ CheckSession }, fetcher);
+  return { user: data, mutate, error, loading: isLoading || isValidating };
+}
 
 export function useListing(listingID: number | undefined, initialData?: Listing) {
   const shouldFetch = listingID;
@@ -300,14 +314,13 @@ export function useCreateAvailabilityRule(
 }
 
 export function useUpdateUser(onSuccess?: () => void): Mutation<UserUpdates> {
-  const { setUser } = useUserContext();
   return useMutation<User, UserUpdates>(
     async (updates: UserUpdates) => {
       return await sendRequest(UpdateUser, { payload: updates });
     },
     {
       onSuccess: (user: User) => {
-        setUser(user);
+        mutate({ CheckSession }, user);
         onSuccess && onSuccess();
       },
     },
@@ -316,7 +329,6 @@ export function useUpdateUser(onSuccess?: () => void): Mutation<UserUpdates> {
 
 export function useUpdateProfilePicture(): Mutation<File> {
   const dispatch = useDispatch();
-  const { setUser } = useUserContext();
 
   return useMutation<User, File>(
     async (profilePicture: File) => {
@@ -326,7 +338,7 @@ export function useUpdateProfilePicture(): Mutation<File> {
     },
     {
       onSuccess: (user) => {
-        setUser(user);
+        mutate({ CheckSession }, user);
       },
       onError: (e) => {
         dispatch({
@@ -339,23 +351,21 @@ export function useUpdateProfilePicture(): Mutation<File> {
 }
 
 export function useResetPassword(): Mutation<ResetPasswordRequest> {
-  const { setUser } = useUserContext();
   return useMutation<User, ResetPasswordRequest>(
     async (request: ResetPasswordRequest) => {
       return await sendRequest(ResetPassword, { payload: request });
     },
     {
       onSuccess: (user: User) => {
-        setUser(user);
+        mutate({ CheckSession }, user);
       },
     },
   );
 }
 
 export function useOnLoginSuccess() {
-  const { setUser } = useUserContext();
   return useCallback(async (user: User) => {
-    setUser(user);
+    mutate({ CheckSession }, user);
     identifyUser(user);
   }, []);
 }
@@ -368,12 +378,11 @@ export function identifyUser(user: User) {
   }
 }
 
-export function useLogout() {
+export function useLogout(onHostApp?: boolean) {
   const dispatch = useDispatch();
-  const { setUser } = useUserContext();
 
   return useCallback(async () => {
     await sendRequest(Logout);
-    setUser(undefined);
+    mutate({ CheckSession }, undefined);
   }, [dispatch]);
 }

@@ -38,8 +38,12 @@ const ProfileFormSchema = z
 type ProfileFormSchemaType = z.infer<typeof ProfileFormSchema>;
 
 export const Profile: React.FC = () => {
+  const user = useUserContext();
+  if (!user) {
+    redirect("/login");
+  }
+
   const showToast = useShowToast();
-  const { user } = useUserContext();
   const imageInputRef = useRef<HTMLInputElement>(null);
   const { mutate: mutateUser, isLoading: isSaving } = useUpdateUser(() => {
     showToast("success", "Profile updated successfully.", 2000);
@@ -79,10 +83,6 @@ export const Profile: React.FC = () => {
     dirtyFields.about && (payload.about = data.about);
     mutateUser(payload);
   };
-
-  if (!user) {
-    redirect("/login");
-  }
 
   return (
     <div className="tw-flex tw-flex-col tw-items-center tw-h-full tw-w-full tw-bg-slate-200 tw-pt-8 sm:tw-pt-14">

@@ -46,8 +46,29 @@ func addCookie(w http.ResponseWriter, name string, value string) {
 	http.SetCookie(w, &cookie)
 }
 
+func deleteCookie(w http.ResponseWriter, name string) {
+	domain := "trycoaster.com"
+	if !application.IsProd() {
+		domain = "localhost"
+	}
+	cookie := http.Cookie{
+		Name:     name,
+		Value:    "",
+		Secure:   application.IsProd(), // disable secure for local testing
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+		Domain:   domain, // share cookies across subdomains
+		MaxAge:   -1,
+	}
+	http.SetCookie(w, &cookie)
+}
+
 func AddSessionCookie(w http.ResponseWriter, token string) {
 	addCookie(w, SESSION_COOKIE_NAME, token)
+}
+
+func DeleteSessionCookie(w http.ResponseWriter) {
+	deleteCookie(w, SESSION_COOKIE_NAME)
 }
 
 func (as AuthServiceImpl) authenticateCookie(r *http.Request) (*Authentication, error) {

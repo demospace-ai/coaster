@@ -1,4 +1,3 @@
-import { getUserServer } from "@coaster/rpc/server";
 import { NextRequest, NextResponse } from "next/server";
 import { pathToRegexp } from "path-to-regexp";
 
@@ -20,8 +19,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const user = await getUserServer();
-  if (!user) {
+  if (!request.cookies.get("X-Session-Token")) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 }

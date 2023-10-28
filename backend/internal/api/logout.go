@@ -7,10 +7,11 @@ import (
 	"go.fabra.io/server/common/repositories/sessions"
 )
 
-func (s ApiService) Logout(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
-	if !auth.IsAuthenticated {
+func (s ApiService) Logout(a auth.Authentication, w http.ResponseWriter, r *http.Request) error {
+	if !a.IsAuthenticated {
 		return nil
 	}
 
-	return sessions.Clear(s.db, auth.Session)
+	auth.DeleteSessionCookie(w)
+	return sessions.Clear(s.db, a.Session)
 }

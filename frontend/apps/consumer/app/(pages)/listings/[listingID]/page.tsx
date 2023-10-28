@@ -1,6 +1,6 @@
 import { BackButton, Callout, LinkButton, ProfilePicture } from "@coaster/components/client";
-import { getListingServer, getUserServer } from "@coaster/rpc/server";
-import { ListingStatus, Listing as ListingType, User } from "@coaster/types";
+import { getListingServer } from "@coaster/rpc/server";
+import { ListingStatus, Listing as ListingType } from "@coaster/types";
 import { isProd } from "@coaster/utils/common";
 import { CheckBadgeIcon } from "@heroicons/react/20/solid";
 import { ClockIcon, GlobeAltIcon, StarIcon, UserGroupIcon } from "@heroicons/react/24/outline";
@@ -8,7 +8,7 @@ import {
   BookingPanel,
   ListingHeader,
   ListingImages,
-  ReserveSlider,
+  ReserveFooter,
 } from "consumer/app/(pages)/listings/[listingID]/client";
 import { getDuration, getHostName, getMaxGuests } from "consumer/app/(pages)/listings/[listingID]/utils";
 
@@ -21,8 +21,6 @@ export async function generateMetadata({ params }: { params: { listingID: string
 }
 
 export default async function Listing({ params }: { params: { listingID: string } }) {
-  const user = await getUserServer();
-
   const listingID = Number(params.listingID);
   if (Number.isNaN(listingID)) {
     // Sometimes the value of listingID is TODO
@@ -45,27 +43,13 @@ export default async function Listing({ params }: { params: { listingID: string 
         <ListingImages listing={listing} />
         <div className="tw-flex tw-mt-8 sm:tw-mt-12">
           <ListingDetails listing={listing} />
-          <BookingPanel user={user} listing={listing} />
+          <BookingPanel listing={listing} />
         </div>
-        <ReserveFooter user={user} listing={listing} />
+        <ReserveFooter listing={listing} />
       </div>
     </div>
   );
 }
-
-const ReserveFooter: React.FC<{ user: User | undefined; listing: ListingType }> = ({ user, listing }) => {
-  return (
-    <div className="tw-fixed lg:tw-hidden tw-z-20 tw-bottom-0 tw-left-0 tw-flex tw-items-center tw-justify-between tw-bg-white tw-border-t tw-border-solid tw-border-gray-300 tw-h-20 tw-w-full tw-px-4">
-      <div className="tw-flex tw-flex-col">
-        <div>
-          <span className="tw-font-semibold">${listing.price}</span> per person
-        </div>
-        <div>/ {getDuration(listing)}</div>
-      </div>
-      <ReserveSlider user={user} listing={listing} />
-    </div>
-  );
-};
 
 const ListingDetails: React.FC<{ listing: ListingType }> = ({ listing }) => {
   return (

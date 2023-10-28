@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { EmailLoginForm, EmailSignup, GoogleLogin, LoginStep, SendResetForm, StartContent } from "./LoginSteps";
 
 export const LoginPage: React.FC<{ create?: boolean }> = ({ create }) => {
-  const { user } = useUserContext();
+  const user = useUserContext();
   const [step, setStep] = useState<LoginStep>(LoginStep.Start);
   const searchParams = useSearchParams();
   const destination = searchParams?.get("destination") ?? "";

@@ -32,7 +32,7 @@ type ResetPasswordFormSchemaType = z.infer<typeof ResetPasswordFormSchema>;
 
 export const ResetPassword: React.FC = () => {
   const router = useRouter();
-  const { user } = useUserContext();
+  const user = useUserContext();
   const searchParams = useSearchParams();
   const destination = searchParams?.get("destination") ?? "";
   const token = searchParams?.get("token");
