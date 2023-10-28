@@ -10,7 +10,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 export const SearchResult: React.FC<{ listing: Listing }> = ({ listing }) => {
   return (
     <Link
-      className="tw-flex tw-flex-col tw-shrink-0 tw-text-base tw-font-medium tw-cursor-pointer tw-text-ellipsis"
+      className="tw-flex tw-flex-col tw-w-full tw-aspect-square tw-text-base tw-font-medium tw-cursor-pointer tw-text-ellipsis"
       href={`/listings/${listing.id}`}
     >
       {/* TODO: when adding wishlist functionality, uncomment this
@@ -30,16 +30,20 @@ const SearchListingImages: React.FC<{ listing: Listing }> = ({ listing }) => {
   const carouselRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
 
+  const indicatorRefs = listing.images.map(() => useRef<HTMLDivElement>(null));
+
   const handleScroll = useCallback(() => {
     if (carouselRef.current) {
       const newIndex = Math.round(carouselRef.current.scrollLeft / width);
       setImageIndex(newIndex);
+      indicatorRefs[newIndex].current?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
     }
   }, [width]);
 
   const scrollForward = () => {
     const newIndex = (imageIndex + 1) % listing.images.length;
     setImageIndex(newIndex);
+    indicatorRefs[newIndex].current?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
     carouselRef.current?.scrollTo({
       left: width * newIndex,
       behavior: "smooth",
@@ -49,6 +53,7 @@ const SearchListingImages: React.FC<{ listing: Listing }> = ({ listing }) => {
   const scrollBack = () => {
     const newIndex = (imageIndex - 1) % listing.images.length;
     setImageIndex(newIndex);
+    indicatorRefs[newIndex].current?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
     carouselRef.current?.scrollTo({
       left: width * newIndex,
       behavior: "smooth",
@@ -93,9 +98,10 @@ const SearchListingImages: React.FC<{ listing: Listing }> = ({ listing }) => {
             />
           </div>
         </div>
-        <div className="tw-absolute tw-flex tw-gap-1 tw-bottom-2 sm:tw-bottom-1 tw-pointer-events-auto tw-opacity-100">
+        <div className="tw-absolute tw-flex tw-gap-1 tw-bottom-2 sm:tw-bottom-1 tw-pointer-events-auto tw-opacity-100 tw-max-w-[100px] tw-overflow-auto tw-hide-scrollbar">
           {listing.images.map((_, idx) => (
             <div
+              ref={indicatorRefs[idx]}
               className={mergeClasses(
                 "tw-text-2xl tw-text-white tw-opacity-50",
                 idx === imageIndex && "tw-opacity-100",
