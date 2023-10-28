@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"net/url"
 
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/models"
@@ -17,7 +18,11 @@ func (s ApiService) CheckEmail(w http.ResponseWriter, r *http.Request) error {
 	if !r.URL.Query().Has("email") {
 		return errors.Newf("(api.CheckEmail) missing email from CheckEmail request URL: %s", r.URL.RequestURI())
 	}
-	email := r.URL.Query().Get("email")
+	encodedEmail := r.URL.Query().Get("email")
+	email, err := url.QueryUnescape(encodedEmail)
+	if err != nil {
+		return errors.Wrap(err, "(api.CheckEmail) error decoding email")
+	}
 
 	user, err := users.LoadByEmail(s.db, email)
 	if err != nil {

@@ -30,6 +30,10 @@ export const ProfilePicture: React.FC<{
             "tw-bg-orange-400 tw-text-white tw-rounded-full tw-flex tw-justify-center tw-items-center",
             className,
           )}
+          style={{
+            width: width,
+            height: height,
+          }}
           onClick={onClick}
         >
           {name.charAt(0)}
