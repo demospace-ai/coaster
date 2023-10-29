@@ -61,7 +61,7 @@ const LogoLink: React.FC = () => {
 };
 
 const ProfileDropdown: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
-  const user = useUserContext();
+  const { user } = useUserContext();
   const pathname = usePathname();
   const isHome = pathname === "/";
 
@@ -269,7 +269,7 @@ const SignedOutMenu: React.FC = () => {
 
 const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
   const dispatch = useDispatch();
-  const user = useUserContext();
+  const { user } = useUserContext();
   const logout = useLogout(onHostApp);
   const navItem = "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-base tw-select-none";
   const [open, setOpen] = useState(false);
@@ -421,7 +421,7 @@ const SwitchToHostingLink: React.FC<{
   onClick?: () => void;
   className?: string;
 }> = (props) => {
-  const user = useUserContext();
+  const { user } = useUserContext();
 
   const baseLink = isProd() ? "https://supplier.trycoaster.com" : "http://localhost:3030";
   const link = user?.is_host ? baseLink : baseLink + "/listings/new";

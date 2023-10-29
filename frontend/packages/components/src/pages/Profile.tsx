@@ -38,7 +38,11 @@ const ProfileFormSchema = z
 type ProfileFormSchemaType = z.infer<typeof ProfileFormSchema>;
 
 export const Profile: React.FC = () => {
-  const user = useUserContext();
+  const { user, loading } = useUserContext();
+  if (loading) {
+    return <Loading />;
+  }
+
   if (!user) {
     redirect("/login");
   }

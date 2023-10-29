@@ -348,7 +348,7 @@ export const ReserveSlider: React.FC<{
 };
 
 export const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) => {
-  const user = useUserContext();
+  const { user } = useUserContext();
   return (
     <div className="tw-fixed lg:tw-hidden tw-z-20 tw-bottom-0 tw-left-0 tw-flex tw-items-center tw-justify-between tw-bg-white tw-border-t tw-border-solid tw-border-gray-300 tw-h-20 tw-w-full tw-px-4">
       <div className="tw-flex tw-flex-col">
@@ -363,7 +363,7 @@ export const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) =
 };
 
 export const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
-  const user = useUserContext();
+  const { user } = useUserContext();
   const [month, setMonth] = useState<Date>(new Date()); // TODO: this should be the current month
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [startTime, setStartTime] = useState<Availability | null>(null);

@@ -46,12 +46,12 @@ import {
 
 // TODO: this isn't the right place for this so reorganize later
 // We use context so that we can populate the initial user from the server-side fetch
-const UserContext = createContext<User | undefined>(undefined);
+const UserContext = createContext<{ user: User | undefined; loading: boolean }>({ user: undefined, loading: false });
 export const useUserContext = () => useContext(UserContext);
 export const UserProviderClient: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user } = useUser();
+  const { user, loading } = useUser();
 
-  return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
+  return <UserContext.Provider value={{ user, loading }}>{children}</UserContext.Provider>;
 };
 
 function useUser() {

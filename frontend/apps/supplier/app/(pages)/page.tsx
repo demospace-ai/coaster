@@ -8,7 +8,7 @@ import { mergeClasses } from "@coaster/utils/common";
 import { CalendarDaysIcon, CheckIcon, ClockIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
 
 export default function Hosting() {
-  const user = useUserContext();
+  const { user } = useUserContext();
   const { hosted, error } = useHostedListings();
 
   const setupStep =

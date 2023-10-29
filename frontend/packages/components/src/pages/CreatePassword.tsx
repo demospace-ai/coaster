@@ -32,7 +32,7 @@ type CreatePasswordFormSchemaType = z.infer<typeof CreatePasswordFormSchema>;
 
 export const CreatePassword: React.FC = () => {
   const router = useRouter();
-  const user = useUserContext();
+  const { user } = useUserContext();
   const searchParams = useSearchParams();
   const destination = searchParams.get("destination") ?? "";
   const token = searchParams.get("token");
