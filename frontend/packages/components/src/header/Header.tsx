@@ -2,6 +2,7 @@
 
 import { useLogout, useUserContext } from "@coaster/rpc/client";
 import { useDispatch } from "@coaster/state";
+import { User } from "@coaster/types";
 import { isProd, lateef, mergeClasses } from "@coaster/utils/common";
 import { autoUpdate, offset, useClick, useDismiss, useFloating, useInteractions, useRole } from "@floating-ui/react";
 import { Dialog, Menu, Transition } from "@headlessui/react";
@@ -10,8 +11,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { Fragment, useEffect, useState } from "react";
 import { NavLink } from "../link/Link";
-import { Loading } from "../loading/Loading";
-import { ProfilePicture } from "../profile/ProfilePicture";
+import { ProfilePicture, ProfilePlaceholder } from "../profile/ProfilePicture";
 import { SearchBarHeader } from "../search/SearchBar";
 
 export const Header: React.FC = () => {
@@ -77,7 +77,7 @@ const ProfileDropdown: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
           />
         )}
         <div className="tw-flex tw-flex-col tw-justify-center">
-          {user ? <SignedInMenu onHostApp={onHostApp} /> : <SignedOutMenu />}
+          {user ? <SignedInMenu user={user} onHostApp={onHostApp} /> : <SignedOutMenu />}
         </div>
       </div>
       {/* TODO: make this open an actual menu on mobile */}
@@ -86,8 +86,7 @@ const ProfileDropdown: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
   );
 };
 
-const SignedInMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
-  const user = useUserContext();
+const SignedInMenu: React.FC<{ user: User; onHostApp?: boolean }> = ({ user, onHostApp }) => {
   const logout = useLogout(onHostApp);
   const menuItem =
     "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded hover:tw-bg-slate-200 ";
@@ -108,11 +107,6 @@ const SignedInMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
   const dismiss = useDismiss(context);
   const role = useRole(context);
   const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
-
-  if (!user) {
-    // Should never happen
-    return <Loading />;
-  }
 
   return (
     <Menu as="div">
@@ -203,20 +197,73 @@ const SignedInMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
 
 const SignedOutMenu: React.FC = () => {
   const dispatch = useDispatch();
-  const buttonStyle =
-    "tw-flex tw-justify-center tw-py-2 tw-w-28 tw-cursor-pointer tw-select-none tw-whitespace-nowrap tw-rounded-3xl sm:tw-font-semibold tw-text-base tw-bg-gray-100 hover:tw-bg-gray-200";
+  const navItem =
+    "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded hover:tw-bg-slate-200 tw-w-full";
+
+  const [open, setOpen] = useState(false);
+  const { refs, floatingStyles, context } = useFloating<HTMLDivElement>({
+    open,
+    onOpenChange: setOpen,
+    middleware: [offset(4)],
+    placement: "bottom-end",
+    whileElementsMounted: autoUpdate,
+  });
+  const click = useClick(context, {
+    keyboardHandlers: false,
+  });
+  const dismiss = useDismiss(context);
+  const role = useRole(context);
+  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
+
   return (
-    <div className="tw-flex tw-gap-3">
-      <div
-        className={mergeClasses(buttonStyle, "tw-text-white tw-bg-gray-900 hover:tw-bg-gray-800")}
-        onClick={() => dispatch({ type: "login.openSignup" })}
-      >
-        Sign up
-      </div>
-      <div className={buttonStyle} onClick={() => dispatch({ type: "login.openLogin" })}>
-        Log in
-      </div>
-    </div>
+    <Menu as="div">
+      {({ open }) => (
+        <>
+          <Menu.Button
+            ref={refs.setReference}
+            {...getReferenceProps()}
+            className={mergeClasses(
+              "tw-cursor-pointer tw-select-none tw-flex tw-items-center tw-rounded-full tw-border tw-border-solid tw-border-gray-300 tw-px-2 tw-py-1.5 hover:tw-shadow-md tw-ease-in-out tw-transition-all",
+              open && "tw-shadow-md",
+            )}
+          >
+            <Bars3Icon className="tw-w-5 tw-h-5 tw-mr-2" />
+            <ProfilePlaceholder width={28} height={28} />
+          </Menu.Button>
+          <div ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
+            <Transition
+              as={Fragment}
+              enter="tw-transition tw-ease-out tw-duration-100"
+              enterFrom="tw-transform tw-opacity-0 tw-scale-95"
+              enterTo="tw-transform tw-opacity-100 tw-scale-100"
+              leave="tw-transition tw-ease-in tw-duration-75"
+              leaveFrom="tw-transform tw-opacity-100 tw-scale-97"
+              leaveTo="tw-transform tw-opacity-0 tw-scale-95"
+            >
+              <Menu.Items
+                static
+                className="tw-z-10 tw-divide-y tw-mt-2 tw-mr-2 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none tw-w-64"
+              >
+                <div className="tw-flex tw-flex-col tw-m-2 tw-pt-2 tw-font-semibold">
+                  <Menu.Item>
+                    <div className={navItem} onClick={() => dispatch({ type: "login.openSignup" })}>
+                      Sign up
+                    </div>
+                  </Menu.Item>
+                </div>
+                <div className="tw-flex tw-flex-col tw-m-2 tw-py-2">
+                  <Menu.Item>
+                    <div className={navItem} onClick={() => dispatch({ type: "login.openLogin" })}>
+                      Log in
+                    </div>
+                  </Menu.Item>
+                </div>
+              </Menu.Items>
+            </Transition>
+          </div>
+        </>
+      )}
+    </Menu>
   );
 };
 

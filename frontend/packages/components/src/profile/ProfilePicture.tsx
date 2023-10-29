@@ -1,4 +1,5 @@
 import { mergeClasses } from "@coaster/utils/common";
+import { UserIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 
 export const ProfilePicture: React.FC<{
@@ -40,5 +41,30 @@ export const ProfilePicture: React.FC<{
         </div>
       )}
     </>
+  );
+};
+
+export const ProfilePlaceholder: React.FC<{
+  className?: string;
+  width: number;
+  height: number;
+  onClick?: () => void;
+}> = ({ width, height, className, onClick }) => {
+  return (
+    <div
+      className={mergeClasses(
+        "tw-bg-gray-400 tw-text-white tw-rounded-full tw-flex tw-justify-center tw-items-center",
+        className,
+      )}
+      onClick={onClick}
+    >
+      <UserIcon
+        className="tw-p-1"
+        style={{
+          width: width,
+          height: height,
+        }}
+      />
+    </div>
   );
 };
