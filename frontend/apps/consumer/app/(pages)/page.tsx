@@ -16,7 +16,7 @@ export default async function Page() {
   return (
     <div className="tw-flex tw-bg-[#efedea] tw-w-full tw-h-full tw-justify-center tw-px-5 sm:tw-px-20">
       <div className="tw-flex tw-flex-col tw-items-center tw-pt-2 tw-pb-24 tw-w-full tw-max-w-[1280px]">
-        <div className="tw-relative tw-flex tw-flex-col tw-mb-6 sm:tw-mb-10 tw-mx-10 tw-w-full tw-h-[480px] tw-rounded-2xl tw-items-center tw-justify-center tw-bg-cover tw-p-8">
+        <div className="tw-relative tw-flex tw-flex-col tw-mb-6 sm:tw-mb-10 tw-mx-10 tw-w-full tw-min-h-[420px] tw-h-[420px] tw-max-h-[420px] sm:tw-min-h-[480px] sm:tw-h-[480px] sm:tw-max-h-[480px] tw-rounded-2xl tw-items-center tw-justify-center tw-bg-cover tw-p-8">
           <div className="tw-absolute tw-top-0 tw-left-0 tw-h-full tw-w-full">
             <Image
               fill
