@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  Button,
-  DatePickerPopper,
-  DateRangePicker,
-  GuestNumberInput,
-  correctFromUTC,
-  correctToUTC,
-  useShowToast,
-} from "@coaster/components/client";
+import { Button, GuestNumberInput, correctFromUTC, correctToUTC, useShowToast } from "@coaster/components/client";
 import { Loading } from "@coaster/components/common";
 import { useAvailability, useCreateCheckoutLink, useUserContext } from "@coaster/rpc/client";
 import { useDispatch } from "@coaster/state";
@@ -26,8 +18,12 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { getDateToTimeSlotMap, getDuration } from "consumer/app/(pages)/listings/[listingID]/utils";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+
+const DatePickerPopper = dynamic(() => import("@coaster/components/client").then((mod) => mod.DatePickerPopper));
+const DateRangePicker = dynamic(() => import("@coaster/components/client").then((mod) => mod.DateRangePicker));
 
 export const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) => {
   const showToast = useShowToast();
