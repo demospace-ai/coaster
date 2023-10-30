@@ -224,7 +224,6 @@ const SearchBarDropdown: React.FC<{
 };
 
 const SearchModal: React.FC<{ open: boolean; close: () => void }> = ({ open, close }) => {
-  const router = useRouter();
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   return (
@@ -277,95 +276,7 @@ const SearchModal: React.FC<{ open: boolean; close: () => void }> = ({ open, clo
                     </Link>
                   ))}
                 </div>
-                {/* <Disclosure>
-                  {({ open }) => (
-                    <div className="tw-rounded-lg tw-px-4 tw-pt-4 tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-divide-y">
-                      <Disclosure.Button className="tw-flex tw-w-full tw-pb-4 tw-rounded-lg tw-justify-between tw-text-left tw-text-base tw-font-medium focus:tw-outline-none">
-                        <span>
-                          {dateRange?.from && dateRange?.to
-                            ? dateRange.from.toLocaleDateString() + " - " + dateRange.to.toLocaleDateString()
-                            : "Add dates"}
-                        </span>
-                        <ChevronUpIcon
-                          className={`${open && "tw-rotate-180 tw-transform"} tw-h-5 tw-w-5 tw-text-slate-500`}
-                        />
-                      </Disclosure.Button>
-                      <Disclosure.Panel className="tw-flex tw-flex-col tw-w-full tw-items-center tw-pb-4 sm:tw-pb-0">
-                        <DateRangePicker
-                          mode="range"
-                          disabled={{ before: new Date() }}
-                          numberOfMonths={1}
-                          className="tw-mt-3 sm:tw-mt-0"
-                          classNames={{
-                            month: "sm:tw-border-0",
-                          }}
-                          selected={dateRange}
-                          onSelect={setDateRange}
-                        />
-                      </Disclosure.Panel>
-                    </div>
-                  )}
-                </Disclosure>
-                <Disclosure>
-                  {({ open }) => (
-                    <div className="tw-rounded-lg tw-px-4 tw-pt-4 tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-divide-y">
-                      <Disclosure.Button className="tw-flex tw-w-full tw-pb-4 tw-rounded-lg tw-justify-between tw-text-left tw-text-base tw-font-medium focus:tw-outline-none">
-                        <span>{numberOfGuests ? numberOfGuests + " travelers" : "Add travelers"}</span>
-                        <ChevronUpIcon
-                          className={`${open && "tw-rotate-180 tw-transform"} tw-h-5 tw-w-5 tw-text-slate-500`}
-                        />
-                      </Disclosure.Button>
-                      <Disclosure.Panel>
-                        <div className="tw-flex tw-justify-between tw-py-5">
-                          <span className="tw-text-base tw-whitespace-nowrap tw-select-none">Adults</span>
-                          <div className="tw-flex tw-gap-3">
-                            <button
-                              onClick={() => {
-                                setNumberOfGuests(Math.max(0, numberOfGuests - 1));
-                              }}
-                            >
-                              <MinusCircleIcon
-                                className={mergeClasses(
-                                  "tw-w-6 tw-cursor-pointer tw-stroke-gray-500 hover:tw-stroke-black",
-                                  numberOfGuests === 0 && "!tw-stroke-gray-300 tw-cursor-not-allowed",
-                                )}
-                              />
-                            </button>
-                            <span className="tw-flex tw-w-3 tw-justify-center tw-select-none">{numberOfGuests}</span>
-                            <button
-                              onClick={() => {
-                                setNumberOfGuests(numberOfGuests + 1);
-                              }}
-                            >
-                              <PlusCircleIcon className="tw-w-6 tw-cursor-pointer tw-stroke-gray-500 hover:tw-stroke-black" />
-                            </button>
-                          </div>
-                        </div>
-                      </Disclosure.Panel>
-                    </div>
-                  )}
-                </Disclosure> */}
               </div>
-              {/* <div className="tw-flex tw-justify-between tw-w-full tw-border-t tw-border-solid tw-border-slate-200 tw-px-6 tw-py-4 tw-mt-auto">
-                <button
-                  className="tw-text-base"
-                  onClick={() => {
-                    setCategories([]);
-                    setDateRange(undefined);
-                    setNumberOfGuests(0);
-                  }}
-                >
-                  Clear all
-                </button>
-                <Button
-                  className="tw-h-10 tw-text-base tw-flex tw-flex-row tw-items-center tw-pr-5"
-                  onClick={search}
-                  ref={buttonRef}
-                >
-                  <MagnifyingGlassIcon className="tw-h-5 tw-mr-1.5 tw-stroke-2" />
-                  Search
-                </Button>
-              </div> */}
             </Dialog.Panel>
           </Transition.Child>
         </div>
