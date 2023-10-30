@@ -6,10 +6,9 @@ import {
   Input,
   correctToUTC,
   tryCorrectFromUTC,
-  useShowToast,
 } from "@coaster/components/client";
 import { Loading } from "@coaster/components/common";
-import { useUpdateAvailabilityRule } from "@coaster/rpc/client";
+import { useNotificationContext, useUpdateAvailabilityRule } from "@coaster/rpc/client";
 import {
   AvailabilityRule,
   AvailabilityRuleType,
@@ -41,11 +40,11 @@ export const ExistingRuleForm: React.FC<{
   existingRule: AvailabilityRule;
   closeModal: () => void;
 }> = ({ listing, existingRule, closeModal }) => {
-  const showToast = useShowToast();
+  const { showNotification } = useNotificationContext();
   const updateAvailability = useUpdateAvailabilityRule(listing.id, existingRule.id, {
     onSuccess: () => {
       closeModal();
-      showToast("success", "Successfully updated rule");
+      showNotification("success", "Successfully updated rule");
     },
   });
 
@@ -93,7 +92,7 @@ const FixedDateRuleUpdateForm: React.FC<{
   existingRule: AvailabilityRule;
   updateAvailability: Mutation<AvailabilityRuleUpdates>;
 }> = ({ availabilityType, existingRule, updateAvailability }) => {
-  const showToast = useShowToast();
+  const { showNotification } = useNotificationContext();
   const {
     control,
     watch,
@@ -122,7 +121,7 @@ const FixedDateRuleUpdateForm: React.FC<{
 
   const onSubmit = async (values: UpdateFixedDateRuleSchema) => {
     if (!isDirty) {
-      showToast("error", "No changes made");
+      showNotification("error", "No changes made");
       return;
     }
 
@@ -205,7 +204,7 @@ const FixedRangeRuleUpdateForm: React.FC<{
   existingRule: AvailabilityRule;
   updateAvailability: Mutation<AvailabilityRuleUpdates>;
 }> = ({ availabilityType, existingRule, updateAvailability }) => {
-  const showToast = useShowToast();
+  const { showNotification } = useNotificationContext();
   const {
     control,
     watch,
@@ -240,7 +239,7 @@ const FixedRangeRuleUpdateForm: React.FC<{
 
   const onSubmit = async (values: UpdateFixedRangeRuleSchema) => {
     if (!isDirty) {
-      showToast("error", "No changes made");
+      showNotification("error", "No changes made");
       return;
     }
 
@@ -382,7 +381,7 @@ const RecurringRuleUpdateForm: React.FC<{
   existingRule: AvailabilityRule;
   updateAvailability: Mutation<AvailabilityRuleUpdates>;
 }> = ({ availabilityType, existingRule, updateAvailability }) => {
-  const showToast = useShowToast();
+  const { showNotification } = useNotificationContext();
   const {
     control,
     watch,
@@ -413,7 +412,7 @@ const RecurringRuleUpdateForm: React.FC<{
 
   const onSubmit = async (values: UpdateRecurringRuleSchema) => {
     if (!isDirty) {
-      showToast("error", "No changes made");
+      showNotification("error", "No changes made");
       return;
     }
 

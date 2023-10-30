@@ -1,10 +1,9 @@
 "use client";
 
-import { Button, GuestNumberInput, correctFromUTC, correctToUTC, useShowToast } from "@coaster/components/client";
+import { Button, GuestNumberInput, correctFromUTC, correctToUTC, useLoginContext } from "@coaster/components/client";
 import { Loading } from "@coaster/components/common";
-import { useAvailability, useCreateCheckoutLink, useUserContext } from "@coaster/rpc/client";
-import { useDispatch } from "@coaster/state";
-import { Availability, AvailabilityType, Image as ListingImage, Listing as ListingType, User } from "@coaster/types";
+import { useAvailability, useCreateCheckoutLink, useNotificationContext, useUserContext } from "@coaster/rpc/client";
+import { Availability, AvailabilityType, Image as ListingImage, Listing as ListingType } from "@coaster/types";
 import { ToTimeOnly, getGcsImageUrl, mergeClasses, toTitleCase } from "@coaster/utils/common";
 import { Dialog, Disclosure, RadioGroup, Transition } from "@headlessui/react";
 import {
@@ -23,7 +22,7 @@ const DatePickerPopper = dynamic(() => import("@coaster/components/client").then
 const DateRangePicker = dynamic(() => import("@coaster/components/client").then((mod) => mod.DateRangePicker));
 
 export const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) => {
-  const showToast = useShowToast();
+  const { showNotification } = useNotificationContext();
 
   return (
     <div className="tw-flex tw-flex-row tw-items-start tw-justify-between">
@@ -39,7 +38,7 @@ export const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) =
         className="tw-cursor-pointer hover:tw-bg-gray-100 tw-rounded-lg tw-p-0.5 sm:tw-p-2"
         onClick={() => {
           navigator.clipboard.writeText(window.location.href);
-          showToast("success", "Copied link to clipboard", 2000);
+          showNotification("success", "Copied link to clipboard", 2000);
         }}
       >
         <ArrowUpOnSquareIcon className="tw-h-6 sm:tw-h-7" />
@@ -49,18 +48,18 @@ export const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) =
 };
 
 export const ReserveSlider: React.FC<{
-  user: User | undefined;
   listing: ListingType;
   className?: string;
   buttonClass?: string;
-}> = ({ listing, className, user }) => {
+}> = ({ listing, className }) => {
+  const { user } = useUserContext();
+  const { openLoginModal } = useLoginContext();
   const [open, setOpen] = useState(false);
   const [month, setMonth] = useState<Date>(new Date()); // TODO: this should be the current month
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [startTime, setStartTime] = useState<Availability | null>(null);
   const [numGuests, setNumGuests] = useState<number>(0);
   const { availability, loading } = useAvailability(listing.id, month);
-  const dispatch = useDispatch();
   const createCheckoutLink = useCreateCheckoutLink({
     onSuccess: (link) => {
       window.location.href = link;
@@ -103,7 +102,7 @@ export const ReserveSlider: React.FC<{
 
       createCheckoutLink.mutate(payload);
     } else {
-      dispatch({ type: "login.openLogin" });
+      openLoginModal();
     }
   };
 
@@ -341,7 +340,6 @@ export const ReserveSlider: React.FC<{
 };
 
 export const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) => {
-  const { user } = useUserContext();
   return (
     <div className="tw-fixed lg:tw-hidden tw-z-20 tw-bottom-0 tw-left-0 tw-flex tw-items-center tw-justify-between tw-bg-white tw-border-t tw-border-solid tw-border-gray-300 tw-h-20 tw-w-full tw-px-4">
       <div className="tw-flex tw-flex-col">
@@ -350,7 +348,7 @@ export const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) =
         </div>
         <div>/ {getDuration(listing)}</div>
       </div>
-      <ReserveSlider user={user} listing={listing} />
+      <ReserveSlider listing={listing} />
     </div>
   );
 };
@@ -362,7 +360,7 @@ export const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) =>
   const [startTime, setStartTime] = useState<Availability | null>(null);
   const [guests, setGuests] = useState<number>(1);
   const { availability, loading } = useAvailability(listing.id, month);
-  const dispatch = useDispatch();
+  const { openLoginModal } = useLoginContext();
   const createCheckoutLink = useCreateCheckoutLink({
     onSuccess: (link) => {
       window.location.href = link;
@@ -423,7 +421,7 @@ export const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) =>
 
       createCheckoutLink.mutate(payload);
     } else {
-      dispatch({ type: "login.openLogin" });
+      openLoginModal();
     }
   };
 

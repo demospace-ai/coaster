@@ -14,7 +14,7 @@ import { lateef, mergeClasses } from "@coaster/utils/common";
 import { Bars3Icon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
-import { Dispatch, SetStateAction, useRef, useState } from "react";
+import { Dispatch, ReactNode, SetStateAction, useRef, useState } from "react";
 
 export const Featured: React.FC<{ initialData: Listing[] }> = ({ initialData }) => {
   const [category, setCategory] = useState<CategoryType | undefined>(undefined);
@@ -148,9 +148,11 @@ const CategorySelector: React.FC<{
   );
 };
 
-export const DynamicToastPortal: React.FC = () => {
-  const ToastPortal = dynamic(() => import("@coaster/components/client").then((mod) => mod.ToastPortal));
-  return <ToastPortal />;
+export const DynamicNotificationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const NotificationProvider = dynamic(() =>
+    import("@coaster/components/client").then((mod) => mod.NotificationProvider),
+  );
+  return <NotificationProvider>{children}</NotificationProvider>;
 };
 
 export const DynamicHeader: React.FC = () => {

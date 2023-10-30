@@ -31,7 +31,6 @@ module.exports = withBundleAnalyzer({
       "@coaster/rpc/server",
       "@coaster/utils/client",
       "@coaster/utils/common",
-      "@coaster/state",
       "@coaster/assets",
     ],
   }

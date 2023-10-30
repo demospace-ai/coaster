@@ -1,7 +1,8 @@
 "use client";
 
-import { Button, FormError, Input, useShowToast } from "@coaster/components/client";
+import { Button, FormError, Input } from "@coaster/components/client";
 import { Loading } from "@coaster/components/common";
+import { useNotificationContext } from "@coaster/rpc/client";
 import { UpdateListing, sendRequest } from "@coaster/rpc/common";
 import { ListingInput } from "@coaster/types";
 import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
@@ -20,7 +21,7 @@ type EditListingIncludesSchemaType = z.infer<typeof EditListingIncludesSchema>;
 
 export default function Includes() {
   const listing = useListingContext();
-  const showToast = useShowToast();
+  const { showNotification } = useNotificationContext();
   const { handleSubmit, register, reset, control, formState } = useForm<EditListingIncludesSchemaType>({
     mode: "onBlur",
     resolver: zodResolver(EditListingIncludesSchema),
@@ -55,7 +56,7 @@ export default function Includes() {
 
       reset({}, { keepValues: true });
 
-      showToast("success", "Listing updated successfully.", 2000);
+      showNotification("success", "Listing updated successfully.", 2000);
     } catch (e) {
       // TODO
     }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useUpdateProfilePicture, useUpdateUser, useUserContext } from "@coaster/rpc/client";
+import { useNotificationContext, useUpdateProfilePicture, useUpdateUser, useUserContext } from "@coaster/rpc/client";
 import { UserUpdates } from "@coaster/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { redirect } from "next/navigation";
@@ -11,7 +11,6 @@ import { Button } from "../button/Button";
 import { FormError } from "../error/FormError";
 import { Input, TextArea } from "../input/Input";
 import { Loading } from "../loading/Loading";
-import { useShowToast } from "../notifications/Notifications";
 import { ProfilePicture } from "../profile/ProfilePicture";
 
 const ProfileFormSchema = z
@@ -47,10 +46,10 @@ export const Profile: React.FC = () => {
     redirect("/login");
   }
 
-  const showToast = useShowToast();
+  const { showNotification } = useNotificationContext();
   const imageInputRef = useRef<HTMLInputElement>(null);
   const { mutate: mutateUser, isLoading: isSaving } = useUpdateUser(() => {
-    showToast("success", "Profile updated successfully.", 2000);
+    showNotification("success", "Profile updated successfully.", 2000);
     reset({}, { keepValues: true });
   });
   const { mutate: mutateProfilePicture } = useUpdateProfilePicture();

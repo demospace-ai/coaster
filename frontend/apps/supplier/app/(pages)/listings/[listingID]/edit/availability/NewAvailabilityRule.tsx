@@ -9,10 +9,9 @@ import {
   RadioInput,
   Step,
   StepProps,
-  useShowToast,
   WizardNavButtons,
 } from "@coaster/components/client";
-import { useCreateAvailabilityRule } from "@coaster/rpc/client";
+import { useCreateAvailabilityRule, useNotificationContext } from "@coaster/rpc/client";
 import {
   AvailabilityRuleInput,
   AvailabilityRuleType,
@@ -177,10 +176,10 @@ const InitialRuleStep = ({ values, setValue, nextStep, prevStep }: StepProps<New
 const SingleDateStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, setValue, nextStep, prevStep }) => {
   const [selected, setSelected] = useState<Date | undefined>(values.start_date);
   const [error, setError] = useState<string | undefined>(undefined);
-  const showToast = useShowToast();
+  const { showNotification } = useNotificationContext();
   const createAvailabilityRule = useCreateAvailabilityRule(values.listingID, {
     onSuccess: () => {
-      showToast("success", "Successfully created rule");
+      showNotification("success", "Successfully created rule");
       nextStep && nextStep();
     },
   });
@@ -289,12 +288,12 @@ const DateRangeStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
 
 // This step lets the user select which days of the week to repeat on for full day listings
 const WeekdaySelectionStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, nextStep, prevStep }) => {
-  const showToast = useShowToast();
+  const { showNotification } = useNotificationContext();
   const [error, setError] = useState<string | undefined>(undefined);
   const [recurringDays, setRecurringDays] = useState<number[]>([]);
   const createAvailabilityRule = useCreateAvailabilityRule(values.listingID, {
     onSuccess: () => {
-      showToast("success", "Successfully created rule");
+      showNotification("success", "Successfully created rule");
       nextStep && nextStep();
     },
   });
@@ -396,10 +395,10 @@ const RecurringStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
     },
   });
   const [error, setError] = useState<string | undefined>(undefined);
-  const showToast = useShowToast();
+  const { showNotification } = useNotificationContext();
   const createAvailabilityRule = useCreateAvailabilityRule(values.listingID, {
     onSuccess: () => {
-      showToast("success", "Successfully created rule");
+      showNotification("success", "Successfully created rule");
       nextStep && nextStep();
     },
   });
@@ -553,10 +552,10 @@ const RecurringStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
 };
 
 const TimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, setValue, nextStep, prevStep }) => {
-  const showToast = useShowToast();
+  const { showNotification } = useNotificationContext();
   const createAvailabilityRule = useCreateAvailabilityRule(values.listingID, {
     onSuccess: () => {
-      showToast("success", "Successfully created rule");
+      showNotification("success", "Successfully created rule");
       nextStep && nextStep();
     },
   });
@@ -657,10 +656,10 @@ const SingleDayTimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({
   nextStep,
   prevStep,
 }) => {
-  const showToast = useShowToast();
+  const { showNotification } = useNotificationContext();
   const createAvailabilityRule = useCreateAvailabilityRule(values.listingID, {
     onSuccess: () => {
-      showToast("success", "Successfully created rule");
+      showNotification("success", "Successfully created rule");
       nextStep && nextStep();
     },
   });

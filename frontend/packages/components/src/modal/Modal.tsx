@@ -31,7 +31,7 @@ export const Modal: React.FC<ModalProps> = (props) => {
       >
         <Dialog
           className={mergeClasses(
-            "tw-fixed tw-z-50 tw-overscroll-contain tw-top-0 tw-left-0 tw-h-full tw-w-full tw-backdrop-blur-sm tw-bg-black tw-bg-opacity-50", // z-index is tied to Toast z-index (toast should be bigger)
+            "tw-fixed tw-z-50 tw-overscroll-contain tw-top-0 tw-left-0 tw-h-full tw-w-full tw-backdrop-blur-sm tw-bg-black tw-bg-opacity-50", // z-index is tied to NotificationProvider z-index (toast should be bigger)
           )}
           onClose={() => props.close && props.close()}
         >

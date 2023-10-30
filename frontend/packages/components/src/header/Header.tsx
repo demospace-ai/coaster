@@ -1,7 +1,6 @@
 "use client";
 
 import { useLogout, useUserContext } from "@coaster/rpc/client";
-import { useDispatch } from "@coaster/state";
 import { User } from "@coaster/types";
 import { isProd, lateef, mergeClasses } from "@coaster/utils/common";
 import { autoUpdate, offset, useClick, useDismiss, useFloating, useInteractions, useRole } from "@floating-ui/react";
@@ -12,6 +11,7 @@ import { usePathname } from "next/navigation";
 import React, { Fragment, useEffect, useState } from "react";
 import { NavLink } from "../link/Link";
 import { ProfilePicture, ProfilePlaceholder } from "../profile/ProfilePicture";
+import { useLoginContext } from "../provider/LoginProvider";
 import { SearchBarHeader } from "../search/SearchBar";
 
 export const Header: React.FC = () => {
@@ -197,7 +197,7 @@ const SignedInMenu: React.FC<{ user: User; onHostApp?: boolean }> = ({ user, onH
 };
 
 const SignedOutMenu: React.FC = () => {
-  const dispatch = useDispatch();
+  const { openLoginModal } = useLoginContext();
   const navItem =
     "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded hover:tw-bg-slate-200 tw-w-full";
 
@@ -247,14 +247,14 @@ const SignedOutMenu: React.FC = () => {
               >
                 <div className="tw-flex tw-flex-col tw-m-2 tw-pt-2 tw-font-semibold">
                   <Menu.Item>
-                    <div className={navItem} onClick={() => dispatch({ type: "login.openSignup" })}>
+                    <div className={navItem} onClick={() => openLoginModal()}>
                       Sign up
                     </div>
                   </Menu.Item>
                 </div>
                 <div className="tw-flex tw-flex-col tw-m-2 tw-py-2">
                   <Menu.Item>
-                    <div className={navItem} onClick={() => dispatch({ type: "login.openLogin" })}>
+                    <div className={navItem} onClick={() => openLoginModal(true)}>
                       Log in
                     </div>
                   </Menu.Item>
@@ -269,7 +269,7 @@ const SignedOutMenu: React.FC = () => {
 };
 
 const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
-  const dispatch = useDispatch();
+  const { openLoginModal } = useLoginContext();
   const { user } = useUserContext();
   const logout = useLogout(onHostApp);
   const navItem = "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-base tw-select-none";
@@ -348,7 +348,7 @@ const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
                             <div
                               className={mergeClasses(buttonStyle, "tw-text-white tw-bg-gray-900 hover:tw-bg-gray-800")}
                               onClick={() => {
-                                dispatch({ type: "login.openSignup" });
+                                openLoginModal();
                                 setOpen(false);
                               }}
                             >
@@ -357,7 +357,7 @@ const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
                             <div
                               className={buttonStyle}
                               onClick={() => {
-                                dispatch({ type: "login.openLogin" });
+                                openLoginModal(true);
                                 setOpen(false);
                               }}
                             >

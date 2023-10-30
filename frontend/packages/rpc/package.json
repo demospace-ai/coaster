@@ -13,7 +13,6 @@
   "dependencies": {
     "@coaster/types": "*",
     "@coaster/utils": "*",
-    "@coaster/state": "*",
     "highlight.run": "^8.0.1",
     "react-dom": "^18.2.0",
     "react": "^18.2.0",

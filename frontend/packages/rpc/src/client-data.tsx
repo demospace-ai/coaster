@@ -1,6 +1,5 @@
 "use client";
 
-import { useDispatch } from "@coaster/state";
 import {
   Availability,
   AvailabilityRule,
@@ -14,10 +13,9 @@ import {
   User,
   UserUpdates,
 } from "@coaster/types";
-import { Mutation, MutationOpts, consumeError, useMutation } from "@coaster/utils/client";
+import { Mutation, MutationOpts, useMutation } from "@coaster/utils/client";
 import { HttpError, forceErrorMessage, isProd } from "@coaster/utils/common";
 import { H } from "highlight.run";
-import { redirect } from "next/navigation";
 import { createContext, useCallback, useContext } from "react";
 import useSWR, { Fetcher, SWRConfiguration, mutate } from "swr";
 import { sendRequest } from "./ajax";
@@ -46,37 +44,18 @@ import {
 
 // TODO: this isn't the right place for this so reorganize later
 // We use context so that we can populate the initial user from the server-side fetch
-const UserContext = createContext<{ user: User | undefined; loading: boolean }>({ user: undefined, loading: false });
+export const UserContext = createContext<{ user: User | undefined; loading: boolean }>({
+  user: undefined,
+  loading: false,
+});
 export const useUserContext = () => useContext(UserContext);
-export const UserProviderClient: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, loading } = useUser();
 
-  return <UserContext.Provider value={{ user, loading }}>{children}</UserContext.Provider>;
-};
-
-function useUser() {
-  const fetcher: Fetcher<User | undefined, {}> = async () => {
-    try {
-      const response = await sendRequest(CheckSession);
-      return response.user;
-    } catch (e) {
-      if (e instanceof HttpError) {
-        if (e.code === 403) {
-          redirect("/unauthorized");
-        } else if (e.code === 401) {
-          return undefined;
-        }
-      }
-
-      // This is an unexpected error, so report it
-      consumeError(e);
-      return undefined;
-    }
-  };
-
-  const { data, mutate, error, isLoading, isValidating } = useSWR({ CheckSession }, fetcher);
-  return { user: data, mutate, error, loading: isLoading || isValidating };
-}
+export const NotificationContext = createContext<{
+  showNotification: (type: "error" | "success" | "info", content: React.ReactNode, duration?: number) => void;
+}>({
+  showNotification: () => {},
+});
+export const useNotificationContext = () => useContext(NotificationContext);
 
 export function useListing(listingID: number | undefined, initialData?: Listing) {
   const shouldFetch = listingID;
@@ -328,8 +307,7 @@ export function useUpdateUser(onSuccess?: () => void): Mutation<UserUpdates> {
 }
 
 export function useUpdateProfilePicture(): Mutation<File> {
-  const dispatch = useDispatch();
-
+  const { showNotification } = useNotificationContext();
   return useMutation<User, File>(
     async (profilePicture: File) => {
       const formData = new FormData();
@@ -341,10 +319,7 @@ export function useUpdateProfilePicture(): Mutation<File> {
         mutate({ CheckSession }, user);
       },
       onError: (e) => {
-        dispatch({
-          type: "toast",
-          toast: { type: "error", content: forceErrorMessage(e) },
-        });
+        showNotification("error", forceErrorMessage(e));
       },
     },
   );
@@ -379,10 +354,8 @@ export function identifyUser(user: User) {
 }
 
 export function useLogout(onHostApp?: boolean) {
-  const dispatch = useDispatch();
-
   return useCallback(async () => {
     await sendRequest(Logout);
     mutate({ CheckSession }, undefined);
-  }, [dispatch]);
+  }, []);
 }

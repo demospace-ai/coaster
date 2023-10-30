@@ -8,9 +8,9 @@ import {
   Input,
   PriceInput,
   TextArea,
-  useShowToast,
 } from "@coaster/components/client";
 import { Loading } from "@coaster/components/common";
+import { useNotificationContext } from "@coaster/rpc/client";
 import { UpdateListing, sendRequest } from "@coaster/rpc/common";
 import { Category, ListingInput } from "@coaster/types";
 import { toTitleCase } from "@coaster/utils/common";
@@ -43,7 +43,7 @@ type EditListingDetailsSchemaType = z.infer<typeof EditListingDetailsSchema>;
 
 export default function Details() {
   const listing = useListingContext();
-  const showToast = useShowToast();
+  const { showNotification } = useNotificationContext();
   const { handleSubmit, register, reset, control, watch, formState } = useForm<EditListingDetailsSchemaType>({
     mode: "onBlur",
     resolver: zodResolver(EditListingDetailsSchema),
@@ -82,7 +82,7 @@ export default function Details() {
 
       reset({}, { keepValues: true });
 
-      showToast("success", "Listing updated successfully.", 2000);
+      showNotification("success", "Listing updated successfully.", 2000);
     } catch (e) {
       // TODO
     }

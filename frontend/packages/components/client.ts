@@ -28,6 +28,8 @@ export * from "./src/pages/Invite";
 export * from "./src/pages/Profile";
 export * from "./src/pages/ResetPassword";
 export * from "./src/profile/ProfilePicture";
+export * from "./src/provider/LoginProvider";
+export * from "./src/provider/UserProvider";
 export * from "./src/search/SearchBar";
 export * from "./src/search/SearchResult";
 export * from "./src/table/Table";

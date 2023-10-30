@@ -12,7 +12,6 @@
     "@coaster/assets": "*",
     "@coaster/components": "*",
     "@coaster/rpc": "*",
-    "@coaster/state": "*",
     "@coaster/types": "*",
     "@coaster/utils": "*",
     "@floating-ui/react": "^0.26.1",

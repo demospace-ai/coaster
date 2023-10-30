@@ -1,20 +1,17 @@
 "use client";
 
 import { LongLogo } from "@coaster/assets";
-import { RootState, useDispatch, useSelector } from "@coaster/state";
 import { mergeClasses } from "@coaster/utils/common";
 import { Dialog, Portal, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { Fragment, useState } from "react";
+import { useLoginContext } from "../provider/LoginProvider";
 import { EmailLoginForm, EmailSignup, GoogleLogin, LoginStep, SendResetForm, StartContent } from "./LoginSteps";
 
 export const LoginModal: React.FC = () => {
-  const modalOpen = useSelector((state: RootState) => state.login.modalOpen);
-  const create = useSelector((state: RootState) => state.login.create);
-  const dispatch = useDispatch();
-  const closeModal = () => dispatch({ type: "login.close" });
+  const { loginOpen, create, closeLoginModal } = useLoginContext();
   const [step, setStep] = useState<LoginStep>(LoginStep.Start);
   const searchParams = useSearchParams();
   const destination = searchParams?.get("destination") ?? "";
@@ -31,17 +28,23 @@ export const LoginModal: React.FC = () => {
   switch (step) {
     case LoginStep.Start:
       loginContent = (
-        <StartContent create={create} setStep={setStep} email={email} setEmail={setEmail} closeModal={closeModal} />
+        <StartContent
+          create={create}
+          setStep={setStep}
+          email={email}
+          setEmail={setEmail}
+          closeModal={closeLoginModal}
+        />
       );
       break;
     case LoginStep.EmailCreate:
-      loginContent = <EmailSignup email={email} reset={reset} closeModal={closeModal} />;
+      loginContent = <EmailSignup email={email} reset={reset} closeModal={closeLoginModal} />;
       break;
     case LoginStep.EmailLogin:
-      loginContent = <EmailLoginForm email={email} reset={reset} closeModal={closeModal} />;
+      loginContent = <EmailLoginForm email={email} reset={reset} closeModal={closeLoginModal} />;
       break;
     case LoginStep.GoogleLogin:
-      loginContent = <GoogleLogin email={email} reset={reset} closeModal={closeModal} />;
+      loginContent = <GoogleLogin email={email} reset={reset} closeModal={closeLoginModal} />;
       break;
     case LoginStep.SendReset:
       loginContent = <SendResetForm reset={reset} destination={destination} />;
@@ -52,7 +55,7 @@ export const LoginModal: React.FC = () => {
     <Portal>
       <Transition
         appear
-        show={modalOpen}
+        show={loginOpen}
         as={Fragment}
         enter="tw-ease-in tw-duration-150"
         enterFrom="tw-opacity-0"
@@ -63,16 +66,16 @@ export const LoginModal: React.FC = () => {
       >
         <Dialog
           className={mergeClasses(
-            "tw-fixed tw-z-50 tw-overscroll-contain tw-top-0 tw-left-0 tw-h-full tw-w-full tw-backdrop-blur-sm tw-bg-black tw-bg-opacity-50", // z-index is tied to Toast z-index (toast should be bigger)
+            "tw-fixed tw-z-50 tw-overscroll-contain tw-top-0 tw-left-0 tw-h-full tw-w-full tw-backdrop-blur-sm tw-bg-black tw-bg-opacity-50", // z-index is tied to NotificationProvider z-index (toast should be bigger)
           )}
-          onClose={() => closeModal()}
+          onClose={() => closeLoginModal()}
         >
           <div className="tw-flex tw-h-full tw-w-full tw-items-center tw-justify-center">
             <button
               className="tw-flex tw-absolute tw-z-20 tw-top-4 sm:tw-top-8 tw-right-4 sm:tw-right-8 tw-bg-transparent tw-border-none tw-cursor-pointer tw-p-0 tw-justify-center tw-items-center"
               onClick={(e) => {
                 e.preventDefault();
-                closeModal();
+                closeLoginModal();
               }}
             >
               <XMarkIcon className="tw-h-6 tw-stroke-black" />

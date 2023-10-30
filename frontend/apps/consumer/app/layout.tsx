@@ -1,8 +1,9 @@
 import { ErrorBoundary } from "@coaster/components/client";
 import { isProd, worksans } from "@coaster/utils/common";
 import { HighlightInit } from "@highlight-run/next/client";
-import "consumer/app/global.css";
 import type { Metadata } from "next";
+
+import "consumer/app/global.css";
 
 export const metadata: Metadata = {
   title: "Coaster",
