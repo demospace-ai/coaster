@@ -52,10 +52,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode; publicPaths: st
   }, []);
 
   const closeLoginModal = useCallback(() => {
-    () => {
-      setModalOpen(false);
-      setCreate(false);
-    };
+    setModalOpen(false);
+    setCreate(false);
   }, []);
 
   const contextObject = useMemo(

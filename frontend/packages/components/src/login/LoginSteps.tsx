@@ -46,7 +46,8 @@ export const StartContent: React.FC<{
 
   if (loading) {
     return (
-      <div className="tw-flex tw-h-32 tw-w-full tw-items-center tw-justify-center">
+      <div className="tw-flex tw-flex-col tw-h-32 tw-w-full tw-items-center tw-justify-center">
+        Continue in new window...
         <Loading />
       </div>
     );
@@ -355,6 +356,7 @@ export const GoogleLogin: React.FC<{
   if (loading) {
     return (
       <div className="tw-flex tw-h-32 tw-w-full tw-items-center tw-justify-center">
+        Continue in new window...
         <Loading />
       </div>
     );
@@ -462,36 +464,58 @@ const useOpenGooglePopup = (
   closeModal?: () => void,
 ) => {
   const onLoginSuccess = useOnLoginSuccess();
+  const [receivedDone, setReceivedDone] = useState<boolean>(false);
 
   // Not exported because everywhere else should use getUserServer or useAuthContext
   // We do this because the redirect to the OAuth callback page cannot directly fetch the user
   // because browsers do not send cookies on redirects from foreign referrers with SameSite=Strict
-  const checkSession = async () => {
-    const checkSessionResponse = await sendRequest(CheckSession);
-    return checkSessionResponse.user;
+  const checkForCompletion = async (loginWindow: Window | null) => {
+    if (loginWindow?.closed) {
+      if (receivedDone) {
+        return;
+      }
+
+      try {
+        const checkSessionResponse = await sendRequest(CheckSession);
+        await onLoginSuccess(checkSessionResponse.user);
+        closeModal && closeModal();
+      } catch (e) {
+        setLoginError("Login window was closed.");
+        setLoading(false);
+      }
+    } else {
+      setTimeout(() => checkForCompletion(loginWindow), 1000);
+    }
   };
 
   return useCallback(() => {
+    setLoading(true);
     const handleMessage = async (event: MessageEvent<LoginMessage>) => {
       if (event.data.type === MessageType.Done) {
+        setReceivedDone(true);
+        window.removeEventListener("message", handleMessage);
         try {
-          window.removeEventListener("message", handleMessage);
-          setLoading(true);
-          const user = await checkSession();
-          await onLoginSuccess(user);
+          const checkSessionResponse = await sendRequest(CheckSession);
+          await onLoginSuccess(checkSessionResponse.user);
           closeModal && closeModal();
         } catch (e) {
           setLoginError("Failed to login with Google.");
+          setLoading(false);
         }
       }
     };
     const y = window.outerHeight / 2 + window.screenY - 300;
     const x = window.outerWidth / 2 + window.screenX - 240;
     window.addEventListener("message", handleMessage);
-    window.open(
+    const loginWindow = window.open(
       getEndpointUrl(OAuthRedirect, { provider: OAuthProvider.Google, origin: window.location.origin }),
       "google-oauth",
       `height=600,width=480 top=${y} left=${x}`,
     );
+
+    // periodically check for completion
+    setTimeout(() => {
+      checkForCompletion(loginWindow);
+    }, 1000);
   }, [setLoading, setLoginError, closeModal]);
 };
