@@ -505,7 +505,7 @@ export const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) =>
 export const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) => {
   const [showImages, setShowImages] = useState(false);
   const ImagesModal = dynamic(() =>
-    import("consumer/app/(pages)/listings/[listingID]/imagesModal").then((mod) => mod.ImagesModal),
+    import("consumer/app/(pages)/listings/[listingID]/ImagesModal").then((mod) => mod.ImagesModal),
   );
 
   return (
