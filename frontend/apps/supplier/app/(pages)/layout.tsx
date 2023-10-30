@@ -1,9 +1,21 @@
 import { AuthProvider, Footer, NotificationProvider, SupplierHeader } from "@coaster/components/client";
 import { DynamicLoginModal } from "supplier/app/(pages)/client";
 
+const PUBLIC_PATHS = [
+  "/login",
+  "/signup",
+  "/terms",
+  "/privacy",
+  "/about",
+  "/reset-password",
+  "/create-password",
+  "/unauthorized",
+  "/oauth-callback",
+];
+
 export default async function PageLayout({ children }: { children: React.ReactNode }) {
   return (
-    <AuthProvider>
+    <AuthProvider publicPaths={PUBLIC_PATHS}>
       <NotificationProvider>
         <DynamicLoginModal />
         <div className="tw-flex tw-flex-col tw-flex-grow">

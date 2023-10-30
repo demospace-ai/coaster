@@ -5,7 +5,8 @@ import { CheckSession, sendRequest } from "@coaster/rpc/common";
 import { User } from "@coaster/types";
 import { consumeError } from "@coaster/utils/client";
 import { HttpError } from "@coaster/utils/common";
-import { redirect } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
+import { pathToRegexp } from "path-to-regexp";
 import { useCallback, useMemo, useState } from "react";
 import useSWR, { Fetcher } from "swr";
 
@@ -34,10 +35,14 @@ function useUser() {
   return { user: data, mutate, error, loading: isLoading || isValidating };
 }
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode; publicPaths: string[] }> = ({
+  children,
+  publicPaths,
+}) => {
   const { user, loading } = useUser();
   const [loginOpen, setModalOpen] = useState(false);
   const [create, setCreate] = useState(false);
+  const pathname = usePathname();
 
   const openLoginModal = useCallback((create?: boolean) => {
     if (create) {
@@ -65,5 +70,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     [user, loading, loginOpen, create, openLoginModal, closeLoginModal],
   );
 
+  const isPublicRoute = createRouteMatcher(publicPaths);
+  if (!user && !loading && !isPublicRoute(pathname)) {
+    return redirect("/login");
+  }
+
   return <AuthContext.Provider value={contextObject}>{children}</AuthContext.Provider>;
+};
+
+const createRouteMatcher = (routes: string[]) => {
+  const matchers = routes.map((route) => pathToRegexp(route));
+  return (pathname: string) => matchers.some((matcher) => matcher.test(pathname));
 };
