@@ -54,7 +54,8 @@ const SearchBarModal: React.FC<{
       {props.show &&
         (props.header ? (
           <MagnifyingGlassIcon
-            aria-label="search-button"
+            aria-label="Open search"
+            aria-role="button"
             className="tw-flex tw-cursor-pointer tw-ml-3 tw-w-6 tw-text-gray-500"
             onClick={() => {
               setOpen(true);
@@ -62,7 +63,7 @@ const SearchBarModal: React.FC<{
           />
         ) : (
           <div
-            aria-label="search-bar"
+            aria-role="search"
             className={mergeClasses(
               "tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[640px] tw-h-14 tw-bg-white tw-shadow-dark-sm tw-p-1.5 tw-rounded-[99px] tw-cursor-pointer",
               props.className,
@@ -136,7 +137,7 @@ const SearchBarDropdown: React.FC<{
   return props.show ? (
     <div className="tw-hidden sm:tw-flex tw-w-full tw-justify-center">
       <div
-        aria-label="search-bar"
+        aria-role="search"
         className={mergeClasses(
           props.header
             ? "tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[400px] tw-h-9 tw-bg-white tw-ring-1 tw-ring-slate-300 tw-rounded-[99px] tw-cursor-pointer"
@@ -158,56 +159,58 @@ const SearchBarDropdown: React.FC<{
           className="tw-w-full tw-bg-transparent tw-pl-4 tw-placeholder-gray-700 tw-text-base tw-select-none tw-cursor-text tw-outline-none"
           placeholder="Choose a category"
         />
-        <form
-          className="tw-relative"
-          ref={refs.setFloating}
-          style={floatingStyles}
-          {...getFloatingProps()}
-          onSubmit={() => {
-            if (activeIndex) {
-              search(filteredCategories[activeIndex]);
-            }
-          }}
-        >
-          <Transition
-            as={Fragment}
-            show={open}
-            enter="tw-transition tw-ease-out tw-duration-100 tw-origin-top"
-            enterFrom="tw-transform tw-opacity-0 tw-scale-y-80"
-            enterTo="tw-transform tw-opacity-100 tw-scale-y-100"
-            leave="tw-transition tw-ease-in tw-duration-100 tw-origin-top"
-            leaveFrom="tw-transform tw-opacity-100 tw-scale-y-100"
-            leaveTo="tw-transform tw-opacity-0 tw-scale-y-0"
+        {/** Floating element must be div for aria attributes to be correct */}
+        <div className="tw-relative" ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
+          <form
+            onSubmit={() => {
+              if (activeIndex) {
+                search(filteredCategories[activeIndex]);
+              }
+            }}
           >
-            <div className="tw-flex tw-flex-col tw-w-full tw-max-h-96 tw-rounded-2xl tw-overflow-hidden tw-bg-white tw-text-black tw-shadow-lg">
-              <div
-                className="tw-pl-4 tw-pt-4 tw-pb-2 tw-font-semibold"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                }}
-              >
-                Choose your adventure
+            <Transition
+              as={Fragment}
+              show={open}
+              enter="tw-transition tw-ease-out tw-duration-100 tw-origin-top"
+              enterFrom="tw-transform tw-opacity-0 tw-scale-y-80"
+              enterTo="tw-transform tw-opacity-100 tw-scale-y-100"
+              leave="tw-transition tw-ease-in tw-duration-100 tw-origin-top"
+              leaveFrom="tw-transform tw-opacity-100 tw-scale-y-100"
+              leaveTo="tw-transform tw-opacity-0 tw-scale-y-0"
+            >
+              <div className="tw-flex tw-flex-col tw-w-full tw-max-h-96 tw-rounded-2xl tw-overflow-hidden tw-bg-white tw-text-black tw-shadow-lg">
+                <div
+                  className="tw-pl-4 tw-pt-4 tw-pb-2 tw-font-semibold"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                  }}
+                >
+                  Choose your adventure
+                </div>
+                <div
+                  aria-role="listbox"
+                  className="tw-flex tw-flex-col tw-gap-2 tw-overflow-auto tw-overscroll-contain tw-p-2 tw-text-sm"
+                >
+                  {filteredCategories.map((category, idx) => (
+                    <Link
+                      key={category}
+                      ref={(node) => (listRef.current[idx] = node)}
+                      className={mergeClasses(
+                        "tw-flex tw-flex-row tw-items-center tw-gap-3 tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 hover:tw-bg-slate-50 tw-rounded-lg",
+                        idx === activeIndex && "tw-bg-slate-100",
+                      )}
+                      href={`/search?categories=["${category}"]`}
+                    >
+                      {getCategoryIcon(category, "tw-h-14 tw-w-14 tw-p-3 tw-bg-gray-100 tw-rounded-lg")}
+                      <span className="tw-font-medium">{getCategoryForDisplay(category)}</span>
+                    </Link>
+                  ))}
+                </div>
               </div>
-              <div className="tw-flex tw-flex-col tw-gap-2 tw-overflow-auto tw-overscroll-contain tw-p-2 tw-text-sm">
-                {filteredCategories.map((category, idx) => (
-                  <Link
-                    key={category}
-                    ref={(node) => (listRef.current[idx] = node)}
-                    className={mergeClasses(
-                      "tw-flex tw-flex-row tw-items-center tw-gap-3 tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 hover:tw-bg-slate-50 tw-rounded-lg",
-                      idx === activeIndex && "tw-bg-slate-100",
-                    )}
-                    href={`/search?categories=["${category}"]`}
-                  >
-                    {getCategoryIcon(category, "tw-h-14 tw-w-14 tw-p-3 tw-bg-gray-100 tw-rounded-lg")}
-                    <span className="tw-font-medium">{getCategoryForDisplay(category)}</span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </Transition>
-        </form>
+            </Transition>
+          </form>
+        </div>
         {!props.header && (
           <div className="tw-hidden tw-px-5 sm:tw-flex tw-items-center tw-rounded-[99px] tw-h-full tw-bg-blue-950 tw-text-white tw-text-base tw-font-medium">
             Search
