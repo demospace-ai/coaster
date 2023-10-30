@@ -463,7 +463,7 @@ const useOpenGooglePopup = (
 ) => {
   const onLoginSuccess = useOnLoginSuccess();
 
-  // Not exported because everywhere else should use getUserServer or useUserContext
+  // Not exported because everywhere else should use getUserServer or useAuthContext
   // We do this because the redirect to the OAuth callback page cannot directly fetch the user
   // because browsers do not send cookies on redirects from foreign referrers with SameSite=Strict
   const checkSession = async () => {

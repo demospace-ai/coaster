@@ -1,17 +1,17 @@
 "use client";
 
 import { LongLogo } from "@coaster/assets";
+import { useAuthContext } from "@coaster/rpc/client";
 import { mergeClasses } from "@coaster/utils/common";
 import { Dialog, Portal, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { Fragment, useState } from "react";
-import { useLoginContext } from "../provider/LoginProvider";
 import { EmailLoginForm, EmailSignup, GoogleLogin, LoginStep, SendResetForm, StartContent } from "./LoginSteps";
 
 export const LoginModal: React.FC = () => {
-  const { loginOpen, create, closeLoginModal } = useLoginContext();
+  const { loginOpen, create, closeLoginModal } = useAuthContext();
   const [step, setStep] = useState<LoginStep>(LoginStep.Start);
   const searchParams = useSearchParams();
   const destination = searchParams?.get("destination") ?? "";

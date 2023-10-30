@@ -2,13 +2,13 @@
 
 import { NavLink } from "@coaster/components/client";
 import { Loading } from "@coaster/components/common";
-import { useHostedListings, useUserContext } from "@coaster/rpc/client";
+import { useAuthContext, useHostedListings } from "@coaster/rpc/client";
 import { ListingStatus, StripeAccountStatus } from "@coaster/types";
 import { mergeClasses } from "@coaster/utils/common";
 import { CalendarDaysIcon, CheckIcon, ClockIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
 
 export default function Hosting() {
-  const { user } = useUserContext();
+  const { user } = useAuthContext();
   const { hosted, error } = useHostedListings();
 
   const setupStep =

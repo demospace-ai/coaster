@@ -1,4 +1,4 @@
-import { LoginProvider, UserProvider } from "@coaster/components/client";
+import { AuthProvider } from "@coaster/components/client";
 import {
   DynamicFooter,
   DynamicHeader,
@@ -8,17 +8,15 @@ import {
 
 export default async function PageLayout({ children }: { children: React.ReactNode }) {
   return (
-    <UserProvider>
-      <LoginProvider>
-        <DynamicNotificationProvider>
-          <DynamicLoginModal />
-          <div className="tw-flex tw-flex-col tw-flex-grow tw-items-center">
-            <DynamicHeader />
-            {children}
-            <DynamicFooter />
-          </div>
-        </DynamicNotificationProvider>
-      </LoginProvider>
-    </UserProvider>
+    <AuthProvider>
+      <DynamicNotificationProvider>
+        <DynamicLoginModal />
+        <div className="tw-flex tw-flex-col tw-flex-grow tw-items-center">
+          <DynamicHeader />
+          {children}
+          <DynamicFooter />
+        </div>
+      </DynamicNotificationProvider>
+    </AuthProvider>
   );
 }

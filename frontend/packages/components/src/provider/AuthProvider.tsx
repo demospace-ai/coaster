@@ -1,14 +1,15 @@
 "use client";
 
-import { UserContext } from "@coaster/rpc/client";
+import { AuthContext } from "@coaster/rpc/client";
 import { CheckSession, sendRequest } from "@coaster/rpc/common";
 import { User } from "@coaster/types";
 import { consumeError } from "@coaster/utils/client";
 import { HttpError } from "@coaster/utils/common";
 import { redirect } from "next/navigation";
+import { useCallback, useMemo, useState } from "react";
 import useSWR, { Fetcher } from "swr";
 
-// Not exported - everywhere else should use useUserContext
+// Not exported - everywhere else should use useAuthContext
 function useUser() {
   const fetcher: Fetcher<User | undefined, {}> = async () => {
     try {
@@ -33,8 +34,36 @@ function useUser() {
   return { user: data, mutate, error, loading: isLoading || isValidating };
 }
 
-export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useUser();
+  const [loginOpen, setModalOpen] = useState(false);
+  const [create, setCreate] = useState(false);
 
-  return <UserContext.Provider value={{ user, loading }}>{children}</UserContext.Provider>;
+  const openLoginModal = useCallback((create?: boolean) => {
+    if (create) {
+      setCreate(true);
+    }
+    setModalOpen(true);
+  }, []);
+
+  const closeLoginModal = useCallback(() => {
+    () => {
+      setModalOpen(false);
+      setCreate(false);
+    };
+  }, []);
+
+  const contextObject = useMemo(
+    () => ({
+      user,
+      loading,
+      loginOpen,
+      create,
+      openLoginModal,
+      closeLoginModal,
+    }),
+    [user, loading, loginOpen, create, openLoginModal, closeLoginModal],
+  );
+
+  return <AuthContext.Provider value={contextObject}>{children}</AuthContext.Provider>;
 };

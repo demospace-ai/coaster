@@ -1,6 +1,6 @@
 "use client";
 
-import { useNotificationContext, useUpdateProfilePicture, useUpdateUser, useUserContext } from "@coaster/rpc/client";
+import { useAuthContext, useNotificationContext, useUpdateProfilePicture, useUpdateUser } from "@coaster/rpc/client";
 import { UserUpdates } from "@coaster/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { redirect } from "next/navigation";
@@ -37,7 +37,7 @@ const ProfileFormSchema = z
 type ProfileFormSchemaType = z.infer<typeof ProfileFormSchema>;
 
 export const Profile: React.FC = () => {
-  const { user, loading } = useUserContext();
+  const { user, loading } = useAuthContext();
   if (loading) {
     return <Loading />;
   }

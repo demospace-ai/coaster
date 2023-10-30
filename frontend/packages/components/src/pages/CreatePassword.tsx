@@ -1,7 +1,7 @@
 "use client";
 
 import { LongLogo } from "@coaster/assets";
-import { useResetPassword, useUserContext } from "@coaster/rpc/client";
+import { useAuthContext, useResetPassword } from "@coaster/rpc/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -32,7 +32,7 @@ type CreatePasswordFormSchemaType = z.infer<typeof CreatePasswordFormSchema>;
 
 export const CreatePassword: React.FC = () => {
   const router = useRouter();
-  const { user } = useUserContext();
+  const { user } = useAuthContext();
   const searchParams = useSearchParams();
   const destination = searchParams.get("destination") ?? "";
   const token = searchParams.get("token");

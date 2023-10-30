@@ -1,8 +1,8 @@
 "use client";
 
-import { Button, GuestNumberInput, correctFromUTC, correctToUTC, useLoginContext } from "@coaster/components/client";
+import { Button, GuestNumberInput, correctFromUTC, correctToUTC } from "@coaster/components/client";
 import { Loading } from "@coaster/components/common";
-import { useAvailability, useCreateCheckoutLink, useNotificationContext, useUserContext } from "@coaster/rpc/client";
+import { useAuthContext, useAvailability, useCreateCheckoutLink, useNotificationContext } from "@coaster/rpc/client";
 import { Availability, AvailabilityType, Image as ListingImage, Listing as ListingType } from "@coaster/types";
 import { ToTimeOnly, getGcsImageUrl, mergeClasses, toTitleCase } from "@coaster/utils/common";
 import { Dialog, Disclosure, RadioGroup, Transition } from "@headlessui/react";
@@ -52,8 +52,7 @@ export const ReserveSlider: React.FC<{
   className?: string;
   buttonClass?: string;
 }> = ({ listing, className }) => {
-  const { user } = useUserContext();
-  const { openLoginModal } = useLoginContext();
+  const { user, openLoginModal } = useAuthContext();
   const [open, setOpen] = useState(false);
   const [month, setMonth] = useState<Date>(new Date()); // TODO: this should be the current month
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
@@ -354,13 +353,12 @@ export const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) =
 };
 
 export const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
-  const { user } = useUserContext();
+  const { user, openLoginModal } = useAuthContext();
   const [month, setMonth] = useState<Date>(new Date()); // TODO: this should be the current month
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [startTime, setStartTime] = useState<Availability | null>(null);
   const [guests, setGuests] = useState<number>(1);
   const { availability, loading } = useAvailability(listing.id, month);
-  const { openLoginModal } = useLoginContext();
   const createCheckoutLink = useCreateCheckoutLink({
     onSuccess: (link) => {
       window.location.href = link;

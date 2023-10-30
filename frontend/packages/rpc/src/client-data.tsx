@@ -44,11 +44,22 @@ import {
 
 // TODO: this isn't the right place for this so reorganize later
 // We use context so that we can populate the initial user from the server-side fetch
-export const UserContext = createContext<{ user: User | undefined; loading: boolean }>({
+export const AuthContext = createContext<{
+  user: User | undefined;
+  loading: boolean;
+  loginOpen: boolean;
+  create: boolean;
+  openLoginModal: (create?: boolean) => void;
+  closeLoginModal: () => void;
+}>({
   user: undefined,
   loading: false,
+  loginOpen: false,
+  create: false,
+  openLoginModal: () => {},
+  closeLoginModal: () => {},
 });
-export const useUserContext = () => useContext(UserContext);
+export const useAuthContext = () => useContext(AuthContext);
 
 export const NotificationContext = createContext<{
   showNotification: (type: "error" | "success" | "info", content: React.ReactNode, duration?: number) => void;

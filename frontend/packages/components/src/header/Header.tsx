@@ -1,6 +1,6 @@
 "use client";
 
-import { useLogout, useUserContext } from "@coaster/rpc/client";
+import { useAuthContext, useLogout } from "@coaster/rpc/client";
 import { User } from "@coaster/types";
 import { isProd, lateef, mergeClasses } from "@coaster/utils/common";
 import { autoUpdate, offset, useClick, useDismiss, useFloating, useInteractions, useRole } from "@floating-ui/react";
@@ -11,7 +11,6 @@ import { usePathname } from "next/navigation";
 import React, { Fragment, useEffect, useState } from "react";
 import { NavLink } from "../link/Link";
 import { ProfilePicture, ProfilePlaceholder } from "../profile/ProfilePicture";
-import { useLoginContext } from "../provider/LoginProvider";
 import { SearchBarHeader } from "../search/SearchBar";
 
 export const Header: React.FC = () => {
@@ -62,7 +61,7 @@ const LogoLink: React.FC = () => {
 };
 
 const ProfileDropdown: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
-  const { user } = useUserContext();
+  const { user } = useAuthContext();
   const pathname = usePathname();
   const isHome = pathname === "/";
 
@@ -197,7 +196,7 @@ const SignedInMenu: React.FC<{ user: User; onHostApp?: boolean }> = ({ user, onH
 };
 
 const SignedOutMenu: React.FC = () => {
-  const { openLoginModal } = useLoginContext();
+  const { openLoginModal } = useAuthContext();
   const navItem =
     "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded hover:tw-bg-slate-200 tw-w-full";
 
@@ -269,8 +268,7 @@ const SignedOutMenu: React.FC = () => {
 };
 
 const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
-  const { openLoginModal } = useLoginContext();
-  const { user } = useUserContext();
+  const { user, openLoginModal } = useAuthContext();
   const logout = useLogout(onHostApp);
   const navItem = "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-base tw-select-none";
   const [open, setOpen] = useState(false);
@@ -422,7 +420,7 @@ const SwitchToHostingLink: React.FC<{
   onClick?: () => void;
   className?: string;
 }> = (props) => {
-  const { user } = useUserContext();
+  const { user } = useAuthContext();
 
   const baseLink = isProd() ? "https://supplier.trycoaster.com" : "http://localhost:3030";
   const link = user?.is_host ? baseLink : baseLink + "/listings/new";
