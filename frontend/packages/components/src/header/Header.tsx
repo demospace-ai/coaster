@@ -37,7 +37,8 @@ export const Header: React.FC = () => {
     >
       <div className="tw-flex tw-w-full tw-max-w-[1280px] tw-items-center tw-justify-between">
         <LogoLink />
-        <SearchBarHeader show={!isHome || scrollPosition > 300} /> {/** Pass "show" here so modal is always rendered */}
+        {/** Pass "show" here so modal is always rendered */}
+        <SearchBarHeader show={!isHome || scrollPosition > 300} />
         <ProfileDropdown />
       </div>
     </div>

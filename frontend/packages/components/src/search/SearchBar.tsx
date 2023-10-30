@@ -55,7 +55,7 @@ const SearchBarModal: React.FC<{
         (props.header ? (
           <MagnifyingGlassIcon
             aria-label="Open search"
-            aria-role="button"
+            role="button"
             className="tw-flex tw-cursor-pointer tw-ml-3 tw-w-6 tw-text-gray-500"
             onClick={() => {
               setOpen(true);
@@ -63,7 +63,7 @@ const SearchBarModal: React.FC<{
           />
         ) : (
           <div
-            aria-role="search"
+            role="search"
             className={mergeClasses(
               "tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[640px] tw-h-14 tw-bg-white tw-shadow-dark-sm tw-p-1.5 tw-rounded-[99px] tw-cursor-pointer",
               props.className,
@@ -137,7 +137,7 @@ const SearchBarDropdown: React.FC<{
   return props.show ? (
     <div className="tw-hidden sm:tw-flex tw-w-full tw-justify-center">
       <div
-        aria-role="search"
+        role="search"
         className={mergeClasses(
           props.header
             ? "tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[400px] tw-h-9 tw-bg-white tw-ring-1 tw-ring-slate-300 tw-rounded-[99px] tw-cursor-pointer"
@@ -189,7 +189,7 @@ const SearchBarDropdown: React.FC<{
                   Choose your adventure
                 </div>
                 <div
-                  aria-role="listbox"
+                  role="listbox"
                   className="tw-flex tw-flex-col tw-gap-2 tw-overflow-auto tw-overscroll-contain tw-p-2 tw-text-sm"
                 >
                   {filteredCategories.map((category, idx) => (

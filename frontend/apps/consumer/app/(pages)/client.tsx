@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ProfilePlaceholder,
   SearchResult,
   getCategoryForDisplay,
   getCategoryIcon,
@@ -9,9 +10,10 @@ import {
 import { Loading } from "@coaster/components/common";
 import { useFeatured } from "@coaster/rpc/client";
 import { CategoryType, Listing } from "@coaster/types";
-import { mergeClasses } from "@coaster/utils/common";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { lateef, mergeClasses } from "@coaster/utils/common";
+import { Bars3Icon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import dynamic from "next/dynamic";
+import { usePathname } from "next/navigation";
 import { Dispatch, SetStateAction, useRef, useState } from "react";
 
 export const Featured: React.FC<{ initialData: Listing[] }> = ({ initialData }) => {
@@ -146,8 +148,58 @@ const CategorySelector: React.FC<{
   );
 };
 
+export const DynamicToastPortal: React.FC = () => {
+  const ToastPortal = dynamic(() => import("@coaster/components/client").then((mod) => mod.ToastPortal));
+  return <ToastPortal />;
+};
+
+export const DynamicHeader: React.FC = () => {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+
+  const Header = dynamic(() => import("@coaster/components/client").then((mod) => mod.Header), {
+    loading: () => (
+      <div
+        className={mergeClasses(
+          "tw-sticky tw-z-10 tw-top-0 tw-flex tw-box-border tw-max-h-[72px] tw-min-h-[72px] sm:tw-max-h-[96px] sm:tw-min-h-[96px] tw-w-full tw-px-4 sm:tw-px-20 tw-py-3 tw-items-center tw-justify-center tw-bg-transparent",
+          isHome && "tw-bg-[#efedea] tw-border-[#d3d1ce]",
+        )}
+      >
+        <div className="tw-flex tw-w-full tw-max-w-[1280px] tw-items-center tw-justify-between">
+          <div
+            className={mergeClasses(
+              lateef.className,
+              "tw-max-w-[150px] tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-tracking-[-0.5px] tw-mt-[-2px] tw-font-bold tw-text-[48px]",
+            )}
+          >
+            Coaster
+          </div>
+          <div className="tw-flex tw-shrink-0 tw-justify-end">
+            <div className="tw-hidden lg:tw-flex">
+              <div className="tw-hidden xl:tw-flex tw-my-auto tw-mr-4 tw-px-4 tw-font-medium ">
+                List your experience
+              </div>
+              <div className="tw-flex tw-select-none tw-items-center tw-rounded-full tw-border tw-border-solid tw-border-gray-300 tw-px-2 tw-py-1.5">
+                <Bars3Icon className="tw-w-5 tw-h-5 tw-mr-2" />
+                <ProfilePlaceholder width={28} height={28} />
+              </div>
+            </div>
+            <Bars3Icon className="tw-flex lg:tw-hidden tw-w-7 tw-ml-4" />
+          </div>
+        </div>
+      </div>
+    ),
+  });
+
+  return <Header />;
+};
+
 export const DynamicLoginModal: React.FC = () => {
   const LoginModal = dynamic(() => import("@coaster/components/client").then((mod) => mod.LoginModal));
-
   return <LoginModal />;
+};
+
+export const DynamicFooter: React.FC = () => {
+  const Footer = dynamic(() => import("@coaster/components/client").then((mod) => mod.Footer));
+  return <Footer />;
 };
