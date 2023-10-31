@@ -6,7 +6,6 @@ import Link from "next/link";
 
 export const SearchResult: React.FC<{ listing: Listing }> = ({ listing }) => {
   const SearchResultImages = dynamic(() => import("./SearchResultImages").then((mod) => mod.SearchResultImages), {
-    ssr: false,
     loading: () => (
       <div
         className="tw-w-full tw-h-full tw-aspect-square tw-rounded-xl"

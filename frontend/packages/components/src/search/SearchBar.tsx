@@ -15,11 +15,11 @@ import {
 } from "@floating-ui/react";
 import { Transition } from "@headlessui/react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Fragment, useRef, useState } from "react";
 import { getCategoryForDisplay, getCategoryIcon, getSearchableCategories } from "../icons/Category";
+import { SearchModal } from "./SearchBarModal";
 
 export const SearchBar: React.FC<{ className: string }> = (props) => {
   return (
@@ -47,7 +47,6 @@ const SearchBarModal: React.FC<{
   header?: boolean;
   show?: boolean;
 }> = (props) => {
-  const SearchModal = dynamic(() => import("./SearchBarModal").then((mod) => mod.SearchModal), { ssr: false });
   const [open, setOpen] = useState(false);
 
   return (
