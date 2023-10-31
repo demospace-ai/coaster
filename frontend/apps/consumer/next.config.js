@@ -19,6 +19,12 @@ module.exports = withBundleAnalyzer({
         port: "",
         pathname: "/user-images-bucket-us/**",
       },
+      {
+        protocol:"https",
+        hostname:"lh3.googleusercontent.com",
+        port:"",
+        pathname: "/a/**"
+      }
     ],
   },
   experimental:{
