@@ -23,7 +23,7 @@ module.exports = withBundleAnalyzer({
         protocol:"https",
         hostname:"lh3.googleusercontent.com",
         port:"",
-        pathname: "/a/**"
+        pathname: "/**"
       }
     ],
   },
