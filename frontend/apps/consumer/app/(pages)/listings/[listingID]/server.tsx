@@ -13,7 +13,7 @@ import { getDuration, getHostName, getMaxGuests } from "consumer/app/(pages)/lis
 
 export const ListingPage: React.FC<{ listing: ListingType }> = ({ listing }) => {
   return (
-    <div className="tw-flex tw-px-5 sm:tw-px-20">
+    <main className="tw-flex tw-px-5 sm:tw-px-20">
       <div className="tw-flex tw-flex-col tw-pt-5 sm:tw-pt-12 tw-pb-32 tw-text-base tw-w-full tw-max-w-[1280px]">
         <BackButton className="tw-mr-auto tw-mb-4" />
         {listing.status !== ListingStatus.Published && (
@@ -27,7 +27,7 @@ export const ListingPage: React.FC<{ listing: ListingType }> = ({ listing }) => 
         </div>
         <ReserveFooter listing={listing} />
       </div>
-    </div>
+    </main>
   );
 };
 

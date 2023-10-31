@@ -161,7 +161,13 @@ const SearchBarDropdown: React.FC<{
           placeholder="Choose a category"
         />
         {/** Floating element must be div for aria attributes to be correct */}
-        <div className="tw-relative" ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
+        <div
+          aria-label="Search options"
+          className="tw-relative"
+          ref={refs.setFloating}
+          style={floatingStyles}
+          {...getFloatingProps()}
+        >
           <form
             onSubmit={() => {
               if (activeIndex) {

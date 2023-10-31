@@ -115,6 +115,7 @@ const SignedInMenu: React.FC<{ user: User; onHostApp?: boolean }> = ({ user, onH
       {({ open }) => (
         <>
           <Menu.Button
+            aria-label="Profile button"
             ref={refs.setReference}
             {...getReferenceProps()}
             className={mergeClasses(
@@ -224,6 +225,7 @@ const SignedOutMenu: React.FC = () => {
       {({ open }) => (
         <>
           <Menu.Button
+            aria-label="Profile button"
             ref={refs.setReference}
             {...getReferenceProps()}
             className={mergeClasses(
