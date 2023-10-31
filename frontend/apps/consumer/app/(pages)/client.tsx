@@ -1,13 +1,9 @@
 "use client";
 
-import {
-  ProfilePlaceholder,
-  SearchResult,
-  getCategoryForDisplay,
-  getCategoryIcon,
-  getSearchableCategories,
-} from "@coaster/components/client";
-import { Loading } from "@coaster/components/common";
+import { getCategoryForDisplay, getCategoryIcon, getSearchableCategories } from "@coaster/components/icons/Category";
+import { Loading } from "@coaster/components/loading/Loading";
+import { ProfilePlaceholder } from "@coaster/components/profile/ProfilePicture";
+import { SearchResult } from "@coaster/components/search/SearchResult";
 import { useFeatured } from "@coaster/rpc/client";
 import { CategoryType, Listing } from "@coaster/types";
 import { lateef, mergeClasses } from "@coaster/utils/common";
@@ -150,7 +146,7 @@ const CategorySelector: React.FC<{
 
 export const DynamicNotificationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const NotificationProvider = dynamic(() =>
-    import("@coaster/components/client").then((mod) => mod.NotificationProvider),
+    import("@coaster/components/notifications/Notifications").then((mod) => mod.NotificationProvider),
   );
   return <NotificationProvider>{children}</NotificationProvider>;
 };
@@ -159,7 +155,7 @@ export const DynamicHeader: React.FC = () => {
   const pathname = usePathname();
   const isHome = pathname === "/";
 
-  const Header = dynamic(() => import("@coaster/components/client").then((mod) => mod.Header), {
+  const Header = dynamic(() => import("@coaster/components/header/Header").then((mod) => mod.Header), {
     loading: () => (
       <div
         className={mergeClasses(
@@ -197,11 +193,11 @@ export const DynamicHeader: React.FC = () => {
 };
 
 export const DynamicLoginModal: React.FC = () => {
-  const LoginModal = dynamic(() => import("@coaster/components/client").then((mod) => mod.LoginModal));
+  const LoginModal = dynamic(() => import("@coaster/components/login/LoginModal").then((mod) => mod.LoginModal));
   return <LoginModal />;
 };
 
 export const DynamicFooter: React.FC = () => {
-  const Footer = dynamic(() => import("@coaster/components/client").then((mod) => mod.Footer));
+  const Footer = dynamic(() => import("@coaster/components/footer/Footer").then((mod) => mod.Footer));
   return <Footer />;
 };

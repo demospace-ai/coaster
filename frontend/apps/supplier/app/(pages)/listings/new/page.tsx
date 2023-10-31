@@ -1,24 +1,21 @@
 "use client";
 
 import { MapPreview } from "@coaster/assets";
+import { Card } from "@coaster/components/dnd/DragAndDrop";
+import { FormError } from "@coaster/components/error/FormError";
 import {
-  Card,
   ErrorMessage,
-  FormError,
-  InlineMapSearch,
-  Input,
   InputStep,
-  MapComponent,
-  MapsWrapper,
-  PriceInput,
   SelectorStep,
   StepProps,
   SubmitResult,
   TextAreaStep,
   WizardNavButtons,
   wrapHandleSubmit,
-} from "@coaster/components/client";
-import { Loading } from "@coaster/components/common";
+} from "@coaster/components/form/MultiStep";
+import { Input, PriceInput } from "@coaster/components/input/Input";
+import { Loading } from "@coaster/components/loading/Loading";
+import { InlineMapSearch, MapComponent, MapsWrapper } from "@coaster/components/maps/Maps";
 import { createListing, updateListing, useDraftListing, useUpdateListing } from "@coaster/rpc/client";
 import {
   AddListingImage,

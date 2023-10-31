@@ -1,4 +1,6 @@
-import { BackButton, Callout, LinkButton, ProfilePicture } from "@coaster/components/client";
+import { BackButton, LinkButton } from "@coaster/components/button/Button";
+import { Callout } from "@coaster/components/callouts/Callout";
+import { ProfilePicture } from "@coaster/components/profile/ProfilePicture";
 import { ListingStatus, Listing as ListingType } from "@coaster/types";
 import { CheckBadgeIcon, ClockIcon, GlobeAltIcon, StarIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import {

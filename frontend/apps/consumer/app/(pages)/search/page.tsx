@@ -1,4 +1,5 @@
-import { SearchResult, getCategoryForDisplay } from "@coaster/components/client";
+import { getCategoryForDisplay } from "@coaster/components/icons/Category";
+import { SearchResult } from "@coaster/components/search/SearchResult";
 import { search } from "@coaster/rpc/server";
 import { type CategoryType, type Listing } from "@coaster/types";
 

@@ -1,4 +1,4 @@
-import { TimeInput } from "@coaster/components/client";
+import { TimeInput } from "@coaster/components/input/Input";
 import { AvailabilityRuleType, AvailabilityRuleTypeType, AvailabilityType, AvailabilityTypeType } from "@coaster/types";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { eachDayOfInterval } from "date-fns";

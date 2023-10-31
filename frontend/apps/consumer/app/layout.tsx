@@ -1,4 +1,4 @@
-import { ErrorBoundary } from "@coaster/components/client";
+import { ErrorBoundary } from "@coaster/components/error/ErrorBoundary";
 import { isProd, worksans } from "@coaster/utils/common";
 import { HighlightInit } from "@highlight-run/next/client";
 import type { Metadata } from "next";

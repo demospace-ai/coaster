@@ -1,13 +1,9 @@
-import {
-  Button,
-  DateRangePicker,
-  DropdownInput,
-  FormError,
-  Input,
-  correctToUTC,
-  tryCorrectFromUTC,
-} from "@coaster/components/client";
-import { Loading } from "@coaster/components/common";
+import { Button } from "@coaster/components/button/Button";
+import { DateRangePicker } from "@coaster/components/dates/DatePicker";
+import { correctToUTC, tryCorrectFromUTC } from "@coaster/components/dates/utils";
+import { FormError } from "@coaster/components/error/FormError";
+import { DropdownInput, Input } from "@coaster/components/input/Input";
+import { Loading } from "@coaster/components/loading/Loading";
 import { useNotificationContext, useUpdateAvailabilityRule } from "@coaster/rpc/client";
 import {
   AvailabilityRule,

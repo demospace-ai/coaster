@@ -1,4 +1,7 @@
-import { AuthProvider, Footer, NotificationProvider, SupplierHeader } from "@coaster/components/client";
+import { Footer } from "@coaster/components/footer/Footer";
+import { SupplierHeader } from "@coaster/components/header/Header";
+import { NotificationProvider } from "@coaster/components/notifications/Notifications";
+import { AuthProvider } from "@coaster/components/provider/AuthProvider";
 import { DynamicLoginModal } from "supplier/app/(pages)/client";
 
 const PUBLIC_PATHS = [

@@ -1,7 +1,10 @@
 "use client";
 
-import { Button, Card, FormError, Modal } from "@coaster/components/client";
-import { Loading } from "@coaster/components/common";
+import { Button } from "@coaster/components/button/Button";
+import { Card } from "@coaster/components/dnd/DragAndDrop";
+import { FormError } from "@coaster/components/error/FormError";
+import { Loading } from "@coaster/components/loading/Loading";
+import { Modal } from "@coaster/components/modal/Modal";
 import { AddListingImage, DeleteListingImage, GetListing, UpdateListingImages, sendRequest } from "@coaster/rpc/common";
 import { Image as ImageType, Listing } from "@coaster/types";
 import { forceErrorMessage, getGcsImageUrl } from "@coaster/utils/common";

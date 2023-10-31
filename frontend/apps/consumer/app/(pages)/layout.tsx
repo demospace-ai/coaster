@@ -1,4 +1,4 @@
-import { AuthProvider } from "@coaster/components/client";
+import { AuthProvider } from "@coaster/components/provider/AuthProvider";
 import {
   DynamicFooter,
   DynamicHeader,

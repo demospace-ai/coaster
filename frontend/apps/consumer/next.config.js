@@ -23,9 +23,7 @@ module.exports = withBundleAnalyzer({
   },
   experimental:{
     optimizePackageImports: [
-      "@coaster/components/client",
-      "@coaster/components/common",
-      "@coaster/components/server",
+      "@coaster/components",
       "@coaster/rpc/client",
       "@coaster/rpc/common",
       "@coaster/rpc/server",

@@ -1,5 +1,5 @@
 import { Hero } from "@coaster/assets";
-import { SearchBar } from "@coaster/components/client";
+import { SearchBar } from "@coaster/components/search/SearchBar";
 import { getFeaturedServer } from "@coaster/rpc/server";
 import { Featured } from "consumer/app/(pages)/client";
 import Image from "next/image";

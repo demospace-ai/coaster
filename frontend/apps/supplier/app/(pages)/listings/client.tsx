@@ -1,7 +1,8 @@
 "use client";
 
-import { Button, Modal } from "@coaster/components/client";
-import { Loading } from "@coaster/components/common";
+import { Button } from "@coaster/components/button/Button";
+import { Loading } from "@coaster/components/loading/Loading";
+import { Modal } from "@coaster/components/modal/Modal";
 import { DeleteListing, GetHostedListings, sendRequest } from "@coaster/rpc/common";
 import { Listing } from "@coaster/types";
 import { mergeClasses } from "@coaster/utils/common";

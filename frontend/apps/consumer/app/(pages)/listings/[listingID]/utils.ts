@@ -1,4 +1,4 @@
-import { correctFromUTC } from "@coaster/components/client";
+import { correctFromUTC } from "@coaster/components/dates/utils";
 import { Availability, Host, Listing as ListingType } from "@coaster/types";
 
 export const getMaxGuests = (listing: ListingType) => {

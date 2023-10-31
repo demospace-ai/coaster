@@ -1,15 +1,10 @@
 "use client";
 
-import {
-  Button,
-  ComboInput,
-  FormError,
-  InlineMapSearch,
-  Input,
-  PriceInput,
-  TextArea,
-} from "@coaster/components/client";
-import { Loading } from "@coaster/components/common";
+import { Button } from "@coaster/components/button/Button";
+import { FormError } from "@coaster/components/error/FormError";
+import { ComboInput, Input, PriceInput, TextArea } from "@coaster/components/input/Input";
+import { Loading } from "@coaster/components/loading/Loading";
+import { InlineMapSearch } from "@coaster/components/maps/Maps";
 import { useNotificationContext } from "@coaster/rpc/client";
 import { UpdateListing, sendRequest } from "@coaster/rpc/common";
 import { Category, ListingInput } from "@coaster/types";

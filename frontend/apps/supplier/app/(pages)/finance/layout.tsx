@@ -1,4 +1,4 @@
-import { NavLink } from "@coaster/components/client";
+import { NavLink } from "@coaster/components/link/Link";
 
 export default function FinanceLayout({ children }: { children: React.ReactNode }) {
   return (

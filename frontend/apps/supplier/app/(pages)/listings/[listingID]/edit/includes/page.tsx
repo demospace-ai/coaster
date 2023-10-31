@@ -1,7 +1,9 @@
 "use client";
 
-import { Button, FormError, Input } from "@coaster/components/client";
-import { Loading } from "@coaster/components/common";
+import { Button } from "@coaster/components/button/Button";
+import { FormError } from "@coaster/components/error/FormError";
+import { Input } from "@coaster/components/input/Input";
+import { Loading } from "@coaster/components/loading/Loading";
 import { useNotificationContext } from "@coaster/rpc/client";
 import { UpdateListing, sendRequest } from "@coaster/rpc/common";
 import { ListingInput } from "@coaster/types";

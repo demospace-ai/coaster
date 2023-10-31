@@ -1,4 +1,4 @@
-import { NavLink } from "@coaster/components/client";
+import { NavLink } from "@coaster/components/link/Link";
 import { getListingServer } from "@coaster/rpc/server";
 import { isProd } from "@coaster/utils/common";
 import { ChevronLeftIcon, ChevronRightIcon, EyeIcon } from "@heroicons/react/24/outline";

@@ -1,7 +1,9 @@
 "use client";
 
-import { Button, GuestNumberInput, correctFromUTC, correctToUTC } from "@coaster/components/client";
-import { Loading } from "@coaster/components/common";
+import { Button } from "@coaster/components/button/Button";
+import { correctFromUTC, correctToUTC } from "@coaster/components/dates/utils";
+import { GuestNumberInput } from "@coaster/components/input/Input";
+import { Loading } from "@coaster/components/loading/Loading";
 import { useAuthContext, useAvailability, useCreateCheckoutLink, useNotificationContext } from "@coaster/rpc/client";
 import { Availability, AvailabilityType, Image as ListingImage, Listing as ListingType } from "@coaster/types";
 import { ToTimeOnly, getGcsImageUrl, mergeClasses, toTitleCase } from "@coaster/utils/common";
@@ -18,8 +20,12 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { Fragment, useState } from "react";
 
-const DatePickerPopper = dynamic(() => import("@coaster/components/client").then((mod) => mod.DatePickerPopper));
-const DateRangePicker = dynamic(() => import("@coaster/components/client").then((mod) => mod.DateRangePicker));
+const DatePickerPopper = dynamic(() =>
+  import("@coaster/components/dates/DatePicker").then((mod) => mod.DatePickerPopper),
+);
+const DateRangePicker = dynamic(() =>
+  import("@coaster/components/dates/DatePicker").then((mod) => mod.DateRangePicker),
+);
 
 export const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) => {
   const { showNotification } = useNotificationContext();

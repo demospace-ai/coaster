@@ -1,7 +1,9 @@
 "use client";
 
-import { Button, DropdownInput, Modal } from "@coaster/components/client";
-import { Loading } from "@coaster/components/common";
+import { Button } from "@coaster/components/button/Button";
+import { DropdownInput } from "@coaster/components/input/Input";
+import { Loading } from "@coaster/components/loading/Loading";
+import { Modal } from "@coaster/components/modal/Modal";
 import { updateListing, useAvailabilityRules } from "@coaster/rpc/client";
 import { DeleteAvailabilityRule, GetAvailabilityRules, sendRequest } from "@coaster/rpc/common";
 import { AvailabilityRule, AvailabilityType, AvailabilityTypeType, Listing } from "@coaster/types";

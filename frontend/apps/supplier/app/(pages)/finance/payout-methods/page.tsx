@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@coaster/components/client";
-import { Loading } from "@coaster/components/common";
+import { Button } from "@coaster/components/button/Button";
+import { Loading } from "@coaster/components/loading/Loading";
 import { useCreatePayoutMethod, useGetStripeDashboardLink, usePayoutMethods } from "@coaster/rpc/client";
 import { PayoutMethod, PayoutMethodType } from "@coaster/types";
 import { BuildingLibraryIcon, CreditCardIcon } from "@heroicons/react/24/outline";
