@@ -2,6 +2,7 @@
 
 import {
   ProfilePlaceholder,
+  SearchResult,
   getCategoryForDisplay,
   getCategoryIcon,
   getSearchableCategories,
@@ -16,19 +17,6 @@ import { usePathname } from "next/navigation";
 import { Dispatch, ReactNode, SetStateAction, useRef, useState } from "react";
 
 export const Featured: React.FC<{ initialData: Listing[] }> = ({ initialData }) => {
-  const SearchResult = dynamic(() => import("@coaster/components/client").then((mod) => mod.SearchResult), {
-    ssr: false,
-    loading: () => (
-      <div
-        className="tw-w-full tw-aspect-square tw-rounded-xl"
-        style={{
-          backgroundImage:
-            "url(data:image/svg+xml;base64,PHN2ZwogICAgICB3aWR0aD0iMTAwJSIKICAgICAgaGVpZ2h0PSIxMDAlIgogICAgICB2aWV3Qm94PSIwIDAgMTAwIDEwMCIKICAgICAgdmVyc2lvbj0iMS4xIgogICAgICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgICAgIHhtbG5zWGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiCiAgICA+CiAgICAgIDxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IiNlZWUiPgogICAgICAgIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9ImZpbGwiIHZhbHVlcz0iI2VlZTsjZGRkOyNlZWUiIGR1cj0iMnMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIiAvPgogICAgICA8L3JlY3Q+CiAgICA8L3N2Zz4=)",
-        }}
-      />
-    ),
-  });
-
   const [category, setCategory] = useState<CategoryType | undefined>(undefined);
   const { featured } = useFeatured(category ? `["${category}"]` : undefined, initialData);
   if (!featured) {
