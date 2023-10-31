@@ -11,7 +11,7 @@ export default async function YourListings() {
 
   return (
     <div className="tw-flex tw-justify-center tw-pt-2 sm:tw-pt-6 tw-pb-24 tw-px-8 tw-overflow-auto">
-      <div className="tw-flex tw-flex-col sm:tw-max-w-6xl tw-w-full">
+      <div className="tw-flex tw-flex-col sm:tw-max-w-7xl tw-w-full">
         <div className="tw-flex tw-flex-row tw-justify-between tw-items-center tw-w-full tw-mt-6 tw-mb-5">
           <div className="tw-font-bold tw-text-2xl sm:tw-text-3xl">Your listings</div>
           <NavLink
@@ -32,6 +32,12 @@ export default async function YourListings() {
                       className="tw-py-3.5 tw-pl-4 tw-pr-3 tw-text-left tw-text-sm tw-font-semibold tw-text-gray-900 sm:tw-pl-6"
                     >
                       Name
+                    </th>
+                    <th
+                      scope="col"
+                      className="tw-px-3 tw-py-3.5 tw-text-left tw-text-sm tw-font-semibold tw-text-gray-900 tw-max-w-md"
+                    >
+                      Status
                     </th>
                     <th
                       scope="col"
@@ -61,6 +67,9 @@ export default async function YourListings() {
                     <tr key={listing.id}>
                       <td className="tw-whitespace-nowrap tw-py-4 tw-pl-4 tw-pr-3 tw-text-sm tw-font-medium tw-text-gray-900 sm:tw-pl-6 tw-cursor-pointer">
                         <NavLink href={`/listings/${listing.id}/edit`}>{listing.name}</NavLink>
+                      </td>
+                      <td className="tw-whitespace-nowrap tw-px-3 tw-py-4 tw-text-sm tw-text-gray-500">
+                        {listing.status}
                       </td>
                       <td className="tw-whitespace-nowrap tw-px-3 tw-py-4 tw-text-sm tw-text-gray-500">
                         {listing.category}

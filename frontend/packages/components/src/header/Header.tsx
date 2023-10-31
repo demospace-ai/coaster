@@ -34,7 +34,7 @@ export const Header: React.FC = () => {
         isHome && scrollPosition < 20 && "tw-border-none",
       )}
     >
-      <div className="tw-flex tw-w-full tw-max-w-[1280px] tw-items-center tw-justify-between">
+      <div className="tw-flex tw-w-full tw-max-w-7xl tw-items-center tw-justify-between">
         <LogoLink />
         {/** Pass "show" here so modal is always rendered */}
         <SearchBarHeader show={!isHome || scrollPosition > 300} />
@@ -68,7 +68,9 @@ const ProfileDropdown: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
   return (
     <div className="tw-flex tw-shrink-0 tw-justify-end">
       <div className="tw-hidden lg:tw-flex">
-        {!onHostApp && (
+        {onHostApp ? (
+          <SwitchToCustomerSiteLink className="tw-hidden xl:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100" />
+        ) : (
           <SwitchToHostingLink
             className={mergeClasses(
               "tw-hidden xl:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm",
@@ -171,13 +173,15 @@ const SignedInMenu: React.FC<{ user: User; onHostApp?: boolean }> = ({ user, onH
                     </Link>
                   </Menu.Item>
                 </div>
-                {!onHostApp && (
-                  <div className="tw-flex xl:tw-hidden tw-m-2 tw-pt-2">
-                    <Menu.Item>
+                <div className="tw-flex xl:tw-hidden tw-m-2 tw-pt-2">
+                  <Menu.Item>
+                    {onHostApp ? (
+                      <SwitchToCustomerSiteLink className={navItem} />
+                    ) : (
                       <SwitchToHostingLink className={navItem} />
-                    </Menu.Item>
-                  </div>
-                )}
+                    )}
+                  </Menu.Item>
+                </div>
                 <div className="tw-flex tw-flex-col tw-m-2 tw-py-2">
                   <Menu.Item>
                     <div className={navItem} onClick={logout}>
@@ -310,7 +314,7 @@ const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
                       </div>
                       <div className="tw-relative tw-mt-6 tw-h-full tw-px-4 sm:tw-px-6">
                         {user ? (
-                          <div className="tw-h-full">
+                          <div className="tw-flex tw-flex-col tw-h-full">
                             <div className="tw-flex tw-items-center tw-py-2 tw-pl-2">
                               <p className="tw-truncate tw-text-xl tw-font-semibold tw-text-slate-900 tw-select-none">
                                 Welcome, {user?.first_name}
@@ -323,11 +327,9 @@ const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
                               Invite friends
                             </Link>
                             {onHostApp ? (
-                              <>
-                                <Link className={navItem} href="/listings" onClick={() => setOpen(false)}>
-                                  Your listings
-                                </Link>
-                              </>
+                              <Link className={navItem} href="/listings" onClick={() => setOpen(false)}>
+                                Your listings
+                              </Link>
                             ) : (
                               <SwitchToHostingLink className={navItem} onClick={() => setOpen(false)} />
                             )}
@@ -340,6 +342,12 @@ const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
                             >
                               Logout
                             </div>
+                            {onHostApp && (
+                              <SwitchToCustomerSiteLink
+                                className={mergeClasses(navItem, "tw-mt-auto")}
+                                onClick={() => setOpen(false)}
+                              />
+                            )}
                           </div>
                         ) : (
                           <div className="tw-flex tw-flex-col tw-gap-4">
@@ -379,9 +387,11 @@ const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
 export const SupplierHeader: React.FC = () => {
   return (
     <div className="tw-sticky tw-z-10 tw-top-0 tw-flex tw-box-border tw-max-h-[72px] tw-min-h-[72px] sm:tw-max-h-[96px] sm:tw-min-h-[96px] tw-w-full tw-px-4 sm:tw-px-20 tw-py-3 tw-items-center tw-justify-center tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white">
-      <LogoLink />
-      <SupplierLinks></SupplierLinks>
-      <ProfileDropdown onHostApp={true} />
+      <div className="tw-flex tw-w-full tw-max-w-7xl tw-items-center tw-justify-between">
+        <LogoLink />
+        <SupplierLinks />
+        <ProfileDropdown onHostApp={true} />
+      </div>
     </div>
   );
 };
@@ -424,10 +434,22 @@ const SwitchToHostingLink: React.FC<{
 
   const baseLink = isProd() ? "https://supplier.trycoaster.com" : "http://localhost:3030";
   const link = user?.is_host ? baseLink : baseLink + "/listings/new";
-  const text = user?.is_host ? "Switch to hosting" : "List your experience";
+  const text = user?.is_host ? "Switch to hosting" : "Apply as a guide";
   return (
     <div className={props.className} onClick={props.onClick}>
       <a href={link}>{text}</a>
     </div>
+  );
+};
+
+const SwitchToCustomerSiteLink: React.FC<{
+  onClick?: () => void;
+  className?: string;
+}> = (props) => {
+  const link = isProd() ? "https://trycoaster.com" : "http://localhost:3000";
+  return (
+    <Link className={props.className} onClick={props.onClick} href={link}>
+      Switch to customer site
+    </Link>
   );
 };
