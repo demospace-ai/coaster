@@ -127,7 +127,7 @@ export const ImagesModal: React.FC<{
               >
                 {listing.images.map((image) => (
                   <div key={image.id} className="tw-flex tw-basis-full tw-snap-center tw-h-full">
-                    <div className="tw-relative tw-block tw-w-screen sm:tw-w-[90vw] tw-px-10 sm:tw-px-0 tw-h-full">
+                    <div className="tw-relative tw-block tw-w-screen sm:tw-w-[90vw] tw-min-w-[80vw] sm:tw-min-w-unset tw-px-10 sm:tw-px-0 tw-h-full tw-max-h-[80vh] sm:tw-max-h-full">
                       <Image
                         fill
                         sizes="100vw"
