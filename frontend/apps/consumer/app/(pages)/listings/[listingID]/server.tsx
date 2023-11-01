@@ -1,7 +1,6 @@
-import { BackButton, LinkButton } from "@coaster/components/button/Button";
-import { Callout } from "@coaster/components/callouts/Callout";
+import { LinkButton } from "@coaster/components/button/Button";
 import { ProfilePicture } from "@coaster/components/profile/ProfilePicture";
-import { ListingStatus, Listing as ListingType } from "@coaster/types";
+import { Listing as ListingType } from "@coaster/types";
 import { CheckBadgeIcon, ClockIcon, GlobeAltIcon, StarIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import {
   BookingPanel,
@@ -13,21 +12,15 @@ import { getDuration, getHostName, getMaxGuests } from "consumer/app/(pages)/lis
 
 export const ListingPage: React.FC<{ listing: ListingType }> = ({ listing }) => {
   return (
-    <main className="tw-flex tw-px-5 sm:tw-px-20">
-      <div className="tw-flex tw-flex-col tw-pt-5 sm:tw-pt-12 tw-pb-32 tw-text-base tw-w-full tw-max-w-[1280px]">
-        <BackButton className="tw-mr-auto tw-mb-4" />
-        {listing.status !== ListingStatus.Published && (
-          <Callout content={"Not published - under review"} className="tw-border tw-border-yellow-400 tw-mb-4" />
-        )}
-        <ListingHeader listing={listing} />
-        <ListingImages listing={listing} />
-        <div className="tw-flex tw-mt-8 sm:tw-mt-12">
-          <ListingDetails listing={listing} />
-          <BookingPanel listing={listing} />
-        </div>
-        <ReserveFooter listing={listing} />
+    <>
+      <ListingHeader listing={listing} />
+      <ListingImages listing={listing} />
+      <div className="tw-flex tw-mt-8 sm:tw-mt-12">
+        <ListingDetails listing={listing} />
+        <BookingPanel listing={listing} />
       </div>
-    </main>
+      <ReserveFooter listing={listing} />
+    </>
   );
 };
 
