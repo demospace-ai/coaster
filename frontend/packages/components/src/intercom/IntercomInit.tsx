@@ -23,8 +23,10 @@ export const IntercomInit = () => {
       const style = window.document.createElement("style");
       style.id = "intercom-mobile-style";
       style.innerHTML = `
-      .intercom-launcher {
-        bottom: 88px !important;
+      @media screen and (min-width: 640px) {
+        .intercom-launcher {
+          bottom: 88px !important;
+        }
       }
     `;
 
