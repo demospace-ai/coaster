@@ -20,6 +20,6 @@ export default async function Image({ params }: { params: { listingID: string } 
 
   const imageRes = await fetch(getGcsImageUrl(listing.images[0].storage_id));
   const original = await imageRes.arrayBuffer();
-  const converted = await sharp(original).resize({ height: 630, width: 1200 }).png({ quality: 80 }).toBuffer();
+  const converted = await sharp(original).resize({ height: 630, width: 1200 }).rotate().png({ quality: 80 }).toBuffer();
   return new Response(converted);
 }
