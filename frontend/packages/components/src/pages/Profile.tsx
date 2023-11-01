@@ -38,7 +38,7 @@ type ProfileFormSchemaType = z.infer<typeof ProfileFormSchema>;
 
 export const Profile: React.FC = () => {
   const { user, loading } = useAuthContext();
-  if (loading) {
+  if (loading && !user) {
     return <Loading />;
   }
 
