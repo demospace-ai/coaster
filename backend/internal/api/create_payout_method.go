@@ -14,6 +14,7 @@ import (
 
 func (s ApiService) CreatePayoutMethod(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	var stripeAccountID string
+	existingAccount := true
 	if auth.User.StripeAccountID == nil {
 		user, err := createStripeAccount(s.db, auth.User)
 		if err != nil {
@@ -21,6 +22,7 @@ func (s ApiService) CreatePayoutMethod(auth auth.Authentication, w http.Response
 		}
 		stripeAccountID = *user.StripeAccountID
 	} else {
+		existingAccount = false
 		stripeAccountID = *auth.User.StripeAccountID
 		isComplete, err := isStripeSetupComplete(s.db, auth.User)
 		if err != nil {
@@ -32,7 +34,7 @@ func (s ApiService) CreatePayoutMethod(auth auth.Authentication, w http.Response
 		}
 	}
 
-	accountLink, err := stripe.CreateAccountLink(stripeAccountID)
+	accountLink, err := stripe.CreateAccountLink(stripeAccountID, existingAccount)
 	if err != nil {
 		return errors.Wrap(err, "(api.CreatePayoutMethod) error creating account link")
 	}

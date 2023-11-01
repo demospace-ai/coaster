@@ -46,7 +46,7 @@ func CreateAccount() (*string, error) {
 	return &result.ID, nil
 }
 
-func CreateAccountLink(accountID string) (*string, error) {
+func CreateAccountLink(accountID string, existingAccount bool) (*string, error) {
 	stripeApiKey, err := secret.FetchSecret(context.TODO(), getStripeApiKey())
 	if err != nil {
 		return nil, errors.Wrap(err, "(stripe.CreateAccountLink) fetching secret")
@@ -58,11 +58,18 @@ func CreateAccountLink(accountID string) (*string, error) {
 	returnLink := getReturnLink()
 	refreshLink := getRefreshLink()
 
+	var linkType string
+	if existingAccount {
+		linkType = string(stripe.AccountLinkTypeAccountUpdate)
+	} else {
+		linkType = string(stripe.AccountLinkTypeAccountOnboarding)
+	}
+
 	params := &stripe.AccountLinkParams{
 		Account:    stripe.String(accountID),
 		RefreshURL: stripe.String(refreshLink),
 		ReturnURL:  stripe.String(returnLink),
-		Type:       stripe.String("account_onboarding"),
+		Type:       stripe.String(linkType),
 	}
 	result, err := sc.AccountLinks.New(params)
 	if err != nil {
