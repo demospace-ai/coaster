@@ -1,6 +1,7 @@
 "use client";
 
 import { Listing } from "@coaster/types";
+import { useDebounce } from "@coaster/utils/client";
 import { getGcsImageUrl, mergeClasses } from "@coaster/utils/common";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
@@ -13,13 +14,16 @@ export const SearchResultImages: React.FC<{ listing: Listing }> = ({ listing }) 
 
   const indicatorRefs = listing.images.map(() => useRef<HTMLDivElement>(null));
 
-  const handleScroll = useCallback(() => {
-    if (carouselRef.current) {
-      const newIndex = Math.round(carouselRef.current.scrollLeft / width);
-      setImageIndex(newIndex);
-      indicatorRefs[newIndex].current?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-    }
-  }, [width]);
+  const handleScroll = useDebounce(
+    useCallback(() => {
+      if (carouselRef.current) {
+        const newIndex = Math.round(carouselRef.current.scrollLeft / width);
+        setImageIndex(newIndex);
+        indicatorRefs[newIndex].current?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+      }
+    }, [width]),
+    500,
+  );
 
   const scrollForward = () => {
     const newIndex = (imageIndex + 1) % listing.images.length;
@@ -41,14 +45,13 @@ export const SearchResultImages: React.FC<{ listing: Listing }> = ({ listing }) 
     });
   };
 
-  // Use effect to attach to the scrollend event rather than just every scroll
   useEffect(() => {
     if (carouselRef.current) {
-      carouselRef.current.addEventListener("scrollend", handleScroll, { passive: true });
+      carouselRef.current.addEventListener("scroll", handleScroll, { passive: true });
       setWidth(carouselRef.current.clientWidth);
     }
     return () => {
-      carouselRef.current?.removeEventListener("scrollend", handleScroll);
+      carouselRef.current?.removeEventListener("scroll", handleScroll);
     };
   }, [carouselRef, handleScroll]);
 

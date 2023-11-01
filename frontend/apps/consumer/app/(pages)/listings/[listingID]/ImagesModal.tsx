@@ -1,7 +1,7 @@
 "use client";
 
 import { Listing as ListingType } from "@coaster/types";
-import { useWindowDimensions } from "@coaster/utils/client";
+import { useDebounce, useWindowDimensions } from "@coaster/utils/client";
 import { getGcsImageUrl, mergeClasses } from "@coaster/utils/common";
 import { Dialog, Transition } from "@headlessui/react";
 import { ChevronLeftIcon, ChevronRightIcon, XMarkIcon } from "@heroicons/react/24/outline";
@@ -17,12 +17,15 @@ export const ImagesModal: React.FC<{
   const { width } = useWindowDimensions();
   const carouselRef = useRef<HTMLDivElement>(null);
 
-  const handleScroll = useCallback(() => {
-    if (carouselRef.current) {
-      const newIndex = Math.round(carouselRef.current.scrollLeft / width);
-      setImageIndex(newIndex);
-    }
-  }, [width]);
+  const handleScroll = useDebounce(
+    useCallback(() => {
+      if (carouselRef.current) {
+        const newIndex = Math.round(carouselRef.current.scrollLeft / width);
+        setImageIndex(newIndex);
+      }
+    }, [width]),
+    500,
+  );
 
   const scrollForward = () => {
     const newIndex = (imageIndex + 1) % listing.images.length;
@@ -52,15 +55,12 @@ export const ImagesModal: React.FC<{
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
-  // Use effect to attach to the scrollend event rather than just every scroll
   useEffect(() => {
     if (carouselRef.current) {
-      carouselRef.current.addEventListener("scrollend", handleScroll, { passive: true });
-      carouselRef.current.addEventListener("touchend", handleScroll, { passive: true });
+      carouselRef.current.addEventListener("scroll", handleScroll, { passive: true });
     }
     return () => {
-      carouselRef.current?.removeEventListener("scrollend", handleScroll);
-      carouselRef.current?.removeEventListener("touchend", handleScroll);
+      carouselRef.current?.removeEventListener("scroll", handleScroll);
     };
   }, [carouselRef, handleScroll]);
 
