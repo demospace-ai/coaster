@@ -1,8 +1,8 @@
 import { getListingServer } from "@coaster/rpc/server";
 import { getGcsImageUrl } from "@coaster/utils/common";
-import { ImageResponse } from "next/server";
+import sharp from "sharp";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 export const alt = "Coaster - Find your next adventure";
 export const size = {
@@ -18,15 +18,8 @@ export default async function Image({ params }: { params: { listingID: string } 
     return undefined;
   }
 
-  return new ImageResponse(
-    (
-      <img
-        src={getGcsImageUrl(listing.images[0].storage_id)}
-        style={{ width: size.width, height: size.height, objectFit: "cover" }}
-      ></img>
-    ),
-    {
-      ...size,
-    },
-  );
+  const imageRes = await fetch(getGcsImageUrl(listing.images[0].storage_id));
+  const original = await imageRes.arrayBuffer();
+  const converted = await sharp(original).resize({ height: 630, width: 1200 }).png({ quality: 80 }).toBuffer();
+  return new Response(converted);
 }
