@@ -282,8 +282,18 @@ const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
     "tw-flex tw-justify-center tw-py-2 tw-w-full tw-cursor-pointer tw-select-none tw-whitespace-nowrap tw-rounded-3xl sm:tw-font-semibold tw-text-base tw-bg-gray-100 hover:tw-bg-gray-200";
 
   return (
-    <>
-      <Bars3Icon className="tw-flex lg:tw-hidden tw-w-7 tw-ml-4" onClick={() => setOpen(true)} />
+    <div className="tw-flex lg:tw-hidden tw-items-center">
+      <button
+        className="tw-font-medium"
+        onClick={() => {
+          if ((window as any).Intercom) {
+            (window as any).Intercom("show");
+          }
+        }}
+      >
+        Help
+      </button>
+      <Bars3Icon className="tw-w-7 tw-ml-4" onClick={() => setOpen(true)} />
       <Transition.Root show={open} as={Fragment}>
         <Dialog as="div" className="tw-relative tw-z-30" onClose={setOpen}>
           <div className="tw-fixed tw-inset-0 tw-overflow-hidden">
@@ -382,7 +392,7 @@ const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
           </div>
         </Dialog>
       </Transition.Root>
-    </>
+    </div>
   );
 };
 

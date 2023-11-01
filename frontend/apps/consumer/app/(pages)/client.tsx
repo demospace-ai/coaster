@@ -182,7 +182,10 @@ export const DynamicHeader: React.FC = () => {
                 <ProfilePlaceholder width={28} height={28} />
               </div>
             </div>
-            <Bars3Icon className="tw-flex lg:tw-hidden tw-w-7 tw-ml-4" />
+            <div className="tw-flex lg:tw-hidden tw-items-center">
+              <div className="tw-font-medium">Help</div>
+              <Bars3Icon className="tw-w-7 tw-ml-4" />
+            </div>
           </div>
         </div>
       </div>
