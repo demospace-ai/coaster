@@ -174,6 +174,8 @@ export function useFeatured(categories?: string, initialData?: Listing[]) {
   };
   const { data, mutate, error, isLoading, isValidating } = useSWR({ GetFeaturedListings, categories }, fetcher, {
     fallbackData: initialData,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
   });
   return { featured: data, mutate, error, loading: isLoading || isValidating };
 }
