@@ -56,7 +56,7 @@ export const SearchResultImages: React.FC<{ listing: Listing }> = ({ listing }) 
 
   return (
     <div className="tw-relative tw-group tw-select-none tw-w-full">
-      <div className="tw-absolute tw-flex tw-h-full tw-w-full tw-justify-center tw-items-center tw-transition-all tw-duration-200 tw-pointer-events-none tw-z-10">
+      <div className="tw-absolute tw-flex tw-h-full tw-w-full tw-justify-center tw-items-center tw-transition-all tw-duration-200 tw-pointer-events-none tw-z-[1]">
         <div className="tw-flex tw-items-center group-hover:tw-opacity-100 tw-opacity-0">
           <div className="tw-absolute tw-right-2 tw-pointer-events-auto">
             <ChevronRightIcon
