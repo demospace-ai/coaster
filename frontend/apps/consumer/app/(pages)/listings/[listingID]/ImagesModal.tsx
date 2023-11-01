@@ -24,7 +24,7 @@ export const ImagesModal: React.FC<{
         setImageIndex(newIndex);
       }
     }, [width]),
-    500,
+    250,
   );
 
   const scrollForward = () => {

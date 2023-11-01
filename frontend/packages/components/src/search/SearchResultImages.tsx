@@ -22,7 +22,7 @@ export const SearchResultImages: React.FC<{ listing: Listing }> = ({ listing }) 
         indicatorRefs[newIndex].current?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
       }
     }, [width]),
-    500,
+    250,
   );
 
   const scrollForward = () => {
