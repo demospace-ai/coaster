@@ -3,6 +3,7 @@ import { IntercomInit } from "@coaster/components/intercom/IntercomInit";
 import { isProd, worksans } from "@coaster/utils/common";
 import { HighlightInit } from "@highlight-run/next/client";
 import type { Metadata } from "next";
+
 import "supplier/app/global.css";
 
 export const metadata: Metadata = {
