@@ -45,12 +45,10 @@ export const SearchResultImages: React.FC<{ listing: Listing }> = ({ listing }) 
   useEffect(() => {
     if (carouselRef.current) {
       carouselRef.current.addEventListener("scrollend", handleScroll, { passive: true });
-      carouselRef.current.addEventListener("touchend", handleScroll, { passive: true });
       setWidth(carouselRef.current.clientWidth);
     }
     return () => {
       carouselRef.current?.removeEventListener("scrollend", handleScroll);
-      carouselRef.current?.removeEventListener("touchend", handleScroll);
     };
   }, [carouselRef, handleScroll]);
 
