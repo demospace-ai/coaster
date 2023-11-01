@@ -98,17 +98,6 @@ const NotIncluded: React.FC<{ listing: ListingType }> = ({ listing }) => {
   );
 };
 
-const Highlights: React.FC<{ listing: ListingType }> = ({ listing }) => {
-  return (
-    <div className="tw-pb-6 tw-border-b tw-border-solid tw-border-gray-300">
-      <div className="tw-mt-5 tw-font-semibold">Highlights</div>
-      <ul className="tw-list-disc tw-list-inside tw-mt-1">
-        {listing.highlights?.map((highlight) => <li key={highlight}>{highlight}</li>)}
-      </ul>
-    </div>
-  );
-};
-
 const QuickInfo: React.FC<{ listing: ListingType }> = ({ listing }) => {
   const duration = getDuration(listing);
   const maxGuests = getMaxGuests(listing);

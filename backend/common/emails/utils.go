@@ -3,33 +3,35 @@ package emails
 import (
 	"context"
 
-	"github.com/resendlabs/resend-go"
+	"github.com/sendgrid/sendgrid-go"
+	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"go.fabra.io/server/common/application"
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/secret"
 )
 
-const RESEND_PRODUCTION_API_KEY = "projects/454026596701/secrets/resend-prod-api-key/versions/latest"
-const RESEND_DEVELOPMENT_API_KEY = "projects/86315250181/secrets/resend-dev-api-key/versions/latest"
+const SENDGRID_PRODUCTION_API_KEY = "projects/454026596701/secrets/sendgrid-prod-api-key/versions/latest"
+const SENDGRID_DEVELOPMENT_API_KEY = "projects/86315250181/secrets/sendgrid-dev-api-key/versions/latest"
 
-func SendEmail(from string, replyTo string, to []string, subject string, html string, plain string) error {
-	resendApiKey, err := getResendApiKey()
+func SendEmail(fromName string, fromAddress string, to string, subject string, html string, plain string) error {
+	sendgridApiKey, err := getSendgridApiKey()
 	if err != nil {
-		return errors.Wrap(err, "(emails.SendEmail) getting resend api key")
+		return errors.Wrap(err, "(emails.SendEmail) getting sendgrid api key")
 	}
 
-	client := resend.NewClient(*resendApiKey)
+	client := sendgrid.NewSendClient(*sendgridApiKey)
 
-	params := &resend.SendEmailRequest{
-		From:    from,
-		ReplyTo: replyTo,
-		To:      to,
-		Subject: subject,
-		Html:    html,
-		Text:    plain,
-	}
+	message := mail.NewSingleEmail(
+		mail.NewEmail(fromName, fromAddress),
+		subject,
+		&mail.Email{
+			Address: to,
+		},
+		plain,
+		html,
+	)
 
-	_, err = client.Emails.Send(params)
+	_, err = client.Send(message)
 	if err != nil {
 		return errors.Wrap(err, "(emails.SendEmail) sending email")
 	}
@@ -37,18 +39,18 @@ func SendEmail(from string, replyTo string, to []string, subject string, html st
 	return nil
 }
 
-func getResendApiKey() (*string, error) {
-	var resendApiKeyKey string
+func getSendgridApiKey() (*string, error) {
+	var sendgridApiKeyKey string
 	if application.IsProd() {
-		resendApiKeyKey = RESEND_PRODUCTION_API_KEY
+		sendgridApiKeyKey = SENDGRID_PRODUCTION_API_KEY
 	} else {
-		resendApiKeyKey = RESEND_DEVELOPMENT_API_KEY
+		sendgridApiKeyKey = SENDGRID_DEVELOPMENT_API_KEY
 	}
 
-	resendApiKey, err := secret.FetchSecret(context.TODO(), resendApiKeyKey)
+	sendgridApiKey, err := secret.FetchSecret(context.TODO(), sendgridApiKeyKey)
 	if err != nil {
-		return nil, errors.Wrap(err, "(emails.getResendApiKey) fetching secret")
+		return nil, errors.Wrap(err, "(emails.getSendgridApiKey) fetching secret")
 	}
 
-	return resendApiKey, nil
+	return sendgridApiKey, nil
 }
