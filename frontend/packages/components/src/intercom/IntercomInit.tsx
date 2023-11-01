@@ -15,11 +15,12 @@ export const IntercomInit = () => {
   const hasMobileFooter = path === "listings" && !isNew && !isEdit;
 
   useEffect(() => {
-    if (window.document.getElementById("intercom-mobile-style") !== null) {
-      return;
-    }
-
+    const mobileStyle = window.document.getElementById("intercom-mobile-style");
     if (hasMobileFooter) {
+      if (mobileStyle !== null) {
+        return;
+      }
+
       const style = window.document.createElement("style");
       style.id = "intercom-mobile-style";
       style.innerHTML = `
@@ -31,6 +32,10 @@ export const IntercomInit = () => {
     `;
 
       window.document.head.appendChild(style);
+    } else {
+      if (mobileStyle) {
+        mobileStyle.remove();
+      }
     }
   }, [hasMobileFooter]);
 
