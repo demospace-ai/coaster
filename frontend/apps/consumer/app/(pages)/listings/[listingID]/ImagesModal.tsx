@@ -127,12 +127,13 @@ export const ImagesModal: React.FC<{
               >
                 {listing.images.map((image) => (
                   <div key={image.id} className="tw-flex tw-basis-full tw-snap-center tw-h-full">
-                    <div className="tw-relative tw-block tw-w-screen sm:tw-w-[90vw] tw-min-w-[80vw] sm:tw-min-w-unset tw-px-10 sm:tw-px-0 tw-h-full tw-max-h-[80vh] sm:tw-max-h-full">
+                    <div className="tw-flex tw-justify-center tw-items-center tw-w-screen sm:tw-w-[90vw] tw-px-10 sm:tw-px-0 tw-h-full tw-max-h-[70vh] sm:tw-max-h-full">
                       <Image
-                        fill
+                        width={image.width}
+                        height={image.height}
                         sizes="100vw"
                         alt="Listing image"
-                        className="!tw-w-fit !tw-left-1/2 -tw-translate-x-1/2 tw-object-contain tw-cursor-pointer tw-rounded-xl tw-overflow-hidden"
+                        className="tw-w-auto tw-h-auto tw-max-w-full tw-max-h-full tw-object-contain tw-cursor-pointer tw-rounded-xl"
                         src={getGcsImageUrl(image.storage_id)}
                         onClick={(e) => {
                           e.stopPropagation();
