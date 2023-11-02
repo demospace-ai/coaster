@@ -2,7 +2,6 @@ package emails
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
@@ -38,7 +37,7 @@ func SendEmail(fromName string, fromAddress string, to string, subject string, h
 	}
 
 	if res.StatusCode >= 400 {
-		return errors.New(fmt.Sprintf("(emails.SendEmail) sendgrid returned status code %d", res.StatusCode))
+		return errors.Newf("(emails.SendEmail) sendgrid returned status code %d", res.StatusCode)
 	}
 
 	return nil
