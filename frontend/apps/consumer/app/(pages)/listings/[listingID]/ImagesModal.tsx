@@ -101,7 +101,7 @@ export const ImagesModal: React.FC<{
             leaveTo="tw-scale-95"
           >
             <Dialog.Panel>
-              <div className="tw-absolute tw-w-full tw-h-[90vh] tw-z-10 tw-flex tw-items-center tw-pointer-events-none">
+              <div className="tw-absolute tw-w-full tw-pt-[10vh] tw-h-[90vh] tw-z-10 tw-flex tw-items-center tw-pointer-events-none">
                 <button
                   className="tw-fixed tw-right-1 sm:tw-right-[5vw] sm:tw-p-10 tw-rounded-full hover:tw-bg-black hover:tw-bg-opacity-20 tw-transition-colors tw-pointer-events-auto"
                   onClick={(e) => {
