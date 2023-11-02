@@ -2,7 +2,7 @@ import { getListingServer } from "@coaster/rpc/server";
 import { getGcsImageUrl } from "@coaster/utils/common";
 import sharp from "sharp";
 
-export const runtime = "nodejs";
+export const runtime = "edge";
 
 export const alt = "Coaster - Find your next adventure";
 export const size = {
