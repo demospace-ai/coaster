@@ -2,6 +2,7 @@ package emails
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
@@ -36,6 +37,7 @@ func SendEmail(fromName string, fromAddress string, to string, subject string, h
 		return errors.Wrap(err, "(emails.SendEmail) sending email")
 	}
 
+	fmt.Printf("%+v\n", message)
 	return nil
 }
 

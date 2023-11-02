@@ -174,9 +174,7 @@ export const DynamicHeader: React.FC = () => {
           </div>
           <div className="tw-flex tw-shrink-0 tw-justify-end">
             <div className="tw-hidden lg:tw-flex">
-              <div className="tw-hidden xl:tw-flex tw-my-auto tw-mr-4 tw-px-4 tw-font-medium ">
-                List your experience
-              </div>
+              <div className="tw-hidden xl:tw-flex tw-my-auto tw-mr-4 tw-px-4 tw-font-medium ">Apply as a guide</div>
               <div className="tw-flex tw-select-none tw-items-center tw-rounded-full tw-border tw-border-solid tw-border-gray-300 tw-px-2 tw-py-1.5">
                 <Bars3Icon className="tw-w-5 tw-h-5 tw-mr-2" />
                 <ProfilePlaceholder width={28} height={28} />
