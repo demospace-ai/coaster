@@ -51,7 +51,7 @@ const HostDetails: React.FC<{ listing: ListingType }> = ({ listing }) => {
         <div>
           <div className="tw-text-xl tw-font-medium">Meet your trip provider: {getHostName(listing.host)}</div>
           <div className="tw-flex tw-flex-row tw-items-center">
-            <CheckBadgeIcon className="tw-h-4 tw-mr-1 tw-fill-green-600" />
+            <CheckBadgeIcon className="tw-h-4 tw-mr-1 tw-fill-green-600 tw-stroke-white" />
             Identity Verified
           </div>
         </div>
