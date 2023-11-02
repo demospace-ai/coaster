@@ -45,9 +45,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode; publicPaths: st
   const pathname = usePathname();
 
   const openLoginModal = useCallback((create?: boolean) => {
-    if (create) {
-      setCreate(true);
-    }
+    setCreate(!!create);
     setModalOpen(true);
   }, []);
 

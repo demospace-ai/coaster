@@ -19,7 +19,7 @@ func (s ApiService) CheckEmail(w http.ResponseWriter, r *http.Request) error {
 		return errors.Newf("(api.CheckEmail) missing email from CheckEmail request URL: %s", r.URL.RequestURI())
 	}
 	encodedEmail := r.URL.Query().Get("email")
-	email, err := url.QueryUnescape(encodedEmail)
+	email, err := url.PathUnescape(encodedEmail)
 	if err != nil {
 		return errors.Wrap(err, "(api.CheckEmail) error decoding email")
 	}

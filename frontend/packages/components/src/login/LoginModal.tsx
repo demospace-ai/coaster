@@ -11,7 +11,7 @@ import { Fragment, useState } from "react";
 import { EmailLoginForm, EmailSignup, GoogleLogin, LoginStep, SendResetForm, StartContent } from "./LoginSteps";
 
 export const LoginModal: React.FC = () => {
-  const { loginOpen, create, closeLoginModal } = useAuthContext();
+  const { loginOpen, create, openLoginModal, closeLoginModal } = useAuthContext();
   const [step, setStep] = useState<LoginStep>(LoginStep.Start);
   const searchParams = useSearchParams();
   const destination = searchParams?.get("destination") ?? "";
@@ -21,8 +21,8 @@ export const LoginModal: React.FC = () => {
 
   const reset = () => {
     setStep(LoginStep.Start);
-    setEmail(initialEmail);
   };
+  const forgotPassword = () => setStep(LoginStep.SendReset);
 
   let loginContent;
   switch (step) {
@@ -34,6 +34,7 @@ export const LoginModal: React.FC = () => {
           email={email}
           setEmail={setEmail}
           closeModal={closeLoginModal}
+          switchModeModal={openLoginModal}
         />
       );
       break;
@@ -41,13 +42,15 @@ export const LoginModal: React.FC = () => {
       loginContent = <EmailSignup email={email} reset={reset} closeModal={closeLoginModal} />;
       break;
     case LoginStep.EmailLogin:
-      loginContent = <EmailLoginForm email={email} reset={reset} closeModal={closeLoginModal} />;
+      loginContent = (
+        <EmailLoginForm email={email} reset={reset} forgotPassword={forgotPassword} closeModal={closeLoginModal} />
+      );
       break;
     case LoginStep.GoogleLogin:
       loginContent = <GoogleLogin email={email} reset={reset} closeModal={closeLoginModal} />;
       break;
     case LoginStep.SendReset:
-      loginContent = <SendResetForm reset={reset} destination={destination} />;
+      loginContent = <SendResetForm initialEmail={email} reset={reset} destination={destination} />;
       break;
   }
 

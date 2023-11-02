@@ -31,7 +31,6 @@ export const LoginPage: React.FC<{ create?: boolean }> = ({ create }) => {
 
   const reset = () => {
     setStep(LoginStep.Start);
-    setEmail(initialEmail);
   };
 
   let loginContent;
@@ -43,13 +42,13 @@ export const LoginPage: React.FC<{ create?: boolean }> = ({ create }) => {
       loginContent = <EmailSignup email={email} reset={reset} />;
       break;
     case LoginStep.EmailLogin:
-      loginContent = <EmailLoginForm email={email} reset={reset} />;
+      loginContent = <EmailLoginForm email={email} reset={reset} forgotPassword={() => setStep(LoginStep.SendReset)} />;
       break;
     case LoginStep.GoogleLogin:
       loginContent = <GoogleLogin email={email} reset={reset} />;
       break;
     case LoginStep.SendReset:
-      loginContent = <SendResetForm reset={reset} destination={destination} />;
+      loginContent = <SendResetForm initialEmail={email} reset={reset} destination={destination} />;
       break;
   }
 

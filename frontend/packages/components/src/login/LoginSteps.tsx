@@ -39,7 +39,8 @@ export const StartContent: React.FC<{
   email?: string;
   setEmail: (email: string) => void;
   closeModal?: () => void;
-}> = ({ create, setStep, email, setEmail, closeModal }) => {
+  switchModeModal?: (create: boolean) => void;
+}> = ({ create, setStep, email, setEmail, closeModal, switchModeModal }) => {
   const [loginError, setLoginError] = useState<string | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
   const openGooglePopup = useOpenGooglePopup(setLoading, setLoginError, closeModal);
@@ -71,6 +72,23 @@ export const StartContent: React.FC<{
         Continue with Google
       </div>
       {loginError && <div className="tw-text-red-500">{loginError}</div>}
+      {switchModeModal ? (
+        <SwitchModeModal create={create} switchModeModal={switchModeModal} />
+      ) : (
+        <SwitchModePage create={create} />
+      )}
+      <div className="tw-mt-3 tw-select-none">
+        <span className="tw-text-blue-500 tw-cursor-pointer" onClick={() => setStep(LoginStep.SendReset)}>
+          Forgot your password?
+        </span>
+      </div>
+    </>
+  );
+};
+
+const SwitchModePage: React.FC<{ create: boolean | undefined }> = ({ create }) => {
+  return (
+    <>
       {create ? (
         <div className="tw-mt-5 tw-select-none">
           Already have an account?{" "}
@@ -86,11 +104,31 @@ export const StartContent: React.FC<{
           </NavLink>
         </div>
       )}
-      <div className="tw-mt-3 tw-select-none">
-        <span className="tw-text-blue-500 tw-cursor-pointer" onClick={() => setStep(LoginStep.SendReset)}>
-          Forgot your password?
-        </span>
-      </div>
+    </>
+  );
+};
+
+const SwitchModeModal: React.FC<{ create: boolean | undefined; switchModeModal: (create: boolean) => void }> = ({
+  create,
+  switchModeModal,
+}) => {
+  return (
+    <>
+      {create ? (
+        <div className="tw-mt-5 tw-select-none">
+          Already have an account?{" "}
+          <span className="tw-text-blue-500 tw-cursor-pointer" onClick={() => switchModeModal(false)}>
+            Sign in
+          </span>
+        </div>
+      ) : (
+        <div className="tw-mt-5 tw-select-none">
+          Need an account?{" "}
+          <span className="tw-text-blue-500 tw-cursor-pointer" onClick={() => switchModeModal(true)}>
+            Sign up
+          </span>
+        </div>
+      )}
     </>
   );
 };
@@ -165,9 +203,10 @@ type EmailLoginSchemaType = z.infer<typeof EmailLoginSchema>;
 
 export const EmailLoginForm: React.FC<{
   reset: () => void;
+  forgotPassword: () => void;
   email?: string;
   closeModal?: () => void;
-}> = ({ reset, email, closeModal }) => {
+}> = ({ reset, forgotPassword, email, closeModal }) => {
   const onLoginSuccess = useOnLoginSuccess();
 
   const {
@@ -222,6 +261,9 @@ export const EmailLoginForm: React.FC<{
       </form>
       <div className="tw-mt-4 tw-text-blue-500 tw-cursor-pointer" onClick={reset}>
         More ways to sign in
+      </div>
+      <div className="tw-mt-3 tw-select-none tw-text-blue-500 tw-cursor-pointer" onClick={forgotPassword}>
+        Forgot your password?
       </div>
     </>
   );
@@ -390,9 +432,10 @@ const SendResetSchema = z.object({
 type SendResetSchemaType = z.infer<typeof SendResetSchema>;
 
 export const SendResetForm: React.FC<{
+  initialEmail?: string;
   reset: () => void;
   destination: string;
-}> = ({ reset, destination }) => {
+}> = ({ initialEmail, reset, destination }) => {
   const [resetSent, setResetSent] = useState<boolean>(false);
   const [sendingReset, setSendingReset] = useState<boolean>(false);
   const {
@@ -404,6 +447,9 @@ export const SendResetForm: React.FC<{
   } = useForm<SendResetSchemaType>({
     mode: "onBlur",
     resolver: zodResolver(SendResetSchema),
+    defaultValues: {
+      email: initialEmail,
+    },
   });
 
   if (resetSent) {
