@@ -27,9 +27,21 @@ export const MaxGuestsSchema = z
   .min(1, "The minimum number of guests is 1.")
   .max(100, "The maximum number of guests is 100.");
 
-export const IncludesSchema = z.array(z.object({ value: z.string().min(1, "Included amenities cannot be empty") }));
+export const IncludesSchema = z.array(
+  z.object({
+    value: z
+      .string()
+      .min(1, "Included amenities cannot be empty")
+      .max(256, "Maximum length for included amenity is 256 characters."),
+  }),
+);
 export const NotIncludedSchema = z.array(
-  z.object({ value: z.string().min(1, "Not included amenities cannot be empty") }),
+  z.object({
+    value: z
+      .string()
+      .min(1, "Not included amenities cannot be empty")
+      .max(256, "Maximum length for not included item is 256 characters."),
+  }),
 );
 
 export const AvailabilityTypeSchema = AvailabilityType;
