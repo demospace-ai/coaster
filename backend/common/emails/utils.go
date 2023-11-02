@@ -20,7 +20,6 @@ func SendEmail(fromName string, fromAddress string, to string, subject string, h
 		return errors.Wrap(err, "(emails.SendEmail) getting sendgrid api key")
 	}
 
-	fmt.Println("making client")
 	client := sendgrid.NewSendClient(*sendgridApiKey)
 
 	message := mail.NewSingleEmail(
@@ -33,13 +32,12 @@ func SendEmail(fromName string, fromAddress string, to string, subject string, h
 		html,
 	)
 
-	fmt.Println("about to send")
+	fmt.Printf("%#v\n", message)
 	_, err = client.Send(message)
 	if err != nil {
 		return errors.Wrap(err, "(emails.SendEmail) sending email")
 	}
 
-	fmt.Printf("%#v\n", message)
 	return nil
 }
 

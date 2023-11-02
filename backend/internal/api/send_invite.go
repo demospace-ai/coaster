@@ -76,7 +76,6 @@ func (s ApiService) sendInvite(email string, sender *models.User) error {
 	if err == nil {
 		// Only admins can send invites for existing users
 		if !sender.IsAdmin {
-			fmt.Println("not admin")
 			return nil
 		}
 
@@ -107,7 +106,6 @@ func (s ApiService) sendInvite(email string, sender *models.User) error {
 			Domain:     domain,
 		})
 
-		fmt.Println("existing user email")
 		err = emails.SendEmail("Coaster Support", "support@trycoaster.com", email, "Welcome to Coaster", html.String(), plain.String())
 		if err != nil {
 			return errors.Wrap(err, "(api.sendInvite) sending existing user email")
