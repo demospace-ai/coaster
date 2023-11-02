@@ -133,7 +133,7 @@ export const ImagesModal: React.FC<{
                         height={image.height}
                         sizes="100vw"
                         alt="Listing image"
-                        className="tw-w-auto tw-h-auto tw-max-w-full tw-max-h-full tw-object-contain tw-cursor-pointer tw-rounded-xl"
+                        className="tw-w-full tw-h-full tw-object-contain"
                         src={getGcsImageUrl(image.storage_id)}
                         onClick={(e) => {
                           e.stopPropagation();
