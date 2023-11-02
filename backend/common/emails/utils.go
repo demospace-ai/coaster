@@ -33,9 +33,15 @@ func SendEmail(fromName string, fromAddress string, to string, subject string, h
 	)
 
 	fmt.Printf("%#v\n", message)
-	_, err = client.Send(message)
+	res, err := client.Send(message)
 	if err != nil {
 		return errors.Wrap(err, "(emails.SendEmail) sending email")
+	}
+
+	fmt.Printf("%#v\n", res)
+
+	if res.StatusCode >= 400 {
+		return errors.New(fmt.Sprintf("(emails.SendEmail) sendgrid returned status code %d", res.StatusCode))
 	}
 
 	return nil
