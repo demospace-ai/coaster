@@ -51,7 +51,10 @@ func (s ApiService) SendInvite(auth auth.Authentication, w http.ResponseWriter, 
 	}
 
 	for _, email := range sendInviteRequest.Emails {
-		s.sendInvite(email, auth.User)
+		err := s.sendInvite(email, auth.User)
+		if err != nil {
+			return errors.Wrap(err, "(api.SendInvite) sending invite")
+		}
 	}
 
 	return nil
