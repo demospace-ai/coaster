@@ -15,7 +15,6 @@ require (
 	github.com/onsi/gomega v1.27.8
 	github.com/ory/dockertest/v3 v3.10.0
 	github.com/rudderlabs/analytics-go v3.3.3+incompatible
-	github.com/sendgrid/sendgrid-go v3.13.0+incompatible
 	github.com/stripe/stripe-go/v75 v75.9.0
 	golang.org/x/image v0.13.0
 	gorm.io/driver/postgres v1.5.2
@@ -30,7 +29,6 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/mattn/go-isatty v0.0.18 // indirect
-	github.com/sendgrid/rest v2.6.9+incompatible // indirect
 	golang.org/x/time v0.0.0-20200416051211-89c76fbcd5d1 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
