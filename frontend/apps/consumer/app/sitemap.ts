@@ -14,14 +14,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     `
       *[_type == "post" && defined(slug.current)]{
         slug,
-        publishedAt
+        publishedAt,
+        _updatedAt
       }
     `,
   );
 
   const blogPostPages = blogPosts.map((post: Post) => ({
     url: "https://www.trycoaster.com/blog/" + post.slug.current,
-    lastModified: post.publishedAt,
+    lastModified: post.publishedAt ? post.publishedAt : post._updatedAt,
   }));
 
   return [

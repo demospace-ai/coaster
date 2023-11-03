@@ -17,7 +17,8 @@ export interface Post {
   authorImage?: ImageAsset;
   mainImage: PostImage;
   body: PortableTextBlock[];
-  publishedAt: Date;
+  publishedAt?: string;
+  _updatedAt: string;
 }
 
 export const urlFor = (source: any) => imageUrlBuilder(SanityClient).image(source);
