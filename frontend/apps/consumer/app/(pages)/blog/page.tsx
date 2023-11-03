@@ -1,23 +1,29 @@
 import { SanityClient } from "@coaster/rpc/sanity";
-import { urlFor } from "app/(pages)/blog/utils";
+import { Post, urlFor } from "app/(pages)/blog/utils";
+import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
+export const metadata: Metadata = {
+  title: "Coaster Blog",
+};
+
 export default async function AllPosts() {
-  const posts = await SanityClient.fetch(
+  const posts: Post[] = await SanityClient.fetch(
     `
-    *[_type == "post" && defined(slug.current)]{
-      _id,
-      title,
-      slug,
-      metaDescription,
-      mainImage{
-        ...,
-        "metadata": asset->metadata,
-      },
-    }
-`,
+      *[_type == "post" && defined(slug.current)]{
+        _id,
+        title,
+        slug,
+        metaDescription,
+        mainImage{
+          ...,
+          "metadata": asset->metadata,
+        },
+      }
+    `,
   );
+
   return (
     <main className="tw-w-full tw-max-w-7xl tw-mt-10 tw-mx-4 sm:tw-mx-10">
       <div className="tw-mb-10">

@@ -12,6 +12,7 @@ export interface Post {
   title: string;
   slug: Slug;
   categories: string[];
+  metaDescription: string;
   authorName: string;
   authorImage?: ImageAsset;
   mainImage: PostImage;
