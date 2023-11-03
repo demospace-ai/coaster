@@ -19,6 +19,8 @@ const PUBLIC_PATHS = [
   "/create-password",
   "/unauthorized",
   "/oauth-callback",
+  "/blog",
+  "/blog/:slug",
 ];
 
 export default async function PageLayout({ children }: { children: React.ReactNode }) {
