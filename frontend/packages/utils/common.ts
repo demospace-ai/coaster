@@ -8,3 +8,4 @@ export * from "./src/string";
 export * from "./src/theme";
 export * from "./src/twmerge";
 export * from "./src/undefined";
+export * from "./src/wait";

@@ -40,6 +40,14 @@ export default defineType({
       options: {
         hotspot: true,
       },
+      fields: [
+        {
+          name: 'alt',
+          type: 'string',
+          title: 'Alternative text',
+          validation: Rule => Rule.required()
+        }
+      ]
     }),
     defineField({
       name: 'categories',

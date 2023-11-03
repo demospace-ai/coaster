@@ -5,7 +5,8 @@
   "exports:":{
     ".client":"./client.ts",
     ".common":"./common.ts",
-    ".server":"./server.ts"
+    ".server":"./server.ts",
+    ".sanity":"./sanity.ts"
   },
   "scripts": {
     "lint": "eslint \"**/*.ts*\""

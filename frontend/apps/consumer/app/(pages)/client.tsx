@@ -1,5 +1,4 @@
 "use client";
-
 import { getCategoryForDisplay, getCategoryIcon, getSearchableCategories } from "@coaster/components/icons/Category";
 import { Loading } from "@coaster/components/loading/Loading";
 import { ProfilePlaceholder } from "@coaster/components/profile/ProfilePicture";
@@ -7,7 +6,7 @@ import { SearchResult } from "@coaster/components/search/SearchResult";
 import { useFeatured } from "@coaster/rpc/client";
 import { CategoryType, Listing } from "@coaster/types";
 import { lateef, mergeClasses } from "@coaster/utils/common";
-import { Bars3Icon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { Bars3Icon, ChevronLeftIcon, ChevronRightIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { Dispatch, ReactNode, SetStateAction, useRef, useState } from "react";
@@ -159,8 +158,8 @@ export const DynamicHeader: React.FC = () => {
     loading: () => (
       <div
         className={mergeClasses(
-          "tw-sticky tw-z-10 tw-top-0 tw-flex tw-box-border tw-max-h-[72px] tw-min-h-[72px] sm:tw-max-h-[96px] sm:tw-min-h-[96px] tw-w-full tw-px-4 sm:tw-px-20 tw-py-3 tw-items-center tw-justify-center tw-bg-transparent",
-          isHome && "tw-bg-[#efedea] tw-border-[#d3d1ce]",
+          "tw-sticky tw-z-10 tw-top-0 tw-flex tw-box-border tw-max-h-[72px] tw-min-h-[72px] sm:tw-max-h-[96px] sm:tw-min-h-[96px] tw-w-full tw-px-4 sm:tw-px-20 tw-py-3 tw-items-center tw-justify-center tw-bg-transparent tw-border-b tw-border-solid tw-border-slate-200",
+          isHome && "tw-bg-[#efedea] tw-border-none",
         )}
       >
         <div className="tw-flex tw-w-full tw-max-w-[1280px] tw-items-center tw-justify-between">
@@ -172,9 +171,15 @@ export const DynamicHeader: React.FC = () => {
           >
             Coaster
           </div>
+          {!isHome && (
+            <div className="tw-hidden sm:tw-flex tw-items-center tw-w-full tw-max-w-[400px] tw-h-9 tw-ring-1 tw-ring-slate-300 tw-rounded-[99px]">
+              <MagnifyingGlassIcon className="tw-ml-4 tw-h-[18px] tw-w-[18.5px] -tw-mr-1.5 tw-stroke-gray-600" />
+              <span className="tw-text-gray-700 tw-text-base tw-ml-4">Choose a category</span>
+            </div>
+          )}
           <div className="tw-flex tw-shrink-0 tw-justify-end">
-            <div className="tw-hidden lg:tw-flex">
-              <div className="tw-hidden xl:tw-flex tw-my-auto tw-mr-4 tw-px-4 tw-font-medium ">Apply as a guide</div>
+            <div className="tw-hidden lg:tw-flex tw-items-center">
+              <div className="tw-hidden xl:tw-flex tw-mr-4 tw-px-4 tw-mt-[1px] tw-font-medium">Apply as a guide</div>
               <div className="tw-flex tw-select-none tw-items-center tw-rounded-full tw-border tw-border-solid tw-border-gray-300 tw-px-2 tw-py-1.5">
                 <Bars3Icon className="tw-w-5 tw-h-5 tw-mr-2" />
                 <ProfilePlaceholder width={28} height={28} />
@@ -182,6 +187,7 @@ export const DynamicHeader: React.FC = () => {
             </div>
             <div className="tw-flex lg:tw-hidden tw-items-center">
               <div className="tw-font-medium">Help</div>
+              <MagnifyingGlassIcon className="tw-flex tw-cursor-pointer tw-ml-3 tw-w-6 tw-text-gray-500" />
               <Bars3Icon className="tw-w-7 tw-ml-4" />
             </div>
           </div>

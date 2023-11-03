@@ -3,6 +3,7 @@ import { Config } from "tailwindcss";
 import defaultTheme from "tailwindcss/defaultTheme";
 
 const config: Config = {
+  plugins: [require("@tailwindcss/typography")],
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     screens: {

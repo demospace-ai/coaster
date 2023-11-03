@@ -136,7 +136,7 @@ const SearchBarDropdown: React.FC<{
   });
 
   return props.show ? (
-    <div className="tw-hidden sm:tw-flex tw-w-full tw-justify-center">
+    <div className="tw-hidden sm:tw-flex tw-w-full tw-justify-center tw-mx-10">
       <div
         role="search"
         className={mergeClasses(

@@ -29,7 +29,7 @@ export const Header: React.FC = () => {
   return (
     <div
       className={mergeClasses(
-        "tw-sticky tw-z-10 tw-top-0 tw-flex tw-box-border tw-max-h-[72px] tw-min-h-[72px] sm:tw-max-h-[96px] sm:tw-min-h-[96px] tw-w-full tw-px-4 sm:tw-px-20 tw-py-3 tw-items-center tw-justify-center tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white",
+        "tw-sticky tw-z-10 tw-top-0 tw-flex tw-box-border tw-max-h-[72px] tw-min-h-[72px] sm:tw-max-h-[96px] sm:tw-min-h-[96px] tw-w-full tw-px-4 sm:tw-px-10 lg:tw-px-20 tw-py-3 tw-items-center tw-justify-center tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white",
         isHome && "tw-bg-[#efedea] tw-border-[#d3d1ce]",
         isHome && scrollPosition < 20 && "tw-border-none",
       )}
@@ -37,10 +37,26 @@ export const Header: React.FC = () => {
       <div className="tw-flex tw-w-full tw-max-w-7xl tw-items-center tw-justify-between">
         <LogoLink />
         {/** Pass "show" here so modal is always rendered */}
+        <MobileHelpButton />
         <SearchBarHeader show={!isHome || scrollPosition > 300} />
         <ProfileDropdown />
       </div>
     </div>
+  );
+};
+
+const MobileHelpButton: React.FC = () => {
+  return (
+    <button
+      className="tw-flex sm:tw-hidden tw-font-medium"
+      onClick={() => {
+        if ((window as any).Intercom) {
+          (window as any).Intercom("show");
+        }
+      }}
+    >
+      Help
+    </button>
   );
 };
 
@@ -283,16 +299,6 @@ const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
 
   return (
     <div className="tw-flex lg:tw-hidden tw-items-center">
-      <button
-        className="tw-font-medium"
-        onClick={() => {
-          if ((window as any).Intercom) {
-            (window as any).Intercom("show");
-          }
-        }}
-      >
-        Help
-      </button>
       <Bars3Icon className="tw-w-7 tw-ml-4" onClick={() => setOpen(true)} />
       <Transition.Root show={open} as={Fragment}>
         <Dialog as="div" className="tw-relative tw-z-30" onClose={setOpen}>
