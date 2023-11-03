@@ -41,6 +41,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: "https://www.trycoaster.com/privacy",
       lastModified: new Date(2023, 9, 1),
     },
+    {
+      url: "https://www.trycoaster.com/blog",
+      lastModified: new Date(2023, 10, 1),
+    },
     ...listingPages,
     ...blogPostPages,
   ];
