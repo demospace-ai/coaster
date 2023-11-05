@@ -69,6 +69,12 @@ resource "google_sql_database_instance" "main_instance" {
   deletion_protection = "true"
 
   depends_on = [google_service_networking_connection.private_vpc_connection]
+
+  lifecycle {
+    ignore_changes = [
+      settings[0].ip_configuration["authorized_networks"],
+    ]
+  }
 }
 
 data "google_secret_manager_secret_version" "db_password" {
@@ -252,34 +258,6 @@ resource "google_compute_backend_service" "default" {
   }
 }
 
-resource "google_compute_backend_service" "frontend-service" {
-  security_policy                 = google_compute_security_policy.fabra-security-policy.id
-  affinity_cookie_ttl_sec         = 0
-  connection_draining_timeout_sec = 300
-  enable_cdn                      = true
-  load_balancing_scheme           = "EXTERNAL"
-  name                            = "fabra-lb-frontend-service"
-  port_name                       = "http"
-  protocol                        = "HTTP"
-  session_affinity                = "NONE"
-  timeout_sec                     = 30
-
-  backend {
-    balancing_mode               = "UTILIZATION"
-    capacity_scaler              = 1
-    group                        = google_compute_region_network_endpoint_group.frontend_neg.id
-    max_connections              = 0
-    max_connections_per_endpoint = 0
-    max_connections_per_instance = 0
-    max_rate                     = 0
-    max_rate_per_endpoint        = 0
-    max_rate_per_instance        = 0
-    max_utilization              = 0
-  }
-}
-
-
-
 resource "google_compute_global_address" "default" {
   address_type  = "EXTERNAL"
   name          = "fabra-lb-address"
@@ -305,7 +283,7 @@ resource "google_compute_global_forwarding_rule" "https" {
 }
 
 locals {
-  managed_domains = tolist(["trycoaster.com", "www.trycoaster.com", "api.trycoaster.com", "images.trycoaster.com"])
+  managed_domains = tolist(["api.trycoaster.com", "images.trycoaster.com"])
 }
 
 resource "random_id" "cert-name" {
@@ -332,13 +310,7 @@ resource "google_compute_managed_ssl_certificate" "cert" {
 
 resource "google_compute_url_map" "default" {
   name            = "fabra-lb-url-map"
-  default_service = google_compute_backend_service.frontend-service.id
-  host_rule {
-    hosts = [
-      "www.trycoaster.com",
-    ]
-    path_matcher = "fabra-lb-path-matcher"
-  }
+  default_service = google_compute_backend_service.default.id
 
   host_rule {
     hosts = [
@@ -354,18 +326,6 @@ resource "google_compute_url_map" "default" {
     path_matcher = "fabra-images-path-matcher"
   }
 
-  host_rule {
-    hosts        = [
-      "trycoaster.com",
-    ]
-    path_matcher = "fabra-www-redirect"
-  }
-
-  path_matcher {
-    name            = "fabra-lb-path-matcher"
-    default_service = google_compute_backend_service.frontend-service.id
-  }
-
   path_matcher {
     name            = "fabra-api-path-matcher"
     default_service = google_compute_backend_service.default.id
@@ -374,15 +334,6 @@ resource "google_compute_url_map" "default" {
   path_matcher {
     name            = "fabra-images-path-matcher"
     default_service = google_compute_backend_bucket.user_images_backend.id
-  }
-
-  path_matcher {
-    name = "fabra-www-redirect"
-    default_url_redirect {
-      host_redirect  = "www.trycoaster.com"
-      https_redirect = true
-      strip_query    = false
-    }
   }
 }
 
@@ -420,70 +371,6 @@ resource "google_compute_region_network_endpoint_group" "fabra_neg" {
   cloud_run {
     service = google_cloud_run_service.fabra.name
   }
-}
-
-resource "google_app_engine_application" "frontend-service" {
-  location_id = "us-west1"
-}
-
-resource "google_compute_region_network_endpoint_group" "frontend_neg" {
-  provider              = google
-  name                  = "frontend-neg"
-  network_endpoint_type = "SERVERLESS"
-  region                = "us-west1"
-  app_engine {
-    service = "default"
-  }
-}
-
-resource "google_storage_bucket" "fabra_frontend_bucket" {
-  name          = "fabra-frontend-bucket-us"
-  location      = "US"
-  storage_class = "STANDARD"
-
-  uniform_bucket_level_access = true
-
-  website {
-    main_page_suffix = "index.html"
-    not_found_page   = "index.html"
-  }
-
-  cors {
-    max_age_seconds = 3600
-    method = [
-      "GET",
-    ]
-    origin = [
-      "*",
-    ]
-    response_header = [
-      "Content-Type",
-    ]
-  }
-}
-
-resource "google_storage_bucket_iam_member" "public_frontend_read_access" {
-  bucket = google_storage_bucket.fabra_frontend_bucket.name
-  role   = "roles/storage.objectViewer"
-  member = "allUsers"
-}
-
-resource "google_cloudbuild_trigger" "frontend-build-trigger" {
-  name = "frontend-trigger"
-
-  included_files = ["frontend/**"]
-
-  github {
-    name  = "fabra"
-    owner = "fabra-io"
-
-    push {
-      branch       = "main"
-      invert_regex = false
-    }
-  }
-
-  filename = "infra/cloudbuild/frontend.yaml"
 }
 
 resource "google_kms_key_ring" "data-connection-keyring" {
