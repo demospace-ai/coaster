@@ -5,6 +5,7 @@ import { ProfilePlaceholder } from "@coaster/components/profile/ProfilePicture";
 import { SearchResult } from "@coaster/components/search/SearchResult";
 import { useFeatured } from "@coaster/rpc/client";
 import { CategoryType, Listing } from "@coaster/types";
+import { useIsMobile } from "@coaster/utils/client";
 import { lateef, mergeClasses } from "@coaster/utils/common";
 import {
   Bars3Icon,
@@ -43,6 +44,7 @@ const CategorySelector: React.FC<{
   selected: CategoryType | undefined;
   setSelected: Dispatch<SetStateAction<CategoryType | undefined>>;
 }> = ({ selected, setSelected }) => {
+  const isMobile = useIsMobile();
   const [showBack, setShowBack] = useState(false);
   const [showForward, setShowForward] = useState(true);
   const categorySelectorRef = useRef<HTMLDivElement>(null);
@@ -80,7 +82,7 @@ const CategorySelector: React.FC<{
   };
 
   const scrollIntoView = () => {
-    const headerOffset = 120;
+    const headerOffset = isMobile ? 125 : 160;
     const elementPosition = categorySelectorRef.current?.getBoundingClientRect().top || 0;
     const offsetPosition = elementPosition + window.scrollY - headerOffset;
     window.scrollTo({ top: offsetPosition, behavior: "smooth" });
