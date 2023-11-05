@@ -41,7 +41,7 @@ func (s ApiService) loadFeaturedByCategory(categoryParam string) ([]listings.Lis
 		return listings.LoadFeatured(s.db)
 	}
 
-	return listings.LoadFeaturedListingsByCategory(
+	return listings.LoadListingsByCategory(
 		s.db,
 		categories,
 	)

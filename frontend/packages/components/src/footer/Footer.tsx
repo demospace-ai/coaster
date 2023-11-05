@@ -22,10 +22,10 @@ export const Footer: React.FC = () => {
     >
       <span className="tw-select-none">© 2023 Coaster, Inc.</span>
       <div className="tw-flex tw-gap-3 sm:tw-gap-5">
-        <Link href="/blog">Blog</Link>
-        <Link href="/about">About</Link>
-        <Link href="/terms">Terms</Link>
-        <Link href="/privacy">Privacy Policy</Link>
+        <Link href="https://www.trycoaster.com/blog">Blog</Link>
+        <Link href="https://www.trycoaster.com/about">About</Link>
+        <Link href="https://www.trycoaster.com/terms">Terms</Link>
+        <Link href="https://www.trycoaster.com/privacy">Privacy Policy</Link>
       </div>
     </div>
   );

@@ -6,32 +6,36 @@ import { SearchResult } from "@coaster/components/search/SearchResult";
 import { useFeatured } from "@coaster/rpc/client";
 import { CategoryType, Listing } from "@coaster/types";
 import { lateef, mergeClasses } from "@coaster/utils/common";
-import { Bars3Icon, ChevronLeftIcon, ChevronRightIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import {
+  Bars3Icon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  MagnifyingGlassIcon,
+  StarIcon,
+} from "@heroicons/react/24/outline";
 import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { Dispatch, ReactNode, SetStateAction, useRef, useState } from "react";
 
 export const Featured: React.FC<{ initialData: Listing[] }> = ({ initialData }) => {
   const [category, setCategory] = useState<CategoryType | undefined>(undefined);
-  const { featured } = useFeatured(category ? `["${category}"]` : undefined, initialData);
-  if (!featured) {
-    return (
-      <div className="tw-h-[400px] tw-pt-32">
-        {/** Needed so scrollbar always remains visible */}
-        <Loading />
-      </div>
-    );
-  }
+  const { listings } = useFeatured(category ? `["${category}"]` : undefined, initialData);
 
   return (
-    <>
-      <CategorySelector selected={category} setSelected={setCategory} />
-      <div className="tw-w-full">
-        <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-3 xl:tw-grid-cols-4 tw-mt-1 sm:tw-mt-4 tw-mb-5 tw-font-bold tw-text-3xl tw-gap-5 sm:tw-gap-10 tw-w-full">
-          {featured?.map((listing: Listing) => <SearchResult key={listing.id} listing={listing} />)}
-        </div>
-      </div>
-    </>
+    <div className="tw-min-h-screen tw-w-full">
+      {listings ? (
+        <>
+          <CategorySelector selected={category} setSelected={setCategory} />
+          <div className="tw-w-full">
+            <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-3 xl:tw-grid-cols-4 tw-mt-1 sm:tw-mt-4 tw-mb-5 tw-font-bold tw-text-3xl tw-gap-5 sm:tw-gap-10 tw-w-full">
+              {listings?.map((listing: Listing) => <SearchResult key={listing.id} listing={listing} />)}
+            </div>
+          </div>
+        </>
+      ) : (
+        <Loading />
+      )}
+    </div>
   );
 };
 
@@ -73,6 +77,13 @@ const CategorySelector: React.FC<{
         behavior: "smooth",
       });
     }
+  };
+
+  const scrollIntoView = () => {
+    const headerOffset = 120;
+    const elementPosition = categorySelectorRef.current?.getBoundingClientRect().top || 0;
+    const offsetPosition = elementPosition + window.scrollY - headerOffset;
+    window.scrollTo({ top: offsetPosition, behavior: "smooth" });
   };
 
   return (
@@ -123,18 +134,38 @@ const CategorySelector: React.FC<{
         onScroll={setScroll}
       >
         <div className="tw-flex tw-h-full tw-flex-1 tw-gap-12 tw-px-2 tw-justify-between tw-pr-10">
+          <div
+            className={mergeClasses(
+              categoryIcon,
+              selected === undefined && "tw-border-slate-900 hover:tw-border-slate-900",
+            )}
+            key="featured"
+            aria-label="Featured"
+            onClick={() => {
+              setSelected(undefined);
+              scrollIntoView();
+            }}
+          >
+            <StarIcon className="tw-w-10 tw-h-10 tw-stroke-1" />
+            <span className="tw-text-xs tw-font-medium tw-mt-1 sm:tw-mt-2">Featured</span>
+          </div>
           {getSearchableCategories().map((category) => (
             <div
               className={mergeClasses(
                 categoryIcon,
-                category == selected && "tw-border-slate-900 hover:tw-border-slate-900",
+                category === selected && "tw-border-slate-900 hover:tw-border-slate-900",
               )}
               key={category}
               aria-label={getCategoryForDisplay(category)}
-              onClick={() => setSelected(category)}
+              onClick={() => {
+                setSelected(category);
+                scrollIntoView();
+              }}
             >
               {getCategoryIcon(category)}
-              <span className="tw-text-xs tw-font-medium tw-mt-1 sm:tw-mt-2">{getCategoryForDisplay(category)}</span>
+              <span className="tw-text-xs tw-font-medium tw-mt-1 sm:tw-mt-2 tw-px-0.5">
+                {getCategoryForDisplay(category)}
+              </span>
             </div>
           ))}
         </div>

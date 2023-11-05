@@ -173,11 +173,11 @@ export function useFeatured(categories?: string, initialData?: Listing[]) {
     return sendRequest(GetFeaturedListings, { queryParams });
   };
   const { data, mutate, error, isLoading, isValidating } = useSWR({ GetFeaturedListings, categories }, fetcher, {
-    fallbackData: initialData,
+    fallbackDate: initialData,
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
   });
-  return { featured: data, mutate, error, loading: isLoading || isValidating };
+  return { listings: data, mutate, error, loading: isLoading || isValidating };
 }
 
 export function useAvailabilityRules(listingID: number | undefined) {
