@@ -104,9 +104,10 @@ func GetCheckoutLink(user *models.User, listing *listings.ListingDetails, bookin
 	expiresAt := time.Now().Add(35 * time.Minute).Unix()                      // Stripe minimum is 30 minutes
 
 	params := &stripe.CheckoutSessionParams{
-		Mode:              stripe.String(string(stripe.CheckoutSessionModePayment)),
-		ClientReferenceID: stripe.String(fmt.Sprintf("%d", listing.ID)),
-		CustomerEmail:     stripe.String(user.Email),
+		Mode:                stripe.String(string(stripe.CheckoutSessionModePayment)),
+		AllowPromotionCodes: stripe.Bool(true),
+		ClientReferenceID:   stripe.String(fmt.Sprintf("%d", listing.ID)),
+		CustomerEmail:       stripe.String(user.Email),
 		LineItems: []*stripe.CheckoutSessionLineItemParams{
 			{
 				PriceData: &stripe.CheckoutSessionLineItemPriceDataParams{
