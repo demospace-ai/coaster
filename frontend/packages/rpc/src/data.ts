@@ -1,9 +1,9 @@
-import { Listing } from "@coaster/types";
+import { Booking, Listing } from "@coaster/types";
 import { HttpError } from "@coaster/utils/common";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { sendRequest } from "./ajax";
-import { GetFeaturedListings, GetHostedListings, GetListing, SearchListings } from "./api";
+import { GetFeaturedListings, GetHostedListings, GetListing, GetUserBookings, SearchListings } from "./api";
 
 export async function getListingServer(listingID: number, cookieString?: string): Promise<Listing | undefined> {
   const extraHeaders: [string, string][] = cookieString ? [["Cookie", cookieString]] : [];
@@ -47,4 +47,9 @@ export async function getHostedListingsServer() {
 
 export async function getFeaturedServer(): Promise<Listing[]> {
   return sendRequest(GetFeaturedListings);
+}
+
+export async function getBookingsServer(): Promise<Booking[] | undefined> {
+  const cookieString = cookies().toString();
+  return sendRequest(GetUserBookings, { extraHeaders: [["Cookie", cookieString]] });
 }

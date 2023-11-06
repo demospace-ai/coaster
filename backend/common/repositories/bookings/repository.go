@@ -9,6 +9,13 @@ import (
 	"gorm.io/gorm"
 )
 
+type BookingDetails struct {
+	models.Booking
+	Listing         models.Listing
+	HostName        string
+	ListingImageURL string
+}
+
 func LoadBookingsForTimeAndDate(db *gorm.DB, listingID int64, startTime *database.Time, startDate time.Time) ([]models.Booking, error) {
 	var bookings []models.Booking
 	var result *gorm.DB
@@ -35,11 +42,11 @@ func LoadBookingsForTimeAndDate(db *gorm.DB, listingID int64, startTime *databas
 	}
 
 	if result.Error != nil {
-		// Not guaranteed to have any time slots for a rule so just return an empty slice
+		// Not guaranteed to have any bookings so just return an empty slice
 		if errors.IsRecordNotFound(result.Error) {
 			return []models.Booking{}, nil
 		} else {
-			return nil, errors.Wrap(result.Error, "(availability_rules.LoadTimeSlotsForRule)")
+			return nil, errors.Wrap(result.Error, "(bookings.LoadBookingsForTimeAndDate)")
 		}
 	}
 
@@ -58,15 +65,53 @@ func LoadTemporaryBookingsForUser(db *gorm.DB, listingID int64, userID int64) ([
 		Find(&bookings)
 
 	if result.Error != nil {
-		// Not guaranteed to have any time slots for a rule so just return an empty slice
+		// Not guaranteed to have any bookings so just return an empty slice
 		if errors.IsRecordNotFound(result.Error) {
 			return []models.Booking{}, nil
 		} else {
-			return nil, errors.Wrap(result.Error, "(availability_rules.LoadTemporaryBookingsForUser)")
+			return nil, errors.Wrap(result.Error, "(bookings.LoadTemporaryBookingsForUser)")
 		}
 	}
 
 	return bookings, nil
+}
+
+func LoadBookingsForUser(db *gorm.DB, userID int64) ([]models.Booking, error) {
+	var bookings []models.Booking
+
+	result := db.Table("bookings").
+		Select("bookings.*").
+		Where("bookings.user_id = ?", userID).
+		Where("bookings.expires_at IS NULL").
+		Where("bookings.deactivated_at IS NULL").
+		Find(&bookings)
+
+	if result.Error != nil {
+		// Not guaranteed to have any bookings so just return an empty slice
+		if errors.IsRecordNotFound(result.Error) {
+			return []models.Booking{}, nil
+		} else {
+			return nil, errors.Wrap(result.Error, "(bookings.LoadBookingsForUser)")
+		}
+	}
+
+	return bookings, nil
+}
+
+func LoadByID(db *gorm.DB, bookingID int64) (*models.Booking, error) {
+	var booking models.Booking
+
+	result := db.Table("bookings").
+		Select("bookings.*").
+		Where("bookings.id = ?", bookingID).
+		Where("bookings.deactivated_at IS NULL").
+		Take(&booking)
+
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(availability_rules.LoadTemporaryBookingsForUser)")
+	}
+
+	return &booking, nil
 }
 
 func CreateBooking(db *gorm.DB, listingID int64, userID int64, startDate time.Time, startTime *time.Time, numGuests int64) (*models.Booking, error) {
@@ -90,12 +135,13 @@ func CreateBooking(db *gorm.DB, listingID int64, userID int64, startDate time.Ti
 }
 
 func CreateTemporaryBooking(db *gorm.DB, listingID int64, userID int64, startDate time.Time, startTime *time.Time, numGuests int64) (*models.Booking, error) {
+	expiration := time.Now().Add(10 * time.Minute)
 	booking := &models.Booking{
 		ListingID: listingID,
 		UserID:    userID,
 		StartDate: database.Date(startDate),
 		Guests:    numGuests,
-		ExpiresAt: time.Now().Add(10 * time.Minute),
+		ExpiresAt: &expiration,
 	}
 	if startTime != nil {
 		startTime := database.Time(*startTime)
@@ -120,10 +166,9 @@ func AddCheckoutLink(db *gorm.DB, booking *models.Booking, checkoutLink string) 
 	return nil
 }
 
-func ConfirmBooking(db *gorm.DB, bookingID int64) error {
-	result := db.Table("bookings").
-		Where("id = ?", bookingID).
-		Update("expires_at", nil)
+func ConfirmBooking(db *gorm.DB, booking *models.Booking) error {
+	booking.ExpiresAt = nil
+	result := db.Save(booking)
 	if result.Error != nil {
 		return errors.Wrap(result.Error, "(bookings.ConfirmBooking)")
 	}

@@ -3,6 +3,7 @@ import {
   AvailabilityRule,
   AvailabilityRuleInput,
   AvailabilityRuleUpdates,
+  Booking,
   CheckSessionResponse,
   CreateCheckoutLinkRequest,
   CreateUserRequest,
@@ -52,6 +53,12 @@ export const GetListing: IEndpoint<undefined, Listing, { listingID: number }> = 
   name: "Get listing",
   method: "GET",
   path: "/listings/:listingID",
+};
+
+export const GetUserBookings: IEndpoint<undefined, Booking[]> = {
+  name: "Get user bookings",
+  method: "GET",
+  path: "/user_bookings",
 };
 
 export const GetAvailability: IEndpoint<

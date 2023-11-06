@@ -168,7 +168,7 @@ const SEND_INVITE_TEMPLATE_STRING = `
         </td>
       </tr>
     </table>
-		<div style="width:100%; text-align:center; color:#404040; margin-top:12px">Coaster, 2261 Market Street STE 5450, San Francisco, CA 94114</div>
+		<div style="width:100%;text-align:center;color:#404040;margin-top:12px;font-size:14px">Coaster, 2261 Market Street STE 5450, San Francisco, CA 94114</div>
   </body>
 
 </html>
@@ -217,7 +217,7 @@ const SEND_CREATE_PASSWORD_TEMPLATE_STRING = `
         </td>
       </tr>
     </table>
-		<div style="width:100%; text-align:center; color:#404040; margin-top:12px">Coaster, 2261 Market Street STE 5450, San Francisco, CA 94114</div>
+		<div style="width:100%;text-align:center;color:#404040;margin-top:12px;font-size:14px">Coaster, 2261 Market Street STE 5450, San Francisco, CA 94114</div>
   </body>
 
 </html>

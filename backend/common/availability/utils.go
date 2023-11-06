@@ -47,9 +47,9 @@ func (rule RuleAndTimes) getAvailabilityInRangeFixedDate(db *gorm.DB, startDate 
 			if capacity > 0 {
 				var availableDay time.Time
 				if listing.AvailabilityType == models.AvailabilityTypeDateTime {
-					availableDay = timeutils.CombineDateAndTime(time.Time(*rule.StartDate), time.Time(*timeSlot.StartTime))
+					availableDay = timeutils.CombineDateAndTime(rule.StartDate.ToTime(), timeSlot.StartTime.ToTime())
 				} else {
-					availableDay = time.Time(*rule.StartDate)
+					availableDay = rule.StartDate.ToTime()
 				}
 
 				availability = append(availability, Availability{
@@ -84,7 +84,7 @@ func (rule RuleAndTimes) getAvailabilityInRangeFixedRange(db *gorm.DB, startDate
 				if capacity > 0 {
 					var availableDay time.Time
 					if listing.AvailabilityType == models.AvailabilityTypeDateTime {
-						availableDay = timeutils.CombineDateAndTime(d, time.Time(*timeSlot.StartTime))
+						availableDay = timeutils.CombineDateAndTime(d, timeSlot.StartTime.ToTime())
 					} else {
 						availableDay = d
 					}
@@ -128,7 +128,7 @@ func (rule RuleAndTimes) getAvailabilityInRangeRecurring(db *gorm.DB, startDate 
 						if capacity > 0 {
 							var availableDay time.Time
 							if listing.AvailabilityType == models.AvailabilityTypeDateTime {
-								availableDay = timeutils.CombineDateAndTime(d, time.Time(*timeSlot.StartTime))
+								availableDay = timeutils.CombineDateAndTime(d, timeSlot.StartTime.ToTime())
 							} else {
 								availableDay = d
 							}

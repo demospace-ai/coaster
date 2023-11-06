@@ -46,6 +46,15 @@ export enum PayoutMethodType {
   BankAccount = "bank_account",
   Card = "card",
 }
+export interface Booking {
+  id: number;
+  start_time: Date;
+  start_date: Date;
+  guests: number;
+  listing_name: string;
+  listing_host: string;
+  listing_image_url: string;
+}
 
 export interface Listing {
   id: number;

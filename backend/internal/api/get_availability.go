@@ -82,7 +82,7 @@ func (s ApiService) GetAvailability(w http.ResponseWriter, r *http.Request) erro
 		for _, booking := range temporaryBookings {
 			var bookingDateTime time.Time
 			if booking.StartTime != nil {
-				bookingDateTime = timeutils.CombineDateAndTime(booking.StartDate.ToTime(), (*booking.StartTime).ToTime())
+				bookingDateTime = timeutils.CombineDateAndTime(booking.StartDate.ToTime(), booking.StartTime.ToTime())
 			} else {
 				bookingDateTime = booking.StartDate.ToTime()
 			}
