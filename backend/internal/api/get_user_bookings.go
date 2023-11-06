@@ -15,14 +15,14 @@ import (
 func (s ApiService) GetUserBookings(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	bookings, err := booking_lib.LoadBookingsForUser(s.db, auth.User.ID)
 	if err != nil {
-		return errors.Wrap(err, "(api.GetBookings) loading bookings")
+		return errors.Wrap(err, "(api.GetUserBookings) loading bookings")
 	}
 
 	bookingDetails := make([]booking_lib.BookingDetails, len(bookings))
 	for i := range bookings {
 		listing, err := listings.LoadDetailsByIDAndUser(s.db, bookings[i].ListingID, auth.User)
 		if err != nil {
-			return errors.Wrap(err, "(bookings.LoadBookingsForUser)")
+			return errors.Wrap(err, "(api.GetUserBookings) loading listing details for booking")
 		}
 
 		bookingDetails[i] = booking_lib.BookingDetails{

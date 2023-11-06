@@ -156,6 +156,12 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			Pattern:     "/user_bookings",
 			HandlerFunc: s.GetUserBookings,
 		},
+		{
+			Name:        "Get consumer booking",
+			Method:      router.GET,
+			Pattern:     "/user_bookings/{bookingID}",
+			HandlerFunc: s.GetUserBooking,
+		},
 	}
 }
 

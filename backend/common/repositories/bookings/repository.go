@@ -98,6 +98,23 @@ func LoadBookingsForUser(db *gorm.DB, userID int64) ([]models.Booking, error) {
 	return bookings, nil
 }
 
+func LoadByIDAndUserID(db *gorm.DB, bookingID int64, userID int64) (*models.Booking, error) {
+	var booking models.Booking
+
+	result := db.Table("bookings").
+		Select("bookings.*").
+		Where("bookings.id = ?", bookingID).
+		Where("bookings.user_id = ?", userID).
+		Where("bookings.deactivated_at IS NULL").
+		Take(&booking)
+
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(bookings.LoadByIDAndUserID)")
+	}
+
+	return &booking, nil
+}
+
 func LoadByID(db *gorm.DB, bookingID int64) (*models.Booking, error) {
 	var booking models.Booking
 
@@ -108,7 +125,7 @@ func LoadByID(db *gorm.DB, bookingID int64) (*models.Booking, error) {
 		Take(&booking)
 
 	if result.Error != nil {
-		return nil, errors.Wrap(result.Error, "(availability_rules.LoadTemporaryBookingsForUser)")
+		return nil, errors.Wrap(result.Error, "(bookings.LoadByID)")
 	}
 
 	return &booking, nil
