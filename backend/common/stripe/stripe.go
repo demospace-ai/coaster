@@ -131,7 +131,7 @@ func CreateCheckoutSession(user *models.User, listing *listings.ListingDetails, 
 			},
 			CaptureMethod: stripe.String(string(stripe.PaymentIntentCaptureMethodManual)),
 		},
-		SuccessURL: stripe.String(getSuccessURL(booking.ID)),
+		SuccessURL: stripe.String(getSuccessURL(booking.Reference)),
 		CancelURL:  stripe.String(getCancelURL(listing.ID)),
 		ExpiresAt:  &expiresAt,
 		Metadata: map[string]string{
@@ -216,11 +216,11 @@ func getRefreshLink() string {
 	}
 }
 
-func getSuccessURL(bookingID int64) string {
+func getSuccessURL(bookingReference string) string {
 	if application.IsProd() {
-		return fmt.Sprintf("https://trycoaster.com/reservations/%d/success?session_id={CHECKOUT_SESSION_ID}", bookingID)
+		return fmt.Sprintf("https://trycoaster.com/reservations/%s", bookingReference)
 	} else {
-		return fmt.Sprintf("http://localhost:3000/reservations/%d/success?session_id={CHECKOUT_SESSION_ID}", bookingID)
+		return fmt.Sprintf("http://localhost:3000/reservations/%s", bookingReference)
 	}
 }
 
