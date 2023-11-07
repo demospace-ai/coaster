@@ -11,11 +11,12 @@ import (
 
 func CreatePayment(db *gorm.DB, booking *models.Booking, checkoutSession *stripe.CheckoutSession) (*models.Payment, error) {
 	payment := models.Payment{
+		UserID:       booking.UserID,
 		BookingID:    booking.ID,
+		SessionID:    checkoutSession.ID,
 		TotalAmount:  checkoutSession.AmountTotal,
 		Currency:     checkoutSession.Currency,
 		Status:       checkoutSession.Status,
-		SessionID:    checkoutSession.ID,
 		CheckoutLink: checkoutSession.URL,
 	}
 
