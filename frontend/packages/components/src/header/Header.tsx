@@ -107,9 +107,9 @@ const ProfileDropdown: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
 const SignedInMenu: React.FC<{ user: User; onHostApp?: boolean }> = ({ user, onHostApp }) => {
   const logout = useLogout(onHostApp);
   const menuItem =
-    "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded hover:tw-bg-slate-200 ";
+    "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded hover:tw-bg-slate-100";
   const navItem =
-    "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded hover:tw-bg-slate-200 tw-w-full";
+    "tw-flex tw-items-center tw-py-2 tw-pl-2 tw-my-1 tw-text-sm tw-cursor-pointer tw-select-none tw-rounded hover:tw-bg-slate-100 tw-w-full";
 
   const [open, setOpen] = useState(false);
   const { refs, floatingStyles, context } = useFloating<HTMLDivElement>({
@@ -154,7 +154,7 @@ const SignedInMenu: React.FC<{ user: User; onHostApp?: boolean }> = ({ user, onH
             >
               <Menu.Items
                 static
-                className="tw-z-10 tw-divide-y tw-mt-2 tw-mr-2 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none tw-w-64"
+                className="tw-z-10 tw-divide-y tw-mt-2 tw-mr-2 tw-rounded-md tw-shadow-lg tw-bg-white focus:tw-outline-none tw-w-64"
               >
                 <div className="tw-m-2">
                   <p className="tw-px-1 tw-pt-2 tw-pb-1 tw-text-xs tw-uppercase">Signed in as</p>
@@ -178,12 +178,15 @@ const SignedInMenu: React.FC<{ user: User; onHostApp?: boolean }> = ({ user, onH
                 </div>
                 <div className="tw-flex tw-flex-col tw-m-2 tw-pt-2">
                   <Menu.Item>
+                    <Link className={navItem} href="/reservations">
+                      Your reservations
+                    </Link>
+                  </Menu.Item>
+                  <Menu.Item>
                     <Link className={navItem} href="/profile">
                       View profile
                     </Link>
                   </Menu.Item>
-                </div>
-                <div className="tw-flex tw-flex-col tw-m-2 tw-pt-2">
                   <Menu.Item>
                     <Link className={navItem} href="/invite">
                       Invite friends
@@ -338,6 +341,9 @@ const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
                                 Welcome, {user?.first_name}
                               </p>
                             </div>
+                            <Link className={navItem} href="/reservations" onClick={() => setOpen(false)}>
+                              Your Reservations
+                            </Link>
                             <Link className={navItem} href="/profile" onClick={() => setOpen(false)}>
                               View profile
                             </Link>
