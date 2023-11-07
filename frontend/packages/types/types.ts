@@ -48,12 +48,25 @@ export enum PayoutMethodType {
 }
 export interface Booking {
   reference: string;
-  start_time: Date;
   start_date: Date;
+  start_time?: Date;
   guests: number;
-  listing_name: string;
+  payments: Payment[];
+  listing: Listing;
   listing_host: string;
-  listing_image_url: string;
+  booking_image: BookingImage;
+}
+
+export interface BookingImage {
+  url: string;
+  width: number;
+  height: number;
+}
+
+export interface Payment {
+  total_amount: number;
+  currency: string;
+  completed_at: Date;
 }
 
 export interface Listing {

@@ -2,28 +2,31 @@ package views
 
 import (
 	"go.fabra.io/server/common/database"
+	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/repositories/bookings"
 )
 
 type Booking struct {
-	Reference       string         `json:"reference"`
-	StartTime       *database.Time `json:"start_time"` // Can be null for date-only listings
-	StartDate       database.Date  `json:"start_date"` // Must have date because time slots can be used for more than one days
-	Guests          int64          `json:"guests"`
-	ListingName     string         `json:"listing_name"`
-	ListingHost     string         `json:"listing_host"`
-	ListingImageURL string         `json:"listing_image_url"`
+	Reference    string                `json:"reference"`
+	StartTime    *database.Time        `json:"start_time"` // Can be null for date-only listings
+	StartDate    database.Date         `json:"start_date"` // Must have date because time slots can be used for more than one days
+	Guests       int64                 `json:"guests"`
+	Listing      models.Listing        `json:"listing"`
+	ListingHost  string                `json:"listing_host"`
+	Payments     []models.Payment      `json:"payments"`
+	BookingImage bookings.BookingImage `json:"booking_image"`
 }
 
 func ConvertBooking(booking bookings.BookingDetails) Booking {
 	return Booking{
-		Reference:       booking.Reference,
-		StartTime:       booking.StartTime,
-		StartDate:       booking.StartDate,
-		Guests:          booking.Guests,
-		ListingName:     *booking.Listing.Name,
-		ListingHost:     booking.HostName,
-		ListingImageURL: booking.ListingImageURL,
+		Reference:    booking.Reference,
+		StartTime:    booking.StartTime,
+		StartDate:    booking.StartDate,
+		Guests:       booking.Guests,
+		Listing:      booking.Listing,
+		ListingHost:  booking.HostName,
+		Payments:     booking.Payments,
+		BookingImage: booking.BookingImage,
 	}
 }
 

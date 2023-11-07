@@ -26,10 +26,14 @@ func (s ApiService) GetUserBookings(auth auth.Authentication, w http.ResponseWri
 		}
 
 		bookingDetails[i] = booking_lib.BookingDetails{
-			Booking:         bookings[i],
-			Listing:         listing.Listing,
-			HostName:        listing.Host.FirstName,
-			ListingImageURL: images.GetGcsImageUrl(listing.Images[0].StorageID),
+			Booking:  bookings[i],
+			Listing:  listing.Listing,
+			HostName: listing.Host.FirstName,
+			BookingImage: booking_lib.BookingImage{
+				URL:    images.GetGcsImageUrl(listing.Images[0].StorageID),
+				Width:  listing.Images[0].Width,
+				Height: listing.Images[0].Height,
+			},
 		}
 	}
 

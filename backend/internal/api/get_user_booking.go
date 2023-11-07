@@ -10,6 +10,7 @@ import (
 	"go.fabra.io/server/common/images"
 	booking_lib "go.fabra.io/server/common/repositories/bookings"
 	"go.fabra.io/server/common/repositories/listings"
+	"go.fabra.io/server/common/repositories/payments"
 	"go.fabra.io/server/common/views"
 )
 
@@ -30,10 +31,20 @@ func (s ApiService) GetUserBooking(auth auth.Authentication, w http.ResponseWrit
 		return errors.Wrap(err, "(api.GetUserBooking) loading listing details for booking")
 	}
 
+	payments, err := payments.LoadCompletedForBooking(s.db, booking)
+	if err != nil {
+		return errors.Wrap(err, "(api.GetUserBooking) loading payment for booking")
+	}
+
 	return json.NewEncoder(w).Encode(views.ConvertBooking(booking_lib.BookingDetails{
-		Booking:         *booking,
-		Listing:         listing.Listing,
-		HostName:        listing.Host.FirstName,
-		ListingImageURL: images.GetGcsImageUrl(listing.Images[0].StorageID),
+		Booking:  *booking,
+		HostName: listing.Host.FirstName,
+		Listing:  listing.Listing,
+		Payments: payments,
+		BookingImage: booking_lib.BookingImage{
+			URL:    images.GetGcsImageUrl(listing.Images[0].StorageID),
+			Width:  listing.Images[0].Width,
+			Height: listing.Images[0].Height,
+		},
 	}))
 }

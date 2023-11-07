@@ -4,7 +4,7 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
 
 module.exports = withBundleAnalyzer({
   reactStrictMode: true,
-  transpilePackages: ["@coaster/components", "@coaster/rpc", "@coaster/utils"],
+  transpilePackages: ["@coaster/components", "@coaster/rpc/client", "@coaster/utils/common"],
   images: {
     remotePatterns: [
       {

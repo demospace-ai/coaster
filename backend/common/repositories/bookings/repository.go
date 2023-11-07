@@ -16,9 +16,16 @@ const BOOKING_REFERNECE_CHARS = 16
 
 type BookingDetails struct {
 	models.Booking
-	Listing         models.Listing
-	HostName        string
-	ListingImageURL string
+	Listing      models.Listing
+	Payments     []models.Payment
+	HostName     string
+	BookingImage BookingImage
+}
+
+type BookingImage struct {
+	URL    string `json:"url"`
+	Width  int    `json:"width"`
+	Height int    `json:"height"`
 }
 
 func LoadBookingsForTimeAndDate(db *gorm.DB, listingID int64, startTime *database.Time, startDate time.Time) ([]models.Booking, error) {
@@ -206,16 +213,6 @@ func CreateTemporaryBooking(db *gorm.DB, listingID int64, userID int64, startDat
 	}
 
 	return booking, nil
-}
-
-func AddCheckoutLink(db *gorm.DB, booking *models.Booking, checkoutLink string) error {
-	booking.CheckoutLink = &checkoutLink
-	result := db.Save(booking)
-	if result.Error != nil {
-		return errors.Wrap(result.Error, "(bookings.AddCheckoutLink)")
-	}
-
-	return nil
 }
 
 func ConfirmBooking(db *gorm.DB, booking *models.Booking) error {

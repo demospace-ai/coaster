@@ -16,6 +16,7 @@ import (
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/repositories/bookings"
 	"go.fabra.io/server/common/repositories/listings"
+	"go.fabra.io/server/common/repositories/payments"
 	"go.fabra.io/server/common/repositories/users"
 	stripeutils "go.fabra.io/server/common/stripe"
 	"go.fabra.io/server/common/timeutils"
@@ -43,6 +44,7 @@ func (s ApiService) WebhookCheckoutComplete(w http.ResponseWriter, r *http.Reque
 		return errors.Wrap(err, "(api.WebhookCheckoutComplete) unmarshalling checkout session")
 	}
 
+	// TODO: use client reference ID instead of metadata
 	strBookingID := checkoutSession.Metadata["booking_id"]
 	if strBookingID == "" {
 		return errors.Newf("No booking ID in checkout session metadata: %+v", checkoutSession)
@@ -61,6 +63,11 @@ func (s ApiService) WebhookCheckoutComplete(w http.ResponseWriter, r *http.Reque
 	err = bookings.ConfirmBooking(s.db, booking)
 	if err != nil {
 		return errors.Wrap(err, "(api.WebhookCheckoutComplete) confirming booking")
+	}
+
+	err = payments.CompletePayment(s.db, checkoutSession)
+	if err != nil {
+		return errors.Wrap(err, "(api.WebhookCheckoutComplete) recording payment")
 	}
 
 	listing, err := listings.LoadDetailsByIDAndUser(s.db, booking.ListingID, nil)

@@ -1,6 +1,7 @@
 import { LinkButton } from "@coaster/components/button/Button";
 import { ProfilePicture } from "@coaster/components/profile/ProfilePicture";
 import { Listing as ListingType } from "@coaster/types";
+import { getDuration } from "@coaster/utils/common";
 import { CheckBadgeIcon, ClockIcon, GlobeAltIcon, StarIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import {
   BookingPanel,
@@ -8,7 +9,7 @@ import {
   ListingImages,
   ReserveFooter,
 } from "consumer/app/(pages)/listings/[listingID]/client";
-import { getDuration, getHostName, getMaxGuests } from "consumer/app/(pages)/listings/[listingID]/utils";
+import { getHostName, getMaxGuests } from "consumer/app/(pages)/listings/[listingID]/utils";
 
 export const ListingPage: React.FC<{ listing: ListingType }> = ({ listing }) => {
   return (
@@ -99,7 +100,7 @@ const NotIncluded: React.FC<{ listing: ListingType }> = ({ listing }) => {
 };
 
 const QuickInfo: React.FC<{ listing: ListingType }> = ({ listing }) => {
-  const duration = getDuration(listing);
+  const duration = getDuration(listing.duration_minutes);
   const maxGuests = getMaxGuests(listing);
 
   return (

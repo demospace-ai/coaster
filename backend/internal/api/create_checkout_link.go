@@ -11,6 +11,7 @@ import (
 	"go.fabra.io/server/common/repositories/availability_rules"
 	"go.fabra.io/server/common/repositories/bookings"
 	"go.fabra.io/server/common/repositories/listings"
+	"go.fabra.io/server/common/repositories/payments"
 	"go.fabra.io/server/common/stripe"
 	"go.fabra.io/server/common/timeutils"
 )
@@ -58,7 +59,11 @@ func (s ApiService) CreateCheckoutLink(auth auth.Authentication, w http.Response
 				break
 			} else {
 				// If the user has an active hold for this date/time/numGuests, just re-use the checkout link
-				return json.NewEncoder(w).Encode(*booking.CheckoutLink)
+				payment, err := payments.LoadOpenForBooking(s.db, &booking)
+				if err != nil {
+					return errors.Wrapf(err, "(api.CreateCheckoutLink) loading payment for booking %d", booking.ID)
+				}
+				return json.NewEncoder(w).Encode(payment.CheckoutLink)
 			}
 		}
 	}
@@ -91,16 +96,16 @@ func (s ApiService) CreateCheckoutLink(auth auth.Authentication, w http.Response
 		return errors.Wrap(err, "(api.CreateCheckoutLink) creating temporary booking")
 	}
 
-	checkoutLink, err := stripe.GetCheckoutLink(auth.User, listing, booking)
+	checkoutSession, err := stripe.CreateCheckoutSession(auth.User, listing, booking)
 	if err != nil {
 		return errors.Wrap(err, "(api.CreateCheckoutLink) error creating account link")
 	}
 
 	// TODO: Adding this after creating the booking is kind of ugly, is there a better way?
-	err = bookings.AddCheckoutLink(s.db, booking, *checkoutLink)
+	_, err = payments.CreatePayment(s.db, booking, checkoutSession)
 	if err != nil {
 		return errors.Wrap(err, "(api.CreateCheckoutLink) adding checkout link")
 	}
 
-	return json.NewEncoder(w).Encode(*checkoutLink)
+	return json.NewEncoder(w).Encode(checkoutSession.URL)
 }

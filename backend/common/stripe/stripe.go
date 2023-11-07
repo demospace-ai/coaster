@@ -90,10 +90,10 @@ func CreateLoginLink(accountID string) (*string, error) {
 	return &result.URL, nil
 }
 
-func GetCheckoutLink(user *models.User, listing *listings.ListingDetails, booking *models.Booking) (*string, error) {
+func CreateCheckoutSession(user *models.User, listing *listings.ListingDetails, booking *models.Booking) (*stripe.CheckoutSession, error) {
 	stripeApiKey, err := secret.FetchSecret(context.TODO(), getStripeApiKey())
 	if err != nil {
-		return nil, errors.Wrap(err, "(stripe.GetCheckoutLink) fetching secret")
+		return nil, errors.Wrap(err, "(stripe.CreateCheckoutSession) fetching secret")
 	}
 
 	sc := &client.API{}
@@ -106,7 +106,7 @@ func GetCheckoutLink(user *models.User, listing *listings.ListingDetails, bookin
 	params := &stripe.CheckoutSessionParams{
 		Mode:                stripe.String(string(stripe.CheckoutSessionModePayment)),
 		AllowPromotionCodes: stripe.Bool(true),
-		ClientReferenceID:   stripe.String(fmt.Sprintf("%d", listing.ID)),
+		ClientReferenceID:   stripe.String(fmt.Sprintf("%d", booking.ID)),
 		CustomerEmail:       stripe.String(user.Email),
 		LineItems: []*stripe.CheckoutSessionLineItemParams{
 			{
@@ -139,12 +139,7 @@ func GetCheckoutLink(user *models.User, listing *listings.ListingDetails, bookin
 		},
 	}
 
-	result, err := sc.CheckoutSessions.New(params)
-	if err != nil {
-		return nil, errors.Wrap(err, "(stripe.CreateCheckoutLink) creating login link")
-	}
-
-	return &result.URL, nil
+	return sc.CheckoutSessions.New(params)
 }
 
 func VerifyWebhookRequest(payload []byte, signature string) (*stripe.Event, error) {

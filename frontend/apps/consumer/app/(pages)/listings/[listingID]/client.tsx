@@ -6,7 +6,7 @@ import { GuestNumberInput } from "@coaster/components/input/Input";
 import { Loading } from "@coaster/components/loading/Loading";
 import { useAuthContext, useAvailability, useCreateCheckoutLink, useNotificationContext } from "@coaster/rpc/client";
 import { Availability, AvailabilityType, Image as ListingImage, Listing as ListingType } from "@coaster/types";
-import { ToTimeOnly, getGcsImageUrl, mergeClasses, toTitleCase } from "@coaster/utils/common";
+import { ToTimeOnly, getDuration, getGcsImageUrl, mergeClasses, toTitleCase } from "@coaster/utils/common";
 import { Dialog, Disclosure, RadioGroup, Transition } from "@headlessui/react";
 import {
   ArrowUpOnSquareIcon,
@@ -15,7 +15,7 @@ import {
   PlusCircleIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { getDateToTimeSlotMap, getDuration } from "consumer/app/(pages)/listings/[listingID]/utils";
+import { getDateToTimeSlotMap } from "consumer/app/(pages)/listings/[listingID]/utils";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { Fragment, useState } from "react";
@@ -351,7 +351,7 @@ export const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) =
         <div>
           <span className="tw-font-semibold">${listing.price}</span> per person
         </div>
-        <div>/ {getDuration(listing)}</div>
+        <div>/ {getDuration(listing.duration_minutes)}</div>
       </div>
       <ReserveSlider listing={listing} />
     </div>
