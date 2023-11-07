@@ -47,7 +47,7 @@ export enum PayoutMethodType {
   Card = "card",
 }
 export interface Booking {
-  id: number;
+  reference: string;
   start_time: Date;
   start_date: Date;
   guests: number;

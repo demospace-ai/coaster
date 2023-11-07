@@ -6,7 +6,7 @@ import (
 )
 
 type Booking struct {
-	ID              int64          `json:"id"`
+	Reference       string         `json:"reference"`
 	StartTime       *database.Time `json:"start_time"` // Can be null for date-only listings
 	StartDate       database.Date  `json:"start_date"` // Must have date because time slots can be used for more than one days
 	Guests          int64          `json:"guests"`
@@ -17,7 +17,7 @@ type Booking struct {
 
 func ConvertBooking(booking bookings.BookingDetails) Booking {
 	return Booking{
-		ID:              booking.ID,
+		Reference:       booking.Reference,
 		StartTime:       booking.StartTime,
 		StartDate:       booking.StartDate,
 		Guests:          booking.Guests,

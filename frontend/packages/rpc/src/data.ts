@@ -61,7 +61,7 @@ export async function getBookingsServer(): Promise<Booking[] | undefined> {
   return sendRequest(GetUserBookings, { extraHeaders: [["Cookie", cookieString]] });
 }
 
-export async function getBookingServer(bookingID: number): Promise<Booking | undefined> {
+export async function getBookingServer(bookingReference: string): Promise<Booking | undefined> {
   const cookieString = cookies().toString();
-  return sendRequest(GetUserBooking, { pathParams: { bookingID }, extraHeaders: [["Cookie", cookieString]] });
+  return sendRequest(GetUserBooking, { pathParams: { bookingReference }, extraHeaders: [["Cookie", cookieString]] });
 }

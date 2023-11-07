@@ -1,7 +1,7 @@
 import { getBookingServer } from "@coaster/rpc/server";
 
-export default async function Reservation({ params }: { params: { bookingID: string } }) {
-  const booking = await getBookingServer(Number(params.bookingID));
+export default async function Reservation({ params }: { params: { bookingReference: string } }) {
+  const booking = await getBookingServer(params.bookingReference);
   if (!booking) {
     return <div>Something unexpected happened.</div>;
   }

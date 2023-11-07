@@ -15,8 +15,8 @@ export default async function Reservations() {
           Reservations
         </div>
         {bookings.map((booking) => (
-          <Link key={booking.id} className="tw-w-full tw-text-lg" href={`/reservations/${booking.id}`}>
-            {booking.id} - {booking.listing_name}
+          <Link key={booking.reference} className="tw-w-full tw-text-lg" href={`/reservations/${booking.reference}`}>
+            {booking.reference} - {booking.listing_name}
           </Link>
         ))}
         <div className="tw-text-sm tw-w-full tw-text-center sm:tw-text-left tw-pt-6 tw-mt-16 tw-border-t tw-border-solid tw-border-gray-300">

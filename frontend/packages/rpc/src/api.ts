@@ -61,10 +61,10 @@ export const GetUserBookings: IEndpoint<undefined, Booking[]> = {
   path: "/user_bookings",
 };
 
-export const GetUserBooking: IEndpoint<undefined, Booking, { bookingID: number }> = {
+export const GetUserBooking: IEndpoint<undefined, Booking, { bookingReference: string }> = {
   name: "Get user bookings",
   method: "GET",
-  path: "/user_bookings/:bookingID",
+  path: "/user_bookings/:bookingReference",
 };
 
 export const GetAvailability: IEndpoint<

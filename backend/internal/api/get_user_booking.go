@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/mux"
 	"go.fabra.io/server/common/auth"
@@ -16,17 +15,12 @@ import (
 
 func (s ApiService) GetUserBooking(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
-	strBookingID, ok := vars["bookingID"]
+	bookingReference, ok := vars["bookingReference"]
 	if !ok {
-		return errors.Newf("(api.GetUserBooking) missing booking ID from GetUserBooking request URL: %s", r.URL.RequestURI())
+		return errors.Newf("(api.GetUserBooking) missing booking reference from GetUserBooking request URL: %s", r.URL.RequestURI())
 	}
 
-	bookingID, err := strconv.ParseInt(strBookingID, 10, 64)
-	if err != nil {
-		return errors.Wrap(err, "(api.GetUserBooking) parsing booking ID")
-	}
-
-	booking, err := booking_lib.LoadByIDAndUserID(s.db, bookingID, auth.User.ID)
+	booking, err := booking_lib.LoadByReferenceAndUserID(s.db, bookingReference, auth.User.ID)
 	if err != nil {
 		return errors.Wrap(err, "(api.GetUserBooking) loading bookings")
 	}

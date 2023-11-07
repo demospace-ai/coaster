@@ -45,17 +45,25 @@ func (s ApiService) OAuthLogin(w http.ResponseWriter, r *http.Request) error {
 		return errors.Wrap(err, "(api.OAuthLogin)")
 	}
 
+	// try loading user by email— we trust OAuth to give us the correct email
+	if user == nil {
+		user, err = users.LoadByEmail(s.db, externalUserInfo.Email)
+		if err != nil && !errors.IsRecordNotFound(err) {
+			return errors.Wrap(err, "(api.OAuthLogin) checking for matching user by email")
+		}
+	}
+
 	// no user exists yet, so if the domain is not allowed then redirect
 	if user == nil {
 		user, err = users.CreateUserForExternalInfo(s.db, externalUserInfo)
 		if err != nil {
-			return errors.Wrap(err, "(api.OAuthLogin)")
+			return errors.Wrap(err, "(api.OAuthLogin) creating new user for OAuth login")
 		}
 	}
 
 	sessionToken, err := sessions.Create(s.db, user.ID)
 	if err != nil {
-		return errors.Wrap(err, "(api.OAuthLogin)")
+		return errors.Wrap(err, "(api.OAuthLogin) creating session token")
 	}
 
 	auth.AddSessionCookie(w, *sessionToken)

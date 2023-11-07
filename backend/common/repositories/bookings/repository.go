@@ -1,6 +1,9 @@
 package bookings
 
 import (
+	"crypto/rand"
+	"fmt"
+	"strings"
 	"time"
 
 	"go.fabra.io/server/common/database"
@@ -8,6 +11,8 @@ import (
 	"go.fabra.io/server/common/models"
 	"gorm.io/gorm"
 )
+
+const BOOKING_REFERNECE_CHARS = 16
 
 type BookingDetails struct {
 	models.Booking
@@ -115,6 +120,23 @@ func LoadByIDAndUserID(db *gorm.DB, bookingID int64, userID int64) (*models.Book
 	return &booking, nil
 }
 
+func LoadByReferenceAndUserID(db *gorm.DB, bookingReference string, userID int64) (*models.Booking, error) {
+	var booking models.Booking
+
+	result := db.Table("bookings").
+		Select("bookings.*").
+		Where("bookings.reference = ?", bookingReference).
+		Where("bookings.user_id = ?", userID).
+		Where("bookings.deactivated_at IS NULL").
+		Take(&booking)
+
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(bookings.LoadByReferenceAndUserID)")
+	}
+
+	return &booking, nil
+}
+
 func LoadByID(db *gorm.DB, bookingID int64) (*models.Booking, error) {
 	var booking models.Booking
 
@@ -131,12 +153,19 @@ func LoadByID(db *gorm.DB, bookingID int64) (*models.Booking, error) {
 	return &booking, nil
 }
 
+// Deprecated: use create temporary booking then update the expiration to confirm
 func CreateBooking(db *gorm.DB, listingID int64, userID int64, startDate time.Time, startTime *time.Time, numGuests int64) (*models.Booking, error) {
+	reference, err := generateReference()
+	if err != nil {
+		return nil, errors.Wrap(err, "(bookings.CreateTemporaryBooking) generating reference")
+	}
+
 	booking := &models.Booking{
 		ListingID: listingID,
 		UserID:    userID,
 		StartDate: database.Date(startDate),
 		Guests:    numGuests,
+		Reference: *reference,
 	}
 	if startTime != nil {
 		startTime := database.Time(*startTime)
@@ -153,12 +182,18 @@ func CreateBooking(db *gorm.DB, listingID int64, userID int64, startDate time.Ti
 
 func CreateTemporaryBooking(db *gorm.DB, listingID int64, userID int64, startDate time.Time, startTime *time.Time, numGuests int64) (*models.Booking, error) {
 	expiration := time.Now().Add(10 * time.Minute)
+	reference, err := generateReference()
+	if err != nil {
+		return nil, errors.Wrap(err, "(bookings.CreateTemporaryBooking) generating reference")
+	}
+
 	booking := &models.Booking{
 		ListingID: listingID,
 		UserID:    userID,
 		StartDate: database.Date(startDate),
 		Guests:    numGuests,
 		ExpiresAt: &expiration,
+		Reference: *reference,
 	}
 	if startTime != nil {
 		startTime := database.Time(*startTime)
@@ -202,4 +237,16 @@ func DeactivateBooking(db *gorm.DB, bookingID int64) error {
 	}
 
 	return nil
+}
+
+func generateReference() (*string, error) {
+	b := make([]byte, BOOKING_REFERNECE_CHARS/2) // 2 chars per byte
+	_, err := rand.Read(b)
+	if err != nil {
+		return nil, errors.Wrap(err, "(bookings.generateReference)")
+	}
+
+	reference := strings.ToUpper(fmt.Sprintf("C%x", b))
+	reference = reference[:len(reference)-1] // We added a C at the beginning, so trim one character off the end
+	return &reference, nil
 }

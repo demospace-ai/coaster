@@ -151,15 +151,15 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.CreateCheckoutLink,
 		},
 		{
-			Name:        "Get consumer bookings",
+			Name:        "Get user bookings",
 			Method:      router.GET,
 			Pattern:     "/user_bookings",
 			HandlerFunc: s.GetUserBookings,
 		},
 		{
-			Name:        "Get consumer booking",
+			Name:        "Get user booking",
 			Method:      router.GET,
-			Pattern:     "/user_bookings/{bookingID}",
+			Pattern:     "/user_bookings/{bookingReference}",
 			HandlerFunc: s.GetUserBooking,
 		},
 	}

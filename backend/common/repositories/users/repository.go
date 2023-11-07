@@ -139,6 +139,7 @@ func CreateUserForExternalInfo(db *gorm.DB, externalUserInfo *oauth.ExternalUser
 		LastName:            externalUserInfo.LastName,
 		Email:               externalUserInfo.Email,
 		ProfilePictureURL:   &externalUserInfo.ProfilePictureURL,
+		LoginMethod:         models.LoginMethodGoogle,
 		IsHost:              false,
 		EmailVerified:       true,
 		StripeAccountStatus: models.StripeAccountStatusIncomplete,
