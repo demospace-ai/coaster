@@ -26,11 +26,11 @@ export default async function AllPosts() {
   );
 
   return (
-    <main className="tw-w-full tw-max-w-7xl tw-mt-10 tw-mx-4 sm:tw-mx-10">
-      <div className="tw-mb-10">
+    <main className="tw-max-w-7xl tw-mt-6 sm:tw-mt-10 tw-mx-4 sm:tw-mx-10 tw-mb-32">
+      <div className="tw-mb-6 sm:tw-mb-10">
         <h1 className="tw-font-bold tw-text-5xl">Blog</h1>
       </div>
-      <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-1 sm:tw-grid-cols-2 md:tw-grid-cols-3 tw-gap-10 tw-w-full tw-justify-start">
+      <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-1 sm:tw-grid-cols-2 md:tw-grid-cols-3 tw-gap-12 sm:tw-gap-10 tw-w-full tw-justify-start">
         {posts.map((post) => (
           <Link href={`/blog/${post.slug.current}`} key={post._id} className="tw-flex tw-flex-col tw-max-w-xl">
             <Image
