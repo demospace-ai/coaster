@@ -8,6 +8,7 @@ import (
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/database"
 	"go.fabra.io/server/common/errors"
+	"go.fabra.io/server/common/events"
 	"go.fabra.io/server/common/repositories/availability_rules"
 	"go.fabra.io/server/common/repositories/bookings"
 	"go.fabra.io/server/common/repositories/listings"
@@ -106,6 +107,8 @@ func (s ApiService) CreateCheckoutLink(auth auth.Authentication, w http.Response
 	if err != nil {
 		return errors.Wrap(err, "(api.CreateCheckoutLink) adding checkout link")
 	}
+
+	events.TrackCheckoutOpen(auth.User.ID)
 
 	return json.NewEncoder(w).Encode(checkoutSession.URL)
 }

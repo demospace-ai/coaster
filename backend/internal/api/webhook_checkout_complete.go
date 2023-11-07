@@ -12,6 +12,7 @@ import (
 	"go.fabra.io/server/common/application"
 	"go.fabra.io/server/common/emails"
 	"go.fabra.io/server/common/errors"
+	"go.fabra.io/server/common/events"
 	"go.fabra.io/server/common/images"
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/repositories/bookings"
@@ -84,6 +85,8 @@ func (s ApiService) WebhookCheckoutComplete(w http.ResponseWriter, r *http.Reque
 	if err != nil {
 		return errors.Wrap(err, "(api.WebhookCheckoutComplete) sending confirmation email")
 	}
+
+	events.TrackBooking(user.ID)
 
 	return nil
 }
