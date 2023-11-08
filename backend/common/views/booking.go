@@ -11,6 +11,7 @@ type Booking struct {
 	StartTime    *database.Time        `json:"start_time"` // Can be null for date-only listings
 	StartDate    database.Date         `json:"start_date"` // Must have date because time slots can be used for more than one days
 	Guests       int64                 `json:"guests"`
+	Status       models.BookingStatus  `json:"status"`
 	Listing      models.Listing        `json:"listing"`
 	ListingHost  string                `json:"listing_host"`
 	Payments     []models.Payment      `json:"payments"`
@@ -23,6 +24,7 @@ func ConvertBooking(booking bookings.BookingDetails) Booking {
 		StartTime:    booking.StartTime,
 		StartDate:    booking.StartDate,
 		Guests:       booking.Guests,
+		Status:       booking.Status,
 		Listing:      booking.Listing,
 		ListingHost:  booking.HostName,
 		Payments:     booking.Payments,

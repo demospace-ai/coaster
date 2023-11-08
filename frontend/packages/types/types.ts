@@ -51,10 +51,17 @@ export interface Booking {
   start_date: Date;
   start_time?: Date;
   guests: number;
+  status: BookingStatus;
   payments: Payment[];
   listing: Listing;
   listing_host: string;
   booking_image: BookingImage;
+}
+
+export enum BookingStatus {
+  Pending = "pending",
+  Confirmed = "confirmed",
+  Cancelled = "cancelled",
 }
 
 export interface BookingImage {

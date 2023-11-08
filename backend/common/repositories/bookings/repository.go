@@ -173,6 +173,7 @@ func CreateBooking(db *gorm.DB, listingID int64, userID int64, startDate time.Ti
 		StartDate: database.Date(startDate),
 		Guests:    numGuests,
 		Reference: *reference,
+		Status:    models.BookingStatusPending,
 	}
 	if startTime != nil {
 		startTime := database.Time(*startTime)
@@ -201,6 +202,7 @@ func CreateTemporaryBooking(db *gorm.DB, listingID int64, userID int64, startDat
 		Guests:    numGuests,
 		ExpiresAt: &expiration,
 		Reference: *reference,
+		Status:    models.BookingStatusPending,
 	}
 	if startTime != nil {
 		startTime := database.Time(*startTime)
@@ -215,7 +217,7 @@ func CreateTemporaryBooking(db *gorm.DB, listingID int64, userID int64, startDat
 	return booking, nil
 }
 
-func ConfirmBooking(db *gorm.DB, booking *models.Booking) error {
+func CompleteBooking(db *gorm.DB, booking *models.Booking) error {
 	booking.ExpiresAt = nil
 	result := db.Save(booking)
 	if result.Error != nil {

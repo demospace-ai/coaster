@@ -93,7 +93,7 @@ func (s ApiService) handleCheckoutComplete(event *stripe.Event) error {
 		return errors.Wrap(err, "(api.WebhookCheckoutComplete) loading booking")
 	}
 
-	err = bookings.ConfirmBooking(s.db, booking)
+	err = bookings.CompleteBooking(s.db, booking)
 	if err != nil {
 		return errors.Wrap(err, "(api.WebhookCheckoutComplete) confirming booking")
 	}

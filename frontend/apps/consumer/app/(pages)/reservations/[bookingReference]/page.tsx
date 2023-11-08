@@ -1,9 +1,10 @@
 import { getCategoryForDisplay } from "@coaster/components/icons/Category";
 import { getBookingServer } from "@coaster/rpc/server";
-import { AvailabilityType, AvailabilityTypeType, Booking } from "@coaster/types";
+import { AvailabilityType, AvailabilityTypeType, Booking, BookingStatus } from "@coaster/types";
 import { getDuration } from "@coaster/utils/common";
 import { CheckIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
+import { ReactNode } from "react";
 
 export default async function Reservation({ params }: { params: { bookingReference: string } }) {
   const booking = await getBookingServer(params.bookingReference);
@@ -38,7 +39,7 @@ export default async function Reservation({ params }: { params: { bookingReferen
             <div className="tw-text-base tw-font-medium">
               {getStartTimeString(booking.start_date, booking.start_time, booking.listing.availability_type)}
             </div>
-            <div className="tw-text-base tw-font-medium">{getDuration(booking.listing.duration_minutes)}</div>
+            {getBookingStatusPill(booking.status)}
           </div>
         </div>
         <YourBooking booking={booking} />
@@ -126,5 +127,28 @@ export function getStartTimeString(
     });
 
     return `${dateString} at ${timeString}`;
+  }
+}
+
+function getBookingStatusPill(status: BookingStatus): ReactNode {
+  switch (status) {
+    case BookingStatus.Confirmed:
+      return (
+        <div className="tw-flex tw-w-fit tw-rounded-lg tw-border tw-border-solid tw-border-green-600 tw-bg-green-100 tw-px-4 tw-py-0.5 tw-mt-2 tw-text-sm tw-font-medium tw-text-green-900">
+          Confirmed
+        </div>
+      );
+    case BookingStatus.Pending:
+      return (
+        <div className="tw-flex tw-items-center tw-w-fit tw-rounded-lg tw-border tw-border-solid tw-border-yellow-600 tw-bg-yellow-100 tw-px-4 tw-py-0.5 tw-mt-2 tw-text-sm tw-font-medium tw-text-yellow-900">
+          Pending
+        </div>
+      );
+    case BookingStatus.Cancelled:
+      return (
+        <div className="tw-flex tw-w-fit tw-rounded-lg tw-border tw-border-solid tw-border-red-600 tw-bg-red-100 tw-px-4 tw-py-0.5 tw-mt-2 tw-text-sm tw-font-medium tw-text-red-900">
+          Cancelled
+        </div>
+      );
   }
 }
