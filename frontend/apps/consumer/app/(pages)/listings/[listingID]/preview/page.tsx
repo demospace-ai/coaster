@@ -24,7 +24,7 @@ export default async function ListingPreview({ params }: { params: { listingID: 
         {listing.status !== ListingStatus.Published && (
           <Callout content={"Not published - under review"} className="tw-border tw-border-yellow-400 tw-mb-4" />
         )}
-        <ListingPage listing={listing} />;
+        <ListingPage listing={listing} />
       </div>
     </main>
   );
