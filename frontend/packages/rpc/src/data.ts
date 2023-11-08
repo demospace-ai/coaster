@@ -15,11 +15,10 @@ import {
 export async function getListingServer(listingID: number, cookieString?: string): Promise<Listing | undefined> {
   const extraHeaders: [string, string][] = cookieString ? [["Cookie", cookieString]] : [];
   try {
-    const response = await sendRequest(GetListing, {
+    return await sendRequest(GetListing, {
       pathParams: { listingID },
       extraHeaders,
     });
-    return response;
   } catch (e) {
     if (e instanceof HttpError) {
       if (e.code === 404) {
@@ -59,7 +58,7 @@ export async function getFeaturedServer(): Promise<Listing[]> {
 export async function getBookingsServer(): Promise<Booking[] | undefined> {
   const cookieString = cookies().toString();
   try {
-    return sendRequest(GetUserBookings, { extraHeaders: [["Cookie", cookieString]] });
+    return await sendRequest(GetUserBookings, { extraHeaders: [["Cookie", cookieString]] });
   } catch (e) {
     if (e instanceof HttpError) {
       if (e.code === 404) {
@@ -75,10 +74,11 @@ export async function getBookingsServer(): Promise<Booking[] | undefined> {
 export async function getBookingServer(bookingReference: string): Promise<Booking | undefined> {
   const cookieString = cookies().toString();
   try {
-    return sendRequest(GetUserBooking, {
+    return await sendRequest(GetUserBooking, {
       pathParams: { bookingReference },
       extraHeaders: [["Cookie", cookieString]],
     });
+    // return response;
   } catch (e) {
     if (e instanceof HttpError) {
       if (e.code === 404) {
