@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/stripe/stripe-go/v75"
 	"go.fabra.io/server/common/application"
 	"go.fabra.io/server/common/emails"
 	"go.fabra.io/server/common/errors"
@@ -23,26 +24,57 @@ import (
 	"go.fabra.io/server/common/timeutils"
 )
 
-func (s ApiService) WebhookCheckoutComplete(w http.ResponseWriter, r *http.Request) error {
+func (s ApiService) WebhookStripe(w http.ResponseWriter, r *http.Request) error {
 	signature := r.Header.Get("Stripe-Signature")
 	payload, err := io.ReadAll(r.Body)
 	if err != nil {
-		return errors.Wrap(err, "(api.WebhookCheckoutComplete) reading request body")
+		return errors.Wrap(err, "(api.WebhookStripe) reading request body")
 	}
 
 	event, err := stripeutils.VerifyWebhookRequest(payload, signature)
 	if err != nil {
-		return errors.Wrap(err, "(api.WebhookCheckoutComplete) verifying webhook request")
+		return errors.Wrap(err, "(api.WebhookStripe) verifying webhook request")
 	}
 
 	// TODO: handle checkout.session.async_payment_succeeded and checkout.session.async_payment_failed
-	if event.Type != "checkout.session.completed" {
+	switch event.Type {
+	case "checkout.session.completed":
+		return s.handleCheckoutComplete(event)
+	case "checkout.session.expired":
+		return s.handleCheckoutExpired(event)
+	default:
 		return errors.Newf("Unexpected event type: %v", event.Type)
 	}
+}
 
+func (s ApiService) handleCheckoutExpired(event *stripe.Event) error {
 	checkoutSession, err := stripeutils.UnmarshallCheckoutSession(event)
 	if err != nil {
-		return errors.Wrap(err, "(api.WebhookCheckoutComplete) unmarshalling checkout session")
+		return errors.Wrap(err, "(api.WebhookCheckoutExpired) unmarshalling checkout session")
+	}
+
+	strBookingID := checkoutSession.Metadata["booking_id"]
+	if strBookingID == "" {
+		return errors.Newf("No booking ID in checkout session metadata: %+v", checkoutSession)
+	}
+
+	bookingID, err := strconv.ParseInt(strBookingID, 10, 64)
+	if err != nil {
+		return errors.Wrap(err, "(api.WebhookCheckoutExpired) converting booking ID to int")
+	}
+
+	err = bookings.DeactivateBooking(s.db, bookingID)
+	if err != nil {
+		return errors.Wrap(err, "(api.WebhookCheckoutExpired) confirming booking")
+	}
+
+	return nil
+}
+
+func (s ApiService) handleCheckoutComplete(event *stripe.Event) error {
+	checkoutSession, err := stripeutils.UnmarshallCheckoutSession(event)
+	if err != nil {
+		return errors.Wrap(err, "(api.WebhookStripe) unmarshalling checkout session")
 	}
 
 	// TODO: use client reference ID instead of metadata

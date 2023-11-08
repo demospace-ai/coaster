@@ -246,16 +246,10 @@ func (s ApiService) UnauthenticatedRoutes() []router.UnauthenticatedRoute {
 			HandlerFunc: s.JoinWaitlist,
 		},
 		{
-			Name:        "Stripe checkout complete webhook",
+			Name:        "Stripe webhook",
 			Method:      router.POST,
-			Pattern:     "/webhooks/checkout_complete",
-			HandlerFunc: s.WebhookCheckoutComplete,
-		},
-		{
-			Name:        "Stripe checkout expired webhook",
-			Method:      router.POST,
-			Pattern:     "/webhooks/checkout_expired",
-			HandlerFunc: s.WebhookCheckoutExpired,
+			Pattern:     "/webhooks/stripe",
+			HandlerFunc: s.WebhookStripe,
 		},
 	}
 }
