@@ -23,7 +23,11 @@ func (s ApiService) GetUserBooking(auth auth.Authentication, w http.ResponseWrit
 
 	booking, err := booking_lib.LoadByReferenceAndUserID(s.db, bookingReference, auth.User.ID)
 	if err != nil {
-		return errors.Wrap(err, "(api.GetUserBooking) loading bookings")
+		if errors.IsRecordNotFound(err) {
+			return errors.NotFound
+		} else {
+			return errors.Wrap(err, "(api.GetUserBooking) loading bookings")
+		}
 	}
 
 	listing, err := listings.LoadDetailsByIDAndUser(s.db, booking.ListingID, auth.User)
