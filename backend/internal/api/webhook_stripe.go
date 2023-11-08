@@ -103,14 +103,14 @@ func (s ApiService) handleCheckoutComplete(event *stripe.Event) error {
 		return errors.Wrap(err, "(api.WebhookCheckoutComplete) recording payment")
 	}
 
-	listing, err := listings.LoadDetailsByIDAndUser(s.db, booking.ListingID, nil)
-	if err != nil {
-		return errors.Wrap(err, "(api.WebhookCheckoutComplete) loading listing")
-	}
-
 	user, err := users.LoadUserByID(s.db, booking.UserID)
 	if err != nil {
 		return errors.Wrap(err, "(api.WebhookCheckoutComplete) loading user")
+	}
+
+	listing, err := listings.LoadDetailsByIDAndUser(s.db, booking.ListingID, user)
+	if err != nil {
+		return errors.Wrap(err, "(api.WebhookCheckoutComplete) loading listing")
 	}
 
 	err = sendConfirmationEmail(listing, booking, user)
