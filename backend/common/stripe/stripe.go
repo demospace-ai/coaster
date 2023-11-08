@@ -218,9 +218,9 @@ func getRefreshLink() string {
 
 func getSuccessURL(bookingReference string) string {
 	if application.IsProd() {
-		return fmt.Sprintf("https://trycoaster.com/reservations/%s", bookingReference)
+		return fmt.Sprintf("https://trycoaster.com/reservations/%s/success", bookingReference)
 	} else {
-		return fmt.Sprintf("http://localhost:3000/reservations/%s", bookingReference)
+		return fmt.Sprintf("http://localhost:3000/reservations/%s/success", bookingReference)
 	}
 }
 

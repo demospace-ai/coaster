@@ -21,6 +21,7 @@ func (s ApiService) GetUserBooking(auth auth.Authentication, w http.ResponseWrit
 		return errors.Newf("(api.GetUserBooking) missing booking reference from GetUserBooking request URL: %s", r.URL.RequestURI())
 	}
 
+	// TODO: only load completed bookings, not temporary ones
 	booking, err := booking_lib.LoadByReferenceAndUserID(s.db, bookingReference, auth.User.ID)
 	if err != nil {
 		if errors.IsRecordNotFound(err) {
