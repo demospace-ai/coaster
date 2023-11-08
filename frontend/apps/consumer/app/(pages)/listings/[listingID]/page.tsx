@@ -14,11 +14,6 @@ export async function generateMetadata({ params }: { params: { listingID: string
 
 export default async function Listing({ params }: { params: { listingID: string } }) {
   const listingID = Number(params.listingID);
-  if (Number.isNaN(listingID)) {
-    // Sometimes the value of listingID is TODO
-    return <div>Something unexpected happened.</div>;
-  }
-
   const listing = await getListingServer(listingID);
   if (!listing) {
     return <div>Something unexpected happened.</div>;
