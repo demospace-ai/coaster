@@ -57,7 +57,7 @@ const YourBooking: React.FC<{ booking: Booking }> = ({ booking }) => {
       <div className="tw-text-base tw-font-semibold tw-mb-1">Participants</div>
       <div className="tw-mb-4">{booking.guests > 1 ? `${booking.guests} guests` : "1 guest"}</div>
       <div className="tw-text-base tw-font-semibold tw-mb-1">Total Cost</div>
-      <div className="tw-mb-4">${booking.payments[0].total_amount / 100}</div>
+      <div className="tw-mb-4">${booking.payments.length > 0 ? booking.payments[0].total_amount / 100 : "Pending"}</div>
     </div>
   );
 };
