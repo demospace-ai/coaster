@@ -58,10 +58,35 @@ export async function getFeaturedServer(): Promise<Listing[]> {
 
 export async function getBookingsServer(): Promise<Booking[] | undefined> {
   const cookieString = cookies().toString();
-  return sendRequest(GetUserBookings, { extraHeaders: [["Cookie", cookieString]] });
+  try {
+    return sendRequest(GetUserBookings, { extraHeaders: [["Cookie", cookieString]] });
+  } catch (e) {
+    if (e instanceof HttpError) {
+      if (e.code === 404) {
+        notFound();
+      }
+    }
+
+    // This is an unexpected error, so report it
+    // TODO: consumeErrorServer(e);g
+  }
 }
 
 export async function getBookingServer(bookingReference: string): Promise<Booking | undefined> {
   const cookieString = cookies().toString();
-  return sendRequest(GetUserBooking, { pathParams: { bookingReference }, extraHeaders: [["Cookie", cookieString]] });
+  try {
+    return sendRequest(GetUserBooking, {
+      pathParams: { bookingReference },
+      extraHeaders: [["Cookie", cookieString]],
+    });
+  } catch (e) {
+    if (e instanceof HttpError) {
+      if (e.code === 404) {
+        notFound();
+      }
+    }
+
+    // This is an unexpected error, so report it
+    // TODO: consumeErrorServer(e);
+  }
 }
