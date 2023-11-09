@@ -16,3 +16,15 @@ export function ToLocaleTimeOnly(time: Date): Date {
       }),
   );
 }
+
+export const compareDates = (a: Date | undefined, b: Date | undefined) => {
+  if (a === undefined && b === undefined) {
+    return true;
+  }
+
+  if (a === undefined || b === undefined) {
+    return false;
+  }
+
+  return a.toDateString() === b.toDateString();
+};

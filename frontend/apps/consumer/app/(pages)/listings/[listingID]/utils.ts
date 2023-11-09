@@ -1,6 +1,6 @@
 import { correctFromUTC } from "@coaster/components/dates/utils";
 import { Availability, Host, Listing as ListingType } from "@coaster/types";
-import { ToDateOnly, ToLocaleTimeOnly } from "@coaster/utils/common";
+import { ToLocaleTimeOnly } from "@coaster/utils/common";
 
 export const getMaxGuests = (listing: ListingType) => {
   if (listing.max_guests) {
@@ -39,15 +39,4 @@ export const getDateToTimeSlotMap = (availability: Availability[] | undefined) =
     }
   }
   return timeSlotMap;
-};
-
-export const getAvailableDates = (availabilityList: Availability[] | undefined): Date[] => {
-  if (!availabilityList) {
-    return [];
-  }
-
-  return availabilityList
-    .map((availability) => ToDateOnly(availability.datetime).getTime())
-    .filter((s, i, a) => a.indexOf(s) == i)
-    .map((dateString) => correctFromUTC(new Date(dateString)));
 };

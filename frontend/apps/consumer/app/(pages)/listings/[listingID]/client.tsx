@@ -12,7 +12,14 @@ import {
   Image as ListingImage,
   Listing as ListingType,
 } from "@coaster/types";
-import { ToTimeOnly, getDuration, getGcsImageUrl, mergeClasses, toTitleCase } from "@coaster/utils/common";
+import {
+  ToTimeOnly,
+  compareDates,
+  getDuration,
+  getGcsImageUrl,
+  mergeClasses,
+  toTitleCase,
+} from "@coaster/utils/common";
 import { Dialog, Disclosure, RadioGroup, Transition } from "@headlessui/react";
 import {
   ArrowUpOnSquareIcon,
@@ -22,7 +29,7 @@ import {
   PlusCircleIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { getAvailableDates, getDateToTimeSlotMap } from "consumer/app/(pages)/listings/[listingID]/utils";
+import { getDateToTimeSlotMap } from "consumer/app/(pages)/listings/[listingID]/utils";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { Fragment, useState } from "react";
@@ -103,6 +110,38 @@ export const ReserveSlider: React.FC<{
     maxGuests,
   } = useBookingState(listing);
 
+  const durationDays = Math.floor((listing.duration_minutes || 0) / 1440);
+  const multiDayDuration = durationDays > 0;
+
+  const getDisplayValue = (value: Date | undefined): string => {
+    if (!value) {
+      return "";
+    }
+
+    if (multiDayDuration) {
+      const endDate = new Date(value.getFullYear(), value.getMonth(), value.getDate() + durationDays);
+      return (
+        value.toLocaleDateString("en-us", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        }) +
+        " - " +
+        endDate.toLocaleDateString("en-us", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        })
+      );
+    } else {
+      return value.toLocaleDateString("en-us", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    }
+  };
+
   return (
     <div className={className}>
       <Button className="tw-font-medium tw-tracking-[0.5px] tw-h-10" onClick={() => setOpen(true)}>
@@ -148,7 +187,13 @@ export const ReserveSlider: React.FC<{
                     {({ open, close }) => (
                       <div className="tw-w-full tw-rounded-lg tw-px-4 tw-pt-4 tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-divide-y">
                         <Disclosure.Button className="tw-flex tw-w-full tw-pb-4 tw-rounded-lg tw-justify-between tw-text-left tw-text-base tw-font-medium focus:tw-outline-none">
-                          <span>{startDate ? startDate.toLocaleDateString() : "Choose start date"}</span>
+                          <span>
+                            {startDate
+                              ? startDate.toLocaleDateString()
+                              : multiDayDuration
+                              ? "Choose dates"
+                              : "Choose start date"}
+                          </span>
                           <ChevronUpIcon
                             className={`${open && "tw-rotate-180 tw-transform"} tw-h-5 tw-w-5 tw-text-slate-500`}
                           />
@@ -189,19 +234,9 @@ export const ReserveSlider: React.FC<{
                             />
                           ) : (
                             <RadioGroup
-                              className="tw-grid tw-grid-cols-2 tw-w-full tw-gap-2 tw-mt-4"
+                              className="tw-grid tw-grid-cols-1 tw-w-full tw-gap-4 tw-mt-4"
                               value={startDate}
-                              by={(a: Date | undefined, b: Date | undefined) => {
-                                if (a === undefined && b === undefined) {
-                                  return true;
-                                }
-
-                                if (a === undefined || b === undefined) {
-                                  return false;
-                                }
-
-                                return a.toDateString() === b.toDateString();
-                              }}
+                              by={compareDates}
                               onChange={(e) => {
                                 setStartDate(e);
                                 close();
@@ -213,12 +248,12 @@ export const ReserveSlider: React.FC<{
                                   value={availableDate}
                                   className={({ checked }) =>
                                     mergeClasses(
-                                      "tw-cursor-pointer tw-select-none tw-text-center tw-py-2 tw-w-32 tw-border tw-border-solid tw-border-slate-300 tw-rounded-lg tw-text-base tw-text-slate-900 tw-mx-auto",
+                                      "tw-flex tw-items-center tw-justify-center tw-cursor-pointer tw-select-none tw-text-center tw-py-2 tw-w-full tw-border tw-border-solid tw-border-slate-300 tw-rounded-lg tw-text-base tw-text-slate-900 tw-mx-auto",
                                       checked && "tw-bg-blue-100",
                                     )
                                   }
                                 >
-                                  {availableDate.toLocaleDateString()}
+                                  {getDisplayValue(availableDate)}
                                 </RadioGroup.Option>
                               ))}
                             </RadioGroup>
@@ -643,7 +678,7 @@ function useBookingState(listing: ListingType) {
 
   const dateToTimeSlotMap = getDateToTimeSlotMap(availability);
   const timeSlots = startDate ? dateToTimeSlotMap.get(startDate.toLocaleDateString()) : undefined;
-  const availableDates: Date[] = getAvailableDates(availability);
+  const availableDates: Date[] = Array.from(dateToTimeSlotMap.keys()).map((dateString) => new Date(dateString));
 
   var bookingSlot: Availability | null = null;
   if (listing.availability_type === AvailabilityType.Enum.datetime) {

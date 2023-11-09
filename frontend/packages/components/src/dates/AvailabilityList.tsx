@@ -1,6 +1,6 @@
 "use client";
 
-import { mergeClasses } from "@coaster/utils/common";
+import { compareDates, mergeClasses, toUndefined } from "@coaster/utils/common";
 import {
   autoUpdate,
   offset,
@@ -13,7 +13,7 @@ import {
   useRole,
 } from "@floating-ui/react";
 import { Listbox, Transition } from "@headlessui/react";
-import { CalendarIcon, CheckIcon } from "@heroicons/react/24/outline";
+import { CalendarIcon } from "@heroicons/react/24/outline";
 import { Fragment, useState } from "react";
 import { Loading } from "../loading/Loading";
 
@@ -83,6 +83,7 @@ export const AvailabilityListPopper: React.FC<{
 
   return (
     <Listbox
+      by={(a, b) => compareDates(toUndefined(a), toUndefined(b))}
       value={selected ? selected : null}
       onChange={(value) => {
         onSelect(value ? value : undefined);
@@ -118,7 +119,7 @@ export const AvailabilityListPopper: React.FC<{
             leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
             leaveTo="tw-transform tw-opacity-0 tw-scale-95"
           >
-            <Listbox.Options className="tw-max-h-60 tw-w-full tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm tw-gap-1 tw-flex tw-flex-col">
+            <Listbox.Options className="tw-max-h-60 tw-w-full tw-overflow-auto tw-rounded-md tw-bg-white tw-p-4 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm tw-gap-3 tw-flex tw-flex-col">
               {loading ? (
                 <Loading />
               ) : (
@@ -127,23 +128,12 @@ export const AvailabilityListPopper: React.FC<{
                     key={index}
                     value={option}
                     className={({ active, selected }) =>
-                      `tw-relative tw-cursor-pointer tw-select-none tw-py-2.5 tw-pl-4 tw-pr-4 tw-text-base tw-text-slate-900
+                      `tw-flex tw-items-center tw-justify-center tw-border tw-border-solid tw-border-gray-300 tw-rounded-xl tw-py-2 tw-px-4 tw-cursor-pointer tw-select-none tw-text-base tw-text-slate-900
                         ${active && "tw-bg-slate-100"}
                         ${selected && "tw-bg-slate-200"}`
                     }
                   >
-                    {({ selected }) => (
-                      <>
-                        <span className={`tw-block tw-truncate ${selected ? "tw-font-medium" : "tw-font-normal"}`}>
-                          {getDisplayValue(option)}
-                        </span>
-                        {selected ? (
-                          <span className="tw-absolute tw-inset-y-0 tw-right-0 tw-flex tw-items-center tw-pr-3 tw-text-slate-600">
-                            <CheckIcon className="tw-h-5 tw-w-5" aria-hidden="true" />
-                          </span>
-                        ) : null}
-                      </>
-                    )}
+                    <div className="tw-font-medium tw-whitespace-nowrap">{getDisplayValue(option)}</div>
                   </Listbox.Option>
                 ))
               )}
