@@ -231,7 +231,7 @@ export const InlineMapSearch: React.FC<{
       >
         <div
           className={mergeClasses(
-            "tw-flex tw-w-full tw-rounded-lg tw-bg-white tw-border tw-border-solid tw-border-gray-300 tw-transition-all tw-duration-100",
+            "tw-flex tw-w-full tw-rounded-lg tw-bg-white tw-border tw-border-solid tw-border-gray-300 tw-transition-all tw-duration-100 hover:tw-border-gray-400",
             props.label ? "tw-py-3" : "tw-py-1.5",
           )}
         >
