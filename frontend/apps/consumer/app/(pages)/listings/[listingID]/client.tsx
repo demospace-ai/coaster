@@ -1,30 +1,56 @@
 "use client";
 
 import { Button } from "@coaster/components/button/Button";
-import { correctFromUTC, correctToUTC } from "@coaster/components/dates/utils";
+import { correctToUTC } from "@coaster/components/dates/utils";
 import { GuestNumberInput } from "@coaster/components/input/Input";
 import { Loading } from "@coaster/components/loading/Loading";
 import { useAuthContext, useAvailability, useCreateCheckoutLink, useNotificationContext } from "@coaster/rpc/client";
-import { Availability, AvailabilityType, Image as ListingImage, Listing as ListingType } from "@coaster/types";
+import {
+  Availability,
+  AvailabilityDisplay,
+  AvailabilityType,
+  Image as ListingImage,
+  Listing as ListingType,
+} from "@coaster/types";
 import { ToTimeOnly, getDuration, getGcsImageUrl, mergeClasses, toTitleCase } from "@coaster/utils/common";
 import { Dialog, Disclosure, RadioGroup, Transition } from "@headlessui/react";
 import {
   ArrowUpOnSquareIcon,
+  CalendarIcon,
   ChevronUpIcon,
   MinusCircleIcon,
   PlusCircleIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { getDateToTimeSlotMap } from "consumer/app/(pages)/listings/[listingID]/utils";
+import { getAvailableDates, getDateToTimeSlotMap } from "consumer/app/(pages)/listings/[listingID]/utils";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { Fragment, useState } from "react";
 
-const DatePickerPopper = dynamic(() =>
-  import("@coaster/components/dates/DatePicker").then((mod) => mod.DatePickerPopper),
+const DatePickerPopper = dynamic(
+  () => import("@coaster/components/dates/DatePicker").then((mod) => mod.DatePickerPopper),
+  {
+    loading: () => (
+      <div className="tw-flex tw-w-3/4 tw-py-2.5 tw-mr-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-justify-start tw-items-center tw-cursor-pointer tw-whitespace-nowrap">
+        <CalendarIcon className="tw-w-5 tw-ml-4 tw-mr-3 -tw-mt-[1.5px]" />
+        Select a date
+      </div>
+    ),
+  },
 );
 const DateRangePicker = dynamic(() =>
   import("@coaster/components/dates/DatePicker").then((mod) => mod.DateRangePicker),
+);
+const AvailabilityListPopper = dynamic(
+  () => import("@coaster/components/dates/AvailabilityList").then((mod) => mod.AvailabilityListPopper),
+  {
+    loading: () => (
+      <div className="tw-flex tw-w-3/4 tw-py-2.5 tw-mr-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-justify-start tw-items-center tw-cursor-pointer tw-whitespace-nowrap">
+        <CalendarIcon className="tw-w-5 tw-ml-5 tw-mr-3 -tw-mt-[1.5px]" />
+        Select a date
+      </div>
+    ),
+  },
 );
 
 export const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) => {
@@ -58,78 +84,24 @@ export const ReserveSlider: React.FC<{
   className?: string;
   buttonClass?: string;
 }> = ({ listing, className }) => {
-  const { user, openLoginModal } = useAuthContext();
   const [open, setOpen] = useState(false);
-  const [month, setMonth] = useState<Date>(new Date()); // TODO: this should be the current month
-  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
-  const [startTime, setStartTime] = useState<Availability | null>(null);
-  const [numGuests, setNumGuests] = useState<number>(0);
-  const { availability, loading } = useAvailability(listing.id, month);
-  const createCheckoutLink = useCreateCheckoutLink({
-    onSuccess: (link) => {
-      window.location.href = link;
-    },
-  });
-
-  const tryToReserve = () => {
-    if (user) {
-      const utcDate = correctToUTC(startDate);
-      if (utcDate == undefined) {
-        // TODO: show error
-        return;
-      }
-
-      var timeOnly: Date | undefined = undefined;
-      if (listing.availability_type === AvailabilityType.Enum.datetime) {
-        if (startTime == undefined) {
-          // TODO: show error
-          return;
-        }
-        timeOnly = ToTimeOnly(startTime.datetime);
-      }
-
-      if (!bookingSlot) {
-        // TODO: this should not happen
-        return;
-      }
-
-      if (numGuests > bookingSlot.capacity) {
-        // TODO: show error
-        return;
-      }
-
-      const payload = {
-        listing_id: listing.id,
-        start_date: utcDate,
-        start_time: timeOnly,
-        number_of_guests: numGuests,
-      };
-
-      createCheckoutLink.mutate(payload);
-    } else {
-      openLoginModal();
-    }
-  };
-
-  const dateToTimeSlotMap = getDateToTimeSlotMap(availability);
-  const timeSlots = startDate ? dateToTimeSlotMap.get(startDate.toLocaleDateString()) : undefined;
-  const correctedAvailability: Date[] = availability ? availability.map((slot) => correctFromUTC(slot.datetime)) : [];
-
-  var bookingSlot: Availability | null = null;
-  if (listing.availability_type === AvailabilityType.Enum.datetime) {
-    bookingSlot = startTime;
-  } else if (startDate !== undefined) {
-    const slots = dateToTimeSlotMap.get(startDate.toLocaleDateString());
-
-    if (slots === undefined || slots.length === 0) {
-      // TODO: this should not happen
-    } else {
-      // Date-only listings should only have a single time slot per day
-      bookingSlot = slots[0];
-    }
-  }
-
-  const maxGuests = bookingSlot ? bookingSlot.capacity : listing.max_guests ? listing.max_guests : 99;
+  const {
+    month,
+    setMonth,
+    startDate,
+    setStartDate,
+    startTime,
+    setStartTime,
+    numGuests,
+    setNumGuests,
+    availabilityLoading,
+    createCheckoutLink,
+    tryToReserve,
+    availableDates,
+    timeSlots,
+    bookingSlot,
+    maxGuests,
+  } = useBookingState(listing);
 
   return (
     <div className={className}>
@@ -164,7 +136,7 @@ export const ReserveSlider: React.FC<{
                   <span className="tw-font-semibold tw-text-lg">Select options</span>
                   <button
                     className="tw-inline tw-ml-auto tw-mb-2 tw-bg-transparent tw-border-none tw-cursor-pointer tw-p-0"
-                    onClick={(e) => {
+                    onClick={() => {
                       setOpen(false);
                     }}
                   >
@@ -182,36 +154,75 @@ export const ReserveSlider: React.FC<{
                           />
                         </Disclosure.Button>
                         <Disclosure.Panel className="tw-flex tw-flex-col tw-w-full tw-items-center tw-pb-4 sm:tw-pb-0">
-                          <DateRangePicker
-                            mode="single"
-                            disabled={(day: Date) => {
-                              // TODO: this should account for the capacity and number of guests selected
-                              const today = new Date();
-                              if (day < today) {
-                                return true;
-                              }
+                          {listing.availability_display === AvailabilityDisplay.Enum.calendar ? (
+                            <DateRangePicker
+                              mode="single"
+                              disabled={(day: Date) => {
+                                // TODO: this should account for the capacity and number of guests selected
+                                const today = new Date();
+                                if (day < today) {
+                                  return true;
+                                }
 
-                              for (const date of correctedAvailability) {
-                                if (date.toDateString() === day.toDateString()) {
+                                for (const date of availableDates) {
+                                  if (date.toDateString() === day.toDateString()) {
+                                    return false;
+                                  }
+                                }
+                                return true;
+                              }}
+                              numberOfMonths={1}
+                              month={month}
+                              onMonthChange={setMonth}
+                              className="tw-mt-3 sm:tw-mt-0"
+                              classNames={{
+                                month: "sm:tw-border-0",
+                              }}
+                              selected={startDate}
+                              onSelect={(e) => {
+                                setStartDate(e);
+                                close();
+                              }}
+                              components={
+                                availabilityLoading ? { Day: () => <Loading className="tw-opacity-30" /> } : {}
+                              }
+                            />
+                          ) : (
+                            <RadioGroup
+                              className="tw-grid tw-grid-cols-2 tw-w-full tw-gap-2 tw-mt-4"
+                              value={startDate}
+                              by={(a: Date | undefined, b: Date | undefined) => {
+                                if (a === undefined && b === undefined) {
+                                  return true;
+                                }
+
+                                if (a === undefined || b === undefined) {
                                   return false;
                                 }
-                              }
-                              return true;
-                            }}
-                            numberOfMonths={1}
-                            month={month}
-                            onMonthChange={setMonth}
-                            className="tw-mt-3 sm:tw-mt-0"
-                            classNames={{
-                              month: "sm:tw-border-0",
-                            }}
-                            selected={startDate}
-                            onSelect={(e) => {
-                              setStartDate(e);
-                              close();
-                            }}
-                            components={loading ? { Day: () => <Loading className="tw-opacity-30" /> } : {}}
-                          />
+
+                                return a.toDateString() === b.toDateString();
+                              }}
+                              onChange={(e) => {
+                                setStartDate(e);
+                                close();
+                              }}
+                            >
+                              {availableDates.map((availableDate: Date) => (
+                                <RadioGroup.Option
+                                  key={availableDate.toLocaleDateString()}
+                                  value={availableDate}
+                                  className={({ checked }) =>
+                                    mergeClasses(
+                                      "tw-cursor-pointer tw-select-none tw-text-center tw-py-2 tw-w-32 tw-border tw-border-solid tw-border-slate-300 tw-rounded-lg tw-text-base tw-text-slate-900 tw-mx-auto",
+                                      checked && "tw-bg-blue-100",
+                                    )
+                                  }
+                                >
+                                  {availableDate.toLocaleDateString()}
+                                </RadioGroup.Option>
+                              ))}
+                            </RadioGroup>
+                          )}
                         </Disclosure.Panel>
                       </div>
                     )}
@@ -227,7 +238,15 @@ export const ReserveSlider: React.FC<{
                             {timeSlots === undefined ? (
                               <span className="tw-cursor-disabled tw-text-gray-500">Pick a date first</span>
                             ) : (
-                              <span>{startTime ? startTime.datetime.toLocaleTimeString() : "Choose start time"}</span>
+                              <span>
+                                {startTime
+                                  ? startTime.datetime.toLocaleTimeString("en-us", {
+                                      hour: "numeric",
+                                      minute: "numeric",
+                                      hour12: true,
+                                    })
+                                  : "Choose start time"}
+                              </span>
                             )}
                             <ChevronUpIcon
                               className={`${open && "tw-rotate-180 tw-transform"} tw-h-5 tw-w-5 tw-text-slate-500`}
@@ -241,7 +260,7 @@ export const ReserveSlider: React.FC<{
                                   setStartTime(e);
                                   close();
                                 }}
-                                className="tw-flex tw-columns-3 tw-justify-start tw-gap-3 tw-mt-4"
+                                className="tw-grid tw-grid-cols-2 tw-justify-center tw-w-full tw-gap-2 tw-mt-4"
                               >
                                 {timeSlots.map((timeSlot) => (
                                   <RadioGroup.Option
@@ -249,12 +268,16 @@ export const ReserveSlider: React.FC<{
                                     value={timeSlot}
                                     className={({ checked }) =>
                                       mergeClasses(
-                                        "tw-px-3 tw-py-2 tw-cursor-pointer tw-rounded-lg tw-border tw-border-solid tw-border-gray-300",
+                                        "tw-cursor-pointer tw-select-none tw-text-center tw-py-2 tw-w-32 tw-border tw-border-solid tw-border-slate-300 tw-rounded-lg tw-text-base tw-text-slate-900 tw-mx-auto",
                                         checked && "tw-bg-blue-100",
                                       )
                                     }
                                   >
-                                    {timeSlot.datetime.toLocaleTimeString()}
+                                    {timeSlot.datetime.toLocaleTimeString("en-us", {
+                                      hour: "numeric",
+                                      minute: "numeric",
+                                      hour12: true,
+                                    })}
                                   </RadioGroup.Option>
                                 ))}
                               </RadioGroup>
@@ -290,13 +313,13 @@ export const ReserveSlider: React.FC<{
                             <div className="tw-flex tw-gap-3">
                               <button
                                 onClick={() => {
-                                  setNumGuests(Math.max(0, numGuests - 1));
+                                  setNumGuests(Math.max(1, numGuests - 1));
                                 }}
                               >
                                 <MinusCircleIcon
                                   className={mergeClasses(
                                     "tw-w-6 tw-cursor-pointer tw-stroke-gray-700 hover:tw-stroke-black",
-                                    numGuests === 0 && "!tw-stroke-gray-300 tw-cursor-not-allowed",
+                                    numGuests === 1 && "!tw-stroke-gray-300 tw-cursor-not-allowed",
                                   )}
                                 />
                               </button>
@@ -359,75 +382,22 @@ export const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) =
 };
 
 export const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
-  const { user, openLoginModal } = useAuthContext();
-  const [month, setMonth] = useState<Date>(new Date()); // TODO: this should be the current month
-  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
-  const [startTime, setStartTime] = useState<Availability | null>(null);
-  const [guests, setGuests] = useState<number>(1);
-  const { availability, loading } = useAvailability(listing.id, month);
-  const createCheckoutLink = useCreateCheckoutLink({
-    onSuccess: (link) => {
-      window.location.href = link;
-    },
-  });
-
-  const dateToTimeSlotMap = getDateToTimeSlotMap(availability);
-  const timeSlots = startDate ? dateToTimeSlotMap.get(startDate.toLocaleDateString()) : undefined;
-  const correctedAvailability: Date[] = availability ? availability.map((slot) => correctFromUTC(slot.datetime)) : [];
-
-  var bookingSlot: Availability | null = null;
-  if (listing.availability_type === AvailabilityType.Enum.datetime) {
-    bookingSlot = startTime;
-  } else if (startDate !== undefined) {
-    const slots = dateToTimeSlotMap.get(startDate.toLocaleDateString());
-
-    if (slots === undefined || slots.length === 0) {
-      // TODO: this should not happen
-    } else {
-      // Date-only listings should only have a single time slot per day
-      bookingSlot = slots[0];
-    }
-  }
-
-  const tryToReserve = () => {
-    if (user) {
-      const utcDate = correctToUTC(startDate);
-      if (utcDate == undefined) {
-        // TODO: show error
-        return;
-      }
-
-      var timeOnly: Date | undefined = undefined;
-      if (listing.availability_type === AvailabilityType.Enum.datetime) {
-        if (startTime == undefined) {
-          // TODO: show error
-          return;
-        }
-        timeOnly = ToTimeOnly(startTime.datetime);
-      }
-
-      if (!bookingSlot) {
-        // TODO: this should not happen
-        return;
-      }
-
-      if (guests > bookingSlot.capacity) {
-        // TODO: show error
-        return;
-      }
-
-      const payload = {
-        listing_id: listing.id,
-        start_date: utcDate,
-        start_time: timeOnly,
-        number_of_guests: guests,
-      };
-
-      createCheckoutLink.mutate(payload);
-    } else {
-      openLoginModal();
-    }
-  };
+  const {
+    month,
+    setMonth,
+    startDate,
+    setStartDate,
+    startTime,
+    setStartTime,
+    numGuests,
+    setNumGuests,
+    availabilityLoading,
+    createCheckoutLink,
+    tryToReserve,
+    availableDates,
+    timeSlots,
+    maxGuests,
+  } = useBookingState(listing);
 
   return (
     <div className="tw-hidden lg:tw-flex tw-w-[400px] tw-min-w-[400px] tw-max-w-[400px]">
@@ -436,32 +406,44 @@ export const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) =>
           <span className="tw-text-2xl tw-font-semibold tw-mb-3">${listing.price}</span> per person
         </div>
         <div className="tw-flex tw-w-full tw-mt-3 tw-mb-5">
-          <DatePickerPopper
-            className="tw-w-3/4 tw-mr-2"
-            selected={startDate}
-            onSelect={setStartDate}
-            month={month}
-            onMonthChange={setMonth}
-            loading={loading}
-            disabled={(day: Date) => {
-              // TODO: this should account for the capacity and number of guests selected
-              const today = new Date();
-              if (day < today) {
-                return true;
-              }
-              for (const date of correctedAvailability) {
-                if (date.toDateString() === day.toDateString()) {
-                  return false;
+          {listing.availability_display === AvailabilityDisplay.Enum.calendar ? (
+            <DatePickerPopper
+              className="tw-w-3/4 tw-mr-2"
+              selected={startDate}
+              onSelect={setStartDate}
+              month={month}
+              onMonthChange={setMonth}
+              loading={availabilityLoading}
+              disabled={(day: Date) => {
+                // TODO: this should account for the capacity and number of guests selected
+                const today = new Date();
+                if (day < today) {
+                  return true;
                 }
-              }
-              return true;
-            }}
-            buttonClass="tw-w-full tw-h-12"
-          />
+                for (const date of availableDates) {
+                  if (date.toDateString() === day.toDateString()) {
+                    return false;
+                  }
+                }
+                return true;
+              }}
+              buttonClass="tw-w-full tw-h-12"
+            />
+          ) : (
+            <AvailabilityListPopper
+              wrapperClass="tw-w-3/4 tw-mr-2"
+              className="tw-w-full tw-py-3 tw-border-gray-300 tw-rounded-lg"
+              selected={startDate}
+              onSelect={setStartDate}
+              availability={availableDates}
+              loading={availabilityLoading}
+              durationMinutes={listing.duration_minutes}
+            />
+          )}
           <GuestNumberInput
-            value={guests}
-            setValue={setGuests}
-            maxGuests={bookingSlot ? bookingSlot.capacity : listing.max_guests}
+            value={numGuests}
+            setValue={setNumGuests}
+            maxGuests={maxGuests}
             className="tw-w-1/4 tw-min-w-[80px]"
           />
         </div>
@@ -473,7 +455,11 @@ export const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) =>
           >
             {timeSlots.map((timeSlot) => (
               <RadioGroup.Option
-                key={timeSlot.datetime.toLocaleTimeString()}
+                key={timeSlot.datetime.toLocaleTimeString("en-us", {
+                  hour: "numeric",
+                  minute: "numeric",
+                  hour12: true,
+                })}
                 value={timeSlot}
                 className={({ checked }) =>
                   mergeClasses(
@@ -482,7 +468,11 @@ export const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) =>
                   )
                 }
               >
-                {timeSlot.datetime.toLocaleTimeString()}
+                {timeSlot.datetime.toLocaleTimeString("en-us", {
+                  hour: "numeric",
+                  minute: "numeric",
+                  hour12: true,
+                })}
               </RadioGroup.Option>
             ))}
           </RadioGroup>
@@ -587,3 +577,105 @@ const NullableImage: React.FC<{
     return <div></div>;
   }
 };
+
+function useBookingState(listing: ListingType) {
+  const { user, openLoginModal } = useAuthContext();
+  const [month, setMonth] = useState<Date>(new Date());
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [startTime, setStartTime] = useState<Availability | null>(null);
+  const [numGuests, setNumGuests] = useState<number>(1);
+
+  var fetchStartDate: string, fetchEndDate: string;
+  if (listing.availability_display === AvailabilityDisplay.Enum.calendar) {
+    fetchStartDate = new Date(month.getFullYear(), month.getMonth(), 1).toISOString().split("T")[0];
+    fetchEndDate = new Date(month.getFullYear(), month.getMonth() + 1, 0).toISOString().split("T")[0];
+  } else {
+    fetchStartDate = new Date(month.getFullYear(), month.getMonth(), month.getDate()).toISOString().split("T")[0];
+    fetchEndDate = new Date(month.getFullYear() + 1, month.getMonth(), month.getDate()).toISOString().split("T")[0];
+  }
+  const { availability, loading } = useAvailability(listing.id, fetchStartDate, fetchEndDate);
+
+  const createCheckoutLink = useCreateCheckoutLink({
+    onSuccess: (link) => {
+      window.location.href = link;
+    },
+  });
+
+  const tryToReserve = () => {
+    if (user) {
+      const utcDate = correctToUTC(startDate);
+      if (utcDate == undefined) {
+        // TODO: show error
+        return;
+      }
+
+      var timeOnly: Date | undefined = undefined;
+      if (listing.availability_type === AvailabilityType.Enum.datetime) {
+        if (startTime == undefined) {
+          // TODO: show error
+          return;
+        }
+        timeOnly = ToTimeOnly(startTime.datetime);
+      }
+
+      if (!bookingSlot) {
+        // TODO: this should not happen
+        return;
+      }
+
+      if (numGuests > bookingSlot.capacity) {
+        // TODO: show error
+        return;
+      }
+
+      const payload = {
+        listing_id: listing.id,
+        start_date: utcDate,
+        start_time: timeOnly,
+        number_of_guests: numGuests,
+      };
+
+      createCheckoutLink.mutate(payload);
+    } else {
+      openLoginModal();
+    }
+  };
+
+  const dateToTimeSlotMap = getDateToTimeSlotMap(availability);
+  const timeSlots = startDate ? dateToTimeSlotMap.get(startDate.toLocaleDateString()) : undefined;
+  const availableDates: Date[] = getAvailableDates(availability);
+
+  var bookingSlot: Availability | null = null;
+  if (listing.availability_type === AvailabilityType.Enum.datetime) {
+    bookingSlot = startTime;
+  } else if (startDate !== undefined) {
+    const slots = dateToTimeSlotMap.get(startDate.toLocaleDateString());
+
+    if (slots === undefined || slots.length === 0) {
+      // TODO: this should not happen
+    } else {
+      // Date-only listings should only have a single time slot per day
+      bookingSlot = slots[0];
+    }
+  }
+
+  const maxGuests = bookingSlot ? bookingSlot.capacity : listing.max_guests ? listing.max_guests : 99;
+
+  return {
+    month,
+    setMonth,
+    startDate,
+    setStartDate,
+    startTime,
+    setStartTime,
+    numGuests,
+    setNumGuests,
+    availabilityLoading: loading,
+    createCheckoutLink,
+    tryToReserve,
+    availableDates,
+    timeSlots,
+    bookingSlot,
+    maxGuests,
+  };
+}

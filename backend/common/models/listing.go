@@ -52,24 +52,32 @@ const (
 	AvailabilityTypeDateTime AvailabilityType = "datetime"
 )
 
+type AvailabilityDisplay string
+
+const (
+	AvailabilityTypeCalendar AvailabilityType = "calendar"
+	AvailabilityTypeList     AvailabilityType = "list"
+)
+
 type Listing struct {
-	UserID           int64               `json:"user_id"`
-	Name             *string             `json:"name"`
-	Description      *string             `json:"description"`
-	Category         *ListingCategory    `json:"category"`
-	Price            *int64              `json:"price"`
-	Location         *string             `json:"location"`
-	Coordinates      *geo.Point          `json:"coordinates"`
-	Status           ListingStatus       `json:"status"`
-	Featured         bool                `json:"featured"`
-	ShortDescription *string             `json:"short_description"`
-	Cancellation     ListingCancellation `json:"cancellation"`
-	DurationMinutes  *int64              `json:"duration_minutes"`
-	MaxGuests        *int64              `json:"max_guests"`
-	Highlights       pq.StringArray      `json:"highlights" gorm:"type:varchar(160)[]"`
-	Includes         pq.StringArray      `json:"includes" gorm:"type:varchar(160)[]"`
-	NotIncluded      pq.StringArray      `json:"not_included" gorm:"type:varchar(160)[]"`
-	AvailabilityType AvailabilityType    `json:"availability_type"`
+	UserID              int64               `json:"user_id"`
+	Name                *string             `json:"name"`
+	Description         *string             `json:"description"`
+	Category            *ListingCategory    `json:"category"`
+	Price               *int64              `json:"price"`
+	Location            *string             `json:"location"`
+	Coordinates         *geo.Point          `json:"coordinates"`
+	Status              ListingStatus       `json:"status"`
+	Featured            bool                `json:"featured"`
+	ShortDescription    *string             `json:"short_description"`
+	Cancellation        ListingCancellation `json:"cancellation"`
+	DurationMinutes     *int64              `json:"duration_minutes"`
+	MaxGuests           *int64              `json:"max_guests"`
+	Highlights          pq.StringArray      `json:"highlights" gorm:"type:varchar(160)[]"`
+	Includes            pq.StringArray      `json:"includes" gorm:"type:varchar(160)[]"`
+	NotIncluded         pq.StringArray      `json:"not_included" gorm:"type:varchar(160)[]"`
+	AvailabilityType    AvailabilityType    `json:"availability_type"`
+	AvailabilityDisplay AvailabilityDisplay `json:"availability_display"`
 
 	BaseModel
 }

@@ -6,22 +6,23 @@ import (
 )
 
 type Listing struct {
-	ID               int64                      `json:"id"`
-	Name             *string                    `json:"name"`
-	Description      *string                    `json:"description"`
-	Category         *models.ListingCategory    `json:"category"`
-	Price            *int64                     `json:"price"`
-	Location         *string                    `json:"location"`
-	Coordinates      *Coordinates               `json:"coordinates"`
-	ShortDescription *string                    `json:"short_description"`
-	Cancellation     models.ListingCancellation `json:"cancellation"`
-	DurationMinutes  *int64                     `json:"duration_minutes"`
-	MaxGuests        *int64                     `json:"max_guests"`
-	Highlights       []string                   `json:"highlights"`
-	Includes         []string                   `json:"includes"`
-	NotIncluded      []string                   `json:"not_included"`
-	Status           models.ListingStatus       `json:"status"`
-	AvailabilityType models.AvailabilityType    `json:"availability_type"`
+	ID                  int64                      `json:"id"`
+	Name                *string                    `json:"name"`
+	Description         *string                    `json:"description"`
+	Category            *models.ListingCategory    `json:"category"`
+	Price               *int64                     `json:"price"`
+	Location            *string                    `json:"location"`
+	Coordinates         *Coordinates               `json:"coordinates"`
+	ShortDescription    *string                    `json:"short_description"`
+	Cancellation        models.ListingCancellation `json:"cancellation"`
+	DurationMinutes     *int64                     `json:"duration_minutes"`
+	MaxGuests           *int64                     `json:"max_guests"`
+	Highlights          []string                   `json:"highlights"`
+	Includes            []string                   `json:"includes"`
+	NotIncluded         []string                   `json:"not_included"`
+	Status              models.ListingStatus       `json:"status"`
+	AvailabilityType    models.AvailabilityType    `json:"availability_type"`
+	AvailabilityDisplay models.AvailabilityDisplay `json:"availability_display"`
 
 	Host Host `json:"host"`
 
@@ -66,22 +67,23 @@ func ConvertListing(listing listings.ListingDetails) Listing {
 		coordinates = &Coordinates{Latitude: listing.Coordinates.Latitude, Longitude: listing.Coordinates.Longitude}
 	}
 	return Listing{
-		ID:               listing.ID,
-		Name:             listing.Name,
-		Description:      listing.Description,
-		Category:         listing.Category,
-		Price:            listing.Price,
-		Location:         listing.Location,
-		Coordinates:      coordinates,
-		ShortDescription: listing.ShortDescription,
-		Cancellation:     listing.Cancellation,
-		DurationMinutes:  listing.DurationMinutes,
-		MaxGuests:        listing.MaxGuests,
-		Highlights:       listing.Highlights,
-		Includes:         listing.Includes,
-		NotIncluded:      listing.NotIncluded,
-		Status:           listing.Status,
-		AvailabilityType: listing.AvailabilityType,
+		ID:                  listing.ID,
+		Name:                listing.Name,
+		Description:         listing.Description,
+		Category:            listing.Category,
+		Price:               listing.Price,
+		Location:            listing.Location,
+		Coordinates:         coordinates,
+		ShortDescription:    listing.ShortDescription,
+		Cancellation:        listing.Cancellation,
+		DurationMinutes:     listing.DurationMinutes,
+		MaxGuests:           listing.MaxGuests,
+		Highlights:          listing.Highlights,
+		Includes:            listing.Includes,
+		NotIncluded:         listing.NotIncluded,
+		Status:              listing.Status,
+		AvailabilityType:    listing.AvailabilityType,
+		AvailabilityDisplay: listing.AvailabilityDisplay,
 
 		Host: ConvertHost(listing.Host),
 

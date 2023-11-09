@@ -94,6 +94,7 @@ export interface Listing {
   languages: string[] | undefined;
   status: ListingStatus;
   availability_type: AvailabilityTypeType;
+  availability_display: AvailabilityDisplayType;
 
   host: Host;
 
@@ -154,6 +155,7 @@ export interface ListingInput {
   includes?: string[];
   not_included?: string[];
   availability_type?: AvailabilityTypeType;
+  availability_display?: AvailabilityDisplayType;
 }
 
 export interface CreateCheckoutLinkRequest {
@@ -310,3 +312,6 @@ export type CategoryType = z.infer<typeof Category>;
 
 export const AvailabilityType = z.enum(["date", "datetime"]);
 export type AvailabilityTypeType = z.infer<typeof AvailabilityType>;
+
+export const AvailabilityDisplay = z.enum(["calendar", "list"]);
+export type AvailabilityDisplayType = z.infer<typeof AvailabilityDisplay>;

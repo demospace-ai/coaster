@@ -177,11 +177,13 @@ const SignedInMenu: React.FC<{ user: User; onHostApp?: boolean }> = ({ user, onH
                   </Menu.Item>
                 </div>
                 <div className="tw-flex tw-flex-col tw-m-2 tw-pt-2">
-                  <Menu.Item>
-                    <Link className={navItem} href="/reservations">
-                      Your reservations
-                    </Link>
-                  </Menu.Item>
+                  {!onHostApp && (
+                    <Menu.Item>
+                      <Link className={navItem} href="/reservations">
+                        Your reservations
+                      </Link>
+                    </Menu.Item>
+                  )}
                   <Menu.Item>
                     <Link className={navItem} href="/profile">
                       View profile
@@ -341,9 +343,11 @@ const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
                                 Welcome, {user?.first_name}
                               </p>
                             </div>
-                            <Link className={navItem} href="/reservations" onClick={() => setOpen(false)}>
-                              Your Reservations
-                            </Link>
+                            {!onHostApp && (
+                              <Link className={navItem} href="/reservations" onClick={() => setOpen(false)}>
+                                Your Reservations
+                              </Link>
+                            )}
                             <Link className={navItem} href="/profile" onClick={() => setOpen(false)}>
                               View profile
                             </Link>

@@ -263,6 +263,10 @@ func UpdateListing(db *gorm.DB, listing *models.Listing, listingUpdates input.Li
 		}
 	}
 
+	if listingUpdates.AvailabilityDisplay != nil {
+		listing.AvailabilityDisplay = *listingUpdates.AvailabilityDisplay
+	}
+
 	// TODO: only admins can make the status published
 	if listingUpdates.Status != nil && *listingUpdates.Status != models.ListingStatusPublished {
 		listing.Status = *listingUpdates.Status

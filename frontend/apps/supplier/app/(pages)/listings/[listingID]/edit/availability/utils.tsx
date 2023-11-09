@@ -1,5 +1,12 @@
 import { TimeInput } from "@coaster/components/input/Input";
-import { AvailabilityRuleType, AvailabilityRuleTypeType, AvailabilityType, AvailabilityTypeType } from "@coaster/types";
+import {
+  AvailabilityDisplay,
+  AvailabilityDisplayType,
+  AvailabilityRuleType,
+  AvailabilityRuleTypeType,
+  AvailabilityType,
+  AvailabilityTypeType,
+} from "@coaster/types";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { eachDayOfInterval } from "date-fns";
 import { FieldArrayWithId } from "react-hook-form";
@@ -121,6 +128,17 @@ export function getAvailabilityTypeDisplay(value: AvailabilityTypeType) {
       return "Full day (customer just chooses a date)";
     case AvailabilityType.Enum.datetime:
       return "Date and time (customer chooses a date and time slot)";
+    default:
+      return "";
+  }
+}
+
+export function getAvailabilityDisplayString(value: AvailabilityDisplayType) {
+  switch (value) {
+    case AvailabilityDisplay.Enum.list:
+      return "List (for trips with limited availability)";
+    case AvailabilityDisplay.Enum.calendar:
+      return "Calendar (default)";
     default:
       return "";
   }

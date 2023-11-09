@@ -6,12 +6,20 @@ import { Loading } from "@coaster/components/loading/Loading";
 import { Modal } from "@coaster/components/modal/Modal";
 import { updateListing, useAvailabilityRules } from "@coaster/rpc/client";
 import { DeleteAvailabilityRule, GetAvailabilityRules, sendRequest } from "@coaster/rpc/common";
-import { AvailabilityRule, AvailabilityType, AvailabilityTypeType, Listing } from "@coaster/types";
+import {
+  AvailabilityDisplay,
+  AvailabilityDisplayType,
+  AvailabilityRule,
+  AvailabilityType,
+  AvailabilityTypeType,
+  Listing,
+} from "@coaster/types";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { ReactNode, useState } from "react";
 import { NewRuleForm } from "supplier/app/(pages)/listings/[listingID]/edit/availability/NewAvailabilityRule";
 import { ExistingRuleForm } from "supplier/app/(pages)/listings/[listingID]/edit/availability/UpdateAvailabilityRules";
 import {
+  getAvailabilityDisplayString,
   getAvailabilityRuleTypeDisplay,
   getAvailabilityTypeDisplay,
 } from "supplier/app/(pages)/listings/[listingID]/edit/availability/utils";
@@ -43,6 +51,10 @@ export default function Availability(): ReactNode {
     }
   };
 
+  const updateAvailabilityDisplay = (value: AvailabilityDisplayType) => {
+    return updateListing(listing.id, { availability_display: value });
+  };
+
   const tableHeaderCell = "tw-w-1/6 tw-p-4";
   const tableRowCell = "tw-p-4";
 
@@ -68,12 +80,20 @@ export default function Availability(): ReactNode {
       />
       <div className="tw-text-2xl tw-font-semibold tw-mb-2">Availability</div>
       <DropdownInput
-        className="tw-w-full tw-flex tw-mt-3"
+        className="tw-w-full tw-flex tw-mt-3 tw-mb-2"
         label="Availability Type"
         value={listing.availability_type}
         options={AvailabilityType.options}
         onChange={onChangeAvailabilityType}
         getElementForDisplay={getAvailabilityTypeDisplay}
+      />
+      <DropdownInput
+        className="tw-w-full tw-flex tw-mt-3"
+        label="Availability Display"
+        value={listing.availability_display}
+        options={AvailabilityDisplay.options}
+        onChange={updateAvailabilityDisplay}
+        getElementForDisplay={getAvailabilityDisplayString}
       />
       <div className="tw-text-xl tw-font-medium tw-mt-8 tw-mb-4">Availability Rules</div>
       <div className="tw-rounded-lg tw-border tw-border-solid tw-border-slate-200 tw-overflow-x-auto">

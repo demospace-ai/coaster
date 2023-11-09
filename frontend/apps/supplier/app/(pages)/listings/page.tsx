@@ -65,7 +65,7 @@ export default async function YourListings() {
                 <tbody className="tw-divide-y tw-divide-gray-200 tw-bg-white">
                   {hosted.map((listing: Listing) => (
                     <tr key={listing.id}>
-                      <td className="tw-whitespace-nowrap tw-py-4 tw-pl-4 tw-pr-3 tw-text-sm tw-font-medium tw-text-gray-900 sm:tw-pl-6 tw-cursor-pointer">
+                      <td className="tw-whitespace-nowrap tw-py-4 tw-pl-4 tw-pr-3 tw-text-sm tw-font-medium tw-text-gray-900 sm:tw-pl-6">
                         <NavLink href={`/listings/${listing.id}/edit`}>{listing.name}</NavLink>
                       </td>
                       <td className="tw-whitespace-nowrap tw-px-3 tw-py-4 tw-text-sm tw-text-gray-500">

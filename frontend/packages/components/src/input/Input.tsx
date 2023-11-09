@@ -201,6 +201,8 @@ export type DropdownInputProps = {
   disabled?: boolean;
   multiple?: boolean;
   closeOnSelect?: boolean;
+  wrapperClass?: string;
+  placeholder?: ReactNode;
 };
 
 // TODO: use ref
@@ -245,8 +247,9 @@ export const DropdownInput: React.FC<DropdownInputProps> = forwardRef((props, re
         props.onChange(e);
       }}
     >
-      <div className="tw-relative tw-flex">
+      <div className={mergeClasses("tw-relative tw-flex", props.wrapperClass)}>
         <Transition
+          as={Fragment}
           show={showLabel}
           enter="tw-transition tw-ease tw-duration-200 tw-transform"
           enterFrom="tw-translate-y-4 tw-opacity-10"
@@ -288,7 +291,7 @@ export const DropdownInput: React.FC<DropdownInputProps> = forwardRef((props, re
             />
           </span>
         </Listbox.Button>
-        <FloatingPortal root={document.body}>
+        <FloatingPortal>
           <div className="tw-relative tw-z-[99]" ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
             <Transition
               as={Fragment}
