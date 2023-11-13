@@ -8,6 +8,7 @@ export async function generateMetadata({ params }: { params: { listingID: string
   const listing = await getListingServer(Number(params.listingID));
   return {
     title: listing ? listing.name : "Listing not found",
+    description: listing ? listing.short_description : "",
     metadataBase: isProd() ? "https://trycoaster.com" : "http://localhost:3000",
   };
 }
