@@ -51,8 +51,8 @@ func (s ApiService) UpdateAvailability(auth auth.Authentication, w http.Response
 		return errors.Wrap(err, "(api.UpdateAvailability) validating request")
 	}
 
-	// Make sure this user has ownership of this listing if the user is not an admin
-	_, err = listings.LoadByIDAndUserID(s.db, auth.User.ID, listingID)
+	// Make sure this user has ownership of this listing or is an admin
+	_, err = listings.LoadByIDAndUser(s.db, listingID, auth.User)
 	if err != nil {
 		return errors.Wrapf(err, "(api.UpdateAvailability) loading listing %d for user %d", listingID, auth.User.ID)
 	}

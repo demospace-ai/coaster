@@ -79,21 +79,6 @@ func LoadByIDAndUser(db *gorm.DB, listingID int64, user *models.User) (*models.L
 	return &listing, nil
 }
 
-func LoadByIDAndUserID(db *gorm.DB, userID int64, listingID int64) (*models.Listing, error) {
-	var listing models.Listing
-	result := db.Table("listings").
-		Select("listings.*").
-		Where("listings.id = ?", listingID).
-		Where("listings.user_id = ?", userID).
-		Where("listings.deactivated_at IS NULL").
-		Take(&listing)
-	if result.Error != nil {
-		return nil, errors.Wrap(result.Error, "(listings.LoadUserListingByID)")
-	}
-
-	return &listing, nil
-}
-
 func LoadAllByUserID(db *gorm.DB, userID int64) ([]ListingDetails, error) {
 	// No need to check if the listings are published since the user can always see their own listings
 	var listings []models.Listing

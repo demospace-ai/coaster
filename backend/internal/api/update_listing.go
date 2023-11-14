@@ -11,7 +11,6 @@ import (
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/input"
 	"go.fabra.io/server/common/maps"
-	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/repositories/listings"
 	"go.fabra.io/server/common/views"
 )
@@ -43,20 +42,10 @@ func (s ApiService) UpdateListing(auth auth.Authentication, w http.ResponseWrite
 		return errors.Wrap(err, "(api.UpdateListing) validating request")
 	}
 
-	// Make sure this user has ownership of this listing if the user is not an admin
-	var listing *models.Listing
-	if auth.User.IsAdmin {
-		listingDetails, err := listings.LoadDetailsByIDAndUser(s.db, listingID, auth.User)
-		if err != nil {
-			return errors.Wrapf(err, "(api.UpdateListing) loading listing %d for user %d", listingID, auth.User.ID)
-		}
-
-		listing = &listingDetails.Listing
-	} else {
-		listing, err = listings.LoadByIDAndUserID(s.db, auth.User.ID, listingID)
-		if err != nil {
-			return errors.Wrapf(err, "(api.UpdateListing) loading listing %d for user %d", listingID, auth.User.ID)
-		}
+	// Make sure this user has ownership of this listing or is an admin
+	listing, err := listings.LoadByIDAndUser(s.db, listingID, auth.User)
+	if err != nil {
+		return errors.Wrapf(err, "(api.UpdateListing) loading listing %d for user %d", listingID, auth.User.ID)
 	}
 
 	if updateListingRequest.Location != nil {

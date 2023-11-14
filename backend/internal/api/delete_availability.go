@@ -33,7 +33,8 @@ func (s ApiService) DeleteAvailability(auth auth.Authentication, w http.Response
 		return errors.Wrap(err, "(api.DeleteAvailability)")
 	}
 
-	_, err = listings.LoadByIDAndUserID(s.db, auth.User.ID, listingID)
+	// Make sure this user has ownership of this listing or is an admin
+	_, err = listings.LoadByIDAndUser(s.db, listingID, auth.User)
 	if err != nil {
 		return errors.Wrap(err, "(api.DeleteAvailability) validating request")
 	}

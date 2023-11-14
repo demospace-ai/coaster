@@ -35,12 +35,10 @@ func (s ApiService) UpdateListingImages(auth auth.Authentication, w http.Respons
 		return errors.Wrap(err, "(api.UpdateListingImages) decoding request")
 	}
 
-	// Make sure this user has ownership of this listing if the user is not an admin
-	if !auth.User.IsAdmin {
-		_, err = listings.LoadByIDAndUserID(s.db, auth.User.ID, listingID)
-		if err != nil {
-			return errors.Wrapf(err, "(api.DeleteListingImage) loading listing %d for user %d", listingID, auth.User.ID)
-		}
+	// Make sure this user has ownership of this listing or is an admin
+	_, err = listings.LoadByIDAndUser(s.db, listingID, auth.User)
+	if err != nil {
+		return errors.Wrapf(err, "(api.DeleteListingImage) loading listing %d for user %d", listingID, auth.User.ID)
 	}
 
 	// TODO: do this transactionally or figure out something to handle failures
