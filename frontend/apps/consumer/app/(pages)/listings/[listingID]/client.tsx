@@ -434,6 +434,9 @@ export const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) =>
     maxGuests,
   } = useBookingState(listing);
 
+  console.log(listing.availability_display);
+  console.log(listing.availability_type);
+
   return (
     <div className="tw-hidden lg:tw-flex tw-w-[400px] tw-min-w-[400px] tw-max-w-[400px]">
       <div className="tw-sticky tw-top-32 tw-flex tw-flex-col tw-px-8 tw-py-6 tw-w-full tw-h-fit tw-border tw-border-solid tw-border-gray-300 tw-rounded-xl tw-shadow-centered-sm">
