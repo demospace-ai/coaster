@@ -10,6 +10,11 @@ export async function generateMetadata({ params }: { params: { listingID: string
     title: listing ? listing.name : "Listing not found",
     description: listing ? listing.short_description : "",
     metadataBase: isProd() ? "https://trycoaster.com" : "http://localhost:3000",
+    twitter: {
+      card: "summary_large_image",
+      title: listing ? listing.name : "Coaster - Find your next adventure",
+      description: listing ? listing.short_description : "",
+    },
   };
 }
 
