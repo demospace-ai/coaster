@@ -7,9 +7,12 @@ export const dynamic = "force-static";
 export async function generateMetadata({ params }: { params: { listingID: string } }) {
   const listing = await getListingServer(Number(params.listingID));
   return {
-    title: listing ? listing.name : "Listing not found",
+    title: listing ? listing.name : "Coaster - Find your next adventure",
     description: listing ? listing.short_description : "",
     metadataBase: isProd() ? "https://trycoaster.com" : "http://localhost:3000",
+    openGraph: {
+      title: listing ? listing.name : "Coaster - Find your next adventure",
+    },
     twitter: {
       card: "summary_large_image",
       title: listing ? listing.name : "Coaster - Find your next adventure",
