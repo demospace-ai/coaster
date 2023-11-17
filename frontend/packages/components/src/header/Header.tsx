@@ -464,9 +464,9 @@ const SwitchToHostingLink: React.FC<{
   const link = user?.is_host ? baseLink : baseLink + "/listings/new";
   const text = user?.is_host ? "Switch to hosting" : "Apply as a guide";
   return (
-    <div className={props.className} onClick={props.onClick}>
-      <a href={link}>{text}</a>
-    </div>
+    <Link className={props.className} onClick={props.onClick} href={link}>
+      {text}
+    </Link>
   );
 };
 

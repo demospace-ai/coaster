@@ -11,7 +11,7 @@ export const NameSchema = z
 export const DescriptionSchema = z
   .string()
   .min(4, "Your description must be at least 4 characters long.")
-  .max(1500, "Descriptions can be up to 1500 characters long.");
+  .max(15000, "Descriptions can be up to 15,000 characters long.");
 
 export const PriceSchema = z
   .number({ invalid_type_error: "The minimum price is $1." })
