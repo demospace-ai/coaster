@@ -442,7 +442,7 @@ export const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) =>
         <div>
           <span className="tw-text-2xl tw-font-semibold tw-mb-3">${listing.price}</span> per person
         </div>
-        <div className="tw-flex tw-w-full tw-mt-3 tw-mb-5">
+        <div className="tw-flex tw-w-full tw-mt-3">
           {listing.availability_display === AvailabilityDisplay.Enum.calendar ? (
             <DatePickerPopper
               className="tw-w-3/4 tw-mr-2"
@@ -488,7 +488,7 @@ export const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) =>
           <RadioGroup
             value={startTime ? startTime : null}
             onChange={setStartTime}
-            className="tw-flex tw-columns-3 tw-justify-start tw-gap-3 tw-mb-5"
+            className="tw-flex tw-columns-3 tw-justify-start tw-gap-3 tw-mt-5"
           >
             {timeSlots.map((timeSlot) => (
               <RadioGroup.Option
@@ -517,7 +517,7 @@ export const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) =>
           </RadioGroup>
         )}
         <Button
-          className="tw-font-medium tw-mb-4 tw-tracking-[0.5px] tw-h-10"
+          className="tw-font-medium tw-mt-5 tw-mb-4 tw-tracking-[0.5px] tw-h-10"
           disabled={!startDate || (listing.availability_type === AvailabilityType.Enum.datetime && !startTime)}
           onClick={tryToReserve}
         >

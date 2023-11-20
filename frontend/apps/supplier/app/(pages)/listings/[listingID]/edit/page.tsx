@@ -5,8 +5,7 @@ import { FormError } from "@coaster/components/error/FormError";
 import { ComboInput, Input, PriceInput, TextArea } from "@coaster/components/input/Input";
 import { Loading } from "@coaster/components/loading/Loading";
 import { InlineMapSearch } from "@coaster/components/maps/Maps";
-import { useNotificationContext } from "@coaster/rpc/client";
-import { UpdateListing, sendRequest } from "@coaster/rpc/common";
+import { updateListing, useNotificationContext } from "@coaster/rpc/client";
 import { Category, ListingInput } from "@coaster/types";
 import { toTitleCase } from "@coaster/utils/common";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -54,7 +53,7 @@ export default function Details() {
     },
   });
 
-  const updateListing = async (values: EditListingDetailsSchemaType) => {
+  const onSubmit = async (values: EditListingDetailsSchemaType) => {
     if (!formState.isDirty) {
       return;
     }
@@ -70,10 +69,7 @@ export default function Details() {
     formState.dirtyFields.availabilityType && (payload.availability_type = values.availabilityType);
 
     try {
-      await sendRequest(UpdateListing, {
-        pathParams: { listingID: listing.id },
-        payload,
-      });
+      await updateListing(listing.id, payload);
 
       reset({}, { keepValues: true });
 
@@ -84,7 +80,7 @@ export default function Details() {
   };
 
   return (
-    <form className="tw-w-full" onSubmit={handleSubmit(updateListing)}>
+    <form className="tw-w-full" onSubmit={handleSubmit(onSubmit)}>
       <div className="tw-text-2xl tw-font-semibold tw-mb-2">Listing Basics</div>
       <Input className="tw-w-full tw-flex tw-mt-3" label="Name" {...register("name")} value={watch("name")} />
       <FormError message={formState.errors.name?.message} />

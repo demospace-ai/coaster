@@ -2,15 +2,20 @@ import { ErrorBoundary } from "@coaster/components/error/ErrorBoundary";
 import { IntercomInit } from "@coaster/components/intercom/IntercomInit";
 import { isProd, worksans } from "@coaster/utils/common";
 import { HighlightInit } from "@highlight-run/next/client";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 
 import "supplier/app/global.css";
 
 export const metadata: Metadata = {
   title: "Coaster",
   description: "Coaster - Curated adventures",
+};
+
+export const viewport: Viewport = {
   themeColor: "#001827",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

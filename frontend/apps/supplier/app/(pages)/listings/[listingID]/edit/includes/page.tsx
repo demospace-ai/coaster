@@ -4,8 +4,7 @@ import { Button } from "@coaster/components/button/Button";
 import { FormError } from "@coaster/components/error/FormError";
 import { Input } from "@coaster/components/input/Input";
 import { Loading } from "@coaster/components/loading/Loading";
-import { useNotificationContext } from "@coaster/rpc/client";
-import { UpdateListing, sendRequest } from "@coaster/rpc/common";
+import { updateListing, useNotificationContext } from "@coaster/rpc/client";
 import { ListingInput } from "@coaster/types";
 import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -34,7 +33,7 @@ export default function Includes() {
     },
   });
 
-  const updateListing = async (values: EditListingIncludesSchemaType) => {
+  const onSubmit = async (values: EditListingIncludesSchemaType) => {
     if (!formState.isDirty) {
       return;
     }
@@ -51,10 +50,7 @@ export default function Includes() {
         .map((not_included) => not_included.value));
 
     try {
-      await sendRequest(UpdateListing, {
-        pathParams: { listingID: listing.id },
-        payload,
-      });
+      await updateListing(listing.id, payload);
 
       reset({}, { keepValues: true });
 
@@ -83,7 +79,7 @@ export default function Includes() {
   });
 
   return (
-    <form className="tw-w-full" onSubmit={handleSubmit(updateListing)}>
+    <form className="tw-w-full" onSubmit={handleSubmit(onSubmit)}>
       <div className="tw-flex tw-flex-col">
         <div className="tw-text-2xl tw-font-semibold tw-mb-2">Included Amenities</div>
         <div className="tw-flex tw-flex-col tw-gap-3">

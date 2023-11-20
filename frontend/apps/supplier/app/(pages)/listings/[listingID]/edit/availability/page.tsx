@@ -38,8 +38,12 @@ export default function Availability(): ReactNode {
     return <Loading />;
   }
 
-  const updateAvailabilityType = (value: AvailabilityTypeType) => {
-    return updateListing(listing.id, { availability_type: value });
+  const updateAvailabilityType = async (value: AvailabilityTypeType) => {
+    try {
+      return await updateListing(listing.id, { availability_type: value });
+    } catch (e) {
+      // TODO: error
+    }
   };
 
   const onChangeAvailabilityType = (value: AvailabilityTypeType) => {
@@ -51,8 +55,12 @@ export default function Availability(): ReactNode {
     }
   };
 
-  const updateAvailabilityDisplay = (value: AvailabilityDisplayType) => {
-    return updateListing(listing.id, { availability_display: value });
+  const updateAvailabilityDisplay = async (value: AvailabilityDisplayType) => {
+    try {
+      return await updateListing(listing.id, { availability_display: value });
+    } catch (e) {
+      // TODO: error
+    }
   };
 
   const tableHeaderCell = "tw-w-1/6 tw-p-4";
@@ -230,7 +238,6 @@ const UpdateAvailabilityTypeModal: React.FC<{
     setUpdating(true);
     try {
       await updateListing(listing.id, { availability_type: newAvailabilityType });
-
       mutate({ GetAvailabilityRules, listingID: listing.id }, []);
       closeModal();
     } catch (e) {}

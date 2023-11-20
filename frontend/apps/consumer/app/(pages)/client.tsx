@@ -214,6 +214,7 @@ export const DynamicHeader: React.FC = () => {
               lateef.className,
               "tw-max-w-[150px] tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-tracking-[-0.5px] tw-mt-[-2px] tw-font-bold tw-text-[48px]",
             )}
+            translate="no"
           >
             Coaster
           </div>

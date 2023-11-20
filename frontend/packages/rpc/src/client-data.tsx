@@ -6,6 +6,7 @@ import {
   AvailabilityRuleInput,
   AvailabilityRuleUpdates,
   CreateCheckoutLinkRequest,
+  Image,
   Listing,
   ListingInput,
   PayoutMethod,
@@ -37,10 +38,15 @@ import {
   ResetPassword,
   SearchListings,
   UpdateAvailabilityRule,
-  UpdateListing,
   UpdateProfilePicture,
   UpdateUser,
 } from "./api";
+import {
+  addListingImagesServerAction,
+  deleteListingImagesServerAction,
+  updateListingImagesServerAction,
+  updateListingServerAction,
+} from "./server-actions";
 
 // TODO: this isn't the right place for this so reorganize later
 // We use context so that we can populate the initial user from the server-side fetch
@@ -193,37 +199,6 @@ export function useAvailabilityRules(listingID: number | undefined) {
   };
 }
 
-export function useUpdateListing(listingID: number): Mutation<ListingInput> {
-  return useMutation<Listing, ListingInput>(
-    async (updates: ListingInput) => {
-      return await sendRequest(UpdateListing, {
-        pathParams: { listingID },
-        payload: updates,
-      });
-    },
-    {
-      onSuccess: (listing: Listing) => {
-        mutate({ GetDraftListing }, listing);
-        mutate({ GetListing, listingID }, listing);
-      },
-    },
-  );
-}
-
-export async function updateListing(listingID: number, updates: ListingInput) {
-  try {
-    const listing = await sendRequest(UpdateListing, {
-      pathParams: { listingID },
-      payload: updates,
-    });
-    mutate({ GetDraftListing });
-    mutate({ GetListing, listingID }, listing);
-    return { success: true, error: "" };
-  } catch (e) {
-    return { success: false, error: forceErrorMessage(e) };
-  }
-}
-
 export async function createListing(input: ListingInput) {
   try {
     const listing = await sendRequest(CreateListing, { payload: input });
@@ -232,6 +207,33 @@ export async function createListing(input: ListingInput) {
   } catch (e) {
     return { success: false, error: forceErrorMessage(e) };
   }
+}
+
+export async function updateListing(listingID: number, updates: ListingInput, isDraft?: boolean) {
+  const listing = await updateListingServerAction(listingID, updates);
+  isDraft && mutate({ GetDraftListing });
+  mutate({ GetListing, listingID }, listing);
+}
+
+export async function updateListingImages(listingID: number, images: Image[], isDraft?: boolean) {
+  const listing = await updateListingImagesServerAction(listingID, images);
+  isDraft && mutate({ GetDraftListing });
+  mutate({ GetListing, listingID }, listing);
+}
+
+export async function addListingImage(listing: Listing, imageFormData: FormData, isDraft?: boolean): Promise<Image> {
+  const listingImage = await addListingImagesServerAction(listing.id, imageFormData);
+  isDraft && mutate({ GetDraftListing });
+  mutate({ GetListing, listingID: listing.id }, { ...listing, images: [...listing.images, listingImage] });
+  return listingImage;
+}
+
+export async function deleteListingImage(listing: Listing, imageID: number, isDraft?: boolean): Promise<Image[]> {
+  await deleteListingImagesServerAction(listing.id, imageID);
+  isDraft && mutate({ GetDraftListing });
+  const newImages = listing.images.filter((item) => item.id !== imageID);
+  mutate({ GetListing, listingID: listing.id }, { ...listing, images: newImages });
+  return newImages;
 }
 
 export function useUpdateAvailabilityRule(

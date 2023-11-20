@@ -1,16 +1,20 @@
 import { ErrorBoundary } from "@coaster/components/error/ErrorBoundary";
-import { IntercomInit } from "@coaster/components/intercom/IntercomInit";
 import { isProd, worksans } from "@coaster/utils/common";
 import { HighlightInit } from "@highlight-run/next/client";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 
 import "consumer/app/global.css";
 
 export const metadata: Metadata = {
   title: "Coaster",
   description: "Coaster - Curated adventures",
+};
+
+export const viewport: Viewport = {
   themeColor: "#ffffff",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -28,7 +32,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           recordHeadersAndBody: true,
         }}
       />
-      <IntercomInit />
       <html lang="en" className={worksans.className}>
         <body>
           <div id="root" className="tw-w-full tw-h-full tw-flex tw-flex-col">

@@ -39,7 +39,7 @@ export const LinkButton: React.FC<LinkButtonProps> = forwardRef<HTMLAnchorElemen
   const { href, className, children, ...remaining } = props;
 
   const buttonStyle = mergeClasses(
-    "tw-flex tw-items-center tw-justify-center tw-text-white tw-bg-blue-950 hover:tw-bg-blue-900tw-tracking-[1px] tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-transition tw-select-none",
+    "tw-flex tw-items-center tw-justify-center tw-text-white tw-bg-blue-950 hover:tw-bg-blue-900 tw-tracking-[1px] tw-py-1 tw-px-4 tw-cursor-pointer tw-font-bold tw-shadow-none tw-rounded-md tw-transition tw-select-none",
     props.className,
   );
   return (

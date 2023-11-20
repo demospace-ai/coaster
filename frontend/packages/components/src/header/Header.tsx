@@ -69,6 +69,7 @@ const LogoLink: React.FC = () => {
           "tw-my-auto tw-max-w-[150px] tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-tracking-[-0.5px] tw-mt-[-2px] tw-font-extrabold tw-text-[48px]",
         )}
         href="/"
+        translate="no"
       >
         Coaster
       </Link>

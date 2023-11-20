@@ -16,15 +16,8 @@ import {
 import { Input, PriceInput } from "@coaster/components/input/Input";
 import { Loading } from "@coaster/components/loading/Loading";
 import { InlineMapSearch, MapComponent, MapsWrapper } from "@coaster/components/maps/Maps";
-import { createListing, updateListing, useDraftListing, useUpdateListing } from "@coaster/rpc/client";
-import {
-  AddListingImage,
-  DeleteListingImage,
-  GetDraftListing,
-  GetListing,
-  UpdateListingImages,
-  sendRequest,
-} from "@coaster/rpc/common";
+import { createListing, updateListing, updateListingImages, useDraftListing } from "@coaster/rpc/client";
+import { AddListingImage, DeleteListingImage, GetDraftListing, GetListing, sendRequest } from "@coaster/rpc/common";
 import { CategoryType, Coordinates, Image, Listing, ListingInput, ListingStatus } from "@coaster/types";
 import { forceErrorMessage, getGcsImageUrl, isProd } from "@coaster/utils/common";
 import { EyeIcon, XMarkIcon } from "@heroicons/react/24/outline";
@@ -176,7 +169,7 @@ const NameStep: React.FC<StepProps> = (props) => {
           // No API call needed if previous value was the same
           return { success: true };
         }
-        return updateListing(listing.id, { name: data.value });
+        return updateListingWrapped(listing.id, { name: data.value });
       }}
     />
   );
@@ -198,7 +191,7 @@ const DescriptionStep: React.FC<StepProps> = (props) => {
           // No API call needed if previous value was the same
           return { success: true };
         }
-        return updateListing(listing.id, { description: data.value });
+        return updateListingWrapped(listing.id, { description: data.value });
       }}
     />
   );
@@ -222,7 +215,7 @@ const CategoryStep: React.FC<StepProps> = (props) => {
             // No API call needed if previous value was the same
             return { success: true };
           }
-          return updateListing(listing.id, { category: data as CategoryType });
+          return updateListingWrapped(listing.id, { category: data as CategoryType });
         } else {
           return createListing({ category: data as CategoryType });
         }
@@ -281,7 +274,7 @@ const ReviewStep: React.FC<StepProps> = ({ prevStep }) => {
       <WizardNavButtons
         isLastStep
         nextStep={async () => {
-          const result = await updateListing(listing.id, { status: ListingStatus.Review });
+          const result = await updateListingWrapped(listing.id, { status: ListingStatus.Review });
           if (result.success) {
             router.push("/listings");
           }
@@ -301,8 +294,12 @@ type LocationParams = {
 };
 
 const LocationStepInner: React.FC<StepProps & LocationParams> = ({ nextStep, prevStep, listing }) => {
-  const { mutate, isLoading } = useUpdateListing(listing.id);
-  const onSelect = useCallback((location: string) => mutate({ location }), []);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const onSelect = useCallback(async (location: string) => {
+    setIsLoading(true);
+    await updateListingWrapped(listing.id, { location });
+    setIsLoading(false);
+  }, []);
   const coordinates = listing.coordinates ? toGoogleCoordinates(listing.coordinates) : null;
   const [error, setError] = useState<string | undefined>(undefined);
   const onSubmit = async () => {
@@ -356,7 +353,7 @@ const PriceStepInner: React.FC<StepProps & PriceParams> = ({ nextStep, prevStep,
       // No API call needed if previous value was the same
       return { success: true, error: "" };
     }
-    return updateListing(listing.id, { price: data.value });
+    return updateListingWrapped(listing.id, { price: data.value });
   };
 
   return (
@@ -425,12 +422,7 @@ const ImageStepInner: React.FC<StepProps & ImageProps> = ({ nextStep, prevStep, 
 
   const updateImages = async () => {
     try {
-      await sendRequest(UpdateListingImages, {
-        pathParams: { listingID: listing.id },
-        payload: { images },
-      });
-
-      mutate({ GetListing, listingID: listing.id }, { ...listing, images });
+      await updateListingImages(listingID, images);
     } catch (e) {}
   };
 
@@ -551,7 +543,7 @@ const DetailsStepInner: React.FC<StepProps & DetailsParams> = ({ nextStep, prevS
       payload.max_guests = data.maxGuests;
     }
 
-    return updateListing(listing.id, payload);
+    return updateListingWrapped(listing.id, payload);
   };
 
   return (
@@ -615,4 +607,13 @@ const computeInitialStep = (listing: Listing | undefined): number => {
   }
 
   return 7;
+};
+
+const updateListingWrapped = async (listingID: number, payload: ListingInput) => {
+  try {
+    await updateListing(listingID, payload, true);
+    return { success: true, error: "" };
+  } catch (e) {
+    return { success: false, error: forceErrorMessage(e) };
+  }
 };

@@ -5,7 +5,7 @@ import { Card } from "@coaster/components/dnd/DragAndDrop";
 import { FormError } from "@coaster/components/error/FormError";
 import { Loading } from "@coaster/components/loading/Loading";
 import { Modal } from "@coaster/components/modal/Modal";
-import { AddListingImage, DeleteListingImage, GetListing, UpdateListingImages, sendRequest } from "@coaster/rpc/common";
+import { addListingImage, deleteListingImage, updateListingImages } from "@coaster/rpc/client";
 import { Image as ImageType, Listing } from "@coaster/types";
 import { forceErrorMessage, getGcsImageUrl } from "@coaster/utils/common";
 import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
@@ -15,7 +15,6 @@ import { FormEvent, useCallback, useRef, useState } from "react";
 import { DndProvider, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useListingContext } from "supplier/app/(pages)/listings/[listingID]/edit/context";
-import { mutate } from "swr";
 
 export default function Images() {
   const listing = useListingContext();
@@ -62,12 +61,7 @@ const ImagesInner: React.FC<{ listing: Listing }> = ({ listing }) => {
 
   const updateImages = async () => {
     try {
-      await sendRequest(UpdateListingImages, {
-        pathParams: { listingID: listing.id },
-        payload: { images },
-      });
-
-      mutate({ GetListing, listingID: listing.id }, { ...listing, images });
+      await updateListingImages(listing.id, images);
     } catch (e) {}
   };
 
@@ -78,15 +72,7 @@ const ImagesInner: React.FC<{ listing: Listing }> = ({ listing }) => {
         const formData = new FormData();
         formData.append("listing_image", file);
         try {
-          const listingImage = await sendRequest(AddListingImage, {
-            pathParams: { listingID: listing.id },
-            formData: formData,
-          });
-
-          mutate({ GetListing, listingID: listing.id }, (prev) => ({
-            ...prev,
-            images: [...prev.images, listingImage],
-          }));
+          const listingImage = await addListingImage(listing, formData);
           setImages((prev) => [...prev, listingImage]);
           setError(undefined);
         } catch (e) {
@@ -116,6 +102,7 @@ const ImagesInner: React.FC<{ listing: Listing }> = ({ listing }) => {
           >
             <Image
               fill
+              sizes="(max-width: 639px) 100vw, 1/2vw"
               alt="Listing image"
               className="tw-aspect-square tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-transition-all tw-duration-100 tw-rounded-lg tw-cursor-grab"
               src={getGcsImageUrl(image.storage_id)}
@@ -168,14 +155,10 @@ interface DeleteModalProps {
 const DeleteModal: React.FC<DeleteModalProps> = ({ listing, imageID, setImages, show, closeModal }) => {
   const [deleting, setDeleting] = useState(false);
   const deleteImage = async () => {
+    if (imageID === null) return; // TODO: this should not happen
     setDeleting(true);
     try {
-      await sendRequest(DeleteListingImage, {
-        pathParams: { listingID: listing.id, imageID },
-      });
-
-      const newImages = listing.images.filter((item) => item.id !== imageID);
-      mutate({ GetListing, listingID: listing.id }, { ...listing, images: newImages });
+      const newImages = await deleteListingImage(listing, imageID);
       setImages(newImages);
       closeModal();
     } catch (e) {}

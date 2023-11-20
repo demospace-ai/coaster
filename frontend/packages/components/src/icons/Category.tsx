@@ -1,15 +1,6 @@
 import { Category, CategoryType } from "@coaster/types";
 import { mergeClasses, toTitleCase } from "@coaster/utils/common";
 
-const EXCLUDED_CATEGORIES: CategoryType[] = [
-  Category.Values.buggying,
-  Category.Values.outdoors,
-  Category.Values.safari,
-  Category.Values.snorkeling,
-  Category.Values.hunting,
-  Category.Values.snowmobile,
-];
-
 type IconProps = {
   className?: string;
   strokeWidth?: string;
@@ -281,6 +272,18 @@ export function getCategoryIcon(category: CategoryType, className?: string) {
   }
 }
 
+const SEARCHABLE_CATEGORIES: CategoryType[] = [
+  Category.Values.surfing,
+  Category.Values.skiing,
+  Category.Values.hiking,
+  Category.Values.fishing,
+  Category.Values.climbing,
+  Category.Values.kitesurf,
+  Category.Values.windsurf,
+  Category.Values.wingfoil,
+  Category.Values.sup,
+];
+
 export function getSearchableCategories(): CategoryType[] {
-  return Object.values(Category.Values).filter((category) => !EXCLUDED_CATEGORIES.includes(category));
+  return SEARCHABLE_CATEGORIES;
 }
