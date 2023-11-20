@@ -282,6 +282,9 @@ const SEARCHABLE_CATEGORIES: CategoryType[] = [
   Category.Values.windsurf,
   Category.Values.wingfoil,
   Category.Values.sup,
+  Category.Values.boating,
+  Category.Values.kayaking,
+  Category.Values.yoga,
 ];
 
 export function getSearchableCategories(): CategoryType[] {
