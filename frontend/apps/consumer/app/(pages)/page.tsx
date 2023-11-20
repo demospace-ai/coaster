@@ -2,11 +2,12 @@ import { Hero } from "@coaster/assets";
 import { SearchBar } from "@coaster/components/search/SearchBar";
 import { getFeaturedServer } from "@coaster/rpc/server";
 import { Featured } from "consumer/app/(pages)/client";
+import { Viewport } from "next";
 import Image from "next/image";
 
 export const dynamic = "force-static";
 
-export const metadata = {
+export const viewport: Viewport = {
   themeColor: "#efedea",
 };
 

@@ -284,6 +284,7 @@ const SEARCHABLE_CATEGORIES: CategoryType[] = [
   Category.Values.sup,
   Category.Values.boating,
   Category.Values.kayaking,
+  Category.Values.camping,
   Category.Values.yoga,
 ];
 
