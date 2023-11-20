@@ -1,5 +1,5 @@
 import { getBookingsServer } from "@coaster/rpc/server";
-import { getStartTimeString } from "app/(pages)/reservations/[bookingReference]/page";
+import { getStartTimeString } from "app/(pages)/reservations/[bookingReference]/utils";
 import { HelpButton } from "app/(pages)/reservations/client";
 import Image from "next/image";
 import Link from "next/link";

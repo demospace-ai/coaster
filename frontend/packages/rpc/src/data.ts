@@ -1,3 +1,5 @@
+"use server";
+
 import { Booking, Listing } from "@coaster/types";
 import { HttpError } from "@coaster/utils/common";
 import { cookies } from "next/headers";
@@ -67,7 +69,7 @@ export async function getBookingsServer(): Promise<Booking[] | undefined> {
     }
 
     // This is an unexpected error, so report it
-    // TODO: consumeErrorServer(e);g
+    // TODO: consumeErrorServer(e);
   }
 }
 
