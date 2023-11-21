@@ -624,15 +624,19 @@ function useBookingState(listing: ListingType) {
   const [startTime, setStartTime] = useState<Availability | null>(null);
   const [numGuests, setNumGuests] = useState<number>(1);
 
-  var fetchStartDate: string, fetchEndDate: string;
-  if (listing.availability_display === AvailabilityDisplay.Enum.calendar) {
-    fetchStartDate = new Date(month.getFullYear(), month.getMonth(), 1).toISOString().split("T")[0];
-    fetchEndDate = new Date(month.getFullYear(), month.getMonth() + 1, 0).toISOString().split("T")[0];
-  } else {
-    fetchStartDate = new Date(month.getFullYear(), month.getMonth(), month.getDate()).toISOString().split("T")[0];
-    fetchEndDate = new Date(month.getFullYear() + 1, month.getMonth(), month.getDate()).toISOString().split("T")[0];
+  const [fetchStartDate, setFetchStartDate] = useState<Date>(new Date(month.getFullYear(), month.getMonth(), 1));
+  const [fetchEndDate, setFetchEndDate] = useState<Date>(new Date(month.getFullYear() + 1, month.getMonth(), 1));
+
+  if (month > fetchEndDate || month < fetchStartDate) {
+    setFetchStartDate(new Date(month.getFullYear(), month.getMonth() - 6, 1));
+    setFetchEndDate(new Date(month.getFullYear(), month.getMonth() + 6, 1));
   }
-  const { availability, loading } = useAvailability(listing.id, fetchStartDate, fetchEndDate);
+
+  const { availability, loading } = useAvailability(
+    listing.id,
+    fetchStartDate.toISOString().split("T")[0],
+    fetchEndDate.toISOString().split("T")[0],
+  );
 
   const createCheckoutLink = useCreateCheckoutLink({
     onSuccess: (link) => {
