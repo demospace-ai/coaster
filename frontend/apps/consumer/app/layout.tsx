@@ -1,5 +1,5 @@
+import { AtlasInit } from "@coaster/components/atlas/AtlasInit";
 import { ErrorBoundary } from "@coaster/components/error/ErrorBoundary";
-import { IntercomInit } from "@coaster/components/intercom/IntercomInit";
 import { RudderInit } from "@coaster/components/rudderstack/RudderInit";
 import { isProd, worksans } from "@coaster/utils/common";
 import { HighlightInit } from "@highlight-run/next/client";
@@ -34,7 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           recordHeadersAndBody: true,
         }}
       />
-      <IntercomInit />
+      <AtlasInit />
       <RudderInit />
       <html lang="en" className={worksans.className}>
         <body>
