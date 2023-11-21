@@ -421,7 +421,7 @@ const RecurringStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
       payload.recurring_months = values.recurring_months ?? [];
 
       // Must send empty time slot for full day listings
-      if (formValues.recurring_days.length == 0) {
+      if (formValues.recurring_days.length === 0) {
         // Empty array means every day is available
         payload.time_slots = Array(7).map((i) => ({
           day_of_week: i,
