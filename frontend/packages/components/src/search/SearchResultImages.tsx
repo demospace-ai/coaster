@@ -36,7 +36,7 @@ export const SearchResultImages: React.FC<{ listing: Listing }> = ({ listing }) 
   };
 
   const scrollBack = () => {
-    const newIndex = (imageIndex - 1) % listing.images.length;
+    const newIndex = Math.max(imageIndex - 1, 0);
     setImageIndex(newIndex);
     indicatorRefs[newIndex].current?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
     carouselRef.current?.scrollTo({
@@ -101,13 +101,14 @@ export const SearchResultImages: React.FC<{ listing: Listing }> = ({ listing }) 
       >
         {listing.images.map((image) => (
           <Image
-            fill
+            width={image.width}
+            height={image.height}
             key={image.id}
             alt="Listing image"
             sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, (max-width: 1280px) 33vw, 25vw"
             placeholder="data:image/svg+xml;base64,PHN2ZwogICAgICB3aWR0aD0iMTAwJSIKICAgICAgaGVpZ2h0PSIxMDAlIgogICAgICB2aWV3Qm94PSIwIDAgMTAwIDEwMCIKICAgICAgdmVyc2lvbj0iMS4xIgogICAgICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgICAgIHhtbG5zWGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiCiAgICA+CiAgICAgIDxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IiNlZWUiPgogICAgICAgIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9ImZpbGwiIHZhbHVlcz0iI2VlZTsjZGRkOyNlZWUiIGR1cj0iMnMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIiAvPgogICAgICA8L3JlY3Q+CiAgICA8L3N2Zz4="
             tabIndex={-1}
-            className="tw-flex-none !tw-static tw-object-cover tw-snap-center tw-snap-always tw-cursor-pointer"
+            className="tw-flex-none tw-object-cover tw-snap-center tw-snap-always tw-cursor-pointer tw-w-full tw-h-full"
             src={getGcsImageUrl(image.storage_id)}
           />
         ))}

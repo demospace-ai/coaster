@@ -34,7 +34,7 @@ export const ImagesModal: React.FC<{
   };
 
   const scrollBack = () => {
-    const newIndex = (imageIndex - 1) % listing.images.length;
+    const newIndex = Math.max(imageIndex - 1, 0);
     setImageIndex(newIndex);
     carouselRef.current?.scrollTo({ left: width * newIndex, behavior: "smooth" });
   };
