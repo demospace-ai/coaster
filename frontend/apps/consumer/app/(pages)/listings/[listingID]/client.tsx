@@ -4,6 +4,7 @@ import { Button } from "@coaster/components/button/Button";
 import { correctToUTC } from "@coaster/components/dates/utils";
 import { GuestNumberInput } from "@coaster/components/input/Input";
 import { Loading } from "@coaster/components/loading/Loading";
+import { trackEvent } from "@coaster/components/rudderstack/events";
 import { useAuthContext, useAvailability, useCreateCheckoutLink, useNotificationContext } from "@coaster/rpc/client";
 import {
   Availability,
@@ -644,6 +645,10 @@ function useBookingState(listing: ListingType) {
   });
 
   const tryToReserve = () => {
+    trackEvent("Reserve clicked", {
+      listingID: listing.id,
+    });
+
     if (user) {
       const utcDate = correctToUTC(startDate);
       if (utcDate == undefined) {

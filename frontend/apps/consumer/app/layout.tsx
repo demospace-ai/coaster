@@ -1,4 +1,6 @@
 import { ErrorBoundary } from "@coaster/components/error/ErrorBoundary";
+import { IntercomInit } from "@coaster/components/intercom/IntercomInit";
+import { RudderInit } from "@coaster/components/rudderstack/RudderInit";
 import { isProd, worksans } from "@coaster/utils/common";
 import { HighlightInit } from "@highlight-run/next/client";
 import type { Metadata, Viewport } from "next";
@@ -32,6 +34,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           recordHeadersAndBody: true,
         }}
       />
+      <IntercomInit />
+      <RudderInit />
       <html lang="en" className={worksans.className}>
         <body>
           <div id="root" className="tw-w-full tw-h-full tw-flex tw-flex-col">

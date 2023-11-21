@@ -21,7 +21,7 @@ export default async function Page() {
           <div className="tw-absolute tw-top-0 tw-left-0 tw-h-full tw-w-full">
             <Image
               fill
-              alt=""
+              alt="Hero image"
               priority
               src={Hero.src}
               sizes="100vw"

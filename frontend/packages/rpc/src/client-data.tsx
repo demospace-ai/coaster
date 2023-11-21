@@ -362,6 +362,9 @@ export function identifyUser(user: User) {
     H.identify(user.email, {
       id: user.id.toString(),
     });
+    if ((window as any).rudderanalytics) {
+      (window as any).rudderanalytics.identify(user.id.toString());
+    }
   }
 }
 
