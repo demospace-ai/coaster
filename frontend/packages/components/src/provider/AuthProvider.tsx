@@ -1,6 +1,6 @@
 "use client";
 
-import { AuthContext } from "@coaster/rpc/client";
+import { AuthContext, identifyUser } from "@coaster/rpc/client";
 import { CheckSession, sendRequest } from "@coaster/rpc/common";
 import { User } from "@coaster/types";
 import { consumeError } from "@coaster/utils/client";
@@ -15,6 +15,7 @@ function useUser() {
   const fetcher: Fetcher<User | undefined, {}> = async () => {
     try {
       const response = await sendRequest(CheckSession);
+      identifyUser(response.user);
       return response.user;
     } catch (e) {
       if (e instanceof HttpError) {
