@@ -5,8 +5,8 @@ export const HelpButton: React.FC = () => {
     <span
       className="tw-underline tw-cursor-pointer"
       onClick={() => {
-        if ((window as any).Intercom) {
-          (window as any).Intercom("show");
+        if ((window as any).Atlas) {
+          (window as any).Atlas.chat.openWindow();
         }
       }}
     >

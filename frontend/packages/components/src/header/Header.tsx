@@ -50,8 +50,8 @@ const MobileHelpButton: React.FC = () => {
     <button
       className="tw-flex sm:tw-hidden tw-font-medium"
       onClick={() => {
-        if ((window as any).Intercom) {
-          (window as any).Intercom("show");
+        if ((window as any).Atlas) {
+          (window as any).Atlas.chat.openWindow();
         }
       }}
     >
