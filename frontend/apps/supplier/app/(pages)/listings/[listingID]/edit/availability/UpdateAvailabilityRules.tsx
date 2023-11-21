@@ -437,7 +437,7 @@ const RecurringRuleUpdateForm: React.FC<{
       // Must send empty time slot for full day listings
       if (values.recurring_days.length == 0) {
         // Empty array means every day is available
-        payload.time_slots = Array.from(Array(7)).map((i) => ({
+        payload.time_slots = Array.from(Array(7)).map((_, i) => ({
           day_of_week: i,
         }));
       } else {
