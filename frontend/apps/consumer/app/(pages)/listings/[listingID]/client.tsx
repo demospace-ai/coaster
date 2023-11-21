@@ -619,14 +619,13 @@ const NullableImage: React.FC<{
 
 function useBookingState(listing: ListingType) {
   const { user, openLoginModal } = useAuthContext();
-  const [month, setMonth] = useState<Date>(new Date());
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [startTime, setStartTime] = useState<Availability | null>(null);
   const [numGuests, setNumGuests] = useState<number>(1);
 
+  const [month, setMonth] = useState<Date>(new Date());
   const [fetchStartDate, setFetchStartDate] = useState<Date>(new Date(month.getFullYear(), month.getMonth(), 1));
   const [fetchEndDate, setFetchEndDate] = useState<Date>(new Date(month.getFullYear() + 1, month.getMonth(), 1));
-
   if (month > fetchEndDate || month < fetchStartDate) {
     setFetchStartDate(new Date(month.getFullYear(), month.getMonth() - 6, 1));
     setFetchEndDate(new Date(month.getFullYear(), month.getMonth() + 6, 1));
