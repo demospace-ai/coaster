@@ -8,23 +8,24 @@ type WindowDimensions = {
 };
 
 function getWindowDimensions(): WindowDimensions {
-  const { innerWidth: width, innerHeight: height } = window;
-  return {
-    width,
-    height,
-  };
+  if (typeof window !== "undefined") {
+    const { innerWidth: width, innerHeight: height } = window;
+    return {
+      width,
+      height,
+    };
+  } else {
+    return {
+      width: 0,
+      height: 0,
+    };
+  }
 }
 
 export function useWindowDimensions(): WindowDimensions {
-  const [windowDimensions, setWindowDimensions] = useState<WindowDimensions>({
-    width: 0,
-    height: 0,
-  });
+  const [windowDimensions, setWindowDimensions] = useState<WindowDimensions>(getWindowDimensions());
 
   useEffect(() => {
-    // Set initial dimensions when running on client
-    setWindowDimensions(getWindowDimensions());
-
     function handleResize() {
       setWindowDimensions(getWindowDimensions());
     }
