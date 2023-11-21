@@ -24,6 +24,7 @@ export const AtlasInit = () => {
 
   useEffect(function atlasSnippetEntry() {
     if (typeof window.Atlas === "object") return;
+    console.log(isMobile);
 
     window.Atlas = {
       appId: "vn78sbkf0q",
