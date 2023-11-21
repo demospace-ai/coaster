@@ -28,25 +28,21 @@ export const AtlasInit = () => {
     window.Atlas = {
       appId: "vn78sbkf0q",
       v: 2,
-      q: [],
+      q: [
+        [
+          "start",
+          {
+            chat: {
+              hideBubble: isMobile,
+            },
+          },
+        ],
+      ],
       call: function () {
         this.q?.push(arguments);
       },
     };
   }, []);
 
-  return (
-    <Script
-      id="atlas-bundle"
-      src="https://app.atlas.so/client-js/atlas.bundle.js"
-      strategy="lazyOnload"
-      onLoad={() => {
-        window.Atlas?.call("start", {
-          chat: {
-            hideBubble: isMobile,
-          },
-        });
-      }}
-    />
-  );
+  return <Script id="atlas-bundle" src="https://app.atlas.so/client-js/atlas.bundle.js" strategy="lazyOnload" />;
 };
