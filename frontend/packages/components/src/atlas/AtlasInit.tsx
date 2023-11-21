@@ -1,5 +1,6 @@
 "use client";
 
+import { useIsMobile } from "@coaster/utils/client";
 import { isProd } from "@coaster/utils/common";
 import Script from "next/script";
 import { useEffect } from "react";
@@ -18,6 +19,7 @@ declare global {
 }
 
 export const AtlasInit = () => {
+  const isMobile = useIsMobile();
   if (!isProd()) return null;
 
   useEffect(function atlasSnippetEntry() {
@@ -26,12 +28,25 @@ export const AtlasInit = () => {
     window.Atlas = {
       appId: "vn78sbkf0q",
       v: 2,
-      q: [["start"]],
+      q: [],
       call: function () {
         this.q?.push(arguments);
       },
     };
   }, []);
 
-  return <Script id="atlas-bundle" src="https://app.atlas.so/client-js/atlas.bundle.js" strategy="lazyOnload" />;
+  return (
+    <Script
+      id="atlas-bundle"
+      src="https://app.atlas.so/client-js/atlas.bundle.js"
+      strategy="lazyOnload"
+      onLoad={() => {
+        window.Atlas?.call("start", {
+          chat: {
+            hideBubble: isMobile,
+          },
+        });
+      }}
+    />
+  );
 };
