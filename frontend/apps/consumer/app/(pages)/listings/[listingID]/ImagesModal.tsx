@@ -65,7 +65,10 @@ export const ImagesModal: React.FC<{
               <div ref={emblaRef} className="tw-overflow-hidden">
                 <div className="tw-flex">
                   {listing.images.map((image) => (
-                    <div className="tw-flex tw-shrink-0 tw-pt-[10vh] tw-h-[90vh] tw-w-screen tw-items-center tw-justify-center">
+                    <div
+                      key={image.id}
+                      className="tw-flex tw-shrink-0 tw-pt-[10vh] tw-h-[90vh] tw-w-screen tw-items-center tw-justify-center"
+                    >
                       <Image
                         width={image.width}
                         height={image.height}
