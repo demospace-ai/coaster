@@ -35,7 +35,7 @@ func LoadByExternalID(db *gorm.DB, externalID string) (*models.User, error) {
 func LoadByEmail(db *gorm.DB, email string) (*models.User, error) {
 	var user models.User
 	result := db.Table("users").
-		Where("users.email = ?", email).
+		Where("LOWER(users.email) = LOWER(?)", email).
 		Where("users.deactivated_at IS NULL").
 		Take(&user)
 
