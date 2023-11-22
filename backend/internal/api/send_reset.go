@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"html/template"
 	"net/http"
+	"strings"
 
 	"github.com/go-playground/validator"
 	"go.fabra.io/server/common/application"
@@ -38,7 +39,8 @@ func (s ApiService) SendReset(w http.ResponseWriter, r *http.Request) error {
 		return errors.Wrap(err, "(api.SendReset) validating request")
 	}
 
-	user, err := users.LoadByEmail(s.db, sendResetRequest.Email)
+	email := strings.ToLower(sendResetRequest.Email)
+	user, err := users.LoadByEmail(s.db, email)
 	if err != nil {
 		// TODO: return something more informative here
 		return errors.Wrap(err, "(api.SendReset) no user for this email")

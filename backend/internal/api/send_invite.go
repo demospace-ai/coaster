@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"strings"
 
 	"github.com/go-playground/validator"
 	"go.fabra.io/server/common/application"
@@ -71,6 +72,7 @@ func (s ApiService) sendInvite(email string, sender *models.User) error {
 	}
 
 	// TODO: rate limit emails
+	email = strings.ToLower(email)
 	user, err := users.LoadByEmail(s.db, email)
 	if err != nil && !errors.IsRecordNotFound(err) {
 		return errors.Wrap(err, "(api.sendInvite) unexpected error")

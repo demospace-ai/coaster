@@ -2,6 +2,7 @@ package users
 
 import (
 	"fmt"
+	"strings"
 
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/events"
@@ -35,7 +36,7 @@ func LoadByExternalID(db *gorm.DB, externalID string) (*models.User, error) {
 func LoadByEmail(db *gorm.DB, email string) (*models.User, error) {
 	var user models.User
 	result := db.Table("users").
-		Where("LOWER(users.email) = LOWER(?)", email).
+		Where("users.email = ?", email).
 		Where("users.deactivated_at IS NULL").
 		Take(&user)
 
@@ -137,7 +138,7 @@ func CreateUserForExternalInfo(db *gorm.DB, externalUserInfo *oauth.ExternalUser
 	user := models.User{
 		FirstName:           externalUserInfo.FirstName,
 		LastName:            externalUserInfo.LastName,
-		Email:               externalUserInfo.Email,
+		Email:               strings.ToLower(externalUserInfo.Email),
 		ProfilePictureURL:   &externalUserInfo.ProfilePictureURL,
 		LoginMethod:         models.LoginMethodGoogle,
 		IsHost:              false,

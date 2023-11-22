@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/go-playground/validator"
 	"go.fabra.io/server/common/auth"
@@ -42,7 +43,8 @@ func (s ApiService) CreateUser(w http.ResponseWriter, r *http.Request) error {
 		return errors.NewBadRequest("passwords do not match")
 	}
 
-	_, err = users.LoadByEmail(s.db, createUserRequest.Email)
+	email := strings.ToLower(createUserRequest.Email)
+	_, err = users.LoadByEmail(s.db, email)
 	if err == nil {
 		return errors.NewBadRequest("user already exists")
 	}
@@ -51,7 +53,7 @@ func (s ApiService) CreateUser(w http.ResponseWriter, r *http.Request) error {
 		return errors.Wrap(err, "(api.CreateUser) unexpected error loading user by email")
 	}
 
-	user, err := users.CreateUserFromEmail(s.db, createUserRequest.Email, createUserRequest.FirstName, createUserRequest.LastName, createUserRequest.Password)
+	user, err := users.CreateUserFromEmail(s.db, email, createUserRequest.FirstName, createUserRequest.LastName, createUserRequest.Password)
 	if err != nil {
 
 		return errors.Wrap(err, "(api.CreateUser) error creating user by email")

@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/go-playground/validator"
 	"go.fabra.io/server/common/auth"
@@ -36,7 +37,8 @@ func (s ApiService) EmailLogin(w http.ResponseWriter, r *http.Request) error {
 		return errors.Wrap(err, "(api.EmailLogin) validating request")
 	}
 
-	user, err := users.LoadByEmail(s.db, emailLoginRequest.Email)
+	email := strings.ToLower(emailLoginRequest.Email)
+	user, err := users.LoadByEmail(s.db, email)
 	if err != nil {
 		return errors.Wrap(err, "(api.EmailLogin) unexpected error loading user by email")
 	}

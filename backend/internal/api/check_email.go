@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/models"
@@ -24,6 +25,7 @@ func (s ApiService) CheckEmail(w http.ResponseWriter, r *http.Request) error {
 		return errors.Wrap(err, "(api.CheckEmail) error decoding email")
 	}
 
+	email = strings.ToLower(email)
 	user, err := users.LoadByEmail(s.db, email)
 	if err != nil {
 		if errors.IsRecordNotFound(err) {

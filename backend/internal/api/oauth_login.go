@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/errors"
@@ -47,7 +48,8 @@ func (s ApiService) OAuthLogin(w http.ResponseWriter, r *http.Request) error {
 
 	// try loading user by email— we trust OAuth to give us the correct email
 	if user == nil {
-		user, err = users.LoadByEmail(s.db, externalUserInfo.Email)
+		email := strings.ToLower(externalUserInfo.Email)
+		user, err = users.LoadByEmail(s.db, email)
 		if err != nil && !errors.IsRecordNotFound(err) {
 			return errors.Wrap(err, "(api.OAuthLogin) checking for matching user by email")
 		}
