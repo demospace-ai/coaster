@@ -6,7 +6,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { ChevronLeftIcon, ChevronRightIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import useEmblaCarousel from "embla-carousel-react";
 import Image from "next/image";
-import { Fragment, useCallback } from "react";
+import { Fragment, useCallback, useEffect } from "react";
 
 export const ImagesModal: React.FC<{
   show: boolean;
@@ -24,6 +24,22 @@ export const ImagesModal: React.FC<{
   }, [emblaApi]);
 
   if (emblaApi) emblaApi.scrollTo(initialIndex, true);
+
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (event.key === "ArrowRight") {
+        scrollNext();
+      } else if (event.key === "ArrowLeft") {
+        scrollPrev();
+      }
+    },
+    [scrollNext, scrollPrev],
+  );
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown, { passive: true });
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
 
   return (
     <>
