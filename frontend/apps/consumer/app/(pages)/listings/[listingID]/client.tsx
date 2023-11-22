@@ -538,6 +538,7 @@ export const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) =>
 
 export const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) => {
   const [showImages, setShowImages] = useState(false);
+  const [initialIndex, setInitialIndex] = useState(0);
   const ImagesModal = dynamic(() =>
     import("consumer/app/(pages)/listings/[listingID]/ImagesModal").then((mod) => mod.ImagesModal),
   );
@@ -550,6 +551,7 @@ export const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) =
           setShowImages(false);
         }}
         listing={listing}
+        initialIndex={initialIndex}
       />
       <div className="tw-relative tw-flex tw-w-full lg:tw-w-2/3 tw-h-full lg:tw-mr-2">
         <NullableImage
@@ -577,6 +579,7 @@ export const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) =
             className="tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
             image={listing.images[1]}
             onClick={() => {
+              setInitialIndex(1);
               setShowImages(true);
             }}
           />
@@ -588,6 +591,7 @@ export const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) =
             className="tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
             image={listing.images[2]}
             onClick={() => {
+              setInitialIndex(2);
               setShowImages(true);
             }}
           />
