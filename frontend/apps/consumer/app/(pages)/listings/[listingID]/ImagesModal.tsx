@@ -23,9 +23,7 @@ export const ImagesModal: React.FC<{
     if (emblaApi) emblaApi.scrollNext();
   }, [emblaApi]);
 
-  if (initialIndex > 0) {
-    if (emblaApi) emblaApi.scrollTo(initialIndex, true);
-  }
+  if (emblaApi) emblaApi.scrollTo(initialIndex, true);
 
   return (
     <>
