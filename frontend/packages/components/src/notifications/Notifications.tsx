@@ -27,7 +27,7 @@ export const getNotificationContentFromDetails = (notification?: NotificationOpt
       case "error":
         notificationContent = (
           <div className="tw-flex tw-flex-row tw-items-center tw-justify-start">
-            <XCircleIcon className="tw-w-5 tw-h-5 tw-text-red-500 tw-stroke-2" />
+            <XCircleIcon className="tw-shrink-0 tw-w-5 tw-h-5 tw-text-red-500 tw-stroke-2" />
             <p className="tw-ml-4 tw-text-sm tw-text-gray-900">{notification.content}</p>
           </div>
         );
@@ -35,7 +35,7 @@ export const getNotificationContentFromDetails = (notification?: NotificationOpt
       case "success":
         notificationContent = (
           <div className="tw-flex tw-flex-row tw-items-center tw-justify-start">
-            <CheckCircleIcon className="tw-w-5 tw-h-5 tw-text-green-500 tw-stroke-2" />
+            <CheckCircleIcon className="tw-shrink-0 tw-w-5 tw-h-5 tw-text-green-500 tw-stroke-2" />
             <p className="tw-ml-4 tw-text-base tw-text-gray-900">{notification.content}</p>
           </div>
         );
@@ -43,7 +43,7 @@ export const getNotificationContentFromDetails = (notification?: NotificationOpt
       case "info":
         notificationContent = (
           <div className="tw-flex tw-flex-row tw-items-center tw-justify-start">
-            <InformationCircleIcon className="tw-w-5 tw-h-5 tw-text-yellow-500 tw-stroke-2" />
+            <InformationCircleIcon className="tw-shrink-0 tw-w-5 tw-h-5 tw-text-yellow-500 tw-stroke-2" />
             <p className="tw-ml-4 tw-text-base tw-text-gray-900">{notification.content}</p>
           </div>
         );

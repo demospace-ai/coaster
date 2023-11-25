@@ -210,6 +210,11 @@ export const ReserveSlider: React.FC<{
                                   return true;
                                 }
 
+                                // Allow choosing any date if there is no availability, so we don't blocking booking
+                                if (availableDates.length === 0) {
+                                  return false;
+                                }
+
                                 for (const date of availableDates) {
                                   if (date.toDateString() === day.toDateString()) {
                                     return false;
@@ -292,7 +297,8 @@ export const ReserveSlider: React.FC<{
                           <Disclosure.Panel className="tw-flex tw-flex-col tw-w-full tw-items-center tw-pb-4 sm:tw-pb-0">
                             {timeSlots != undefined && (
                               <RadioGroup
-                                value={startTime ? startTime : null}
+                                value={startTime}
+                                by={compareAvailability}
                                 onChange={(e) => {
                                   setStartTime(e);
                                   close();
@@ -387,11 +393,7 @@ export const ReserveSlider: React.FC<{
                     onClick={() => {
                       tryToReserve();
                     }}
-                    disabled={
-                      !startDate ||
-                      (listing.availability_type === AvailabilityType.Enum.datetime && !startTime) ||
-                      numGuests === 0
-                    }
+                    disabled={!bookingSlot}
                   >
                     {createCheckoutLink.isLoading ? <Loading light /> : "Reserve"}
                   </Button>
@@ -435,6 +437,7 @@ export const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) =>
     availableDates,
     timeSlots,
     maxGuests,
+    bookingSlot,
   } = useBookingState(listing);
 
   return (
@@ -458,6 +461,12 @@ export const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) =>
                 if (day < today) {
                   return true;
                 }
+
+                // Allow choosing any date if there is no availability, so we don't blocking booking
+                if (availableDates.length === 0) {
+                  return false;
+                }
+
                 for (const date of availableDates) {
                   if (date.toDateString() === day.toDateString()) {
                     return false;
@@ -487,9 +496,10 @@ export const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) =>
         </div>
         {listing.availability_type === AvailabilityType.Enum.datetime && timeSlots != undefined && (
           <RadioGroup
-            value={startTime ? startTime : null}
+            by={compareAvailability}
+            value={startTime}
             onChange={setStartTime}
-            className="tw-flex tw-columns-3 tw-justify-start tw-gap-3 tw-mt-5"
+            className="tw-grid tw-grid-cols-2 tw-justify-start tw-gap-3 tw-mt-5"
           >
             {timeSlots.map((timeSlot) => (
               <RadioGroup.Option
@@ -502,7 +512,7 @@ export const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) =>
                 value={timeSlot}
                 className={({ checked }) =>
                   mergeClasses(
-                    "tw-px-2 tw-py-1 tw-cursor-pointer tw-rounded-lg tw-border tw-border-solid tw-border-gray-300",
+                    "tw-flex tw-items-center tw-justify-center tw-py-1 tw-cursor-pointer tw-rounded-lg tw-border tw-border-solid tw-border-gray-300",
                     checked && "tw-bg-blue-100",
                   )
                 }
@@ -519,7 +529,7 @@ export const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) =>
         )}
         <Button
           className="tw-font-medium tw-mt-5 tw-mb-4 tw-tracking-[0.5px] tw-h-10"
-          disabled={!startDate || (listing.availability_type === AvailabilityType.Enum.datetime && !startTime)}
+          disabled={!bookingSlot}
           onClick={tryToReserve}
         >
           {createCheckoutLink.isLoading ? <Loading light /> : "Reserve"}
@@ -624,6 +634,7 @@ const NullableImage: React.FC<{
 };
 
 function useBookingState(listing: ListingType) {
+  const { showNotification } = useNotificationContext();
   const { user, openLoginModal } = useAuthContext();
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [startTime, setStartTime] = useState<Availability | null>(null);
@@ -655,6 +666,12 @@ function useBookingState(listing: ListingType) {
     });
 
     if (user) {
+      if (availability === undefined || availability.length === 0) {
+        // No-op, just send the notification to us and the user
+        showNotification("success", "Requested to book! You'll hear back from us soon.", 2000);
+        return;
+      }
+
       const utcDate = correctToUTC(startDate);
       if (utcDate == undefined) {
         // TODO: show error
@@ -694,7 +711,7 @@ function useBookingState(listing: ListingType) {
   };
 
   const dateToTimeSlotMap = getDateToTimeSlotMap(availability);
-  const timeSlots = startDate ? dateToTimeSlotMap.get(startDate.toLocaleDateString()) : undefined;
+  var timeSlots = startDate ? dateToTimeSlotMap.get(startDate.toLocaleDateString()) : undefined;
   const availableDates: Date[] = Array.from(dateToTimeSlotMap.keys()).map((dateString) => new Date(dateString));
 
   var bookingSlot: Availability | null = null;
@@ -708,6 +725,31 @@ function useBookingState(listing: ListingType) {
     } else {
       // Date-only listings should only have a single time slot per day
       bookingSlot = slots[0];
+    }
+  }
+
+  // We allow setting a dummy booking slot so the user can still click reserve for listings with no availability
+  if (availability && availability.length === 0) {
+    if (startDate !== undefined) {
+      // Let the user choose any hour from 9 to 6 pm in the listing time
+      if (listing.availability_type === AvailabilityType.Enum.datetime) {
+        timeSlots = Array.from(Array(8)).map((_, i) => {
+          const datetime = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), i + 9);
+          return {
+            datetime: datetime,
+            capacity: 10,
+          };
+        });
+
+        if (startTime) {
+          bookingSlot = startTime;
+        }
+      } else {
+        bookingSlot = {
+          datetime: new Date(),
+          capacity: 0,
+        };
+      }
     }
   }
 
@@ -731,3 +773,23 @@ function useBookingState(listing: ListingType) {
     maxGuests,
   };
 }
+
+export const compareAvailability = (a: Availability | null, b: Availability | null) => {
+  if (a === undefined && b === undefined) {
+    return true;
+  }
+
+  if (a === undefined || b === undefined) {
+    return false;
+  }
+
+  if (a === null && b === null) {
+    return true;
+  }
+
+  if (a === null || b === null) {
+    return false;
+  }
+
+  return a.datetime.toUTCString() === b.datetime.toUTCString();
+};
