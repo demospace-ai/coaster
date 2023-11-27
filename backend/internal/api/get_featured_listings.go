@@ -13,7 +13,7 @@ import (
 
 func (s ApiService) GetFeaturedListings(w http.ResponseWriter, r *http.Request) error {
 	categoryParam := r.URL.Query().Get("categories")
-	durationParam := r.URL.Query().Get("duration_minutes")
+	durationParam := r.URL.Query().Get("durationMinutes")
 
 	var listingDetails []listings.ListingDetails
 	var err error
