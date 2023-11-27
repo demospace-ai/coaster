@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/models"
@@ -12,6 +13,7 @@ import (
 
 func (s ApiService) GetFeaturedListings(w http.ResponseWriter, r *http.Request) error {
 	categoryParam := r.URL.Query().Get("categories")
+	durationParam := r.URL.Query().Get("duration_minutes")
 
 	var listingDetails []listings.ListingDetails
 	var err error
@@ -19,6 +21,16 @@ func (s ApiService) GetFeaturedListings(w http.ResponseWriter, r *http.Request) 
 		listingDetails, err = s.loadFeaturedByCategory(categoryParam)
 		if err != nil {
 			return errors.Wrap(err, "(api.GetFeaturedListings) loading listings filtered by category")
+		}
+	} else if len(durationParam) > 0 {
+		durationMinutes, err := strconv.ParseInt(durationParam, 10, 64)
+		if err != nil {
+			return errors.Wrap(err, "(api.GetFeaturedListings) parsing duration param")
+		}
+
+		listingDetails, err = listings.LoadByDuration(s.db, durationMinutes)
+		if err != nil {
+			return errors.Wrap(err, "(api.GetFeaturedListings) loading listings filtered by duration")
 		}
 	} else {
 		listingDetails, err = listings.LoadFeatured(s.db)

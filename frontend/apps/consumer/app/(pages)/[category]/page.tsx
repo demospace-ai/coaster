@@ -7,6 +7,6 @@ export const viewport: Viewport = {
   themeColor: "#efedea",
 };
 
-export default async function Page() {
-  return <FeaturedPage />;
+export default async function Page({ params }: { params: { category: string } }) {
+  return <FeaturedPage category={params.category} />;
 }

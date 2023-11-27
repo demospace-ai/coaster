@@ -413,6 +413,40 @@ func LoadFeatured(db *gorm.DB) ([]ListingDetails, error) {
 	return listingsAndImages, nil
 }
 
+func LoadByDuration(db *gorm.DB, durationMinutes int64) ([]ListingDetails, error) {
+	var listings []models.Listing
+	result := db.Table("listings").
+		Select("listings.*").
+		Where("listings.status = ?", models.ListingStatusPublished).
+		Where("listings.duration_minutes <= ?", durationMinutes).
+		Where("listings.deactivated_at IS NULL").
+		Find(&listings)
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(listings.LoadDayTrips)")
+	}
+
+	listingsAndImages := make([]ListingDetails, len(listings))
+	for i, listing := range listings {
+		images, err := LoadImagesForListing(db, listing.ID)
+		if err != nil {
+			return nil, errors.Wrap(err, "(listings.LoadDayTrips) getting images")
+		}
+
+		host, err := users.LoadUserByID(db, listing.UserID)
+		if err != nil {
+			return nil, errors.Wrap(err, "(listings.LoadDayTrips) getting host")
+		}
+
+		listingsAndImages[i] = ListingDetails{
+			listing,
+			host,
+			images,
+		}
+	}
+
+	return listingsAndImages, nil
+}
+
 func LoadListingsByCategory(db *gorm.DB, categories []models.ListingCategory) ([]ListingDetails, error) {
 	var listings []models.Listing
 	result := db.Table("listings").

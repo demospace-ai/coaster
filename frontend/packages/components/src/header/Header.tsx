@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuthContext, useLogout } from "@coaster/rpc/client";
-import { User } from "@coaster/types";
+import { Category, User } from "@coaster/types";
 import { isProd, lateef, mergeClasses } from "@coaster/utils/common";
 import { autoUpdate, offset, useClick, useDismiss, useFloating, useInteractions, useRole } from "@floating-ui/react";
 import { Dialog, Menu, Transition } from "@headlessui/react";
@@ -15,7 +15,7 @@ import { SearchBarHeader } from "../search/SearchBar";
 
 export const Header: React.FC = () => {
   const pathname = usePathname();
-  const isHome = pathname === "/";
+  const isHome = ["/", "/daytrips", Object.keys(Category).map((category) => `/${category}`)].includes(pathname);
   const [scrollPosition, setScrollPosition] = useState(0);
 
   useEffect(() => {

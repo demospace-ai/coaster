@@ -166,11 +166,15 @@ export function useSearch(location?: string, categories?: string) {
   return { listings: data, mutate, error, loading: isLoading || isValidating };
 }
 
-export function useFeatured(categories?: string, initialData?: Listing[]) {
+export function useFeatured(categories?: string, duration?: number, initialData?: Listing[]) {
   const fetcher: Fetcher<Listing[], { categories?: string }> = ({ categories }) => {
-    const queryParams: { categories?: string } = {};
+    const queryParams: { categories?: string; durationMinutes?: number } = {};
     if (categories) {
       queryParams.categories = categories;
+    }
+
+    if (duration) {
+      queryParams.durationMinutes = duration;
     }
 
     return sendRequest(GetFeaturedListings, { queryParams });
