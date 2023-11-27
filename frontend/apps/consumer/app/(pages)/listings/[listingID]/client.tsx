@@ -71,7 +71,7 @@ export const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) =
           {listing.name}
         </div>
         <div className="tw-flex tw-items-center tw-mt-3 tw-mb-4 tw-font-medium">
-          {listing.location} • {toTitleCase(listing.category ? listing.category : "")}
+          {listing.location} • {toTitleCase(listing.category ? getCategoryForDisplay(listing.category) : "")}
         </div>
       </div>
       <div
