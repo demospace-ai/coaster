@@ -179,11 +179,15 @@ export function useFeatured(categories?: string, duration?: number, initialData?
 
     return sendRequest(GetFeaturedListings, { queryParams });
   };
-  const { data, mutate, error, isLoading, isValidating } = useSWR({ GetFeaturedListings, categories }, fetcher, {
-    fallbackDate: initialData,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-  });
+  const { data, mutate, error, isLoading, isValidating } = useSWR(
+    { GetFeaturedListings, categories, duration },
+    fetcher,
+    {
+      fallbackDate: initialData,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    },
+  );
   return { listings: data, mutate, error, loading: isLoading || isValidating };
 }
 
