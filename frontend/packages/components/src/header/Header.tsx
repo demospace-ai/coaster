@@ -35,10 +35,10 @@ export const Header: React.FC = () => {
       )}
     >
       <PromoBanner />
-      <div className="tw-flex tw-w-full tw-max-w-7xl tw-max-h-[72px] tw-min-h-[72px] sm:tw-max-h-[96px] sm:tw-min-h-[96px] tw-items-center tw-justify-between">
+      <div className="tw-flex tw-w-[calc(100%-40px)] tw-max-w-7xl tw-max-h-[72px] tw-min-h-[72px] sm:tw-max-h-[96px] sm:tw-min-h-[96px] tw-items-center tw-justify-between">
         <LogoLink />
-        {/** Pass "show" here so modal is always rendered */}
         <MobileHelpButton />
+        {/** Pass "show" here so modal is always rendered */}
         <SearchBarHeader show={!isHome || scrollPosition > 300} />
         <ProfileDropdown />
       </div>
@@ -55,7 +55,7 @@ export const PromoBanner: React.FC = () => {
 
   return (
     <div
-      className="tw-flex tw-text-base tw-font-medium tw-max-h-[56px] tw-min-h-[56px] tw-w-full tw-items-center tw-justify-center tw-bg-blue-200 tw-cursor-pointer"
+      className="tw-flex tw-flex-col sm:tw-flex-row sm:tw-text-base sm:tw-font-medium tw-max-h-[56px] tw-min-h-[56px] tw-w-full tw-items-center tw-justify-center tw-bg-blue-200 tw-cursor-pointer"
       onClick={() => openLoginModal(true)}
     >
       <span className="tw-font-bold tw-mr-2">Limited Time!</span>Get a $100 Amazon gift card for booking a trip!
