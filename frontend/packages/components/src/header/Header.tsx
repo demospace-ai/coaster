@@ -29,18 +29,36 @@ export const Header: React.FC = () => {
   return (
     <div
       className={mergeClasses(
-        "tw-sticky tw-z-10 tw-top-0 tw-flex tw-box-border tw-max-h-[72px] tw-min-h-[72px] sm:tw-max-h-[96px] sm:tw-min-h-[96px] tw-w-full tw-px-4 sm:tw-px-10 lg:tw-px-20 tw-py-3 tw-items-center tw-justify-center tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white",
+        "tw-sticky tw-z-10 tw-top-0 tw-flex tw-flex-col tw-items-center tw-justify-center tw-box-border tw-w-full tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white",
         isHome && "tw-bg-[#efedea] tw-border-[#d3d1ce]",
         isHome && scrollPosition < 20 && "tw-border-none",
       )}
     >
-      <div className="tw-flex tw-w-full tw-max-w-7xl tw-items-center tw-justify-between">
+      <PromoBanner />
+      <div className="tw-flex tw-w-full tw-max-w-7xl tw-max-h-[72px] tw-min-h-[72px] sm:tw-max-h-[96px] sm:tw-min-h-[96px] tw-items-center tw-justify-between">
         <LogoLink />
         {/** Pass "show" here so modal is always rendered */}
         <MobileHelpButton />
         <SearchBarHeader show={!isHome || scrollPosition > 300} />
         <ProfileDropdown />
       </div>
+    </div>
+  );
+};
+
+export const PromoBanner: React.FC = () => {
+  const { user, loading, openLoginModal } = useAuthContext();
+
+  if (loading || user) {
+    return null;
+  }
+
+  return (
+    <div
+      className="tw-flex tw-text-base tw-font-medium tw-max-h-[56px] tw-min-h-[56px] tw-w-full tw-items-center tw-justify-center tw-bg-blue-200 tw-cursor-pointer"
+      onClick={() => openLoginModal(true)}
+    >
+      <span className="tw-font-bold tw-mr-2">Limited Time!</span>Get a $100 Amazon gift card for booking a trip!
     </div>
   );
 };

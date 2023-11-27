@@ -1,5 +1,6 @@
 "use client";
 
+import { PromoBanner } from "@coaster/components/header/Header";
 import { ProfilePlaceholder } from "@coaster/components/profile/ProfilePicture";
 import { Category } from "@coaster/types";
 import { lateef, mergeClasses } from "@coaster/utils/common";
@@ -23,11 +24,12 @@ export const DynamicHeader: React.FC = () => {
     loading: () => (
       <div
         className={mergeClasses(
-          "tw-sticky tw-z-10 tw-top-0 tw-flex tw-box-border tw-max-h-[72px] tw-min-h-[72px] sm:tw-max-h-[96px] sm:tw-min-h-[96px] tw-w-full tw-px-4 sm:tw-px-20 tw-py-3 tw-items-center tw-justify-center tw-bg-transparent tw-border-b tw-border-solid tw-border-slate-200",
+          "tw-sticky tw-z-10 tw-top-0 tw-flex tw-flex-col tw-items-center tw-justify-center tw-box-border tw-w-full tw-bg-transparent tw-border-b tw-border-solid tw-border-slate-200",
           isHome && "tw-bg-[#efedea] tw-border-none",
         )}
       >
-        <div className="tw-flex tw-w-full tw-max-w-[1280px] tw-items-center tw-justify-between">
+        <PromoBanner />
+        <div className="tw-flex tw-w-full tw-max-w-7xl tw-max-h-[72px] tw-min-h-[72px] sm:tw-max-h-[96px] sm:tw-min-h-[96px] tw-items-center tw-justify-between">
           <div
             className={mergeClasses(
               lateef.className,
