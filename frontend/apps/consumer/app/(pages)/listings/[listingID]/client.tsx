@@ -2,6 +2,7 @@
 
 import { Button } from "@coaster/components/button/Button";
 import { correctToUTC } from "@coaster/components/dates/utils";
+import { getCategoryForDisplay } from "@coaster/components/icons/Category";
 import { GuestNumberInput } from "@coaster/components/input/Input";
 import { Loading } from "@coaster/components/loading/Loading";
 import { trackEvent } from "@coaster/components/rudderstack/events";
