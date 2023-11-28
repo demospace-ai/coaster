@@ -8,8 +8,9 @@ import { Dialog, Menu, Transition } from "@headlessui/react";
 import { ArrowRightOnRectangleIcon, Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import React, { Fragment, useEffect, useState } from "react";
+import { Button } from "../button/Button";
 import { NavLink } from "../link/Link";
 import { ProfilePicture, ProfilePlaceholder } from "../profile/ProfilePicture";
 import { SearchBarHeader } from "../search/SearchBar";
@@ -49,6 +50,8 @@ export const Header: React.FC = () => {
 
 export const PromoBanner: React.FC = () => {
   const Modal = dynamic(() => import("../modal/Modal").then((mod) => mod.Modal));
+  const { openLoginModal, user } = useAuthContext();
+  const router = useRouter();
   const [showModal, setShowModal] = useState(false);
   return (
     <>
@@ -60,6 +63,15 @@ export const PromoBanner: React.FC = () => {
             card, simply book any trip on Coaster. You'll receive the gift card via the email you use to create an
             account.
           </div>
+          <Button
+            className="tw-mt-5 tw-py-2 tw-px-5"
+            onClick={() => {
+              user || openLoginModal(true);
+              setShowModal(false);
+            }}
+          >
+            {user ? "Got it!" : "Sign up"}
+          </Button>
         </div>
       </Modal>
       <div
