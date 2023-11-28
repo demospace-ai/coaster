@@ -1,6 +1,6 @@
 "use client";
 
-import { LongLogo } from "@coaster/assets";
+import LongLogo from "@coaster/assets/long-logo.svg";
 import { SendInvite, sendRequest } from "@coaster/rpc/common";
 import { SendInviteRequest } from "@coaster/types";
 import { useMutation } from "@coaster/utils/client";
@@ -21,7 +21,7 @@ export const Invite: React.FC = () => {
     <div className="tw-flex tw-flex-row tw-h-full tw-w-full tw-bg-slate-100 tw-pb-20">
       <div className="tw-mt-20 sm:tw-mt-32 tw-mb-auto tw-mx-auto tw-w-[400px]">
         <div className="tw-flex tw-flex-col tw-pt-12 tw-pb-10 tw-px-8 tw-rounded-lg sm:tw-shadow-md sm:tw-bg-white tw-items-center">
-          <Image src={LongLogo.src} width={200} height={32} className="tw-select-none tw-mb-4" alt="coaster logo" />
+          <Image src={LongLogo} width={200} height={32} className="tw-select-none tw-mb-4" alt="coaster logo" />
           {done ? (
             <div className="tw-flex tw-flex-col tw-items-center">
               <div className="tw-text-xl">Invites sent!</div>

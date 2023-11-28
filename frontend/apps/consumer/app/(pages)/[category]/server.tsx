@@ -1,4 +1,4 @@
-import { Hero } from "@coaster/assets";
+import Hero from "@coaster/assets/hero.jpg";
 import { SearchBar } from "@coaster/components/search/SearchBar";
 import { getFeaturedServer } from "@coaster/rpc/server";
 import { FeaturedClient } from "app/(pages)/[category]/client";

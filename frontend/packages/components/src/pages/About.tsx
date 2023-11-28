@@ -1,4 +1,4 @@
-import { Founders } from "@coaster/assets";
+import Founders from "@coaster/assets/founders.webp";
 import Image from "next/image";
 
 export const About: React.FC = () => {
@@ -6,7 +6,7 @@ export const About: React.FC = () => {
     <div className="tw-flex tw-items-center tw-justify-center tw-py-16 sm:tw-py-32">
       <div className="tw-flex tw-flex-col tw-items-center tw-max-w-[300px] sm:tw-max-w-[600px]">
         <Image
-          src={Founders.src}
+          src={Founders}
           alt="The founders of Coaster"
           width={320}
           height={320}

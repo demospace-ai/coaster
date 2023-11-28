@@ -1,6 +1,6 @@
 "use client";
 
-import { LongLogo } from "@coaster/assets";
+import LongLogo from "@coaster/assets/long-logo.svg";
 import { useAuthContext } from "@coaster/rpc/client";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -56,7 +56,7 @@ export const LoginPage: React.FC<{ create?: boolean }> = ({ create }) => {
     <div className="tw-flex tw-flex-row tw-h-full tw-w-full tw-bg-slate-100">
       <div className="tw-mt-20 sm:tw-mt-32 tw-mb-auto tw-mx-auto tw-w-[400px]">
         <div className="tw-flex tw-flex-col tw-pt-12 tw-pb-10 tw-px-8 tw-rounded-lg sm:tw-shadow-md sm:tw-bg-white tw-items-center">
-          <Image src={LongLogo.src} width={200} height={32} className="tw-select-none tw-mb-4" alt="coaster logo" />
+          <Image src={LongLogo} width={200} height={32} className="tw-select-none tw-mb-4" alt="coaster logo" />
           <div className="tw-flex tw-flex-col tw-items-center tw-my-2 tw-w-full">{loginContent}</div>
         </div>
         <div className="tw-text-xs tw-text-center tw-mt-4 tw-text-slate-800 tw-select-none tw-mx-8 sm:tw-mx-0">

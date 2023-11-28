@@ -1,6 +1,6 @@
 "use client";
 
-import { LongLogo } from "@coaster/assets";
+import LongLogo from "@coaster/assets/long-logo.svg";
 import { useAuthContext } from "@coaster/rpc/client";
 import { mergeClasses } from "@coaster/utils/common";
 import { Dialog, Transition } from "@headlessui/react";
@@ -92,7 +92,7 @@ export const LoginModal: React.FC = () => {
             leaveTo="tw-scale-95"
           >
             <Dialog.Panel className="tw-flex tw-flex-col tw-h-full sm:tw-h-auto tw-max-w-[400px] tw-pt-28 sm:tw-pt-12 tw-pb-10 tw-px-8 sm:tw-rounded-lg sm:tw-shadow-md tw-bg-white tw-items-center sm:-tw-mt-20">
-              <Image width={200} height={32} src={LongLogo.src} className="tw-select-none tw-mb-4" alt="coaster logo" />
+              <Image width={200} height={32} src={LongLogo} className="tw-select-none tw-mb-4" alt="coaster logo" />
               <div className="tw-flex tw-flex-col tw-items-center tw-my-2 tw-w-full">{loginContent}</div>
               <div className="tw-text-xs tw-text-center tw-mt-4 tw-text-slate-800 tw-select-none tw-mx-8 sm:tw-mx-0">
                 By continuing you agree to Coaster's{" "}

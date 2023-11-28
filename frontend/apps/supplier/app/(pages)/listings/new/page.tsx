@@ -1,6 +1,6 @@
 "use client";
 
-import { MapPreview } from "@coaster/assets";
+import MapPreview from "@coaster/assets/map-preview.webp";
 import { Card } from "@coaster/components/dnd/DragAndDrop";
 import { FormError } from "@coaster/components/error/FormError";
 import {

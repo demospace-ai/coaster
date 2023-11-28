@@ -1,5 +1,12 @@
 {
   "extends": "@coaster/tsconfig/react-library.json",
   "include": ["."],
-  "exclude": ["dist", "build", "node_modules"]
+  "exclude": ["dist", "build", "node_modules"],
+  "compilerOptions": {
+    "plugins": [{ "name": "next" }],
+    "baseUrl": ".",
+    "paths": {
+      "@coaster/assets/*": ["../../packages/assets/src/*"]
+    }
+  },
 }

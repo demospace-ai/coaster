@@ -1,10 +1,10 @@
-import { Logo } from "@coaster/assets";
+import Logo from "@coaster/assets/logo.svg";
 import Image from "next/image";
 
 export const LogoLoading: React.FC = () => {
   return (
     <Image
-      src={Logo.src}
+      src={Logo}
       width={144}
       height={144}
       className="

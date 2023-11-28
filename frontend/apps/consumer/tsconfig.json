@@ -4,7 +4,8 @@
     "plugins": [{ "name": "next" }],
     "baseUrl": ".",
     "paths": {
-      "@coaster/components/*": ["../../packages/components/src/*"]
+      "@coaster/components/*": ["../../packages/components/src/*"],
+      "@coaster/assets/*": ["../../packages/assets/src/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
