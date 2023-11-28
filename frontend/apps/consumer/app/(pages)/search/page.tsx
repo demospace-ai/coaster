@@ -19,6 +19,7 @@ export default async function Search({ searchParams }: { searchParams: { [key: s
         <div className="tw-font-bold tw-text-xl tw-w-full tw-text-center sm:tw-text-left">
           {listings.length} results for{" "}
           {categoriesParsed.map((category: CategoryType) => `"${getCategoryForDisplay(category)}"`).join(", ")}
+          {location}
         </div>
         <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-3 xl:tw-grid-cols-4 tw-mt-5 tw-mb-5 tw-font-bold tw-text-3xl tw-gap-10 tw-w-full">
           {listings.map((listing: Listing) => (
