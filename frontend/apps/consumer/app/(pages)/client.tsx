@@ -29,7 +29,7 @@ export const DynamicHeader: React.FC = () => {
         )}
       >
         <PromoBanner />
-        <div className="tw-flex tw-w-[calc(100%-40px)] tw-max-w-7xl tw-max-h-[72px] tw-min-h-[72px] sm:tw-max-h-[96px] sm:tw-min-h-[96px] tw-items-center tw-justify-between">
+        <div className="tw-flex tw-w-[calc(100%-2.5rem)] sm:tw-w-[calc(100%-10rem)] tw-max-w-7xl tw-max-h-[72px] tw-min-h-[72px] sm:tw-max-h-[96px] sm:tw-min-h-[96px] tw-items-center tw-justify-between">
           <div
             className={mergeClasses(
               lateef.className,

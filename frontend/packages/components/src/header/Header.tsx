@@ -6,6 +6,7 @@ import { isProd, lateef, mergeClasses } from "@coaster/utils/common";
 import { autoUpdate, offset, useClick, useDismiss, useFloating, useInteractions, useRole } from "@floating-ui/react";
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import { ArrowRightOnRectangleIcon, Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { Fragment, useEffect, useState } from "react";
@@ -35,7 +36,7 @@ export const Header: React.FC = () => {
       )}
     >
       <PromoBanner />
-      <div className="tw-flex tw-w-[calc(100%-40px)] tw-max-w-7xl tw-max-h-[72px] tw-min-h-[72px] sm:tw-max-h-[96px] sm:tw-min-h-[96px] tw-items-center tw-justify-between">
+      <div className="tw-flex tw-w-[calc(100%-2.5rem)] sm:tw-w-[calc(100%-10rem)] tw-max-w-7xl tw-max-h-[72px] tw-min-h-[72px] sm:tw-max-h-[96px] sm:tw-min-h-[96px] tw-items-center tw-justify-between">
         <LogoLink />
         <MobileHelpButton />
         {/** Pass "show" here so modal is always rendered */}
@@ -47,19 +48,27 @@ export const Header: React.FC = () => {
 };
 
 export const PromoBanner: React.FC = () => {
-  const { user, loading, openLoginModal } = useAuthContext();
-
-  if (loading || user) {
-    return null;
-  }
-
+  const Modal = dynamic(() => import("../modal/Modal").then((mod) => mod.Modal));
+  const [showModal, setShowModal] = useState(false);
   return (
-    <div
-      className="tw-flex tw-flex-col sm:tw-flex-row sm:tw-text-base sm:tw-font-medium tw-max-h-[56px] tw-min-h-[56px] tw-w-full tw-items-center tw-justify-center tw-bg-blue-200 tw-cursor-pointer"
-      onClick={() => openLoginModal(true)}
-    >
-      <span className="tw-font-bold tw-mr-2">Limited Time!</span>Get a $100 Amazon gift card for booking a trip!
-    </div>
+    <>
+      <Modal show={showModal} close={() => setShowModal(false)} clickToClose>
+        <div className="tw-flex tw-flex-col tw-items-center tw-w-[320px] sm:tw-w-[420px] tw-px-8 sm:tw-px-12 tw-pb-10">
+          <div className="tw-text-center tw-w-full tw-text-xl tw-font-semibold tw-mb-4">Limited Time Offer</div>
+          <div>
+            For a limited time only, we're giving away $100 to every user who books a trip. To receive the Amazon gift
+            card, simply book any trip on Coaster. You'll receive the gift card via the email you use to create an
+            account.
+          </div>
+        </div>
+      </Modal>
+      <div
+        className="tw-flex tw-flex-col sm:tw-flex-row sm:tw-text-base sm:tw-font-medium tw-max-h-[56px] tw-min-h-[56px] tw-w-full tw-items-center tw-justify-center tw-bg-blue-200 tw-cursor-pointer"
+        onClick={() => setShowModal(true)}
+      >
+        <span className="tw-font-bold tw-mr-2">Limited Time!</span>Get a $100 Amazon gift card for booking a trip!
+      </div>
+    </>
   );
 };
 
