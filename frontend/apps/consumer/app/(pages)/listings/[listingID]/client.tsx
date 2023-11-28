@@ -568,7 +568,7 @@ export const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) =
         <NullableImage
           alt="Main listing image"
           priority
-          sizes="(max-width: 1023px) 100vw, 66vw"
+          sizes="(max-width: 1024px) 100vw, 66vw"
           className="tw-w-full tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
           image={listing.images[0]}
           onClick={() => {

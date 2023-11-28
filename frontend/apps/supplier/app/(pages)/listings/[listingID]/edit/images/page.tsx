@@ -102,7 +102,7 @@ const ImagesInner: React.FC<{ listing: Listing }> = ({ listing }) => {
           >
             <Image
               fill
-              sizes="(max-width: 639px) 100vw, 1/2vw"
+              sizes="(max-width: 640px) 100vw, 1/2vw"
               alt="Listing image"
               className="tw-aspect-square tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-transition-all tw-duration-100 tw-rounded-lg tw-cursor-grab"
               src={getGcsImageUrl(image.storage_id)}
