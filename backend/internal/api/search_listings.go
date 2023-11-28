@@ -27,9 +27,11 @@ func (s ApiService) SearchListings(w http.ResponseWriter, r *http.Request) error
 			return errors.Wrap(err, "(api.SearchListings) loading listings filtered by location")
 		}
 
-		filteredListings, err = s.filterByCategory(filteredListings, categoryParam)
-		if err != nil {
-			return errors.Wrap(err, "(api.SearchListings) filtering listings by category")
+		if len(categoryParam) > 0 {
+			filteredListings, err = s.filterByCategory(filteredListings, categoryParam)
+			if err != nil {
+				return errors.Wrap(err, "(api.SearchListings) filtering listings by category")
+			}
 		}
 	} else if len(categoryParam) > 0 {
 		filteredListings, err = s.loadByCategory(categoryParam)
