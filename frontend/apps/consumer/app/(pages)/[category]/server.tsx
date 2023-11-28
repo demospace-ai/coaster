@@ -18,7 +18,7 @@ export const FeaturedPage = async ({ category }: { category?: FeaturedCategory }
               alt="Hero image"
               priority
               src={Hero}
-              sizes="100vw"
+              sizes="50vw"
               placeholder="blur"
               className="tw-rounded-2xl tw-object-left tw-object-cover"
             />
