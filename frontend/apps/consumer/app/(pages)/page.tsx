@@ -8,9 +8,9 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Coaster - Find your next outdoor adventure.",
+  title: "Coaster - Book guided outdoor adventures",
   description:
-    "Discover local guides & plan your next adventure with Coaster. Book a unique adventure with expert local guides on Coaster for unforgettable memories.",
+    "Discover local guides and plan your next adventure with Coaster. Book a unique adventure with expert local guides on Coaster for unforgettable memories.",
 };
 
 export default async function Page() {
