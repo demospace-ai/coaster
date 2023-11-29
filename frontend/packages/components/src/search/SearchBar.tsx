@@ -55,7 +55,7 @@ const SearchBarModal: React.FC<{
         <MagnifyingGlassIcon
           aria-label="Open search"
           role="button"
-          className="tw-flex tw-cursor-pointer tw-ml-3 tw-w-6 tw-text-gray-500"
+          className="tw-flex tw-cursor-pointer tw-ml-3 tw-w-6 tw-h-6"
           onClick={() => {
             setOpen(true);
           }}
@@ -69,7 +69,7 @@ const SearchBarModal: React.FC<{
           )}
           onClick={() => setOpen(true)}
         >
-          <MagnifyingGlassIcon className="tw-ml-3 sm:tw-ml-2 tw-h-6 sm:tw-h-7 tw-stroke-gray-600" />
+          <MagnifyingGlassIcon className="tw-ml-3 sm:tw-ml-2 tw-w-6 tw-h-6 sm:tw-w-7 sm:tw-h-7 tw-stroke-gray-600" />
           <div className="tw-w-full tw-bg-transparent tw-px-2 tw-text-gray-700 tw-text-lg tw-select-none tw-cursor-pointer">
             Search trips
           </div>

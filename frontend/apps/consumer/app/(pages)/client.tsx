@@ -41,7 +41,7 @@ export const DynamicHeader: React.FC = () => {
           </div>
           {!isHome && (
             <div className="tw-hidden sm:tw-flex tw-items-center tw-w-full tw-max-w-[400px] tw-h-9 tw-ring-1 tw-ring-slate-300 tw-rounded-[99px]">
-              <MagnifyingGlassIcon className="tw-ml-4 tw-h-[18px] tw-w-[18.5px] -tw-mr-1.5 tw-stroke-gray-600" />
+              <MagnifyingGlassIcon className="tw-ml-4 tw-h-[18.5px] tw-w-[18.5px] -tw-mr-1.5 tw-stroke-gray-600" />
               <span className="tw-text-gray-700 tw-text-base tw-ml-4">Choose a category</span>
             </div>
           )}
@@ -55,7 +55,7 @@ export const DynamicHeader: React.FC = () => {
             </div>
             <div className="tw-flex lg:tw-hidden tw-items-center">
               <div className="tw-font-medium">Help</div>
-              <MagnifyingGlassIcon className="tw-flex tw-cursor-pointer tw-ml-3 tw-w-6 tw-text-gray-500" />
+              <MagnifyingGlassIcon className="tw-flex tw-cursor-pointer tw-ml-3 tw-w-6 tw-h-6" />
               <Bars3Icon className="tw-w-7 tw-ml-4" />
             </div>
           </div>
