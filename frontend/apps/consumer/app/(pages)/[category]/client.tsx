@@ -106,7 +106,7 @@ const CategorySelector: React.FC<{
           style={{
             opacity: showBack ? "100" : "0",
             height: showBack ? "100%" : "0",
-            backgroundImage: "linear-gradient(to left, rgb(255 255 255/0), #efedea 40px)",
+            backgroundImage: "linear-gradient(to left, rgb(255 255 255/0), rgb(255 255 255) 40px)",
           }}
         >
           <button
@@ -125,7 +125,7 @@ const CategorySelector: React.FC<{
           style={{
             opacity: showForward ? "100" : "0",
             height: showForward ? "100%" : "0",
-            backgroundImage: "linear-gradient(to right, rgb(255 255 255/0), #efedea 40px)",
+            backgroundImage: "linear-gradient(to right, rgb(255 255 255/0), rgb(255 255 255) 40px)",
           }}
         >
           <button
