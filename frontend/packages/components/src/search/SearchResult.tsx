@@ -1,6 +1,7 @@
 "use client";
 
 import { Listing } from "@coaster/types";
+import { getDuration } from "@coaster/utils/common";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 
@@ -31,7 +32,9 @@ export const SearchResult: React.FC<{ listing: Listing }> = ({ listing }) => {
       <SearchResultImages listing={listing} />
       <span className="tw-mt-2 sm:tw-mt-3 tw-font-bold tw-text-lg">{listing.name}</span>
       <span>{listing.location}</span>
-      <span>${listing.price}</span>
+      <span>
+        ${listing.price} • {getDuration(listing.duration_minutes)}
+      </span>
     </Link>
   );
 };
