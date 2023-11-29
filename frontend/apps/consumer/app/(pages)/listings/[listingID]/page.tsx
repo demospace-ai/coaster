@@ -3,6 +3,7 @@ import { isProd } from "@coaster/utils/common";
 import { ListingPage } from "consumer/app/(pages)/listings/[listingID]/server";
 
 export const dynamic = "force-static";
+export const revalidate = 3600;
 
 export async function generateMetadata({ params }: { params: { listingID: string } }) {
   const listing = await getListingServer(Number(params.listingID));

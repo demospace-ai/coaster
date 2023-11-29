@@ -3,6 +3,8 @@ import { SanityClient } from "@coaster/rpc/sanity";
 import { Post } from "app/(pages)/blog/utils";
 import { MetadataRoute } from "next";
 
+export const revalidate = 3600;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const listingMetadataList = await sendRequest(GetAllListingMetadata);
   const listingPages = listingMetadataList.map((metadata) => ({
