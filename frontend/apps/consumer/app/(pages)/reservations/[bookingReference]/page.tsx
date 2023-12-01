@@ -14,7 +14,7 @@ export default async function Reservation({ params }: { params: { bookingReferen
 
   return (
     <main className="tw-flex tw-w-full tw-justify-center tw-px-5 sm:tw-px-20">
-      <div className="tw-flex tw-flex-col tw-items-center tw-pt-5 sm:tw-pt-8 tw-pb-24 tw-w-full tw-max-w-[1280px]">
+      <div className="tw-flex tw-flex-col tw-items-center tw-pt-5 sm:tw-pt-8 tw-pb-24 tw-w-full tw-max-w-7xl">
         <div className="tw-flex sm:tw-hidden tw-flex-col tw-justify-start tw-w-full tw-mb-4">
           <div className="tw-font-semibold tw-text-lg tw-text-slate-800">{booking.reference}</div>
           <div className="tw-font-bold tw-text-3xl">{booking.listing.name}</div>
