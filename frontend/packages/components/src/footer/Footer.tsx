@@ -35,9 +35,9 @@ export const Footer: React.FC = () => {
           </div>
           <div className="tw-font-semibold tw-mb-2">Newsletter</div>
           <div className="tw-w-80 tw-mb-2">We send occasional updates on new trips, stories, and discounts.</div>
-          <div className="tw-flex tw-gap-1">
+          <div className="tw-flex tw-gap-2">
             <Input className="tw-w-48 tw-h-8" value={""} />
-            <Button>Subscribe</Button>
+            <Button className="tw-font-medium">Subscribe</Button>
           </div>
         </div>
         <div className="tw-flex tw-flex-col tw-gap-1">

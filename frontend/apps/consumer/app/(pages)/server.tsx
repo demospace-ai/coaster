@@ -1,5 +1,6 @@
 import Hero from "@coaster/assets/hero.jpg";
 import Footer from "@coaster/assets/home-footer.jpg";
+import NeedHelp from "@coaster/assets/need-help.jpg";
 import { SearchBar } from "@coaster/components/search/SearchBar";
 import { getFeaturedServer } from "@coaster/rpc/server";
 import { FeaturedClient } from "app/(pages)/client";
@@ -14,7 +15,7 @@ export const FeaturedPage = async ({ category }: { category?: FeaturedCategory }
     <main className="tw-flex tw-flex-col tw-w-full tw-h-full tw-justify-center">
       <div className="tw-flex tw-items-center tw-justify-center tw-w-full tw-px-5 sm:tw-px-20">
         <div className="tw-flex tw-flex-col tw-items-center tw-pt-2 tw-pb-24 tw-w-full tw-max-w-7xl">
-          <div className="tw-relative tw-flex tw-flex-col tw-mb-6 sm:tw-mb-10 tw-mx-10 tw-w-full tw-min-h-[420px] tw-h-[420px] tw-max-h-[420px] sm:tw-min-h-[480px] sm:tw-h-[480px] sm:tw-max-h-[480px] tw-rounded-2xl tw-items-center tw-justify-center tw-bg-cover tw-p-8">
+          <div className="tw-relative tw-flex tw-flex-col tw-items-center tw-justify-center tw-mb-6 sm:tw-mb-10 tw-mx-10 tw-w-full tw-min-h-[420px] tw-h-[420px] tw-max-h-[420px] sm:tw-min-h-[480px] sm:tw-h-[480px] sm:tw-max-h-[480px] tw-rounded-2xl tw-p-8">
             <div className="tw-absolute tw-top-0 tw-left-0 tw-h-full tw-w-full">
               <Image
                 fill
@@ -40,9 +41,36 @@ export const FeaturedPage = async ({ category }: { category?: FeaturedCategory }
           </div>
           <div className="tw-text-2xl tw-font-semibold tw-w-full tw-mb-2">Explore by Category</div>
           <FeaturedClient initialCategory={category} initialData={featured} />
-          <div className="tw-text-3xl tw-font-semibold tw-mt-8 tw-mb-5">Ready to get out there?</div>
+          <div className="tw-relative tw-flex tw-flex-col tw-items-center tw-justify-start tw-w-full tw-min-h-[300px] tw-max-h-[300px] tw-h-[300px] sm:tw-min-h-[560px] sm:tw-h-[560px] sm:tw-max-h-[560px]">
+            <div className="tw-absolute tw-top-0 tw-left-0 tw-h-full tw-w-full">
+              <Image
+                fill
+                alt="Need help?"
+                quality={90}
+                src={NeedHelp}
+                sizes="90vw"
+                placeholder="blur"
+                className="tw-rounded-2xl tw-object-left tw-object-cover"
+              />
+            </div>
+            <div className="tw-flex tw-flex-col tw-items-center tw-text-center tw-z-[1] tw-mt-16 sm:tw-mt-28 tw-text-white">
+              <div className="tw-font-semibold tw-text-xl sm:tw-text-4xl tw-tracking-tighter">
+                Need help finding the perfect trip?
+              </div>
+              <div className="tw-text-base sm:tw-text-lg tw-tracking-tight tw-mt-2">
+                Talk to one of our adventure experts!
+              </div>
+              <Link
+                className="tw-flex tw-justify-center tw-items-center tw-mt-4 tw-bg-black tw-text-white tw-w-48 tw-h-10 tw-rounded-lg tw-font-medium"
+                href="https://calendly.com/coaster/adventure-expert-call"
+              >
+                Book a call
+              </Link>
+            </div>
+          </div>
+          <div className="tw-text-3xl tw-font-semibold tw-mt-20 tw-mb-5">Ready to get out there?</div>
           <Link
-            className="tw-flex tw-justify-center tw-items-center tw-bg-blue-950 tw-text-white tw-w-48 tw-h-10 tw-rounded-lg -tw-mb-12"
+            className="tw-flex tw-justify-center tw-items-center tw-bg-blue-950 tw-text-white tw-w-48 tw-h-10 tw-rounded-lg tw-font-medium -tw-mb-12"
             href="/search"
           >
             Explore trips
