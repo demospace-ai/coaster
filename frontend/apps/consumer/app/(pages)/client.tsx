@@ -3,7 +3,7 @@
 import { PromoBanner } from "@coaster/components/header/Header";
 import { ProfilePlaceholder } from "@coaster/components/profile/ProfilePicture";
 import { lateef, mergeClasses } from "@coaster/utils/common";
-import { Bars3Icon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { Bars3Icon, MagnifyingGlassIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
@@ -47,22 +47,15 @@ export const DynamicHeader: React.FC = () => {
           <div className="tw-flex tw-shrink-0 tw-justify-end">
             <div className="tw-hidden lg:tw-flex tw-items-center">
               <div className="tw-hidden xl:tw-flex tw-px-4 tw-mt-[1px] tw-font-medium">Apply as a guide</div>
-              <button
-                className="tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-font-medium tw-text-sm"
-                onClick={() => {
-                  if ((window as any).Atlas) {
-                    (window as any).Atlas.chat.openWindow();
-                  }
-                }}
-              >
-                Help
-              </button>
+              <button className="tw-flex tw-items-center tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-font-medium tw-text-sm">
+              <QuestionMarkCircleIcon className="tw-h-[18px] tw-w-[18px] tw-mr-1" />Help</button>
               <div className="tw-flex tw-select-none tw-items-center tw-rounded-full tw-border tw-border-solid tw-border-gray-300 tw-px-2 tw-py-1.5">
                 <Bars3Icon className="tw-w-5 tw-h-5 tw-mr-2" />
                 <ProfilePlaceholder width={28} height={28} />
               </div>
             </div>
             <div className="tw-flex lg:tw-hidden tw-items-center">
+              <button className="tw-flex tw-my-auto tw-py-2 tw-px-1 tw-font-medium tw-text-sm">Help</button>
               <MagnifyingGlassIcon className="tw-flex tw-cursor-pointer tw-ml-3 tw-w-6 tw-h-6" />
               <Bars3Icon className="tw-w-7 tw-ml-4" />
             </div>

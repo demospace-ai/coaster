@@ -5,7 +5,7 @@ import { User } from "@coaster/types";
 import { isProd, lateef, mergeClasses } from "@coaster/utils/common";
 import { autoUpdate, offset, useClick, useDismiss, useFloating, useInteractions, useRole } from "@floating-ui/react";
 import { Dialog, Menu, Transition } from "@headlessui/react";
-import { ArrowRightOnRectangleIcon, Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { ArrowRightOnRectangleIcon, Bars3Icon, QuestionMarkCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -58,7 +58,7 @@ const MobileHeader: React.FC = () => {
     <div className="tw-flex sm:tw-hidden tw-w-[calc(100%-2.5rem)] tw-max-w-7xl tw-max-h-[72px] tw-min-h-[72px] tw-items-center tw-justify-between">
       <LogoLink />
       <button
-        className="tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-font-medium tw-text-sm hover:tw-bg-gray-100"
+        className="tw-flex tw-my-auto tw-py-2 tw-px-1 tw-rounded-lg tw-font-medium tw-text-sm hover:tw-bg-gray-100"
         onClick={() => {
           if ((window as any).Atlas) {
             (window as any).Atlas.chat.openWindow();
@@ -141,13 +141,14 @@ const ProfileDropdown: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
           />
         )}
         <button
-          className="tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-font-medium tw-text-sm hover:tw-bg-gray-100"
+          className="tw-flex tw-items-center tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-font-medium tw-text-sm hover:tw-bg-gray-100"
           onClick={() => {
             if ((window as any).Atlas) {
               (window as any).Atlas.chat.openWindow();
             }
           }}
         >
+          <QuestionMarkCircleIcon className="tw-h-[18px] tw-w-[18px] tw-mr-1" />
           Help
         </button>
         <div className="tw-flex tw-flex-col tw-justify-center">
