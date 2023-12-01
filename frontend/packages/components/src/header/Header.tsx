@@ -1,23 +1,23 @@
 "use client";
 
 import { useAuthContext, useLogout } from "@coaster/rpc/client";
-import { Category, User } from "@coaster/types";
+import { User } from "@coaster/types";
 import { isProd, lateef, mergeClasses } from "@coaster/utils/common";
 import { autoUpdate, offset, useClick, useDismiss, useFloating, useInteractions, useRole } from "@floating-ui/react";
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import { ArrowRightOnRectangleIcon, Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import React, { Fragment, useEffect, useState } from "react";
 import { Button } from "../button/Button";
 import { NavLink } from "../link/Link";
 import { ProfilePicture, ProfilePlaceholder } from "../profile/ProfilePicture";
-import { SearchBarHeader } from "../search/SearchBar";
+import { SearchBarDropdown, SearchBarModal } from "../search/SearchBar";
 
 export const Header: React.FC = () => {
   const pathname = usePathname();
-  const isHome = ["/", "/daytrips", Object.keys(Category).map((category) => `/${category}`)].includes(pathname);
+  const isHome = pathname === "/";
   const [scrollPosition, setScrollPosition] = useState(0);
 
   useEffect(() => {
@@ -36,13 +36,39 @@ export const Header: React.FC = () => {
       )}
     >
       <PromoBanner />
-      <div className="tw-flex tw-w-[calc(100%-2.5rem)] sm:tw-w-[calc(100%-10rem)] tw-max-w-7xl tw-max-h-[72px] tw-min-h-[72px] sm:tw-max-h-[96px] sm:tw-min-h-[96px] tw-items-center tw-justify-between">
-        <LogoLink />
-        <MobileHelpButton />
-        {/** Pass "show" here so modal is always rendered */}
-        <SearchBarHeader show={!isHome || scrollPosition > 300} />
-        <ProfileDropdown />
-      </div>
+      <DesktopHeader isHome={isHome} scrollPosition={scrollPosition} />
+      <MobileHeader />
+    </div>
+  );
+};
+
+const DesktopHeader: React.FC<{ isHome: boolean; scrollPosition: number }> = ({ isHome, scrollPosition }) => {
+  return (
+    <div className="tw-hidden sm:tw-flex tw-w-[calc(100%-10rem)] tw-max-w-7xl tw-max-h-[96px] tw-min-h-[96px] tw-items-center tw-justify-between">
+      <LogoLink />
+      {/** Pass "show" here so modal is always rendered */}
+      <SearchBarDropdown show={!isHome || scrollPosition > 300} header />
+      <ProfileDropdown />
+    </div>
+  );
+};
+
+const MobileHeader: React.FC = () => {
+  return (
+    <div className="tw-flex sm:tw-hidden tw-w-[calc(100%-2.5rem)] tw-max-w-7xl tw-max-h-[72px] tw-min-h-[72px] tw-items-center tw-justify-between">
+      <LogoLink />
+      <button
+        className="tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-font-medium tw-text-sm hover:tw-bg-gray-100"
+        onClick={() => {
+          if ((window as any).Atlas) {
+            (window as any).Atlas.chat.openWindow();
+          }
+        }}
+      >
+        Help
+      </button>
+      <SearchBarModal header />
+      <MobileMenu />
     </div>
   );
 };
@@ -50,7 +76,6 @@ export const Header: React.FC = () => {
 export const PromoBanner: React.FC = () => {
   const Modal = dynamic(() => import("../modal/Modal").then((mod) => mod.Modal));
   const { openLoginModal, user } = useAuthContext();
-  const router = useRouter();
   const [showModal, setShowModal] = useState(false);
   return (
     <>
@@ -83,21 +108,6 @@ export const PromoBanner: React.FC = () => {
   );
 };
 
-const MobileHelpButton: React.FC = () => {
-  return (
-    <button
-      className="tw-flex sm:tw-hidden tw-font-medium"
-      onClick={() => {
-        if ((window as any).Atlas) {
-          (window as any).Atlas.chat.openWindow();
-        }
-      }}
-    >
-      Help
-    </button>
-  );
-};
-
 const LogoLink: React.FC = () => {
   return (
     <div className="tw-flex tw-flex-1 tw-flex-row tw-h-fit tw-box-border tw-w-fit">
@@ -117,28 +127,33 @@ const LogoLink: React.FC = () => {
 
 const ProfileDropdown: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
   const { user } = useAuthContext();
-  const pathname = usePathname();
-  const isHome = pathname === "/";
 
   return (
     <div className="tw-flex tw-shrink-0 tw-justify-end">
       <div className="tw-hidden lg:tw-flex">
         {onHostApp ? (
-          <SwitchToCustomerSiteLink className="tw-hidden xl:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100" />
+          <SwitchToCustomerSiteLink className="tw-hidden xl:tw-flex tw-my-auto tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100" />
         ) : (
           <SwitchToHostingLink
             className={mergeClasses(
-              "tw-hidden xl:tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm",
-              isHome ? "hover:tw-bg-[#dfdfdc]" : "hover:tw-bg-gray-100",
+              "tw-hidden xl:tw-flex tw-my-auto tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100",
             )}
           />
         )}
+        <button
+          className="tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-font-medium tw-text-sm hover:tw-bg-gray-100"
+          onClick={() => {
+            if ((window as any).Atlas) {
+              (window as any).Atlas.chat.openWindow();
+            }
+          }}
+        >
+          Help
+        </button>
         <div className="tw-flex tw-flex-col tw-justify-center">
           {user ? <SignedInMenu user={user} onHostApp={onHostApp} /> : <SignedOutMenu />}
         </div>
       </div>
-      {/* TODO: make this open an actual menu on mobile */}
-      <MobileMenu onHostApp={onHostApp} />
     </div>
   );
 };
@@ -453,12 +468,39 @@ const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
 
 export const SupplierHeader: React.FC = () => {
   return (
-    <div className="tw-sticky tw-z-10 tw-top-0 tw-flex tw-box-border tw-max-h-[72px] tw-min-h-[72px] sm:tw-max-h-[96px] sm:tw-min-h-[96px] tw-w-full tw-px-4 sm:tw-px-20 tw-py-3 tw-items-center tw-justify-center tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white">
-      <div className="tw-flex tw-w-full tw-max-w-7xl tw-items-center tw-justify-between">
-        <LogoLink />
-        <SupplierLinks />
-        <ProfileDropdown onHostApp={true} />
-      </div>
+    <div className="tw-sticky tw-z-10 tw-top-0 tw-flex tw-flex-col tw-items-center tw-justify-center tw-box-border tw-w-full tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white">
+      <SupplierDesktopHeader />
+      <SupplierMobileHeader />
+    </div>
+  );
+};
+
+const SupplierDesktopHeader: React.FC = () => {
+  return (
+    <div className="tw-hidden sm:tw-flex tw-w-[calc(100%-10rem)] tw-max-w-7xl tw-max-h-[96px] tw-min-h-[96px] tw-items-center tw-justify-between">
+      <LogoLink />
+      <SupplierLinks />
+      <ProfileDropdown onHostApp />
+    </div>
+  );
+};
+
+const SupplierMobileHeader: React.FC = () => {
+  return (
+    <div className="tw-flex sm:tw-hidden tw-w-[calc(100%-2.5rem)] tw-max-w-7xl tw-max-h-[72px] tw-min-h-[72px] tw-items-center tw-justify-between">
+      <LogoLink />
+      <button
+        className="tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-font-medium tw-text-sm hover:tw-bg-gray-100"
+        onClick={() => {
+          if ((window as any).Atlas) {
+            (window as any).Atlas.chat.openWindow();
+          }
+        }}
+      >
+        Help
+      </button>
+      <SupplierLinks />
+      <MobileMenu onHostApp />
     </div>
   );
 };

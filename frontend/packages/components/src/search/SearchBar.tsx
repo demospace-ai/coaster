@@ -30,19 +30,7 @@ export const SearchBar: React.FC<{ className: string }> = (props) => {
   );
 };
 
-export const SearchBarHeader: React.FC<{
-  show?: boolean;
-  className?: string;
-}> = (props) => {
-  return (
-    <>
-      <SearchBarModal {...props} header />
-      <SearchBarDropdown {...props} header />
-    </>
-  );
-};
-
-const SearchBarModal: React.FC<{
+export const SearchBarModal: React.FC<{
   className?: string;
   header?: boolean;
 }> = (props) => {
@@ -82,7 +70,7 @@ const SearchBarModal: React.FC<{
   );
 };
 
-const SearchBarDropdown: React.FC<{
+export const SearchBarDropdown: React.FC<{
   className?: string;
   header?: boolean;
   show?: boolean;
