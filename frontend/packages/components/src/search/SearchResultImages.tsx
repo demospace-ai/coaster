@@ -12,14 +12,14 @@ export const SearchResultImages: React.FC<{ listing: Listing }> = ({ listing }) 
   const carouselRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
 
-  const indicatorRefs = listing.images.map(() => useRef<HTMLDivElement>(null));
+  const indicatorContainerRef = useRef<HTMLDivElement>(null);
 
   const handleScroll = useDebounce(
     useCallback(() => {
       if (carouselRef.current) {
         const newIndex = Math.round(carouselRef.current.scrollLeft / width);
         setImageIndex(newIndex);
-        indicatorRefs[newIndex].current?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+        indicatorContainerRef.current?.scrollTo({ left: 2 * newIndex, behavior: "smooth" });
       }
     }, [width]),
     250,
@@ -28,7 +28,7 @@ export const SearchResultImages: React.FC<{ listing: Listing }> = ({ listing }) 
   const scrollForward = () => {
     const newIndex = (imageIndex + 1) % listing.images.length;
     setImageIndex(newIndex);
-    indicatorRefs[newIndex].current?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    indicatorContainerRef.current?.scrollTo({ left: 2 * newIndex, behavior: "smooth" });
     carouselRef.current?.scrollTo({
       left: width * newIndex,
       behavior: "smooth",
@@ -38,7 +38,7 @@ export const SearchResultImages: React.FC<{ listing: Listing }> = ({ listing }) 
   const scrollBack = () => {
     const newIndex = Math.max(imageIndex - 1, 0);
     setImageIndex(newIndex);
-    indicatorRefs[newIndex].current?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    indicatorContainerRef.current?.scrollTo({ left: 2 * newIndex, behavior: "smooth" });
     carouselRef.current?.scrollTo({
       left: width * newIndex,
       behavior: "smooth",
@@ -56,7 +56,7 @@ export const SearchResultImages: React.FC<{ listing: Listing }> = ({ listing }) 
   }, [carouselRef, handleScroll]);
 
   return (
-    <div className="tw-relative tw-group tw-select-none tw-w-full">
+    <div className="tw-relative tw-group tw-select-none tw-w-full tw-overscroll-contain">
       <div className="tw-absolute tw-flex tw-h-full tw-w-full tw-justify-center tw-items-center tw-transition-all tw-duration-200 tw-pointer-events-none tw-z-[1]">
         <div className="tw-flex tw-items-center group-hover:tw-opacity-100 tw-opacity-0">
           <div className="tw-absolute tw-right-2 tw-pointer-events-auto">
@@ -80,11 +80,13 @@ export const SearchResultImages: React.FC<{ listing: Listing }> = ({ listing }) 
             />
           </div>
         </div>
-        <div className="tw-absolute tw-flex tw-gap-1 tw-bottom-2 sm:tw-bottom-1 tw-pointer-events-auto tw-opacity-100 tw-max-w-[100px] tw-overflow-auto tw-hide-scrollbar">
+        <div
+          ref={indicatorContainerRef}
+          className="tw-absolute tw-flex tw-gap-1 tw-bottom-2 sm:tw-bottom-1 tw-pointer-events-auto tw-opacity-100 tw-max-w-[100px] tw-overflow-auto tw-hide-scrollbar"
+        >
           {listing.images.map((_, idx) => (
             <div
               key={idx}
-              ref={indicatorRefs[idx]}
               className={mergeClasses(
                 "tw-text-2xl tw-text-white tw-opacity-50",
                 idx === imageIndex && "tw-opacity-100",

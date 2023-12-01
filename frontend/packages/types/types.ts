@@ -80,7 +80,6 @@ export interface Listing {
   id: number;
   name: string | undefined;
   description: string | undefined;
-  category: CategoryType | undefined;
   price: number | undefined;
   location: string | undefined;
   coordinates: Coordinates | undefined;
@@ -99,6 +98,8 @@ export interface Listing {
   host: Host;
 
   images: Image[];
+
+  categories: CategoryType[] | undefined;
 }
 
 export interface AvailabilityRule {
@@ -146,7 +147,7 @@ export interface Host {
 export interface ListingInput {
   name?: string;
   description?: string;
-  category?: CategoryType;
+  categories?: CategoryType[];
   price?: number;
   location?: string;
   status?: ListingStatus;
@@ -309,6 +310,8 @@ export const Category = z.enum([
   "hunting",
 ]);
 export type CategoryType = z.infer<typeof Category>;
+
+export const SpecialCategory = z.enum(["popular", "featured"]);
 
 export const AvailabilityType = z.enum(["date", "datetime"]);
 export type AvailabilityTypeType = z.infer<typeof AvailabilityType>;

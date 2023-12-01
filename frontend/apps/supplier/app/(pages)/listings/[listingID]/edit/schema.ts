@@ -1,7 +1,7 @@
 import { AvailabilityType, Category } from "@coaster/types";
 import { z } from "zod";
 
-export const CategorySchema = Category;
+export const CategoriesSchema = z.array(Category);
 
 export const NameSchema = z
   .string()

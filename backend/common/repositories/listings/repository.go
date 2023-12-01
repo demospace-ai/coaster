@@ -1,6 +1,7 @@
 package listings
 
 import (
+	"slices"
 	"time"
 
 	"go.fabra.io/server/common/errors"
@@ -14,8 +15,9 @@ import (
 
 type ListingDetails struct {
 	models.Listing
-	Host   *models.User
-	Images []models.ListingImage
+	Host       *models.User
+	Images     []models.ListingImage
+	Categories []models.ListingCategory
 }
 
 type ListingMetadata struct {
@@ -41,21 +43,7 @@ func LoadDetailsByIDAndUser(db *gorm.DB, listingID int64, user *models.User) (*L
 		}
 	}
 
-	images, err := LoadImagesForListing(db, listingID)
-	if err != nil {
-		return nil, errors.Wrap(err, "(listings.LoadByID) getting images")
-	}
-
-	host, err := users.LoadUserByID(db, listing.UserID)
-	if err != nil {
-		return nil, errors.Wrap(err, "(listings.LoadByID) getting host")
-	}
-
-	return &ListingDetails{
-		listing,
-		host,
-		images,
-	}, nil
+	return loadDetailsForListing(db, listing)
 }
 
 func LoadByIDAndUser(db *gorm.DB, listingID int64, user *models.User) (*models.Listing, error) {
@@ -104,10 +92,16 @@ func LoadAllByUserID(db *gorm.DB, userID int64) ([]ListingDetails, error) {
 			return nil, errors.Wrap(err, "(listings.LoadAllByUserID) getting images")
 		}
 
+		categories, err := LoadCategoriesForListing(db, listing.ID)
+		if err != nil {
+			return nil, errors.Wrap(err, "(listings.LoadByID) getting categories")
+		}
+
 		listingsAndImages[i] = ListingDetails{
 			listing,
 			host,
 			images,
+			categories,
 		}
 	}
 
@@ -123,24 +117,10 @@ func GetDraftListing(db *gorm.DB, userID int64) (*ListingDetails, error) {
 		Where("listings.status = ?", models.ListingStatusDraft).
 		Take(&listing)
 	if result.Error != nil {
-		return nil, errors.Wrap(result.Error, "(listings.getDraftListing)")
+		return nil, errors.Wrap(result.Error, "(listings.GetDraftListing)")
 	}
 
-	images, err := LoadImagesForListing(db, listing.ID)
-	if err != nil {
-		return nil, errors.Wrap(err, "(listings.getDraftListing) getting images")
-	}
-
-	host, err := users.LoadUserByID(db, userID)
-	if err != nil {
-		return nil, errors.Wrap(err, "(listings.getDraftListing) getting host")
-	}
-
-	return &ListingDetails{
-		listing,
-		host,
-		images,
-	}, nil
+	return loadDetailsForListing(db, listing)
 }
 
 func SubmitListing(db *gorm.DB, listing *models.Listing) error {
@@ -158,7 +138,7 @@ func CreateListing(
 	userID int64,
 	name *string,
 	description *string,
-	category *models.ListingCategory,
+	categories []models.ListingCategoryType,
 	price *int64,
 	location *string,
 	coordinates *geo.Point,
@@ -167,12 +147,10 @@ func CreateListing(
 		UserID:           userID,
 		Name:             name,
 		Description:      description,
-		Category:         category,
 		Price:            price,
 		Location:         location,
 		Coordinates:      coordinates,
 		Status:           models.ListingStatusDraft,
-		Featured:         false,
 		Cancellation:     models.ListingCancellationFlexible,
 		Highlights:       []string{},
 		Includes:         []string{},
@@ -185,20 +163,30 @@ func CreateListing(
 		return nil, errors.Wrap(result.Error, "(listings.CreateListing)")
 	}
 
+	for _, category := range categories {
+		if slices.Contains(models.SPECIAL_CATEGORIES, category) {
+			continue
+		}
+
+		result := db.Create(&models.ListingCategory{
+			ListingID: listing.ID,
+			Category:  category,
+		})
+		if result.Error != nil {
+			return nil, errors.Wrap(result.Error, "(listings.CreateListing) creating category")
+		}
+	}
+
 	return &listing, nil
 }
 
-func UpdateListing(db *gorm.DB, listing *models.Listing, listingUpdates input.Listing) (*models.Listing, error) {
+func UpdateListing(db *gorm.DB, listing *models.Listing, listingUpdates input.Listing) (*ListingDetails, error) {
 	if listingUpdates.Name != nil {
 		listing.Name = listingUpdates.Name
 	}
 
 	if listingUpdates.Description != nil {
 		listing.Description = listingUpdates.Description
-	}
-
-	if listingUpdates.Category != nil {
-		listing.Category = listingUpdates.Category
 	}
 
 	if listingUpdates.Price != nil {
@@ -262,7 +250,45 @@ func UpdateListing(db *gorm.DB, listing *models.Listing, listingUpdates input.Li
 		return nil, errors.Wrap(result.Error, "(listings.UpdateListing)")
 	}
 
-	return listing, nil
+	if listingUpdates.Categories != nil {
+		err := updateListingCategories(db, listing.ID, listingUpdates.Categories)
+		if err != nil {
+			return nil, errors.Wrap(err, "(api.UpdateListing) updating listing categories")
+		}
+	}
+
+	return loadDetailsForListing(db, *listing)
+}
+
+func updateListingCategories(db *gorm.DB, listingID int64, categories []models.ListingCategoryType) error {
+	err := db.Transaction(func(tx *gorm.DB) error {
+		result := tx.Model(&models.ListingCategory{}).Where("listing_id = ?", listingID).Where("category NOT IN ?", models.SPECIAL_CATEGORIES).Update("deactivated_at", time.Now())
+		if result.Error != nil {
+			return errors.Wrap(result.Error, "(listings.UpdateListingCategories) deleting old categories")
+		}
+
+		for _, category := range categories {
+			if slices.Contains(models.SPECIAL_CATEGORIES, category) {
+				continue
+			}
+
+			result := tx.Create(&models.ListingCategory{
+				ListingID: listingID,
+				Category:  category,
+			})
+			if result.Error != nil {
+				return errors.Wrap(result.Error, "(listings.UpdateListingCategories) creating category")
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return errors.Wrap(err, "(listings.UpdateListingCategories) updating categories")
+	}
+
+	return nil
 }
 
 func CreateListingImage(db *gorm.DB, listingID int64, storageID string, rank int, width int, height int) (*models.ListingImage, error) {
@@ -359,58 +385,19 @@ func LoadListingsWithinRadius(db *gorm.DB, coordinates geo.Point, radius int64) 
 
 	listingsAndImages := make([]ListingDetails, len(listings))
 	for i, listing := range listings {
-		images, err := LoadImagesForListing(db, listing.ID)
+		details, err := loadDetailsForListing(db, listing)
 		if err != nil {
-			return nil, errors.Wrap(err, "(listings.LoadListingsWithinRadius) getting images")
+			return nil, errors.Wrap(err, "(listings.LoadListingsWithinRadius) loading details")
 		}
 
-		host, err := users.LoadUserByID(db, listing.UserID)
-		if err != nil {
-			return nil, errors.Wrap(err, "(listings.LoadListingsWithinRadius) getting host")
-		}
-
-		listingsAndImages[i] = ListingDetails{
-			listing,
-			host,
-			images,
-		}
+		listingsAndImages[i] = *details
 	}
 
 	return listingsAndImages, nil
 }
 
 func LoadFeatured(db *gorm.DB) ([]ListingDetails, error) {
-	var listings []models.Listing
-	result := db.Table("listings").
-		Select("listings.*").
-		Where("listings.status = ?", models.ListingStatusPublished).
-		Where("listings.featured = TRUE").
-		Where("listings.deactivated_at IS NULL").
-		Find(&listings)
-	if result.Error != nil {
-		return nil, errors.Wrap(result.Error, "(listings.LoadFeatured)")
-	}
-
-	listingsAndImages := make([]ListingDetails, len(listings))
-	for i, listing := range listings {
-		images, err := LoadImagesForListing(db, listing.ID)
-		if err != nil {
-			return nil, errors.Wrap(err, "(listings.LoadFeatured) getting images")
-		}
-
-		host, err := users.LoadUserByID(db, listing.UserID)
-		if err != nil {
-			return nil, errors.Wrap(err, "(listings.LoadFeatured) getting host")
-		}
-
-		listingsAndImages[i] = ListingDetails{
-			listing,
-			host,
-			images,
-		}
-	}
-
-	return listingsAndImages, nil
+	return LoadListingsByCategory(db, []models.ListingCategoryType{models.CategoryFeatured})
 }
 
 func LoadByDuration(db *gorm.DB, durationMinutes int64) ([]ListingDetails, error) {
@@ -427,32 +414,24 @@ func LoadByDuration(db *gorm.DB, durationMinutes int64) ([]ListingDetails, error
 
 	listingsAndImages := make([]ListingDetails, len(listings))
 	for i, listing := range listings {
-		images, err := LoadImagesForListing(db, listing.ID)
+		details, err := loadDetailsForListing(db, listing)
 		if err != nil {
-			return nil, errors.Wrap(err, "(listings.LoadDayTrips) getting images")
+			return nil, errors.Wrap(err, "(listings.LoadByDuration) loading details")
 		}
 
-		host, err := users.LoadUserByID(db, listing.UserID)
-		if err != nil {
-			return nil, errors.Wrap(err, "(listings.LoadDayTrips) getting host")
-		}
-
-		listingsAndImages[i] = ListingDetails{
-			listing,
-			host,
-			images,
-		}
+		listingsAndImages[i] = *details
 	}
 
 	return listingsAndImages, nil
 }
 
-func LoadListingsByCategory(db *gorm.DB, categories []models.ListingCategory) ([]ListingDetails, error) {
+func LoadListingsByCategory(db *gorm.DB, categories []models.ListingCategoryType) ([]ListingDetails, error) {
 	var listings []models.Listing
 	result := db.Table("listings").
 		Select("listings.*").
+		Joins("JOIN listing_categories ON listing_categories.listing_id = listings.id").
 		Where("listings.status = ?", models.ListingStatusPublished).
-		Where("listings.category IN ?", categories).
+		Where("listing_categories.category IN ?", categories).
 		Where("listings.deactivated_at IS NULL").
 		Find(&listings)
 	if result.Error != nil {
@@ -461,56 +440,12 @@ func LoadListingsByCategory(db *gorm.DB, categories []models.ListingCategory) ([
 
 	listingsAndImages := make([]ListingDetails, len(listings))
 	for i, listing := range listings {
-		images, err := LoadImagesForListing(db, listing.ID)
+		details, err := loadDetailsForListing(db, listing)
 		if err != nil {
-			return nil, errors.Wrap(err, "(listings.LoadListingsByCategory) getting images")
+			return nil, errors.Wrap(err, "(listings.LoadListingsByCategory) loading details")
 		}
 
-		host, err := users.LoadUserByID(db, listing.UserID)
-		if err != nil {
-			return nil, errors.Wrap(err, "(listings.LoadListingsByCategory) getting host")
-		}
-
-		listingsAndImages[i] = ListingDetails{
-			listing,
-			host,
-			images,
-		}
-	}
-
-	return listingsAndImages, nil
-}
-
-func LoadFeaturedListingsByCategory(db *gorm.DB, categories []models.ListingCategory) ([]ListingDetails, error) {
-	var listings []models.Listing
-	result := db.Table("listings").
-		Select("listings.*").
-		Where("listings.status = ?", models.ListingStatusPublished).
-		Where("listings.category IN ?", categories).
-		Where("listings.featured = TRUE").
-		Where("listings.deactivated_at IS NULL").
-		Find(&listings)
-	if result.Error != nil {
-		return nil, errors.Wrap(result.Error, "(listings.LoadListingsByCategory)")
-	}
-
-	listingsAndImages := make([]ListingDetails, len(listings))
-	for i, listing := range listings {
-		images, err := LoadImagesForListing(db, listing.ID)
-		if err != nil {
-			return nil, errors.Wrap(err, "(listings.LoadListingsByCategory) getting images")
-		}
-
-		host, err := users.LoadUserByID(db, listing.UserID)
-		if err != nil {
-			return nil, errors.Wrap(err, "(listings.LoadListingsByCategory) getting host")
-		}
-
-		listingsAndImages[i] = ListingDetails{
-			listing,
-			host,
-			images,
-		}
+		listingsAndImages[i] = *details
 	}
 
 	return listingsAndImages, nil
@@ -528,4 +463,47 @@ func LoadAllPublishedMetadata(db *gorm.DB) ([]ListingMetadata, error) {
 	}
 
 	return listingMetadataList, nil
+}
+
+func LoadCategoriesForListing(db *gorm.DB, listingID int64) ([]models.ListingCategory, error) {
+	var listingCategories []models.ListingCategory
+	result := db.Table("listing_categories").
+		Select("listing_categories.*").
+		Where("listing_categories.listing_id = ?", listingID).
+		Where("listing_categories.deactivated_at IS NULL").
+		Find(&listingCategories)
+	if result.Error != nil {
+		// Not guaranteed to have any images for a listing so just return an empty slice
+		if errors.IsRecordNotFound(result.Error) {
+			return []models.ListingCategory{}, nil
+		} else {
+			return nil, errors.Wrap(result.Error, "(listings.LoadCategoriesForListing)")
+		}
+	}
+
+	return listingCategories, nil
+}
+
+func loadDetailsForListing(db *gorm.DB, listing models.Listing) (*ListingDetails, error) {
+	host, err := users.LoadUserByID(db, listing.UserID)
+	if err != nil {
+		return nil, errors.Wrap(err, "(listings.loadDetailsForListing) getting host")
+	}
+
+	images, err := LoadImagesForListing(db, listing.ID)
+	if err != nil {
+		return nil, errors.Wrap(err, "(listings.loadDetailsForListing) getting images")
+	}
+
+	categories, err := LoadCategoriesForListing(db, listing.ID)
+	if err != nil {
+		return nil, errors.Wrap(err, "(listings.loadDetailsForListing) getting categories")
+	}
+
+	return &ListingDetails{
+		listing,
+		host,
+		images,
+		categories,
+	}, nil
 }

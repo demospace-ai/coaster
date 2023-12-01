@@ -15,6 +15,7 @@ const config: Config = {
         shimmer: "shimmer 1.5s linear infinite",
         "fade-in": "fade-in 200ms ease-in-out",
         "dot-flashing": "dot-flashing 1s infinite linear alternate",
+        "infinite-scroll": "infinite-scroll 20s linear infinite",
       },
       colors: {
         primary: {
@@ -53,6 +54,14 @@ const config: Config = {
           },
           "30%, 100%": {
             opacity: "0.2",
+          },
+        },
+        "infinite-scroll": {
+          from: {
+            transform: "translateX(0)",
+          },
+          to: {
+            transform: "translateX(-50%)",
           },
         },
       },

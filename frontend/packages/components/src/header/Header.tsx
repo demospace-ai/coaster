@@ -58,7 +58,7 @@ const MobileHeader: React.FC = () => {
     <div className="tw-flex sm:tw-hidden tw-w-[calc(100%-2.5rem)] tw-max-w-7xl tw-max-h-[72px] tw-min-h-[72px] tw-items-center tw-justify-between">
       <LogoLink />
       <button
-        className="tw-flex tw-my-auto tw-py-2 tw-px-1 tw-rounded-lg tw-font-medium tw-text-sm hover:tw-bg-gray-100"
+        className="tw-flex tw-my-auto tw-mr-3 tw-py-2 tw-px-1 tw-rounded-lg tw-font-medium tw-text-sm hover:tw-bg-gray-100"
         onClick={() => {
           if ((window as any).Atlas) {
             (window as any).Atlas.chat.openWindow();
@@ -359,7 +359,7 @@ const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
 
   return (
     <div className="tw-flex lg:tw-hidden tw-items-center">
-      <Bars3Icon className="tw-w-7 tw-ml-4" onClick={() => setOpen(true)} />
+      <Bars3Icon className="tw-w-7" onClick={() => setOpen(true)} />
       <Transition.Root show={open} as={Fragment}>
         <Dialog as="div" className="tw-relative tw-z-30" onClose={setOpen}>
           <div className="tw-fixed tw-inset-0 tw-overflow-hidden">
@@ -491,7 +491,7 @@ const SupplierMobileHeader: React.FC = () => {
     <div className="tw-flex sm:tw-hidden tw-w-[calc(100%-2.5rem)] tw-max-w-7xl tw-max-h-[72px] tw-min-h-[72px] tw-items-center tw-justify-between">
       <LogoLink />
       <button
-        className="tw-flex tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-font-medium tw-text-sm hover:tw-bg-gray-100"
+        className="tw-flex tw-my-auto tw-py-2 tw-px-4 tw-rounded-lg tw-font-medium tw-text-sm hover:tw-bg-gray-100"
         onClick={() => {
           if ((window as any).Atlas) {
             (window as any).Atlas.chat.openWindow();

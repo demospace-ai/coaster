@@ -64,23 +64,14 @@ func (s ApiService) UpdateListing(auth auth.Authentication, w http.ResponseWrite
 		updateListingRequest.Coordinates = coordinates
 	}
 
-	listing, err = listings.UpdateListing(
+	listingDetails, err := listings.UpdateListing(
 		s.db,
 		listing,
 		updateListingRequest,
 	)
 	if err != nil {
-		return errors.Wrap(err, "(api.UpdateListing) creating listing")
+		return errors.Wrap(err, "(api.UpdateListing) updating listing")
 	}
 
-	listingImages, err := listings.LoadImagesForListing(s.db, listing.ID)
-	if err != nil {
-		return errors.Wrapf(err, "(api.UpdateListing) loading images for listing %d", listing.ID)
-	}
-
-	return json.NewEncoder(w).Encode(views.ConvertListing(listings.ListingDetails{
-		Listing: *listing,
-		Host:    auth.User,
-		Images:  listingImages,
-	}))
+	return json.NewEncoder(w).Encode(views.ConvertListing(*listingDetails))
 }

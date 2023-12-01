@@ -1,6 +1,8 @@
 package views
 
 import (
+	"slices"
+
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/repositories/listings"
 )
@@ -9,7 +11,6 @@ type Listing struct {
 	ID                  int64                      `json:"id"`
 	Name                *string                    `json:"name"`
 	Description         *string                    `json:"description"`
-	Category            *models.ListingCategory    `json:"category"`
 	Price               *int64                     `json:"price"`
 	Location            *string                    `json:"location"`
 	Coordinates         *Coordinates               `json:"coordinates"`
@@ -27,6 +28,8 @@ type Listing struct {
 	Host Host `json:"host"`
 
 	Images []Image `json:"images"`
+
+	Categories []models.ListingCategoryType `json:"categories"`
 }
 
 type Image struct {
@@ -34,6 +37,11 @@ type Image struct {
 	StorageID string `json:"storage_id"`
 	Width     int    `json:"width"`
 	Height    int    `json:"height"`
+}
+
+type Category struct {
+	ID       int64                      `json:"id"`
+	Category models.ListingCategoryType `json:"category"`
 }
 
 type Host struct {
@@ -70,7 +78,6 @@ func ConvertListing(listing listings.ListingDetails) Listing {
 		ID:                  listing.ID,
 		Name:                listing.Name,
 		Description:         listing.Description,
-		Category:            listing.Category,
 		Price:               listing.Price,
 		Location:            listing.Location,
 		Coordinates:         coordinates,
@@ -88,6 +95,8 @@ func ConvertListing(listing listings.ListingDetails) Listing {
 		Host: ConvertHost(listing.Host),
 
 		Images: ConvertImages(listing.Images),
+
+		Categories: ConvertCategories(listing.Categories),
 	}
 }
 
@@ -114,6 +123,19 @@ func ConvertImages(images []models.ListingImage) []Image {
 			Width:     image.Width,
 			Height:    image.Height,
 		}
+	}
+
+	return converted
+}
+
+func ConvertCategories(categories []models.ListingCategory) []models.ListingCategoryType {
+	converted := []models.ListingCategoryType{}
+	for _, category := range categories {
+		if slices.Contains(models.SPECIAL_CATEGORIES, category.Category) {
+			continue
+		}
+
+		converted = append(converted, category.Category)
 	}
 
 	return converted

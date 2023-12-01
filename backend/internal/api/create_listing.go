@@ -51,7 +51,7 @@ func (s ApiService) CreateListing(auth auth.Authentication, w http.ResponseWrite
 		auth.User.ID,
 		createListingRequest.Name,
 		createListingRequest.Description,
-		createListingRequest.Category,
+		createListingRequest.Categories,
 		createListingRequest.Price,
 		location,
 		coordinates,

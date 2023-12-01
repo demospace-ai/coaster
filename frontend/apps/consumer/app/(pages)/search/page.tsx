@@ -15,9 +15,8 @@ export default async function Search({ searchParams }: { searchParams: { [key: s
 
   let searchTitle = "";
   if (categories) {
-    searchTitle = `${listings.length} results for ${categoriesParsed
-      .map((category) => getCategoryForDisplay(category))
-      .join(", ")}`;
+    const categoryString = categoriesParsed.map((category) => getCategoryForDisplay(category)).join(", ");
+    searchTitle = `${listings.length} results for ${categoryString}`;
   } else if (location) {
     searchTitle = `${listings.length} results for ${location}`;
   } else {

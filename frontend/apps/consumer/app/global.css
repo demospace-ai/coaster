@@ -21,6 +21,10 @@
   .tw-hide-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
+  .tw-pause-animation {
+    animation-play-state: paused;
+  }
 }
 
 :root {

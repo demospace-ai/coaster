@@ -1,6 +1,6 @@
 module go.fabra.io/server
 
-go 1.20
+go 1.21
 
 require (
 	cloud.google.com/go/kms v1.11.0

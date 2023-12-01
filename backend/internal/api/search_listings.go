@@ -85,7 +85,7 @@ func (s ApiService) loadByLocation(locationParam string, radiusParam string) ([]
 }
 
 func (s ApiService) loadByCategory(categoryParam string) ([]listings.ListingDetails, error) {
-	var categories []models.ListingCategory
+	var categories []models.ListingCategoryType
 	err := json.Unmarshal([]byte(categoryParam), &categories)
 	if err != nil {
 		return nil, errors.Wrap(err, "(api.filterByCategory) unmarshalling categories")
@@ -114,13 +114,11 @@ func (s ApiService) filterByCategory(unfiltered []listings.ListingDetails, categ
 
 	var filteredByCategory []listings.ListingDetails
 	for _, listing := range unfiltered {
-		if listing.Category == nil {
-			continue
-		}
-
 		for _, category := range categories {
-			if *listing.Category == category {
-				filteredByCategory = append(filteredByCategory, listing)
+			for _, listingCategory := range listing.Categories {
+				if listingCategory == category {
+					filteredByCategory = append(filteredByCategory, listing)
+				}
 			}
 		}
 	}

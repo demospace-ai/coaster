@@ -8,7 +8,6 @@ import (
 type Listing struct {
 	Name                *string                     `json:"name"`
 	Description         *string                     `json:"description"`
-	Category            *models.ListingCategory     `json:"category"`
 	Price               *int64                      `json:"price"`
 	Location            *string                     `json:"location"`
 	Coordinates         *geo.Point                  `json:"coordinates"`
@@ -22,6 +21,8 @@ type Listing struct {
 	NotIncluded         []string                    `json:"not_included"`
 	AvailabilityType    *models.AvailabilityType    `json:"availability_type"`
 	AvailabilityDisplay *models.AvailabilityDisplay `json:"availability_display"`
+
+	Categories []models.ListingCategoryType `json:"categories"`
 }
 
 type ListingImage struct {

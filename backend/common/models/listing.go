@@ -5,30 +5,6 @@ import (
 	"go.fabra.io/server/common/geo"
 )
 
-type ListingCategory string
-
-const (
-	CategorySurfing    ListingCategory = "surfing"
-	CategorySkiing     ListingCategory = "skiing"
-	CategoryFishing    ListingCategory = "fishing"
-	CategoryHiking     ListingCategory = "hiking"
-	CategoryCamping    ListingCategory = "camping"
-	CategoryCycling    ListingCategory = "cycling"
-	CategoryBoating    ListingCategory = "boating"
-	CategoryClimbing   ListingCategory = "climbing"
-	CategoryOutdoors   ListingCategory = "outdoors"
-	CategoryDiving     ListingCategory = "diving"
-	CategorySnorkeling ListingCategory = "snorkeling"
-	CategorySafari     ListingCategory = "safari"
-	CategorySup        ListingCategory = "sup"
-	CategoryKiteSurf   ListingCategory = "kitesurf"
-	CategoryWindSurf   ListingCategory = "windsurf"
-	CategoryWingfoil   ListingCategory = "wingfoil"
-	CategoryKayaking   ListingCategory = "kayaking"
-	CategoryBuggying   ListingCategory = "buggying"
-	CategoryHunting    ListingCategory = "hunting"
-)
-
 type ListingStatus string
 
 const (
@@ -63,12 +39,10 @@ type Listing struct {
 	UserID              int64               `json:"user_id"`
 	Name                *string             `json:"name"`
 	Description         *string             `json:"description"`
-	Category            *ListingCategory    `json:"category"`
 	Price               *int64              `json:"price"`
 	Location            *string             `json:"location"`
 	Coordinates         *geo.Point          `json:"coordinates"`
 	Status              ListingStatus       `json:"status"`
-	Featured            bool                `json:"featured"`
 	ShortDescription    *string             `json:"short_description"`
 	Cancellation        ListingCancellation `json:"cancellation"`
 	DurationMinutes     *int64              `json:"duration_minutes"`
@@ -88,6 +62,42 @@ type ListingImage struct {
 	Rank      int    `json:"rank"` // TODO: use lexorank for this
 	Width     int    `json:"width"`
 	Height    int    `json:"height"`
+
+	BaseModel
+}
+
+type ListingCategoryType string
+
+const (
+	CategorySurfing    ListingCategoryType = "surfing"
+	CategorySkiing     ListingCategoryType = "skiing"
+	CategoryFishing    ListingCategoryType = "fishing"
+	CategoryHiking     ListingCategoryType = "hiking"
+	CategoryCamping    ListingCategoryType = "camping"
+	CategoryCycling    ListingCategoryType = "cycling"
+	CategoryBoating    ListingCategoryType = "boating"
+	CategoryClimbing   ListingCategoryType = "climbing"
+	CategoryOutdoors   ListingCategoryType = "outdoors"
+	CategoryDiving     ListingCategoryType = "diving"
+	CategorySnorkeling ListingCategoryType = "snorkeling"
+	CategorySafari     ListingCategoryType = "safari"
+	CategorySup        ListingCategoryType = "sup"
+	CategoryKiteSurf   ListingCategoryType = "kitesurf"
+	CategoryWindSurf   ListingCategoryType = "windsurf"
+	CategoryWingfoil   ListingCategoryType = "wingfoil"
+	CategoryKayaking   ListingCategoryType = "kayaking"
+	CategoryBuggying   ListingCategoryType = "buggying"
+	CategoryHunting    ListingCategoryType = "hunting"
+
+	CategoryFeatured ListingCategoryType = "featured"
+	CategoryPopular  ListingCategoryType = "popular"
+)
+
+var SPECIAL_CATEGORIES = []ListingCategoryType{CategoryFeatured, CategoryPopular}
+
+type ListingCategory struct {
+	ListingID int64               `json:"listing_id"`
+	Category  ListingCategoryType `json:"category"`
 
 	BaseModel
 }

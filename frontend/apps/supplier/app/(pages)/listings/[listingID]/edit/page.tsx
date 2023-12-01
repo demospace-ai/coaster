@@ -2,7 +2,7 @@
 
 import { Button } from "@coaster/components/button/Button";
 import { FormError } from "@coaster/components/error/FormError";
-import { ComboInput, Input, PriceInput, TextArea } from "@coaster/components/input/Input";
+import { Input, MultiSelect, PriceInput, TextArea } from "@coaster/components/input/Input";
 import { Loading } from "@coaster/components/loading/Loading";
 import { InlineMapSearch } from "@coaster/components/maps/Maps";
 import { updateListing, useNotificationContext } from "@coaster/rpc/client";
@@ -13,7 +13,7 @@ import { Controller, useForm } from "react-hook-form";
 import { useListingContext } from "supplier/app/(pages)/listings/[listingID]/edit/context";
 import {
   AvailabilityTypeSchema,
-  CategorySchema,
+  CategoriesSchema,
   DescriptionSchema,
   DurationSchema,
   MaxGuestsSchema,
@@ -26,7 +26,7 @@ const EditListingDetailsSchema = z.object({
   name: NameSchema,
   description: DescriptionSchema,
   price: PriceSchema,
-  category: CategorySchema,
+  categories: CategoriesSchema,
   location: z.string().min(1),
   duration: DurationSchema,
   maxGuests: MaxGuestsSchema,
@@ -45,7 +45,7 @@ export default function Details() {
       name: listing.name,
       description: listing.description,
       price: listing.price,
-      category: listing.category,
+      categories: listing.categories,
       location: listing.location,
       duration: listing.duration_minutes,
       maxGuests: listing.max_guests,
@@ -62,7 +62,7 @@ export default function Details() {
     formState.dirtyFields.name && (payload.name = values.name);
     formState.dirtyFields.description && (payload.description = values.description);
     formState.dirtyFields.price && (payload.price = values.price);
-    formState.dirtyFields.category && (payload.category = values.category);
+    formState.dirtyFields.categories && (payload.categories = values.categories);
     formState.dirtyFields.location && (payload.location = values.location);
     formState.dirtyFields.duration && (payload.duration_minutes = values.duration);
     formState.dirtyFields.maxGuests && (payload.max_guests = values.maxGuests);
@@ -78,6 +78,7 @@ export default function Details() {
       // TODO
     }
   };
+  console.log(formState.errors);
 
   return (
     <form className="tw-w-full" onSubmit={handleSubmit(onSubmit)}>
@@ -99,21 +100,27 @@ export default function Details() {
       />
       <FormError message={formState.errors.price?.message} />
       <Controller
-        name="category"
+        name="categories"
         control={control}
         render={({ field }) => (
-          <ComboInput
-            placeholder={"Category"}
+          <MultiSelect
+            placeholder={"Categories"}
             className="tw-w-full tw-flex tw-mt-3"
             label="Category"
-            value={watch("category")}
+            value={watch("categories")}
             options={Category.options}
             onChange={field.onChange}
-            getElementForDisplay={(value) => toTitleCase(value)}
+            getElementForDisplay={(value) => {
+              if (Array.isArray(value)) {
+                return value.map((value) => toTitleCase(value)).join(", ");
+              }
+
+              return toTitleCase(value);
+            }}
           />
         )}
       />
-      <FormError message={formState.errors.category?.message} />
+      <FormError message={formState.errors.categories?.message} />
       <Controller
         name="location"
         control={control}

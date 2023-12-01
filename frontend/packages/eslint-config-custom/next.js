@@ -3,7 +3,7 @@ module.exports = {
   ignorePatterns: ["postcss.config.cjs", "tailwind.config.cjs"],
   rules: {
     "@typescript-eslint/switch-exhaustiveness-check": "error",
-    "@typescript-eslint/quotes": ["error", "double"],
+    "@typescript-eslint/quotes": ["error", "double", { "avoidEscape": true }],
     "no-restricted-imports": ["error", {
       "patterns": [".*"]
     }],

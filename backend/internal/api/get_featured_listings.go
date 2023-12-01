@@ -43,7 +43,7 @@ func (s ApiService) GetFeaturedListings(w http.ResponseWriter, r *http.Request) 
 }
 
 func (s ApiService) loadFeaturedByCategory(categoryParam string) ([]listings.ListingDetails, error) {
-	var categories []models.ListingCategory
+	var categories []models.ListingCategoryType
 	err := json.Unmarshal([]byte(categoryParam), &categories)
 	if err != nil {
 		return nil, errors.Wrap(err, "(api.loadFeaturedByCategory) unmarshalling categories")

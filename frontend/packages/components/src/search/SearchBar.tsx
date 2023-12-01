@@ -43,7 +43,7 @@ export const SearchBarModal: React.FC<{
         <MagnifyingGlassIcon
           aria-label="Open search"
           role="button"
-          className="tw-flex tw-cursor-pointer tw-ml-3 tw-w-6 tw-h-6"
+          className="tw-flex tw-cursor-pointer tw-mr-4 tw-w-6 tw-h-6"
           onClick={() => {
             setOpen(true);
           }}
