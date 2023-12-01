@@ -9,6 +9,7 @@ import { Listing } from "@coaster/types";
 import { useIsMobile } from "@coaster/utils/client";
 import { lateef, mergeClasses } from "@coaster/utils/common";
 import {
+  ArrowRightIcon,
   Bars3Icon,
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -17,10 +18,14 @@ import {
   StarIcon,
   SunIcon,
 } from "@heroicons/react/24/outline";
+import { Post, urlFor } from "app/(pages)/blog/utils";
 import { FeaturedCategory } from "app/(pages)/utils";
+import useEmblaCarousel from "embla-carousel-react";
 import dynamic from "next/dynamic";
+import Image from "next/image";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Dispatch, ReactNode, SetStateAction, useRef, useState } from "react";
+import { Dispatch, ReactNode, SetStateAction, useCallback, useRef, useState } from "react";
 
 export const FeaturedClient: React.FC<{ initialCategory: FeaturedCategory; initialData: Listing[] }> = ({
   initialCategory,
@@ -44,6 +49,57 @@ export const FeaturedClient: React.FC<{ initialCategory: FeaturedCategory; initi
               ))}
             </>
           )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const BlogSectionClient: React.FC<{ posts: Post[] }> = ({ posts }) => {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
+  const scrollPrev = useCallback(() => {
+    if (emblaApi) emblaApi.scrollPrev();
+  }, [emblaApi]);
+
+  const scrollNext = useCallback(() => {
+    if (emblaApi) emblaApi.scrollNext();
+  }, [emblaApi]);
+
+  return (
+    <div className="tw-flex tw-flex-col tw-w-full tw-mt-10 tw-mb-20">
+      <div className="tw-flex tw-w-full tw-justify-between tw-mb-4">
+        <div className="tw-text-2xl tw-font-semibold">Latest blog posts</div>
+        <Link className="tw-flex tw-items-center tw-font-medium" href="/blog">
+          <span className="tw-underline">View blog</span>
+          <ArrowRightIcon className="tw-ml-2 tw-h-5 tw-w-5" />
+        </Link>
+      </div>
+      <div ref={emblaRef} className="tw-overflow-hidden">
+        <div className="tw-flex lg:tw-w-full lg:tw-gap-4">
+          {posts.map((post) => (
+            <Link
+              href={`/blog/${post.slug.current}`}
+              key={post._id}
+              className="tw-flex tw-flex-col tw-shrink-0 lg:tw-shrink tw-w-[90vw] sm:tw-w-[50vw] lg:tw-w-1/3 tw-rounded-xl tw-bg-blue-950 tw-p-8 tw-text-white tw-mx-3 lg:tw-mx-0"
+            >
+              <Image
+                priority
+                alt={post.mainImage.alt}
+                src={urlFor(post.mainImage).url()}
+                sizes="100vw"
+                width={post.mainImage.metadata.dimensions.width}
+                height={post.mainImage.metadata.dimensions.height}
+                placeholder="blur"
+                blurDataURL={post.mainImage.metadata.lqip}
+                className="tw-shadow-md tw-h-60 tw-object-cover"
+              />
+              <div className="tw-flex tw-flex-col tw-h-48 tw-text-center">
+                <div className="tw-mt-4 tw-uppercase">By {post.authorName}</div>
+                <div className="tw-mt-1 tw-font-bold tw-text-2xl">{post.title}</div>
+              </div>
+              <div className="tw-text-center tw-underline">READ NOW</div>
+            </Link>
+          ))}
         </div>
       </div>
     </div>
