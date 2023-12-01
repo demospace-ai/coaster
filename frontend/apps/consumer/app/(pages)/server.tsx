@@ -1,8 +1,8 @@
 import Hero from "@coaster/assets/hero.jpg";
 import { SearchBar } from "@coaster/components/search/SearchBar";
 import { getFeaturedServer } from "@coaster/rpc/server";
-import { FeaturedClient } from "app/(pages)/[category]/client";
-import { FeaturedCategory } from "app/(pages)/[category]/utils";
+import { FeaturedClient } from "app/(pages)/client";
+import { FeaturedCategory } from "app/(pages)/utils";
 import Image from "next/image";
 
 export const FeaturedPage = async ({ category }: { category?: FeaturedCategory }) => {

@@ -1,4 +1,4 @@
-import { FeaturedPage } from "app/(pages)/[category]/server";
+import { FeaturedPage } from "app/(pages)/server";
 import { Metadata, Viewport } from "next";
 
 export const dynamic = "force-static";
