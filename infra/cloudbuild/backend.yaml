@@ -1,6 +1,6 @@
 steps:
 - id: test-backend
-  name: 'golang:1.20'
+  name: 'golang:1.21'
   script: |
     cd backend;
     go test -v ./...;
