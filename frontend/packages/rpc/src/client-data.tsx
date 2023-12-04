@@ -29,7 +29,6 @@ import {
   GetAvailability,
   GetAvailabilityRules,
   GetDraftListing,
-  GetFeaturedListings,
   GetHostedListings,
   GetListing,
   GetPayoutMethods,
@@ -162,31 +161,6 @@ export function useSearch(location?: string, categories?: string) {
   const { data, mutate, error, isLoading, isValidating } = useSWR(
     shouldFetch ? { SearchListings, location, categories } : null,
     fetcher,
-  );
-  return { listings: data, mutate, error, loading: isLoading || isValidating };
-}
-
-export function useFeatured(categories?: string, duration?: number, initialData?: Listing[]) {
-  const fetcher: Fetcher<Listing[], { categories?: string }> = ({ categories }) => {
-    const queryParams: { categories?: string; durationMinutes?: number } = {};
-    if (categories) {
-      queryParams.categories = categories;
-    }
-
-    if (duration) {
-      queryParams.durationMinutes = duration;
-    }
-
-    return sendRequest(GetFeaturedListings, { queryParams });
-  };
-  const { data, mutate, error, isLoading, isValidating } = useSWR(
-    { GetFeaturedListings, categories, duration },
-    fetcher,
-    {
-      fallbackDate: initialData,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    },
   );
   return { listings: data, mutate, error, loading: isLoading || isValidating };
 }

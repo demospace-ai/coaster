@@ -146,17 +146,6 @@ export const UpdateListingImages: IEndpoint<{ images: Image[] }, undefined, { li
   path: "/listings/:listingID/images",
 };
 
-export const GetFeaturedListings: IEndpoint<
-  undefined,
-  Listing[],
-  undefined,
-  { categories?: string; durationMinutes?: number }
-> = {
-  name: "Get featured listings",
-  method: "GET",
-  path: "/featured",
-};
-
 export const GetAvailabilityRules: IEndpoint<undefined, AvailabilityRule[]> = {
   name: "Get availability rules",
   method: "GET",

@@ -4,7 +4,7 @@ import NeedHelp from "@coaster/assets/need-help.jpg";
 import { GlobeIcon, LeafIcon } from "@coaster/components/icons/Icons";
 import { SearchBar } from "@coaster/components/search/SearchBar";
 import { SanityClient } from "@coaster/rpc/sanity";
-import { getFeaturedServer, search } from "@coaster/rpc/server";
+import { search } from "@coaster/rpc/server";
 import { Listing } from "@coaster/types";
 import { mergeClasses } from "@coaster/utils/common";
 import { BellIcon, BoltIcon, CalendarDaysIcon, CheckBadgeIcon, StarIcon } from "@heroicons/react/24/outline";
@@ -130,7 +130,7 @@ const ListingsSection: React.FC<{ type: ListingsSectionType; backsplash?: boolea
     case "featured":
       title = "Featured adventures";
       searchQuery = 'categories=["featured"]';
-      listings = await getFeaturedServer();
+      listings = await search(undefined, '["featured"]');
       break;
     case "skiing":
       title = "Guided backcountry skiing";

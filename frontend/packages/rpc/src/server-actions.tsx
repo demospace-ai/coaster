@@ -15,7 +15,7 @@ export async function updateListingServerAction(listingID: number, updates: List
   });
 
   let rootDomain = isProd() ? "https://www.trycoaster.com" : "http://localhost:3000";
-  await fetch(`${rootDomain}/api/revalidate/listings/${listingID}`);
+  await fetch(`${rootDomain}/api/revalidate/listings/${listingID}`, { method: "POST" });
   return listing;
 }
 
@@ -28,7 +28,7 @@ export async function updateListingImagesServerAction(listingID: number, images:
   });
 
   let rootDomain = isProd() ? "https://www.trycoaster.com" : "http://localhost:3000";
-  await fetch(`${rootDomain}/api/revalidate/listings/${listingID}`);
+  await fetch(`${rootDomain}/api/revalidate/listings/${listingID}`, { method: "POST" });
   return listing;
 }
 
@@ -41,7 +41,7 @@ export async function addListingImagesServerAction(listingID: number, imageFormD
   });
 
   let rootDomain = isProd() ? "https://www.trycoaster.com" : "http://localhost:3000";
-  await fetch(`${rootDomain}/api/revalidate/listings/${listingID}`);
+  await fetch(`${rootDomain}/api/revalidate/listings/${listingID}`, { method: "POST" });
   return listingImage;
 }
 
@@ -53,5 +53,5 @@ export async function deleteListingImagesServerAction(listingID: number, imageID
   });
 
   let rootDomain = isProd() ? "https://www.trycoaster.com" : "http://localhost:3000";
-  await fetch(`${rootDomain}/api/revalidate/listings/${listingID}`);
+  await fetch(`${rootDomain}/api/revalidate/listings/${listingID}`, { method: "POST" });
 }

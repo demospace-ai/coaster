@@ -56,7 +56,7 @@ export const ListingsSectionClient: React.FC<{ title: string; listings: Listing[
   }, [emblaApi]);
 
   return (
-    <div className="tw-flex tw-flex-col tw-w-full tw-mb-2">
+    <div className="tw-flex tw-flex-col tw-w-full tw-mb-5">
       <div className="tw-flex tw-w-full tw-justify-between tw-items-center">
         <div className="tw-text-xl sm:tw-text-2xl tw-font-semibold tw-mr-5">{title}</div>
         <Link className="tw-flex tw-font-medium tw-items-center tw-pt-1" href={`/search?${searchQuery}`}>
@@ -64,7 +64,7 @@ export const ListingsSectionClient: React.FC<{ title: string; listings: Listing[
           <ArrowRightIcon className="tw-ml-2 tw-h-4 tw-w-5 sm:tw-h-5 sm:tw-w-5" />
         </Link>
       </div>
-      <div className="tw-relative tw-w-full tw-mt-3 sm:tw-mt-4 tw-mb-5">
+      <div className="tw-relative tw-w-full tw-mt-3 sm:tw-mt-4">
         <div ref={emblaRef} className="tw-w-full tw-overflow-hidden">
           <div className="tw-flex tw-font-bold tw-text-3xl tw-gap-5 sm:tw-gap-10 tw-w-full">
             {listings ? (
