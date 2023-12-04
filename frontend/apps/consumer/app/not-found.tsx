@@ -4,7 +4,7 @@ import { DynamicFooter, DynamicHeader } from "app/(pages)/client";
 
 export default function NotFoundPage() {
   return (
-    <div className="tw-flex tw-flex-col tw-flex-grow tw-items-center">
+    <div className="tw-flex tw-flex-col tw-flex-grow tw-items-center tw-h-96">
       <AuthProvider publicPaths={[]} noRedirect>
         <DynamicHeader />
         <NotFound />
