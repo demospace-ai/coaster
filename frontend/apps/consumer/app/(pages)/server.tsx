@@ -26,7 +26,14 @@ export const FeaturedPage = async () => {
       <BlogSection />
       <NeedHelpSection />
       <ExploreTrips />
-      <Image src={Footer} sizes="100vw" alt="Footer image" quality={100} placeholder="blur" className="tw-max-h-96" />
+      <Image
+        src={Footer}
+        sizes="100vw"
+        alt="Footer image"
+        quality={100}
+        placeholder="blur"
+        className="tw-max-h-96 tw-min-w-full"
+      />
     </main>
   );
 };
