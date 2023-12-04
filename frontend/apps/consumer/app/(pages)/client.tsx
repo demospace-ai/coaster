@@ -197,6 +197,7 @@ export const ValuePropSection: React.FC = () => {
                 priority
                 src={FreeCancellation}
                 sizes="40px"
+                quality={100}
                 placeholder="blur"
                 className="tw-w-16 tw-h-16 tw-mb-4"
               />
@@ -211,6 +212,7 @@ export const ValuePropSection: React.FC = () => {
                 priority
                 src={CuratedExperiences}
                 sizes="40px"
+                quality={100}
                 placeholder="blur"
                 className="tw-w-16 tw-h-16 tw-mb-4"
               />
@@ -225,6 +227,7 @@ export const ValuePropSection: React.FC = () => {
                 priority
                 src={SustainableTravel}
                 sizes="40px"
+                quality={100}
                 placeholder="blur"
                 className="tw-w-16 tw-h-16 tw-mb-4"
               />
@@ -239,6 +242,7 @@ export const ValuePropSection: React.FC = () => {
                 priority
                 src={AdventureGuarantee}
                 sizes="40px"
+                quality={100}
                 placeholder="blur"
                 className="tw-w-16 tw-h-16 tw-mb-4"
               />
