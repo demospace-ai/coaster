@@ -184,7 +184,7 @@ export const ValuePropSection: React.FC = () => {
       <div className="tw-flex tw-flex-col tw-items-center tw-w-full tw-max-w-7xl">
         <div className="tw-text-xl sm:tw-text-3xl tw-font-semibold tw-mb-10">We make adventure travel easy</div>
         <div ref={emblaRef} className="tw-w-full tw-overflow-hidden">
-          <div className="tw-flex lg:tw-w-full lg:tw-gap-4">
+          <div className="tw-flex sm:tw-w-full sm:tw-justify-between">
             <div className="tw-flex tw-flex-col tw-shrink-0 tw-items-center tw-w-[90vw] sm:tw-w-fit tw-text-center">
               <Image
                 alt="Free cancellation"
