@@ -159,7 +159,7 @@ export const BlogSectionClient: React.FC<{ posts: Post[] }> = ({ posts }) => {
 };
 
 export const ValuePropSection: React.FC = () => {
-  const [emblaRef, emblaApi] = useEmblaCarousel();
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
