@@ -1,7 +1,7 @@
 "use server";
 
 import { Image, ListingInput } from "@coaster/types";
-import { revalidatePath } from "next/cache";
+import { isProd } from "@coaster/utils/common";
 import { cookies } from "next/headers";
 import { sendRequest } from "./ajax";
 import { AddListingImage, DeleteListingImage, UpdateListing, UpdateListingImages } from "./api";
@@ -14,7 +14,8 @@ export async function updateListingServerAction(listingID: number, updates: List
     extraHeaders: [["Cookie", cookieString]],
   });
 
-  revalidatePath(`/listings/${listingID}`);
+  let rootDomain = isProd() ? "https://www.trycoaster.com" : "http://localhost:3000";
+  await fetch(`${rootDomain}/api/revalidate/listings/${listingID}`);
   return listing;
 }
 
@@ -26,7 +27,8 @@ export async function updateListingImagesServerAction(listingID: number, images:
     extraHeaders: [["Cookie", cookieString]],
   });
 
-  revalidatePath(`/listings/${listingID}`);
+  let rootDomain = isProd() ? "https://www.trycoaster.com" : "http://localhost:3000";
+  await fetch(`${rootDomain}/api/revalidate/listings/${listingID}`);
   return listing;
 }
 
@@ -38,7 +40,8 @@ export async function addListingImagesServerAction(listingID: number, imageFormD
     extraHeaders: [["Cookie", cookieString]],
   });
 
-  revalidatePath(`/listings/${listingID}`);
+  let rootDomain = isProd() ? "https://www.trycoaster.com" : "http://localhost:3000";
+  await fetch(`${rootDomain}/api/revalidate/listings/${listingID}`);
   return listingImage;
 }
 
@@ -49,5 +52,6 @@ export async function deleteListingImagesServerAction(listingID: number, imageID
     extraHeaders: [["Cookie", cookieString]],
   });
 
-  revalidatePath(`/listings/${listingID}`);
+  let rootDomain = isProd() ? "https://www.trycoaster.com" : "http://localhost:3000";
+  await fetch(`${rootDomain}/api/revalidate/listings/${listingID}`);
 }
