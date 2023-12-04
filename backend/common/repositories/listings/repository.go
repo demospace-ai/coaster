@@ -433,6 +433,7 @@ func LoadListingsByCategory(db *gorm.DB, categories []models.ListingCategoryType
 		Where("listings.status = ?", models.ListingStatusPublished).
 		Where("listing_categories.category IN ?", categories).
 		Where("listings.deactivated_at IS NULL").
+		Where("listing_categories.deactivated_at IS NULL").
 		Find(&listings)
 	if result.Error != nil {
 		return nil, errors.Wrap(result.Error, "(listings.LoadListingsByCategory)")

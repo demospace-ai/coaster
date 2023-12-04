@@ -24,6 +24,7 @@ func LoadByExternalID(db *gorm.DB, externalID string) (*models.User, error) {
 		Joins("JOIN external_profiles ON external_profiles.user_id = users.id").
 		Where("external_profiles.external_id = ?", externalID).
 		Where("users.deactivated_at IS NULL").
+		Where("external_profiles.deactivated_at IS NULL").
 		Take(&user)
 
 	if result.Error != nil {
