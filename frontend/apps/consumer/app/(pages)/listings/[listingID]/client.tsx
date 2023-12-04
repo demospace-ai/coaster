@@ -14,14 +14,7 @@ import {
   Image as ListingImage,
   Listing as ListingType,
 } from "@coaster/types";
-import {
-  ToTimeOnly,
-  compareDates,
-  getDuration,
-  getGcsImageUrl,
-  mergeClasses,
-  toTitleCase,
-} from "@coaster/utils/common";
+import { ToTimeOnly, compareDates, getDuration, getGcsImageUrl, mergeClasses } from "@coaster/utils/common";
 import { Dialog, Disclosure, RadioGroup, Transition } from "@headlessui/react";
 import {
   ArrowUpOnSquareIcon,
@@ -64,6 +57,9 @@ const AvailabilityListPopper = dynamic(
 
 export const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) => {
   const { showNotification } = useNotificationContext();
+  const categoriesString = listing.categories
+    ? listing.categories.map((category) => getCategoryForDisplay(category)).join(" | ")
+    : "";
 
   return (
     <div className="tw-flex tw-flex-row tw-items-start tw-justify-between">
@@ -72,7 +68,7 @@ export const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) =
           {listing.name}
         </div>
         <div className="tw-flex tw-items-center tw-mt-3 tw-mb-4 tw-font-medium">
-          {listing.location} • {toTitleCase(listing.category ? getCategoryForDisplay(listing.category) : "")}
+          {listing.location} • {categoriesString}
         </div>
       </div>
       <div
@@ -630,7 +626,7 @@ const NullableImage: React.FC<{
   if (image) {
     return <Image {...props} src={getGcsImageUrl(image.storage_id)} fill />;
   } else {
-    return <div></div>;
+    return <div />;
   }
 };
 

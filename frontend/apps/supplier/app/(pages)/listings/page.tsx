@@ -1,3 +1,4 @@
+import { getCategoryForDisplay } from "@coaster/components/icons/Category";
 import { NavLink } from "@coaster/components/link/Link";
 import { getHostedListingsServer } from "@coaster/rpc/server";
 import { Listing } from "@coaster/types";
@@ -72,7 +73,9 @@ export default async function YourListings() {
                         {listing.status}
                       </td>
                       <td className="tw-whitespace-nowrap tw-px-3 tw-py-4 tw-text-sm tw-text-gray-500">
-                        {listing.category}
+                        {listing.categories
+                          ? listing.categories.map((category) => getCategoryForDisplay(category)).join(" | ")
+                          : ""}
                       </td>
                       <td className="tw-whitespace-nowrap tw-text-ellipsis tw-px-3 tw-py-4 tw-text-sm tw-text-gray-500 tw-max-w-[120px] tw-overflow-hidden">
                         {listing.location}

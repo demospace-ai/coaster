@@ -1,7 +1,7 @@
 import { AvailabilityType, Category } from "@coaster/types";
 import { z } from "zod";
 
-export const CategoriesSchema = z.array(Category);
+export const CategoriesSchema = z.array(Category).min(1, "Must have at least one category.");
 
 export const NameSchema = z
   .string()

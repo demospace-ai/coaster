@@ -26,7 +26,7 @@ export const FeaturedPage = async () => {
       <BlogSection />
       <NeedHelpSection />
       <ExploreTrips />
-      <Image src={Footer} sizes="100vw" alt="Footer image" quality={100} placeholder="blur" />
+      <Image src={Footer} sizes="100vw" alt="Footer image" quality={100} placeholder="blur" className="tw-max-h-96" />
     </main>
   );
 };
@@ -153,12 +153,16 @@ const ListingsSection: React.FC<{ type: ListingsSectionType; backsplash?: boolea
 
 const FreeCancellationBanner: React.FC = () => {
   return (
-    <div className="tw-flex tw-items-center tw-justify-center tw-w-full tw-px-5 sm:tw-px-20 tw-bg-blue-100 tw-py-12">
-      <div className="tw-flex tw-flex-col tw-items-center tw-w-full tw-max-w-7xl tw-text-center">
-        <div className="tw-text-xl sm:tw-text-2xl tw-font-semibold">Flexible Booking</div>
-        <div className="tw-max-w-md tw-mt-2">
-          Book now and only pay once the reservation is confirmed by your guide. Change your mind? On most trips you’ll
-          receive a full refund if you cancel in advance.
+    <div className="tw-flex tw-items-center tw-justify-center tw-w-full tw-px-5 sm:tw-px-20 tw-mb-10 sm:tw-mb-16 tw-mt-4 sm:tw-mt-10">
+      <div className="tw-flex tw-flex-col tw-items-center tw-w-full tw-max-w-7xl">
+        <div className="tw-flex tw-items-center tw-justify-center tw-w-full tw-px-5 sm:tw-px-20 tw-bg-blue-100 tw-py-12 tw-rounded-xl">
+          <div className="tw-flex tw-flex-col tw-items-center tw-w-full tw-max-w-7xl tw-text-center">
+            <div className="tw-text-xl sm:tw-text-2xl tw-font-semibold">Flexible Booking</div>
+            <div className="tw-max-w-md tw-mt-2">
+              Book now and only pay once the reservation is confirmed by your guide. Change your mind? On most trips
+              you'll receive a full refund if you cancel in advance.
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -183,7 +187,7 @@ const BlogSection: React.FC = async () => {
   );
 
   return (
-    <div className="tw-flex tw-items-center tw-justify-center tw-w-full tw-px-5 sm:tw-px-20">
+    <div className="tw-flex tw-items-center tw-justify-center tw-w-full tw-px-5 sm:tw-px-20 tw-mt-10 tw-mb-10 sm:tw-mb-20">
       <div className="tw-flex tw-flex-col tw-items-center tw-w-full tw-max-w-7xl">
         <BlogSectionClient posts={posts} />
       </div>
@@ -204,7 +208,7 @@ const NeedHelpSection: React.FC = () => {
               src={NeedHelp}
               sizes="90vw"
               placeholder="blur"
-              className="tw-rounded-2xl tw-object-left tw-object-cover"
+              className="tw-rounded-xl tw-object-left tw-object-cover"
             />
           </div>
           <div className="tw-flex tw-flex-col tw-items-center tw-text-center tw-z-[1] tw-mt-16 sm:tw-mt-28 tw-text-white">

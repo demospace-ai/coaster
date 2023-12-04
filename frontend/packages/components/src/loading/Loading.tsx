@@ -47,9 +47,9 @@ export const DotsLoading: React.FC<LoadingProps> = (props) => {
   const dotStyle = "tw-w-[5px] tw-h-[5px] tw-bg-slate-500 tw-rounded tw-animate-dot-flashing";
   return (
     <div className={mergeClasses("tw-flex tw-gap-0.5", props.className)}>
-      <div className={mergeClasses(dotStyle, "[animation-delay:0s]")}></div>
-      <div className={mergeClasses(dotStyle, "[animation-delay:0.25s]")}></div>
-      <div className={mergeClasses(dotStyle, "[animation-delay:0.5s]")}></div>
+      <div className={mergeClasses(dotStyle, "[animation-delay:0s]")} />
+      <div className={mergeClasses(dotStyle, "[animation-delay:0.25s]")} />
+      <div className={mergeClasses(dotStyle, "[animation-delay:0.5s]")} />
     </div>
   );
 };

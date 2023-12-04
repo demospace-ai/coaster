@@ -36,9 +36,10 @@ function useUser() {
   return { user: data, mutate, error, loading: isLoading || isValidating };
 }
 
-export const AuthProvider: React.FC<{ children: React.ReactNode; publicPaths: string[] }> = ({
+export const AuthProvider: React.FC<{ children: React.ReactNode; publicPaths: string[]; noRedirect?: boolean }> = ({
   children,
   publicPaths,
+  noRedirect,
 }) => {
   const { user, loading } = useUser();
   const [loginOpen, setModalOpen] = useState(false);
@@ -68,7 +69,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode; publicPaths: st
   );
 
   const isPublicRoute = createRouteMatcher(publicPaths);
-  if (!user && !loading && !isPublicRoute(pathname)) {
+  if (!user && !loading && !isPublicRoute(pathname) && !noRedirect) {
     return redirect("/login");
   }
 

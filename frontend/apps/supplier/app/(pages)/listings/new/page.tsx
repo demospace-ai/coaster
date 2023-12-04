@@ -6,7 +6,7 @@ import { FormError } from "@coaster/components/error/FormError";
 import {
   ErrorMessage,
   InputStep,
-  SelectorStep,
+  MultiSelectorStep,
   StepProps,
   SubmitResult,
   TextAreaStep,
@@ -30,7 +30,7 @@ import { DndProvider, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useForm } from "react-hook-form";
 import {
-  CategorySchema,
+  CategoriesSchema,
   DescriptionSchema,
   DurationSchema,
   MaxGuestsSchema,
@@ -204,20 +204,20 @@ const CategoryStep: React.FC<StepProps> = (props) => {
   }
 
   return (
-    <SelectorStep
+    <MultiSelectorStep
       {...props}
-      schema={CategorySchema}
-      existingData={listing?.category}
+      schema={CategoriesSchema}
+      existingData={listing?.categories}
       // TODO: fix the typing issue for the onChange data parameter
-      onChange={async (data: string): Promise<SubmitResult> => {
+      onChange={async (data: string[]): Promise<SubmitResult> => {
         if (listing) {
-          if (data === listing.category) {
+          if (data === listing.categories) {
             // No API call needed if previous value was the same
             return { success: true };
           }
-          return updateListingWrapped(listing.id, { category: data as CategoryType });
+          return updateListingWrapped(listing.id, { categories: data as CategoryType[] });
         } else {
-          return createListing({ category: data as CategoryType });
+          return createListing({ categories: data as CategoryType[] });
         }
       }}
     />
@@ -584,7 +584,7 @@ const computeInitialStep = (listing: Listing | undefined): number => {
   if (!listing) {
     return 0;
   }
-  if (!listing.category) {
+  if (!listing.categories) {
     return 0;
   }
   if (!listing.location) {

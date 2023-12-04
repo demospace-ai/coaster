@@ -5,7 +5,7 @@ import { CheckCircleIcon, ExclamationCircleIcon } from "@heroicons/react/24/outl
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Dispatch, ReactElement, SetStateAction, useState } from "react";
 import { FieldError, FieldValues, UseFormHandleSubmit, useForm } from "react-hook-form";
-import { ZodEnum, ZodString, z } from "zod";
+import { ZodArray, ZodEnum, ZodString, z } from "zod";
 import { FormError } from "../error/FormError";
 import { Loading } from "../loading/Loading";
 
@@ -228,6 +228,79 @@ export const SelectorStep = <T extends FieldValues | undefined>({
           >
             {toTitleCase(option)}
             {option === selected ? (
+              <CheckCircleIcon className="tw-w-[25px] tw-mr-[-1px]" />
+            ) : (
+              <div className="tw-w-5 tw-h-5 tw-border-2 tw-border-solid tw-border-gray-300 tw-rounded-3xl" />
+            )}
+          </div>
+        ))}
+      </div>
+      <FormError message={error} />
+      <WizardNavButtons nextStep={onSubmitWrapper} prevStep={prevStep} />
+    </>
+  );
+};
+
+type MultiSelectorProps = {
+  schema: ZodArray<ZodEnum<[string, ...string[]]>>;
+  onChange?: (data: string[]) => Promise<SubmitResult>;
+  onSubmit?: (data: string[]) => Promise<SubmitResult>;
+  existingData?: string[];
+  placeholder?: string;
+};
+
+export const MultiSelectorStep = <T extends FieldValues | undefined>({
+  schema,
+  existingData,
+  onChange,
+  onSubmit,
+  nextStep,
+  prevStep,
+}: StepProps<T> & MultiSelectorProps) => {
+  type schemaType = z.infer<typeof schema>;
+  const [error, setError] = useState<string | undefined>(undefined);
+  const [selected, setSelected] = useState<schemaType>(existingData || []);
+
+  const onSubmitWrapper = async () => {
+    if (selected !== undefined) {
+      if (onSubmit) {
+        const result = await onSubmit(selected);
+        if (result.success) {
+          nextStep && nextStep();
+        } else {
+          setError(result.error);
+        }
+      } else {
+        nextStep && nextStep();
+      }
+    } else {
+      setError("Please select an option.");
+    }
+  };
+
+  return (
+    <>
+      <div className="tw-flex tw-flex-col tw-items-center">
+        {schema.element.options.map((option) => (
+          <div
+            key={option}
+            className={mergeClasses(
+              "tw-flex tw-justify-between tw-items-center tw-w-full tw-min-h-[56px] tw-px-4 tw-my-1 tw-rounded-lg tw-border tw-border-solid tw-border-gray-300 sm:hover:tw-border-black tw-cursor-pointer tw-select-none",
+              selected.includes(option) && "tw-border-black",
+            )}
+            onClick={async () => {
+              if (selected.includes(option)) {
+                setSelected([...selected.filter((item) => item !== option)]);
+              } else {
+                setSelected([...selected, option]);
+                if (onChange) {
+                  await onChange([...selected, option]); // only call on change when a valid value is selected
+                }
+              }
+            }}
+          >
+            {toTitleCase(option)}
+            {selected.includes(option) ? (
               <CheckCircleIcon className="tw-w-[25px] tw-mr-[-1px]" />
             ) : (
               <div className="tw-w-5 tw-h-5 tw-border-2 tw-border-solid tw-border-gray-300 tw-rounded-3xl" />

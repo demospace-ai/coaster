@@ -114,7 +114,7 @@ export const BlogSectionClient: React.FC<{ posts: Post[] }> = ({ posts }) => {
   const [emblaRef] = useEmblaCarousel({ loop: true });
 
   return (
-    <div className="tw-flex tw-flex-col tw-w-full tw-mt-10 tw-mb-20">
+    <div className="tw-flex tw-flex-col tw-w-full">
       <div className="tw-flex tw-w-full tw-justify-between tw-mb-4">
         <div className="tw-text-2xl tw-font-semibold">Latest blog posts</div>
         <Link className="tw-flex tw-items-center tw-font-medium" href="/blog">
@@ -180,7 +180,7 @@ export const ValuePropSection: React.FC = () => {
   }, [emblaApi, onInit, onSelect]);
 
   return (
-    <div className="tw-flex tw-items-center tw-justify-center tw-w-full tw-px-5 sm:tw-px-20 tw-mt-12 sm:tw-mt-20 tw-mb-5 sm:tw-mb-10">
+    <div className="tw-flex tw-items-center tw-justify-center tw-w-full tw-px-5 sm:tw-px-20 tw-mt-12 sm:tw-mt-16 tw-mb-5 sm:tw-mb-10">
       <div className="tw-flex tw-flex-col tw-items-center tw-w-full tw-max-w-7xl">
         <div className="tw-text-xl sm:tw-text-3xl tw-font-semibold tw-mb-10">We make adventure travel easy</div>
         <div ref={emblaRef} className="tw-w-full tw-overflow-hidden">

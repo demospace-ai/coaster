@@ -64,11 +64,15 @@ const YourBooking: React.FC<{ booking: Booking }> = ({ booking }) => {
 };
 
 const AboutTheTrip: React.FC<{ booking: Booking }> = ({ booking }) => {
+  const categoriesString = booking.listing.categories
+    ? booking.listing.categories.map((category) => getCategoryForDisplay(category)).join(" | ")
+    : "";
+
   return (
     <div className="tw-flex tw-flex-col tw-justify-start tw-w-full tw-mt-5">
       <div className="tw-text-2xl tw-font-bold tw-mb-4">About the trip</div>
       <div className="tw-text-base tw-font-semibold tw-mb-1">Activity Type</div>
-      <div className="tw-mb-4">{booking.listing.category ? getCategoryForDisplay(booking.listing.category) : ""}</div>
+      <div className="tw-mb-4">{categoriesString}</div>
       <div className="tw-text-base tw-font-semibold tw-mb-1">Duration</div>
       <div className="tw-mb-4">Approx. {getDuration(booking.listing.duration_minutes)}</div>
       {booking.listing.includes && booking.listing.includes.length > 0 && (
