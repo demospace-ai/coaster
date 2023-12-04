@@ -198,8 +198,8 @@ export const ValuePropSection: React.FC = () => {
                 placeholder="blur"
                 className="tw-w-16 tw-h-16 tw-mb-4"
               />
-              <span className="tw-font-semibold tw-text-base tw-mb-2">Free Cancellation</span>
-              <span className="tw-max-w-[240px]">
+              <span className="tw-font-semibold tw-text-lg tw-mb-2">Free Cancellation</span>
+              <span className="tw-max-w-[240px] tw-text-base">
                 Booking a trip on Coaster is stress-free thanks to our flexible booking options.
               </span>
             </div>
@@ -212,8 +212,8 @@ export const ValuePropSection: React.FC = () => {
                 placeholder="blur"
                 className="tw-w-16 tw-h-16 tw-mb-4"
               />
-              <span className="tw-font-semibold tw-text-base tw-mb-2">Curated experiences</span>
-              <span className="tw-max-w-[240px]">
+              <span className="tw-font-semibold tw-text-lg tw-mb-2">Curated experiences</span>
+              <span className="tw-max-w-[240px] tw-text-base">
                 We do the research so you don't have to. Every trip is verified for safety and stoke.
               </span>
             </div>
@@ -226,8 +226,8 @@ export const ValuePropSection: React.FC = () => {
                 placeholder="blur"
                 className="tw-w-16 tw-h-16 tw-mb-4"
               />
-              <span className="tw-font-semibold tw-text-base tw-mb-2">Sustainable Travel</span>
-              <span className="tw-max-w-[240px]">
+              <span className="tw-font-semibold tw-text-lg tw-mb-2">Sustainable Travel</span>
+              <span className="tw-max-w-[240px] tw-text-base">
                 We care deeply about our planet, and only work with responsible guides.
               </span>
             </div>
@@ -240,8 +240,8 @@ export const ValuePropSection: React.FC = () => {
                 placeholder="blur"
                 className="tw-w-16 tw-h-16 tw-mb-4"
               />
-              <span className="tw-font-semibold tw-text-base tw-mb-2">Adventure Guarantee</span>
-              <span className="tw-max-w-[240px]">
+              <span className="tw-font-semibold tw-text-lg tw-mb-2">Adventure Guarantee</span>
+              <span className="tw-max-w-[240px] tw-text-base">
                 Didn't have a good time? We'll give you a full refund, no questions asked.
               </span>
             </div>
