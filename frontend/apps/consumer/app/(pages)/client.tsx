@@ -86,7 +86,7 @@ export const ListingsSectionClient: React.FC<{ title: string; listings: Listing[
             )}
           </div>
         </div>
-        <div className="tw-absolute tw-top-0 tw-w-full tw-h-[75vw] sm:tw-h-[20vw] tw-flex tw-items-center tw-justify-between tw-pointer-events-none">
+        <div className="tw-absolute tw-top-0 tw-w-full tw-h-[75vw] xs:tw-h-[40vw] sm:tw-h-[30vw] lg:tw-h-[20vw] xl:tw-h-[15vw] 4xl:tw-h-[12vw] tw-flex tw-items-center tw-justify-between tw-pointer-events-none">
           <button
             className={mergeClasses(
               "tw-absolute tw-left-1 sm:-tw-left-7 tw-p-2 tw-hidden tw-rounded-full tw-bg-white tw-bg-opacity-90 hover:tw-bg-opacity-100 tw-transition-colors tw-pointer-events-auto tw-shadow-centered-md",
