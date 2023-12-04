@@ -70,7 +70,11 @@ export const ListingsSectionClient: React.FC<{ title: string; listings: Listing[
             {listings ? (
               <>
                 {listings?.map((listing: Listing) => (
-                  <SearchResult key={listing.id} listing={listing} className="tw-w-[75vw] sm:tw-w-[20vw] tw-shrink-0" />
+                  <SearchResult
+                    key={listing.id}
+                    listing={listing}
+                    className="tw-w-[75vw] xs:tw-w-[30vw] sm:tw-w-[25vw] md:tw-w-[20vw] lg:tw-w-[18vw] 2xl:tw-w-[15vw] 4xl:tw-w-[12vw] tw-shrink-0"
+                  />
                 ))}
               </>
             ) : (
