@@ -78,14 +78,14 @@ export function useTooltip({
   );
 }
 
-type ContextType = ReturnType<typeof useTooltip> | null;
+type ContextType = ReturnType<typeof useTooltip> | undefined;
 
-const TooltipContext = createContext<ContextType>(null);
+const TooltipContext = createContext<ContextType>(undefined);
 
 export const useTooltipContext = () => {
   const context = useContext(TooltipContext);
 
-  if (context == null) {
+  if (context === undefined) {
     throw new Error("Tooltip components must be wrapped in <Tooltip />");
   }
 

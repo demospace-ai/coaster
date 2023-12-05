@@ -2,13 +2,14 @@
 
 import { useListing } from "@coaster/rpc/client";
 import { Listing } from "@coaster/types";
+import { consumeError } from "@coaster/utils/client";
 import { createContext, useContext } from "react";
 
-const ListingContext = createContext<Listing | null>(null);
+const ListingContext = createContext<Listing | undefined>(undefined);
 export const useListingContext = () => {
   const context = useContext(ListingContext);
-  if (context == null) {
-    throw new Error("Tooltip components must be wrapped in <Tooltip />");
+  if (context === undefined) {
+    consumeError("Missing listing context.");
   }
 
   return context;
@@ -22,5 +23,5 @@ export const ListingContextProvider: React.FC<{
   if (error) {
     return <div>Something unexpected happened.</div>;
   }
-  return <ListingContext.Provider value={listing ? listing : null}>{children}</ListingContext.Provider>;
+  return <ListingContext.Provider value={listing}>{children}</ListingContext.Provider>;
 };
