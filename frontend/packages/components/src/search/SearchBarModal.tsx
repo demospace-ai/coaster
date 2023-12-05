@@ -4,8 +4,8 @@ import { Dialog, Transition } from "@headlessui/react";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
 import { Fragment, useRef, useState } from "react";
-import { trackEvent } from "src/rudderstack/events";
 import { Button } from "../button/Button";
+import { trackEvent } from "../rudderstack/events";
 
 export const SearchModal: React.FC<{ open: boolean; close: () => void }> = ({ open, close }) => {
   const inputRef = useRef<HTMLInputElement>(null);
