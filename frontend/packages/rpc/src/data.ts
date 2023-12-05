@@ -29,7 +29,7 @@ export async function getListingServer(listingID: number, cookieString?: string)
 }
 
 export async function search(queryParams: SearchParams): Promise<Listing[]> {
-  return sendRequest(SearchListings, { queryParams });
+  return sendRequest(SearchListings, { queryParams, revalidate: 600 });
 }
 
 export async function getHostedListingsServer() {

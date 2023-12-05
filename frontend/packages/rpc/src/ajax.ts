@@ -21,6 +21,13 @@ export function getEndpointUrl<QueryParams extends Record<string, any>>(
   return url.toString();
 }
 
+type CoasterRequest = RequestInit & {
+  next: {
+    revalidate?: false | 0 | number;
+    tags?: string[];
+  };
+};
+
 export async function sendRequest<
   RequestType extends Record<string, any>,
   ResponseType,
@@ -34,6 +41,8 @@ export async function sendRequest<
     pathParams?: PathParams;
     queryParams?: QueryParams;
     formData?: FormData;
+    revalidate?: false | 0 | number;
+    tags?: string[];
   },
 ): Promise<ResponseType> {
   const toPath = compile(endpoint.path);
@@ -51,11 +60,20 @@ export async function sendRequest<
   if (!opts?.formData) {
     headers.append("Content-Type", "application/json");
   }
-  let options: RequestInit = {
+  let options: CoasterRequest = {
     method: endpoint.method,
     headers: headers,
     credentials: "include",
+    next: {},
   };
+
+  if (opts?.revalidate) {
+    options.next.revalidate = opts.revalidate;
+  }
+
+  if (opts?.tags) {
+    options.next.tags = opts.tags;
+  }
 
   if (["POST", "PATCH", "PUT"].includes(endpoint.method)) {
     if (opts?.formData) {
