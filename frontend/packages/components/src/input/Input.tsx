@@ -85,7 +85,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
           ref={inputRef}
           autoComplete={id}
           className={mergeClasses(
-            "tw-w-full tw-outline-none tw-ring-none tw-text-base disabled:tw-bg-slate-50 disabled:tw-select-none tw-cursor-[inherit] tw-hide-number-wheel",
+            "tw-w-full tw-outline-none tw-ring-none disabled:tw-bg-slate-50 disabled:tw-select-none tw-cursor-[inherit] tw-hide-number-wheel",
             props.label && "tw-mt-0.5",
           )}
           onKeyDown={onKeydown}

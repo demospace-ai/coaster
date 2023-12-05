@@ -3,6 +3,7 @@
 import { lateef, mergeClasses } from "@coaster/utils/common";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { Button } from "../button/Button";
 import { Input } from "../input/Input";
 
@@ -35,10 +36,7 @@ export const Footer: React.FC = () => {
           </div>
           <div className="tw-font-semibold tw-mb-2">Newsletter</div>
           <div className="tw-w-80 tw-mb-2">We send occasional updates on new trips, stories, and discounts.</div>
-          <div className="tw-flex tw-gap-2">
-            <Input className="tw-w-48 tw-h-8" value={""} />
-            <Button className="tw-font-medium">Subscribe</Button>
-          </div>
+          <NewsletterForm />
         </div>
         <div className="tw-flex tw-flex-col tw-gap-1">
           <div className="tw-font-semibold tw-mb-2">Company</div>
@@ -98,4 +96,115 @@ export const Footer: React.FC = () => {
       </div>
     </div>
   );
+};
+
+const NewsletterForm: React.FC = () => {
+  const INIT = "INIT";
+  const SUBMITTING = "SUBMITTING";
+  const SUCCESS = "SUCCESS";
+  const FormStates = [INIT, SUBMITTING, SUCCESS] as const;
+  const [email, setEmail] = useState("");
+  const [formState, setFormState] = useState<(typeof FormStates)[number]>(INIT);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const resetForm = () => {
+    setEmail("");
+    setFormState(INIT);
+    setErrorMessage("");
+  };
+
+  /**
+   * Rate limit the number of submissions allowed
+   * @returns {boolean} true if the form has been successfully submitted in the past minute
+   */
+  const hasRecentSubmission = (): boolean => {
+    const time = new Date();
+    const timestamp = time.valueOf();
+    const previousTimestamp = localStorage.getItem("loops-form-timestamp");
+
+    // Indicate if the last sign up was less than a minute ago
+    if (previousTimestamp && Number(previousTimestamp) + 60 * 1000 > timestamp) {
+      setErrorMessage("Too many signups, please try again in a little while");
+      return true;
+    }
+
+    localStorage.setItem("loops-form-timestamp", timestamp.toString());
+    return false;
+  };
+
+  const isValidEmail = (email: any) => {
+    return /.+@.+/.test(email);
+  };
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    // Prevent the default form submission
+    event.preventDefault();
+
+    // boundary conditions for submission
+    if (formState !== INIT) return;
+    if (!isValidEmail(email)) {
+      setErrorMessage("Please enter a valid email");
+      return;
+    }
+    if (hasRecentSubmission()) return;
+    setFormState(SUBMITTING);
+
+    // build body
+    const formBody = `email=${encodeURIComponent(email)}`;
+
+    // API request to add user to newsletter
+    fetch("https://app.loops.so/api/newsletter-form/clgzfa7c40052l70fomrecqid", {
+      method: "POST",
+      body: formBody,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    })
+      .then((res: any) => [res.ok, res.json(), res])
+      .then(([ok, dataPromise, res]) => {
+        if (ok) {
+          resetForm();
+          setFormState(SUCCESS);
+        } else {
+          dataPromise.then((data: any) => {
+            setErrorMessage(data.message || res.statusText);
+            localStorage.setItem("loops-form-timestamp", "");
+          });
+        }
+      })
+      .catch((error) => {
+        // check for cloudflare error
+        if (error.message === "Failed to fetch") {
+          setErrorMessage("Too many signups, please try again in a little while");
+        } else if (error.message) {
+          setErrorMessage(error.message);
+        }
+        localStorage.setItem("loops-form-timestamp", "");
+      });
+  };
+
+  switch (formState) {
+    case SUCCESS:
+      return <p className="tw-text-green-700">Success!</p>;
+    default:
+      return (
+        <>
+          <form onSubmit={handleSubmit} className="tw-flex tw-gap-2">
+            <Input
+              type="text"
+              name="email"
+              placeholder="Email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required={true}
+              className="tw-w-50 tw-h-8 tw-text-sm"
+            />
+            <Button type="submit" className="tw-font-medium tw-text-sm">
+              {formState === SUBMITTING ? "Please wait..." : "Subscribe"}
+            </Button>
+          </form>
+          <p className="tw-text-red-500">{errorMessage}</p>
+        </>
+      );
+  }
 };
