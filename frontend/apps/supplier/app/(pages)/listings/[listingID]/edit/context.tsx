@@ -2,14 +2,13 @@
 
 import { useListing } from "@coaster/rpc/client";
 import { Listing } from "@coaster/types";
-import { consumeError } from "@coaster/utils/client";
 import { createContext, useContext } from "react";
 
 const ListingContext = createContext<Listing | undefined>(undefined);
 export const useListingContext = () => {
   const context = useContext(ListingContext);
   if (context === undefined) {
-    consumeError("Missing listing context.");
+    throw new Error("Missing listing context.");
   }
 
   return context;
