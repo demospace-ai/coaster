@@ -15,13 +15,19 @@ import (
 )
 
 func (s ApiService) SearchListings(w http.ResponseWriter, r *http.Request) error {
+	queryParam := r.URL.Query().Get("query")
 	locationParam := r.URL.Query().Get("location")
 	radiusParam := r.URL.Query().Get("radius")
 	categoryParam := r.URL.Query().Get("categories")
 
 	var filteredListings []listings.ListingDetails
 	var err error
-	if len(locationParam) > 0 {
+	if len(queryParam) > 0 {
+		filteredListings, err = listings.LoadListingsForQuery(s.db, queryParam)
+		if err != nil {
+			return errors.Wrap(err, "(api.SearchListings) loading listings by query")
+		}
+	} else if len(locationParam) > 0 {
 		filteredListings, err = s.loadByLocation(locationParam, radiusParam)
 		if err != nil {
 			return errors.Wrap(err, "(api.SearchListings) loading listings filtered by location")

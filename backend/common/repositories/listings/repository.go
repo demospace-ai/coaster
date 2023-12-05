@@ -11,6 +11,7 @@ import (
 	"go.fabra.io/server/common/repositories/availability_rules"
 	"go.fabra.io/server/common/repositories/users"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type ListingDetails struct {
@@ -85,7 +86,7 @@ func LoadAllByUserID(db *gorm.DB, userID int64) ([]ListingDetails, error) {
 		return nil, errors.Wrap(err, "(listings.LoadAllByUserID) getting host")
 	}
 
-	listingsAndImages := make([]ListingDetails, len(listings))
+	listingDetails := make([]ListingDetails, len(listings))
 	for i, listing := range listings {
 		images, err := LoadImagesForListing(db, listing.ID)
 		if err != nil {
@@ -97,7 +98,7 @@ func LoadAllByUserID(db *gorm.DB, userID int64) ([]ListingDetails, error) {
 			return nil, errors.Wrap(err, "(listings.LoadByID) getting categories")
 		}
 
-		listingsAndImages[i] = ListingDetails{
+		listingDetails[i] = ListingDetails{
 			listing,
 			host,
 			images,
@@ -105,7 +106,7 @@ func LoadAllByUserID(db *gorm.DB, userID int64) ([]ListingDetails, error) {
 		}
 	}
 
-	return listingsAndImages, nil
+	return listingDetails, nil
 }
 
 func GetDraftListing(db *gorm.DB, userID int64) (*ListingDetails, error) {
@@ -144,18 +145,19 @@ func CreateListing(
 	coordinates *geo.Point,
 ) (*models.Listing, error) {
 	listing := models.Listing{
-		UserID:           userID,
-		Name:             name,
-		Description:      description,
-		Price:            price,
-		Location:         location,
-		Coordinates:      coordinates,
-		Status:           models.ListingStatusDraft,
-		Cancellation:     models.ListingCancellationFlexible,
-		Highlights:       []string{},
-		Includes:         []string{},
-		NotIncluded:      []string{},
-		AvailabilityType: models.AvailabilityTypeDate,
+		UserID:              userID,
+		Name:                name,
+		Description:         description,
+		Price:               price,
+		Location:            location,
+		Coordinates:         coordinates,
+		Status:              models.ListingStatusDraft,
+		Cancellation:        models.ListingCancellationFlexible,
+		Highlights:          []string{},
+		Includes:            []string{},
+		NotIncluded:         []string{},
+		AvailabilityType:    models.AvailabilityTypeDate,
+		AvailabilityDisplay: models.AvailabilityDisplayCalendar,
 	}
 
 	result := db.Create(&listing)
@@ -383,17 +385,43 @@ func LoadListingsWithinRadius(db *gorm.DB, coordinates geo.Point, radius int64) 
 		return nil, errors.Wrap(result.Error, "(listings.LoadListingsWithinRadius)")
 	}
 
-	listingsAndImages := make([]ListingDetails, len(listings))
+	listingDetails := make([]ListingDetails, len(listings))
 	for i, listing := range listings {
 		details, err := loadDetailsForListing(db, listing)
 		if err != nil {
 			return nil, errors.Wrap(err, "(listings.LoadListingsWithinRadius) loading details")
 		}
 
-		listingsAndImages[i] = *details
+		listingDetails[i] = *details
 	}
 
-	return listingsAndImages, nil
+	return listingDetails, nil
+}
+
+func LoadListingsForQuery(db *gorm.DB, query string) ([]ListingDetails, error) {
+	var listings []models.Listing
+	result := db.Table("listings").
+		Select("listings.*").
+		Where("ts @@ to_tsquery('english', replace(?, ' ', '|'))", query).
+		Clauses(clause.OrderBy{
+			Expression: clause.Expr{SQL: "ts_rank(ts, to_tsquery('english', replace(?, ' ', '|'))) DESC", Vars: []interface{}{query}},
+		}).
+		Find(&listings)
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(listings.LoadListingsForQuery)")
+	}
+
+	listingDetails := make([]ListingDetails, len(listings))
+	for i, listing := range listings {
+		details, err := loadDetailsForListing(db, listing)
+		if err != nil {
+			return nil, errors.Wrap(err, "(listings.LoadListingsForQuery) loading details")
+		}
+
+		listingDetails[i] = *details
+	}
+
+	return listingDetails, nil
 }
 
 func LoadFeatured(db *gorm.DB) ([]ListingDetails, error) {
@@ -412,17 +440,17 @@ func LoadByDuration(db *gorm.DB, durationMinutes int64) ([]ListingDetails, error
 		return nil, errors.Wrap(result.Error, "(listings.LoadDayTrips)")
 	}
 
-	listingsAndImages := make([]ListingDetails, len(listings))
+	listingDetails := make([]ListingDetails, len(listings))
 	for i, listing := range listings {
 		details, err := loadDetailsForListing(db, listing)
 		if err != nil {
 			return nil, errors.Wrap(err, "(listings.LoadByDuration) loading details")
 		}
 
-		listingsAndImages[i] = *details
+		listingDetails[i] = *details
 	}
 
-	return listingsAndImages, nil
+	return listingDetails, nil
 }
 
 func LoadListingsByCategory(db *gorm.DB, categories []models.ListingCategoryType) ([]ListingDetails, error) {
@@ -439,17 +467,17 @@ func LoadListingsByCategory(db *gorm.DB, categories []models.ListingCategoryType
 		return nil, errors.Wrap(result.Error, "(listings.LoadListingsByCategory)")
 	}
 
-	listingsAndImages := make([]ListingDetails, len(listings))
+	listingDetails := make([]ListingDetails, len(listings))
 	for i, listing := range listings {
 		details, err := loadDetailsForListing(db, listing)
 		if err != nil {
 			return nil, errors.Wrap(err, "(listings.LoadListingsByCategory) loading details")
 		}
 
-		listingsAndImages[i] = *details
+		listingDetails[i] = *details
 	}
 
-	return listingsAndImages, nil
+	return listingDetails, nil
 }
 
 func LoadAllPublishedMetadata(db *gorm.DB) ([]ListingMetadata, error) {

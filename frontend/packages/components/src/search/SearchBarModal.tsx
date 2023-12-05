@@ -1,13 +1,20 @@
 "use client";
 
 import { Dialog, Transition } from "@headlessui/react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
-import Link from "next/link";
-import { Fragment, useRef } from "react";
-import { getCategoryForDisplay, getCategoryIcon, getSearchableCategories } from "../icons/Category";
+import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useRouter } from "next/navigation";
+import { Fragment, useRef, useState } from "react";
+import { Button } from "../button/Button";
 
 export const SearchModal: React.FC<{ open: boolean; close: () => void }> = ({ open, close }) => {
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
+  const [query, setQuery] = useState<string>("");
+  const search = () => {
+    if (query.length > 0) {
+      router.push(`/search?query=${query}`);
+    }
+  };
 
   return (
     <Transition
@@ -23,7 +30,7 @@ export const SearchModal: React.FC<{ open: boolean; close: () => void }> = ({ op
       <Dialog
         onClose={close}
         className="tw-fixed tw-top-0 tw-left-0 tw-h-full tw-w-full tw-z-[100] tw-bg-black tw-bg-opacity-30"
-        initialFocus={buttonRef}
+        initialFocus={inputRef}
       >
         <div className="tw-fixed tw-inset-x-0 tw-bottom-0 tw-h-[90svh]">
           <Transition.Child
@@ -35,9 +42,9 @@ export const SearchModal: React.FC<{ open: boolean; close: () => void }> = ({ op
             leaveFrom="tw-translate-y-0"
             leaveTo="tw-translate-y-full"
           >
-            <Dialog.Panel className="tw-flex tw-flex-col tw-bg-white tw-shadow-md tw-rounded-t-xl tw-w-screen tw-h-full tw-items-center tw-justify-start tw-overflow-clip">
-              <div className="tw-flex tw-w-full tw-items-center tw-justify-between tw-px-6 tw-pt-6 tw-pb-2">
-                <span className="tw-text-lg tw-font-semibold">Choose an activity</span>
+            <Dialog.Panel className="tw-flex tw-flex-col tw-bg-white tw-shadow-md tw-rounded-t-xl tw-w-screen tw-h-full tw-items-center tw-justify-start tw-overflow-clip tw-px-6 ">
+              <div className="tw-flex tw-w-full tw-items-center tw-justify-between tw-pt-6 tw-pb-4">
+                <span className="tw-text-lg tw-font-semibold">Find an adventure</span>
                 <button
                   className="tw-inline tw-bg-transparent tw-border-none tw-cursor-pointer"
                   onClick={(e) => {
@@ -48,18 +55,28 @@ export const SearchModal: React.FC<{ open: boolean; close: () => void }> = ({ op
                   <XMarkIcon className="tw-h-6 tw-stroke-black" />
                 </button>
               </div>
-              <div className="tw-flex tw-flex-col tw-w-full tw-gap-2 tw-p-6 tw-pt-0 tw-overflow-auto tw-h-full">
-                <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-3 tw-py-5 tw-gap-5">
-                  {getSearchableCategories().map((category) => (
-                    <Link key={category} href={`/search?categories=["${category}"]`} onClick={() => close()}>
-                      <div className="tw-flex tw-flex-col tw-justify-center tw-items-center tw-cursor-pointer tw-select-none tw-p-2 tw-rounded-lg">
-                        {getCategoryIcon(category)}
-                        <span className="tw-text-xs tw-font-medium tw-mt-1">{getCategoryForDisplay(category)}</span>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  search();
+                }}
+                className="tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[400px] tw-h-14 tw-bg-white tw-border tw-border-slate-200 tw-border-solid tw-p-1.5 tw-rounded-md tw-cursor-pointer"
+              >
+                <input
+                  ref={inputRef}
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  className="tw-w-full tw-bg-transparent tw-pl-4 tw-placeholder-gray-700 tw-text-base tw-select-none tw-cursor-text tw-outline-none"
+                  placeholder="Ex. Surfing in Morocco"
+                />
+                <MagnifyingGlassIcon
+                  className="tw-flex sm:tw-hidden tw-w-6 tw-h-6 tw-mr-4 tw-stroke-gray-600"
+                  onClick={search}
+                />
+              </form>
+              <Button className="tw-w-full tw-py-3 tw-mt-4" onClick={search}>
+                Search
+              </Button>
             </Dialog.Panel>
           </Transition.Child>
         </div>

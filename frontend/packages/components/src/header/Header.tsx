@@ -13,7 +13,7 @@ import React, { Fragment, useEffect, useState } from "react";
 import { Button } from "../button/Button";
 import { NavLink } from "../link/Link";
 import { ProfilePicture, ProfilePlaceholder } from "../profile/ProfilePicture";
-import { SearchBarDropdown, SearchBarModal } from "../search/SearchBar";
+import { SearchBarHeader, SearchBarModal } from "../search/SearchBar";
 
 export const Header: React.FC = () => {
   const pathname = usePathname();
@@ -46,8 +46,7 @@ const DesktopHeader: React.FC<{ isHome: boolean; scrollPosition: number }> = ({ 
   return (
     <div className="tw-hidden sm:tw-flex tw-w-[calc(100%-10rem)] tw-max-w-7xl tw-max-h-[96px] tw-min-h-[96px] tw-items-center tw-justify-between">
       <LogoLink />
-      {/** Pass "show" here so modal is always rendered */}
-      <SearchBarDropdown show={!isHome || scrollPosition > 300} header />
+      <SearchBarHeader show={!isHome || scrollPosition > 300} />
       <ProfileDropdown />
     </div>
   );

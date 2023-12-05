@@ -54,7 +54,7 @@ const HeroSection: React.FC = () => {
               className="tw-rounded-2xl tw-object-left tw-object-cover"
             />
           </div>
-          <div className="tw-z-[1]">
+          <div className="tw-flex tw-flex-col tw-justify-center tw-items-center tw-z-[1]">
             <div className="tw-text-white tw-w-full tw-max-w-[800px] tw-py-5 tw-rounded-2xl tw-text-center">
               <div className="tw-font-semibold tw-text-5xl sm:tw-text-6xl tw-tracking-tighter">
                 Discover, Book, Adventure
@@ -63,7 +63,7 @@ const HeroSection: React.FC = () => {
                 Find a local guide to take you on the trip of a lifetime
               </div>
             </div>
-            <SearchBar className="tw-mt-4" />
+            <SearchBar />
           </div>
         </div>
       </div>
@@ -130,17 +130,17 @@ const ListingsSection: React.FC<{ type: ListingsSectionType; backsplash?: boolea
     case "featured":
       title = "Featured adventures";
       searchQuery = 'categories=["featured"]';
-      listings = await search(undefined, '["featured"]');
+      listings = await search({ categories: '["featured"]' });
       break;
     case "skiing":
       title = "Guided backcountry skiing";
       searchQuery = 'categories=["skiing"]';
-      listings = await search(undefined, '["skiing"]');
+      listings = await search({ categories: '["skiing"]' });
       break;
     case "popular":
       title = "Popular this week";
       searchQuery = 'categories=["popular"]';
-      listings = await search(undefined, '["popular"]');
+      listings = await search({ categories: '["popular"]' });
       break;
   }
 

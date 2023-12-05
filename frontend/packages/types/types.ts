@@ -76,6 +76,12 @@ export interface Payment {
   completed_at: Date;
 }
 
+export interface SearchParams {
+  query?: string;
+  location?: string;
+  categories?: string;
+}
+
 export interface Listing {
   id: number;
   name: string | undefined;

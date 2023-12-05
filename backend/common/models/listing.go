@@ -31,8 +31,8 @@ const (
 type AvailabilityDisplay string
 
 const (
-	AvailabilityTypeCalendar AvailabilityType = "calendar"
-	AvailabilityTypeList     AvailabilityType = "list"
+	AvailabilityDisplayCalendar AvailabilityDisplay = "calendar"
+	AvailabilityDisplayList     AvailabilityDisplay = "list"
 )
 
 type Listing struct {

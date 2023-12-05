@@ -4,9 +4,10 @@ import { search } from "@coaster/rpc/server";
 import { type CategoryType, type Listing } from "@coaster/types";
 
 export default async function Search({ searchParams }: { searchParams: { [key: string]: string | undefined } }) {
+  const listings = await search(searchParams);
+  const query = searchParams["query"];
   const location = searchParams["location"];
   const categories = searchParams["categories"];
-  const listings = await search(location, categories);
 
   let categoriesParsed: CategoryType[] = [];
   if (categories) {
@@ -14,7 +15,9 @@ export default async function Search({ searchParams }: { searchParams: { [key: s
   }
 
   let searchTitle = "";
-  if (categories) {
+  if (query) {
+    searchTitle = `${listings.length} results for "${query}"`;
+  } else if (categories) {
     const categoryString = categoriesParsed.map((category) => getCategoryForDisplay(category)).join(", ");
     searchTitle = `${listings.length} results for ${categoryString}`;
   } else if (location) {

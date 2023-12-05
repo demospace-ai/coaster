@@ -1,6 +1,6 @@
 "use server";
 
-import { Booking, Listing } from "@coaster/types";
+import { Booking, Listing, SearchParams } from "@coaster/types";
 import { HttpError } from "@coaster/utils/common";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
@@ -28,16 +28,7 @@ export async function getListingServer(listingID: number, cookieString?: string)
   return undefined;
 }
 
-export async function search(location: string | undefined, categories: string | undefined): Promise<Listing[]> {
-  const queryParams: { location?: string; categories?: string } = {};
-  if (location) {
-    queryParams.location = location;
-  }
-
-  if (categories) {
-    queryParams.categories = categories;
-  }
-
+export async function search(queryParams: SearchParams): Promise<Listing[]> {
   return sendRequest(SearchListings, { queryParams });
 }
 

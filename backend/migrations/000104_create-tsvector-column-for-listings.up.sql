@@ -1,0 +1,2 @@
+ALTER TABLE listings ADD COLUMN IF NOT EXISTS ts tsvector GENERATED ALWAYS AS (to_tsvector('english', name || ' ' || description || ' ' || location)) STORED;
+CREATE INDEX ts_idx ON listings USING GIN (ts);

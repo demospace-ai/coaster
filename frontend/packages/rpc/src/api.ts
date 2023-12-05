@@ -20,6 +20,7 @@ import {
   OAuthProvider,
   PayoutMethod,
   ResetPasswordRequest,
+  SearchParams,
   SendInviteRequest,
   SendResetRequest,
   User,
@@ -38,12 +39,7 @@ export const CheckSession: IEndpoint<undefined, CheckSessionResponse> = {
   path: "/check_session",
 };
 
-export const SearchListings: IEndpoint<
-  undefined,
-  Listing[],
-  undefined,
-  { location?: string; radius?: number; categories?: string }
-> = {
+export const SearchListings: IEndpoint<undefined, Listing[], undefined, SearchParams> = {
   name: "Search listings",
   method: "GET",
   path: "/listings",

@@ -21,12 +21,71 @@ import { Fragment, useRef, useState } from "react";
 import { getCategoryForDisplay, getCategoryIcon, getSearchableCategories } from "../icons/Category";
 import { SearchModal } from "./SearchBarModal";
 
-export const SearchBar: React.FC<{ className: string }> = (props) => {
+export const SearchBar: React.FC = () => {
+  const router = useRouter();
+  const [query, setQuery] = useState<string>("");
+  const search = () => {
+    if (query.length > 0) {
+      router.push(`/search?query=${query}`);
+    }
+  };
+
   return (
-    <>
-      <SearchBarModal {...props} />
-      <SearchBarDropdown {...props} show />
-    </>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        search();
+      }}
+      className="tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[400px] tw-h-14 tw-bg-white tw-shadow-dark-sm tw-p-1.5 tw-rounded-[99px] tw-cursor-pointer tw-mt-2"
+    >
+      <input
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        className="tw-w-full tw-bg-transparent tw-pl-4 tw-placeholder-gray-700 tw-text-base tw-select-none tw-cursor-text tw-outline-none"
+        placeholder="Search trips"
+      />
+      <div
+        className="tw-hidden tw-px-5 sm:tw-flex tw-items-center tw-rounded-[99px] tw-h-full tw-bg-blue-950 tw-text-white tw-text-base tw-font-medium"
+        onClick={search}
+      >
+        Search
+      </div>
+      <MagnifyingGlassIcon className="tw-flex sm:tw-hidden tw-w-6 tw-h-6 tw-mr-4 tw-stroke-gray-600" onClick={search} />
+    </form>
+  );
+};
+
+export const SearchBarHeader: React.FC<{ show: boolean }> = ({ show }) => {
+  const router = useRouter();
+  const [query, setQuery] = useState<string>("");
+  const search = () => {
+    if (query.length > 0) {
+      router.push(`/search?query=${query}`);
+    }
+  };
+
+  if (!show) {
+    return <></>;
+  }
+
+  return (
+    <div className="tw-flex tw-w-full tw-justify-center">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          search();
+        }}
+        className="tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[400px] tw-h-9 tw-bg-white tw-ring-1 tw-ring-slate-300 tw-rounded-[99px] tw-cursor-pointer tw-mx-10"
+      >
+        <MagnifyingGlassIcon className="tw-ml-4 tw-h-5 -tw-mr-1.5 tw-stroke-gray-600" />
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="tw-w-full tw-bg-transparent tw-pl-4 tw-placeholder-gray-700 tw-text-base tw-select-none tw-cursor-text tw-outline-none"
+          placeholder="Search trips"
+        />
+      </form>
+    </div>
   );
 };
 
