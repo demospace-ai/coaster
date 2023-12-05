@@ -403,6 +403,7 @@ func LoadListingsForQuery(db *gorm.DB, query string) ([]ListingDetails, error) {
 	result := db.Table("listings").
 		Select("listings.*").
 		Where("ts @@ to_tsquery('english', replace(?, ' ', '|'))", query).
+		Where("listings.status = ?", models.ListingStatusPublished).
 		Clauses(clause.OrderBy{
 			Expression: clause.Expr{SQL: "ts_rank(ts, to_tsquery('english', replace(?, ' ', '|'))) DESC", Vars: []interface{}{query}},
 		}).
