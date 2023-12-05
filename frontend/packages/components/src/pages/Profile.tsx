@@ -88,7 +88,7 @@ export const Profile: React.FC = () => {
   };
 
   return (
-    <div className="tw-flex tw-flex-col tw-items-center tw-h-full tw-w-full tw-bg-slate-200 tw-pt-8 sm:tw-pt-14">
+    <div className="tw-flex tw-flex-col tw-items-center tw-h-full tw-w-full tw-bg-slate-200 tw-pt-8 sm:tw-pt-14 tw-pb-24">
       <form
         className="tw-flex tw-flex-col tw-max-w-full sm:tw-max-w-2xl tw-w-full tw-px-4 sm:tw-px-0"
         onSubmit={handleSubmit(onSubmit)}
