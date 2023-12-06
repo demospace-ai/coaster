@@ -10,7 +10,7 @@ export default function Sustainability() {
         <Image
           src={SustainableHero}
           alt={"Arch in Moab"}
-          className="tw-object-cover tw-mb-5 sm:tw-mb-10"
+          className="tw-rounded-xl tw-object-cover tw-mb-5 sm:tw-mb-10"
           sizes="60vw"
         />
         <div className="tw-mb-5">
@@ -104,7 +104,7 @@ export default function Sustainability() {
             <Image
               src={SustainableLower}
               alt={"Ski touring in winter"}
-              className="tw-object-cover tw-mt-5 tw-mb-5 sm:tw-mb-10"
+              className="tw-rounded-xl tw-object-cover tw-mt-5 tw-mb-5 sm:tw-mb-10"
               sizes="60vw"
             />
             <div className="tw-mt-5">
