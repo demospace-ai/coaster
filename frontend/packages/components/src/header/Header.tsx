@@ -129,7 +129,7 @@ const ProfileDropdown: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
 
   return (
     <div className="tw-flex tw-shrink-0 tw-justify-end">
-      <div className="tw-hidden lg:tw-flex">
+      <div className="tw-flex">
         {onHostApp ? (
           <SwitchToCustomerSiteLink className="tw-hidden xl:tw-flex tw-my-auto tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100" />
         ) : (
@@ -357,7 +357,7 @@ const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
     "tw-flex tw-justify-center tw-py-2 tw-w-full tw-cursor-pointer tw-select-none tw-whitespace-nowrap tw-rounded-3xl sm:tw-font-semibold tw-text-base tw-bg-gray-100 hover:tw-bg-gray-200";
 
   return (
-    <div className="tw-flex lg:tw-hidden tw-items-center">
+    <div className="tw-flex tw-items-center">
       <Bars3Icon className="tw-w-7" onClick={() => setOpen(true)} />
       <Transition.Root show={open} as={Fragment}>
         <Dialog as="div" className="tw-relative tw-z-30" onClose={setOpen}>

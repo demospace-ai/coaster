@@ -87,7 +87,7 @@ export const SearchBarModal: React.FC<{
   const [open, setOpen] = useState(false);
 
   return (
-    <div className={mergeClasses("tw-flex sm:tw-hidden", !props.header && "tw-w-full tw-justify-center")}>
+    <div className={mergeClasses("tw-flex", !props.header && "tw-w-full tw-justify-center")}>
       <SearchModal open={open} close={() => setOpen(false)} />
       {props.header ? (
         <MagnifyingGlassIcon
