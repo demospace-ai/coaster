@@ -13,7 +13,7 @@ export const SearchBar: React.FC = () => {
   const [query, setQuery] = useState<string>("");
   const search = () => {
     if (query.length > 0) {
-      trackEvent("search", { query });
+      trackEvent("Search", { query });
       router.push(`/search?query=${query}`);
     }
   };
@@ -50,7 +50,7 @@ export const SearchBarHeader: React.FC<{ show: boolean }> = ({ show }) => {
   const [query, setQuery] = useState<string>("");
   const search = () => {
     if (query.length > 0) {
-      trackEvent("search", { query });
+      trackEvent("Search", { query });
       router.push(`/search?query=${query}`);
     }
   };

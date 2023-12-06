@@ -13,7 +13,7 @@ export const SearchModal: React.FC<{ open: boolean; close: () => void }> = ({ op
   const [query, setQuery] = useState<string>("");
   const search = () => {
     if (query.length > 0) {
-      trackEvent("search", { query });
+      trackEvent("Search", { query });
       router.push(`/search?query=${query}`);
     }
   };
