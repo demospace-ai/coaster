@@ -3,6 +3,9 @@ import { NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
   const params = req.nextUrl.searchParams.toString();
-  revalidatePath(`/listings?${params}`);
-  return Response.json({ revalidated: true, now: Date.now(), params: params });
+  const decodedParams = decodeURI(params);
+  console.log(params);
+  console.log(decodedParams);
+  revalidatePath(`/listings?${decodedParams}`);
+  return Response.json({ revalidated: true, now: Date.now(), params: decodedParams });
 }
