@@ -199,7 +199,6 @@ export async function updateListing(listingID: number, updates: ListingInput, is
 
 export async function updateListingImages(listingID: number, images: Image[], isDraft?: boolean) {
   const listing = await updateListingImagesServerAction(listingID, images);
-  console.log(listing);
   isDraft && mutate({ GetDraftListing });
   mutate({ GetListing, listingID }, listing);
 }
