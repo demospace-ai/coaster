@@ -184,7 +184,7 @@ export function useAvailabilityRules(listingID: number | undefined) {
 export async function createListing(input: ListingInput) {
   try {
     const listing = await sendRequest(CreateListing, { payload: input });
-    mutate({ GetDraftListing }, listing);
+    mutate({ GetDraftListing }, listing, { revalidate: false });
     return { success: true, error: "" };
   } catch (e) {
     return { success: false, error: forceErrorMessage(e) };
@@ -193,28 +193,33 @@ export async function createListing(input: ListingInput) {
 
 export async function updateListing(listingID: number, updates: ListingInput, isDraft?: boolean) {
   const listing = await updateListingServerAction(listingID, updates);
-  isDraft && mutate({ GetDraftListing });
-  mutate({ GetListing, listingID }, listing);
+  isDraft && mutate({ GetDraftListing }, listing, { revalidate: false });
+  mutate({ GetListing, listingID }, listing, { revalidate: false });
 }
 
 export async function updateListingImages(listingID: number, images: Image[], isDraft?: boolean) {
   const listing = await updateListingImagesServerAction(listingID, images);
-  isDraft && mutate({ GetDraftListing });
-  mutate({ GetListing, listingID }, listing);
+  isDraft && mutate({ GetDraftListing }, listing, { revalidate: false });
+  mutate({ GetListing, listingID }, listing, { revalidate: false });
 }
 
 export async function addListingImage(listing: Listing, imageFormData: FormData, isDraft?: boolean): Promise<Image> {
   const listingImage = await addListingImagesServerAction(listing.id, imageFormData);
-  isDraft && mutate({ GetDraftListing });
-  mutate({ GetListing, listingID: listing.id }, { ...listing, images: [...listing.images, listingImage] });
+  isDraft &&
+    mutate({ GetDraftListing }, { ...listing, images: [...listing.images, listingImage] }, { revalidate: false });
+  mutate(
+    { GetListing, listingID: listing.id },
+    { ...listing, images: [...listing.images, listingImage] },
+    { revalidate: false },
+  );
   return listingImage;
 }
 
 export async function deleteListingImage(listing: Listing, imageID: number, isDraft?: boolean): Promise<Image[]> {
   await deleteListingImagesServerAction(listing.id, imageID);
-  isDraft && mutate({ GetDraftListing });
   const newImages = listing.images.filter((item) => item.id !== imageID);
-  mutate({ GetListing, listingID: listing.id }, { ...listing, images: newImages });
+  isDraft && mutate({ GetDraftListing }, { ...listing, images: newImages }, { revalidate: false });
+  mutate({ GetListing, listingID: listing.id }, { ...listing, images: newImages }, { revalidate: false });
   return newImages;
 }
 

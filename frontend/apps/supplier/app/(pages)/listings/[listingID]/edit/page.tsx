@@ -42,20 +42,16 @@ export default function Details() {
     mode: "onBlur",
     resolver: zodResolver(EditListingDetailsSchema),
     defaultValues: {
-      name: listing?.name,
-      description: listing?.description,
-      price: listing?.price,
-      categories: listing?.categories,
-      location: listing?.location,
-      duration: listing?.duration_minutes,
-      maxGuests: listing?.max_guests,
-      availabilityType: listing?.availability_type,
+      name: listing.name,
+      description: listing.description,
+      price: listing.price,
+      categories: listing.categories,
+      location: listing.location,
+      duration: listing.duration_minutes,
+      maxGuests: listing.max_guests,
+      availabilityType: listing.availability_type,
     },
   });
-
-  if (!listing) {
-    return <Loading />;
-  }
 
   const onSubmit = async (values: EditListingDetailsSchemaType) => {
     if (!formState.isDirty) {

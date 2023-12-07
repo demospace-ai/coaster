@@ -33,11 +33,7 @@ export default function Availability(): ReactNode {
   const [existingRule, setExistingRule] = useState<AvailabilityRule | undefined>(undefined);
   const [newAvailabilityType, setNewAvailabilityType] = useState<AvailabilityTypeType | undefined>(undefined);
   const [showAvailabilityTypeConfirmation, setShowAvailabilityTypeConfirmation] = useState(false);
-  const { availabilityRules } = useAvailabilityRules(listing?.id);
-
-  if (!listing) {
-    return <Loading />;
-  }
+  const { availabilityRules } = useAvailabilityRules(listing.id);
 
   if (!availabilityRules) {
     return <Loading />;

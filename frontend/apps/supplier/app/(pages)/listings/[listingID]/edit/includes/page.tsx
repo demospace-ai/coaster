@@ -33,10 +33,6 @@ export default function Includes() {
     },
   });
 
-  if (!listing) {
-    return <Loading />;
-  }
-
   const onSubmit = async (values: EditListingIncludesSchemaType) => {
     if (!formState.isDirty) {
       return;

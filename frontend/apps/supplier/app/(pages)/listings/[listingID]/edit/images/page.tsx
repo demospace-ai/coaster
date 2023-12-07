@@ -18,9 +18,6 @@ import { useListingContext } from "supplier/app/(pages)/listings/[listingID]/edi
 
 export default function Images() {
   const listing = useListingContext();
-  if (!listing) {
-    return <Loading />;
-  }
 
   return (
     <DndProvider backend={HTML5Backend}>
