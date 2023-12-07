@@ -82,7 +82,6 @@ export default function Details() {
       // TODO
     }
   };
-  console.log(formState.errors);
 
   return (
     <form className="tw-w-full" onSubmit={handleSubmit(onSubmit)}>
