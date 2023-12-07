@@ -29,6 +29,7 @@ export async function updateListingImagesServerAction(listingID: number, images:
 
   let rootDomain = isProd() ? "https://www.trycoaster.com" : "http://localhost:3000";
   await fetch(`${rootDomain}/api/revalidate/listings/${listingID}`, { method: "POST" });
+  console.log(listing);
   return listing;
 }
 

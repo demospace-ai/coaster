@@ -10,6 +10,7 @@ import (
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/input"
 	"go.fabra.io/server/common/repositories/listings"
+	"go.fabra.io/server/common/views"
 )
 
 type UpdateListingImagesRequest struct {
@@ -49,5 +50,14 @@ func (s ApiService) UpdateListingImages(auth auth.Authentication, w http.Respons
 		}
 	}
 
-	return nil
+	listingDetails, err := listings.LoadDetailsByIDAndUser(
+		s.db,
+		listingID,
+		auth.User,
+	)
+	if err != nil {
+		return errors.Wrap(err, "(api.DeleteListingImage) loading listing details")
+	}
+
+	return json.NewEncoder(w).Encode(views.ConvertListing(*listingDetails))
 }
