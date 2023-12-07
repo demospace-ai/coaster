@@ -6,12 +6,7 @@ import { createContext, useContext } from "react";
 
 const ListingContext = createContext<Listing | undefined>(undefined);
 export const useListingContext = () => {
-  const context = useContext(ListingContext);
-  if (context === undefined) {
-    throw new Error("Missing listing context.");
-  }
-
-  return context;
+  return useContext(ListingContext);
 };
 
 export const ListingContextProvider: React.FC<{
