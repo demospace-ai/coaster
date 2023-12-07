@@ -1,6 +1,7 @@
 import Hero from "@coaster/assets/hero.jpg";
 import Footer from "@coaster/assets/home-footer.jpg";
 import NeedHelp from "@coaster/assets/need-help.jpg";
+import { getCategoryForDisplay, getCategoryIcon, getSearchableCategories } from "@coaster/components/icons/Category";
 import { GlobeIcon, LeafIcon } from "@coaster/components/icons/Icons";
 import { SearchBar } from "@coaster/components/search/SearchBar";
 import { SanityClient } from "@coaster/rpc/sanity";
@@ -25,6 +26,7 @@ export const FeaturedPage = async () => {
       <ValuePropSection />
       <BlogSection />
       <NeedHelpSection />
+      <ExploreByCategory />
       <ExploreTrips />
       <Image
         src={Footer}
@@ -213,25 +215,48 @@ const NeedHelpSection: React.FC = () => {
               alt="Need help?"
               quality={90}
               src={NeedHelp}
-              sizes="90vw"
+              sizes="60vw"
               placeholder="blur"
-              className="tw-rounded-xl tw-object-left tw-object-cover"
+              className="tw-rounded-xl tw-object-left lg:tw-object-right tw-object-cover"
             />
           </div>
-          <div className="tw-flex tw-flex-col tw-items-center tw-text-center tw-z-[1] tw-mt-16 sm:tw-mt-28 tw-text-white">
-            <div className="tw-font-semibold tw-text-xl sm:tw-text-4xl tw-tracking-tighter">
-              Need help finding the perfect trip?
+          <div className="tw-flex tw-justify-center tw-items-center tw-text-center tw-w-full tw-h-full tw-z-[1] tw-text-white">
+            <div className="tw-flex tw-flex-col tw-items-center sm:tw-pb-16">
+              <div className="tw-font-semibold tw-text-xl sm:tw-text-4xl tw-tracking-tighter tw-px-5">
+                Need help finding the perfect trip?
+              </div>
+              <div className="tw-text-base sm:tw-text-lg tw-tracking-tight sm:tw-mt-2">
+                Talk to one of our adventure experts!
+              </div>
+              <Link
+                className="tw-flex tw-justify-center tw-items-center tw-mt-4 tw-bg-black tw-text-white tw-w-48 tw-h-10 tw-rounded-lg tw-font-medium"
+                href="https://calendly.com/coaster/adventure-expert-call"
+              >
+                Book a call
+              </Link>
             </div>
-            <div className="tw-text-base sm:tw-text-lg tw-tracking-tight tw-mt-2">
-              Talk to one of our adventure experts!
-            </div>
-            <Link
-              className="tw-flex tw-justify-center tw-items-center tw-mt-4 tw-bg-black tw-text-white tw-w-48 tw-h-10 tw-rounded-lg tw-font-medium"
-              href="https://calendly.com/coaster/adventure-expert-call"
-            >
-              Book a call
-            </Link>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ExploreByCategory: React.FC = () => {
+  return (
+    <div className="tw-flex tw-items-center tw-justify-center tw-w-full tw-px-5 sm:tw-px-20 tw-mt-8 sm:tw-mt-16">
+      <div className="tw-flex tw-flex-col tw-w-full tw-max-w-7xl">
+        <div className="tw-text-2xl tw-font-semibold tw-mb-5">Explore by category</div>
+        <div className="tw-grid tw-grid-cols-2 sm:tw-grid-cols-4 tw-w-full tw-gap-y-3">
+          {getSearchableCategories().map((category) => (
+            <Link
+              href={`/search?categories=["${category}"]`}
+              className="tw-flex tw-items-center tw-justify-start tw-gap-3"
+            >
+              {getCategoryIcon(category, "tw-h-5 tw-w-5")}
+              <span className="tw-underline tw-text-base tw-px-0.5">{getCategoryForDisplay(category)}</span>
+            </Link>
+          ))}
         </div>
       </div>
     </div>
