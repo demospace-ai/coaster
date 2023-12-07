@@ -1,4 +1,4 @@
-# https://www.robotstxt.org/robotstxt.html
 User-agent: *
 Allow: /
-Disallow: /listings/new
+
+Sitemap: https://www.trycoaster.com/sitemap.xml
