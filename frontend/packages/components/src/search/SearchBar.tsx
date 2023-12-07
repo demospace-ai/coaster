@@ -34,12 +34,12 @@ export const SearchBar: React.FC = () => {
         className="tw-w-full tw-bg-transparent tw-pl-4 tw-placeholder-gray-700 tw-text-base tw-select-none tw-cursor-text tw-outline-none"
         placeholder="Search trips"
       />
-      <div
+      <button
         className="tw-hidden tw-px-5 sm:tw-flex tw-items-center tw-rounded-[99px] tw-h-full tw-bg-blue-950 tw-text-white tw-text-base tw-font-medium"
         onClick={search}
       >
         Search
-      </div>
+      </button>
       <MagnifyingGlassIcon className="tw-flex sm:tw-hidden tw-w-6 tw-h-6 tw-mr-4 tw-stroke-gray-600" onClick={search} />
     </form>
   );
