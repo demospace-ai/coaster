@@ -25,7 +25,7 @@ export const SearchBar: React.FC = () => {
         e.preventDefault();
         search();
       }}
-      className="tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[400px] tw-h-14 tw-bg-white tw-shadow-dark-sm tw-p-1.5 tw-rounded-[99px] tw-cursor-pointer tw-mt-2"
+      className="tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[400px] tw-h-14 tw-bg-white tw-shadow-dark-sm tw-p-1.5 tw-rounded-[99px] tw-cursor-text tw-mt-2"
     >
       <input
         ref={inputRef}
