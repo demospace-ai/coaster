@@ -24,7 +24,12 @@ async function getGeneratedCategories(query: string): Promise<GeneratedCategoryT
     model: "gpt-4",
   });
 
-  return JSON.parse(completion.choices[0].message.content ?? "[]");
+  try {
+    const parsed = JSON.parse(completion.choices[0].message.content ?? "[]");
+    return parsed;
+  } catch (e) {
+    return [];
+  }
 }
 
 async function getPlaceFromQuery(query: string): Promise<string> {
