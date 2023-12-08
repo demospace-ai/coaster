@@ -7,7 +7,7 @@ import { Loading } from "@coaster/components/loading/Loading";
 import { Modal } from "@coaster/components/modal/Modal";
 import { addListingImage, deleteListingImage, updateListingImages } from "@coaster/rpc/client";
 import { Image as ImageType, Listing } from "@coaster/types";
-import { forceErrorMessage, getGcsImageUrl } from "@coaster/utils/common";
+import { forceErrorMessage } from "@coaster/utils/common";
 import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import update from "immutability-helper";
 import Image from "next/image";
@@ -106,7 +106,7 @@ const ImagesInner: React.FC<{ listing: Listing }> = ({ listing }) => {
               sizes="(max-width: 640px) 100vw, 1/2vw"
               alt="Listing image"
               className="tw-aspect-square tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-transition-all tw-duration-100 tw-rounded-lg tw-cursor-grab"
-              src={getGcsImageUrl(image.storage_id)}
+              src={image.url}
             />
             <XMarkIcon
               className="tw-w-8 tw-absolute tw-right-2 tw-top-2 tw-bg-gray-100 tw-p-1 tw-rounded-lg tw-opacity-80 tw-cursor-pointer hover:tw-opacity-100"

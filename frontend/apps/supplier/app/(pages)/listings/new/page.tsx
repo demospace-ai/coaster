@@ -19,7 +19,7 @@ import { InlineMapSearch, MapComponent, MapsWrapper } from "@coaster/components/
 import { createListing, updateListing, updateListingImages, useDraftListing } from "@coaster/rpc/client";
 import { AddListingImage, DeleteListingImage, GetDraftListing, GetListing, sendRequest } from "@coaster/rpc/common";
 import { CategoryType, Coordinates, Image, Listing, ListingInput, ListingStatus } from "@coaster/types";
-import { forceErrorMessage, getGcsImageUrl, isProd } from "@coaster/utils/common";
+import { forceErrorMessage, isProd } from "@coaster/utils/common";
 import { EyeIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import update from "immutability-helper";
@@ -249,7 +249,7 @@ const ReviewStep: React.FC<StepProps> = ({ prevStep }) => {
       <div className="tw-flex tw-flex-col tw-items-center tw-pb-6">
         <div className="tw-p-8 tw-shadow-centered-md tw-rounded-xl tw-w-full sm:tw-w-96">
           <img
-            src={getGcsImageUrl(listing.images[0].storage_id)}
+            src={listing.images[0].url}
             alt="preview-cover"
             className="tw-rounded-lg tw-aspect-square tw-object-cover"
           />
@@ -486,11 +486,7 @@ const ImageStepInner: React.FC<StepProps & ImageProps> = ({ nextStep, prevStep, 
               onDrop={updateImages}
               className="tw-flex tw-relative tw-w-fit tw-h-fit"
             >
-              <img
-                src={getGcsImageUrl(image.storage_id)}
-                alt="preview-image"
-                className="tw-select-none tw-rounded-lg tw-cursor-grab"
-              />
+              <img src={image.url} alt="preview-image" className="tw-select-none tw-rounded-lg tw-cursor-grab" />
               <XMarkIcon
                 className="tw-w-8 tw-absolute tw-right-2 tw-top-2 tw-bg-gray-100 tw-p-1 tw-rounded-lg tw-opacity-[90%] tw-cursor-pointer hover:tw-opacity-100"
                 onClick={() => deleteImage(image.id)}
