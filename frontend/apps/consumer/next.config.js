@@ -30,6 +30,12 @@ module.exports = withBundleAnalyzer({
         hostname: "cdn.sanity.io",
         port:"",
         pathname: "/**"
+      },
+      {
+        protocol:"https",
+        hostname: "www.trycoaster.com",
+        port:"",
+        pathname: "/**"
       }
     ],
   },

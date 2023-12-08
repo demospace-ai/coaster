@@ -1,5 +1,4 @@
 import { getListingServer } from "@coaster/rpc/server";
-import { getGcsImageUrl } from "@coaster/utils/common";
 import sharp from "sharp";
 
 export const alt = "Coaster - Find your next adventure";
@@ -16,7 +15,7 @@ export default async function Image({ params }: { params: { listingID: string } 
     return undefined;
   }
 
-  const imageRes = await fetch(getGcsImageUrl(listing.images[0].storage_id));
+  const imageRes = await fetch(listing.images[0].url);
   const original = await imageRes.arrayBuffer();
   const converted = await sharp(original).resize({ height: 630, width: 1200 }).rotate().png({ quality: 80 }).toBuffer();
   return new Response(converted);

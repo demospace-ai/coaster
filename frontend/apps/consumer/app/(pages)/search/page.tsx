@@ -1,7 +1,9 @@
+import { GeneratedSearchResult } from "@coaster/components/generated/GeneratedListings";
 import { getCategoryForDisplay } from "@coaster/components/icons/Category";
 import { SearchResult } from "@coaster/components/search/SearchResult";
 import { search } from "@coaster/rpc/server";
-import { type CategoryType, type Listing } from "@coaster/types";
+import { GeneratedListing, type CategoryType, type Listing } from "@coaster/types";
+import { getGeneratedListings } from "app/(pages)/search/server-actions";
 
 export default async function Search({ searchParams }: { searchParams: { [key: string]: string | undefined } }) {
   const listings = await search(searchParams);
@@ -15,15 +17,17 @@ export default async function Search({ searchParams }: { searchParams: { [key: s
   }
 
   let searchTitle = "";
+  let generatedListings: GeneratedListing[] = [];
   if (query) {
-    searchTitle = `${listings.length} results for "${query}"`;
+    searchTitle = `${listings.length} result(s) for "${query}"`;
+    generatedListings = await getGeneratedListings(query);
   } else if (categories) {
     const categoryString = categoriesParsed.map((category) => getCategoryForDisplay(category)).join(", ");
-    searchTitle = `${listings.length} results for ${categoryString}`;
+    searchTitle = `${listings.length} result(s) for ${categoryString}`;
   } else if (location) {
-    searchTitle = `${listings.length} results for ${location}`;
+    searchTitle = `${listings.length} result(s) for ${location}`;
   } else {
-    searchTitle = `${listings.length} results`;
+    searchTitle = `${listings.length} result(s)`;
   }
 
   return (
@@ -33,6 +37,9 @@ export default async function Search({ searchParams }: { searchParams: { [key: s
         <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-3 xl:tw-grid-cols-4 tw-mt-5 tw-mb-5 tw-font-bold tw-text-3xl tw-gap-10 tw-w-full">
           {listings.map((listing: Listing) => (
             <SearchResult key={listing.id} listing={listing} />
+          ))}
+          {generatedListings.map((listing: GeneratedListing) => (
+            <GeneratedSearchResult key={listing.category} listing={listing} />
           ))}
         </div>
       </div>

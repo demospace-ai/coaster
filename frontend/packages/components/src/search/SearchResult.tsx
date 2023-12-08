@@ -1,7 +1,7 @@
 "use client";
 
 import { Listing } from "@coaster/types";
-import { getDuration, getGcsImageUrl, mergeClasses } from "@coaster/utils/common";
+import { getDuration, mergeClasses } from "@coaster/utils/common";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -27,13 +27,12 @@ export const SearchResult: React.FC<{ listing: Listing; className?: string }> = 
       <Image
         width={listing.images[0].width}
         height={listing.images[0].height}
-        key={listing.images[0].id}
         alt="Listing image"
         sizes="(max-width: 400px) 75vw, (max-width: 640px) 30vw, (max-width: 768px) 25vw, (max-width: 1024px) 20vw, (max-width: 1536px) 18vw, (max-width: 2000px) 15vw, 12vw"
         placeholder="data:image/svg+xml;base64,PHN2ZwogICAgICB3aWR0aD0iMTAwJSIKICAgICAgaGVpZ2h0PSIxMDAlIgogICAgICB2aWV3Qm94PSIwIDAgMTAwIDEwMCIKICAgICAgdmVyc2lvbj0iMS4xIgogICAgICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgICAgIHhtbG5zWGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiCiAgICA+CiAgICAgIDxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IiNlZWUiPgogICAgICAgIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9ImZpbGwiIHZhbHVlcz0iI2VlZTsjZGRkOyNlZWUiIGR1cj0iMnMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIiAvPgogICAgICA8L3JlY3Q+CiAgICA8L3N2Zz4="
         tabIndex={-1}
         className="tw-flex tw-rounded-xl tw-aspect-square tw-flex-none tw-object-cover"
-        src={getGcsImageUrl(listing.images[0].storage_id)}
+        src={listing.images[0].url}
       />
       <span className="tw-mt-2 sm:tw-mt-3 tw-font-bold tw-text-lg">{listing.name}</span>
       <span>{listing.location}</span>

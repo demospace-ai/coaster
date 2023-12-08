@@ -14,7 +14,7 @@ import {
   Image as ListingImage,
   Listing as ListingType,
 } from "@coaster/types";
-import { ToTimeOnly, compareDates, getDuration, getGcsImageUrl, mergeClasses } from "@coaster/utils/common";
+import { ToTimeOnly, compareDates, getDuration, mergeClasses } from "@coaster/utils/common";
 import { Dialog, Disclosure, RadioGroup, Transition } from "@headlessui/react";
 import {
   ArrowUpOnSquareIcon,
@@ -86,9 +86,8 @@ export const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) =
 
 export const ReserveSlider: React.FC<{
   listing: ListingType;
-  className?: string;
-  buttonClass?: string;
-}> = ({ listing, className }) => {
+  generated: boolean;
+}> = ({ listing, generated }) => {
   const [open, setOpen] = useState(false);
   const {
     month,
@@ -106,7 +105,7 @@ export const ReserveSlider: React.FC<{
     timeSlots,
     bookingSlot,
     maxGuests,
-  } = useBookingState(listing);
+  } = useBookingState(listing, generated);
 
   const durationDays = Math.floor((listing.duration_minutes || 0) / 1440);
   const multiDayDuration = durationDays > 0;
@@ -141,7 +140,7 @@ export const ReserveSlider: React.FC<{
   };
 
   return (
-    <div className={className}>
+    <div>
       <Button className="tw-font-medium tw-tracking-[0.5px] tw-h-10" onClick={() => setOpen(true)}>
         View availability
       </Button>
@@ -404,7 +403,7 @@ export const ReserveSlider: React.FC<{
   );
 };
 
-export const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) => {
+export const ReserveFooter: React.FC<{ listing: ListingType; generated: boolean }> = ({ listing, generated }) => {
   return (
     <div className="tw-fixed lg:tw-hidden tw-z-20 tw-bottom-0 tw-left-0 tw-flex tw-items-center tw-justify-between tw-bg-white tw-border-t tw-border-solid tw-border-gray-300 tw-h-20 tw-w-full tw-px-4">
       <div className="tw-flex tw-flex-col">
@@ -413,12 +412,12 @@ export const ReserveFooter: React.FC<{ listing: ListingType }> = ({ listing }) =
         </div>
         <div>/ {getDuration(listing.duration_minutes)}</div>
       </div>
-      <ReserveSlider listing={listing} />
+      <ReserveSlider listing={listing} generated={generated} />
     </div>
   );
 };
 
-export const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) => {
+export const BookingPanel: React.FC<{ listing: ListingType; generated: boolean }> = ({ listing, generated }) => {
   const {
     month,
     setMonth,
@@ -435,7 +434,7 @@ export const BookingPanel: React.FC<{ listing: ListingType }> = ({ listing }) =>
     timeSlots,
     maxGuests,
     bookingSlot,
-  } = useBookingState(listing);
+  } = useBookingState(listing, generated);
 
   return (
     <div className="tw-hidden lg:tw-flex tw-w-[400px] tw-min-w-[400px] tw-max-w-[400px]">
@@ -624,13 +623,13 @@ const NullableImage: React.FC<{
   onClick?: () => void;
 }> = ({ image, ...props }) => {
   if (image) {
-    return <Image {...props} src={getGcsImageUrl(image.storage_id)} fill />;
+    return <Image {...props} src={image.url} fill />;
   } else {
     return <div />;
   }
 };
 
-function useBookingState(listing: ListingType) {
+function useBookingState(listing: ListingType, generated: boolean) {
   const { showNotification } = useNotificationContext();
   const { user, openLoginModal } = useAuthContext();
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
@@ -645,11 +644,17 @@ function useBookingState(listing: ListingType) {
     setFetchEndDate(new Date(month.getFullYear(), month.getMonth() + 6, 1));
   }
 
-  const { availability, loading } = useAvailability(
-    listing.id,
-    fetchStartDate.toISOString().split("T")[0],
-    fetchEndDate.toISOString().split("T")[0],
-  );
+  var availability: Availability[] | undefined = [];
+  var loading: boolean = false;
+  if (!generated) {
+    const { availability: fetchedAvailability, loading: fetching } = useAvailability(
+      listing.id,
+      fetchStartDate.toISOString().split("T")[0],
+      fetchEndDate.toISOString().split("T")[0],
+    );
+    availability = fetchedAvailability;
+    loading = fetching;
+  }
 
   const createCheckoutLink = useCreateCheckoutLink({
     onSuccess: (link) => {
@@ -663,6 +668,12 @@ function useBookingState(listing: ListingType) {
     });
 
     if (user) {
+      if (generated) {
+        // TODO: if generated, reserve via special booking endpoint
+        showNotification("success", "Requested to book! You'll hear back from us soon.", 2000);
+        return;
+      }
+
       if (availability === undefined || availability.length === 0) {
         // No-op, just send the notification to us and the user
         showNotification("success", "Requested to book! You'll hear back from us soon.", 2000);

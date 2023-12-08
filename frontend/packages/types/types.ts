@@ -136,7 +136,7 @@ export interface TimeSlot {
 
 export interface Image {
   id: number;
-  storage_id: string;
+  url: string;
   width: number;
   height: number;
 }
@@ -293,10 +293,13 @@ export interface ListingMetadata {
 
 export const Category = z.enum([
   "surfing",
+  "flyfishing",
+  "oceanfishing",
   "fishing",
   "skiing",
   "hiking",
   "kitesurf",
+  "iceclimbing",
   "climbing",
   "cycling",
   "diving",
@@ -324,3 +327,26 @@ export type AvailabilityTypeType = z.infer<typeof AvailabilityType>;
 
 export const AvailabilityDisplay = z.enum(["calendar", "list"]);
 export type AvailabilityDisplayType = z.infer<typeof AvailabilityDisplay>;
+
+export const GeneratedCategory = z.enum([
+  "surfing",
+  "flyfishing",
+  "oceanfishing",
+  "skiing",
+  "hiking",
+  "iceclimbing",
+  "climbing",
+  "cycling",
+  "diving",
+  "sup",
+  "camping",
+  "yoga",
+  "snorkeling",
+]);
+
+export type GeneratedCategoryType = z.infer<typeof GeneratedCategory>;
+
+export interface GeneratedListing {
+  category: GeneratedCategoryType;
+  place: string;
+}

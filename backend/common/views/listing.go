@@ -3,6 +3,7 @@ package views
 import (
 	"slices"
 
+	image_lib "go.fabra.io/server/common/images"
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/repositories/listings"
 )
@@ -33,10 +34,10 @@ type Listing struct {
 }
 
 type Image struct {
-	ID        int64  `json:"id"`
-	StorageID string `json:"storage_id"`
-	Width     int    `json:"width"`
-	Height    int    `json:"height"`
+	ID     int64  `json:"id"`
+	URL    string `json:"url"`
+	Width  int    `json:"width"`
+	Height int    `json:"height"`
 }
 
 type Category struct {
@@ -118,10 +119,10 @@ func ConvertImages(images []models.ListingImage) []Image {
 	converted := make([]Image, len(images))
 	for i, image := range images {
 		converted[i] = Image{
-			ID:        image.ID,
-			StorageID: image.StorageID,
-			Width:     image.Width,
-			Height:    image.Height,
+			ID:     image.ID,
+			URL:    image_lib.GetGcsImageUrl(image.StorageID),
+			Width:  image.Width,
+			Height: image.Height,
 		}
 	}
 

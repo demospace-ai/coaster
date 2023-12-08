@@ -1,12 +1,13 @@
 "use client";
 
-import { Listing as ListingType } from "@coaster/types";
-import { getGcsImageUrl, mergeClasses } from "@coaster/utils/common";
+import { Loading } from "@coaster/components/loading/Loading";
+import { Image as ImageType, Listing as ListingType } from "@coaster/types";
+import { mergeClasses } from "@coaster/utils/common";
 import { Dialog, Transition } from "@headlessui/react";
 import { ChevronLeftIcon, ChevronRightIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import useEmblaCarousel from "embla-carousel-react";
 import Image from "next/image";
-import { Fragment, useCallback, useEffect } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 
 export const ImagesModal: React.FC<{
   show: boolean;
@@ -85,17 +86,7 @@ export const ImagesModal: React.FC<{
                       key={image.id}
                       className="tw-flex tw-shrink-0 tw-pt-[10vh] tw-h-[90vh] tw-w-screen tw-items-center tw-justify-center"
                     >
-                      <Image
-                        width={image.width}
-                        height={image.height}
-                        sizes="100vw"
-                        alt="Listing image"
-                        className="tw-w-screen sm:tw-w-[90vw] tw-h-full tw-max-h-[70vh] sm:tw-max-h-full tw-object-contain"
-                        src={getGcsImageUrl(image.storage_id)}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                        }}
-                      />
+                      <LoadingImage image={image} />
                     </div>
                   ))}
                 </div>
@@ -118,6 +109,32 @@ export const ImagesModal: React.FC<{
           </Transition.Child>
         </Dialog>
       </Transition>
+    </>
+  );
+};
+
+const LoadingImage: React.FC<{ image: ImageType }> = ({ image }) => {
+  const [loaded, setLoaded] = useState(false);
+
+  return (
+    <>
+      {!loaded && (
+        <div className="tw-h-full tw-w-full tw-absolute">
+          <Loading light className="tw-absolute tw-z-10 tw-top-1/2 tw-left-1/2 tw-w-12 tw-h-12 -tw-mt-6 -tw-ml-6" />
+        </div>
+      )}
+      <Image
+        width={image.width}
+        height={image.height}
+        onLoad={() => setLoaded(true)}
+        sizes="100vw"
+        alt="Listing image"
+        className="tw-w-screen sm:tw-w-[90vw] tw-h-full tw-max-h-[70vh] sm:tw-max-h-full tw-object-contain"
+        src={image.url}
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+      />
     </>
   );
 };

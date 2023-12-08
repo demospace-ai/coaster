@@ -230,7 +230,23 @@ export const WingfoilIcon: React.FC<IconProps> = (props) => {
 };
 
 export function getCategoryForDisplay(category: CategoryType): string {
-  return category === Category.Enum.sup ? "SUP" : toTitleCase(category);
+  if (category === Category.Enum.sup) {
+    return "Stand-Up Paddleboard";
+  }
+
+  if (category === Category.Enum.oceanfishing) {
+    return "Ocean Fishing";
+  }
+
+  if (category === Category.Enum.flyfishing) {
+    return "Fly Fishing";
+  }
+
+  if (category === Category.Enum.iceclimbing) {
+    return "Ice Climbing";
+  }
+
+  return toTitleCase(category);
 }
 
 export function getCategoryIcon(category: CategoryType, className?: string) {

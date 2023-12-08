@@ -20,6 +20,7 @@ import (
 	"go.fabra.io/server/common/application"
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/errors"
+	"go.fabra.io/server/common/images"
 	"go.fabra.io/server/common/repositories/listings"
 	"go.fabra.io/server/common/views"
 )
@@ -111,8 +112,10 @@ func (s ApiService) AddListingImage(auth auth.Authentication, w http.ResponseWri
 	}
 
 	return json.NewEncoder(w).Encode(views.Image{
-		ID:        listingImage.ID,
-		StorageID: listingImage.StorageID,
+		ID:     listingImage.ID,
+		URL:    images.GetGcsImageUrl(listingImage.StorageID),
+		Width:  imageCfg.Width,
+		Height: imageCfg.Height,
 	})
 }
 

@@ -11,16 +11,16 @@ import {
 } from "consumer/app/(pages)/listings/[listingID]/client";
 import { getHostName, getMaxGuests } from "consumer/app/(pages)/listings/[listingID]/utils";
 
-export const ListingPage: React.FC<{ listing: ListingType }> = ({ listing }) => {
+export const ListingPage: React.FC<{ listing: ListingType; generated?: boolean }> = ({ listing, generated }) => {
   return (
     <>
       <ListingHeader listing={listing} />
       <ListingImages listing={listing} />
       <div className="tw-flex tw-mt-8 sm:tw-mt-12">
         <ListingDetails listing={listing} />
-        <BookingPanel listing={listing} />
+        <BookingPanel listing={listing} generated={!!generated} />
       </div>
-      <ReserveFooter listing={listing} />
+      <ReserveFooter listing={listing} generated={!!generated} />
     </>
   );
 };
