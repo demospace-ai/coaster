@@ -16,11 +16,14 @@ export default async function Search({ searchParams }: { searchParams: { [key: s
     categoriesParsed = JSON.parse(categories) as CategoryType[];
   }
 
-  let searchTitle = "";
   let generatedListings: GeneratedListing[] = [];
   if (query) {
-    searchTitle = `${listings.length} result(s) for "${query}"`;
     generatedListings = await getGeneratedListings(query);
+  }
+
+  let searchTitle = "";
+  if (query) {
+    searchTitle = `${listings.length + generatedListings.length} result(s) for "${query}"`;
   } else if (categories) {
     const categoryString = categoriesParsed.map((category) => getCategoryForDisplay(category)).join(", ");
     searchTitle = `${listings.length} result(s) for ${categoryString}`;
