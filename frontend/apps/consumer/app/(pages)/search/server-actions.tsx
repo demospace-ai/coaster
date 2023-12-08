@@ -14,7 +14,7 @@ async function getGeneratedCategories(query: string): Promise<GeneratedCategoryT
     messages: [
       {
         role: "system",
-        content: `You will be provided with a search query, and your task is to select the 1-3 of the most relevant activities from this list: ${categories}. Always respond in the format ["activity1", "activity2", "activity3"]. Only suggest activitie from the list. If you are unsure, choose 1-3 of the most likely from the list. Never respond in any format other than an array of 1-3 activities.`,
+        content: `You will be provided with a search query, and your task is to select the 0-3 of the most relevant activities from this list: ${categories}. Always respond in the format ["activity1", "activity2", "activity3"]. Only suggest activities from the list. If you are unsure, choose 0-3 of the most likely from the list. Never respond in any format other than an array of 0-3 activities.`,
       },
       {
         role: "user",
