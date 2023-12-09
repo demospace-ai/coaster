@@ -376,9 +376,9 @@ Whether you're a beginner or an experienced skier, we'll make sure you have a gr
 `;
     case "hiking":
       return `
-Lace up your boots and venture into a world of natural wonder! Imagine yourself surrounded by lush greenery, breathing in the crisp, fresh air as you step onto the trailhead. In just two hours, immerse yourself in the beauty of nature, where every step leads to breathtaking vistas and newfound serenity.
+Lace up your boots and venture into a world of natural wonder! On this Coaster-organized trip, we'll link you up with a local guide to go on a hike in the area. In just two hours, immerse yourself in the beauty of nature, where every step leads to breathtaking vistas and newfound serenity.
 
-Feel the thrill of conquering trails that wind through stunning landscapes. With each ascent, witness panoramic views that steal your breath away. This short but invigorating hike offers a glimpse into the splendor of the outdoors, a chance to reconnect with nature and find solace in its tranquility.
+Whatever your skill level, we'll match you with a hike that's right for you. Whether you're a seasoned hiker or just starting out, this adventure promises a memorable experience in the great outdoors.
 
 As the hike concludes, bask in the glow of accomplishment and the awe-inspiring sights you've witnessed. Capture memories of this brief but profound journey, where every step brings you closer to the heart of the wilderness.
 
