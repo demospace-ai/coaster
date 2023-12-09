@@ -15,6 +15,7 @@ export const SearchModal: React.FC<{ open: boolean; close: () => void }> = ({ op
     if (query.length > 0) {
       trackEvent("Search", { query });
       router.push(`/search?query=${query}`);
+      close();
     }
   };
 
