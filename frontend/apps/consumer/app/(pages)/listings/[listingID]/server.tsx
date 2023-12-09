@@ -106,7 +106,7 @@ const QuickInfo: React.FC<{ listing: ListingType }> = ({ listing }) => {
   return (
     <div className="tw-border-b tw-border-solid tw-border-gray-300 tw-mt-6 tw-pb-2">
       <div className="tw-flex tw-items-center tw-mb-6">
-        <StarIcon className="tw-h-6 tw-w-6 tw-mr-4" />
+        <StarIcon className="tw-h-6 tw-w-6 tw-mr-4 tw-shrink-0" />
         <div className="tw-flex tw-flex-col">
           <span className="tw-font-medium">Professional guide</span>
           <span className="tw-text-sm">Our guides are committed to providing a great experience.</span>
