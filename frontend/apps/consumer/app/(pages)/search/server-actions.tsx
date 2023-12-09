@@ -21,7 +21,7 @@ async function getGeneratedCategories(query: string): Promise<GeneratedCategoryT
         content: query,
       },
     ],
-    model: "gpt-4",
+    model: "gpt-3.5-turbo",
   });
 
   try {
