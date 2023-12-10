@@ -46,6 +46,7 @@ export const SearchBar: React.FC = () => {
 };
 
 export const SearchBarHeader: React.FC<{ show: boolean }> = ({ show }) => {
+  const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const [query, setQuery] = useState<string>("");
   const search = () => {
@@ -62,14 +63,16 @@ export const SearchBarHeader: React.FC<{ show: boolean }> = ({ show }) => {
   return (
     <div className="tw-flex tw-w-full tw-justify-center">
       <form
+        onClick={() => inputRef.current?.focus()}
         onSubmit={(e) => {
           e.preventDefault();
           search();
         }}
-        className="tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[400px] tw-h-9 tw-bg-white tw-ring-1 tw-ring-slate-300 tw-rounded-[99px] tw-cursor-pointer tw-mx-10"
+        className="tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[400px] tw-h-9 tw-bg-white tw-ring-1 tw-ring-slate-300 tw-rounded-[99px] tw-cursor-text tw-mx-10"
       >
-        <MagnifyingGlassIcon className="tw-ml-4 tw-h-5 -tw-mr-1.5 tw-stroke-gray-600" />
+        <MagnifyingGlassIcon className="tw-ml-4 tw-h-5 -tw-mr-1.5 tw-stroke-gray-600 tw-cursor-pointer" />
         <input
+          ref={inputRef}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="tw-w-full tw-bg-transparent tw-pl-4 tw-placeholder-gray-700 tw-text-base tw-select-none tw-cursor-text tw-outline-none"
