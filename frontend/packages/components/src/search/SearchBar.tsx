@@ -70,7 +70,7 @@ export const SearchBarHeader: React.FC<{ show: boolean }> = ({ show }) => {
         }}
         className="tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[400px] tw-h-9 tw-bg-white tw-ring-1 tw-ring-slate-300 tw-rounded-[99px] tw-cursor-text tw-mx-10"
       >
-        <MagnifyingGlassIcon className="tw-ml-4 tw-h-5 -tw-mr-1.5 tw-stroke-gray-600 tw-cursor-pointer" />
+        <MagnifyingGlassIcon className="tw-ml-4 tw-h-5 -tw-mr-1.5 tw-stroke-gray-600" />
         <input
           ref={inputRef}
           value={query}
