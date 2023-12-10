@@ -80,12 +80,12 @@ export default function Details() {
   };
 
   return (
-    <form className="tw-w-full" onSubmit={handleSubmit(onSubmit)}>
+    <form className="tw-w-full tw-text-base" onSubmit={handleSubmit(onSubmit)}>
       <div className="tw-text-2xl tw-font-semibold tw-mb-2">Listing Basics</div>
       <Input className="tw-w-full tw-flex tw-mt-3" label="Name" {...register("name")} value={watch("name")} />
       <FormError message={formState.errors.name?.message} />
       <TextArea
-        className="tw-w-full tw-flex tw-mt-3"
+        className="tw-w-full tw-flex tw-mt-3 tw-min-h-[160px] sm:tw-min-h-[256px]"
         label="Description"
         {...register("description")}
         value={watch("description")}
