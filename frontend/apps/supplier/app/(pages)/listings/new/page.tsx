@@ -13,6 +13,7 @@ import {
   WizardNavButtons,
   wrapHandleSubmit,
 } from "@coaster/components/form/MultiStep";
+import { getCategoryForDisplay } from "@coaster/components/icons/Category";
 import { Input, PriceInput } from "@coaster/components/input/Input";
 import { Loading } from "@coaster/components/loading/Loading";
 import { InlineMapSearch, MapComponent, MapsWrapper } from "@coaster/components/maps/Maps";
@@ -57,7 +58,7 @@ const NewListingInner: React.FC<{ initialStepNumber: number }> = ({ initialStepN
   const steps = [
     {
       element: CategoryStep,
-      title: "What kind of experience do you want to host?",
+      title: "What kind of experience do you want to host? (You can select multiple).",
     },
     {
       element: LocationStep,
@@ -208,6 +209,7 @@ const CategoryStep: React.FC<StepProps> = (props) => {
       {...props}
       schema={CategoriesSchema}
       existingData={listing?.categories}
+      getDisplayName={getCategoryForDisplay}
       // TODO: fix the typing issue for the onChange data parameter
       onChange={async (data: string[]): Promise<SubmitResult> => {
         if (listing) {

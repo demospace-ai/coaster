@@ -247,6 +247,7 @@ type MultiSelectorProps = {
   onSubmit?: (data: string[]) => Promise<SubmitResult>;
   existingData?: string[];
   placeholder?: string;
+  getDisplayName?: (option: string) => string;
 };
 
 export const MultiSelectorStep = <T extends FieldValues | undefined>({
@@ -256,6 +257,7 @@ export const MultiSelectorStep = <T extends FieldValues | undefined>({
   onSubmit,
   nextStep,
   prevStep,
+  getDisplayName,
 }: StepProps<T> & MultiSelectorProps) => {
   type schemaType = z.infer<typeof schema>;
   const [error, setError] = useState<string | undefined>(undefined);
@@ -299,7 +301,7 @@ export const MultiSelectorStep = <T extends FieldValues | undefined>({
               }
             }}
           >
-            {toTitleCase(option)}
+            {getDisplayName ? getDisplayName(option) : option}
             {selected.includes(option) ? (
               <CheckCircleIcon className="tw-w-[25px] tw-mr-[-1px]" />
             ) : (
