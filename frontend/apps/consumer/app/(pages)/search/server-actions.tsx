@@ -25,6 +25,10 @@ async function getGeneratedCategories(query: string): Promise<GeneratedCategoryT
   });
 
   try {
+    if (!completion.choices || completion.choices.length === 0) {
+      return [];
+    }
+
     const parsed = JSON.parse(completion.choices[0].message.content ?? "[]");
     return parsed;
   } catch (e) {
