@@ -563,7 +563,7 @@ export const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) =
         <NullableImage
           alt="Main listing image"
           priority
-          sizes="(max-width: 1024px) 100vw, 66vw"
+          sizes="(max-width: 1024px) 80vw, 60vw"
           className="tw-w-full tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
           image={listing.images[0]}
           onClick={() => {
@@ -582,7 +582,7 @@ export const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) =
         <div className="tw-relative tw-block tw-h-1/2 tw-w-full tw-bg-gray-100">
           <NullableImage
             alt="Listing image 2"
-            sizes="33vw"
+            sizes="(max-width: 1024px) 33vw, 20vw"
             className="tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
             image={listing.images[1]}
             onClick={() => {
@@ -594,7 +594,7 @@ export const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) =
         <div className="tw-relative tw-block tw-h-1/2 tw-w-full tw-bg-gray-100">
           <NullableImage
             alt="Listing image 3"
-            sizes="33vw"
+            sizes="(max-width: 1024px) 33vw, 20vw"
             className="tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
             image={listing.images[2]}
             onClick={() => {
