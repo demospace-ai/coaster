@@ -72,12 +72,12 @@ export default async function YourListings() {
                       <td className="tw-whitespace-nowrap tw-px-3 tw-py-4 tw-text-sm tw-text-gray-500">
                         {listing.status}
                       </td>
-                      <td className="tw-whitespace-nowrap tw-px-3 tw-py-4 tw-text-sm tw-text-gray-500">
+                      <td className="tw-whitespace-nowrap tw-px-3 tw-py-4 tw-text-sm tw-text-gray-500 tw-max-w-[120px] tw-text-ellipsis tw-overflow-hidden">
                         {listing.categories
                           ? listing.categories.map((category) => getCategoryForDisplay(category)).join(" | ")
                           : ""}
                       </td>
-                      <td className="tw-whitespace-nowrap tw-text-ellipsis tw-px-3 tw-py-4 tw-text-sm tw-text-gray-500 tw-max-w-[120px] tw-overflow-hidden">
+                      <td className="tw-whitespace-nowrap tw-px-3 tw-py-4 tw-text-sm tw-text-gray-500 tw-max-w-[120px] tw-text-ellipsis tw-overflow-hidden">
                         {listing.location}
                       </td>
                       <td className="tw-whitespace-nowrap tw-px-3 tw-py-4 tw-text-sm tw-text-gray-500">
