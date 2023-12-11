@@ -3,6 +3,7 @@ import { ErrorBoundary } from "@coaster/components/error/ErrorBoundary";
 import { RudderInit } from "@coaster/components/rudderstack/RudderInit";
 import { isProd, worksans } from "@coaster/utils/common";
 import { HighlightInit } from "@highlight-run/next/client";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
 
 import "consumer/app/global.css";
@@ -36,6 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       />
       <AtlasInit />
       <RudderInit />
+      <SpeedInsights />
       <html lang="en" className={worksans.className}>
         <body>
           <div id="root" className="tw-w-full tw-h-full tw-flex tw-flex-col">
