@@ -1,10 +1,21 @@
 "use client";
 
 import { isProd } from "@coaster/utils/common";
+import { usePathname, useSearchParams } from "next/navigation";
 import Script from "next/script";
+import { useEffect } from "react";
 
 export const RudderInit = () => {
   if (!isProd()) return null;
+
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if ((window as any).rudderanalytics) {
+      (window as any).rudderanalytics.page();
+    }
+  }, [pathname, searchParams]);
 
   return (
     <Script id="rudder-script">
