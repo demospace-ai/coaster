@@ -29,16 +29,18 @@ export const Header: React.FC = () => {
   }, []);
 
   return (
-    <div
-      className={mergeClasses(
-        "tw-sticky tw-z-10 tw-top-0 tw-flex tw-flex-col tw-items-center tw-justify-center tw-box-border tw-w-full tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white",
-        isHome && scrollPosition < 20 && "tw-border-none",
-      )}
-    >
+    <>
       <PromoBanner />
-      <DesktopHeader isHome={isHome} scrollPosition={scrollPosition} />
-      <MobileHeader />
-    </div>
+      <div
+        className={mergeClasses(
+          "tw-sticky tw-z-10 tw-top-0 tw-flex tw-flex-col tw-items-center tw-justify-center tw-box-border tw-w-full tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white",
+          isHome && scrollPosition < 20 && "tw-border-none",
+        )}
+      >
+        <DesktopHeader isHome={isHome} scrollPosition={scrollPosition} />
+        <MobileHeader />
+      </div>
+    </>
   );
 };
 
