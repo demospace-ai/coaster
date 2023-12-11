@@ -127,7 +127,7 @@ const LoadingImage: React.FC<{ image: ImageType }> = ({ image }) => {
         width={image.width}
         height={image.height}
         onLoad={() => setLoaded(true)}
-        sizes="100vw"
+        sizes="50vw"
         alt="Listing image"
         className="tw-w-screen sm:tw-w-[90vw] tw-h-full tw-max-h-[70vh] sm:tw-max-h-full tw-object-contain"
         src={image.url}
