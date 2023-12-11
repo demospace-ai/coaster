@@ -37,9 +37,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       />
       <AtlasInit />
       <RudderInit />
-      <SpeedInsights />
       <html lang="en" className={worksans.className}>
         <body>
+          <SpeedInsights />
           <div id="root" className="tw-w-full tw-h-full tw-flex tw-flex-col">
             <ErrorBoundary>{children}</ErrorBoundary>
           </div>
