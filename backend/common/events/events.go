@@ -7,7 +7,7 @@ import (
 	"go.fabra.io/server/common/application"
 )
 
-func TrackSignup(userID int64, name string, email string) {
+func TrackSignup(userID int64, firstName string, lastName string, email string) {
 	if !application.IsProd() {
 		return
 	}
@@ -24,7 +24,8 @@ func TrackSignup(userID int64, name string, email string) {
 	client.Enqueue(analytics.Identify{
 		UserId: fmt.Sprintf("%d", userID),
 		Traits: analytics.NewTraits().
-			SetName(name).
+			SetFirstName(firstName).
+			SetLastName(lastName).
 			SetEmail(email),
 	})
 
