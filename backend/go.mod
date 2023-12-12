@@ -23,12 +23,15 @@ require (
 
 require (
 	cloud.google.com/go v0.110.2 // indirect
+	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.14.1 // indirect
+	github.com/gorilla/css v1.0.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/mattn/go-isatty v0.0.18 // indirect
+	github.com/microcosm-cc/bluemonday v1.0.26 // indirect
 	golang.org/x/time v0.0.0-20200416051211-89c76fbcd5d1 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
@@ -102,12 +105,12 @@ require (
 	go.opentelemetry.io/otel/sdk v1.16.0 // indirect
 	go.opentelemetry.io/otel/trace v1.16.0 // indirect
 	go.opentelemetry.io/proto/otlp v0.20.0 // indirect
-	golang.org/x/crypto v0.14.0
+	golang.org/x/crypto v0.16.0
 	golang.org/x/mod v0.10.0 // indirect
-	golang.org/x/net v0.17.0 // indirect
+	golang.org/x/net v0.19.0 // indirect
 	golang.org/x/oauth2 v0.8.0
-	golang.org/x/sys v0.13.0 // indirect
-	golang.org/x/text v0.13.0 // indirect
+	golang.org/x/sys v0.15.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/tools v0.9.3 // indirect
 	google.golang.org/api v0.126.0
 	google.golang.org/appengine v1.6.7 // indirect

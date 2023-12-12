@@ -147,7 +147,7 @@ func CreateListing(
 	listing := models.Listing{
 		UserID:              userID,
 		Name:                name,
-		Description:         description,
+		Description:         input.SanitizePtr(description),
 		Price:               price,
 		Location:            location,
 		Coordinates:         coordinates,
@@ -188,7 +188,7 @@ func UpdateListing(db *gorm.DB, listing *models.Listing, listingUpdates input.Li
 	}
 
 	if listingUpdates.Description != nil {
-		listing.Description = listingUpdates.Description
+		listing.Description = input.SanitizePtr(listingUpdates.Description)
 	}
 
 	if listingUpdates.Price != nil {
