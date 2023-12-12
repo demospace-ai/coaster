@@ -34,7 +34,7 @@ export const RudderInit = () => {
         },"undefined"==typeof Promise||"undefined"==typeof globalThis){var d=document.createElement("script")
         ;d.src="https://polyfill.io/v3/polyfill.min.js?features=Symbol%2CPromise&callback=rudderAnalyticsMount",
         d.async=asyncScript,document.head?document.head.appendChild(d):document.body.appendChild(d)}else{
-        window.rudderAnalyticsMount()}window.rudderanalytics.load("2Va8vvJ85DejVV7jncdVenC6smB","https://trycoasterlyoh.dataplane.rudderstack.com",{plugins:["DeviceModeDestinations"]})}();`}
+        window.rudderAnalyticsMount()}window.rudderanalytics.load("2Va8vvJ85DejVV7jncdVenC6smB","https://trycoasterlyoh.dataplane.rudderstack.com",{plugins:["BeaconQueue", "DeviceModeDestinations", "NativeDestinationQueue", "StorageEncryption", "XhrQueue"]})}();`}
     </Script>
   );
 };
