@@ -2,7 +2,7 @@
 
 import { Button } from "@coaster/components/button/Button";
 import { FormError } from "@coaster/components/error/FormError";
-import { Input, MultiSelect, PriceInput, TextArea } from "@coaster/components/input/Input";
+import { Input, MultiSelect, PriceInput, RichTextEditor } from "@coaster/components/input/Input";
 import { Loading } from "@coaster/components/loading/Loading";
 import { InlineMapSearch } from "@coaster/components/maps/Maps";
 import { updateListing, useNotificationContext } from "@coaster/rpc/client";
@@ -80,15 +80,21 @@ export default function Details() {
   };
 
   return (
-    <form className="tw-w-full tw-text-base" onSubmit={handleSubmit(onSubmit)}>
+    <form className="tw-w-full" onSubmit={handleSubmit(onSubmit)}>
       <div className="tw-text-2xl tw-font-semibold tw-mb-2">Listing Basics</div>
       <Input className="tw-w-full tw-flex tw-mt-3" label="Name" {...register("name")} value={watch("name")} />
       <FormError message={formState.errors.name?.message} />
-      <TextArea
-        className="tw-w-full tw-flex tw-mt-3 tw-min-h-[160px] sm:tw-min-h-[256px]"
-        label="Description"
-        {...register("description")}
-        value={watch("description")}
+      <Controller
+        name="description"
+        control={control}
+        render={({ field }) => (
+          <RichTextEditor
+            className="tw-mt-3 tw-h-[160px] tw-min-h-[160px] sm:tw-h-[256px] sm:tw-min-h-[256px]"
+            label="Description"
+            value={field.value}
+            setValue={field.onChange}
+          />
+        )}
       />
       <FormError message={formState.errors.description?.message} />
       <PriceInput

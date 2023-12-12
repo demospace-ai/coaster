@@ -17,6 +17,8 @@ import {
 import { Combobox, Listbox, RadioGroup, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { InformationCircleIcon, MinusCircleIcon, PlusCircleIcon, UserIcon } from "@heroicons/react/24/outline";
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 import React, {
   Fragment,
   InputHTMLAttributes,
@@ -40,7 +42,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
   const { id, disabled, className, label, tooltip, value, onBlur, onFocus, ...other } = props;
   const [focused, setFocused] = useState<boolean>(false);
-  let classes = [
+  const classes = [
     "tw-flex tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-md tw-py-[6px] tw-px-3 tw-w-full tw-box-border focus-within:tw-border-slate-400 tw-outline-none tw-items-center",
     !disabled && "hover:tw-border-slate-400 tw-cursor-text",
     disabled && "tw-bg-slate-50 tw-select-none tw-cursor-not-allowed",
@@ -67,13 +69,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
       }}
     >
       {props.icon && props.icon}
-      <div className={mergeClasses("tw-relative tw-flex tw-flex-col tw-w-full", label && "tw-mt-3.5")}>
+      <div className={mergeClasses("tw-relative tw-flex tw-flex-col tw-w-full", label && "tw-mt-4 tw-pb-0.5")}>
         {label && (
           <label
             htmlFor={id}
             className={mergeClasses(
               "tw-absolute -tw-top-1.5 tw-text-base tw-text-slate-600 tw-cursor-[inherit] tw-select-none tw-inline-block tw-transition-all tw-duration-150",
-              showLabel && "-tw-top-3.5 tw-text-xs",
+              showLabel && "-tw-top-4 tw-text-xs",
             )}
           >
             {label}
@@ -85,7 +87,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
           ref={inputRef}
           autoComplete={id}
           className={mergeClasses(
-            "tw-w-full tw-outline-none tw-ring-none disabled:tw-bg-slate-50 disabled:tw-select-none tw-cursor-[inherit] tw-hide-number-wheel",
+            "tw-w-full tw-outline-none tw-ring-none disabled:tw-bg-slate-50 disabled:tw-select-none tw-cursor-[inherit] tw-hide-number-wheel tw-text-base",
             props.label && "tw-mt-0.5",
           )}
           onKeyDown={onKeydown}
@@ -111,6 +113,44 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
   );
 });
 
+export const RichTextEditor: React.FC<{
+  value: string;
+  setValue: (value: string) => void;
+  label?: string;
+  className?: string;
+}> = ({ value, setValue, label, className }) => {
+  const editor = useEditor({
+    editorProps: {
+      attributes: {
+        class:
+          "tw-w-full tw-h-full tw-outline-none tw-text-base [&_ul]:tw-list-disc [&_ul]:tw-ml-5 [&_ol]:tw-list-decimal [&_ol]:tw-ml-5",
+      },
+    },
+    extensions: [StarterKit],
+    content: value,
+    onUpdate: ({ editor }) => {
+      setValue(editor.getHTML());
+    },
+    injectCSS: false,
+  });
+  const classes = [
+    "tw-relative tw-w-full tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-md tw-px-3 tw-py-3 focus-within:tw-border-slate-400 tw-resize-y tw-overflow-hidden",
+    label && "tw-pt-6",
+    className,
+  ];
+
+  return (
+    <div className={mergeClasses(...classes)}>
+      {label && (
+        <label className="tw-absolute tw-text-slate-600 tw-cursor-[inherit] tw-select-none tw-inline-block tw-transition-all tw-duration-150 tw-top-1.5 tw-text-xs">
+          {label}
+        </label>
+      )}
+      <EditorContent editor={editor} className="tw-w-full tw-h-full tw-overflow-auto" />
+    </div>
+  );
+};
+
 interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
   tooltip?: string;
@@ -119,7 +159,7 @@ interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
 export const TextArea: React.FC<TextAreaProps> = forwardRef<HTMLTextAreaElement, TextAreaProps>((props, ref) => {
   const { id, value, disabled, className, label, tooltip, onBlur, onFocus, ...other } = props;
   const [focused, setFocused] = useState<boolean>(false);
-  let classes = [
+  const classes = [
     "tw-flex tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-md tw-py-2.5 tw-px-3 tw-w-full tw-box-border focus-within:tw-border-slate-400 tw-outline-none",
     !disabled && "hover:tw-border-slate-400 tw-cursor-text",
     disabled && "tw-bg-slate-50 tw-select-none tw-cursor-not-allowed",

@@ -4,9 +4,10 @@ import { mergeClasses, toTitleCase } from "@coaster/utils/common";
 import { CheckCircleIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Dispatch, ReactElement, SetStateAction, useState } from "react";
-import { FieldError, FieldValues, UseFormHandleSubmit, useForm } from "react-hook-form";
+import { Controller, FieldError, FieldValues, UseFormHandleSubmit, useForm } from "react-hook-form";
 import { ZodArray, ZodEnum, ZodString, z } from "zod";
 import { FormError } from "../error/FormError";
+import { RichTextEditor } from "../input/Input";
 import { Loading } from "../loading/Loading";
 
 export const WizardNavButtons: React.FC<{
@@ -134,24 +135,31 @@ export const TextAreaStep = <T extends FieldValues | undefined>({
   type formSchemaType = z.infer<typeof formSchema>;
   const {
     handleSubmit,
+    control,
     clearErrors,
-    register,
     setError,
     formState: { errors },
   } = useForm<formSchemaType>({
     mode: "onBlur",
-    defaultValues: { value: existingData },
+    defaultValues: { value: existingData ?? "" },
     resolver: zodResolver(formSchema),
   });
 
   return (
     <>
       <div className="tw-flex tw-flex-col tw-items-center">
-        <textarea
-          className="tw-flex tw-py-3 tw-px-3 tw-w-full tw-outline-0 tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-text-base tw-justify-center focus-within:tw-border-2 focus-within:tw-border-blue-700 focus-within:tw-m-[-1px] focus-within:tw-px-[11px] tw-cursor-text"
-          {...register("value", {
-            onChange: () => clearErrors("value"),
-          })}
+        <Controller
+          name="value"
+          control={control}
+          render={({ field }) => (
+            <RichTextEditor
+              value={field.value}
+              setValue={(e) => {
+                field.onChange(e);
+                clearErrors();
+              }}
+            />
+          )}
         />
         <ErrorMessage error={errors.value} />
       </div>

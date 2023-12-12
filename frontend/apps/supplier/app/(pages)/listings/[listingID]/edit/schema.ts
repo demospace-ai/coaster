@@ -1,17 +1,24 @@
 import { AvailabilityType, Category } from "@coaster/types";
+import { generateJSON, generateText } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 import { z } from "zod";
 
 export const CategoriesSchema = z.array(Category).min(1, "Must have at least one category.");
 
 export const NameSchema = z
   .string()
-  .min(4, "Your name must be at least 4 characters long.")
-  .max(64, "Your name can be up to 64 characters long.");
+  .min(4, "Your listing's name must be at least 4 characters long.")
+  .max(64, "Your listing's name can be up to 64 characters long.");
 
-export const DescriptionSchema = z
-  .string()
-  .min(4, "Your description must be at least 4 characters long.")
-  .max(15000, "Descriptions can be up to 15,000 characters long.");
+export const DescriptionSchema = z.string().superRefine((data, ctx) => {
+  const json = generateText(generateJSON(data, [StarterKit]), [StarterKit]);
+  if (json.length < 4) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Your description must be at least 4 characters long." });
+  }
+  if (json.length > 15000) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Descriptions can be up to 15,000 characters long." });
+  }
+});
 
 export const PriceSchema = z
   .number({ invalid_type_error: "The minimum price is $1." })

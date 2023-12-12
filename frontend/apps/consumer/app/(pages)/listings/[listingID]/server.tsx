@@ -72,7 +72,10 @@ const Description: React.FC<{ listing: ListingType }> = ({ listing }) => {
   return (
     <div className="tw-pb-6 tw-border-b tw-border-solid tw-border-gray-300">
       <div className="tw-mt-5 tw-font-semibold">About</div>
-      <div className="tw-mt-2 tw-whitespace-pre-wrap">{listing.description}</div>
+      <div
+        className="tw-mt-2 tw-whitespace-pre-wrap [&_ul]:tw-list-disc [&_ul]:tw-ml-5 [&_ol]:tw-list-decimal [&_ol]:tw-ml-5 [&_p]:tw-min-h-[1.5rem]"
+        dangerouslySetInnerHTML={{ __html: listing.description ?? "" }}
+      />
     </div>
   );
 };
