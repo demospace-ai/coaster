@@ -5,7 +5,7 @@ import { CheckCircleIcon, ExclamationCircleIcon } from "@heroicons/react/24/outl
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Dispatch, ReactElement, SetStateAction, useState } from "react";
 import { Controller, FieldError, FieldValues, UseFormHandleSubmit, useForm } from "react-hook-form";
-import { ZodArray, ZodEnum, ZodString, z } from "zod";
+import { ZodArray, ZodEffects, ZodEnum, ZodString, z } from "zod";
 import { FormError } from "../error/FormError";
 import { RichTextEditor } from "../input/Input";
 import { Loading } from "../loading/Loading";
@@ -67,7 +67,7 @@ export type StepProps<T extends FieldValues | undefined = undefined> = {
 } & (T extends undefined ? { values?: never } : { values: T });
 
 type InputProps = {
-  schema: ZodString;
+  schema: ZodEffects<ZodString> | ZodString;
   onChange?: (data: { value: string }) => void;
   onSubmit?: (data: { value: string }) => Promise<SubmitResult>;
   existingData?: string;
