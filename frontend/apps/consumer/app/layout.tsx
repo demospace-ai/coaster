@@ -11,6 +11,7 @@ import "consumer/app/global.css";
 export const metadata: Metadata = {
   title: "Coaster",
   description: "Coaster - Curated adventures",
+  metadataBase: isProd() ? new URL("https://trycoaster.com") : new URL("http://localhost:3000"),
 };
 
 export const viewport: Viewport = {

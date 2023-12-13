@@ -1,5 +1,4 @@
 import { SanityClient } from "@coaster/rpc/sanity";
-import { isProd } from "@coaster/utils/common";
 import { PortableText } from "@portabletext/react";
 import { Post, urlFor } from "app/(pages)/blog/utils";
 import Image from "next/image";
@@ -19,7 +18,6 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   return {
     title: post.title,
     description: post.metaDescription,
-    metadataBase: isProd() ? "https://trycoaster.com" : "http://localhost:3000",
   };
 }
 

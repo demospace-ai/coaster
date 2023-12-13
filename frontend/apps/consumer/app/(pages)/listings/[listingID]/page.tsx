@@ -1,5 +1,4 @@
 import { getListingServer } from "@coaster/rpc/server";
-import { isProd } from "@coaster/utils/common";
 import { ListingPage } from "consumer/app/(pages)/listings/[listingID]/server";
 
 export const dynamic = "force-static";
@@ -9,7 +8,6 @@ export async function generateMetadata({ params }: { params: { listingID: string
   return {
     title: listing ? listing.name : "Coaster - Find your next adventure",
     description: listing ? listing.short_description : "",
-    metadataBase: isProd() ? "https://trycoaster.com" : "http://localhost:3000",
     openGraph: {
       title: listing ? listing.name : "Coaster - Find your next adventure",
     },

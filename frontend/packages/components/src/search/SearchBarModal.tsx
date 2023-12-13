@@ -5,7 +5,7 @@ import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
 import { Fragment, useRef, useState } from "react";
 import { Button } from "../button/Button";
-import { trackEvent } from "../rudderstack/events";
+import { trackEvent } from "../rudderstack/client-events";
 
 export const SearchModal: React.FC<{ open: boolean; close: () => void }> = ({ open, close }) => {
   const inputRef = useRef<HTMLInputElement>(null);

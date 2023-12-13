@@ -202,7 +202,7 @@ export const TextArea: React.FC<TextAreaProps> = forwardRef<HTMLTextAreaElement,
           name={id}
           ref={textAreaRef}
           autoComplete={id}
-          className="tw-w-full tw-outline-none tw-text-base tw-mt-1 disabled:tw-bg-slate-50 disabled:tw-select-none tw-cursor-[inherit]"
+          className="tw-w-full tw-h-full tw-min-h-full tw-outline-none tw-text-base tw-mt-1 disabled:tw-bg-slate-50 disabled:tw-select-none tw-cursor-[inherit]"
           onKeyDown={onKeydown}
           value={value ? value : ""}
           onBlur={(e) => {

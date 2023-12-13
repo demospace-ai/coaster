@@ -1,3 +1,5 @@
+"use client";
+
 import { isProd } from "@coaster/utils/common";
 
 export function trackEvent(eventName: string, eventProperties?: any) {

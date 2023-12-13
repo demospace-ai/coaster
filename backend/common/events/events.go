@@ -34,23 +34,14 @@ func TrackSignup(userID int64, firstName string, lastName string, email string) 
 }
 
 func TrackBooking(userID int64) {
-	if !application.IsProd() {
-		return
-	}
-
-	client := analytics.New("2Va8zq1kRrOOFb9sK4MYOrqPFbr", "https://trycoasterlyoh.dataplane.rudderstack.com")
-
-	// Enqueues a track event that will be sent asynchronously.
-	client.Enqueue(analytics.Track{
-		UserId: fmt.Sprintf("%d", userID),
-		Event:  "Trip Booked",
-	})
-
-	// Flushes any queued messages and closes the client.
-	client.Close()
+	track(userID, "Trip Booked")
 }
 
 func TrackCheckoutOpen(userID int64) {
+	track(userID, "Checkout Open")
+}
+
+func track(userID int64, eventName string) {
 	if !application.IsProd() {
 		return
 	}
@@ -60,8 +51,9 @@ func TrackCheckoutOpen(userID int64) {
 	// Enqueues a track event that will be sent asynchronously.
 	client.Enqueue(analytics.Track{
 		UserId: fmt.Sprintf("%d", userID),
-		Event:  "Checkout Open",
+		Event:  eventName,
 	})
+
 	// Flushes any queued messages and closes the client.
 	client.Close()
 }
