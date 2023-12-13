@@ -250,6 +250,7 @@ const ExploreByCategory: React.FC = () => {
         <div className="tw-grid tw-grid-cols-2 sm:tw-grid-cols-4 tw-w-full tw-gap-y-3">
           {getSearchableCategories().map((category) => (
             <Link
+              key={category}
               href={`/search?categories=["${category}"]`}
               className="tw-flex tw-items-center tw-justify-start tw-gap-3"
             >
