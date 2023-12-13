@@ -69,7 +69,7 @@ func updateDescriptions(db *gorm.DB) {
 	}
 
 	for _, listing := range listings {
-		if !strings.Contains((*listing.Description), "</p>") {
+		if listing.Description != nil && !strings.Contains((*listing.Description), "</p>") {
 			newDescription := fmt.Sprintf("<p>%s</p>", strings.ReplaceAll((*listing.Description), "\n", "</p><p>"))
 			listing.Description = &newDescription
 			result := db.Save(&listing)
