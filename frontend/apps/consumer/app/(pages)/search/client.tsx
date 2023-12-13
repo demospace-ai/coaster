@@ -5,6 +5,7 @@ import { FormError } from "@coaster/components/error/FormError";
 import { Input, TextArea } from "@coaster/components/input/Input";
 import { Loading } from "@coaster/components/loading/Loading";
 import { Modal } from "@coaster/components/modal/Modal";
+import { getAnonymousID } from "@coaster/components/rudderstack/client";
 import { useAuthContext } from "@coaster/rpc/client";
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -34,7 +35,8 @@ export const CustomResult: React.FC = () => {
 
   const submit = async (values: SchemaType) => {
     setLoading(true);
-    await requestTrip(values.email, values.description);
+    const anonymousID = getAnonymousID();
+    await requestTrip(values.email, values.description, anonymousID);
     setLoading(false);
     setSubmitted(true);
   };

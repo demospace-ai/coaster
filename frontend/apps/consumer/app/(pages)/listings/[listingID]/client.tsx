@@ -5,7 +5,7 @@ import { correctToUTC } from "@coaster/components/dates/utils";
 import { getCategoryForDisplay } from "@coaster/components/icons/Category";
 import { GuestNumberInput } from "@coaster/components/input/Input";
 import { Loading } from "@coaster/components/loading/Loading";
-import { trackEvent } from "@coaster/components/rudderstack/client-events";
+import { trackEvent } from "@coaster/components/rudderstack/client";
 import { useAuthContext, useAvailability, useCreateCheckoutLink, useNotificationContext } from "@coaster/rpc/client";
 import {
   Availability,

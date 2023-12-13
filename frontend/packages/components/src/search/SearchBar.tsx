@@ -4,7 +4,7 @@ import { mergeClasses } from "@coaster/utils/common";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
-import { trackEvent } from "../rudderstack/client-events";
+import { trackEvent } from "../rudderstack/client";
 import { SearchModal } from "./SearchBarModal";
 
 export const SearchBar: React.FC = () => {

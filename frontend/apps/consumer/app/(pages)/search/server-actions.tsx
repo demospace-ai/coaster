@@ -1,6 +1,6 @@
 "use server";
 
-import { trackEvent } from "@coaster/components/rudderstack/server-events";
+import { trackEvent } from "@coaster/components/rudderstack/server";
 import { GeneratedCategory, GeneratedCategoryType, GeneratedListing } from "@coaster/types";
 import OpenAI from "openai";
 
@@ -58,7 +58,7 @@ export async function getGeneratedListings(query: string): Promise<GeneratedList
   }));
 }
 
-export async function requestTrip(email: string, description: string) {
+export async function requestTrip(email: string, description: string, anonymousID: string) {
   const data = new URLSearchParams({
     "entry.2054719272": description,
     emailAddress: email,
@@ -76,7 +76,7 @@ export async function requestTrip(email: string, description: string) {
     },
   );
 
-  trackEvent("Trip Request", {
+  trackEvent(anonymousID, "Trip Request", {
     email,
   });
 }
