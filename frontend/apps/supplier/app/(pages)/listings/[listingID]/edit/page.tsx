@@ -158,7 +158,7 @@ export default function Details() {
       />
       <FormError message={formState.errors.maxGuests?.message} />
       <Button type="submit" className="tw-mt-6 tw-w-full sm:tw-w-32 tw-h-12 tw-ml-auto" disabled={!formState.isDirty}>
-        {formState.isSubmitting ? <Loading /> : "Save"}
+        {formState.isSubmitting ? <Loading light /> : "Save"}
       </Button>
       <FormError message={formState.errors.root?.message} />
     </form>
