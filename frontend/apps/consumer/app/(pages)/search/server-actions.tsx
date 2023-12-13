@@ -76,7 +76,7 @@ export async function requestTrip(email: string, description: string, anonymousI
     },
   );
 
-  trackEvent(anonymousID, "Trip Request", {
+  trackEvent(anonymousID, "Trip requested", {
     email,
   });
 }
