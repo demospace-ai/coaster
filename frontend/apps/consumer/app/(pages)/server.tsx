@@ -254,7 +254,7 @@ const ExploreByCategory: React.FC = () => {
               href={`/search?categories=["${category}"]`}
               className="tw-flex tw-items-center tw-justify-start tw-gap-3"
             >
-              {getCategoryIcon(category, "tw-h-5 tw-w-5")}
+              {getCategoryIcon(category, "tw-h-5 tw-w-5 tw-shrink-0")}
               <span className="tw-underline tw-text-base tw-px-0.5">{getCategoryForDisplay(category)}</span>
             </Link>
           ))}
