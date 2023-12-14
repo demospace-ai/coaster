@@ -2,19 +2,19 @@
 
 import { Dialog, Transition } from "@headlessui/react";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Fragment, useRef, useState } from "react";
 import { Button } from "../button/Button";
 import { trackEvent } from "../rudderstack/client";
 
 export const SearchModal: React.FC<{ open: boolean; close: () => void }> = ({ open, close }) => {
+  const searchParams = useSearchParams();
+  const [query, setQuery] = useState<string>(searchParams.get("query") ?? "");
   const inputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
-  const [query, setQuery] = useState<string>("");
   const search = () => {
     if (query.length > 0) {
       trackEvent("Search", { query });
-      router.push(`/search?query=${query}`);
+      window.location.href = `/search?query=${query}`;
       close();
     }
   };
