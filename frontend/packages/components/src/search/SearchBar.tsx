@@ -2,19 +2,17 @@
 
 import { mergeClasses } from "@coaster/utils/common";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { trackEvent } from "../rudderstack/client";
 import { SearchModal } from "./SearchBarModal";
 
 export const SearchBar: React.FC = () => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
   const [query, setQuery] = useState<string>("");
   const search = () => {
     if (query.length > 0) {
       trackEvent("Search", { query });
-      router.push(`/search?query=${query}`);
+      window.location.href = `/search?query=${query}`;
     }
   };
 
@@ -47,12 +45,11 @@ export const SearchBar: React.FC = () => {
 
 export const SearchBarHeader: React.FC<{ show: boolean }> = ({ show }) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
   const [query, setQuery] = useState<string>("");
   const search = () => {
     if (query.length > 0) {
       trackEvent("Search", { query });
-      router.push(`/search?query=${query}`);
+      window.location.href = `/search?query=${query}`;
     }
   };
 
