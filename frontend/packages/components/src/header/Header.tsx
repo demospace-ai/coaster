@@ -6,11 +6,9 @@ import { isProd, lateef, mergeClasses } from "@coaster/utils/common";
 import { autoUpdate, offset, useClick, useDismiss, useFloating, useInteractions, useRole } from "@floating-ui/react";
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import { ArrowRightOnRectangleIcon, Bars3Icon, QuestionMarkCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { Fragment, useEffect, useState } from "react";
-import { Button } from "../button/Button";
 import { NavLink } from "../link/Link";
 import { ProfilePicture, ProfilePlaceholder } from "../profile/ProfilePicture";
 import { SearchBarHeader, SearchBarModal } from "../search/SearchBar";
@@ -75,35 +73,16 @@ const MobileHeader: React.FC = () => {
 };
 
 export const PromoBanner: React.FC = () => {
-  const Modal = dynamic(() => import("../modal/Modal").then((mod) => mod.Modal));
   const { openLoginModal, user } = useAuthContext();
-  const [showModal, setShowModal] = useState(false);
+
   return (
     <>
-      <Modal show={showModal} close={() => setShowModal(false)} clickToClose>
-        <div className="tw-flex tw-flex-col tw-items-center tw-w-[320px] sm:tw-w-[420px] tw-px-8 sm:tw-px-12 tw-pb-10">
-          <div className="tw-text-center tw-w-full tw-text-xl tw-font-semibold tw-mb-4">Limited Time Offer</div>
-          <div>
-            For a limited time only, we're giving away $100 to every user who books a trip. To receive the Amazon gift
-            card, simply book any trip on Coaster. You'll receive the gift card via the email you use to create an
-            account.
-          </div>
-          <Button
-            className="tw-mt-5 tw-py-2 tw-px-5"
-            onClick={() => {
-              user || openLoginModal(true);
-              setShowModal(false);
-            }}
-          >
-            {user ? "Got it!" : "Sign up"}
-          </Button>
-        </div>
-      </Modal>
       <div
-        className="tw-flex tw-flex-col sm:tw-flex-row sm:tw-text-base sm:tw-font-medium tw-max-h-[56px] tw-min-h-[56px] tw-w-full tw-items-center tw-justify-center tw-bg-blue-200 tw-cursor-pointer"
-        onClick={() => setShowModal(true)}
+        className="tw-flex tw-flex-col sm:tw-flex-row sm:tw-text-base sm:tw-font-medium tw-max-h-[56px] tw-min-h-[56px] tw-w-full tw-items-center tw-justify-center tw-bg-blue-200 tw-cursor-pointer tw-select-none"
+        onClick={user ? undefined : () => openLoginModal(true)}
       >
-        <span className="tw-font-bold tw-mr-2">Limited Time!</span>Get a $100 Amazon gift card for booking a trip!
+        <span className="tw-font-bold tw-mr-2">Limited Time!</span>
+        Sign up to claim $100 credit to use on any trip!
       </div>
     </>
   );
