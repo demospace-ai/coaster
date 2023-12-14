@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"go.fabra.io/server/common/errors"
@@ -23,7 +24,8 @@ func (s ApiService) SearchListings(w http.ResponseWriter, r *http.Request) error
 	var filteredListings []listings.ListingDetails
 	var err error
 	if len(queryParam) > 0 {
-		filteredListings, err = listings.LoadListingsForQuery(s.db, queryParam)
+		cleanedQuery := strings.Trim(queryParam, " ")
+		filteredListings, err = listings.LoadListingsForQuery(s.db, cleanedQuery)
 		if err != nil {
 			return errors.Wrap(err, "(api.SearchListings) loading listings by query")
 		}
