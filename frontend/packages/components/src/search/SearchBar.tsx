@@ -2,6 +2,7 @@
 
 import { mergeClasses } from "@coaster/utils/common";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { useSearchParams } from "next/navigation";
 import { useRef, useState } from "react";
 import { trackEvent } from "../rudderstack/client";
 import { SearchModal } from "./SearchBarModal";
@@ -44,8 +45,9 @@ export const SearchBar: React.FC = () => {
 };
 
 export const SearchBarHeader: React.FC<{ show: boolean }> = ({ show }) => {
+  const searchParams = useSearchParams();
+  const [query, setQuery] = useState<string>(searchParams.get("query") ?? "");
   const inputRef = useRef<HTMLInputElement>(null);
-  const [query, setQuery] = useState<string>("");
   const search = () => {
     if (query.length > 0) {
       trackEvent("Search", { query });

@@ -52,10 +52,12 @@ export async function getGeneratedListings(query: string): Promise<GeneratedList
   const categories = await getGeneratedCategories(query);
   const place = await getPlaceFromQuery(query);
 
-  return categories.map((category) => ({
-    category,
-    place,
-  }));
+  return categories
+    .filter((category) => Object.keys(GeneratedCategory.Values).includes(category))
+    .map((category) => ({
+      category,
+      place,
+    }));
 }
 
 export async function requestTrip(email: string, description: string, anonymousID: string) {

@@ -22,7 +22,7 @@ import useEmblaCarousel, { EmblaCarouselType } from "embla-carousel-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { ReactNode, useCallback, useEffect, useState } from "react";
 
 export const ListingsSectionClient: React.FC<{ title: string; listings: Listing[]; searchQuery: string }> = ({
@@ -293,6 +293,7 @@ export const DynamicNotificationProvider: React.FC<{ children: ReactNode }> = ({
 export const DynamicHeader: React.FC = () => {
   const pathname = usePathname();
   const isHome = pathname === "/";
+  const searchParams = useSearchParams();
 
   const Header = dynamic(() => import("@coaster/components/header/Header").then((mod) => mod.Header), {
     loading: () => (
@@ -316,7 +317,9 @@ export const DynamicHeader: React.FC = () => {
           {!isHome && (
             <div className="tw-hidden sm:tw-flex tw-items-center tw-w-full tw-max-w-[400px] tw-h-9 tw-ring-1 tw-ring-slate-300 tw-rounded-[99px]">
               <MagnifyingGlassIcon className="tw-ml-4 tw-h-[18.5px] tw-w-[18.5px] -tw-mr-1.5 tw-stroke-gray-600" />
-              <span className="tw-text-gray-700 tw-text-base tw-ml-4">Search trips</span>
+              <span className="tw-text-gray-700 tw-text-base tw-ml-4">
+                {searchParams.get("query") ?? "Search trips"}
+              </span>
             </div>
           )}
           <div className="tw-flex tw-shrink-0 tw-justify-end">
