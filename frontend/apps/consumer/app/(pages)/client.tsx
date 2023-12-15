@@ -315,11 +315,11 @@ export const DynamicHeader: React.FC = () => {
             Coaster
           </div>
           {!isHome && (
-            <div className="tw-hidden sm:tw-flex tw-items-center tw-w-full tw-max-w-[400px] tw-h-9 tw-ring-1 tw-ring-slate-300 tw-rounded-[99px]">
-              <MagnifyingGlassIcon className="tw-ml-4 tw-h-[18.5px] tw-w-[18.5px] -tw-mr-1.5 tw-stroke-gray-600" />
+            <div className="tw-hidden sm:tw-flex tw-justify-between tw-items-center tw-w-full tw-max-w-[400px] tw-h-9 tw-ring-1 tw-ring-slate-300 tw-rounded-[99px]">
               <span className="tw-text-gray-700 tw-text-base tw-ml-4">
                 {searchParams.get("query") ?? "Search trips"}
               </span>
+              <MagnifyingGlassIcon className="tw-ml-2 tw-mr-4 tw-h-[18px] tw-w-[18px] tw-stroke-gray-600" />
             </div>
           )}
           <div className="tw-flex tw-shrink-0 tw-justify-end">
