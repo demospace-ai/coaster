@@ -33,15 +33,16 @@ func TrackSignup(userID int64, firstName string, lastName string, email string) 
 	client.Close()
 }
 
-func TrackBooking(userID int64) {
-	track(userID, "Trip Booked")
+func TrackBooking(userID int64, listingID int64) {
+	track(userID, "Trip Booked", analytics.NewProperties().
+		Set("listingID", listingID))
 }
 
 func TrackCheckoutOpen(userID int64) {
-	track(userID, "Checkout Open")
+	track(userID, "Checkout Open", nil)
 }
 
-func track(userID int64, eventName string) {
+func track(userID int64, eventName string, properties analytics.Properties) {
 	if !application.IsProd() {
 		return
 	}
@@ -50,8 +51,9 @@ func track(userID int64, eventName string) {
 
 	// Enqueues a track event that will be sent asynchronously.
 	client.Enqueue(analytics.Track{
-		UserId: fmt.Sprintf("%d", userID),
-		Event:  eventName,
+		UserId:     fmt.Sprintf("%d", userID),
+		Event:      eventName,
+		Properties: properties,
 	})
 
 	// Flushes any queued messages and closes the client.

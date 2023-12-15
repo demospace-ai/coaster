@@ -118,7 +118,7 @@ func (s ApiService) handleCheckoutComplete(event *stripe.Event) error {
 		return errors.Wrap(err, "(api.WebhookCheckoutComplete) sending confirmation email")
 	}
 
-	events.TrackBooking(user.ID)
+	events.TrackBooking(user.ID, listing.ID)
 
 	return nil
 }
