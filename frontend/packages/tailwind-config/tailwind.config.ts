@@ -32,6 +32,7 @@ const config: Config = {
         "centered-md": "rgba(99, 99, 99, 0.15) 0 0 8px",
         "centered-lg": "rgba(99, 99, 99, 0.15) 0 0 16px",
         "dark-sm": "rgba(0,0,0,.15) 0 2px 3px 0",
+        "centered-white": "0 0 0 4px white",
       },
       width: {
         "100": "400px",

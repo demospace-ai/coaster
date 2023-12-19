@@ -5,6 +5,7 @@ import { getDuration } from "@coaster/utils/common";
 import { CheckBadgeIcon, ClockIcon, GlobeAltIcon, StarIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import {
   BookingPanel,
+  Itinerary,
   ListingHeader,
   ListingImages,
   ReserveFooter,
@@ -33,6 +34,7 @@ const ListingDetails: React.FC<{ listing: ListingType }> = ({ listing }) => {
       <Description listing={listing} />
       {listing.includes && listing.includes.length > 0 && <Included listing={listing} />}
       {listing.not_included && listing.not_included.length > 0 && <NotIncluded listing={listing} />}
+      {listing.itinerary_steps && listing.itinerary_steps.length > 0 && <Itinerary listing={listing} />}
       <HostDetails listing={listing} />
     </div>
   );
@@ -71,7 +73,7 @@ const HostDetails: React.FC<{ listing: ListingType }> = ({ listing }) => {
 const Description: React.FC<{ listing: ListingType }> = ({ listing }) => {
   return (
     <div className="tw-pb-6 tw-border-b tw-border-solid tw-border-gray-300">
-      <div className="tw-mt-5 tw-text-lg tw-font-semibold">About</div>
+      <div className="tw-mt-5 tw-text-xl tw-font-semibold">About</div>
       <div
         className="tw-mt-2 tw-whitespace-pre-wrap [&_ul]:tw-list-disc [&_ul]:tw-ml-5 [&_ol]:tw-list-decimal [&_ol]:tw-ml-5 [&_p]:tw-min-h-[1.5rem]"
         dangerouslySetInnerHTML={{ __html: listing.description ?? "" }}
@@ -83,8 +85,8 @@ const Description: React.FC<{ listing: ListingType }> = ({ listing }) => {
 const Included: React.FC<{ listing: ListingType }> = ({ listing }) => {
   return (
     <div className="tw-pb-6 tw-border-b tw-border-solid tw-border-gray-300">
-      <div className="tw-mt-5 tw-font-semibold">What's included</div>
-      <ul className="tw-list-disc tw-list-inside tw-mt-1">
+      <div className="tw-mt-5 tw-text-xl tw-font-semibold">What's included</div>
+      <ul className="tw-list-disc tw-list-inside tw-mt-2">
         {listing.includes?.map((included) => <li key={included}>{included}</li>)}
       </ul>
     </div>
@@ -94,8 +96,8 @@ const Included: React.FC<{ listing: ListingType }> = ({ listing }) => {
 const NotIncluded: React.FC<{ listing: ListingType }> = ({ listing }) => {
   return (
     <div className="tw-pb-6 tw-border-b tw-border-solid tw-border-gray-300">
-      <div className="tw-mt-5 tw-font-semibold">Not Included</div>
-      <ul className="tw-list-disc tw-list-inside tw-mt-1">
+      <div className="tw-mt-5 tw-text-xl tw-font-semibold">Not Included</div>
+      <ul className="tw-list-disc tw-list-inside tw-mt-2">
         {listing.not_included?.map((notIncluded) => <li key={notIncluded}>{notIncluded}</li>)}
       </ul>
     </div>

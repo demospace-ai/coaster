@@ -21,13 +21,15 @@ import {
   CalendarIcon,
   ChevronUpIcon,
   MinusCircleIcon,
+  MinusIcon,
   PlusCircleIcon,
+  PlusIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { getDateToTimeSlotMap } from "consumer/app/(pages)/listings/[listingID]/utils";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { Fragment, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 
 const DatePickerPopper = dynamic(
   () => import("@coaster/components/dates/DatePicker").then((mod) => mod.DatePickerPopper),
@@ -627,6 +629,58 @@ const NullableImage: React.FC<{
   } else {
     return <div />;
   }
+};
+
+export const Itinerary: React.FC<{ listing: ListingType }> = ({ listing }) => {
+  const stepRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  return (
+    <div className="tw-pb-8 tw-border-b tw-border-solid tw-border-gray-300">
+      <div className="tw-mt-5 tw-text-xl tw-font-semibold">Itinerary</div>
+      <button
+        className="tw-mt-2 tw-text-sm tw-font-medium tw-text-blue-600 hover:tw-underline"
+        onClick={() => {
+          stepRefs.current.forEach((ref) => {
+            if (ref && ref.ariaExpanded === "false") {
+              ref.click();
+            }
+          });
+        }}
+      >
+        View full itinerary
+      </button>
+      <div className="tw-mt-8 tw-flex tw-flex-col">
+        {listing.itinerary_steps?.map((step, i) => (
+          <Disclosure as="div" key={step.id} className="tw-flex tw-flex-row tw-items-center tw-group">
+            {({ open }) => (
+              <div className="tw-flex tw-flex-col tw-w-full tw-pl-8 tw-ml-2 tw-relative tw-border-l tw-border-solid tw-border-gray-400 group-last:tw-border-none">
+                <Disclosure.Button
+                  className="tw-w-full tw-mb-6 tw-group/button"
+                  ref={(el) => (stepRefs.current[i] = el)}
+                >
+                  <div className="tw-absolute tw-left-0 tw-top-0 -tw-translate-x-1/2 tw-bg-white tw-rounded-full tw-h-3 tw-w-3 tw-border tw-border-solid tw-border-black tw-shrink-0 tw-shadow-centered-white group-last:tw-bg-black group-first:tw-bg-black" />
+                  <div className="-tw-mt-4 tw-flex tw-w-full tw-justify-between tw-items-center">
+                    <div className="tw-flex tw-flex-col tw-mb-2 tw-items-start tw-text-left">
+                      <div className="tw-uppercase tw-mb-1 tw-text-gray-500">{step.step_label}</div>
+                      <div className="tw-font-medium group-hover/button:tw-underline">{step.title}</div>
+                    </div>
+                    {open ? (
+                      <MinusIcon className="-tw-mt-2 tw-w-6 tw-h-6 tw-shrink-0" />
+                    ) : (
+                      <PlusIcon className="-tw-mt-2 tw-w-6 tw-h-6 tw-shrink-0" />
+                    )}
+                  </div>
+                </Disclosure.Button>
+                <Disclosure.Panel
+                  className="tw-text-base tw-leading-6 tw-text-gray-700 -tw-mt-6 tw-mb-10"
+                  dangerouslySetInnerHTML={{ __html: step.description }}
+                />
+              </div>
+            )}
+          </Disclosure>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 function useBookingState(listing: ListingType, generated: boolean) {
