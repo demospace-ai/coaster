@@ -59,6 +59,7 @@ export default async function GeneratedListing({
     max_guests: undefined,
     highlights: undefined,
     languages: undefined,
+    itinerary_steps: undefined,
   };
 
   return (
