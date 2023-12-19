@@ -1,10 +1,25 @@
 "use server";
 
-import { Image, ListingInput } from "@coaster/types";
+import {
+  AvailabilityRule,
+  AvailabilityRuleInput,
+  Image,
+  ItineraryStep,
+  ItineraryStepInput,
+  ListingInput,
+} from "@coaster/types";
 import { isProd } from "@coaster/utils/common";
 import { cookies } from "next/headers";
 import { sendRequest } from "./ajax";
-import { AddListingImage, DeleteListingImage, UpdateListing, UpdateListingImages } from "./api";
+import {
+  AddListingImage,
+  CreateAvailabilityRule,
+  DeleteListingImage,
+  UpdateAvailabilityRule,
+  UpdateItinerarySteps,
+  UpdateListing,
+  UpdateListingImages,
+} from "./api";
 
 export async function updateListingServerAction(listingID: number, updates: ListingInput) {
   const cookieString = cookies().toString();
@@ -17,6 +32,22 @@ export async function updateListingServerAction(listingID: number, updates: List
   let rootDomain = isProd() ? "https://www.trycoaster.com" : "http://localhost:3000";
   await fetch(`${rootDomain}/api/revalidate/listings/${listingID}`, { method: "POST" });
   return listing;
+}
+
+export async function updateItineraryServerAction(
+  listingID: number,
+  updates: ItineraryStepInput[],
+): Promise<ItineraryStep[]> {
+  const cookieString = cookies().toString();
+  const itinerarySteps = await sendRequest(UpdateItinerarySteps, {
+    pathParams: { listingID },
+    payload: updates,
+    extraHeaders: [["Cookie", cookieString]],
+  });
+
+  let rootDomain = isProd() ? "https://www.trycoaster.com" : "http://localhost:3000";
+  await fetch(`${rootDomain}/api/revalidate/listings/${listingID}`, { method: "POST" });
+  return itinerarySteps;
 }
 
 export async function updateListingImagesServerAction(listingID: number, images: Image[]) {
@@ -54,4 +85,35 @@ export async function deleteListingImagesServerAction(listingID: number, imageID
 
   let rootDomain = isProd() ? "https://www.trycoaster.com" : "http://localhost:3000";
   await fetch(`${rootDomain}/api/revalidate/listings/${listingID}`, { method: "POST" });
+}
+
+export async function updateAvailabilityRuleServerAction(
+  listingID: number,
+  availabilityRuleID: number,
+  updates: any,
+): Promise<AvailabilityRule> {
+  const updatedRules = await sendRequest(UpdateAvailabilityRule, {
+    pathParams: { listingID, availabilityRuleID },
+    payload: updates,
+  });
+
+  let rootDomain = isProd() ? "https://www.trycoaster.com" : "http://localhost:3000";
+  await fetch(`${rootDomain}/api/revalidate/listings/${listingID}`, { method: "POST" });
+
+  return updatedRules;
+}
+
+export async function createAvailabilityRuleServerAction(
+  listingID: number,
+  input: AvailabilityRuleInput,
+): Promise<AvailabilityRule> {
+  const rule = await sendRequest(CreateAvailabilityRule, {
+    pathParams: { listingID },
+    payload: input,
+  });
+
+  let rootDomain = isProd() ? "https://www.trycoaster.com" : "http://localhost:3000";
+  await fetch(`${rootDomain}/api/revalidate/listings/${listingID}`, { method: "POST" });
+
+  return rule;
 }

@@ -93,6 +93,7 @@ export default function Details() {
             label="Description"
             value={field.value}
             setValue={field.onChange}
+            onBlur={field.onBlur}
           />
         )}
       />

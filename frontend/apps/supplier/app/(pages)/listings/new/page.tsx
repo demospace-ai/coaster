@@ -396,10 +396,10 @@ const ImageStepInner: React.FC<StepProps & ImageProps> = ({ nextStep, prevStep, 
 
   const findCard = useCallback(
     (id: string) => {
-      const image = images.filter((image) => `${image.id}` === id)[0];
+      const found = images.filter((image) => `${image.id}` === id)[0];
       return {
-        image,
-        index: images.indexOf(image),
+        found,
+        index: images.indexOf(found),
       };
     },
     [images],
@@ -407,12 +407,12 @@ const ImageStepInner: React.FC<StepProps & ImageProps> = ({ nextStep, prevStep, 
 
   const moveCard = useCallback(
     (id: string, atIndex: number) => {
-      const { image, index } = findCard(id);
+      const { found, index } = findCard(id);
       setImages(
         update(images, {
           $splice: [
             [index, 1],
-            [atIndex, 0, image],
+            [atIndex, 0, found],
           ],
         }),
       );

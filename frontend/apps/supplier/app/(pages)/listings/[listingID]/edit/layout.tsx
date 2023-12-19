@@ -60,6 +60,14 @@ export default async function EditListingLayout({
                 Images
               </NavLink>
               <NavLink
+                key="itinerary"
+                href={`/listings/${params.listingID}/edit/itinerary`}
+                className="tw-w-full tw-rounded-lg tw-py-2.5 tw-px-4 tw-font-medium tw-leading-5 tw-whitespace-nowrap tw-text-start tw-outline-none hover:tw-bg-slate-100"
+                activeClassName="tw-bg-white tw-shadow"
+              >
+                Itinerary
+              </NavLink>
+              <NavLink
                 key="includes"
                 href={`/listings/${listing.id}/edit/includes`}
                 className="tw-w-full tw-rounded-lg tw-py-2.5 tw-px-4 tw-font-medium tw-leading-5 tw-whitespace-nowrap tw-text-start tw-outline-none hover:tw-bg-slate-100"

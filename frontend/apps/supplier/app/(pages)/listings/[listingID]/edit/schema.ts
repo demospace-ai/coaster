@@ -15,7 +15,7 @@ export const DescriptionSchema = z.string().superRefine((data, ctx) => {
   if (json.length < 4) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Your description must be at least 4 characters long." });
   }
-  if (json.length > 15000) {
+  if (json.length > 15_000) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Descriptions can be up to 15,000 characters long." });
   }
 });
@@ -42,6 +42,7 @@ export const IncludesSchema = z.array(
       .max(256, "Maximum length for included amenity is 256 characters."),
   }),
 );
+
 export const NotIncludedSchema = z.array(
   z.object({
     value: z
@@ -50,6 +51,41 @@ export const NotIncludedSchema = z.array(
       .max(256, "Maximum length for not included item is 256 characters."),
   }),
 );
+
+export const NewItineraryStepSchema = z.object({
+  title: z
+    .string()
+    .min(1, "Itinerary step title cannot be empty")
+    .max(256, "Maximum length for not itinerary step title is 256 characters."),
+  description: z
+    .string()
+    .min(1, "Itinerary step description cannot be empty")
+    .max(15_000, "Maximum length for not itinerary step description is 15,000 characters."),
+  step_label: z
+    .string()
+    .min(1, "Itinerary step label cannot be empty")
+    .max(64, "Maximum length for not itinerary step label is 64 characters."),
+});
+
+export const ExistingItineraryStepSchema = z.object({
+  id: z.number().readonly(),
+  title: z
+    .string()
+    .min(1, "Itinerary step title cannot be empty")
+    .max(256, "Maximum length for not itinerary step title is 256 characters."),
+  description: z
+    .string()
+    .min(1, "Itinerary step description cannot be empty")
+    .max(15_000, "Maximum length for not itinerary step description is 15,000 characters."),
+  step_label: z
+    .string()
+    .min(1, "Itinerary step label cannot be empty")
+    .max(64, "Maximum length for not itinerary step label is 64 characters."),
+});
+
+export type ExistingItineraryStepSchemaType = z.infer<typeof ExistingItineraryStepSchema>;
+
+export const ItinerarySchema = z.array(z.union([NewItineraryStepSchema, ExistingItineraryStepSchema]));
 
 export const AvailabilityTypeSchema = AvailabilityType;
 

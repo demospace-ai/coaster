@@ -59,7 +59,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
     }
   };
 
-  const showLabel = focused || inputRef.current?.value || props.value;
+  const showLabel = focused || inputRef.current?.value || props.value || props.placeholder;
 
   return (
     <div
@@ -116,9 +116,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
 export const RichTextEditor: React.FC<{
   value: string;
   setValue: (value: string) => void;
+  onBlur?: () => void;
   label?: string;
   className?: string;
-}> = ({ value, setValue, label, className }) => {
+}> = ({ value, setValue, onBlur, label, className }) => {
   const editor = useEditor({
     editorProps: {
       attributes: {
@@ -129,18 +130,23 @@ export const RichTextEditor: React.FC<{
     extensions: [StarterKit],
     content: value,
     onUpdate: ({ editor }) => {
-      setValue(editor.getHTML());
+      if (editor.getText() == "") {
+        setValue("");
+      } else {
+        setValue(editor.getHTML());
+      }
     },
+    onBlur,
     injectCSS: false,
   });
   const classes = [
-    "tw-relative tw-w-full tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-md tw-px-3 tw-py-3 focus-within:tw-border-slate-400 tw-resize-y tw-overflow-hidden",
+    "tw-relative tw-w-full tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-rounded-md tw-px-3 tw-py-3 focus-within:tw-border-slate-400 tw-resize-y tw-overflow-hidden tw-cursor-text",
     label && "tw-pt-6",
     className,
   ];
 
   return (
-    <div className={mergeClasses(...classes)}>
+    <div className={mergeClasses(...classes)} onClick={() => editor?.chain().focus()}>
       {label && (
         <label className="tw-absolute tw-text-slate-600 tw-cursor-[inherit] tw-select-none tw-inline-block tw-transition-all tw-duration-150 tw-top-1.5 tw-text-xs">
           {label}

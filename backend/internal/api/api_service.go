@@ -127,6 +127,12 @@ func (s ApiService) AuthenticatedRoutes() []router.AuthenticatedRoute {
 			HandlerFunc: s.UpdateAvailability,
 		},
 		{
+			Name:        "Update itinerary steps",
+			Method:      router.POST,
+			Pattern:     "/listings/{listingID}/itinerary_steps",
+			HandlerFunc: s.UpdateItinerarySteps,
+		},
+		{
 			Name:        "Get payout methods",
 			Method:      router.GET,
 			Pattern:     "/payout_methods",

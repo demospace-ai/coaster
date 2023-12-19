@@ -158,6 +158,7 @@ export const TextAreaStep = <T extends FieldValues | undefined>({
                 field.onChange(e);
                 clearErrors();
               }}
+              onBlur={field.onBlur}
             />
           )}
         />

@@ -1,8 +1,8 @@
 import { AtlasInit } from "@coaster/components/atlas/AtlasInit";
 import { ErrorBoundary } from "@coaster/components/error/ErrorBoundary";
+import { HighlightInit } from "@coaster/components/highlight/HighlightInit";
 import { RudderInit } from "@coaster/components/rudderstack/RudderInit";
 import { isProd, worksans } from "@coaster/utils/common";
-import { HighlightInit } from "@highlight-run/next/client";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
 
@@ -22,20 +22,9 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const highlightProjectId = isProd() ? "6glrn57g" : "6gl37zg9";
-  const tracingOrigins = isProd() ? ["api.trycoaster.com"] : ["localhost"];
-
   return (
     <>
-      <HighlightInit
-        projectId={highlightProjectId}
-        serviceName="frontend-app"
-        tracingOrigins={tracingOrigins}
-        networkRecording={{
-          enabled: true,
-          recordHeadersAndBody: true,
-        }}
-      />
+      <HighlightInit />
       <AtlasInit />
       <RudderInit />
       <html lang="en" className={worksans.className}>

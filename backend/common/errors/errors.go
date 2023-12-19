@@ -60,6 +60,12 @@ func NewCustomerVisibleError(message string) error {
 	}
 }
 
+func NewCustomerVisibleErrorf(messageFmt string, args ...any) error {
+	return &CustomerVisibleError{
+		message: fmt.Sprintf(messageFmt, args...),
+	}
+}
+
 // Be very careful with this! Customer visible errors should be wrapped at the lowest level,
 // to avoid including our entire stack trace.
 // TODO: when wrapping, include the stack in a separate field

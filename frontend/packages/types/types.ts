@@ -106,6 +106,16 @@ export interface Listing {
   images: Image[];
 
   categories: CategoryType[] | undefined;
+
+  itinerary_steps: ItineraryStep[] | undefined;
+}
+
+export interface ItineraryStep {
+  id: number;
+  title: string;
+  description: string;
+  step_label: string;
+  step_order: number;
 }
 
 export interface AvailabilityRule {
@@ -175,6 +185,14 @@ export interface CreateCheckoutLinkRequest {
 export interface Availability {
   datetime: Date;
   capacity: number;
+}
+
+export interface ItineraryStepInput {
+  id?: number;
+  title?: string;
+  description?: string;
+  step_label?: string;
+  step_order?: number;
 }
 
 export interface AvailabilityRuleInput {

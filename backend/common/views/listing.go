@@ -31,6 +31,8 @@ type Listing struct {
 	Images []Image `json:"images"`
 
 	Categories []models.ListingCategoryType `json:"categories"`
+
+	ItinerarySteps []models.ItineraryStep `json:"itinerary_steps"`
 }
 
 type Image struct {
@@ -98,6 +100,8 @@ func ConvertListing(listing listings.ListingDetails) Listing {
 		Images: ConvertImages(listing.Images),
 
 		Categories: ConvertCategories(listing.Categories),
+
+		ItinerarySteps: listing.ItinerarySteps,
 	}
 }
 

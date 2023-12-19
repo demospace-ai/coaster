@@ -11,6 +11,8 @@ import {
   EmailLoginRequest,
   EmailLoginResponse,
   Image,
+  ItineraryStep,
+  ItineraryStepInput,
   Listing,
   ListingInput,
   ListingMetadata,
@@ -96,6 +98,12 @@ export const DeleteListing: IEndpoint<undefined, undefined, { listingID: number 
   name: "Delete listing",
   method: "DELETE",
   path: "/listings/:listingID",
+};
+
+export const UpdateItinerarySteps: IEndpoint<ItineraryStepInput[], ItineraryStep[], { listingID: number }> = {
+  name: "Update itinerary steps",
+  method: "POST",
+  path: "/listings/:listingID/itinerary_steps",
 };
 
 export const CreateAvailabilityRule: IEndpoint<AvailabilityRuleInput, AvailabilityRule, { listingID: number }> = {

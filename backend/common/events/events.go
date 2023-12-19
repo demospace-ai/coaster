@@ -18,6 +18,10 @@ func TrackSignup(userID int64, firstName string, lastName string, email string) 
 	client.Enqueue(analytics.Track{
 		UserId: fmt.Sprintf("%d", userID),
 		Event:  "User Signup",
+		Properties: analytics.NewProperties().
+			Set("firstName", firstName).
+			Set("lastName", lastName).
+			Set("email", email),
 	})
 
 	// Enqueues an identify event that will be sent asynchronously.

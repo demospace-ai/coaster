@@ -7,6 +7,8 @@ import {
   AvailabilityRuleUpdates,
   CreateCheckoutLinkRequest,
   Image,
+  ItineraryStep,
+  ItineraryStepInput,
   Listing,
   ListingInput,
   PayoutMethod,
@@ -22,7 +24,6 @@ import useSWR, { Fetcher, SWRConfiguration, mutate } from "swr";
 import { sendRequest } from "./ajax";
 import {
   CheckSession,
-  CreateAvailabilityRule,
   CreateCheckoutLink,
   CreateListing,
   CreatePayoutMethod,
@@ -36,13 +37,15 @@ import {
   Logout,
   ResetPassword,
   SearchListings,
-  UpdateAvailabilityRule,
   UpdateProfilePicture,
   UpdateUser,
 } from "./api";
 import {
   addListingImagesServerAction,
+  createAvailabilityRuleServerAction,
   deleteListingImagesServerAction,
+  updateAvailabilityRuleServerAction,
+  updateItineraryServerAction,
   updateListingImagesServerAction,
   updateListingServerAction,
 } from "./server-actions";
@@ -197,6 +200,18 @@ export async function updateListing(listingID: number, updates: ListingInput, is
   mutate({ GetListing, listingID }, listing, { revalidate: false });
 }
 
+export async function updateItinerarySteps(listingID: number, updates: ItineraryStepInput[]): Promise<ItineraryStep[]> {
+  const itinerarySteps = await updateItineraryServerAction(listingID, updates);
+  mutate({ GetListing, listingID }, (listing) => {
+    if (listing) {
+      return { ...listing, itinerary_steps: itinerarySteps };
+    }
+    return listing;
+  });
+
+  return itinerarySteps;
+}
+
 export async function updateListingImages(listingID: number, images: Image[], isDraft?: boolean) {
   const listing = await updateListingImagesServerAction(listingID, images);
   isDraft && mutate({ GetDraftListing }, listing, { revalidate: false });
@@ -230,10 +245,7 @@ export function useUpdateAvailabilityRule(
 ): Mutation<AvailabilityRuleUpdates> {
   return useMutation<AvailabilityRule, AvailabilityRuleUpdates>(
     async (updates: AvailabilityRuleUpdates) => {
-      return await sendRequest(UpdateAvailabilityRule, {
-        pathParams: { listingID, availabilityRuleID },
-        payload: updates,
-      });
+      return await updateAvailabilityRuleServerAction(listingID, availabilityRuleID, updates);
     },
     {
       onSuccess: (availabilityRule: AvailabilityRule) => {
@@ -276,10 +288,7 @@ export function useCreateAvailabilityRule(
 ): Mutation<AvailabilityRuleInput> {
   return useMutation<AvailabilityRule, AvailabilityRuleInput>(
     async (input: AvailabilityRuleInput) => {
-      return await sendRequest(CreateAvailabilityRule, {
-        pathParams: { listingID },
-        payload: input,
-      });
+      return await createAvailabilityRuleServerAction(listingID, input);
     },
     {
       onSuccess: (availabilityRule: AvailabilityRule) => {

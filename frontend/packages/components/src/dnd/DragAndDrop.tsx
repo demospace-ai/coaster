@@ -14,7 +14,7 @@ interface CardProps {
   className?: string;
   children: React.ReactNode;
   moveCard: (id: string, atIndex: number) => void;
-  findCard: (id: string) => { image: any; index: number };
+  findCard: (id: string) => { found: any; index: number };
   onDrop: () => void;
 }
 

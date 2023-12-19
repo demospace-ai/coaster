@@ -18,7 +18,7 @@ declare global {
   }
 }
 
-export const AtlasInit = () => {
+export const AtlasInit: React.FC = () => {
   const isMobile = useIsMobile();
   if (!isProd()) return null;
 

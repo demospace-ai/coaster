@@ -9,6 +9,7 @@ import (
 	"go.fabra.io/server/common/input"
 	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/common/repositories/availability_rules"
+	"go.fabra.io/server/common/repositories/itinerary_steps"
 	"go.fabra.io/server/common/repositories/users"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -16,9 +17,10 @@ import (
 
 type ListingDetails struct {
 	models.Listing
-	Host       *models.User
-	Images     []models.ListingImage
-	Categories []models.ListingCategory
+	Host           *models.User
+	Images         []models.ListingImage
+	Categories     []models.ListingCategory
+	ItinerarySteps []models.ItineraryStep
 }
 
 type ListingMetadata struct {
@@ -98,11 +100,17 @@ func LoadAllByUserID(db *gorm.DB, userID int64) ([]ListingDetails, error) {
 			return nil, errors.Wrap(err, "(listings.LoadByID) getting categories")
 		}
 
+		itinerarySteps, err := itinerary_steps.LoadItineraryForListing(db, listing.ID)
+		if err != nil {
+			return nil, errors.Wrap(err, "(listings.LoadByID) getting itinerary")
+		}
+
 		listingDetails[i] = ListingDetails{
 			listing,
 			host,
 			images,
 			categories,
+			itinerarySteps,
 		}
 	}
 
@@ -503,7 +511,7 @@ func LoadCategoriesForListing(db *gorm.DB, listingID int64) ([]models.ListingCat
 		Where("listing_categories.deactivated_at IS NULL").
 		Find(&listingCategories)
 	if result.Error != nil {
-		// Not guaranteed to have any images for a listing so just return an empty slice
+		// TODO: this shouldn't happen. Should we return an error?
 		if errors.IsRecordNotFound(result.Error) {
 			return []models.ListingCategory{}, nil
 		} else {
@@ -530,10 +538,16 @@ func loadDetailsForListing(db *gorm.DB, listing models.Listing) (*ListingDetails
 		return nil, errors.Wrap(err, "(listings.loadDetailsForListing) getting categories")
 	}
 
+	itinerarySteps, err := itinerary_steps.LoadItineraryForListing(db, listing.ID)
+	if err != nil {
+		return nil, errors.Wrap(err, "(listings.LoadByID) getting itinerary")
+	}
+
 	return &ListingDetails{
 		listing,
 		host,
 		images,
 		categories,
+		itinerarySteps,
 	}, nil
 }

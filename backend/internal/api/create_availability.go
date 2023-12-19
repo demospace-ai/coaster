@@ -45,7 +45,7 @@ func (s ApiService) CreateAvailability(auth auth.Authentication, w http.Response
 	// Make sure this user has ownership of this listing or is an admin
 	listing, err := listings.LoadByIDAndUser(s.db, listingID, auth.User)
 	if err != nil {
-		return errors.Wrap(err, "(api.CreateAvailability) validating request")
+		return errors.Wrap(err, "(api.CreateAvailability) validating ownership of listing")
 	}
 
 	if listing.AvailabilityType == models.AvailabilityTypeDateTime && len(createAvailabilityRequest.TimeSlots) == 0 {
