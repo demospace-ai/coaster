@@ -132,7 +132,7 @@ export const BlogSectionClient: React.FC<{ posts: Post[] }> = ({ posts }) => {
             <Link
               href={`/blog/${post.slug.current}`}
               key={post._id}
-              className="tw-flex tw-flex-col tw-shrink-0 lg:tw-shrink tw-w-[90vw] sm:tw-w-[50vw] lg:tw-w-1/3 tw-rounded-xl tw-bg-blue-950 tw-p-8 tw-text-white tw-mx-3 lg:tw-mx-0"
+              className="tw-flex tw-flex-col tw-items-center tw-shrink-0 lg:tw-shrink tw-w-[90vw] sm:tw-w-[50vw] lg:tw-w-1/3 tw-rounded-xl tw-bg-blue-950 tw-p-8 tw-text-white tw-mx-3 lg:tw-mx-0 tw-group"
             >
               <Image
                 priority
@@ -143,13 +143,15 @@ export const BlogSectionClient: React.FC<{ posts: Post[] }> = ({ posts }) => {
                 height={post.mainImage.metadata.dimensions.height}
                 placeholder="blur"
                 blurDataURL={post.mainImage.metadata.lqip}
-                className="tw-shadow-md tw-h-60 tw-object-cover"
+                className="tw-shadow-md tw-h-60 tw-object-cover group-hover:tw-scale-[1.02] tw-transition-transform tw-duration-200"
               />
               <div className="tw-flex tw-flex-col tw-h-48 tw-text-center">
                 <div className="tw-mt-4 tw-uppercase">By {post.authorName}</div>
                 <div className="tw-mt-1 tw-font-bold tw-text-2xl">{post.title}</div>
               </div>
-              <div className="tw-text-center tw-underline">READ NOW</div>
+              <div className="tw-w-fit tw-text-center tw-border-b tw-border-solid tw-border-white group-hover:tw-font-semibold tw-transition-all tw-duration-200">
+                READ NOW
+              </div>
             </Link>
           ))}
         </div>
