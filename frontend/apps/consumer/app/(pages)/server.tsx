@@ -35,6 +35,7 @@ export const FeaturedPage = async () => {
         quality={100}
         placeholder="blur"
         className="tw-max-h-96 tw-min-w-full"
+        draggable={false}
       />
     </main>
   );
@@ -54,6 +55,7 @@ const HeroSection: React.FC = () => {
               sizes="(max-width: 640px) 80vw, 50vw"
               placeholder="blur"
               className="tw-rounded-2xl tw-object-left tw-object-cover"
+              draggable={false}
             />
           </div>
           <div className="tw-flex tw-flex-col tw-justify-center tw-items-center tw-z-[1]">
@@ -218,6 +220,7 @@ const NeedHelpSection: React.FC = () => {
               sizes="60vw"
               placeholder="blur"
               className="tw-rounded-xl tw-object-left lg:tw-object-right tw-object-cover"
+              draggable={false}
             />
           </div>
           <div className="tw-flex tw-justify-center tw-items-center tw-text-center tw-w-full tw-h-full tw-z-[1] tw-text-white">
