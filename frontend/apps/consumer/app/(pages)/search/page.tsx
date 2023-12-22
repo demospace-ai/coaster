@@ -6,6 +6,14 @@ import { GeneratedListing, type CategoryType, type Listing } from "@coaster/type
 import { CustomResult } from "app/(pages)/search/client";
 import { getGeneratedListings } from "app/(pages)/search/server-actions";
 
+export async function generateMetadata({ searchParams }: { searchParams: { query: string } }) {
+  return {
+    alternates: {
+      canonical: `https://www.trycoaster.com/search?query=${searchParams.query}`,
+    },
+  };
+}
+
 export default async function Search({ searchParams }: { searchParams: { [key: string]: string | undefined } }) {
   const listings = await search(searchParams);
   const query = searchParams["query"];
