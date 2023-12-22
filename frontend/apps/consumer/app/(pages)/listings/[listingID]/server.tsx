@@ -157,7 +157,7 @@ const HostOverview: React.FC<{ listing: ListingType }> = ({ listing }) => {
 };
 
 const RecommendedListings: React.FC<{ listing: ListingType }> = async ({ listing }) => {
-  var listings: Listing[] = await search({ categories: '["featured"]' });
+  var listings: Listing[] = await search({ categories: '["popular"]' });
 
   return (
     <div className="tw-flex tw-w-full tw-mt-12 sm:tw-mt-16">
