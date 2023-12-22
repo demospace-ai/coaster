@@ -1,8 +1,10 @@
 import { LinkButton } from "@coaster/components/button/Button";
 import { ProfilePicture } from "@coaster/components/profile/ProfilePicture";
-import { Listing as ListingType } from "@coaster/types";
+import { search } from "@coaster/rpc/server";
+import { Listing, Listing as ListingType } from "@coaster/types";
 import { getDuration } from "@coaster/utils/common";
 import { CheckBadgeIcon, ClockIcon, GlobeAltIcon, StarIcon, UserGroupIcon } from "@heroicons/react/24/outline";
+import { ListingsSectionClient } from "app/(pages)/client";
 import {
   BookingPanel,
   Itinerary,
@@ -21,6 +23,7 @@ export const ListingPage: React.FC<{ listing: ListingType; generated?: boolean }
         <ListingDetails listing={listing} />
         <BookingPanel listing={listing} generated={!!generated} />
       </div>
+      <RecommendedListings listing={listing} />
       <ReserveFooter listing={listing} generated={!!generated} />
     </>
   );
@@ -149,6 +152,16 @@ const HostOverview: React.FC<{ listing: ListingType }> = ({ listing }) => {
         </div>
       </div>
       <ProfilePicture url={listing.host.profile_picture_url} name={getHostName(listing.host)} width={48} height={48} />
+    </div>
+  );
+};
+
+const RecommendedListings: React.FC<{ listing: ListingType }> = async ({ listing }) => {
+  var listings: Listing[] = await search({ categories: '["featured"]' });
+
+  return (
+    <div className="tw-flex tw-w-full tw-mt-12 sm:tw-mt-16">
+      <ListingsSectionClient title="Recommended for you" listings={listings} searchQuery={undefined} />
     </div>
   );
 };
