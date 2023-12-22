@@ -18,6 +18,18 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   return {
     title: post.title,
     description: post.metaDescription,
+    openGraph: {
+      title: post.title,
+      description: post.metaDescription,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.metaDescription,
+    },
+    alternates: {
+      canonical: `https://www.trycoaster.com/blog/${slug}`,
+    },
   };
 }
 

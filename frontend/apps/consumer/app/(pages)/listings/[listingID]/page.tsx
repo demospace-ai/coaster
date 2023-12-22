@@ -5,16 +5,26 @@ export const dynamic = "force-static";
 
 export async function generateMetadata({ params }: { params: { listingID: string } }) {
   const listing = await getListingServer(Number(params.listingID));
+  if (!listing) {
+    return {
+      title: "Coaster - Find your next adventure",
+    };
+  }
+
   return {
-    title: listing ? listing.name + " | Coaster" : "Coaster - Find your next adventure",
-    description: listing ? listing.short_description : "",
+    title: listing.name + " | Coaster",
+    description: listing.short_description,
     openGraph: {
-      title: listing ? listing.name : "Coaster - Find your next adventure",
+      title: listing.name,
+      description: listing.short_description,
     },
     twitter: {
       card: "summary_large_image",
-      title: listing ? listing.name : "Coaster - Find your next adventure",
-      description: listing ? listing.short_description : "",
+      title: listing.name,
+      description: listing.short_description,
+    },
+    alternates: {
+      canonical: `https://www.trycoaster.com/listings/${listing.id}`,
     },
   };
 }
