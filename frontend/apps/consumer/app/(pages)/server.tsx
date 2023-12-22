@@ -60,12 +60,12 @@ const HeroSection: React.FC = () => {
           </div>
           <div className="tw-flex tw-flex-col tw-justify-center tw-items-center tw-z-[1]">
             <div className="tw-text-white tw-w-full tw-max-w-[800px] tw-py-5 tw-rounded-2xl tw-text-center">
-              <div className="tw-font-semibold tw-text-5xl sm:tw-text-6xl tw-tracking-tighter">
+              <h1 className="tw-font-semibold tw-text-5xl sm:tw-text-6xl tw-tracking-tighter">
                 Discover, Book, Adventure
-              </div>
-              <div className="tw-font-medium tw-text-xl tw-tracking-tight tw-mt-2">
+              </h1>
+              <h2 className="tw-font-medium tw-text-xl tw-tracking-tight tw-mt-2">
                 Find a local guide to take you on the trip of a lifetime
-              </div>
+              </h2>
             </div>
             <SearchBar />
           </div>
