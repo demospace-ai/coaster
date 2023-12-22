@@ -6,7 +6,7 @@ export const dynamic = "force-static";
 export async function generateMetadata({ params }: { params: { listingID: string } }) {
   const listing = await getListingServer(Number(params.listingID));
   return {
-    title: listing ? listing.name : "Coaster - Find your next adventure",
+    title: listing ? listing.name + " | Coaster" : "Coaster - Find your next adventure",
     description: listing ? listing.short_description : "",
     openGraph: {
       title: listing ? listing.name : "Coaster - Find your next adventure",
