@@ -151,7 +151,7 @@ const HostOverview: React.FC<{ listing: ListingType }> = ({ listing }) => {
           {languages}
         </div>
       </div>
-      <ProfilePicture url={listing.host.profile_picture_url} name={getHostName(listing.host)} width={48} height={48} />
+      <ProfilePicture url={listing.host.profile_picture_url} name={getHostName(listing.host)} width={54} height={54} />
     </div>
   );
 };

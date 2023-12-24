@@ -18,7 +18,7 @@ export const ProfilePicture: React.FC<{
           height={height}
           src={url}
           className={mergeClasses(
-            "tw-aspect-square tw-rounded-full tw-select-none tw-flex tw-items-center tw-justify-center tw-object-contain",
+            "tw-aspect-square tw-rounded-full tw-select-none tw-flex tw-items-center tw-justify-center tw-object-cover",
             className,
           )}
           referrerPolicy="no-referrer"
