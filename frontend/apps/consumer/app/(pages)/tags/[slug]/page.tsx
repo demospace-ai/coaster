@@ -3,6 +3,30 @@ import { getTagServer } from "@coaster/rpc/server";
 import { Listing } from "@coaster/types";
 import { CustomResult } from "app/(pages)/search/client";
 
+export async function generateMetadata({ params }: { params: { slug: string } }) {
+  const tag = await getTagServer(params.slug);
+  if (!tag) {
+    return undefined;
+  }
+
+  return {
+    title: tag.title,
+    description: tag.description,
+    openGraph: {
+      title: tag.title,
+      description: tag.description,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: tag.title,
+      description: tag.description,
+    },
+    alternates: {
+      canonical: `https://www.trycoaster.com/tags/${slug}`,
+    },
+  };
+}
+
 export default async function Tag({ params }: { params: { slug: string } }) {
   const tag = await getTagServer(params.slug);
   if (!tag) {
