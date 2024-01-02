@@ -522,6 +522,31 @@ func LoadCategoriesForListing(db *gorm.DB, listingID int64) ([]models.ListingCat
 	return listingCategories, nil
 }
 
+func LoadListingsForTag(db *gorm.DB, tagID int64) ([]ListingDetails, error) {
+	var listings []models.Listing
+	result := db.Table("listings").
+		Select("listings.*").
+		Joins("JOIN tag_listings ON tag_listings.listing_id = listings.id").
+		Where("tag_listings.tag_id = ?", tagID).
+		Find(&listings)
+
+	if result.Error != nil {
+		return nil, errors.Wrapf(result.Error, "(listings.LoadListingsForTag) loading listings for tag %d", tagID)
+	}
+
+	listingDetails := make([]ListingDetails, len(listings))
+	for i, listing := range listings {
+		details, err := loadDetailsForListing(db, listing)
+		if err != nil {
+			return nil, errors.Wrap(err, "(listings.LoadListingsForTag) loading details")
+		}
+
+		listingDetails[i] = *details
+	}
+
+	return listingDetails, nil
+}
+
 func loadDetailsForListing(db *gorm.DB, listing models.Listing) (*ListingDetails, error) {
 	host, err := users.LoadUserByID(db, listing.UserID)
 	if err != nil {

@@ -25,6 +25,7 @@ import {
   SearchParams,
   SendInviteRequest,
   SendResetRequest,
+  Tag,
   User,
   UserUpdates,
 } from "@coaster/types";
@@ -51,6 +52,12 @@ export const GetListing: IEndpoint<undefined, Listing, { listingID: number }> = 
   name: "Get listing",
   method: "GET",
   path: "/listings/:listingID",
+};
+
+export const GetTag: IEndpoint<undefined, Tag, { slug: string }> = {
+  name: "Get tag",
+  method: "GET",
+  path: "/tags/:slug",
 };
 
 export const GetUserBookings: IEndpoint<undefined, Booking[]> = {

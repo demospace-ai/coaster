@@ -82,6 +82,14 @@ export interface SearchParams {
   categories?: string;
 }
 
+export interface Tag {
+  slug: string;
+  title: string;
+  description: string;
+  image_url: string;
+  listings: Listing[];
+}
+
 export interface Listing {
   id: number;
   name: string | undefined;

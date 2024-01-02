@@ -1,17 +1,38 @@
 "use server";
 
-import { Booking, Listing, SearchParams } from "@coaster/types";
+import { Booking, Listing, SearchParams, Tag } from "@coaster/types";
 import { HttpError } from "@coaster/utils/common";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { sendRequest } from "./ajax";
-import { GetHostedListings, GetListing, GetUserBooking, GetUserBookings, SearchListings } from "./api";
+import { GetHostedListings, GetListing, GetTag, GetUserBooking, GetUserBookings, SearchListings } from "./api";
 
 export async function getListingServer(listingID: number, cookieString?: string): Promise<Listing | undefined> {
   const extraHeaders: [string, string][] = cookieString ? [["Cookie", cookieString]] : [];
   try {
     return await sendRequest(GetListing, {
       pathParams: { listingID },
+      extraHeaders,
+    });
+  } catch (e) {
+    if (e instanceof HttpError) {
+      if (e.code === 404) {
+        notFound();
+      }
+    }
+
+    // This is an unexpected error, so report it
+    // TODO: consumeErrorServer(e);
+  }
+
+  return undefined;
+}
+
+export async function getTagServer(slug: string, cookieString?: string): Promise<Tag | undefined> {
+  const extraHeaders: [string, string][] = cookieString ? [["Cookie", cookieString]] : [];
+  try {
+    return await sendRequest(GetTag, {
+      pathParams: { slug },
       extraHeaders,
     });
   } catch (e) {
