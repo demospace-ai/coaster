@@ -1,8 +1,6 @@
 import { getTagServer } from "@coaster/rpc/server";
 import sharp from "sharp";
 
-export const runtime = "edge";
-
 export async function generateImageMetadata({ params }: { params: { slug: string } }) {
   const tag = await getTagServer(params.slug);
   if (!tag) {
