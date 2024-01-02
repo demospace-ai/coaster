@@ -24,6 +24,7 @@ const PUBLIC_PATHS = [
   "/oauth-callback",
   "/blog",
   "/blog/:slug",
+  "/tags/:slug",
 ];
 
 export default async function PageLayout({ children }: { children: React.ReactNode }) {

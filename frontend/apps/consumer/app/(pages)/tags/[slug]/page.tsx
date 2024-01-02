@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       description: tag.description,
     },
     alternates: {
-      canonical: `https://www.trycoaster.com/tags/${slug}`,
+      canonical: `https://www.trycoaster.com/tags/${params.slug}`,
     },
   };
 }
