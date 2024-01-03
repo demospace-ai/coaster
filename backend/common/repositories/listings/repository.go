@@ -528,6 +528,8 @@ func LoadListingsForTag(db *gorm.DB, tagID int64) ([]ListingDetails, error) {
 		Select("listings.*").
 		Joins("JOIN tag_listings ON tag_listings.listing_id = listings.id").
 		Where("tag_listings.tag_id = ?", tagID).
+		Where("listings.status = ?", models.ListingStatusPublished).
+		Where("listings.deactivated_at IS NULL").
 		Find(&listings)
 
 	if result.Error != nil {
