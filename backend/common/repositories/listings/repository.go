@@ -530,6 +530,7 @@ func LoadListingsForTag(db *gorm.DB, tagID int64) ([]ListingDetails, error) {
 		Where("tag_listings.tag_id = ?", tagID).
 		Where("listings.status = ?", models.ListingStatusPublished).
 		Where("listings.deactivated_at IS NULL").
+		Where("tag_listings.deactivated_at IS NULL").
 		Find(&listings)
 
 	if result.Error != nil {
