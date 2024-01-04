@@ -79,6 +79,7 @@ export const Footer: React.FC = () => {
           <Link href="https://twitter.com/coasterguides">Twitter</Link>
           <Link href="https://www.instagram.com/coasterguides">Instagram</Link>
           <Link href="mailto:info@trycoaster.com">Email</Link>
+          <Link href="/request-trip">Request a Trip</Link>
         </div>
         <div className="tw-flex tw-flex-col tw-gap-1">
           <div className="tw-font-semibold tw-mb-2">Guides / Suppliers</div>
