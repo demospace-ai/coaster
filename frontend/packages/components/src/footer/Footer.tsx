@@ -40,9 +40,9 @@ export const Footer: React.FC = () => {
         </div>
         <div className="tw-flex tw-flex-col tw-gap-1">
           <div className="tw-font-semibold tw-mb-2">Company</div>
-          <Link href="https://www.trycoaster.com/about">About</Link>
-          <Link href="https://www.trycoaster.com/blog">Blog</Link>
-          <Link href="https://www.trycoaster.com/careers">Careers</Link>
+          <Link href="/about">About</Link>
+          <Link href="/blog">Blog</Link>
+          <Link href="/careers">Careers</Link>
           <button
             className="tw-flex"
             onClick={() => {
@@ -53,16 +53,16 @@ export const Footer: React.FC = () => {
           >
             Help
           </button>
-          <Link href="https://www.trycoaster.com/sustainability">Sustainability</Link>
+          <Link href="/sustainability">Sustainability</Link>
         </div>
         <div className="tw-flex tw-flex-col tw-gap-1">
           <div className="tw-font-semibold tw-mb-2">Locations</div>
-          <Link href="https://www.trycoaster.com/search?location=Lisbon">Portugal</Link>
-          <Link href="https://www.trycoaster.com/search?location=El+Salvador">El Salvador</Link>
-          <Link href="https://www.trycoaster.com/search?location=Nepal">Nepal</Link>
-          <Link href="https://www.trycoaster.com/search?location=San+Francisco">San Francisco</Link>
-          <Link href="https://www.trycoaster.com/search?location=New+Hampshire">New Hampshire</Link>
-          <Link href="https://www.trycoaster.com/search?location=Sandgate+QLD+Australia">Australia</Link>
+          <Link href="/search?location=Lisbon">Portugal</Link>
+          <Link href="/search?location=El+Salvador">El Salvador</Link>
+          <Link href="/search?location=Nepal">Nepal</Link>
+          <Link href="/search?location=San+Francisco">San Francisco</Link>
+          <Link href="/search?location=New+Hampshire">New Hampshire</Link>
+          <Link href="/search?location=Sandgate+QLD+Australia">Australia</Link>
         </div>
         <div className="tw-flex tw-flex-col tw-gap-1">
           <div className="tw-font-semibold tw-mb-2">Get in touch</div>
@@ -90,8 +90,8 @@ export const Footer: React.FC = () => {
       <div className="tw-flex tw-w-full tw-max-w-7xl tw-items-center tw-justify-between tw-text-xs sm:tw-text-sm tw-whitespace-nowrap tw-mt-20">
         <span className="tw-select-none">© 2023 Coaster, Inc.</span>
         <div className="tw-flex tw-gap-3 sm:tw-gap-5">
-          <Link href="https://www.trycoaster.com/terms">Terms</Link>
-          <Link href="https://www.trycoaster.com/privacy">Privacy Policy</Link>
+          <Link href="/terms">Terms</Link>
+          <Link href="/privacy">Privacy Policy</Link>
         </div>
       </div>
     </div>

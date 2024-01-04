@@ -1,6 +1,6 @@
 "use server";
 
-import { trackEvent } from "@coaster/components/rudderstack/server";
+import { trackEventServer } from "@coaster/components/rudderstack/server";
 import { GeneratedCategory, GeneratedCategoryType, GeneratedListing } from "@coaster/types";
 import OpenAI from "openai";
 
@@ -78,7 +78,7 @@ export async function requestTrip(email: string, description: string, anonymousI
     },
   );
 
-  trackEvent(anonymousID, "Trip requested", {
+  trackEventServer(anonymousID, "Trip requested", {
     email,
   });
 }

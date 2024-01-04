@@ -5,7 +5,7 @@ const client = new Analytics("2Va8vvJ85DejVV7jncdVenC6smB", {
   dataPlaneUrl: "https://trycoasterlyoh.dataplane.rudderstack.com",
 });
 
-export function trackEvent(anonymousID: string, eventName: string, eventProperties?: any) {
+export function trackEventServer(anonymousID: string, eventName: string, eventProperties?: any) {
   if (isProd()) {
     client.track({
       anonymousId: anonymousID,
