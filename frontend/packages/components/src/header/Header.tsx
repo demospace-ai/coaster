@@ -90,7 +90,7 @@ export const PromoBanner: React.FC = () => {
 
 const LogoLink: React.FC = () => {
   return (
-    <div className="tw-flex tw-flex-1 tw-flex-row tw-h-fit tw-box-border tw-w-fit">
+    <div className="tw-flex tw-flex-1 tw-flex-row tw-h-fit tw-box-border">
       <Link
         className={mergeClasses(
           lateef.className,
@@ -109,17 +109,8 @@ const ProfileDropdown: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
   const { user } = useAuthContext();
 
   return (
-    <div className="tw-flex tw-shrink-0 tw-justify-end">
+    <div className="tw-flex tw-flex-1 tw-justify-end">
       <div className="tw-flex">
-        {onHostApp ? (
-          <SwitchToCustomerSiteLink className="tw-hidden xl:tw-flex tw-my-auto tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100" />
-        ) : (
-          <SwitchToHostingLink
-            className={mergeClasses(
-              "tw-hidden xl:tw-flex tw-my-auto tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100",
-            )}
-          />
-        )}
         <button
           className="tw-flex tw-items-center tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-font-medium tw-text-sm hover:tw-bg-gray-100"
           onClick={() => {
@@ -131,7 +122,7 @@ const ProfileDropdown: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
           <QuestionMarkCircleIcon className="tw-h-[18px] tw-w-[18px] tw-mr-1" />
           Help
         </button>
-        <div className="tw-flex tw-flex-col tw-justify-center">
+        <div className="tw-flex tw-flex-col tw-justify-center tw-shrink-0">
           {user ? <SignedInMenu user={user} onHostApp={onHostApp} /> : <SignedOutMenu />}
         </div>
       </div>
@@ -230,7 +221,7 @@ const SignedInMenu: React.FC<{ user: User; onHostApp?: boolean }> = ({ user, onH
                     </Link>
                   </Menu.Item>
                 </div>
-                <div className="tw-flex xl:tw-hidden tw-m-2 tw-pt-2">
+                <div className="tw-flex tw-m-2 tw-pt-2">
                   <Menu.Item>
                     {onHostApp ? (
                       <SwitchToCustomerSiteLink className={navItem} />

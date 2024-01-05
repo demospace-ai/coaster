@@ -303,7 +303,7 @@ export const DynamicHeader: React.FC = () => {
     loading: () => (
       <div
         className={mergeClasses(
-          "tw-sticky tw-z-10 tw-top-0 tw-flex tw-flex-col tw-items-center tw-justify-center tw-box-border tw-w-full tw-bg-transparent tw-border-b tw-border-solid tw-border-slate-200",
+          "tw-sticky tw-z-10 tw-top-0 tw-flex tw-flex-col tw-items-center tw-justify-center tw-box-border tw-w-full tw-bg-white tw-border-b tw-border-solid tw-border-slate-200",
           isHome && "tw-border-none",
         )}
       >
@@ -312,23 +312,22 @@ export const DynamicHeader: React.FC = () => {
           <div
             className={mergeClasses(
               lateef.className,
-              "tw-max-w-[150px] tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-tracking-[-0.5px] tw-mt-[-2px] tw-font-bold tw-text-[48px]",
+              "tw-flex tw-flex-1 tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-tracking-[-0.5px] tw-mt-[-2px] tw-font-bold tw-text-[48px]",
             )}
             translate="no"
           >
             Coaster
           </div>
           {!isHome && (
-            <div className="tw-hidden sm:tw-flex tw-justify-between tw-items-center tw-w-full tw-max-w-[400px] tw-h-9 tw-ring-1 tw-ring-slate-300 tw-rounded-[99px]">
+            <div className="tw-hidden sm:tw-flex tw-flex-1 tw-justify-between tw-items-center tw-max-w-[400px] tw-h-9 tw-ring-1 tw-ring-slate-300 tw-rounded-[99px]">
               <span className="tw-text-gray-700 tw-text-base tw-ml-4">
                 {searchParams.get("query") ?? "Search trips"}
               </span>
               <MagnifyingGlassIcon className="tw-ml-2 tw-mr-4 tw-h-[18px] tw-w-[18px] tw-stroke-gray-600" />
             </div>
           )}
-          <div className="tw-flex tw-shrink-0 tw-justify-end">
+          <div className="tw-flex tw-flex-1 tw-justify-end">
             <div className="tw-hidden lg:tw-flex tw-items-center">
-              <div className="tw-hidden xl:tw-flex tw-px-4 tw-mt-[1px] tw-font-medium">Apply as a guide</div>
               <button className="tw-flex tw-items-center tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-font-medium tw-text-sm">
                 <QuestionMarkCircleIcon className="tw-h-[18px] tw-w-[18px] tw-mr-1" />
                 Help

@@ -60,14 +60,14 @@ export const SearchBarHeader: React.FC<{ show: boolean }> = ({ show }) => {
   }
 
   return (
-    <div className="tw-flex tw-w-full tw-justify-center">
+    <div className="tw-flex tw-flex-1 tw-justify-center">
       <form
         onClick={() => inputRef.current?.focus()}
         onSubmit={(e) => {
           e.preventDefault();
           search();
         }}
-        className="tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[400px] tw-h-9 tw-bg-white tw-ring-1 tw-ring-slate-300 tw-rounded-[99px] tw-cursor-text tw-mx-10"
+        className="tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[400px] tw-h-9 tw-bg-white tw-ring-1 tw-ring-slate-300 tw-rounded-[99px] tw-cursor-text tw-mx-2"
       >
         <input
           ref={inputRef}
