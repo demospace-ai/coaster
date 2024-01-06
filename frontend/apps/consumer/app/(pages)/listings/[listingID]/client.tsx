@@ -655,7 +655,7 @@ export const Itinerary: React.FC<{ listing: ListingType }> = ({ listing }) => {
                   className="tw-w-full tw-mb-6 tw-group/button"
                   ref={(el) => (stepRefs.current[i] = el)}
                 >
-                  <div className="tw-absolute tw-left-0 tw-top-0 -tw-translate-x-1/2 tw-bg-white tw-rounded-full tw-h-3 tw-w-3 tw-border tw-border-solid tw-border-black tw-shrink-0 tw-shadow-centered-white group-last:tw-bg-black group-first:tw-bg-black" />
+                  <div className="tw-absolute tw-left-0 tw-top-0 -tw-translate-x-1/2 tw-bg-white tw-rounded-full tw-h-3 tw-w-3 tw-border tw-border-solid tw-border-gray-400 tw-shrink-0 tw-shadow-centered-white group-last:tw-bg-gray-400 group-first:tw-bg-gray-400" />
                   <div className="-tw-mt-4 tw-flex tw-w-full tw-justify-between tw-items-center">
                     <div className="tw-flex tw-flex-col tw-mb-2 tw-items-start tw-text-left">
                       <div className="tw-uppercase tw-mb-1 tw-text-gray-500">{step.step_label}</div>
