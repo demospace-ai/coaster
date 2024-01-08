@@ -73,7 +73,7 @@ func (s ApiService) SendReset(w http.ResponseWriter, r *http.Request) error {
 		Domain:    domain,
 	})
 
-	err = emails.SendEmail("support@trycoaster.com", sendResetRequest.Email, "Reset your password", html.String(), plain.String())
+	err = emails.SendEmail("Coaster <support@trycoaster.com>", sendResetRequest.Email, "Reset your password", html.String(), plain.String())
 	if err != nil {
 		return errors.Wrap(err, "(api.SendReset) sending email")
 	}

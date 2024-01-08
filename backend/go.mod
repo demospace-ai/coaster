@@ -31,6 +31,7 @@ require (
 	github.com/gorilla/css v1.0.1 // indirect
 	github.com/jackc/puddle/v2 v2.2.1 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
+	github.com/resend/resend-go/v2 v2.4.0
 	github.com/sosodev/duration v1.2.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.46.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.46.1 // indirect

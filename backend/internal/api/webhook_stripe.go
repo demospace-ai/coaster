@@ -156,7 +156,7 @@ func sendConfirmationEmail(listing *listings.ListingDetails, booking *models.Boo
 		Domain:         domain,
 	})
 
-	err := emails.SendEmail("support@trycoaster.com", user.Email, "Booking request sent", html.String(), plain.String())
+	err := emails.SendEmail("Coaster <support@trycoaster.com>", user.Email, "Booking request sent", html.String(), plain.String())
 	if err != nil {
 		return errors.Wrap(err, "(api.sendInvite) sending email")
 	}

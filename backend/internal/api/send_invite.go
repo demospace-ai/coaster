@@ -111,7 +111,7 @@ func (s ApiService) sendInvite(email string, sender *models.User) error {
 			Domain:     domain,
 		})
 
-		err = emails.SendEmail("support@trycoaster.com", email, "Welcome to Coaster", html.String(), plain.String())
+		err = emails.SendEmail("Coaster <support@trycoaster.com>", email, "Welcome to Coaster", html.String(), plain.String())
 		if err != nil {
 			return errors.Wrap(err, "(api.sendInvite) sending existing user email")
 		}
@@ -131,7 +131,7 @@ func (s ApiService) sendInvite(email string, sender *models.User) error {
 			Domain:     domain,
 		})
 
-		err = emails.SendEmail("support@trycoaster.com", email, "You're invited to Coaster", html.String(), plain.String())
+		err = emails.SendEmail("Coaster <support@trycoaster.com>", email, "You're invited to Coaster", html.String(), plain.String())
 		if err != nil {
 			return errors.Wrap(err, "(api.sendInvite) sending email")
 		}
