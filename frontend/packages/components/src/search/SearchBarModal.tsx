@@ -13,7 +13,7 @@ export const SearchModal: React.FC<{ open: boolean; close: () => void }> = ({ op
   const inputRef = useRef<HTMLInputElement>(null);
   const search = () => {
     if (query.length > 0) {
-      trackEvent("Search", { query });
+      trackEvent("search", { query });
       window.location.href = `/search?query=${query}`;
       close();
     }

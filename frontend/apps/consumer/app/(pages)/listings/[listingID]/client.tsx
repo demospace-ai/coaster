@@ -715,9 +715,16 @@ function useBookingState(listing: ListingType, generated: boolean) {
   });
 
   const tryToReserve = () => {
-    trackEvent("Reserve clicked", {
-      listingID: listing.id,
-    });
+    if (generated) {
+      trackEvent("reserve_clicked_operated", {
+        category: listing.categories ? listing.categories[0] : "unknown",
+        location: listing.location,
+      });
+    } else {
+      trackEvent("reserve_clicked", {
+        listingID: listing.id,
+      });
+    }
 
     if (user) {
       if (generated) {

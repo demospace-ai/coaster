@@ -17,7 +17,7 @@ func TrackSignup(userID int64, firstName string, lastName string, email string) 
 	// Enqueues a track event that will be sent asynchronously.
 	client.Enqueue(analytics.Track{
 		UserId: fmt.Sprintf("%d", userID),
-		Event:  "User Signup",
+		Event:  "user_signup",
 		Properties: analytics.NewProperties().
 			Set("firstName", firstName).
 			Set("lastName", lastName).
@@ -38,12 +38,12 @@ func TrackSignup(userID int64, firstName string, lastName string, email string) 
 }
 
 func TrackBooking(userID int64, listingID int64) {
-	track(userID, "Trip Booked", analytics.NewProperties().
+	track(userID, "trip_booked", analytics.NewProperties().
 		Set("listingID", listingID))
 }
 
 func TrackCheckoutOpen(userID int64) {
-	track(userID, "Checkout Open", nil)
+	track(userID, "checkout_open", nil)
 }
 
 func track(userID int64, eventName string, properties analytics.Properties) {
