@@ -151,7 +151,7 @@ const NewsletterForm: React.FC = () => {
     setFormState(SUBMITTING);
 
     // build body
-    const formBody = `email=${encodeURIComponent(email)}`;
+    const formBody = `userGroup=newsletter&email=${encodeURIComponent(email)}`;
 
     // API request to add user to newsletter
     fetch("https://app.loops.so/api/newsletter-form/clgzfa7c40052l70fomrecqid", {
