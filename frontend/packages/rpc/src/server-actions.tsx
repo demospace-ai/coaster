@@ -92,9 +92,11 @@ export async function updateAvailabilityRuleServerAction(
   availabilityRuleID: number,
   updates: any,
 ): Promise<AvailabilityRule> {
+  const cookieString = cookies().toString();
   const updatedRules = await sendRequest(UpdateAvailabilityRule, {
     pathParams: { listingID, availabilityRuleID },
     payload: updates,
+    extraHeaders: [["Cookie", cookieString]],
   });
 
   let rootDomain = isProd() ? "https://www.trycoaster.com" : "http://localhost:3000";
@@ -107,9 +109,11 @@ export async function createAvailabilityRuleServerAction(
   listingID: number,
   input: AvailabilityRuleInput,
 ): Promise<AvailabilityRule> {
+  const cookieString = cookies().toString();
   const rule = await sendRequest(CreateAvailabilityRule, {
     pathParams: { listingID },
     payload: input,
+    extraHeaders: [["Cookie", cookieString]],
   });
 
   let rootDomain = isProd() ? "https://www.trycoaster.com" : "http://localhost:3000";
