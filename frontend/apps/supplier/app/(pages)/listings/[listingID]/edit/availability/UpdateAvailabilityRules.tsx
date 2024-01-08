@@ -249,7 +249,7 @@ const FixedRangeRuleUpdateForm: React.FC<{
       payload.end_date = correctToUTC(values.date_range.to);
     }
 
-    if (dirtyFields.time_slots) {
+    if (availabilityType === AvailabilityType.Enum.datetime && dirtyFields.time_slots) {
       payload.time_slots = values.time_slots.map((ts) => ({
         day_of_week: ts.dayOfWeek,
         start_time: ts.startTime,
@@ -257,7 +257,7 @@ const FixedRangeRuleUpdateForm: React.FC<{
       }));
     }
 
-    if (dirtyFields.recurring_days) {
+    if (availabilityType === AvailabilityType.Enum.date && dirtyFields.recurring_days) {
       // Must send empty time slot for full day listings
       if (values.recurring_days.length == 0) {
         const everyDay = eachDayOfInterval({
