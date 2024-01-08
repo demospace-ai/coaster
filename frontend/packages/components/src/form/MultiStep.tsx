@@ -46,7 +46,7 @@ export const WizardNavButtons: React.FC<{
           disabled && "tw-cursor-not-allowed tw-bg-gray-400 tw-border-gray-400",
         )}
       >
-        {isLoading ? <Loading /> : isLastStep ? "Submit" : "Continue"}
+        {isLoading ? <Loading light /> : isLastStep ? "Submit" : "Continue"}
       </button>
     </div>
   );

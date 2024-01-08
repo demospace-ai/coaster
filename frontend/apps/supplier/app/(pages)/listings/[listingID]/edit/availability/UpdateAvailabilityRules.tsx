@@ -1,6 +1,6 @@
 import { Button } from "@coaster/components/button/Button";
 import { DateRangePicker } from "@coaster/components/dates/DatePicker";
-import { correctToUTC, tryCorrectFromUTC } from "@coaster/components/dates/utils";
+import { correctTime, correctToUTC, tryCorrectFromUTC } from "@coaster/components/dates/utils";
 import { FormError } from "@coaster/components/error/FormError";
 import { DropdownInput, Input } from "@coaster/components/input/Input";
 import { Loading } from "@coaster/components/loading/Loading";
@@ -15,7 +15,6 @@ import {
 } from "@coaster/types";
 import { Mutation } from "@coaster/utils/client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { eachDayOfInterval } from "date-fns";
 import { ReactElement } from "react";
 import { Controller, FieldArrayWithId, useFieldArray, useForm } from "react-hook-form";
 import {
@@ -133,7 +132,7 @@ const FixedDateRuleUpdateForm: React.FC<{
     if (dirtyFields.time_slots) {
       payload.time_slots = values.time_slots.map((ts) => ({
         day_of_week: ts.dayOfWeek,
-        start_time: ts.startTime,
+        start_time: correctTime(ts.startTime),
         capacity: ts.capacity,
       }));
     }
@@ -189,7 +188,7 @@ const FixedDateRuleUpdateForm: React.FC<{
         <FormError message={updateAvailability.error?.message} className="tw-mt-1" />
       </div>
       <Button className="tw-mt-3 tw-w-48 tw-py-2" type="submit">
-        {updateAvailability.isLoading ? <Loading /> : "Submit"}
+        {updateAvailability.isLoading ? <Loading light/> : "Submit"}
       </Button>
     </form>
   );
@@ -252,7 +251,7 @@ const FixedRangeRuleUpdateForm: React.FC<{
     if (availabilityType === AvailabilityType.Enum.datetime && dirtyFields.time_slots) {
       payload.time_slots = values.time_slots.map((ts) => ({
         day_of_week: ts.dayOfWeek,
-        start_time: ts.startTime,
+        start_time: correctTime(ts.startTime),
         capacity: ts.capacity,
       }));
     }
@@ -260,11 +259,6 @@ const FixedRangeRuleUpdateForm: React.FC<{
     if (availabilityType === AvailabilityType.Enum.date && dirtyFields.recurring_days) {
       // Must send empty time slot for full day listings
       if (values.recurring_days.length == 0) {
-        const everyDay = eachDayOfInterval({
-          start: values.date_range.from,
-          end: values.date_range.to,
-        });
-
         // Empty array means every day is available
         payload.time_slots = options.map((i) => ({
           day_of_week: i,
@@ -366,7 +360,7 @@ const FixedRangeRuleUpdateForm: React.FC<{
         <FormError message={updateAvailability.error?.message} className="tw-mt-1" />
       </div>
       <Button className="tw-mt-3 tw-w-48 tw-py-2" type="submit">
-        {updateAvailability.isLoading ? <Loading /> : "Submit"}
+        {updateAvailability.isLoading ? <Loading light /> : "Submit"}
       </Button>
     </form>
   );
@@ -425,15 +419,15 @@ const RecurringRuleUpdateForm: React.FC<{
       payload.recurring_months = values.recurring_months;
     }
 
-    if (dirtyFields.time_slots) {
+    if (availabilityType === AvailabilityType.Enum.datetime && dirtyFields.time_slots) {
       payload.time_slots = values.time_slots.map((ts) => ({
         day_of_week: ts.dayOfWeek,
-        start_time: ts.startTime,
+        start_time: correctTime(ts.startTime),
         capacity: ts.capacity,
       }));
     }
 
-    if (dirtyFields.recurring_days) {
+    if (availabilityType === AvailabilityType.Enum.date && dirtyFields.recurring_days) {
       // Must send empty time slot for full day listings
       if (values.recurring_days.length == 0) {
         // Empty array means every day is available
@@ -570,7 +564,7 @@ const RecurringRuleUpdateForm: React.FC<{
         <FormError message={updateAvailability.error?.message} className="tw-mt-1" />
       </div>
       <Button className="tw-mt-3 tw-w-48 tw-py-2" type="submit">
-        {updateAvailability.isLoading ? <Loading /> : "Submit"}
+        {updateAvailability.isLoading ? <Loading light /> : "Submit"}
       </Button>
     </form>
   );

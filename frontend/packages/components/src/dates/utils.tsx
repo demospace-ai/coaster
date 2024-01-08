@@ -36,3 +36,11 @@ export function correctToUTC(date: Date | undefined): Date | undefined {
 
   return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0));
 }
+
+export function correctTime(date: Date | undefined): Date | undefined {
+  if (!date) {
+    return undefined;
+  }
+
+  return new Date(1970, 0, 0, date.getHours(), date.getMinutes(), date.getSeconds(), 0);
+}

@@ -1,7 +1,7 @@
 "use client";
 
 import { DateRangePicker } from "@coaster/components/dates/DatePicker";
-import { correctToUTC } from "@coaster/components/dates/utils";
+import { correctTime, correctToUTC } from "@coaster/components/dates/utils";
 import { FormError } from "@coaster/components/error/FormError";
 import { Step, StepProps, WizardNavButtons } from "@coaster/components/form/MultiStep";
 import { DropdownInput, Input, RadioInput } from "@coaster/components/input/Input";
@@ -620,7 +620,7 @@ const TimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, s
 
     payload.time_slots = values.time_slots.map((ts) => ({
       day_of_week: ts.dayOfWeek,
-      start_time: ts.startTime,
+      start_time: correctTime(ts.startTime),
       capacity: ts.capacity,
     }));
 
@@ -720,7 +720,7 @@ const SingleDayTimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({
 
     payload.time_slots = values.time_slots.map((ts) => ({
       day_of_week: ts.dayOfWeek,
-      start_time: ts.startTime,
+      start_time: correctTime(ts.startTime),
       capacity: ts.capacity,
     }));
 
