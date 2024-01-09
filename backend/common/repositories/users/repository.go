@@ -3,6 +3,7 @@ package users
 import (
 	"strings"
 
+	"go.fabra.io/server/common/emails"
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/events"
 	"go.fabra.io/server/common/input"
@@ -129,6 +130,7 @@ func CreateUserFromEmail(db *gorm.DB, email string, firstName string, lastName s
 		return nil, errors.Wrap(result.Error, "(users.CreateUserFromEmail) creating user")
 	}
 
+	emails.CreateContact(user.Email, user.FirstName, user.LastName, user.ID)
 	events.TrackSignup(user.ID, user.FirstName, user.LastName, user.Email)
 
 	return &user, nil
@@ -158,6 +160,7 @@ func CreateUserForExternalInfo(db *gorm.DB, externalUserInfo *oauth.ExternalUser
 		return nil, errors.Wrap(err, "(users.CreateUserForExternalInfo)")
 	}
 
+	emails.CreateContact(user.Email, user.FirstName, user.LastName, user.ID)
 	events.TrackSignup(user.ID, user.FirstName, user.LastName, user.Email)
 
 	return &user, nil
