@@ -366,6 +366,13 @@ export function identifyUser(user: User) {
         last_name: user.last_name,
       });
     }
+    if ((window as any).gtag) {
+      (window as any).gtag("set", "user_data", {
+        email: user.email,
+        first_name: user.first_name,
+        last_name: user.last_name,
+      });
+    }
   }
 }
 
