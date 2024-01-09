@@ -350,6 +350,7 @@ export function useOnLoginSuccess() {
   return useCallback(async (user: User) => {
     mutate({ CheckSession }, user);
     identifyUser(user);
+    recordSignupConversion(user);
   }, []);
 }
 
@@ -365,6 +366,14 @@ export function identifyUser(user: User) {
         last_name: user.last_name,
       });
     }
+  }
+}
+
+export function recordSignupConversion(user: User) {
+  if ((window as any).gtag) {
+    (window as any).gtag("event", "conversion", {
+      send_to: "AW-10823158367/ysuFCMa_l4cZEN-U8ago",
+    });
   }
 }
 
