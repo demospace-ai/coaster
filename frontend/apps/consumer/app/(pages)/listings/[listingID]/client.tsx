@@ -27,6 +27,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { getDateToTimeSlotMap } from "consumer/app/(pages)/listings/[listingID]/utils";
+import { H } from "highlight.run";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { Fragment, useRef, useState } from "react";
@@ -694,6 +695,8 @@ function useBookingState(listing: ListingType, generated: boolean) {
   const [startTime, setStartTime] = useState<Availability | null>(null);
   const [numGuests, setNumGuests] = useState<number>(1);
 
+  H.consumeError(new Error("starting"));
+
   const [month, setMonth] = useState<Date>(new Date());
   const [fetchStartDate, setFetchStartDate] = useState<Date>(new Date(month.getFullYear(), month.getMonth(), 1));
   const [fetchEndDate, setFetchEndDate] = useState<Date>(new Date(month.getFullYear() + 1, month.getMonth(), 1));
@@ -713,6 +716,8 @@ function useBookingState(listing: ListingType, generated: boolean) {
     availability = fetchedAvailability;
     loading = fetching;
   }
+
+  H.consumeError(new Error(JSON.stringify(availability)));
 
   const createCheckoutLink = useCreateCheckoutLink({
     onSuccess: (link) => {
