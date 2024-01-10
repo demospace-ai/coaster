@@ -391,7 +391,13 @@ export const ReserveSlider: React.FC<{
                     }}
                     disabled={!bookingSlot}
                   >
-                    {createCheckoutLink.isLoading ? <Loading light /> : "Reserve"}
+                    {createCheckoutLink.isLoading ? (
+                      <Loading light />
+                    ) : availableDates.length === 0 ? (
+                      "Send Inquiry"
+                    ) : (
+                      "Reserve"
+                    )}
                   </Button>
                 </div>
               </Dialog.Panel>
@@ -528,7 +534,7 @@ export const BookingPanel: React.FC<{ listing: ListingType; generated: boolean }
           disabled={!bookingSlot}
           onClick={tryToReserve}
         >
-          {createCheckoutLink.isLoading ? <Loading light /> : "Reserve"}
+          {createCheckoutLink.isLoading ? <Loading light /> : availableDates.length === 0 ? "Send Inquiry" : "Reserve"}
         </Button>
         <div className="tw-w-full tw-text-center tw-text-sm tw-mb-4 tw-pb-3 tw-border-b tw-border-solid tw-border-gray-300">
           You won't be charged yet
