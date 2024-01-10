@@ -385,7 +385,7 @@ export const ReserveSlider: React.FC<{
                 </div>
                 <div className="tw-flex tw-mt-auto tw-w-full tw-justify-end">
                   <Button
-                    className="tw-h-10 tw-w-28"
+                    className="tw-h-10 tw-min-w-28 tw-whitespace-nowrap"
                     onClick={() => {
                       tryToReserve();
                     }}
@@ -530,7 +530,7 @@ export const BookingPanel: React.FC<{ listing: ListingType; generated: boolean }
           </RadioGroup>
         )}
         <Button
-          className="tw-font-medium tw-mt-5 tw-mb-4 tw-tracking-[0.5px] tw-h-10"
+          className="tw-font-medium tw-mt-5 tw-mb-4 tw-tracking-[0.5px] tw-h-10 tw-whitespace-nowrap"
           disabled={!bookingSlot}
           onClick={tryToReserve}
         >
