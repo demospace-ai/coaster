@@ -104,7 +104,7 @@ func CreateCheckoutSession(user *models.User, listing *listings.ListingDetails, 
 	expiresAt := time.Now().Add(35 * time.Minute).Unix()                      // Stripe minimum is 30 minutes
 
 	// We default to the Coaster Stripe account ID, but if the host has their own Stripe account, we use that instead
-	stripeAccountID := "acct_1O07uFI5sOklrZyq"
+	stripeAccountID := "acct_1Nrnb8ImZ2ZmnWKQ"
 	if listing.Host.StripeAccountID != nil {
 		stripeAccountID = *listing.Host.StripeAccountID
 	}
