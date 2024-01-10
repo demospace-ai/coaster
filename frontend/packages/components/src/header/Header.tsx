@@ -180,7 +180,7 @@ const SignedInMenu: React.FC<{ user: User; onHostApp?: boolean }> = ({ user, onH
             >
               <Menu.Items
                 static
-                className="tw-z-10 tw-divide-y tw-mt-2 tw-mr-2 tw-rounded-md tw-shadow-lg tw-bg-white focus:tw-outline-none tw-w-64"
+                className="tw-z-10 tw-divide-y tw-mt-2 tw-mr-2 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none tw-w-64"
               >
                 <div className="tw-m-2">
                   <p className="tw-px-1 tw-pt-2 tw-pb-1 tw-text-xs tw-uppercase">Signed in as</p>
@@ -193,7 +193,7 @@ const SignedInMenu: React.FC<{ user: User; onHostApp?: boolean }> = ({ user, onH
                         width={28}
                         height={28}
                       />
-                      <div className="tw-flex tw-flex-col">
+                      <div className="tw-flex tw-flex-col tw-overflow-hidden tw-pr-1">
                         <p className="tw-truncate tw-text-sm tw-font-semibold tw-text-slate-900">
                           {user?.first_name} {user?.last_name}
                         </p>

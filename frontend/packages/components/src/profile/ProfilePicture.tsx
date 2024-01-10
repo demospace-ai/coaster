@@ -28,7 +28,7 @@ export const ProfilePicture: React.FC<{
       ) : (
         <div
           className={mergeClasses(
-            "tw-bg-orange-400 tw-text-white tw-rounded-full tw-flex tw-justify-center tw-items-center",
+            "tw-bg-orange-400 tw-text-white tw-aspect-square tw-rounded-full tw-flex tw-justify-center tw-items-center",
             className,
           )}
           style={{
