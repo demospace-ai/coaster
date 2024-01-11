@@ -69,12 +69,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
       }}
     >
       {props.icon && props.icon}
-      <div className={mergeClasses("tw-relative tw-flex tw-flex-col tw-w-full", label && "tw-mt-4 tw-pb-0.5")}>
+      <div className={mergeClasses("tw-relative tw-flex tw-w-full tw-flex-col", label && "tw-mt-4 tw-pb-0.5")}>
         {label && (
           <label
             htmlFor={id}
             className={mergeClasses(
-              "tw-absolute -tw-top-1.5 tw-text-base tw-text-slate-600 tw-cursor-[inherit] tw-select-none tw-inline-block tw-transition-all tw-duration-150",
+              "tw-absolute -tw-top-1.5 tw-inline-block tw-cursor-[inherit] tw-select-none tw-text-base tw-text-slate-600 tw-transition-all tw-duration-150",
               showLabel && "-tw-top-4 tw-text-xs",
             )}
           >
@@ -87,7 +87,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
           ref={inputRef}
           autoComplete={id}
           className={mergeClasses(
-            "tw-w-full tw-outline-none tw-ring-none disabled:tw-bg-slate-50 disabled:tw-select-none tw-cursor-[inherit] tw-hide-number-wheel tw-text-base",
+            "tw-ring-none tw-hide-number-wheel tw-w-full tw-cursor-[inherit] tw-text-base tw-outline-none disabled:tw-select-none disabled:tw-bg-slate-50",
             props.label && "tw-mt-0.5",
           )}
           onKeyDown={onKeydown}
@@ -106,7 +106,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
       </div>
       {tooltip && (
         <Tooltip content={tooltip}>
-          <InformationCircleIcon className="tw-w-5 tw-mr-2" />
+          <InformationCircleIcon className="tw-mr-2 tw-w-5" />
         </Tooltip>
       )}
     </div>
@@ -148,11 +148,11 @@ export const RichTextEditor: React.FC<{
   return (
     <div className={mergeClasses(...classes)} onClick={() => editor?.chain().focus()}>
       {label && (
-        <label className="tw-absolute tw-text-slate-600 tw-cursor-[inherit] tw-select-none tw-inline-block tw-transition-all tw-duration-150 tw-top-1.5 tw-text-xs">
+        <label className="tw-absolute tw-top-1.5 tw-inline-block tw-cursor-[inherit] tw-select-none tw-text-xs tw-text-slate-600 tw-transition-all tw-duration-150">
           {label}
         </label>
       )}
-      <EditorContent editor={editor} className="tw-w-full tw-h-full tw-overflow-auto" />
+      <EditorContent editor={editor} className="tw-h-full tw-w-full tw-overflow-auto" />
     </div>
   );
 };
@@ -191,12 +191,12 @@ export const TextArea: React.FC<TextAreaProps> = forwardRef<HTMLTextAreaElement,
         textAreaRef.current?.focus();
       }}
     >
-      <div className={mergeClasses("tw-relative tw-flex tw-flex-col tw-w-full", label && "tw-pt-3")}>
+      <div className={mergeClasses("tw-relative tw-flex tw-w-full tw-flex-col", label && "tw-pt-3")}>
         {label && (
           <label
             htmlFor={id}
             className={mergeClasses(
-              "tw-absolute -tw-top-1 tw-text-base tw-text-slate-600 tw-cursor-[inherit] tw-select-none tw-inline-block tw-transition-all tw-duration-150",
+              "tw-absolute -tw-top-1 tw-inline-block tw-cursor-[inherit] tw-select-none tw-text-base tw-text-slate-600 tw-transition-all tw-duration-150",
               showLabel && "-tw-top-1 tw-text-xs",
             )}
           >
@@ -208,7 +208,7 @@ export const TextArea: React.FC<TextAreaProps> = forwardRef<HTMLTextAreaElement,
           name={id}
           ref={textAreaRef}
           autoComplete={id}
-          className="tw-w-full tw-h-full tw-min-h-full tw-outline-none tw-text-base tw-mt-1 disabled:tw-bg-slate-50 disabled:tw-select-none tw-cursor-[inherit]"
+          className="tw-mt-1 tw-h-full tw-min-h-full tw-w-full tw-cursor-[inherit] tw-text-base tw-outline-none disabled:tw-select-none disabled:tw-bg-slate-50"
           onKeyDown={onKeydown}
           value={value ? value : ""}
           onBlur={(e) => {
@@ -225,7 +225,7 @@ export const TextArea: React.FC<TextAreaProps> = forwardRef<HTMLTextAreaElement,
       </div>
       {tooltip && (
         <Tooltip content={tooltip}>
-          <InformationCircleIcon className="tw-w-5 tw-mr-4" />
+          <InformationCircleIcon className="tw-mr-4 tw-w-5" />
         </Tooltip>
       )}
     </div>
@@ -306,7 +306,7 @@ export const DropdownInput: React.FC<DropdownInputProps> = forwardRef((props, re
         >
           <label
             htmlFor="name"
-            className="tw-absolute tw-top-5 tw-left-2 -tw-mt-px tw-inline-block tw-bg-white tw-px-1 tw-text-xs tw-text-slate-600 tw-whitespace-nowrap"
+            className="tw-absolute tw-left-2 tw-top-5 -tw-mt-px tw-inline-block tw-whitespace-nowrap tw-bg-white tw-px-1 tw-text-xs tw-text-slate-600"
           >
             {props.label}
           </label>
@@ -315,24 +315,24 @@ export const DropdownInput: React.FC<DropdownInputProps> = forwardRef((props, re
           ref={refs.setReference}
           {...getReferenceProps()}
           className={mergeClasses(
-            "tw-flex tw-py-3.5 tw-px-3 tw-rounded-md tw-bg-white tw-text-left tw-border tw-border-solid tw-border-slate-300 tw-transition tw-duration-100 tw-cursor-pointer tw-items-center",
+            "tw-flex tw-cursor-pointer tw-items-center tw-rounded-md tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-px-3 tw-py-3.5 tw-text-left tw-transition tw-duration-100",
             !props.disabled && "hover:tw-border-gray-400",
-            props.disabled && "tw-bg-slate-100 tw-cursor-not-allowed",
+            props.disabled && "tw-cursor-not-allowed tw-bg-slate-100",
             props.className,
             props.valid === false && "tw-border-red-600",
           )}
         >
           <div
             className={mergeClasses(
-              "tw-inline-block tw-w-[calc(100%-20px)] tw-truncate tw-leading-5 tw-text-base tw-overflow-none",
-              showLabel && "tw-mt-3 -tw-mb-1",
+              "tw-overflow-none tw-inline-block tw-w-[calc(100%-20px)] tw-truncate tw-text-base tw-leading-5",
+              showLabel && "-tw-mb-1 tw-mt-3",
             )}
           >
             {getElementForDisplay(props.value)}
           </div>
-          <span className="tw-pointer-events-none pr-2">
+          <span className="pr-2 tw-pointer-events-none">
             <ChevronUpDownIcon
-              className="tw-inline tw-float-right tw-h-5 tw-w-5 tw-text-slate-400"
+              className="tw-float-right tw-inline tw-h-5 tw-w-5 tw-text-slate-400"
               aria-hidden="true"
             />
           </span>
@@ -351,7 +351,7 @@ export const DropdownInput: React.FC<DropdownInputProps> = forwardRef((props, re
             >
               <Listbox.Options
                 className={mergeClasses(
-                  "tw-absolute tw-z-20 tw-mt-1 tw-max-h-60 tw-min-w-full tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm tw-gap-1 tw-flex tw-flex-col",
+                  "tw-absolute tw-z-20 tw-mt-1 tw-flex tw-max-h-60 tw-min-w-full tw-flex-col tw-gap-1 tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm",
                   props.dropdownHeight,
                 )}
               >
@@ -416,7 +416,7 @@ const DropdownOptions: React.FC<DropdownOptionsProps> = (props) => {
       </>
     );
   } else {
-    return <div className="tw-p-2 tw-pl-4 tw-select-none">{props.noOptionsString}</div>;
+    return <div className="tw-select-none tw-p-2 tw-pl-4">{props.noOptionsString}</div>;
   }
 };
 
@@ -514,7 +514,7 @@ export const ComboInput: React.FC<ComboInputProps> = forwardRef((props, ref) => 
         >
           <label
             htmlFor="name"
-            className="tw-absolute tw-top-5 tw-left-2 -tw-mt-px tw-inline-block tw-bg-white tw-px-1 tw-text-xs tw-text-slate-600 tw-whitespace-nowrap"
+            className="tw-absolute tw-left-2 tw-top-5 -tw-mt-px tw-inline-block tw-whitespace-nowrap tw-bg-white tw-px-1 tw-text-xs tw-text-slate-600"
           >
             {props.label}
           </label>
@@ -523,19 +523,19 @@ export const ComboInput: React.FC<ComboInputProps> = forwardRef((props, ref) => 
           ref={refs.setReference}
           {...getReferenceProps()}
           className={mergeClasses(
-            "tw-flex tw-rounded-md tw-bg-white tw-text-left tw-border tw-border-solid tw-border-slate-300 focus-within:!tw-border-gray-700 tw-transition tw-duration-100 tw-cursor-pointer",
+            "tw-flex tw-cursor-pointer tw-rounded-md tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-text-left tw-transition tw-duration-100 focus-within:!tw-border-gray-700",
             !props.disabled && "hover:tw-border-gray-400",
-            props.disabled && "tw-bg-slate-100 tw-cursor-not-allowed",
+            props.disabled && "tw-cursor-not-allowed tw-bg-slate-100",
             props.className,
             props.valid === false && "tw-border-red-600",
           )}
         >
-          <div className="tw-py-3.5 tw-px-3 tw-flex tw-flex-1">
+          <div className="tw-flex tw-flex-1 tw-px-3 tw-py-3.5">
             <Combobox.Input
               className={mergeClasses(
-                "tw-inline tw-bg-transparent tw-w-[calc(100%-20px)] tw-border-none tw-text-base tw-leading-5 tw-text-slate-900 tw-outline-none tw-text-ellipsis tw-cursor-pointer focus:tw-cursor-text tw-transition-all tw-duration-10",
-                showLabel && "tw-mt-3 -tw-mb-1",
-                props.disabled && "tw-bg-slate-100 tw-text-slate-400 tw-cursor-not-allowed",
+                "tw-duration-10 tw-inline tw-w-[calc(100%-20px)] tw-cursor-pointer tw-text-ellipsis tw-border-none tw-bg-transparent tw-text-base tw-leading-5 tw-text-slate-900 tw-outline-none tw-transition-all focus:tw-cursor-text",
+                showLabel && "-tw-mb-1 tw-mt-3",
+                props.disabled && "tw-cursor-not-allowed tw-bg-slate-100 tw-text-slate-400",
               )}
               onClick={(e) => open && e.stopPropagation()}
               displayValue={(value) => (value ? getElementForDisplay(value) : "")}
@@ -543,9 +543,9 @@ export const ComboInput: React.FC<ComboInputProps> = forwardRef((props, ref) => 
               placeholder={props.placeholder}
             />
             <Combobox.Button className="tw-inline-block tw-h-full" ref={buttonRef}>
-              <span className="tw-pointer-events-none pr-2">
+              <span className="pr-2 tw-pointer-events-none">
                 <ChevronUpDownIcon
-                  className="tw-inline tw-float-right tw-h-5 tw-w-5 tw-text-slate-400"
+                  className="tw-float-right tw-inline tw-h-5 tw-w-5 tw-text-slate-400"
                   aria-hidden="true"
                 />
               </span>
@@ -569,7 +569,7 @@ export const ComboInput: React.FC<ComboInputProps> = forwardRef((props, ref) => 
             <Combobox.Options
               static
               className={mergeClasses(
-                "tw-absolute tw-z-20 tw-mt-1 tw-min-w-full tw-max-h-60 tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm",
+                "tw-absolute tw-z-20 tw-mt-1 tw-max-h-60 tw-min-w-full tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm",
                 props.dropdownHeight,
               )}
             >
@@ -667,7 +667,7 @@ export const MultiSelect: React.FC<ComboInputProps> = forwardRef((props, ref) =>
         >
           <label
             htmlFor="name"
-            className="tw-absolute tw-top-5 tw-left-2 -tw-mt-px tw-inline-block tw-bg-white tw-px-1 tw-text-xs tw-text-slate-600 tw-whitespace-nowrap"
+            className="tw-absolute tw-left-2 tw-top-5 -tw-mt-px tw-inline-block tw-whitespace-nowrap tw-bg-white tw-px-1 tw-text-xs tw-text-slate-600"
           >
             {props.label}
           </label>
@@ -676,19 +676,19 @@ export const MultiSelect: React.FC<ComboInputProps> = forwardRef((props, ref) =>
           ref={refs.setReference}
           {...getReferenceProps()}
           className={mergeClasses(
-            "tw-flex tw-rounded-md tw-bg-white tw-text-left tw-border tw-border-solid tw-border-slate-300 focus-within:!tw-border-gray-700 tw-transition tw-duration-100 tw-cursor-pointer",
+            "tw-flex tw-cursor-pointer tw-rounded-md tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-text-left tw-transition tw-duration-100 focus-within:!tw-border-gray-700",
             !props.disabled && "hover:tw-border-gray-400",
-            props.disabled && "tw-bg-slate-100 tw-cursor-not-allowed",
+            props.disabled && "tw-cursor-not-allowed tw-bg-slate-100",
             props.className,
             props.valid === false && "tw-border-red-600",
           )}
         >
-          <div className="tw-py-3.5 tw-px-3 tw-flex tw-flex-1">
+          <div className="tw-flex tw-flex-1 tw-px-3 tw-py-3.5">
             <Combobox.Input
               className={mergeClasses(
-                "tw-inline tw-bg-transparent tw-w-[calc(100%-20px)] tw-border-none tw-text-base tw-leading-5 tw-text-slate-900 tw-outline-none tw-text-ellipsis tw-cursor-pointer focus:tw-cursor-text tw-transition-all tw-duration-10",
-                showLabel && "tw-mt-3 -tw-mb-1",
-                props.disabled && "tw-bg-slate-100 tw-text-slate-400 tw-cursor-not-allowed",
+                "tw-duration-10 tw-inline tw-w-[calc(100%-20px)] tw-cursor-pointer tw-text-ellipsis tw-border-none tw-bg-transparent tw-text-base tw-leading-5 tw-text-slate-900 tw-outline-none tw-transition-all focus:tw-cursor-text",
+                showLabel && "-tw-mb-1 tw-mt-3",
+                props.disabled && "tw-cursor-not-allowed tw-bg-slate-100 tw-text-slate-400",
               )}
               onClick={(e) => open && e.stopPropagation()}
               displayValue={(value) => (value ? getElementForDisplay(value) : "")}
@@ -696,9 +696,9 @@ export const MultiSelect: React.FC<ComboInputProps> = forwardRef((props, ref) =>
               placeholder={props.placeholder}
             />
             <Combobox.Button className="tw-inline-block tw-h-full" ref={buttonRef}>
-              <span className="tw-pointer-events-none pr-2">
+              <span className="pr-2 tw-pointer-events-none">
                 <ChevronUpDownIcon
-                  className="tw-inline tw-float-right tw-h-5 tw-w-5 tw-text-slate-400"
+                  className="tw-float-right tw-inline tw-h-5 tw-w-5 tw-text-slate-400"
                   aria-hidden="true"
                 />
               </span>
@@ -722,7 +722,7 @@ export const MultiSelect: React.FC<ComboInputProps> = forwardRef((props, ref) =>
             <Combobox.Options
               static
               className={mergeClasses(
-                "tw-absolute tw-z-20 tw-mt-1 tw-min-w-full tw-max-h-60 tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm",
+                "tw-absolute tw-z-20 tw-mt-1 tw-max-h-60 tw-min-w-full tw-overflow-auto tw-rounded-md tw-bg-white tw-py-1 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm",
                 props.dropdownHeight,
               )}
             >
@@ -819,7 +819,7 @@ const ComboOptions: React.FC<ComboOptionsProps> = (props) => {
             </Combobox.Option>
           )
         ) : (
-          <div className="tw-p-2 tw-pl-4 tw-select-none">{props.noOptionsString}</div>
+          <div className="tw-select-none tw-p-2 tw-pl-4">{props.noOptionsString}</div>
         )}
       </>
     );
@@ -845,16 +845,16 @@ export const PriceInput = forwardRef<HTMLInputElement, InputProps>((props, ref) 
   return (
     <div
       className={mergeClasses(
-        "tw-flex tw-w-full tw-rounded-md tw-outline tw-outline-1 tw-outline-slate-300 focus-within:tw-outline-slate-400 hover:tw-outline-slate-400 tw-text-base tw-cursor-text",
+        "tw-flex tw-w-full tw-cursor-text tw-rounded-md tw-text-base tw-outline tw-outline-1 tw-outline-slate-300 focus-within:tw-outline-slate-400 hover:tw-outline-slate-400",
         className,
       )}
       onClick={() => inputRef.current?.focus()}
     >
-      <div className="tw-inline-block tw-relative">
+      <div className="tw-relative tw-inline-block">
         <div
           className={mergeClasses(
-            "tw-flex tw-justify-center tw-items-center tw-py-4 tw-px-3",
-            label && "tw-mt-2 -tw-mb-2",
+            "tw-flex tw-items-center tw-justify-center tw-px-3 tw-py-4",
+            label && "-tw-mb-2 tw-mt-2",
           )}
         >
           ${stringifyPrice(value)}
@@ -863,7 +863,7 @@ export const PriceInput = forwardRef<HTMLInputElement, InputProps>((props, ref) 
           <label
             htmlFor={id}
             className={mergeClasses(
-              "tw-absolute tw-top-1.5 tw-left-3 tw-text-xs tw-text-slate-600 tw-cursor-[inherit] tw-select-none tw-inline-block tw-transition-all tw-duration-150",
+              "tw-absolute tw-left-3 tw-top-1.5 tw-inline-block tw-cursor-[inherit] tw-select-none tw-text-xs tw-text-slate-600 tw-transition-all tw-duration-150",
             )}
           >
             {label}
@@ -876,8 +876,8 @@ export const PriceInput = forwardRef<HTMLInputElement, InputProps>((props, ref) 
           value={value ? value : ""}
           onWheel={(e) => e.currentTarget.blur()}
           className={mergeClasses(
-            "tw-absolute tw-top-0 tw-right-0 tw-flex tw-h-full tw-w-full tw-bg-transparent tw-text-transparent tw-caret-black tw-text-right tw-py-4 tw-px-3 tw-outline-0 tw-hide-number-wheel",
-            label && "tw-mt-2 -tw-mb-2",
+            "tw-hide-number-wheel tw-absolute tw-right-0 tw-top-0 tw-flex tw-h-full tw-w-full tw-bg-transparent tw-px-3 tw-py-4 tw-text-right tw-text-transparent tw-caret-black tw-outline-0",
+            label && "-tw-mb-2 tw-mt-2",
           )}
           onKeyDown={preventMinusAndPeriod}
           {...other}
@@ -899,9 +899,9 @@ export const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>((props, re
   const [period, setPeriod] = useState<"AM" | "PM">(date.getHours() < 12 ? "AM" : "PM");
 
   return (
-    <div className={mergeClasses("tw-flex tw-gap-1 tw-items-center", props.className)}>
+    <div className={mergeClasses("tw-flex tw-items-center tw-gap-1", props.className)}>
       <select
-        className="tw-outline-none tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-p-1"
+        className="tw-rounded-lg tw-border tw-border-solid tw-border-gray-300 tw-p-1 tw-outline-none"
         value={date.getHours() % 12}
         onChange={(e) => {
           if (period === "AM") {
@@ -928,7 +928,7 @@ export const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>((props, re
       </select>
       :
       <select
-        className="tw-outline-none tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-p-1"
+        className="tw-rounded-lg tw-border tw-border-solid tw-border-gray-300 tw-p-1 tw-outline-none"
         value={date.getMinutes()}
         onChange={(e) => {
           date.setMinutes(parseInt(e.target.value));
@@ -945,7 +945,7 @@ export const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>((props, re
         ))}
       </select>
       <select
-        className="tw-outline-none tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-p-1"
+        className="tw-rounded-lg tw-border tw-border-solid tw-border-gray-300 tw-p-1 tw-outline-none"
         value={period}
         onChange={(e) => {
           if (e.target.value === "AM") {
@@ -992,7 +992,7 @@ export const RadioInput = forwardRef<HTMLDivElement, RadioInputProps>((props, re
             value={option}
             className={({ checked }) =>
               `${checked ? "tw-bg-slate-100" : "tw-bg-white"}
-              tw-relative tw-flex tw-cursor-pointer tw-rounded-lg tw-px-3 sm:tw-px-5 tw-py-4 tw-border tw-border-solid tw-border-slate-200 tw-outline-none`
+              tw-relative tw-flex tw-cursor-pointer tw-rounded-lg tw-border tw-border-solid tw-border-slate-200 tw-px-3 tw-py-4 tw-outline-none sm:tw-px-5`
             }
           >
             {({ checked }) => (
@@ -1002,12 +1002,12 @@ export const RadioInput = forwardRef<HTMLDivElement, RadioInputProps>((props, re
                     {props.noBullet || (
                       <span
                         className={mergeClasses(
-                          checked ? "tw-bg-slate-600 tw-border-transparent" : "tw-bg-white tw-border-gray-300",
-                          "tw-mt-0.5 tw-mr-3 sm:tw-mr-5 tw-h-4 tw-w-4 tw-shrink-0 tw-cursor-pointer tw-rounded-full tw-border tw-flex tw-items-center tw-justify-center",
+                          checked ? "tw-border-transparent tw-bg-slate-600" : "tw-border-gray-300 tw-bg-white",
+                          "tw-mr-3 tw-mt-0.5 tw-flex tw-h-4 tw-w-4 tw-shrink-0 tw-cursor-pointer tw-items-center tw-justify-center tw-rounded-full tw-border sm:tw-mr-5",
                         )}
                         aria-hidden="true"
                       >
-                        <span className="tw-rounded-full tw-bg-white tw-w-1.5 tw-h-1.5" />
+                        <span className="tw-h-1.5 tw-w-1.5 tw-rounded-full tw-bg-white" />
                       </span>
                     )}
                     <div className="tw-text-sm">
@@ -1064,12 +1064,12 @@ export const GuestNumberInput: React.FC<{
         ref={refs.setReference}
         {...getReferenceProps()}
         className={mergeClasses(
-          "tw-flex tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-items-center tw-cursor-pointer tw-px-4",
+          "tw-flex tw-cursor-pointer tw-items-center tw-rounded-lg tw-border tw-border-solid tw-border-gray-300 tw-px-4",
           className,
         )}
       >
-        <UserIcon className="tw-w-5 tw-mr-1" />
-        <span className="tw-flex tw-flex-grow tw-justify-center tw-select-none">{value}</span>
+        <UserIcon className="tw-mr-1 tw-w-5" />
+        <span className="tw-flex tw-flex-grow tw-select-none tw-justify-center">{value}</span>
       </button>
       <Transition
         show={open}
@@ -1085,10 +1085,10 @@ export const GuestNumberInput: React.FC<{
             ref={refs.setFloating}
             style={floatingStyles}
             {...getFloatingProps()}
-            className="tw-bg-white tw-rounded-lg tw-p-5 tw-border tw-border-solid tw-border-gray-200 tw-w-56 tw-shadow-md"
+            className="tw-w-56 tw-rounded-lg tw-border tw-border-solid tw-border-gray-200 tw-bg-white tw-p-5 tw-shadow-md"
           >
             <div className="tw-flex tw-justify-between">
-              <span className="tw-whitespace-nowrap tw-select-none">Adults</span>
+              <span className="tw-select-none tw-whitespace-nowrap">Adults</span>
               <div className="tw-flex tw-gap-3">
                 <button
                   onClick={() => {
@@ -1098,11 +1098,11 @@ export const GuestNumberInput: React.FC<{
                   <MinusCircleIcon
                     className={mergeClasses(
                       "tw-w-6 tw-cursor-pointer tw-stroke-gray-500 hover:tw-stroke-black",
-                      value === 1 && "!tw-stroke-gray-300 tw-cursor-not-allowed",
+                      value === 1 && "tw-cursor-not-allowed !tw-stroke-gray-300",
                     )}
                   />
                 </button>
-                <span className="tw-flex tw-w-3 tw-justify-center tw-select-none">{value}</span>
+                <span className="tw-flex tw-w-3 tw-select-none tw-justify-center">{value}</span>
                 <button
                   onClick={() => {
                     setValue(Math.min(maxGuests, value + 1));
@@ -1111,7 +1111,7 @@ export const GuestNumberInput: React.FC<{
                   <PlusCircleIcon
                     className={mergeClasses(
                       "tw-w-6 tw-cursor-pointer tw-stroke-gray-500 hover:tw-stroke-black",
-                      value === maxGuests && "!tw-stroke-gray-300 tw-cursor-not-allowed",
+                      value === maxGuests && "tw-cursor-not-allowed !tw-stroke-gray-300",
                     )}
                   />
                 </button>

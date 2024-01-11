@@ -63,8 +63,8 @@ export default async function GeneratedListing({
   };
 
   return (
-    <main className="tw-flex tw-items-center tw-justify-center tw-w-full tw-px-5 sm:tw-px-20">
-      <div className="tw-flex tw-flex-col tw-pt-5 sm:tw-pt-12 tw-pb-32 tw-text-base tw-w-full tw-max-w-7xl">
+    <main className="tw-flex tw-w-full tw-items-center tw-justify-center tw-px-5 sm:tw-px-20">
+      <div className="tw-flex tw-w-full tw-max-w-7xl tw-flex-col tw-pb-32 tw-pt-5 tw-text-base sm:tw-pt-12">
         <ListingPage listing={listing} generated />
       </div>
     </main>

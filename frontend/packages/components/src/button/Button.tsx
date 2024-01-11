@@ -80,7 +80,7 @@ export const BackButton: React.FC<InputHTMLAttributes<HTMLDivElement>> = (props)
   return (
     <div
       className={mergeClasses(
-        "tw-cursor-pointer tw-select-none tw-text-sm tw-font-[500] hover:tw-text-slate-600 tw-w-fit",
+        "tw-w-fit tw-cursor-pointer tw-select-none tw-text-sm tw-font-[500] hover:tw-text-slate-600",
         props.className,
       )}
       onClick={onClick}
@@ -122,5 +122,5 @@ export const IconButton: React.FC<IconButtonProps> = forwardRef<HTMLButtonElemen
 });
 
 export const DeleteButton = (props: Omit<IconButtonProps, "icon">) => (
-  <IconButton {...props} icon={<TrashIcon className="tw-w-5 tw-h-5" />} />
+  <IconButton {...props} icon={<TrashIcon className="tw-h-5 tw-w-5" />} />
 );

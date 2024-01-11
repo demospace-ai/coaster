@@ -95,12 +95,12 @@ export const NewRuleForm: React.FC<{ closeModal: () => void; listing: Listing }>
   }
 
   return (
-    <div className="tw-flex tw-flex-col tw-w-[320px] sm:tw-w-[480px] md:tw-w-[640px] lg:tw-w-[900px] tw-h-[80vh] sm:tw-h-[70vh] 4xl:tw-h-[65vh] tw-px-8 sm:tw-px-12 tw-pb-10 tw-border-box">
-      <div className="tw-text-left tw-w-full tw-text-2xl tw-font-semibold tw-mb-2">New Availability Rule</div>
-      <div className="tw-flex tw-flex-col tw-w-full tw-flex-grow tw-overflow-hidden">
-        {currentStep.title && <div className="tw-w-full tw-text-left tw-text-xl tw-mb-4">{currentStep.title}</div>}
+    <div className="tw-border-box tw-flex tw-h-[80vh] tw-w-[320px] tw-flex-col tw-px-8 tw-pb-10 sm:tw-h-[70vh] sm:tw-w-[480px] sm:tw-px-12 md:tw-w-[640px] lg:tw-w-[900px] 4xl:tw-h-[65vh]">
+      <div className="tw-mb-2 tw-w-full tw-text-left tw-text-2xl tw-font-semibold">New Availability Rule</div>
+      <div className="tw-flex tw-w-full tw-flex-grow tw-flex-col tw-overflow-hidden">
+        {currentStep.title && <div className="tw-mb-4 tw-w-full tw-text-left tw-text-xl">{currentStep.title}</div>}
         {currentStep.subtitle && (
-          <div className="tw-w-full tw-text-left tw-text-base tw-text-gray-600 tw-mb-4">{currentStep.subtitle}</div>
+          <div className="tw-mb-4 tw-w-full tw-text-left tw-text-base tw-text-gray-600">{currentStep.subtitle}</div>
         )}
         {currentStep.element}
       </div>
@@ -122,9 +122,9 @@ const InitialRuleStep = ({ values, setValue, nextStep, prevStep }: StepProps<New
   const { onChange: onNameChange, ...nameProps } = register("name");
 
   return (
-    <div className="tw-flex tw-flex-col tw-flex-grow tw-overflow-hidden">
-      <div className="tw-flex tw-flex-col tw-flex-grow tw-justify-start tw-overflow-y-auto tw-pb-16">
-        <div className="tw-text-lg tw-font-medium tw-mb-4">Provide a name for this rule</div>
+    <div className="tw-flex tw-flex-grow tw-flex-col tw-overflow-hidden">
+      <div className="tw-flex tw-flex-grow tw-flex-col tw-justify-start tw-overflow-y-auto tw-pb-16">
+        <div className="tw-mb-4 tw-text-lg tw-font-medium">Provide a name for this rule</div>
         <Input
           {...nameProps}
           onChange={(e) => {
@@ -136,7 +136,7 @@ const InitialRuleStep = ({ values, setValue, nextStep, prevStep }: StepProps<New
           placeholder="E.g. 2020 Summer Availability"
         />
         <FormError message={formState.errors.name?.message} />
-        <div className="tw-text-lg tw-font-medium tw-mt-5 tw-mb-4">What kind of rule do you want to create?</div>
+        <div className="tw-mb-4 tw-mt-5 tw-text-lg tw-font-medium">What kind of rule do you want to create?</div>
         <Controller
           name="type"
           control={control}
@@ -213,8 +213,8 @@ const SingleDateStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values,
   };
 
   return (
-    <div className="tw-flex tw-flex-col tw-flex-grow sm:tw-mt-4 tw-overflow-hidden">
-      <div className="tw-flex tw-flex-col tw-flex-grow tw-justify-start tw-items-center tw-overflow-y-auto">
+    <div className="tw-flex tw-flex-grow tw-flex-col tw-overflow-hidden sm:tw-mt-4">
+      <div className="tw-flex tw-flex-grow tw-flex-col tw-items-center tw-justify-start tw-overflow-y-auto">
         <DateRangePicker mode="single" disabled={{ before: new Date() }} selected={selected} onSelect={setSelected} />
       </div>
       <FormError message={error} />
@@ -255,8 +255,8 @@ const DateRangeStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
   };
 
   return (
-    <div className="tw-flex tw-flex-col tw-flex-grow sm:tw-mt-4 tw-overflow-hidden">
-      <div className="tw-flex tw-flex-col tw-flex-grow tw-self-stretch tw-justify-start tw-items-center tw-overflow-y-auto">
+    <div className="tw-flex tw-flex-grow tw-flex-col tw-overflow-hidden sm:tw-mt-4">
+      <div className="tw-flex tw-flex-grow tw-flex-col tw-items-center tw-justify-start tw-self-stretch tw-overflow-y-auto">
         <Controller
           name="date_range"
           control={control}
@@ -334,10 +334,10 @@ const WeekdaySelectionStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ v
   };
 
   return (
-    <div className="tw-flex tw-flex-col tw-flex-grow tw-mt-5 tw-overflow-hidden">
-      <div className="tw-flex tw-flex-col tw-flex-grow tw-justify-start tw-items-center tw-overflow-y-auto tw-pb-16">
-        <div className="tw-flex tw-flex-col tw-w-full">
-          <div className="tw-text-lg tw-font-medium tw-mb-1">(Optional) Affected days of the week</div>
+    <div className="tw-mt-5 tw-flex tw-flex-grow tw-flex-col tw-overflow-hidden">
+      <div className="tw-flex tw-flex-grow tw-flex-col tw-items-center tw-justify-start tw-overflow-y-auto tw-pb-16">
+        <div className="tw-flex tw-w-full tw-flex-col">
+          <div className="tw-mb-1 tw-text-lg tw-font-medium">(Optional) Affected days of the week</div>
           <div className="tw-mb-4">Select which days of the week within your range should be available.</div>
           <DropdownInput
             multiple
@@ -437,9 +437,9 @@ const RecurringStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
   };
 
   return (
-    <div className="tw-flex tw-flex-col tw-flex-grow tw-overflow-hidden">
-      <div className="tw-flex tw-flex-col tw-flex-grow tw-justify-start tw-overflow-auto tw-pb-20">
-        <div className="tw-text-lg tw-font-medium tw-mb-1">Affected years</div>
+    <div className="tw-flex tw-flex-grow tw-flex-col tw-overflow-hidden">
+      <div className="tw-flex tw-flex-grow tw-flex-col tw-justify-start tw-overflow-auto tw-pb-20">
+        <div className="tw-mb-1 tw-text-lg tw-font-medium">Affected years</div>
         <div className="tw-mb-4">Select which year(s) this availability rule applies to.</div>
         <Controller
           name="recurring_years"
@@ -467,7 +467,7 @@ const RecurringStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
             />
           )}
         />
-        <div className="tw-text-lg tw-font-medium tw-mb-1">Affected months</div>
+        <div className="tw-mb-1 tw-text-lg tw-font-medium">Affected months</div>
         <div className="tw-mb-4">Select which month(s) this availability rule applies to.</div>
         <Controller
           name="recurring_months"
@@ -499,7 +499,7 @@ const RecurringStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
         {values?.availabilityType === AvailabilityType.Enum.date && (
           // Let the user select which days of the week to repeat on for full day listings
           <>
-            <div className="tw-text-lg tw-font-medium tw-mb-1">Affected days of the week</div>
+            <div className="tw-mb-1 tw-text-lg tw-font-medium">Affected days of the week</div>
             <div className="tw-mb-4">Select which days of the week this availability rule applies to.</div>
             <Controller
               name="recurring_days"
@@ -628,8 +628,8 @@ const TimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, s
   };
 
   return (
-    <div className="tw-flex tw-flex-col tw-flex-grow tw-overflow-hidden">
-      <div className="tw-divide-y tw-flex-grow tw-overflow-y-auto tw-pr-4 tw-pb-10">
+    <div className="tw-flex tw-flex-grow tw-flex-col tw-overflow-hidden">
+      <div className="tw-flex-grow tw-divide-y tw-overflow-y-auto tw-pb-10 tw-pr-4">
         <WeekDayTimeSlotFields fields={fields} update={update} append={append} remove={remove} />
       </div>
       <FormError message={error} />
@@ -728,9 +728,9 @@ const SingleDayTimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({
   };
 
   return (
-    <div className="tw-flex tw-flex-col tw-flex-grow tw-overflow-hidden">
-      <div className="tw-flex-grow tw-overflow-y-auto tw-pr-4 tw-pb-10">
-        <div className="tw-flex-col sm:tw-flex-row tw-flex tw-items-start tw-py-4">
+    <div className="tw-flex tw-flex-grow tw-flex-col tw-overflow-hidden">
+      <div className="tw-flex-grow tw-overflow-y-auto tw-pb-10 tw-pr-4">
+        <div className="tw-flex tw-flex-col tw-items-start tw-py-4 sm:tw-flex-row">
           <SingleDayTimeSlotFields fields={fields} update={update} append={append} remove={remove} />
         </div>
       </div>

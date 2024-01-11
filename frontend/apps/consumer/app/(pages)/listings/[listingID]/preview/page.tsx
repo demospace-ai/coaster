@@ -19,10 +19,10 @@ export default async function ListingPreview({ params }: { params: { listingID: 
 
   return (
     <main className="tw-flex tw-px-5 sm:tw-px-20">
-      <div className="tw-flex tw-flex-col tw-pt-5 sm:tw-pt-12 tw-pb-32 tw-text-base tw-w-full tw-max-w-7xl">
-        <BackButton className="tw-mr-auto tw-mb-4" />
+      <div className="tw-flex tw-w-full tw-max-w-7xl tw-flex-col tw-pb-32 tw-pt-5 tw-text-base sm:tw-pt-12">
+        <BackButton className="tw-mb-4 tw-mr-auto" />
         {listing.status !== ListingStatus.Published && (
-          <Callout content={"Not published - under review"} className="tw-border tw-border-yellow-400 tw-mb-4" />
+          <Callout content={"Not published - under review"} className="tw-mb-4 tw-border tw-border-yellow-400" />
         )}
         <ListingPage listing={listing} />
       </div>

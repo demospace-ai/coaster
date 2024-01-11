@@ -71,12 +71,12 @@ export const CreatePassword: React.FC = () => {
   };
 
   return (
-    <div className="tw-flex tw-flex-row tw-h-full tw-w-full tw-bg-slate-100">
-      <div className="tw-mt-20 sm:tw-mt-32 tw-mb-auto tw-mx-auto tw-w-[400px]">
-        <div className="tw-flex tw-flex-col tw-pt-12 tw-pb-10 tw-px-8 tw-rounded-lg sm:tw-shadow-md sm:tw-bg-white tw-items-center">
-          <Image src={LongLogo} width={200} height={32} className="tw-select-none tw-mb-4" alt="coaster logo" />
-          <form className="tw-flex tw-flex-col tw-items-center tw-my-2 tw-w-full" onSubmit={handleSubmit(onSubmit)}>
-            <div className="tw-text-xl tw-font-semibold tw-text-center tw-mb-2">Create Password</div>
+    <div className="tw-flex tw-h-full tw-w-full tw-flex-row tw-bg-slate-100">
+      <div className="tw-mx-auto tw-mb-auto tw-mt-20 tw-w-[400px] sm:tw-mt-32">
+        <div className="tw-flex tw-flex-col tw-items-center tw-rounded-lg tw-px-8 tw-pb-10 tw-pt-12 sm:tw-bg-white sm:tw-shadow-md">
+          <Image src={LongLogo} width={200} height={32} className="tw-mb-4 tw-select-none" alt="coaster logo" />
+          <form className="tw-my-2 tw-flex tw-w-full tw-flex-col tw-items-center" onSubmit={handleSubmit(onSubmit)}>
+            <div className="tw-mb-2 tw-text-center tw-text-xl tw-font-semibold">Create Password</div>
             <Input
               className="tw-my-1"
               label="New Password"
@@ -93,7 +93,7 @@ export const CreatePassword: React.FC = () => {
               value={watch("confirm_password")}
             />
             <FormError message={errors.confirm_password?.message} />
-            <Button type="submit" className="tw-w-full tw-bg-[#3673aa] hover:tw-bg-[#396082] tw-px-10 tw-h-12 tw-mt-4">
+            <Button type="submit" className="tw-mt-4 tw-h-12 tw-w-full tw-bg-[#3673aa] tw-px-10 hover:tw-bg-[#396082]">
               {isLoading ? <Loading /> : "Submit"}
             </Button>
             <FormError
@@ -102,7 +102,7 @@ export const CreatePassword: React.FC = () => {
             />
           </form>
         </div>
-        <div className="tw-text-xs tw-text-center tw-mt-4 tw-text-slate-800 tw-select-none tw-mx-8 sm:tw-mx-0">
+        <div className="tw-mx-8 tw-mt-4 tw-select-none tw-text-center tw-text-xs tw-text-slate-800 sm:tw-mx-0">
           By continuing you agree to Coaster's{" "}
           <a className="tw-text-blue-500" href="https://trycoaster.com/terms" target="_blank" rel="noreferrer">
             Terms of Use

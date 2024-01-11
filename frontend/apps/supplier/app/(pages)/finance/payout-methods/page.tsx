@@ -28,7 +28,7 @@ export default function PayoutMethods() {
 
   return (
     <div className="tw-flex tw-flex-col">
-      <div className="tw-text-2xl tw-font-bold tw-mb-2">How you'll get paid</div>
+      <div className="tw-mb-2 tw-text-2xl tw-font-bold">How you'll get paid</div>
       {!payoutMethods ? (
         <Loading />
       ) : (
@@ -37,7 +37,7 @@ export default function PayoutMethods() {
             <>
               <div>Add at least one payout method so we know where to send your money.</div>
               <Button
-                className="tw-mt-4 tw-w-56 tw-h-10 tw-bg-slate-800 hover:tw-bg-black"
+                className="tw-mt-4 tw-h-10 tw-w-56 tw-bg-slate-800 hover:tw-bg-black"
                 onClick={createPayoutMethod.mutate}
                 disabled={createPayoutMethod.isLoading}
               >
@@ -54,7 +54,7 @@ export default function PayoutMethods() {
                     {getDetailsForPayoutMethod(payoutMethod)}
                   </div>
                   <Button
-                    className="tw-bg-white tw-text-black tw-font-normal tw-border tw-border-solid tw-border-black tw-h-8 tw-w-16 tw-tracking-normal tw-ml-auto hover:tw-bg-slate-200"
+                    className="tw-ml-auto tw-h-8 tw-w-16 tw-border tw-border-solid tw-border-black tw-bg-white tw-font-normal tw-tracking-normal tw-text-black hover:tw-bg-slate-200"
                     onClick={edit.mutate}
                     disabled={edit.isLoading}
                   >
@@ -63,7 +63,7 @@ export default function PayoutMethods() {
                 </div>
               ))}
               <Button
-                className="tw-mt-8 tw-w-64 tw-h-10 tw-bg-slate-800 hover:tw-bg-black"
+                className="tw-mt-8 tw-h-10 tw-w-64 tw-bg-slate-800 hover:tw-bg-black"
                 onClick={getStripeDashboardLink.mutate}
                 disabled={getStripeDashboardLink.isLoading}
               >
@@ -89,9 +89,9 @@ function getPayoutMethodTypeDisplay(type: PayoutMethodType): string {
 function getPayoutMethodIcon(type: PayoutMethodType): React.ReactNode {
   switch (type) {
     case PayoutMethodType.BankAccount:
-      return <BuildingLibraryIcon className="tw-w-10 tw-h-10 tw-mr-3" />;
+      return <BuildingLibraryIcon className="tw-mr-3 tw-h-10 tw-w-10" />;
     case PayoutMethodType.Card:
-      return <CreditCardIcon className="tw-w-10 tw-h-10 tw-mr-3" />;
+      return <CreditCardIcon className="tw-mr-3 tw-h-10 tw-w-10" />;
   }
 }
 

@@ -33,7 +33,7 @@ export default async function PageLayout({ children }: { children: React.ReactNo
     <AuthProvider publicPaths={PUBLIC_PATHS}>
       <DynamicNotificationProvider>
         <DynamicLoginModal />
-        <div className="tw-flex tw-flex-col tw-flex-grow tw-items-center">
+        <div className="tw-flex tw-flex-grow tw-flex-col tw-items-center">
           <DynamicHeader />
           {children}
           <DynamicFooter />

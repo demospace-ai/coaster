@@ -19,27 +19,27 @@ export const Footer: React.FC = () => {
   return (
     <div
       className={mergeClasses(
-        "tw-z-10 tw-flex tw-flex-col tw-justify-center tw-items-center tw-w-full tw-px-5 xs:tw-px-8 sm:tw-px-20 tw-py-8 tw-border-t tw-border-solid tw-border-slate-200 tw-mt-auto tw-bg-gray-50",
+        "tw-z-10 tw-mt-auto tw-flex tw-w-full tw-flex-col tw-items-center tw-justify-center tw-border-t tw-border-solid tw-border-slate-200 tw-bg-gray-50 tw-px-5 tw-py-8 xs:tw-px-8 sm:tw-px-20",
         hasMobileFooter && "tw-mb-20 md:tw-mb-0",
       )}
     >
-      <div className="tw-flex tw-flex-wrap tw-w-full tw-max-w-7xl tw-gap-y-8 tw-gap-x-16 sm:tw-gap-x-20 tw-justify-start sm:tw-justify-between">
+      <div className="tw-flex tw-w-full tw-max-w-7xl tw-flex-wrap tw-justify-start tw-gap-x-16 tw-gap-y-8 sm:tw-justify-between sm:tw-gap-x-20">
         <div className="tw-flex tw-flex-col tw-gap-1">
           <div
             translate="no"
             className={mergeClasses(
               lateef.className,
-              "tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-tracking-[-0.5px] -tw-mt-5 tw-font-extrabold tw-text-[40px]",
+              "-tw-mt-5 tw-select-none tw-overflow-hidden tw-whitespace-nowrap tw-text-[40px] tw-font-extrabold tw-tracking-[-0.5px]",
             )}
           >
             Coaster
           </div>
-          <div className="tw-font-semibold tw-mb-2">Newsletter</div>
-          <div className="tw-w-80 tw-mb-2">We send occasional updates on new trips, stories, and discounts.</div>
+          <div className="tw-mb-2 tw-font-semibold">Newsletter</div>
+          <div className="tw-mb-2 tw-w-80">We send occasional updates on new trips, stories, and discounts.</div>
           <NewsletterForm />
         </div>
         <div className="tw-flex tw-flex-col tw-gap-1">
-          <div className="tw-font-semibold tw-mb-2">Company</div>
+          <div className="tw-mb-2 tw-font-semibold">Company</div>
           <Link href="/about">About</Link>
           <Link href="/blog">Blog</Link>
           <Link href="/careers">Careers</Link>
@@ -56,7 +56,7 @@ export const Footer: React.FC = () => {
           <Link href="/sustainability">Sustainability</Link>
         </div>
         <div className="tw-flex tw-flex-col tw-gap-1">
-          <div className="tw-font-semibold tw-mb-2">Locations</div>
+          <div className="tw-mb-2 tw-font-semibold">Locations</div>
           <Link href="/search?location=Lisbon">Portugal</Link>
           <Link href="/search?location=El+Salvador">El Salvador</Link>
           <Link href="/search?location=Nepal">Nepal</Link>
@@ -65,7 +65,7 @@ export const Footer: React.FC = () => {
           <Link href="/search?location=Sandgate+QLD+Australia">Australia</Link>
         </div>
         <div className="tw-flex tw-flex-col tw-gap-1">
-          <div className="tw-font-semibold tw-mb-2">Get in touch</div>
+          <div className="tw-mb-2 tw-font-semibold">Get in touch</div>
           <button
             className="tw-flex"
             onClick={() => {
@@ -82,13 +82,13 @@ export const Footer: React.FC = () => {
           <Link href="/request-trip">Request a Trip</Link>
         </div>
         <div className="tw-flex tw-flex-col tw-gap-1">
-          <div className="tw-font-semibold tw-mb-2">Guides / Suppliers</div>
+          <div className="tw-mb-2 tw-font-semibold">Guides / Suppliers</div>
           <Link href="https://supplier.trycoaster.com">Supplier Portal</Link>
           <Link href="https://supplier.trycoaster.com">Apply as a guide</Link>
         </div>
       </div>
 
-      <div className="tw-flex tw-w-full tw-max-w-7xl tw-items-center tw-justify-between tw-text-xs sm:tw-text-sm tw-whitespace-nowrap tw-mt-20">
+      <div className="tw-mt-20 tw-flex tw-w-full tw-max-w-7xl tw-items-center tw-justify-between tw-whitespace-nowrap tw-text-xs sm:tw-text-sm">
         <span className="tw-select-none">© 2023 Coaster, Inc.</span>
         <div className="tw-flex tw-gap-3 sm:tw-gap-5">
           <Link href="/terms">Terms</Link>
@@ -200,7 +200,7 @@ const NewsletterForm: React.FC = () => {
               required={true}
               className="tw-w-50 tw-h-8 tw-text-sm"
             />
-            <Button type="submit" className="tw-font-medium tw-text-sm">
+            <Button type="submit" className="tw-text-sm tw-font-medium">
               {formState === SUBMITTING ? "Please wait..." : "Subscribe"}
             </Button>
           </form>

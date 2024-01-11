@@ -1,7 +1,6 @@
 import { Loading } from "../loading/Loading";
 
-const tableHeaderStyle =
-  "tw-sticky tw-top-0 tw-z-0 tw-h-12 sm:tw-pr-6 lg:tw-pr-8 tw-text-left tw-whitespace-nowrap";
+const tableHeaderStyle = "tw-sticky tw-top-0 tw-z-0 tw-h-12 sm:tw-pr-6 lg:tw-pr-8 tw-text-left tw-whitespace-nowrap";
 const tableCellStyle =
   "tw-whitespace-nowrap tw-left tw-overflow-hidden tw-py-4 tw-pl-4 tw-text-sm tw-text-slate-800 tw-hidden sm:tw-table-cell";
 

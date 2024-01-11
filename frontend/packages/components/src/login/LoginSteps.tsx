@@ -47,7 +47,7 @@ export const StartContent: React.FC<{
 
   if (loading) {
     return (
-      <div className="tw-flex tw-flex-col tw-h-32 tw-w-full tw-items-center tw-justify-center">
+      <div className="tw-flex tw-h-32 tw-w-full tw-flex-col tw-items-center tw-justify-center">
         Continue in new window...
         <Loading />
       </div>
@@ -55,16 +55,16 @@ export const StartContent: React.FC<{
   }
   return (
     <>
-      <div className="tw-text-center tw-text-base tw-font-medium tw-mb-2 tw-select-none">
+      <div className="tw-mb-2 tw-select-none tw-text-center tw-text-base tw-font-medium">
         {create ? "Welcome to Coaster." : "Sign in to continue to Coaster."}
       </div>
       <EmailCheck email={email} setStep={setStep} setEmail={setEmail} />
-      <div className='tw-flex tw-w-full tw-items-center tw-text-sm tw-mt-5 tw-justify-between before:tw-block before:tw-w-full before:tw-h-px before:tw-content-[" "] before:tw-bg-gray-300 before:tw-mr-4 before:tw-ml-px after:tw-block after:tw-w-full after:tw-h-px after:tw-content-[" "] after:tw-bg-gray-300 after:tw-ml-4 after:tw-mr-px'>
+      <div className='before:tw-content-[" "] after:tw-content-[" "] tw-mt-5 tw-flex tw-w-full tw-items-center tw-justify-between tw-text-sm before:tw-ml-px before:tw-mr-4 before:tw-block before:tw-h-px before:tw-w-full before:tw-bg-gray-300 after:tw-ml-4 after:tw-mr-px after:tw-block after:tw-h-px after:tw-w-full after:tw-bg-gray-300'>
         or
       </div>
       <div
         className={mergeClasses(
-          "tw-relative tw-flex tw-items-center tw-select-none tw-cursor-pointer tw-justify-center tw-mt-4 tw-h-12 tw-bg-white tw-border tw-border-slate-300 hover:tw-bg-slate-100 tw-transition-colors tw-font-medium tw-w-full tw-text-slate-800 tw-rounded",
+          "tw-relative tw-mt-4 tw-flex tw-h-12 tw-w-full tw-cursor-pointer tw-select-none tw-items-center tw-justify-center tw-rounded tw-border tw-border-slate-300 tw-bg-white tw-font-medium tw-text-slate-800 tw-transition-colors hover:tw-bg-slate-100",
         )}
         onClick={openGooglePopup}
       >
@@ -78,7 +78,7 @@ export const StartContent: React.FC<{
         <SwitchModePage create={create} />
       )}
       <div className="tw-mt-3 tw-select-none">
-        <span className="tw-text-blue-500 tw-cursor-pointer" onClick={() => setStep(LoginStep.SendReset)}>
+        <span className="tw-cursor-pointer tw-text-blue-500" onClick={() => setStep(LoginStep.SendReset)}>
           Forgot your password?
         </span>
       </div>
@@ -117,14 +117,14 @@ const SwitchModeModal: React.FC<{ create: boolean | undefined; switchModeModal: 
       {create ? (
         <div className="tw-mt-5 tw-select-none">
           Already have an account?{" "}
-          <span className="tw-text-blue-500 tw-cursor-pointer" onClick={() => switchModeModal(false)}>
+          <span className="tw-cursor-pointer tw-text-blue-500" onClick={() => switchModeModal(false)}>
             Sign in
           </span>
         </div>
       ) : (
         <div className="tw-mt-5 tw-select-none">
           Need an account?{" "}
-          <span className="tw-text-blue-500 tw-cursor-pointer" onClick={() => switchModeModal(true)}>
+          <span className="tw-cursor-pointer tw-text-blue-500" onClick={() => switchModeModal(true)}>
             Sign up
           </span>
         </div>
@@ -181,13 +181,13 @@ export const EmailCheck: React.FC<{
     >
       <Input
         autoComplete="email"
-        className="tw-w-full tw-flex tw-mt-3"
+        className="tw-mt-3 tw-flex tw-w-full"
         label="Email"
         {...register("email")}
         value={watch("email")}
       />
       <FormError message={errors.email?.message} />
-      <Button type="submit" className="tw-w-full tw-bg-[#3673aa] hover:tw-bg-[#396082] tw-h-12 tw-mt-4">
+      <Button type="submit" className="tw-mt-4 tw-h-12 tw-w-full tw-bg-[#3673aa] hover:tw-bg-[#396082]">
         Continue
       </Button>
     </form>
@@ -240,7 +240,7 @@ export const EmailLoginForm: React.FC<{
       >
         <Input
           autoComplete="email"
-          className="tw-w-full tw-flex tw-mt-3"
+          className="tw-mt-3 tw-flex tw-w-full"
           label="Email"
           {...register("email")}
           value={watch("email")}
@@ -249,20 +249,20 @@ export const EmailLoginForm: React.FC<{
         <Input
           autoComplete="password"
           type="password"
-          className="tw-w-full tw-flex tw-mt-3"
+          className="tw-mt-3 tw-flex tw-w-full"
           label="Password"
           {...register("password")}
           value={watch("password")}
         />
         <FormError message={errors.password?.message} />
-        <Button type="submit" className="tw-w-full tw-bg-[#3673aa] hover:tw-bg-[#396082] tw-h-12 tw-mt-4">
+        <Button type="submit" className="tw-mt-4 tw-h-12 tw-w-full tw-bg-[#3673aa] hover:tw-bg-[#396082]">
           Login
         </Button>
       </form>
-      <div className="tw-mt-4 tw-text-blue-500 tw-cursor-pointer" onClick={reset}>
+      <div className="tw-mt-4 tw-cursor-pointer tw-text-blue-500" onClick={reset}>
         More ways to sign in
       </div>
-      <div className="tw-mt-3 tw-select-none tw-text-blue-500 tw-cursor-pointer" onClick={forgotPassword}>
+      <div className="tw-mt-3 tw-cursor-pointer tw-select-none tw-text-blue-500" onClick={forgotPassword}>
         Forgot your password?
       </div>
     </>
@@ -331,7 +331,7 @@ export const EmailSignup: React.FC<{
           <div className="tw-flex tw-flex-col">
             <Input
               autoComplete="given-name"
-              className="tw-w-full tw-flex tw-mt-3"
+              className="tw-mt-3 tw-flex tw-w-full"
               label="First name"
               {...register("firstName")}
               value={watch("firstName")}
@@ -341,7 +341,7 @@ export const EmailSignup: React.FC<{
           <div className="tw-flex tw-flex-col">
             <Input
               autoComplete="family-name"
-              className="tw-w-full tw-flex tw-mt-3"
+              className="tw-mt-3 tw-flex tw-w-full"
               label="Last name"
               {...register("lastName")}
               value={watch("lastName")}
@@ -351,7 +351,7 @@ export const EmailSignup: React.FC<{
         </div>
         <Input
           autoComplete="email"
-          className="tw-w-full tw-flex tw-mt-3"
+          className="tw-mt-3 tw-flex tw-w-full"
           label="Email"
           {...register("email")}
           value={watch("email")}
@@ -360,7 +360,7 @@ export const EmailSignup: React.FC<{
         <Input
           autoComplete="password"
           type="password"
-          className="tw-w-full tw-flex tw-mt-3"
+          className="tw-mt-3 tw-flex tw-w-full"
           label="Password"
           {...register("password")}
           value={watch("password")}
@@ -369,17 +369,17 @@ export const EmailSignup: React.FC<{
         <Input
           autoComplete="password"
           type="password"
-          className="tw-w-full tw-flex tw-mt-3"
+          className="tw-mt-3 tw-flex tw-w-full"
           label="Confirm Password"
           {...register("confirmPassword")}
           value={watch("confirmPassword")}
         />
         <FormError className="tw-ml-1" message={errors.confirmPassword?.message} />
-        <Button type="submit" className="tw-w-full tw-bg-[#3673aa] hover:tw-bg-[#396082] tw-h-12 tw-mt-4">
+        <Button type="submit" className="tw-mt-4 tw-h-12 tw-w-full tw-bg-[#3673aa] hover:tw-bg-[#396082]">
           Create Account
         </Button>
       </form>
-      <div className="tw-mt-4 tw-text-blue-500 tw-cursor-pointer" onClick={reset}>
+      <div className="tw-mt-4 tw-cursor-pointer tw-text-blue-500" onClick={reset}>
         More ways to sign up
       </div>
     </>
@@ -406,11 +406,11 @@ export const GoogleLogin: React.FC<{
 
   return (
     <>
-      <div className="tw-text-center tw-text-base tw-mb-2 tw-select-none">You have an existing account with email:</div>
-      <div className="tw-font-medium tw-text-base">{email}</div>
+      <div className="tw-mb-2 tw-select-none tw-text-center tw-text-base">You have an existing account with email:</div>
+      <div className="tw-text-base tw-font-medium">{email}</div>
       <div
         className={mergeClasses(
-          "tw-relative tw-flex tw-items-center tw-select-none tw-cursor-pointer tw-justify-center tw-mt-4 tw-h-12 tw-border tw-border-slate-400 hover:tw-bg-slate-100 tw-transition-colors tw-font-medium tw-w-80 tw-text-slate-800 tw-rounded",
+          "tw-relative tw-mt-4 tw-flex tw-h-12 tw-w-80 tw-cursor-pointer tw-select-none tw-items-center tw-justify-center tw-rounded tw-border tw-border-slate-400 tw-font-medium tw-text-slate-800 tw-transition-colors hover:tw-bg-slate-100",
         )}
         onClick={openGooglePopup}
       >
@@ -418,7 +418,7 @@ export const GoogleLogin: React.FC<{
         Continue with Google
       </div>
       {loginError && <div className="tw-text-red-500">{loginError}</div>}
-      <div className="tw-mt-5 tw-text-blue-500 tw-cursor-pointer" onClick={reset}>
+      <div className="tw-mt-5 tw-cursor-pointer tw-text-blue-500" onClick={reset}>
         Use a different account
       </div>
     </>
@@ -481,23 +481,23 @@ export const SendResetForm: React.FC<{
           setSendingReset(false);
         })}
       >
-        <div className="tw-font-bold tw-text-xl tw-w-full tw-text-center tw-mb-2">Reset password</div>
-        <div className="tw-w-full tw-text-center tw-mb-2">
+        <div className="tw-mb-2 tw-w-full tw-text-center tw-text-xl tw-font-bold">Reset password</div>
+        <div className="tw-mb-2 tw-w-full tw-text-center">
           Enter your email to receive a link to reset your password.
         </div>
         <Input
           autoComplete="email"
-          className="tw-w-full tw-flex tw-mt-3"
+          className="tw-mt-3 tw-flex tw-w-full"
           label="Email"
           {...register("email")}
           value={watch("email")}
         />
         <FormError message={errors.email?.message} />
-        <Button type="submit" className="tw-w-full tw-bg-[#3673aa] hover:tw-bg-[#396082] tw-h-12 tw-mt-4">
+        <Button type="submit" className="tw-mt-4 tw-h-12 tw-w-full tw-bg-[#3673aa] hover:tw-bg-[#396082]">
           {sendingReset ? <Loading /> : "Send Reset"}
         </Button>
       </form>
-      <div className="tw-mt-4 tw-text-blue-500 tw-cursor-pointer" onClick={reset}>
+      <div className="tw-mt-4 tw-cursor-pointer tw-text-blue-500" onClick={reset}>
         Go back
       </div>
     </>

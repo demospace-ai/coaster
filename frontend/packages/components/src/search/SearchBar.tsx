@@ -24,22 +24,22 @@ export const SearchBar: React.FC = () => {
         e.preventDefault();
         search();
       }}
-      className="tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[400px] tw-h-14 tw-bg-white tw-shadow-dark-sm tw-p-1.5 tw-rounded-[99px] tw-cursor-text tw-mt-2"
+      className="tw-mt-2 tw-flex tw-h-14 tw-w-full tw-max-w-[400px] tw-cursor-text tw-flex-row tw-items-center tw-rounded-[99px] tw-bg-white tw-p-1.5 tw-shadow-dark-sm"
     >
       <input
         ref={inputRef}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        className="tw-w-full tw-bg-transparent tw-pl-4 tw-placeholder-gray-700 tw-text-base tw-select-none tw-cursor-text tw-outline-none"
+        className="tw-w-full tw-cursor-text tw-select-none tw-bg-transparent tw-pl-4 tw-text-base tw-placeholder-gray-700 tw-outline-none"
         placeholder="Search trips"
       />
       <button
-        className="tw-hidden tw-px-5 sm:tw-flex tw-items-center tw-rounded-[99px] tw-h-full tw-bg-blue-950 tw-text-white tw-text-base tw-font-medium"
+        className="tw-hidden tw-h-full tw-items-center tw-rounded-[99px] tw-bg-blue-950 tw-px-5 tw-text-base tw-font-medium tw-text-white sm:tw-flex"
         onClick={search}
       >
         Search
       </button>
-      <MagnifyingGlassIcon className="tw-flex sm:tw-hidden tw-w-6 tw-h-6 tw-mr-4 tw-stroke-gray-600" onClick={search} />
+      <MagnifyingGlassIcon className="tw-mr-4 tw-flex tw-h-6 tw-w-6 tw-stroke-gray-600 sm:tw-hidden" onClick={search} />
     </form>
   );
 };
@@ -67,16 +67,16 @@ export const SearchBarHeader: React.FC<{ show: boolean }> = ({ show }) => {
           e.preventDefault();
           search();
         }}
-        className="tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[400px] tw-h-9 tw-bg-white tw-ring-1 tw-ring-slate-300 tw-rounded-[99px] tw-cursor-text tw-mx-2"
+        className="tw-mx-2 tw-flex tw-h-9 tw-w-full tw-max-w-[400px] tw-cursor-text tw-flex-row tw-items-center tw-rounded-[99px] tw-bg-white tw-ring-1 tw-ring-slate-300"
       >
         <input
           ref={inputRef}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="tw-w-full tw-bg-transparent tw-pl-4 tw-placeholder-gray-700 tw-text-base tw-select-none tw-cursor-text tw-outline-none"
+          className="tw-w-full tw-cursor-text tw-select-none tw-bg-transparent tw-pl-4 tw-text-base tw-placeholder-gray-700 tw-outline-none"
           placeholder="Search trips"
         />
-        <MagnifyingGlassIcon className="tw-ml-2 tw-mr-4 tw-h-5 tw-stroke-gray-600 tw-cursor-pointer" onClick={search} />
+        <MagnifyingGlassIcon className="tw-ml-2 tw-mr-4 tw-h-5 tw-cursor-pointer tw-stroke-gray-600" onClick={search} />
       </form>
     </div>
   );
@@ -95,7 +95,7 @@ export const SearchBarModal: React.FC<{
         <MagnifyingGlassIcon
           aria-label="Open search"
           role="button"
-          className="tw-flex tw-cursor-pointer tw-mr-4 tw-w-6 tw-h-6"
+          className="tw-mr-4 tw-flex tw-h-6 tw-w-6 tw-cursor-pointer"
           onClick={() => {
             setOpen(true);
           }}
@@ -104,16 +104,16 @@ export const SearchBarModal: React.FC<{
         <div
           role="search"
           className={mergeClasses(
-            "tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[640px] tw-h-14 tw-bg-white tw-shadow-dark-sm tw-p-1.5 tw-rounded-[99px] tw-cursor-pointer",
+            "tw-flex tw-h-14 tw-w-full tw-max-w-[640px] tw-cursor-pointer tw-flex-row tw-items-center tw-rounded-[99px] tw-bg-white tw-p-1.5 tw-shadow-dark-sm",
             props.className,
           )}
           onClick={() => setOpen(true)}
         >
-          <MagnifyingGlassIcon className="tw-ml-3 sm:tw-ml-2 tw-w-6 tw-h-6 sm:tw-w-7 sm:tw-h-7 tw-stroke-gray-600" />
-          <div className="tw-w-full tw-bg-transparent tw-px-2 tw-text-gray-700 tw-text-lg tw-select-none tw-cursor-pointer">
+          <MagnifyingGlassIcon className="tw-ml-3 tw-h-6 tw-w-6 tw-stroke-gray-600 sm:tw-ml-2 sm:tw-h-7 sm:tw-w-7" />
+          <div className="tw-w-full tw-cursor-pointer tw-select-none tw-bg-transparent tw-px-2 tw-text-lg tw-text-gray-700">
             Search trips
           </div>
-          <div className="tw-hidden tw-px-5 sm:tw-flex tw-items-center tw-rounded-[99px] tw-h-full tw-bg-blue-950 tw-text-white tw-text-base tw-font-medium">
+          <div className="tw-hidden tw-h-full tw-items-center tw-rounded-[99px] tw-bg-blue-950 tw-px-5 tw-text-base tw-font-medium tw-text-white sm:tw-flex">
             Search
           </div>
         </div>

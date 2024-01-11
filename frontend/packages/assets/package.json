@@ -9,6 +9,6 @@
     "lint": "eslint ."
   },
   "devDependencies": {
-    "eslint-config-custom": "*"
+    "@coaster/eslint-config-custom": "*"
   }
 }

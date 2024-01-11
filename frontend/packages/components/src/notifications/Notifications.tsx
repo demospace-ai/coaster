@@ -27,7 +27,7 @@ export const getNotificationContentFromDetails = (notification?: NotificationOpt
       case "error":
         notificationContent = (
           <div className="tw-flex tw-flex-row tw-items-center tw-justify-start">
-            <XCircleIcon className="tw-shrink-0 tw-w-5 tw-h-5 tw-text-red-500 tw-stroke-2" />
+            <XCircleIcon className="tw-h-5 tw-w-5 tw-shrink-0 tw-stroke-2 tw-text-red-500" />
             <p className="tw-ml-4 tw-text-sm tw-text-gray-900">{notification.content}</p>
           </div>
         );
@@ -35,7 +35,7 @@ export const getNotificationContentFromDetails = (notification?: NotificationOpt
       case "success":
         notificationContent = (
           <div className="tw-flex tw-flex-row tw-items-center tw-justify-start">
-            <CheckCircleIcon className="tw-shrink-0 tw-w-5 tw-h-5 tw-text-green-500 tw-stroke-2" />
+            <CheckCircleIcon className="tw-h-5 tw-w-5 tw-shrink-0 tw-stroke-2 tw-text-green-500" />
             <p className="tw-ml-4 tw-text-base tw-text-gray-900">{notification.content}</p>
           </div>
         );
@@ -43,7 +43,7 @@ export const getNotificationContentFromDetails = (notification?: NotificationOpt
       case "info":
         notificationContent = (
           <div className="tw-flex tw-flex-row tw-items-center tw-justify-start">
-            <InformationCircleIcon className="tw-shrink-0 tw-w-5 tw-h-5 tw-text-yellow-500 tw-stroke-2" />
+            <InformationCircleIcon className="tw-h-5 tw-w-5 tw-shrink-0 tw-stroke-2 tw-text-yellow-500" />
             <p className="tw-ml-4 tw-text-base tw-text-gray-900">{notification.content}</p>
           </div>
         );
@@ -65,9 +65,9 @@ const Notification: React.FC<NotificationProps> = ({ content, show, duration, cl
     <>
       <div
         aria-live="assertive"
-        className="tw-z-[60] tw-pointer-events-none tw-fixed tw-inset-0 tw-flex tw-p-6 tw-items-start" // z-index is tied to Modal z-index (Notification should be bigger)
+        className="tw-pointer-events-none tw-fixed tw-inset-0 tw-z-[60] tw-flex tw-items-start tw-p-6" // z-index is tied to Modal z-index (Notification should be bigger)
       >
-        <div className="tw-flex tw-w-full tw-flex-col tw-space-y-4 tw-items-end">
+        <div className="tw-flex tw-w-full tw-flex-col tw-items-end tw-space-y-4">
           <Transition
             show={show}
             as={Fragment}

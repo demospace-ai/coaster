@@ -9,13 +9,13 @@ export const LogoLoading: React.FC = () => {
       height={144}
       className="
         tw-m-auto
-        tw-justify-center
-        tw-items-center
-        tw-rounded
-        tw-flex
         tw-my-auto
-        tw-select-none
+        tw-flex
         tw-animate-shimmer
+        tw-select-none
+        tw-items-center
+        tw-justify-center
+        tw-rounded
         [mask:linear-gradient(-60deg,#000_30%,#0005,#000_70%)_right/500%_100%]
         "
       alt="coaster logo"

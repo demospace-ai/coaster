@@ -37,7 +37,7 @@ export const ListingMenu: React.FC<{ listing: Listing }> = ({ listing }) => {
         show={showDeleteConfirmation}
         closeModal={() => setShowDeleteConfirmation(false)}
       />
-      <Menu as="div" className="tw-inline-block tw-text-left tw-ml-5">
+      <Menu as="div" className="tw-ml-5 tw-inline-block tw-text-left">
         <div>
           <Menu.Button
             className="tw-flex tw-items-center tw-rounded-full tw-text-gray-600 hover:tw-text-gray-900 focus:tw-outline-none"
@@ -65,7 +65,7 @@ export const ListingMenu: React.FC<{ listing: Listing }> = ({ listing }) => {
                     <div
                       className={mergeClasses(
                         active ? "tw-bg-gray-100 tw-text-gray-900" : "tw-text-gray-700",
-                        "tw-block tw-px-4 tw-py-2 tw-text-sm tw-cursor-pointer",
+                        "tw-block tw-cursor-pointer tw-px-4 tw-py-2 tw-text-sm",
                       )}
                       onClick={() => {
                         setListingToDelete(listing);
@@ -119,8 +119,8 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ selected, show, closeModal })
 
   return (
     <Modal show={show} close={closeModal}>
-      <div className="tw-flex tw-flex-col tw-items-center tw-max-w-xl tw-px-8 sm:tw-px-12 tw-pb-10 tw-mt-2">
-        <div className="tw-text-center tw-w-full tw-text-xl tw-font-medium tw-mb-6 tw-whitespace-nowrap">
+      <div className="tw-mt-2 tw-flex tw-max-w-xl tw-flex-col tw-items-center tw-px-8 tw-pb-10 sm:tw-px-12">
+        <div className="tw-mb-6 tw-w-full tw-whitespace-nowrap tw-text-center tw-text-xl tw-font-medium">
           Permanently delete "{selected.name}"?
         </div>
         <Button className="tw-flex tw-h-10 tw-w-48 tw-items-center tw-justify-center" onClick={deleteListing}>

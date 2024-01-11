@@ -109,19 +109,19 @@ export const DatePickerPopper: React.FC<
     <div className={className}>
       <button
         className={mergeClasses(
-          "tw-flex tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-justify-start tw-items-center tw-cursor-pointer tw-whitespace-nowrap",
+          "tw-flex tw-cursor-pointer tw-items-center tw-justify-start tw-whitespace-nowrap tw-rounded-lg tw-border tw-border-solid tw-border-gray-300",
           buttonClass,
         )}
         ref={refs.setReference}
         {...getReferenceProps()}
       >
-        <CalendarIcon className="tw-w-5 tw-ml-4 tw-mr-3 -tw-mt-[1.5px]" />
+        <CalendarIcon className="-tw-mt-[1.5px] tw-ml-4 tw-mr-3 tw-w-5" />
         {props.selected ? props.selected.toLocaleDateString() : "Select a date"}
       </button>
       {isMounted && (
         <FloatingFocusManager context={context}>
           <div ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
-            <div style={transitionStyles} className="tw-bg-white tw-rounded-lg tw-shadow-md">
+            <div style={transitionStyles} className="tw-rounded-lg tw-bg-white tw-shadow-md">
               <DateRangePicker
                 mode="single"
                 className="tw-w-[320px]"

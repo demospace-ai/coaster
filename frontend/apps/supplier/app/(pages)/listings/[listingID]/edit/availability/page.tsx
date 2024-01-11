@@ -68,7 +68,7 @@ export default function Availability(): ReactNode {
   const tableRowCell = "tw-p-4";
 
   return (
-    <div className="tw-flex tw-flex-col tw-w-full">
+    <div className="tw-flex tw-w-full tw-flex-col">
       <AvailabilityRuleModal
         listing={listing}
         show={showRuleModal}
@@ -87,9 +87,9 @@ export default function Availability(): ReactNode {
         closeModal={() => setShowAvailabilityTypeConfirmation(false)}
         newAvailabilityType={newAvailabilityType}
       />
-      <div className="tw-text-2xl tw-font-semibold tw-mb-2">Availability</div>
+      <div className="tw-mb-2 tw-text-2xl tw-font-semibold">Availability</div>
       <DropdownInput
-        className="tw-w-full tw-flex tw-mt-3 tw-mb-2"
+        className="tw-mb-2 tw-mt-3 tw-flex tw-w-full"
         label="Availability Type"
         value={listing.availability_type}
         options={AvailabilityType.options}
@@ -97,15 +97,15 @@ export default function Availability(): ReactNode {
         getElementForDisplay={getAvailabilityTypeDisplay}
       />
       <DropdownInput
-        className="tw-w-full tw-flex tw-mt-3"
+        className="tw-mt-3 tw-flex tw-w-full"
         label="Availability Display"
         value={listing.availability_display}
         options={AvailabilityDisplay.options}
         onChange={updateAvailabilityDisplay}
         getElementForDisplay={getAvailabilityDisplayString}
       />
-      <div className="tw-text-xl tw-font-medium tw-mt-8 tw-mb-4">Availability Rules</div>
-      <div className="tw-rounded-lg tw-border tw-border-solid tw-border-slate-200 tw-overflow-x-auto">
+      <div className="tw-mb-4 tw-mt-8 tw-text-xl tw-font-medium">Availability Rules</div>
+      <div className="tw-overflow-x-auto tw-rounded-lg tw-border tw-border-solid tw-border-slate-200">
         <table className="tw-w-full tw-text-left">
           <thead>
             <tr className="tw-w-full tw-border-b tw-border-solid tw-border-slate-200">
@@ -117,15 +117,15 @@ export default function Availability(): ReactNode {
           </thead>
           <tbody>
             {availabilityRules.map((rule) => (
-              <tr key={rule.id} className="tw-py-4 tw-border-b tw-border-solid tw-border-slate-100">
+              <tr key={rule.id} className="tw-border-b tw-border-solid tw-border-slate-100 tw-py-4">
                 <td className={tableRowCell}>{rule.name}</td>
                 <td className={tableRowCell}>
-                  <div className="tw-bg-green-100 tw-text-green-900 tw-rounded-lg tw-px-6 tw-py-0.5 tw-w-fit">
+                  <div className="tw-w-fit tw-rounded-lg tw-bg-green-100 tw-px-6 tw-py-0.5 tw-text-green-900">
                     Active
                   </div>
                 </td>
                 <td className={tableRowCell}>{getAvailabilityRuleTypeDisplay(rule.type)}</td>
-                <td className="tw-flex tw-items-center tw-justify-end tw-gap-8 tw-p-4 tw-ml-auto tw-pr-8">
+                <td className="tw-ml-auto tw-flex tw-items-center tw-justify-end tw-gap-8 tw-p-4 tw-pr-8">
                   <button
                     className="tw-font-medium tw-text-blue-600 hover:tw-text-blue-800"
                     onClick={() => {
@@ -148,7 +148,7 @@ export default function Availability(): ReactNode {
             <tr key="new-rule" className="tw-py-4">
               <td className="tw-p-4 tw-text-left">
                 <button
-                  className="tw-text-blue-600 tw-font-medium hover:tw-text-blue-800 tw-whitespace-nowrap"
+                  className="tw-whitespace-nowrap tw-font-medium tw-text-blue-600 hover:tw-text-blue-800"
                   onClick={() => {
                     setExistingRule(undefined);
                     setShowRuleModal(true);
@@ -209,8 +209,8 @@ const DeleteRuleModal: React.FC<AvailabilityRuleModalProps> = ({ listing, existi
 
   return (
     <Modal show={show} close={closeModal}>
-      <div className="tw-flex tw-flex-col tw-items-center tw-w-[320px] sm:tw-w-[420px] tw-px-8 sm:tw-px-12 tw-pb-10">
-        <div className="tw-text-center tw-w-full tw-text-xl tw-font-medium tw-mb-6">
+      <div className="tw-flex tw-w-[320px] tw-flex-col tw-items-center tw-px-8 tw-pb-10 sm:tw-w-[420px] sm:tw-px-12">
+        <div className="tw-mb-6 tw-w-full tw-text-center tw-text-xl tw-font-medium">
           Permanently delete the availability rule <span className="tw-font-bold">{existingRule.name}</span>?
         </div>
         <Button
@@ -247,13 +247,13 @@ const UpdateAvailabilityTypeModal: React.FC<{
 
   return (
     <Modal show={show} close={closeModal}>
-      <div className="tw-w-[80vw] sm:tw-w-[600px] tw-px-8 sm:tw-px-12 tw-pb-10">
-        <div className="tw-text-center tw-w-full tw-text-base sm:tw-text-lg tw-mb-8">
+      <div className="tw-w-[80vw] tw-px-8 tw-pb-10 sm:tw-w-[600px] sm:tw-px-12">
+        <div className="tw-mb-8 tw-w-full tw-text-center tw-text-base sm:tw-text-lg">
           Changing the availability type of this listing will <span className="tw-font-semibold">permanently</span>{" "}
           delete all existing availability rules. Are you sure you want to continue?
         </div>
         <Button
-          className="tw-flex tw-h-[52px] tw-items-center tw-justify-center tw-whitespace-nowrap tw-w-full"
+          className="tw-flex tw-h-[52px] tw-w-full tw-items-center tw-justify-center tw-whitespace-nowrap"
           onClick={updateAvailabilityType}
         >
           {updating ? <Loading /> : "Continue"}

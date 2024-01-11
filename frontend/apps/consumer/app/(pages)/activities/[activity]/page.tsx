@@ -10,12 +10,12 @@ export default async function Page({ params }: { params: { activity: string } })
 
   return (
     <div className="tw-flex tw-px-5 sm:tw-px-20">
-      <div className="tw-flex tw-flex-col tw-items-start tw-pt-5 sm:tw-pt-8 tw-pb-24 tw-w-full tw-max-w-7xl">
-        <div className="tw-font-bold tw-text-4xl tw-w-full tw-text-center sm:tw-text-left tw-mb-3">
+      <div className="tw-flex tw-w-full tw-max-w-7xl tw-flex-col tw-items-start tw-pb-24 tw-pt-5 sm:tw-pt-8">
+        <div className="tw-mb-3 tw-w-full tw-text-center tw-text-4xl tw-font-bold sm:tw-text-left">
           {getCategoryForDisplay(activityType)}
         </div>
-        <div className="tw-mb-5 tw-text-base tw-max-w-2xl">{getDescriptionForCategory(activityType)}</div>
-        <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-3 xl:tw-grid-cols-4 tw-mt-5 tw-mb-5 tw-gap-10 tw-w-full">
+        <div className="tw-mb-5 tw-max-w-2xl tw-text-base">{getDescriptionForCategory(activityType)}</div>
+        <div className="tw-mb-5 tw-mt-5 tw-grid tw-w-full tw-grid-flow-row-dense tw-grid-cols-1 tw-gap-10 sm:tw-grid-cols-2 lg:tw-grid-cols-3 xl:tw-grid-cols-4">
           {listings.map((listing: Listing) => (
             <SearchResult key={listing.id} listing={listing} />
           ))}

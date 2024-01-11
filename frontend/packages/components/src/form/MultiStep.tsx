@@ -22,7 +22,7 @@ export const WizardNavButtons: React.FC<{
     <div
       id="multistep-footer"
       className={mergeClasses(
-        "tw-flex tw-mt-6 tw-mb-1",
+        "tw-mb-1 tw-mt-6 tw-flex",
         !prevStep ? "tw-justify-end" : "tw-justify-between",
         className,
       )}
@@ -32,7 +32,7 @@ export const WizardNavButtons: React.FC<{
         className={mergeClasses(
           !prevStep
             ? "tw-hidden"
-            : "tw-flex tw-justify-center tw-py-2 tw-w-24 tw-font-medium tw-border tw-border-solid tw-border-black tw-rounded-3xl ",
+            : "tw-flex tw-w-24 tw-justify-center tw-rounded-3xl tw-border tw-border-solid tw-border-black tw-py-2 tw-font-medium ",
         )}
       >
         ←
@@ -42,8 +42,8 @@ export const WizardNavButtons: React.FC<{
           !disabled && nextStep && nextStep();
         }}
         className={mergeClasses(
-          "tw-flex tw-justify-center tw-py-2 tw-w-28 tw-rounded-3xl tw-bg-black tw-border tw-border-solid tw-border-black tw-text-white tw-font-medium",
-          disabled && "tw-cursor-not-allowed tw-bg-gray-400 tw-border-gray-400",
+          "tw-flex tw-w-28 tw-justify-center tw-rounded-3xl tw-border tw-border-solid tw-border-black tw-bg-black tw-py-2 tw-font-medium tw-text-white",
+          disabled && "tw-cursor-not-allowed tw-border-gray-400 tw-bg-gray-400",
         )}
       >
         {isLoading ? <Loading light /> : isLastStep ? "Submit" : "Continue"}
@@ -102,7 +102,7 @@ export const InputStep = <T extends FieldValues | undefined>({
       <div className="tw-flex tw-flex-col tw-items-center">
         <input
           type="text"
-          className="tw-flex tw-py-3 tw-px-3 tw-w-full tw-outline-0 tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-text-base tw-justify-center focus-within:tw-border-2 focus-within:tw-border-blue-700 focus-within:tw-m-[-1px] focus-within:tw-px-[11px] tw-cursor-text"
+          className="tw-flex tw-w-full tw-cursor-text tw-justify-center tw-rounded-lg tw-border tw-border-solid tw-border-gray-300 tw-px-3 tw-py-3 tw-text-base tw-outline-0 focus-within:tw-m-[-1px] focus-within:tw-border-2 focus-within:tw-border-blue-700 focus-within:tw-px-[11px]"
           {...register("value", {
             onChange: () => clearErrors("value"),
           })}
@@ -221,7 +221,7 @@ export const SelectorStep = <T extends FieldValues | undefined>({
           <div
             key={option}
             className={mergeClasses(
-              "tw-flex tw-justify-between tw-items-center tw-w-full tw-min-h-[56px] tw-px-4 tw-my-1 tw-rounded-lg tw-border tw-border-solid tw-border-gray-300 sm:hover:tw-border-black tw-cursor-pointer tw-select-none",
+              "tw-my-1 tw-flex tw-min-h-[56px] tw-w-full tw-cursor-pointer tw-select-none tw-items-center tw-justify-between tw-rounded-lg tw-border tw-border-solid tw-border-gray-300 tw-px-4 sm:hover:tw-border-black",
               option === selected && "tw-border-black",
             )}
             onClick={async () => {
@@ -237,9 +237,9 @@ export const SelectorStep = <T extends FieldValues | undefined>({
           >
             {toTitleCase(option)}
             {option === selected ? (
-              <CheckCircleIcon className="tw-w-[25px] tw-mr-[-1px]" />
+              <CheckCircleIcon className="tw-mr-[-1px] tw-w-[25px]" />
             ) : (
-              <div className="tw-w-5 tw-h-5 tw-border-2 tw-border-solid tw-border-gray-300 tw-rounded-3xl" />
+              <div className="tw-h-5 tw-w-5 tw-rounded-3xl tw-border-2 tw-border-solid tw-border-gray-300" />
             )}
           </div>
         ))}
@@ -296,7 +296,7 @@ export const MultiSelectorStep = <T extends FieldValues | undefined>({
           <div
             key={option}
             className={mergeClasses(
-              "tw-flex tw-justify-between tw-items-center tw-w-full tw-min-h-[56px] tw-px-4 tw-my-1 tw-rounded-lg tw-border tw-border-solid tw-border-gray-300 sm:hover:tw-border-black tw-cursor-pointer tw-select-none",
+              "tw-my-1 tw-flex tw-min-h-[56px] tw-w-full tw-cursor-pointer tw-select-none tw-items-center tw-justify-between tw-rounded-lg tw-border tw-border-solid tw-border-gray-300 tw-px-4 sm:hover:tw-border-black",
               selected.includes(option) && "tw-border-black",
             )}
             onClick={async () => {
@@ -312,9 +312,9 @@ export const MultiSelectorStep = <T extends FieldValues | undefined>({
           >
             {getDisplayName ? getDisplayName(option) : option}
             {selected.includes(option) ? (
-              <CheckCircleIcon className="tw-w-[25px] tw-mr-[-1px]" />
+              <CheckCircleIcon className="tw-mr-[-1px] tw-w-[25px]" />
             ) : (
-              <div className="tw-w-5 tw-h-5 tw-border-2 tw-border-solid tw-border-gray-300 tw-rounded-3xl" />
+              <div className="tw-h-5 tw-w-5 tw-rounded-3xl tw-border-2 tw-border-solid tw-border-gray-300" />
             )}
           </div>
         ))}
@@ -329,13 +329,13 @@ export const ErrorMessage: React.FC<{ error: FieldError | undefined }> = ({ erro
   return (
     <div
       className={mergeClasses(
-        "tw-flex tw-transition-all tw-duration-100 tw-text-red-600 tw-mt-1 tw-w-full tw-text-xs tw-h-0",
-        error && "tw-h-2 tw-mb-3",
+        "tw-mt-1 tw-flex tw-h-0 tw-w-full tw-text-xs tw-text-red-600 tw-transition-all tw-duration-100",
+        error && "tw-mb-3 tw-h-2",
       )}
     >
       {error && (
         <>
-          <ExclamationCircleIcon className="tw-w-4 tw-h-4 tw-mr-1" />
+          <ExclamationCircleIcon className="tw-mr-1 tw-h-4 tw-w-4" />
           {error.message}
         </>
       )}

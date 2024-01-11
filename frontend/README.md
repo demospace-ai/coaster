@@ -29,8 +29,10 @@ The build is minified and the filenames include the hashes.\
 Your app is ready to be deployed!
 
 ## Creacte typescript headers for CSS
+
 tcm src
 
 ## Serve initialize.js locally
+
 Run `npm run dev-initialize`
 Then run `npx http-server build`

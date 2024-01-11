@@ -5,7 +5,7 @@ import { AuthProvider } from "@coaster/components/provider/AuthProvider";
 
 export default function NotFoundPage() {
   return (
-    <div className="tw-flex tw-flex-col tw-flex-grow tw-items-center tw-h-96">
+    <div className="tw-flex tw-h-96 tw-flex-grow tw-flex-col tw-items-center">
       <AuthProvider publicPaths={[]} noRedirect>
         <SupplierHeader />
         <NotFound />
