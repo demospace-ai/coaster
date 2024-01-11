@@ -8,6 +8,7 @@ import {
 
 const PUBLIC_PATHS = [
   "/",
+  "/activities/:activity",
   "/listings/:listingID",
   "/listings/operated/:category/:place",
   "/search",
