@@ -103,12 +103,6 @@ func CreateCheckoutSession(user *models.User, listing *listings.ListingDetails, 
 	commission := booking.Guests * unitPrice * listing.Host.CommissionPercent // No need to divide percent by 100 because Stripe uses cents and we use dollars
 	expiresAt := time.Now().Add(35 * time.Minute).Unix()                      // Stripe minimum is 30 minutes
 
-	// We default to the Coaster Stripe account ID, but if the host has their own Stripe account, we use that instead
-	stripeAccountID := "acct_1Nrnb8ImZ2ZmnWKQ"
-	if listing.Host.StripeAccountID != nil {
-		stripeAccountID = *listing.Host.StripeAccountID
-	}
-
 	params := &stripe.CheckoutSessionParams{
 		Mode:                stripe.String(string(stripe.CheckoutSessionModePayment)),
 		AllowPromotionCodes: stripe.Bool(true),
@@ -130,19 +124,23 @@ func CreateCheckoutSession(user *models.User, listing *listings.ListingDetails, 
 				Quantity: stripe.Int64(booking.Guests),
 			},
 		},
-		PaymentIntentData: &stripe.CheckoutSessionPaymentIntentDataParams{
-			ApplicationFeeAmount: stripe.Int64(commission),
-			TransferData: &stripe.CheckoutSessionPaymentIntentDataTransferDataParams{
-				Destination: stripe.String(stripeAccountID),
-			},
-			CaptureMethod: stripe.String(string(stripe.PaymentIntentCaptureMethodManual)),
-		},
 		SuccessURL: stripe.String(getSuccessURL(booking.Reference)),
 		CancelURL:  stripe.String(getCancelURL(listing.ID)),
 		ExpiresAt:  &expiresAt,
 		Metadata: map[string]string{
 			"booking_id": fmt.Sprintf("%d", booking.ID),
 		},
+	}
+
+	// We default to the Coaster Stripe account ID, but if the host has their own Stripe account, we use that instead
+	if listing.Host.StripeAccountStatus == models.StripeAccountStatusComplete && listing.Host.StripeAccountID != nil {
+		params.PaymentIntentData = &stripe.CheckoutSessionPaymentIntentDataParams{
+			ApplicationFeeAmount: stripe.Int64(commission),
+			TransferData: &stripe.CheckoutSessionPaymentIntentDataTransferDataParams{
+				Destination: stripe.String(*listing.Host.StripeAccountID),
+			},
+			CaptureMethod: stripe.String(string(stripe.PaymentIntentCaptureMethodManual)),
+		}
 	}
 
 	return sc.CheckoutSessions.New(params)
