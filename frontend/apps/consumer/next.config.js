@@ -1,6 +1,6 @@
 const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true",
-})
+});
 
 module.exports = withBundleAnalyzer({
   reactStrictMode: true,
@@ -20,26 +20,26 @@ module.exports = withBundleAnalyzer({
         pathname: "/user-images-bucket-us/**",
       },
       {
-        protocol:"https",
-        hostname:"lh3.googleusercontent.com",
-        port:"",
-        pathname: "/**"
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+        port: "",
+        pathname: "/**",
       },
       {
-        protocol:"https",
+        protocol: "https",
         hostname: "cdn.sanity.io",
-        port:"",
-        pathname: "/**"
+        port: "",
+        pathname: "/**",
       },
       {
-        protocol:"https",
+        protocol: "https",
         hostname: "www.trycoaster.com",
-        port:"",
-        pathname: "/**"
-      }
+        port: "",
+        pathname: "/**",
+      },
     ],
   },
-  experimental:{
+  experimental: {
     optimizePackageImports: [
       "@coaster/components",
       "@coaster/rpc/client",
@@ -48,6 +48,8 @@ module.exports = withBundleAnalyzer({
       "@coaster/utils/client",
       "@coaster/utils/common",
       "@coaster/assets",
+      "@headlessui/react",
+      "@heroicons/react",
     ],
-  }
+  },
 });

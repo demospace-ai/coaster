@@ -18,7 +18,8 @@ import {
   QuestionMarkCircleIcon,
 } from "@heroicons/react/24/outline";
 import { Post, urlFor } from "app/(pages)/blog/utils";
-import useEmblaCarousel, { EmblaCarouselType } from "embla-carousel-react";
+import { EmblaCarouselType } from "embla-carousel";
+import useEmblaCarousel from "embla-carousel-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
