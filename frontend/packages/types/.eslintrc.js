@@ -1,3 +1,3 @@
 module.exports = {
-  extends: ["custom/react"],
+  extends: ["@coaster/eslint-config-custom/react"],
 };

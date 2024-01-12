@@ -1,6 +1,6 @@
 module.exports = {
   extends: [],
-  ignorePatterns: ["postcss.config.cjs", "tailwind.config.cjs"],
+  ignorePatterns: ["postcss.config.cjs", "tailwind.config.cjs", ".eslintrc.js"],
   rules: {
     "@typescript-eslint/switch-exhaustiveness-check": "error",
     "@typescript-eslint/quotes": ["error", "double", { "avoidEscape": true }],

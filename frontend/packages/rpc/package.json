@@ -21,9 +21,9 @@
     "swr": "^2.2.4"
   },
   "devDependencies": {
+    "@coaster/eslint-config-custom": "*",
     "@coaster/tsconfig": "*",
     "eslint": "^8.52.0",
-    "eslint-config-custom": "*",
     "typescript": "^5.2.2"
   }
 }
