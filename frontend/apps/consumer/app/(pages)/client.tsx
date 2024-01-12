@@ -4,7 +4,6 @@ import AdventureGuarantee from "@coaster/assets/adventure-guarantee.jpg";
 import CuratedExperiences from "@coaster/assets/curated-experiences.jpg";
 import FreeCancellation from "@coaster/assets/free-cancellation.jpg";
 import SustainableTravel from "@coaster/assets/sustainable-travel.jpg";
-import { PromoBanner } from "@coaster/components/header/Header";
 import { ProfilePlaceholder } from "@coaster/components/profile/ProfilePicture";
 import { SearchResult } from "@coaster/components/search/SearchResult";
 import { Listing } from "@coaster/types";
@@ -308,7 +307,6 @@ export const DynamicHeader: React.FC = () => {
           isHome && "tw-border-none",
         )}
       >
-        <PromoBanner />
         <div className="tw-flex tw-w-[calc(100%-2.5rem)] sm:tw-w-[calc(100%-10rem)] tw-max-w-7xl tw-max-h-[72px] tw-min-h-[72px] sm:tw-max-h-[96px] sm:tw-min-h-[96px] tw-items-center tw-justify-between">
           <div
             className={mergeClasses(

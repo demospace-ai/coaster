@@ -27,18 +27,15 @@ export const Header: React.FC = () => {
   }, []);
 
   return (
-    <>
-      <PromoBanner />
-      <div
-        className={mergeClasses(
-          "tw-sticky tw-z-10 tw-top-0 tw-flex tw-flex-col tw-items-center tw-justify-center tw-box-border tw-w-full tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white",
-          isHome && scrollPosition < 20 && "tw-border-none",
-        )}
-      >
-        <DesktopHeader isHome={isHome} scrollPosition={scrollPosition} />
-        <MobileHeader />
-      </div>
-    </>
+    <div
+      className={mergeClasses(
+        "tw-sticky tw-z-10 tw-top-0 tw-flex tw-flex-col tw-items-center tw-justify-center tw-box-border tw-w-full tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white",
+        isHome && scrollPosition < 20 && "tw-border-none",
+      )}
+    >
+      <DesktopHeader isHome={isHome} scrollPosition={scrollPosition} />
+      <MobileHeader />
+    </div>
   );
 };
 
@@ -69,22 +66,6 @@ const MobileHeader: React.FC = () => {
       <SearchBarModal header />
       <MobileMenu />
     </div>
-  );
-};
-
-export const PromoBanner: React.FC = () => {
-  const { openLoginModal, user } = useAuthContext();
-
-  return (
-    <>
-      <div
-        className="tw-flex tw-flex-col sm:tw-flex-row sm:tw-text-base sm:tw-font-medium tw-max-h-[56px] tw-min-h-[56px] tw-w-full tw-items-center tw-justify-center tw-bg-blue-200 tw-cursor-pointer tw-select-none"
-        onClick={user ? undefined : () => openLoginModal(true)}
-      >
-        <span className="tw-font-bold tw-mr-2">Limited Time!</span>
-        Sign up to claim $100 credit to use on any trip!
-      </div>
-    </>
   );
 };
 
