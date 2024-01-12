@@ -1,4 +1,4 @@
 module.exports = {
   root: true,
-  extends: ["@coaster/eslint-config-custom/next"],
+  extends: ["custom/next"],
 };

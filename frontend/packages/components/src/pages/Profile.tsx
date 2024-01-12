@@ -88,15 +88,15 @@ export const Profile: React.FC = () => {
   };
 
   return (
-    <div className="tw-flex tw-h-full tw-w-full tw-flex-col tw-items-center tw-bg-slate-200 tw-pb-24 tw-pt-8 sm:tw-pt-14">
+    <div className="tw-flex tw-flex-col tw-items-center tw-h-full tw-w-full tw-bg-slate-200 tw-pt-8 sm:tw-pt-14 tw-pb-24">
       <form
-        className="tw-flex tw-w-full tw-max-w-full tw-flex-col tw-px-4 sm:tw-max-w-2xl sm:tw-px-0"
+        className="tw-flex tw-flex-col tw-max-w-full sm:tw-max-w-2xl tw-w-full tw-px-4 sm:tw-px-0"
         onSubmit={handleSubmit(onSubmit)}
       >
-        <div className="tw-mb-3 tw-w-full tw-text-center tw-text-3xl tw-font-semibold sm:tw-text-left">
+        <div className="tw-text-center sm:tw-text-left tw-w-full tw-text-3xl tw-font-semibold tw-mb-3">
           Profile Details
         </div>
-        <div className="tw-mb-5 tw-flex tw-w-full tw-flex-col tw-items-center tw-justify-center">
+        <div className="tw-flex tw-flex-col tw-w-full tw-items-center tw-justify-center tw-mb-5">
           <input
             ref={imageInputRef}
             type="file"
@@ -119,14 +119,14 @@ export const Profile: React.FC = () => {
             />
           ) : (
             <div
-              className="tw-flex tw-aspect-square tw-h-24 tw-cursor-pointer tw-select-none tw-items-center tw-justify-center tw-rounded-full tw-bg-slate-400 tw-text-4xl tw-text-white"
+              className="tw-bg-slate-400 tw-text-white tw-text-4xl tw-rounded-full tw-aspect-square tw-h-24 tw-select-none tw-flex tw-items-center tw-justify-center tw-cursor-pointer"
               onClick={() => imageInputRef.current?.click()}
             >
               {user!.first_name.charAt(0)}
             </div>
           )}
           <div
-            className="tw-mt-1 tw-cursor-pointer tw-select-none tw-text-blue-600 tw-opacity-80"
+            className="tw-text-blue-600 tw-select-none tw-opacity-80 tw-cursor-pointer tw-mt-1"
             onClick={() => imageInputRef.current?.click()}
           >
             Edit
@@ -171,7 +171,7 @@ export const Profile: React.FC = () => {
         <FormError message={errors.about?.message} />
         <Button
           type="submit"
-          className="tw-mt-3 tw-flex tw-w-full tw-items-center tw-justify-center tw-px-10 tw-py-2 sm:tw-w-32"
+          className="tw-w-full sm:tw-w-32 tw-flex tw-items-center tw-justify-center tw-px-10 tw-py-2 tw-mt-3"
           disabled={!isDirty}
         >
           {isSaving ? <Loading /> : "Save"}

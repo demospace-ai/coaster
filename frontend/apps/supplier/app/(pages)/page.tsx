@@ -30,22 +30,22 @@ export default function Hosting() {
   const financeComplete = user && user.stripe_account_status === StripeAccountStatus.Complete;
 
   return (
-    <div className="tw-flex tw-justify-center tw-overflow-auto tw-px-8 tw-pb-56 tw-pt-6 sm:tw-pt-12">
-      <div className="tw-flex tw-w-full tw-flex-col sm:tw-max-w-3xl">
+    <div className="tw-flex tw-justify-center tw-pt-6 sm:tw-pt-12 tw-pb-56 tw-px-8 tw-overflow-auto">
+      <div className="tw-flex tw-flex-col sm:tw-max-w-3xl tw-w-full">
         <div className="tw-mb-8 tw-text-3xl tw-font-bold">Welcome back, {user?.first_name}!</div>
         {draft && (
-          <div className="tw-mb-10 tw-flex tw-w-fit tw-items-center tw-justify-between tw-rounded-xl tw-border tw-border-solid tw-border-slate-300 tw-p-6">
+          <div className="tw-border tw-border-solid tw-border-slate-300 tw-rounded-xl tw-p-6 tw-w-fit tw-mb-10 tw-flex tw-items-center tw-justify-between">
             <div>
-              <div className="tw-mb-1 tw-text-xl tw-font-bold">Draft Listing</div>
-              <div className="tw-mb-2 tw-text-slate-500">{draft.name ? draft.name : "Untitled"}</div>
+              <div className="tw-font-bold tw-text-xl tw-mb-1">Draft Listing</div>
+              <div className="tw-text-slate-500 tw-mb-2">{draft.name ? draft.name : "Untitled"}</div>
               <NavLink href="/listings/new" className="tw-underline">
                 Continue where you left off
               </NavLink>
             </div>
-            <ExclamationCircleIcon className="tw-ml-2 tw-h-6 tw-text-yellow-600 sm:tw-ml-12" />
+            <ExclamationCircleIcon className="tw-h-6 tw-text-yellow-600 tw-ml-2 sm:tw-ml-12" />
           </div>
         )}
-        <div className="tw-mb-3 tw-flex tw-flex-col tw-justify-end tw-text-xl tw-font-semibold sm:tw-text-2xl">
+        <div className="tw-flex tw-flex-col tw-mb-3 tw-justify-end tw-font-semibold tw-text-xl sm:tw-text-2xl">
           <div className="tw-flex tw-flex-row tw-items-center">
             <div>Setup Checklist</div>
             <CompletionTimeBanner />
@@ -71,7 +71,7 @@ export default function Hosting() {
           <div className={stepNumber}>3</div>
           Add your payment information for payouts
         </NavLink>
-        <div className="tw-mt-10 tw-rounded-lg tw-border tw-border-solid tw-border-slate-100 tw-bg-white tw-shadow">
+        <div className="tw-bg-white tw-shadow tw-border tw-border-slate-100 tw-border-solid tw-rounded-lg tw-mt-10">
           <div className="tw-px-4 tw-py-5 sm:tw-p-6">
             <h3 className="tw-text-base tw-font-medium tw-leading-6 tw-text-gray-900">Need help?</h3>
             <div className="tw-mt-2 tw-max-w-xl tw-text-sm tw-text-gray-500">
@@ -79,14 +79,14 @@ export default function Hosting() {
                 If you have any trouble getting setup, let us know! Our team will help you get everything configured.
               </p>
             </div>
-            <div className="tw-mt-5 tw-flex tw-flex-row tw-gap-4">
+            <div className="tw-flex tw-flex-row tw-mt-5 tw-gap-4">
               <a
                 href="https://calendly.com/coaster/onboarding"
                 target="_blank"
                 rel="noreferrer"
                 className="tw-inline-flex tw-items-center tw-rounded-md tw-border tw-border-solid tw-border-slate-300 tw-px-3 tw-py-2 tw-text-sm tw-font-medium tw-shadow hover:tw-bg-slate-100"
               >
-                <CalendarDaysIcon className="tw-mr-2 tw-h-4" />
+                <CalendarDaysIcon className="tw-h-4 tw-mr-2" />
                 Book a call
               </a>
             </div>
@@ -99,13 +99,13 @@ export default function Hosting() {
 
 const CompletionTimeBanner: React.FC = () => {
   return (
-    <div className="tw-ml-4 tw-rounded-lg tw-bg-blue-50 tw-px-2 tw-py-1">
+    <div className="tw-rounded-lg tw-bg-blue-50 tw-px-2 tw-py-1 tw-ml-4">
       <div className="tw-flex">
         <div className="tw-flex-shrink-0">
-          <ClockIcon className="tw-h-5 tw-w-5 tw-stroke-2 tw-text-blue-600" aria-hidden="true" />
+          <ClockIcon className="tw-h-5 tw-w-5 tw-text-blue-600 tw-stroke-2" aria-hidden="true" />
         </div>
         <div className="tw-ml-2 tw-flex-1 md:tw-flex md:tw-justify-between">
-          <p className="tw-whitespace-nowrap tw-text-sm tw-font-medium tw-text-blue-700">10 minutes</p>
+          <p className="tw-text-sm tw-font-medium tw-text-blue-700 tw-whitespace-nowrap">10 minutes</p>
         </div>
       </div>
     </div>

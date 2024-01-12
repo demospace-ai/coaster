@@ -36,8 +36,8 @@ const DatePickerPopper = dynamic(
   () => import("@coaster/components/dates/DatePicker").then((mod) => mod.DatePickerPopper),
   {
     loading: () => (
-      <div className="tw-mr-2 tw-flex tw-w-3/4 tw-cursor-pointer tw-items-center tw-justify-start tw-whitespace-nowrap tw-rounded-lg tw-border tw-border-solid tw-border-gray-300 tw-py-2.5">
-        <CalendarIcon className="-tw-mt-[1.5px] tw-ml-4 tw-mr-3 tw-w-5" />
+      <div className="tw-flex tw-w-3/4 tw-py-2.5 tw-mr-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-justify-start tw-items-center tw-cursor-pointer tw-whitespace-nowrap">
+        <CalendarIcon className="tw-w-5 tw-ml-4 tw-mr-3 -tw-mt-[1.5px]" />
         Select a date
       </div>
     ),
@@ -50,8 +50,8 @@ const AvailabilityListPopper = dynamic(
   () => import("@coaster/components/dates/AvailabilityList").then((mod) => mod.AvailabilityListPopper),
   {
     loading: () => (
-      <div className="tw-mr-2 tw-flex tw-w-3/4 tw-cursor-pointer tw-items-center tw-justify-start tw-whitespace-nowrap tw-rounded-lg tw-border tw-border-solid tw-border-gray-300 tw-py-2.5">
-        <CalendarIcon className="-tw-mt-[1.5px] tw-ml-5 tw-mr-3 tw-w-5" />
+      <div className="tw-flex tw-w-3/4 tw-py-2.5 tw-mr-2 tw-border tw-border-solid tw-border-gray-300 tw-rounded-lg tw-justify-start tw-items-center tw-cursor-pointer tw-whitespace-nowrap">
+        <CalendarIcon className="tw-w-5 tw-ml-5 tw-mr-3 -tw-mt-[1.5px]" />
         Select a date
       </div>
     ),
@@ -67,13 +67,13 @@ export const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) =
   return (
     <div className="tw-flex tw-flex-row tw-items-start tw-justify-between">
       <div>
-        <h1 className="tw-hyphens-auto tw-text-3xl tw-font-semibold sm:tw-text-4xl sm:tw-font-bold">{listing.name}</h1>
-        <div className="tw-mb-4 tw-mt-3 tw-flex tw-items-center tw-font-medium">
+        <h1 className="tw-font-semibold sm:tw-font-bold tw-text-3xl sm:tw-text-4xl tw-hyphens-auto">{listing.name}</h1>
+        <div className="tw-flex tw-items-center tw-mt-3 tw-mb-4 tw-font-medium">
           {listing.location} • {categoriesString}
         </div>
       </div>
       <div
-        className="tw-cursor-pointer tw-rounded-lg tw-p-0.5 hover:tw-bg-gray-100 sm:tw-p-2"
+        className="tw-cursor-pointer hover:tw-bg-gray-100 tw-rounded-lg tw-p-0.5 sm:tw-p-2"
         onClick={() => {
           navigator.clipboard.writeText(window.location.href);
           showNotification("success", "Copied link to clipboard", 2000);
@@ -142,7 +142,7 @@ export const ReserveSlider: React.FC<{
 
   return (
     <div>
-      <Button className="tw-h-10 tw-font-medium tw-tracking-[0.5px]" onClick={() => setOpen(true)}>
+      <Button className="tw-font-medium tw-tracking-[0.5px] tw-h-10" onClick={() => setOpen(true)}>
         View availability
       </Button>
       <Transition.Root show={open} as={Fragment}>
@@ -156,7 +156,7 @@ export const ReserveSlider: React.FC<{
             leaveFrom="tw-opacity-100"
             leaveTo="tw-opacity-0"
           >
-            <div className="tw-fixed tw-inset-0 tw-bg-black tw-bg-opacity-10 tw-backdrop-blur-sm" />
+            <div className="tw-fixed tw-inset-0 tw-backdrop-blur-sm tw-bg-black tw-bg-opacity-10" />
           </Transition.Child>
           <div className="tw-fixed tw-inset-x-0 tw-bottom-0 tw-h-[80vh]">
             <Transition.Child
@@ -168,11 +168,11 @@ export const ReserveSlider: React.FC<{
               leaveFrom="tw-translate-y-0"
               leaveTo="tw-translate-y-full"
             >
-              <Dialog.Panel className="tw-flex tw-h-full tw-w-full tw-flex-col tw-items-center tw-justify-start tw-rounded-xl tw-bg-white tw-p-6">
-                <div className="tw-mb-4 tw-flex tw-w-full">
-                  <span className="tw-text-lg tw-font-semibold">Select options</span>
+              <Dialog.Panel className="tw-flex tw-flex-col tw-bg-white tw-rounded-xl tw-h-full tw-w-full tw-items-center tw-justify-start tw-p-6">
+                <div className="tw-flex tw-w-full tw-mb-4">
+                  <span className="tw-font-semibold tw-text-lg">Select options</span>
                   <button
-                    className="tw-mb-2 tw-ml-auto tw-inline tw-cursor-pointer tw-border-none tw-bg-transparent tw-p-0"
+                    className="tw-inline tw-ml-auto tw-mb-2 tw-bg-transparent tw-border-none tw-cursor-pointer tw-p-0"
                     onClick={() => {
                       setOpen(false);
                     }}
@@ -180,23 +180,23 @@ export const ReserveSlider: React.FC<{
                     <XMarkIcon className="tw-h-5 tw-stroke-black" />
                   </button>
                 </div>
-                <div className="tw-flex tw-h-full tw-w-full tw-flex-col tw-gap-3 tw-overflow-scroll tw-pb-10">
+                <div className="tw-flex tw-flex-col tw-overflow-scroll tw-w-full tw-h-full tw-pb-10 tw-gap-3">
                   <Disclosure>
                     {({ open, close }) => (
-                      <div className="tw-w-full tw-divide-y tw-rounded-lg tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-px-4 tw-pt-4">
-                        <Disclosure.Button className="tw-flex tw-w-full tw-justify-between tw-rounded-lg tw-pb-4 tw-text-left tw-text-base tw-font-medium focus:tw-outline-none">
+                      <div className="tw-w-full tw-rounded-lg tw-px-4 tw-pt-4 tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-divide-y">
+                        <Disclosure.Button className="tw-flex tw-w-full tw-pb-4 tw-rounded-lg tw-justify-between tw-text-left tw-text-base tw-font-medium focus:tw-outline-none">
                           <span>
                             {startDate
                               ? startDate.toLocaleDateString()
                               : multiDayDuration
-                                ? "Choose dates"
-                                : "Choose start date"}
+                              ? "Choose dates"
+                              : "Choose start date"}
                           </span>
                           <ChevronUpIcon
                             className={`${open && "tw-rotate-180 tw-transform"} tw-h-5 tw-w-5 tw-text-slate-500`}
                           />
                         </Disclosure.Button>
-                        <Disclosure.Panel className="tw-flex tw-w-full tw-flex-col tw-items-center tw-pb-4 sm:tw-pb-0">
+                        <Disclosure.Panel className="tw-flex tw-flex-col tw-w-full tw-items-center tw-pb-4 sm:tw-pb-0">
                           {listing.availability_display === AvailabilityDisplay.Enum.calendar ? (
                             <DateRangePicker
                               mode="single"
@@ -237,7 +237,7 @@ export const ReserveSlider: React.FC<{
                             />
                           ) : (
                             <RadioGroup
-                              className="tw-mt-4 tw-grid tw-w-full tw-grid-cols-1 tw-gap-4"
+                              className="tw-grid tw-grid-cols-1 tw-w-full tw-gap-4 tw-mt-4"
                               value={startDate}
                               by={compareDates}
                               onChange={(e) => {
@@ -251,7 +251,7 @@ export const ReserveSlider: React.FC<{
                                   value={availableDate}
                                   className={({ checked }) =>
                                     mergeClasses(
-                                      "tw-mx-auto tw-flex tw-w-full tw-cursor-pointer tw-select-none tw-items-center tw-justify-center tw-rounded-lg tw-border tw-border-solid tw-border-slate-300 tw-py-2 tw-text-center tw-text-base tw-text-slate-900",
+                                      "tw-flex tw-items-center tw-justify-center tw-cursor-pointer tw-select-none tw-text-center tw-py-2 tw-w-full tw-border tw-border-solid tw-border-slate-300 tw-rounded-lg tw-text-base tw-text-slate-900 tw-mx-auto",
                                       checked && "tw-bg-blue-100",
                                     )
                                   }
@@ -268,9 +268,9 @@ export const ReserveSlider: React.FC<{
                   {listing.availability_type === AvailabilityType.Enum.datetime && (
                     <Disclosure>
                       {({ open, close }) => (
-                        <div className="tw-w-full tw-divide-y tw-rounded-lg tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-px-4 tw-pt-4">
+                        <div className="tw-w-full tw-rounded-lg tw-px-4 tw-pt-4 tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-divide-y">
                           <Disclosure.Button
-                            className="tw-flex tw-w-full tw-justify-between tw-rounded-lg tw-pb-4 tw-text-left tw-text-base tw-font-medium focus:tw-outline-none"
+                            className="tw-flex tw-w-full tw-pb-4 tw-rounded-lg tw-justify-between tw-text-left tw-text-base tw-font-medium focus:tw-outline-none"
                             disabled={timeSlots === undefined}
                           >
                             {timeSlots === undefined ? (
@@ -291,7 +291,7 @@ export const ReserveSlider: React.FC<{
                               className={`${open && "tw-rotate-180 tw-transform"} tw-h-5 tw-w-5 tw-text-slate-500`}
                             />
                           </Disclosure.Button>
-                          <Disclosure.Panel className="tw-flex tw-w-full tw-flex-col tw-items-center tw-pb-4 sm:tw-pb-0">
+                          <Disclosure.Panel className="tw-flex tw-flex-col tw-w-full tw-items-center tw-pb-4 sm:tw-pb-0">
                             {timeSlots != undefined && (
                               <RadioGroup
                                 value={startTime}
@@ -300,7 +300,7 @@ export const ReserveSlider: React.FC<{
                                   setStartTime(e);
                                   close();
                                 }}
-                                className="tw-mt-4 tw-grid tw-w-full tw-grid-cols-2 tw-justify-center tw-gap-2"
+                                className="tw-grid tw-grid-cols-2 tw-justify-center tw-w-full tw-gap-2 tw-mt-4"
                               >
                                 {timeSlots.map((timeSlot) => (
                                   <RadioGroup.Option
@@ -308,7 +308,7 @@ export const ReserveSlider: React.FC<{
                                     value={timeSlot}
                                     className={({ checked }) =>
                                       mergeClasses(
-                                        "tw-mx-auto tw-w-32 tw-cursor-pointer tw-select-none tw-rounded-lg tw-border tw-border-solid tw-border-slate-300 tw-py-2 tw-text-center tw-text-base tw-text-slate-900",
+                                        "tw-cursor-pointer tw-select-none tw-text-center tw-py-2 tw-w-32 tw-border tw-border-solid tw-border-slate-300 tw-rounded-lg tw-text-base tw-text-slate-900 tw-mx-auto",
                                         checked && "tw-bg-blue-100",
                                       )
                                     }
@@ -330,9 +330,9 @@ export const ReserveSlider: React.FC<{
                   )}
                   <Disclosure>
                     {({ open }) => (
-                      <div className="tw-w-full tw-divide-y tw-rounded-lg tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-px-4 tw-pt-4">
+                      <div className="tw-w-full tw-rounded-lg tw-px-4 tw-pt-4 tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-divide-y">
                         <Disclosure.Button
-                          className="tw-flex tw-w-full tw-justify-between tw-rounded-lg tw-pb-4 tw-text-left tw-text-base tw-font-medium focus:tw-outline-none"
+                          className="tw-flex tw-w-full tw-pb-4 tw-rounded-lg tw-justify-between tw-text-left tw-text-base tw-font-medium focus:tw-outline-none"
                           disabled={bookingSlot === null}
                         >
                           {bookingSlot === null ? (
@@ -350,7 +350,7 @@ export const ReserveSlider: React.FC<{
                         </Disclosure.Button>
                         <Disclosure.Panel>
                           <div className="tw-flex tw-justify-between tw-py-5">
-                            <span className="tw-select-none tw-whitespace-nowrap tw-text-base">Adults</span>
+                            <span className="tw-text-base tw-whitespace-nowrap tw-select-none">Adults</span>
                             <div className="tw-flex tw-gap-3">
                               <button
                                 onClick={() => {
@@ -360,11 +360,11 @@ export const ReserveSlider: React.FC<{
                                 <MinusCircleIcon
                                   className={mergeClasses(
                                     "tw-w-6 tw-cursor-pointer tw-stroke-gray-700 hover:tw-stroke-black",
-                                    numGuests === 1 && "tw-cursor-not-allowed !tw-stroke-gray-300",
+                                    numGuests === 1 && "!tw-stroke-gray-300 tw-cursor-not-allowed",
                                   )}
                                 />
                               </button>
-                              <span className="tw-flex tw-w-3 tw-select-none tw-justify-center">{numGuests}</span>
+                              <span className="tw-flex tw-w-3 tw-justify-center tw-select-none">{numGuests}</span>
                               <button
                                 onClick={() => {
                                   setNumGuests(Math.min(maxGuests, numGuests + 1));
@@ -373,7 +373,7 @@ export const ReserveSlider: React.FC<{
                                 <PlusCircleIcon
                                   className={mergeClasses(
                                     "tw-w-6 tw-cursor-pointer tw-stroke-gray-700 hover:tw-stroke-black",
-                                    numGuests === maxGuests && "tw-cursor-not-allowed !tw-stroke-gray-300",
+                                    numGuests === maxGuests && "!tw-stroke-gray-300 tw-cursor-not-allowed",
                                   )}
                                 />
                               </button>
@@ -384,7 +384,7 @@ export const ReserveSlider: React.FC<{
                     )}
                   </Disclosure>
                 </div>
-                <div className="tw-mt-auto tw-flex tw-w-full tw-justify-end">
+                <div className="tw-flex tw-mt-auto tw-w-full tw-justify-end">
                   <Button
                     className="tw-h-10 tw-min-w-28 tw-whitespace-nowrap"
                     onClick={() => {
@@ -412,7 +412,7 @@ export const ReserveSlider: React.FC<{
 
 export const ReserveFooter: React.FC<{ listing: ListingType; generated: boolean }> = ({ listing, generated }) => {
   return (
-    <div className="tw-fixed tw-bottom-0 tw-left-0 tw-z-20 tw-flex tw-h-20 tw-w-full tw-items-center tw-justify-between tw-border-t tw-border-solid tw-border-gray-300 tw-bg-white tw-px-4 lg:tw-hidden">
+    <div className="tw-fixed lg:tw-hidden tw-z-20 tw-bottom-0 tw-left-0 tw-flex tw-items-center tw-justify-between tw-bg-white tw-border-t tw-border-solid tw-border-gray-300 tw-h-20 tw-w-full tw-px-4">
       <div className="tw-flex tw-flex-col">
         <div>
           <span className="tw-font-semibold">${listing.price}</span> per person
@@ -444,15 +444,15 @@ export const BookingPanel: React.FC<{ listing: ListingType; generated: boolean }
   } = useBookingState(listing, generated);
 
   return (
-    <div className="tw-hidden tw-w-[400px] tw-min-w-[400px] tw-max-w-[400px] lg:tw-flex">
-      <div className="tw-sticky tw-top-32 tw-flex tw-h-fit tw-w-full tw-flex-col tw-rounded-xl tw-border tw-border-solid tw-border-gray-300 tw-px-8 tw-py-6 tw-shadow-centered-sm">
+    <div className="tw-hidden lg:tw-flex tw-w-[400px] tw-min-w-[400px] tw-max-w-[400px]">
+      <div className="tw-sticky tw-top-32 tw-flex tw-flex-col tw-px-8 tw-py-6 tw-w-full tw-h-fit tw-border tw-border-solid tw-border-gray-300 tw-rounded-xl tw-shadow-centered-sm">
         <div>
-          <span className="tw-mb-3 tw-text-2xl tw-font-semibold">${listing.price}</span> per person
+          <span className="tw-text-2xl tw-font-semibold tw-mb-3">${listing.price}</span> per person
         </div>
-        <div className="tw-mt-3 tw-flex tw-w-full">
+        <div className="tw-flex tw-w-full tw-mt-3">
           {listing.availability_display === AvailabilityDisplay.Enum.calendar ? (
             <DatePickerPopper
-              className="tw-mr-2 tw-w-3/4"
+              className="tw-w-3/4 tw-mr-2"
               selected={startDate}
               onSelect={setStartDate}
               month={month}
@@ -482,7 +482,7 @@ export const BookingPanel: React.FC<{ listing: ListingType; generated: boolean }
           ) : (
             <AvailabilityListPopper
               wrapperClass="tw-w-3/4 tw-mr-2"
-              className="tw-w-full tw-rounded-lg tw-border-gray-300 tw-py-3"
+              className="tw-w-full tw-py-3 tw-border-gray-300 tw-rounded-lg"
               selected={startDate}
               onSelect={setStartDate}
               availability={availableDates}
@@ -502,7 +502,7 @@ export const BookingPanel: React.FC<{ listing: ListingType; generated: boolean }
             by={compareAvailability}
             value={startTime}
             onChange={setStartTime}
-            className="tw-mt-5 tw-grid tw-grid-cols-2 tw-justify-start tw-gap-3"
+            className="tw-grid tw-grid-cols-2 tw-justify-start tw-gap-3 tw-mt-5"
           >
             {timeSlots.map((timeSlot) => (
               <RadioGroup.Option
@@ -515,7 +515,7 @@ export const BookingPanel: React.FC<{ listing: ListingType; generated: boolean }
                 value={timeSlot}
                 className={({ checked }) =>
                   mergeClasses(
-                    "tw-flex tw-cursor-pointer tw-items-center tw-justify-center tw-rounded-lg tw-border tw-border-solid tw-border-gray-300 tw-py-1",
+                    "tw-flex tw-items-center tw-justify-center tw-py-1 tw-cursor-pointer tw-rounded-lg tw-border tw-border-solid tw-border-gray-300",
                     checked && "tw-bg-blue-100",
                   )
                 }
@@ -531,13 +531,13 @@ export const BookingPanel: React.FC<{ listing: ListingType; generated: boolean }
           </RadioGroup>
         )}
         <Button
-          className="tw-mb-4 tw-mt-5 tw-h-10 tw-whitespace-nowrap tw-font-medium tw-tracking-[0.5px]"
+          className="tw-font-medium tw-mt-5 tw-mb-4 tw-tracking-[0.5px] tw-h-10 tw-whitespace-nowrap"
           disabled={!bookingSlot}
           onClick={tryToReserve}
         >
           {createCheckoutLink.isLoading ? <Loading light /> : availableDates.length === 0 ? "Send Inquiry" : "Reserve"}
         </Button>
-        <div className="tw-mb-4 tw-w-full tw-border-b tw-border-solid tw-border-gray-300 tw-pb-3 tw-text-center tw-text-sm">
+        <div className="tw-w-full tw-text-center tw-text-sm tw-mb-4 tw-pb-3 tw-border-b tw-border-solid tw-border-gray-300">
           You won't be charged yet
         </div>
         <span className="tw-text-sm">
@@ -557,7 +557,7 @@ export const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) =
   );
 
   return (
-    <div className="tw-flex tw-aspect-square tw-h-full tw-max-h-[560px] tw-overflow-clip tw-rounded-xl sm:tw-h-[560px]">
+    <div className="tw-flex tw-aspect-square tw-h-full sm:tw-h-[560px] tw-max-h-[560px] tw-rounded-xl tw-overflow-clip">
       <ImagesModal
         show={showImages}
         close={() => {
@@ -566,12 +566,12 @@ export const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) =
         listing={listing}
         initialIndex={initialIndex}
       />
-      <div className="tw-relative tw-flex tw-h-full tw-w-full lg:tw-mr-2 lg:tw-w-2/3">
+      <div className="tw-relative tw-flex tw-w-full lg:tw-w-2/3 tw-h-full lg:tw-mr-2">
         <NullableImage
           alt="Main listing image"
           priority
           sizes="(max-width: 1024px) 80vw, 60vw"
-          className="tw-w-full tw-cursor-pointer tw-bg-gray-100 tw-object-cover tw-transition-all tw-duration-100 hover:tw-brightness-90"
+          className="tw-w-full tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
           image={listing.images[0]}
           onClick={() => {
             setInitialIndex(0);
@@ -579,18 +579,18 @@ export const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) =
           }}
         />
         <div
-          className="tw-absolute tw-bottom-4 tw-left-1/2 tw-mt-4 tw-flex tw-w-fit -tw-translate-x-1/2 tw-cursor-pointer tw-whitespace-nowrap tw-rounded-3xl tw-border tw-border-solid tw-border-black tw-bg-white tw-px-3 tw-py-1 tw-text-sm tw-font-medium hover:tw-bg-slate-200 sm:tw-hidden"
+          className="tw-absolute tw-bottom-4 tw-left-1/2 -tw-translate-x-1/2 tw-flex sm:tw-hidden tw-bg-white hover:tw-bg-slate-200 tw-cursor-pointer tw-rounded-3xl tw-border tw-border-black tw-border-solid tw-px-3 tw-text-sm tw-font-medium tw-py-1 tw-w-fit tw-mt-4 tw-whitespace-nowrap"
           onClick={() => setShowImages(true)}
         >
           See all images →
         </div>
       </div>
-      <div className="tw-relative tw-hidden tw-w-1/3 tw-flex-col tw-gap-2 lg:tw-flex">
+      <div className="tw-relative tw-flex-col tw-w-1/3 tw-gap-2 tw-hidden lg:tw-flex">
         <div className="tw-relative tw-block tw-h-1/2 tw-w-full tw-bg-gray-100">
           <NullableImage
             alt="Listing image 2"
             sizes="(max-width: 1024px) 33vw, 20vw"
-            className="tw-cursor-pointer tw-object-cover tw-transition-all tw-duration-100 hover:tw-brightness-90"
+            className="tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
             image={listing.images[1]}
             onClick={() => {
               setInitialIndex(1);
@@ -602,7 +602,7 @@ export const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) =
           <NullableImage
             alt="Listing image 3"
             sizes="(max-width: 1024px) 33vw, 20vw"
-            className="tw-cursor-pointer tw-object-cover tw-transition-all tw-duration-100 hover:tw-brightness-90"
+            className="tw-object-cover hover:tw-brightness-90 tw-cursor-pointer tw-transition-all tw-duration-100"
             image={listing.images[2]}
             onClick={() => {
               setInitialIndex(2);
@@ -611,7 +611,7 @@ export const ListingImages: React.FC<{ listing: ListingType }> = ({ listing }) =
           />
         </div>
         <div
-          className="tw-absolute tw-bottom-3 tw-right-3 tw-cursor-pointer tw-rounded-3xl tw-border tw-border-solid tw-border-black tw-bg-white tw-px-3 tw-py-1 tw-text-sm tw-font-medium hover:tw-bg-slate-200"
+          className="tw-absolute tw-bottom-3 tw-right-3 tw-bg-white hover:tw-bg-slate-200 tw-cursor-pointer tw-rounded-3xl tw-border tw-border-black tw-border-solid tw-px-3 tw-text-sm tw-font-medium tw-py-1"
           onClick={() => setShowImages(true)}
         >
           See all images →
@@ -639,7 +639,7 @@ const NullableImage: React.FC<{
 export const Itinerary: React.FC<{ listing: ListingType }> = ({ listing }) => {
   const stepRefs = useRef<Array<HTMLButtonElement | null>>([]);
   return (
-    <div className="tw-border-b tw-border-solid tw-border-gray-300 tw-pb-8">
+    <div className="tw-pb-8 tw-border-b tw-border-solid tw-border-gray-300">
       <div className="tw-mt-5 tw-text-xl tw-font-semibold">Itinerary</div>
       <button
         className="tw-mt-2 tw-text-sm tw-font-medium tw-text-blue-600 hover:tw-underline"
@@ -655,28 +655,28 @@ export const Itinerary: React.FC<{ listing: ListingType }> = ({ listing }) => {
       </button>
       <div className="tw-mt-8 tw-flex tw-flex-col">
         {listing.itinerary_steps?.map((step, i) => (
-          <Disclosure as="div" key={step.id} className="tw-group tw-flex tw-flex-row tw-items-center">
+          <Disclosure as="div" key={step.id} className="tw-flex tw-flex-row tw-items-center tw-group">
             {({ open }) => (
-              <div className="tw-relative tw-ml-2 tw-flex tw-w-full tw-flex-col tw-border-l tw-border-solid tw-border-gray-400 tw-pl-8 group-last:tw-border-none">
+              <div className="tw-flex tw-flex-col tw-w-full tw-pl-8 tw-ml-2 tw-relative tw-border-l tw-border-solid tw-border-gray-400 group-last:tw-border-none">
                 <Disclosure.Button
-                  className="tw-group/button tw-mb-6 tw-w-full"
+                  className="tw-w-full tw-mb-6 tw-group/button"
                   ref={(el) => (stepRefs.current[i] = el)}
                 >
-                  <div className="tw-absolute tw-left-0 tw-top-0 tw-h-3 tw-w-3 tw-shrink-0 -tw-translate-x-1/2 tw-rounded-full tw-border tw-border-solid tw-border-gray-400 tw-bg-white tw-shadow-centered-white group-first:tw-bg-gray-400 group-last:tw-bg-gray-400" />
-                  <div className="-tw-mt-4 tw-flex tw-w-full tw-items-center tw-justify-between">
-                    <div className="tw-mb-2 tw-flex tw-flex-col tw-items-start tw-text-left">
-                      <div className="tw-mb-1 tw-uppercase tw-text-gray-500">{step.step_label}</div>
+                  <div className="tw-absolute tw-left-0 tw-top-0 -tw-translate-x-1/2 tw-bg-white tw-rounded-full tw-h-3 tw-w-3 tw-border tw-border-solid tw-border-gray-400 tw-shrink-0 tw-shadow-centered-white group-last:tw-bg-gray-400 group-first:tw-bg-gray-400" />
+                  <div className="-tw-mt-4 tw-flex tw-w-full tw-justify-between tw-items-center">
+                    <div className="tw-flex tw-flex-col tw-mb-2 tw-items-start tw-text-left">
+                      <div className="tw-uppercase tw-mb-1 tw-text-gray-500">{step.step_label}</div>
                       <div className="tw-font-medium group-hover/button:tw-underline">{step.title}</div>
                     </div>
                     {open ? (
-                      <MinusIcon className="-tw-mt-2 tw-h-6 tw-w-6 tw-shrink-0" />
+                      <MinusIcon className="-tw-mt-2 tw-w-6 tw-h-6 tw-shrink-0" />
                     ) : (
-                      <PlusIcon className="-tw-mt-2 tw-h-6 tw-w-6 tw-shrink-0" />
+                      <PlusIcon className="-tw-mt-2 tw-w-6 tw-h-6 tw-shrink-0" />
                     )}
                   </div>
                 </Disclosure.Button>
                 <Disclosure.Panel
-                  className="-tw-mt-6 tw-mb-10 tw-text-base tw-leading-6 tw-text-gray-700"
+                  className="tw-text-base tw-leading-6 tw-text-gray-700 -tw-mt-6 tw-mb-10"
                   dangerouslySetInnerHTML={{ __html: step.description }}
                 />
               </div>

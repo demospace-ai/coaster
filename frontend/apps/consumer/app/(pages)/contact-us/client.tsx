@@ -41,25 +41,25 @@ export const ContactUs: React.FC = () => {
 
   return (
     <>
-      <div className="tw-w-[90vw] tw-max-w-2xl">
+      <div className="tw-max-w-2xl tw-w-[90vw]">
         <form onSubmit={handleSubmit(submit)}>
           <Input className="tw-mt-4" value={watch("email")} label="Email" {...register("email")} />
           <FormError message={formState.errors["email"]?.message} />
           <TextArea
-            className="tw-mt-4 tw-max-h-96 tw-min-h-[140px]"
+            className="tw-mt-4 tw-min-h-[140px] tw-max-h-96"
             value={watch("message")}
             label="Message"
             {...register("message")}
           />
           <FormError message={formState.errors["message"]?.message} />
-          <Button className="tw-mt-6 tw-w-24 tw-py-2" type="submit">
+          <Button className="tw-w-24 tw-py-2 tw-mt-6" type="submit">
             {loading ? <Loading light /> : "Submit"}
           </Button>
         </form>
       </div>
       {submitted && (
-        <div className="tw-mt-4 tw-flex tw-w-[90vw] tw-max-w-lg tw-items-center ">
-          <CheckCircleIcon className="tw-mr-3 tw-h-16 tw-w-16 tw-stroke-green-600" />
+        <div className="tw-flex tw-items-center tw-mt-4 tw-max-w-lg tw-w-[90vw] ">
+          <CheckCircleIcon className="tw-w-16 tw-h-16 tw-stroke-green-600 tw-mr-3" />
           <div className="tw-text-left tw-text-base">
             We've received your request and will get back to you as soon as possible!
           </div>

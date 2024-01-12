@@ -2,7 +2,10 @@
 
 import { RefObject } from "react";
 
-export const createResizeFunction = <T extends HTMLElement>(ref: RefObject<T>, setHeight: (height: number) => void) => {
+export const createResizeFunction = <T extends HTMLElement>(
+  ref: RefObject<T>,
+  setHeight: (height: number) => void
+) => {
   const createOnDrag = (startHeight: number, startY: number) => {
     return (e: MouseEvent) => {
       e.stopPropagation();

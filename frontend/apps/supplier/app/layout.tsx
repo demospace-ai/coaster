@@ -25,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <AtlasInit />
       <html lang="en" className={worksans.className}>
         <body>
-          <div id="root" className="tw-flex tw-h-full tw-w-full tw-flex-col">
+          <div id="root" className="tw-w-full tw-h-full tw-flex tw-flex-col">
             <ErrorBoundary>{children}</ErrorBoundary>
           </div>
         </body>

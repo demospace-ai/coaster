@@ -26,14 +26,14 @@ export default async function AllPosts() {
   );
 
   return (
-    <main className="tw-mt-6 tw-flex tw-w-full tw-items-center tw-justify-center tw-px-5 tw-pb-32 sm:tw-mt-10 sm:tw-px-20">
+    <main className="tw-flex tw-items-center tw-justify-center tw-w-full tw-px-5 sm:tw-px-20 tw-mt-6 sm:tw-mt-10 tw-pb-32">
       <div className="tw-w-full tw-max-w-7xl">
         <div className="tw-mb-6 sm:tw-mb-10">
-          <h1 className="tw-text-5xl tw-font-bold">Blog</h1>
+          <h1 className="tw-font-bold tw-text-5xl">Blog</h1>
         </div>
-        <div className="tw-grid tw-w-full tw-grid-flow-row-dense tw-grid-cols-1 tw-justify-start tw-gap-12 sm:tw-grid-cols-2 sm:tw-gap-10 md:tw-grid-cols-3">
+        <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-1 sm:tw-grid-cols-2 md:tw-grid-cols-3 tw-gap-12 sm:tw-gap-10 tw-w-full tw-justify-start">
           {posts.map((post) => (
-            <Link href={`/blog/${post.slug.current}`} key={post._id} className="tw-flex tw-max-w-xl tw-flex-col">
+            <Link href={`/blog/${post.slug.current}`} key={post._id} className="tw-flex tw-flex-col tw-max-w-xl">
               <Image
                 priority
                 alt={post.mainImage.alt}
@@ -46,7 +46,7 @@ export default async function AllPosts() {
                 className="tw-shadow-md"
               />
               <div className="tw-mt-4 tw-uppercase">By {post.authorName}</div>
-              <div className="tw-mt-1 tw-text-2xl tw-font-bold">{post.title}</div>
+              <div className="tw-mt-1 tw-font-bold tw-text-2xl">{post.title}</div>
               <div className="tw-mt-1 tw-text-base">{post.metaDescription}</div>
             </Link>
           ))}

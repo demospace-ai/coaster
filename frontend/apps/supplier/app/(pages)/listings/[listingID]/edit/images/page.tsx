@@ -86,11 +86,11 @@ const ImagesInner: React.FC<{ listing: Listing }> = ({ listing }) => {
 
   const [, drop] = useDrop(() => ({ accept: "card" }));
   return (
-    <div className="tw-flex tw-w-full tw-flex-col">
+    <div className="tw-flex tw-flex-col tw-w-full">
       <div className="tw-text-2xl tw-font-semibold">Images</div>
       <div
         ref={drop}
-        className="tw-mt-3 tw-grid tw-w-full tw-grid-cols-1 tw-justify-items-center tw-gap-4 sm:tw-grid-cols-2 sm:tw-gap-8"
+        className="tw-w-full tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-mt-3 tw-gap-4 sm:tw-gap-8 tw-justify-items-center"
       >
         {images.map((image) => (
           <Card
@@ -99,17 +99,17 @@ const ImagesInner: React.FC<{ listing: Listing }> = ({ listing }) => {
             moveCard={moveCard}
             findCard={findCard}
             onDrop={updateImages}
-            className="tw-relative tw-aspect-square tw-w-full"
+            className="tw-relative tw-w-full tw-aspect-square"
           >
             <Image
               fill
               sizes="(max-width: 640px) 100vw, 1/2vw"
               alt="Listing image"
-              className="tw-aspect-square tw-cursor-grab tw-rounded-lg tw-bg-gray-100 tw-object-cover tw-transition-all tw-duration-100 hover:tw-brightness-90"
+              className="tw-aspect-square tw-bg-gray-100 tw-object-cover hover:tw-brightness-90 tw-transition-all tw-duration-100 tw-rounded-lg tw-cursor-grab"
               src={image.url}
             />
             <XMarkIcon
-              className="tw-absolute tw-right-2 tw-top-2 tw-w-8 tw-cursor-pointer tw-rounded-lg tw-bg-gray-100 tw-p-1 tw-opacity-80 hover:tw-opacity-100"
+              className="tw-w-8 tw-absolute tw-right-2 tw-top-2 tw-bg-gray-100 tw-p-1 tw-rounded-lg tw-opacity-80 tw-cursor-pointer hover:tw-opacity-100"
               onClick={() => {
                 if (images.length <= 3) {
                   setError("You must have at least 3 images.");
@@ -122,14 +122,14 @@ const ImagesInner: React.FC<{ listing: Listing }> = ({ listing }) => {
           </Card>
         ))}
         <div
-          className="tw-group tw-flex tw-aspect-square tw-w-full tw-cursor-pointer tw-items-center tw-justify-center tw-rounded-lg tw-bg-gray-100"
+          className="tw-group tw-aspect-square tw-w-full tw-bg-gray-100 tw-rounded-lg tw-cursor-pointer tw-flex tw-justify-center tw-items-center"
           onClick={() => newImageRef.current?.click()}
         >
-          <input ref={newImageRef} type="file" multiple className="tw-invisible tw-hidden" onChange={addImage} />
+          <input ref={newImageRef} type="file" multiple className="tw-hidden tw-invisible" onChange={addImage} />
           {uploading ? (
-            <Loading className="tw-mx-auto tw-my-auto tw-h-12 tw-w-12" />
+            <Loading className="tw-h-12 tw-w-12 tw-mx-auto tw-my-auto" />
           ) : (
-            <PlusIcon className="tw-mx-auto tw-my-auto tw-h-12 tw-text-gray-400 tw-transition-all tw-duration-100 group-hover:tw-text-gray-600" />
+            <PlusIcon className="tw-h-12 tw-mx-auto tw-my-auto tw-text-gray-400 group-hover:tw-text-gray-600 tw-transition-all tw-duration-100" />
           )}
         </div>
         <DeleteModal
@@ -168,8 +168,8 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ listing, imageID, setImages, 
 
   return (
     <Modal show={show} close={closeModal}>
-      <div className="tw-flex tw-w-[320px] tw-flex-col tw-items-center tw-px-8 tw-pb-10 sm:tw-w-[420px] sm:tw-px-12">
-        <div className="tw-mb-6 tw-w-full tw-text-center tw-text-xl tw-font-medium">Permanently delete this image?</div>
+      <div className="tw-flex tw-flex-col tw-items-center tw-w-[320px] sm:tw-w-[420px] tw-px-8 sm:tw-px-12 tw-pb-10">
+        <div className="tw-text-center tw-w-full tw-text-xl tw-font-medium tw-mb-6">Permanently delete this image?</div>
         <Button
           className="tw-flex tw-h-10 tw-w-48 tw-items-center tw-justify-center tw-whitespace-nowrap"
           onClick={deleteImage}

@@ -95,16 +95,16 @@ export const AvailabilityListPopper: React.FC<{
           ref={refs.setReference}
           {...getReferenceProps()}
           className={mergeClasses(
-            "tw-flex tw-cursor-pointer tw-items-center tw-rounded-md tw-border tw-border-solid tw-border-slate-300 tw-bg-white tw-px-3 tw-py-3.5 tw-text-left tw-transition tw-duration-100",
+            "tw-flex tw-py-3.5 tw-px-3 tw-rounded-md tw-bg-white tw-text-left tw-border tw-border-solid tw-border-slate-300 tw-transition tw-duration-100 tw-cursor-pointer tw-items-center",
             className,
           )}
         >
           <div
             className={
-              "tw-overflow-none tw-flex tw-w-[calc(100%-20px)] tw-items-center tw-truncate tw-text-base tw-leading-5"
+              "tw-flex tw-items-center tw-w-[calc(100%-20px)] tw-truncate tw-leading-5 tw-text-base tw-overflow-none"
             }
           >
-            <CalendarIcon className="-tw-mt-[1.5px] tw-ml-2 tw-mr-3 tw-w-5" />
+            <CalendarIcon className="tw-w-5 tw-ml-2 tw-mr-3 -tw-mt-[1.5px]" />
             {selected ? selected.toLocaleDateString() : "Select a date"}
           </div>
         </Listbox.Button>
@@ -119,7 +119,7 @@ export const AvailabilityListPopper: React.FC<{
             leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
             leaveTo="tw-transform tw-opacity-0 tw-scale-95"
           >
-            <Listbox.Options className="tw-flex tw-max-h-60 tw-w-full tw-flex-col tw-gap-3 tw-overflow-auto tw-rounded-md tw-bg-white tw-p-4 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm">
+            <Listbox.Options className="tw-max-h-60 tw-w-full tw-overflow-auto tw-rounded-md tw-bg-white tw-p-4 tw-text-base tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none sm:tw-text-sm tw-gap-3 tw-flex tw-flex-col">
               {loading ? (
                 <Loading />
               ) : (
@@ -128,12 +128,12 @@ export const AvailabilityListPopper: React.FC<{
                     key={index}
                     value={option}
                     className={({ active, selected }) =>
-                      `tw-flex tw-cursor-pointer tw-select-none tw-items-center tw-justify-center tw-rounded-xl tw-border tw-border-solid tw-border-gray-300 tw-px-4 tw-py-2 tw-text-base tw-text-slate-900
+                      `tw-flex tw-items-center tw-justify-center tw-border tw-border-solid tw-border-gray-300 tw-rounded-xl tw-py-2 tw-px-4 tw-cursor-pointer tw-select-none tw-text-base tw-text-slate-900
                         ${active && "tw-bg-slate-100"}
                         ${selected && "tw-bg-slate-200"}`
                     }
                   >
-                    <div className="tw-whitespace-nowrap tw-font-medium">{getDisplayValue(option)}</div>
+                    <div className="tw-font-medium tw-whitespace-nowrap">{getDisplayValue(option)}</div>
                   </Listbox.Option>
                 ))
               )}

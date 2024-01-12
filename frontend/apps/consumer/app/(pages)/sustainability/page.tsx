@@ -4,13 +4,13 @@ import Image from "next/image";
 
 export default function Sustainability() {
   return (
-    <main className="tw-mt-6 tw-flex tw-w-full tw-items-center tw-justify-center tw-px-5 tw-pb-16 sm:tw-mt-10 sm:tw-px-20 sm:tw-pb-32">
+    <main className="tw-flex tw-items-center tw-justify-center tw-w-full tw-px-5 sm:tw-px-20 tw-mt-6 sm:tw-mt-10 tw-pb-16 sm:tw-pb-32">
       <div className="tw-w-full tw-max-w-7xl tw-text-base">
-        <h1 className="tw-mb-6 tw-text-5xl tw-font-bold sm:tw-mb-10">Sustainability</h1>
+        <h1 className="tw-font-bold tw-text-5xl tw-mb-6 sm:tw-mb-10">Sustainability</h1>
         <Image
           src={SustainableHero}
           alt={"Arch in Moab"}
-          className="tw-mb-5 tw-rounded-xl tw-object-cover sm:tw-mb-10"
+          className="tw-rounded-xl tw-object-cover tw-mb-5 sm:tw-mb-10"
           sizes="60vw"
         />
         <div className="tw-mb-5">
@@ -28,8 +28,8 @@ export default function Sustainability() {
           preserve our planet for generations to come.
         </div>
         <div>
-          <h2 className="tw-mb-5 tw-mt-5 tw-text-2xl tw-font-semibold">What are we currently doing?</h2>
-          <ul className="tw-ml-5 tw-flex tw-list-disc tw-flex-col tw-gap-2">
+          <h2 className="tw-mt-5 tw-mb-5 tw-font-semibold tw-text-2xl">What are we currently doing?</h2>
+          <ul className="tw-flex tw-flex-col tw-list-disc tw-ml-5 tw-gap-2">
             <li>
               <span className="tw-font-semibold">Inspiring Responsibility</span>: Coaster recognizes that experiencing
               the beauty of nature fosters a sense of responsibility. We emphasize the importance of enjoying these
@@ -55,8 +55,8 @@ export default function Sustainability() {
             </li>
           </ul>
           <div>
-            <h2 className="tw-mb-5 tw-mt-5 tw-text-2xl tw-font-semibold">What are we working on?</h2>
-            <ul className="tw-ml-5 tw-flex tw-list-disc tw-flex-col tw-gap-2">
+            <h2 className="tw-mt-5 tw-mb-5 tw-font-semibold tw-text-2xl">What are we working on?</h2>
+            <ul className="tw-flex tw-flex-col tw-list-disc tw-ml-5 tw-gap-2">
               <li>
                 <span className="tw-font-semibold">Eco-Friendly Accommodations</span>: We prioritize partnerships with
                 accommodations that adhere to sustainable practices. Coaster identifies and promotes eco-friendly
@@ -85,8 +85,8 @@ export default function Sustainability() {
             </ul>
 
             <div>
-              <h2 className="tw-mb-5 tw-mt-5 tw-text-2xl tw-font-semibold">What's on our roadmap?</h2>
-              <ul className="tw-ml-5 tw-flex tw-list-disc tw-flex-col tw-gap-2">
+              <h2 className="tw-mt-5 tw-mb-5 tw-font-semibold tw-text-2xl">What's on our roadmap?</h2>
+              <ul className="tw-flex tw-flex-col tw-list-disc tw-ml-5 tw-gap-2">
                 <li>
                   <span className="tw-font-semibold">Carbon Offsetting</span>: Coaster is committed to offsetting the
                   carbon footprint of every adventure booked through our platform. We have partnered with reputable
@@ -104,7 +104,7 @@ export default function Sustainability() {
             <Image
               src={SustainableLower}
               alt={"Ski touring in winter"}
-              className="tw-mb-5 tw-mt-5 tw-rounded-xl tw-object-cover sm:tw-mb-10"
+              className="tw-rounded-xl tw-object-cover tw-mt-5 tw-mb-5 sm:tw-mb-10"
               sizes="60vw"
             />
             <div className="tw-mt-5">

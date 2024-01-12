@@ -81,8 +81,8 @@ export default function Details() {
 
   return (
     <form className="tw-w-full" onSubmit={handleSubmit(onSubmit)}>
-      <div className="tw-mb-2 tw-text-2xl tw-font-semibold">Listing Basics</div>
-      <Input className="tw-mt-3 tw-flex tw-w-full" label="Name" {...register("name")} value={watch("name")} />
+      <div className="tw-text-2xl tw-font-semibold tw-mb-2">Listing Basics</div>
+      <Input className="tw-w-full tw-flex tw-mt-3" label="Name" {...register("name")} value={watch("name")} />
       <FormError message={formState.errors.name?.message} />
       <Controller
         name="description"
@@ -99,7 +99,7 @@ export default function Details() {
       />
       <FormError message={formState.errors.description?.message} />
       <PriceInput
-        className="tw-mt-3 tw-flex tw-w-full"
+        className="tw-w-full tw-flex tw-mt-3"
         label="Price"
         {...register("price", { valueAsNumber: true })}
         value={watch("price")}
@@ -111,7 +111,7 @@ export default function Details() {
         render={({ field }) => (
           <MultiSelect
             placeholder={"Categories"}
-            className="tw-mt-3 tw-flex tw-w-full"
+            className="tw-w-full tw-flex tw-mt-3"
             label="Category"
             value={watch("categories")}
             options={Category.options}
@@ -134,7 +134,7 @@ export default function Details() {
           <InlineMapSearch
             label="Location"
             hideIcon
-            className="tw-mb-0 tw-mt-3 tw-justify-start"
+            className="tw-justify-start tw-mt-3 tw-mb-0"
             key={listing.location}
             onSelect={field.onChange}
             initial={listing.location}
@@ -144,7 +144,7 @@ export default function Details() {
       <FormError message={formState.errors.location?.message} />
       <Input
         type="number"
-        className="tw-mt-3 tw-flex tw-w-full"
+        className="tw-w-full tw-flex tw-mt-3"
         label="Duration (minutes)"
         {...register("duration", { valueAsNumber: true })}
         value={watch("duration")}
@@ -152,13 +152,13 @@ export default function Details() {
       <FormError message={formState.errors.duration?.message} />
       <Input
         type="number"
-        className="tw-mt-3 tw-flex tw-w-full"
+        className="tw-w-full tw-flex tw-mt-3"
         label="Max Guests"
         {...register("maxGuests", { valueAsNumber: true })}
         value={watch("maxGuests")}
       />
       <FormError message={formState.errors.maxGuests?.message} />
-      <Button type="submit" className="tw-ml-auto tw-mt-6 tw-h-12 tw-w-full sm:tw-w-32" disabled={!formState.isDirty}>
+      <Button type="submit" className="tw-mt-6 tw-w-full sm:tw-w-32 tw-h-12 tw-ml-auto" disabled={!formState.isDirty}>
         {formState.isSubmitting ? <Loading light /> : "Save"}
       </Button>
       <FormError message={formState.errors.root?.message} />

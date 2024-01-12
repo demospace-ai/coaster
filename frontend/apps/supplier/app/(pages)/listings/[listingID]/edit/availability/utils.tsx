@@ -39,8 +39,8 @@ export const WeekDayTimeSlotFields: React.FC<TimeSlotFieldsProps<TimeSlotSchemaT
       {[1, 2, 3, 4, 5, 6, 0].map((i) => {
         const timeSlotFields = timeSlotMap.get(i) ?? [];
         return (
-          <div key={i} className="tw-flex tw-flex-col tw-items-start tw-py-4 sm:tw-flex-row">
-            <div className="tw-mb-2 tw-flex tw-w-24 tw-shrink-0 tw-font-semibold sm:tw-mb-0">{DAY_OF_WEEK[i]}</div>
+          <div key={i} className="tw-flex-col sm:tw-flex-row tw-flex tw-items-start tw-py-4">
+            <div className="tw-flex tw-shrink-0 tw-font-semibold tw-w-24 tw-mb-2 sm:tw-mb-0">{DAY_OF_WEEK[i]}</div>
             <div className="tw-flex tw-flex-wrap tw-gap-x-2 tw-gap-y-4">
               {timeSlotFields.map((field) => {
                 if (field.timeSlot.startTime === undefined) {
@@ -56,7 +56,7 @@ export const WeekDayTimeSlotFields: React.FC<TimeSlotFieldsProps<TimeSlotSchemaT
                       }}
                     />
                     <XMarkIcon
-                      className="tw-ml-2 tw-h-5 tw-cursor-pointer tw-stroke-red-600"
+                      className="tw-ml-2 tw-h-5 tw-stroke-red-600 tw-cursor-pointer"
                       onClick={() => {
                         remove(field.index);
                       }}
@@ -65,7 +65,7 @@ export const WeekDayTimeSlotFields: React.FC<TimeSlotFieldsProps<TimeSlotSchemaT
                 );
               })}
               <div
-                className="tw-flex tw-cursor-pointer tw-items-center tw-font-medium tw-text-blue-600"
+                className="tw-flex tw-items-center tw-font-medium tw-text-blue-600 tw-cursor-pointer"
                 onClick={() => {
                   append({ type: "time_slots", dayOfWeek: i, startTime: new Date("1970-01-01T10:00") });
                 }}
@@ -102,7 +102,7 @@ export const SingleDayTimeSlotFields: React.FC<TimeSlotFieldsProps<SingleDayTime
               }}
             />
             <XMarkIcon
-              className="tw-ml-2 tw-h-5 tw-cursor-pointer tw-stroke-red-600"
+              className="tw-ml-2 tw-h-5 tw-stroke-red-600 tw-cursor-pointer"
               onClick={() => {
                 remove(idx);
               }}
@@ -111,7 +111,7 @@ export const SingleDayTimeSlotFields: React.FC<TimeSlotFieldsProps<SingleDayTime
         );
       })}
       <div
-        className="tw-flex tw-cursor-pointer tw-items-center tw-font-medium tw-text-blue-600"
+        className="tw-flex tw-items-center tw-font-medium tw-text-blue-600 tw-cursor-pointer"
         onClick={() => {
           append({ type: "single_day_time_slots", startTime: new Date("1970-01-01T10:00") });
         }}

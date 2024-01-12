@@ -56,12 +56,12 @@ export const ImagesModal: React.FC<{
       >
         <Dialog
           className={mergeClasses(
-            "tw-fixed tw-left-0 tw-top-0 tw-z-50 tw-h-full tw-w-full tw-overscroll-contain tw-bg-black tw-bg-opacity-50 tw-backdrop-blur-sm", // z-index is tied to NotificationProvider z-index (toast should be bigger)
+            "tw-fixed tw-z-50 tw-overscroll-contain tw-top-0 tw-left-0 tw-h-full tw-w-full tw-backdrop-blur-sm tw-bg-black tw-bg-opacity-50", // z-index is tied to NotificationProvider z-index (toast should be bigger)
           )}
           onClose={close}
         >
           <button
-            className="tw-absolute tw-right-4 tw-top-4 tw-z-20 tw-flex tw-cursor-pointer tw-items-center tw-justify-center tw-border-none tw-bg-transparent tw-p-0 sm:tw-right-8 sm:tw-top-8"
+            className="tw-flex tw-absolute tw-z-20 tw-top-4 sm:tw-top-8 tw-right-4 sm:tw-right-8 tw-bg-transparent tw-border-none tw-cursor-pointer tw-p-0 tw-justify-center tw-items-center"
             onClick={(e) => {
               e.preventDefault();
               close();
@@ -84,25 +84,25 @@ export const ImagesModal: React.FC<{
                   {listing.images.map((image) => (
                     <div
                       key={image.id}
-                      className="tw-flex tw-h-[90vh] tw-w-screen tw-shrink-0 tw-items-center tw-justify-center tw-pt-[10vh]"
+                      className="tw-flex tw-shrink-0 tw-pt-[10vh] tw-h-[90vh] tw-w-screen tw-items-center tw-justify-center"
                     >
                       <LoadingImage image={image} />
                     </div>
                   ))}
                 </div>
               </div>
-              <div className="tw-pointer-events-none tw-absolute tw-top-0 tw-z-10 tw-flex tw-h-[90vh] tw-w-full tw-items-center tw-pt-[10vh]">
+              <div className="tw-absolute tw-top-0 tw-w-full tw-pt-[10vh] tw-h-[90vh] tw-z-10 tw-flex tw-items-center tw-pointer-events-none">
                 <button
-                  className="tw-pointer-events-auto tw-fixed tw-right-1 tw-rounded-full tw-transition-colors hover:tw-bg-black hover:tw-bg-opacity-20 sm:tw-right-[5vw] sm:tw-p-10"
+                  className="tw-fixed tw-right-1 sm:tw-right-[5vw] sm:tw-p-10 tw-rounded-full hover:tw-bg-black hover:tw-bg-opacity-20 tw-transition-colors tw-pointer-events-auto"
                   onClick={scrollNext}
                 >
-                  <ChevronRightIcon className="tw-h-8 tw-cursor-pointer tw-stroke-slate-300 sm:tw-h-10" />
+                  <ChevronRightIcon className="tw-h-8 sm:tw-h-10 tw-cursor-pointer tw-stroke-slate-300" />
                 </button>
                 <button
-                  className="tw-pointer-events-auto tw-fixed tw-left-1 tw-rounded-full tw-transition-colors hover:tw-bg-black hover:tw-bg-opacity-20 sm:tw-left-[5vw] sm:tw-p-10"
+                  className="tw-fixed tw-left-1 sm:tw-left-[5vw] sm:tw-p-10 tw-rounded-full hover:tw-bg-black hover:tw-bg-opacity-20 tw-transition-colors tw-pointer-events-auto"
                   onClick={scrollPrev}
                 >
-                  <ChevronLeftIcon className="tw-h-8 tw-cursor-pointer tw-stroke-slate-300 sm:tw-h-10" />
+                  <ChevronLeftIcon className="tw-h-8 sm:tw-h-10 tw-cursor-pointer tw-stroke-slate-300" />
                 </button>
               </div>
             </Dialog.Panel>
@@ -119,8 +119,8 @@ const LoadingImage: React.FC<{ image: ImageType }> = ({ image }) => {
   return (
     <>
       {!loaded && (
-        <div className="tw-absolute tw-h-full tw-w-full">
-          <Loading light className="tw-absolute tw-left-1/2 tw-top-1/2 tw-z-10 -tw-ml-6 -tw-mt-6 tw-h-12 tw-w-12" />
+        <div className="tw-h-full tw-w-full tw-absolute">
+          <Loading light className="tw-absolute tw-z-10 tw-top-1/2 tw-left-1/2 tw-w-12 tw-h-12 -tw-mt-6 -tw-ml-6" />
         </div>
       )}
       <Image
@@ -129,7 +129,7 @@ const LoadingImage: React.FC<{ image: ImageType }> = ({ image }) => {
         onLoad={() => setLoaded(true)}
         sizes="50vw"
         alt="Listing image"
-        className="tw-h-full tw-max-h-[70vh] tw-w-screen tw-object-contain sm:tw-max-h-full sm:tw-w-[90vw]"
+        className="tw-w-screen sm:tw-w-[90vw] tw-h-full tw-max-h-[70vh] sm:tw-max-h-full tw-object-contain"
         src={image.url}
         onClick={(e) => {
           e.stopPropagation();

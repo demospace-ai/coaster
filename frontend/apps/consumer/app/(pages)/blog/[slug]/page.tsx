@@ -63,9 +63,9 @@ export default async function BlogPost({ params }: { params: { slug: string } })
   );
 
   return (
-    <article className="tw-prose tw-mx-4 tw-mb-64 tw-mt-12 tw-max-w-4xl sm:tw-mx-10">
+    <article className="tw-prose tw-mt-12 tw-mb-64 tw-mx-4 sm:tw-mx-10 tw-max-w-4xl">
       <h1 className="tw-mb-4">{post.title}</h1>
-      <div className="tw-mb-1 tw-flex tw-items-center">
+      <div className="tw-flex tw-items-center tw-mb-1">
         <div>By {post.authorName}</div>
         <span className="tw-mx-2">|</span>
         <span>
@@ -84,10 +84,10 @@ export default async function BlogPost({ params }: { params: { slug: string } })
         <span className="tw-mx-2">|</span>
         {post.categories && (
           <>
-            <ul className="tw-m-0 tw-list-none tw-p-0">
+            <ul className="tw-list-none tw-p-0 tw-m-0">
               {post.categories.map((category) => (
                 <li
-                  className="tw-mr-2 tw-flex tw-w-fit tw-rounded-lg tw-border tw-border-solid tw-border-orange-300 tw-bg-orange-100 tw-px-2 tw-py-0.5 tw-text-sm"
+                  className="tw-flex tw-w-fit tw-mr-2 tw-px-2 tw-py-0.5 tw-text-sm tw-bg-orange-100 tw-border tw-border-solid tw-border-orange-300 tw-rounded-lg"
                   key={category}
                 >
                   {category}

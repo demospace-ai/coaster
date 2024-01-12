@@ -68,13 +68,13 @@ export const LoginModal: React.FC = () => {
     >
       <Dialog
         className={mergeClasses(
-          "tw-fixed tw-left-0 tw-top-0 tw-z-50 tw-h-full tw-w-full tw-overscroll-contain tw-bg-black tw-bg-opacity-50 tw-backdrop-blur-sm", // z-index is tied to NotificationProvider z-index (toast should be bigger)
+          "tw-fixed tw-z-50 tw-overscroll-contain tw-top-0 tw-left-0 tw-h-full tw-w-full tw-backdrop-blur-sm tw-bg-black tw-bg-opacity-50", // z-index is tied to NotificationProvider z-index (toast should be bigger)
         )}
         onClose={() => closeLoginModal()}
       >
         <div className="tw-flex tw-h-full tw-w-full tw-items-center tw-justify-center">
           <button
-            className="tw-absolute tw-right-4 tw-top-4 tw-z-20 tw-flex tw-cursor-pointer tw-items-center tw-justify-center tw-border-none tw-bg-transparent tw-p-0 sm:tw-right-8 sm:tw-top-8"
+            className="tw-flex tw-absolute tw-z-20 tw-top-4 sm:tw-top-8 tw-right-4 sm:tw-right-8 tw-bg-transparent tw-border-none tw-cursor-pointer tw-p-0 tw-justify-center tw-items-center"
             onClick={(e) => {
               e.preventDefault();
               closeLoginModal();
@@ -91,10 +91,10 @@ export const LoginModal: React.FC = () => {
             leaveFrom="tw-scale-100"
             leaveTo="tw-scale-95"
           >
-            <Dialog.Panel className="tw-flex tw-h-full tw-max-w-[400px] tw-flex-col tw-items-center tw-bg-white tw-px-8 tw-pb-10 tw-pt-28 sm:-tw-mt-20 sm:tw-h-auto sm:tw-rounded-lg sm:tw-pt-12 sm:tw-shadow-md">
-              <Image width={200} height={32} src={LongLogo} className="tw-mb-4 tw-select-none" alt="coaster logo" />
-              <div className="tw-my-2 tw-flex tw-w-full tw-flex-col tw-items-center">{loginContent}</div>
-              <div className="tw-mx-8 tw-mt-4 tw-select-none tw-text-center tw-text-xs tw-text-slate-800 sm:tw-mx-0">
+            <Dialog.Panel className="tw-flex tw-flex-col tw-h-full sm:tw-h-auto tw-max-w-[400px] tw-pt-28 sm:tw-pt-12 tw-pb-10 tw-px-8 sm:tw-rounded-lg sm:tw-shadow-md tw-bg-white tw-items-center sm:-tw-mt-20">
+              <Image width={200} height={32} src={LongLogo} className="tw-select-none tw-mb-4" alt="coaster logo" />
+              <div className="tw-flex tw-flex-col tw-items-center tw-my-2 tw-w-full">{loginContent}</div>
+              <div className="tw-text-xs tw-text-center tw-mt-4 tw-text-slate-800 tw-select-none tw-mx-8 sm:tw-mx-0">
                 By continuing you agree to Coaster's{" "}
                 <a className="tw-text-blue-500" href="https://trycoaster.com/terms" target="_blank" rel="noreferrer">
                   Terms of Use

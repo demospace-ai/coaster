@@ -107,14 +107,14 @@ const NewListingInner: React.FC<{ initialStepNumber: number }> = ({ initialStepN
   const currentStep = stepsHydrated[currentStepNumber];
 
   return (
-    <div className="tw-flex tw-w-full tw-justify-center">
-      <div className="tw-mt-10 tw-flex tw-min-h-[600px] tw-w-[500px] tw-items-center tw-px-8 tw-pb-24 sm:tw-px-0">
+    <div className="tw-w-full tw-flex tw-justify-center">
+      <div className="tw-flex tw-px-8 sm:tw-px-0 tw-w-[500px] tw-min-h-[600px] tw-mt-10 tw-items-center tw-pb-24">
         <div className="tw-w-full">
-          <div className="tw-mb-3 tw-w-full tw-text-left tw-text-2xl tw-font-bold sm:tw-text-3xl">
+          <div className="tw-w-full tw-text-left tw-text-2xl sm:tw-text-3xl tw-font-bold tw-mb-3">
             {currentStep.title}
           </div>
           {currentStep.subtitle && (
-            <div className="tw-mb-6 tw-w-full tw-text-left tw-text-base tw-text-gray-600">{currentStep.subtitle}</div>
+            <div className="tw-w-full tw-text-left tw-text-base tw-text-gray-600 tw-mb-6">{currentStep.subtitle}</div>
           )}
           {currentStep.element}
         </div>
@@ -249,17 +249,17 @@ const ReviewStep: React.FC<StepProps> = ({ prevStep }) => {
   return (
     <>
       <div className="tw-flex tw-flex-col tw-items-center tw-pb-6">
-        <div className="tw-w-full tw-rounded-xl tw-p-8 tw-shadow-centered-md sm:tw-w-96">
+        <div className="tw-p-8 tw-shadow-centered-md tw-rounded-xl tw-w-full sm:tw-w-96">
           <img
             src={listing.images[0].url}
             alt="preview-cover"
-            className="tw-aspect-square tw-rounded-lg tw-object-cover"
+            className="tw-rounded-lg tw-aspect-square tw-object-cover"
           />
-          <div className="tw-mt-4 tw-text-xl tw-font-bold">{listing.name}</div>
+          <div className="tw-mt-4 tw-font-bold tw-text-xl">{listing.name}</div>
           <div className="tw-mt-1 tw-font-medium">{listing.location}</div>
           <div className="tw-mt-1">${listing.price} / person</div>
           <Link
-            className="tw-mt-1 tw-flex tw-w-fit tw-items-center tw-gap-1 tw-text-blue-600"
+            className="tw-flex tw-w-fit tw-items-center tw-gap-1 tw-mt-1 tw-text-blue-600"
             href={
               isProd()
                 ? `https://www.trycoaster.com/listings/${listing.id}/preview`
@@ -360,9 +360,9 @@ const PriceStepInner: React.FC<StepProps & PriceParams> = ({ nextStep, prevStep,
 
   return (
     <>
-      <div className="tw-mx-0.5 tw-mb-6 tw-flex tw-flex-col tw-items-center">
+      <div className="tw-flex tw-flex-col tw-items-center tw-mb-6 tw-mx-0.5">
         <PriceInput
-          className="tw-justify-center tw-text-3xl tw-font-semibold focus-within:tw-outline-2 focus-within:tw-outline-blue-700"
+          className="tw-text-3xl tw-font-semibold tw-justify-center focus-within:tw-outline-2 focus-within:tw-outline-blue-700"
           {...register("value", { valueAsNumber: true })}
           value={watch("value")}
         />
@@ -473,12 +473,12 @@ const ImageStepInner: React.FC<StepProps & ImageProps> = ({ nextStep, prevStep, 
 
   return (
     <>
-      <div className="tw-mb-6 tw-flex tw-flex-col tw-items-center">
+      <div className="tw-flex tw-flex-col tw-items-center tw-mb-6">
         <button className="tw-flex tw-rounded-xl tw-bg-gray-200 tw-px-10 tw-py-3" onClick={() => ref.current?.click()}>
           {uploading ? <Loading /> : "Add image"}
         </button>
-        <input ref={ref} type="file" multiple className="tw-invisible tw-flex" onChange={addImage} />
-        <div ref={drop} className="tw-grid tw-grid-cols-2 tw-items-center tw-justify-items-center tw-gap-4">
+        <input ref={ref} type="file" multiple className="tw-flex tw-invisible" onChange={addImage} />
+        <div ref={drop} className="tw-grid tw-grid-cols-2 tw-gap-4 tw-justify-items-center tw-items-center">
           {images.map((image) => (
             <Card
               key={image.id}
@@ -486,11 +486,11 @@ const ImageStepInner: React.FC<StepProps & ImageProps> = ({ nextStep, prevStep, 
               moveCard={moveCard}
               findCard={findCard}
               onDrop={updateImages}
-              className="tw-relative tw-flex tw-h-fit tw-w-fit"
+              className="tw-flex tw-relative tw-w-fit tw-h-fit"
             >
-              <img src={image.url} alt="preview-image" className="tw-cursor-grab tw-select-none tw-rounded-lg" />
+              <img src={image.url} alt="preview-image" className="tw-select-none tw-rounded-lg tw-cursor-grab" />
               <XMarkIcon
-                className="tw-absolute tw-right-2 tw-top-2 tw-w-8 tw-cursor-pointer tw-rounded-lg tw-bg-gray-100 tw-p-1 tw-opacity-[90%] hover:tw-opacity-100"
+                className="tw-w-8 tw-absolute tw-right-2 tw-top-2 tw-bg-gray-100 tw-p-1 tw-rounded-lg tw-opacity-[90%] tw-cursor-pointer hover:tw-opacity-100"
                 onClick={() => deleteImage(image.id)}
               />
             </Card>
@@ -546,7 +546,7 @@ const DetailsStepInner: React.FC<StepProps & DetailsParams> = ({ nextStep, prevS
 
   return (
     <>
-      <div className="tw-mx-0.5 tw-mb-6 tw-flex tw-flex-col tw-items-center tw-gap-1">
+      <div className="tw-flex tw-flex-col tw-items-center tw-mb-6 tw-gap-1 tw-mx-0.5">
         <Input
           label="Duration (minutes)"
           type="number"

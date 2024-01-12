@@ -31,7 +31,7 @@ export const Header: React.FC = () => {
       <PromoBanner />
       <div
         className={mergeClasses(
-          "tw-sticky tw-top-0 tw-z-10 tw-box-border tw-flex tw-w-full tw-flex-col tw-items-center tw-justify-center tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white",
+          "tw-sticky tw-z-10 tw-top-0 tw-flex tw-flex-col tw-items-center tw-justify-center tw-box-border tw-w-full tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white",
           isHome && scrollPosition < 20 && "tw-border-none",
         )}
       >
@@ -44,7 +44,7 @@ export const Header: React.FC = () => {
 
 const DesktopHeader: React.FC<{ isHome: boolean; scrollPosition: number }> = ({ isHome, scrollPosition }) => {
   return (
-    <div className="tw-hidden tw-max-h-[96px] tw-min-h-[96px] tw-w-[calc(100%-10rem)] tw-max-w-7xl tw-items-center tw-justify-between sm:tw-flex">
+    <div className="tw-hidden sm:tw-flex tw-w-[calc(100%-10rem)] tw-max-w-7xl tw-max-h-[96px] tw-min-h-[96px] tw-items-center tw-justify-between">
       <LogoLink />
       <SearchBarHeader show={!isHome || scrollPosition > 300} />
       <ProfileDropdown />
@@ -54,10 +54,10 @@ const DesktopHeader: React.FC<{ isHome: boolean; scrollPosition: number }> = ({ 
 
 const MobileHeader: React.FC = () => {
   return (
-    <div className="tw-flex tw-max-h-[72px] tw-min-h-[72px] tw-w-[calc(100%-2.5rem)] tw-max-w-7xl tw-items-center tw-justify-between sm:tw-hidden">
+    <div className="tw-flex sm:tw-hidden tw-w-[calc(100%-2.5rem)] tw-max-w-7xl tw-max-h-[72px] tw-min-h-[72px] tw-items-center tw-justify-between">
       <LogoLink />
       <button
-        className="tw-my-auto tw-mr-3 tw-flex tw-rounded-lg tw-px-1 tw-py-2 tw-text-sm tw-font-medium hover:tw-bg-gray-100"
+        className="tw-flex tw-my-auto tw-mr-3 tw-py-2 tw-px-1 tw-rounded-lg tw-font-medium tw-text-sm hover:tw-bg-gray-100"
         onClick={() => {
           if ((window as any).Atlas) {
             (window as any).Atlas.chat.openWindow();
@@ -78,10 +78,10 @@ export const PromoBanner: React.FC = () => {
   return (
     <>
       <div
-        className="tw-flex tw-max-h-[56px] tw-min-h-[56px] tw-w-full tw-cursor-pointer tw-select-none tw-flex-col tw-items-center tw-justify-center tw-bg-blue-200 sm:tw-flex-row sm:tw-text-base sm:tw-font-medium"
+        className="tw-flex tw-flex-col sm:tw-flex-row sm:tw-text-base sm:tw-font-medium tw-max-h-[56px] tw-min-h-[56px] tw-w-full tw-items-center tw-justify-center tw-bg-blue-200 tw-cursor-pointer tw-select-none"
         onClick={user ? undefined : () => openLoginModal(true)}
       >
-        <span className="tw-mr-2 tw-font-bold">Limited Time!</span>
+        <span className="tw-font-bold tw-mr-2">Limited Time!</span>
         Sign up to claim $100 credit to use on any trip!
       </div>
     </>
@@ -90,11 +90,11 @@ export const PromoBanner: React.FC = () => {
 
 const LogoLink: React.FC = () => {
   return (
-    <div className="tw-box-border tw-flex tw-h-fit tw-flex-1 tw-flex-row">
+    <div className="tw-flex tw-flex-1 tw-flex-row tw-h-fit tw-box-border">
       <Link
         className={mergeClasses(
           lateef.className,
-          "tw-my-auto tw-mt-[-2px] tw-max-w-[150px] tw-select-none tw-overflow-hidden tw-whitespace-nowrap tw-text-[48px] tw-font-extrabold tw-tracking-[-0.5px]",
+          "tw-my-auto tw-max-w-[150px] tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-tracking-[-0.5px] tw-mt-[-2px] tw-font-extrabold tw-text-[48px]",
         )}
         href="/"
         translate="no"
@@ -112,17 +112,17 @@ const ProfileDropdown: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
     <div className="tw-flex tw-flex-1 tw-justify-end">
       <div className="tw-flex">
         <button
-          className="tw-my-auto tw-mr-4 tw-flex tw-items-center tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm tw-font-medium hover:tw-bg-gray-100"
+          className="tw-flex tw-items-center tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-font-medium tw-text-sm hover:tw-bg-gray-100"
           onClick={() => {
             if ((window as any).Atlas) {
               (window as any).Atlas.chat.openWindow();
             }
           }}
         >
-          <QuestionMarkCircleIcon className="tw-mr-1 tw-h-[18px] tw-w-[18px]" />
+          <QuestionMarkCircleIcon className="tw-h-[18px] tw-w-[18px] tw-mr-1" />
           Help
         </button>
-        <div className="tw-flex tw-shrink-0 tw-flex-col tw-justify-center">
+        <div className="tw-flex tw-flex-col tw-justify-center tw-shrink-0">
           {user ? <SignedInMenu user={user} onHostApp={onHostApp} /> : <SignedOutMenu />}
         </div>
       </div>
@@ -161,11 +161,11 @@ const SignedInMenu: React.FC<{ user: User; onHostApp?: boolean }> = ({ user, onH
             ref={refs.setReference}
             {...getReferenceProps()}
             className={mergeClasses(
-              "tw-flex tw-cursor-pointer tw-select-none tw-items-center tw-rounded-full tw-border tw-border-solid tw-border-gray-300 tw-px-2 tw-py-1.5 tw-transition-all tw-ease-in-out hover:tw-shadow-md",
+              "tw-cursor-pointer tw-select-none tw-flex tw-items-center tw-rounded-full tw-border tw-border-solid tw-border-gray-300 tw-px-2 tw-py-1.5 hover:tw-shadow-md tw-ease-in-out tw-transition-all",
               open && "tw-shadow-md",
             )}
           >
-            <Bars3Icon className="tw-mr-2 tw-h-5 tw-w-5" />
+            <Bars3Icon className="tw-w-5 tw-h-5 tw-mr-2" />
             <ProfilePicture url={user.profile_picture_url} name={user.first_name} width={28} height={28} />
           </Menu.Button>
           <div ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
@@ -180,10 +180,10 @@ const SignedInMenu: React.FC<{ user: User; onHostApp?: boolean }> = ({ user, onH
             >
               <Menu.Items
                 static
-                className="tw-z-10 tw-mr-2 tw-mt-2 tw-w-64 tw-divide-y tw-rounded-md tw-bg-white tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none"
+                className="tw-z-10 tw-divide-y tw-mt-2 tw-mr-2 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none tw-w-64"
               >
                 <div className="tw-m-2">
-                  <p className="tw-px-1 tw-pb-1 tw-pt-2 tw-text-xs tw-uppercase">Signed in as</p>
+                  <p className="tw-px-1 tw-pt-2 tw-pb-1 tw-text-xs tw-uppercase">Signed in as</p>
                   <Menu.Item>
                     <Link className={menuItem} href="/profile">
                       <ProfilePicture
@@ -202,7 +202,7 @@ const SignedInMenu: React.FC<{ user: User; onHostApp?: boolean }> = ({ user, onH
                     </Link>
                   </Menu.Item>
                 </div>
-                <div className="tw-m-2 tw-flex tw-flex-col tw-pt-2">
+                <div className="tw-flex tw-flex-col tw-m-2 tw-pt-2">
                   {!onHostApp && (
                     <Menu.Item>
                       <Link className={navItem} href="/reservations">
@@ -221,7 +221,7 @@ const SignedInMenu: React.FC<{ user: User; onHostApp?: boolean }> = ({ user, onH
                     </Link>
                   </Menu.Item>
                 </div>
-                <div className="tw-m-2 tw-flex tw-pt-2">
+                <div className="tw-flex tw-m-2 tw-pt-2">
                   <Menu.Item>
                     {onHostApp ? (
                       <SwitchToCustomerSiteLink className={navItem} />
@@ -230,10 +230,10 @@ const SignedInMenu: React.FC<{ user: User; onHostApp?: boolean }> = ({ user, onH
                     )}
                   </Menu.Item>
                 </div>
-                <div className="tw-m-2 tw-flex tw-flex-col tw-py-2">
+                <div className="tw-flex tw-flex-col tw-m-2 tw-py-2">
                   <Menu.Item>
                     <div className={navItem} onClick={logout}>
-                      <ArrowRightOnRectangleIcon className="tw-mr-2 tw-inline tw-h-4 tw-stroke-2" />
+                      <ArrowRightOnRectangleIcon className="tw-h-4 tw-inline tw-mr-2 tw-stroke-2" />
                       Logout
                     </div>
                   </Menu.Item>
@@ -276,11 +276,11 @@ const SignedOutMenu: React.FC = () => {
             ref={refs.setReference}
             {...getReferenceProps()}
             className={mergeClasses(
-              "tw-flex tw-cursor-pointer tw-select-none tw-items-center tw-rounded-full tw-border tw-border-solid tw-border-gray-300 tw-px-2 tw-py-1.5 tw-transition-all tw-ease-in-out hover:tw-shadow-md",
+              "tw-cursor-pointer tw-select-none tw-flex tw-items-center tw-rounded-full tw-border tw-border-solid tw-border-gray-300 tw-px-2 tw-py-1.5 hover:tw-shadow-md tw-ease-in-out tw-transition-all",
               open && "tw-shadow-md",
             )}
           >
-            <Bars3Icon className="tw-mr-2 tw-h-5 tw-w-5" />
+            <Bars3Icon className="tw-w-5 tw-h-5 tw-mr-2" />
             <ProfilePlaceholder width={28} height={28} />
           </Menu.Button>
           <div ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
@@ -295,16 +295,16 @@ const SignedOutMenu: React.FC = () => {
             >
               <Menu.Items
                 static
-                className="tw-z-10 tw-mr-2 tw-mt-2 tw-w-64 tw-divide-y tw-rounded-md tw-bg-white tw-shadow-lg tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none"
+                className="tw-z-10 tw-divide-y tw-mt-2 tw-mr-2 tw-rounded-md tw-shadow-lg tw-bg-white tw-ring-1 tw-ring-slate-900 tw-ring-opacity-5 focus:tw-outline-none tw-w-64"
               >
-                <div className="tw-m-2 tw-flex tw-flex-col tw-pt-2 tw-font-semibold">
+                <div className="tw-flex tw-flex-col tw-m-2 tw-pt-2 tw-font-semibold">
                   <Menu.Item>
                     <div className={navItem} onClick={() => openLoginModal()}>
                       Sign up
                     </div>
                   </Menu.Item>
                 </div>
-                <div className="tw-m-2 tw-flex tw-flex-col tw-py-2">
+                <div className="tw-flex tw-flex-col tw-m-2 tw-py-2">
                   <Menu.Item>
                     <div className={navItem} onClick={() => openLoginModal(true)}>
                       Log in
@@ -363,9 +363,9 @@ const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
                       </div>
                       <div className="tw-relative tw-mt-6 tw-h-full tw-px-4 sm:tw-px-6">
                         {user ? (
-                          <div className="tw-flex tw-h-full tw-flex-col">
+                          <div className="tw-flex tw-flex-col tw-h-full">
                             <div className="tw-flex tw-items-center tw-py-2 tw-pl-2">
-                              <p className="tw-select-none tw-truncate tw-text-xl tw-font-semibold tw-text-slate-900">
+                              <p className="tw-truncate tw-text-xl tw-font-semibold tw-text-slate-900 tw-select-none">
                                 Welcome, {user?.first_name}
                               </p>
                             </div>
@@ -406,7 +406,7 @@ const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
                         ) : (
                           <div className="tw-flex tw-flex-col tw-gap-4">
                             <div
-                              className={mergeClasses(buttonStyle, "tw-bg-gray-900 tw-text-white hover:tw-bg-gray-800")}
+                              className={mergeClasses(buttonStyle, "tw-text-white tw-bg-gray-900 hover:tw-bg-gray-800")}
                               onClick={() => {
                                 openLoginModal();
                                 setOpen(false);
@@ -440,7 +440,7 @@ const MobileMenu: React.FC<{ onHostApp?: boolean }> = ({ onHostApp }) => {
 
 export const SupplierHeader: React.FC = () => {
   return (
-    <div className="tw-sticky tw-top-0 tw-z-10 tw-box-border tw-flex tw-w-full tw-flex-col tw-items-center tw-justify-center tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white">
+    <div className="tw-sticky tw-z-10 tw-top-0 tw-flex tw-flex-col tw-items-center tw-justify-center tw-box-border tw-w-full tw-border-b tw-border-solid tw-border-slate-200 tw-bg-white">
       <SupplierDesktopHeader />
       <SupplierMobileHeader />
     </div>
@@ -449,7 +449,7 @@ export const SupplierHeader: React.FC = () => {
 
 const SupplierDesktopHeader: React.FC = () => {
   return (
-    <div className="tw-hidden tw-max-h-[96px] tw-min-h-[96px] tw-w-[calc(100%-10rem)] tw-max-w-7xl tw-items-center tw-justify-between sm:tw-flex">
+    <div className="tw-hidden sm:tw-flex tw-w-[calc(100%-10rem)] tw-max-w-7xl tw-max-h-[96px] tw-min-h-[96px] tw-items-center tw-justify-between">
       <LogoLink />
       <SupplierLinks />
       <ProfileDropdown onHostApp />
@@ -459,10 +459,10 @@ const SupplierDesktopHeader: React.FC = () => {
 
 const SupplierMobileHeader: React.FC = () => {
   return (
-    <div className="tw-flex tw-max-h-[72px] tw-min-h-[72px] tw-w-[calc(100%-2.5rem)] tw-max-w-7xl tw-items-center tw-justify-between sm:tw-hidden">
+    <div className="tw-flex sm:tw-hidden tw-w-[calc(100%-2.5rem)] tw-max-w-7xl tw-max-h-[72px] tw-min-h-[72px] tw-items-center tw-justify-between">
       <LogoLink />
       <button
-        className="tw-my-auto tw-flex tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm tw-font-medium hover:tw-bg-gray-100"
+        className="tw-flex tw-my-auto tw-py-2 tw-px-4 tw-rounded-lg tw-font-medium tw-text-sm hover:tw-bg-gray-100"
         onClick={() => {
           if ((window as any).Atlas) {
             (window as any).Atlas.chat.openWindow();
@@ -479,16 +479,16 @@ const SupplierMobileHeader: React.FC = () => {
 
 const SupplierLinks: React.FC = () => {
   return (
-    <div className="tw-hidden tw-w-full tw-justify-center sm:tw-flex">
+    <div className="tw-hidden sm:tw-flex tw-w-full tw-justify-center">
       <NavLink
-        className="tw-my-auto tw-mr-4 tw-select-none tw-overflow-hidden tw-whitespace-nowrap tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm tw-font-medium hover:tw-bg-gray-100"
+        className="tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
         activeClassName="tw-bg-gray-100"
         href="/"
       >
         Home
       </NavLink>
       <NavLink
-        className="tw-my-auto tw-mr-4 tw-select-none tw-overflow-hidden tw-whitespace-nowrap tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm tw-font-medium hover:tw-bg-gray-100"
+        className="tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
         activeClassName="tw-bg-gray-100"
         href="/listings"
         fullMatch={false}
@@ -496,7 +496,7 @@ const SupplierLinks: React.FC = () => {
         Listings
       </NavLink>
       <NavLink
-        className="tw-my-auto tw-mr-4 tw-select-none tw-overflow-hidden tw-whitespace-nowrap tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm tw-font-medium hover:tw-bg-gray-100"
+        className="tw-my-auto tw-mr-4 tw-py-2 tw-px-4 tw-rounded-lg tw-whitespace-nowrap tw-overflow-hidden tw-select-none tw-font-medium tw-text-sm hover:tw-bg-gray-100"
         activeClassName="tw-bg-gray-100"
         href="/finance"
         fullMatch={false}

@@ -1,16 +1,16 @@
 export default function Page() {
   return (
-    <main className="tw-mt-6 tw-flex tw-w-full tw-items-center tw-justify-center tw-px-5 tw-pb-16 sm:tw-mt-10 sm:tw-px-20 sm:tw-pb-32">
+    <main className="tw-flex tw-items-center tw-justify-center tw-w-full tw-px-5 sm:tw-px-20 tw-mt-6 sm:tw-mt-10 tw-pb-16 sm:tw-pb-32">
       <div className="tw-w-full tw-max-w-4xl tw-text-base">
-        <h1 className="tw-mb-4 tw-text-4xl tw-font-bold sm:tw-mb-6 sm:tw-text-5xl">Reserve Now, Enjoy Later</h1>
-        <h2 className="tw-mb-4 tw-text-2xl tw-font-semibold">Overview</h2>
+        <h1 className="tw-font-bold tw-text-4xl sm:tw-text-5xl tw-mb-4 sm:tw-mb-6">Reserve Now, Enjoy Later</h1>
+        <h2 className="tw-text-2xl tw-font-semibold tw-mb-4">Overview</h2>
         <p className="tw-mb-5">
           Our Reserve Now & Pay Later option allows you to secure a spot on without any initial payment! No deposit is
           needed, but you will need to provide an authorized credit card when you make the reservation. A nominal one
           dollar (or the lowest denomination in your currency) authorization fee is charged to verify the card.
         </p>
-        <h3 className="tw-mb-4 tw-text-2xl tw-font-semibold">How it Works</h3>
-        <ul className="tw-mb-5 tw-list-decimal tw-pl-5 marker:tw-text-xl">
+        <h3 className="tw-text-2xl tw-font-semibold tw-mb-4">How it Works</h3>
+        <ul className="tw-list-decimal marker:tw-text-xl tw-pl-5 tw-mb-5">
           <li className="tw-mb-4">
             <h4 className="tw-text-xl tw-font-semibold">Find your Dream Trip</h4>
             <p>
@@ -41,7 +41,7 @@ export default function Page() {
             </p>
           </li>
         </ul>
-        <h2 className="tw-mb-4 tw-text-2xl tw-font-semibold">Terms & Conditions</h2>
+        <h2 className="tw-text-2xl tw-font-semibold tw-mb-4">Terms & Conditions</h2>
         <p className="tw-mb-5">
           Payment for your experience will be processed 48 hours in advance, according to Pacific Time (US West Coast).
           For example, if you have scheduled an experience in Mexico City to begin at 1pm on Saturday, October 5, your

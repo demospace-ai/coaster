@@ -8,5 +8,5 @@
     "paths": {
       "@coaster/assets/*": ["../../packages/assets/src/*"]
     }
-  }
+  },
 }

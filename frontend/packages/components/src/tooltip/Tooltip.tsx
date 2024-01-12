@@ -147,7 +147,7 @@ const TooltipContent = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>
         style={{
           ...context.floatingStyles,
         }}
-        className="tw-rounded-lg tw-bg-slate-600 tw-px-2 tw-py-1 tw-text-white"
+        className="tw-bg-slate-600 tw-text-white tw-py-1 tw-px-2 tw-rounded-lg"
         {...context.getFloatingProps(props)}
       >
         {children}

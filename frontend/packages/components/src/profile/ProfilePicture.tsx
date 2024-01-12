@@ -18,7 +18,7 @@ export const ProfilePicture: React.FC<{
           height={height}
           src={url}
           className={mergeClasses(
-            "tw-flex tw-aspect-square tw-select-none tw-items-center tw-justify-center tw-rounded-full tw-object-cover",
+            "tw-aspect-square tw-rounded-full tw-select-none tw-flex tw-items-center tw-justify-center tw-object-cover",
             className,
           )}
           referrerPolicy="no-referrer"
@@ -28,7 +28,7 @@ export const ProfilePicture: React.FC<{
       ) : (
         <div
           className={mergeClasses(
-            "tw-flex tw-aspect-square tw-items-center tw-justify-center tw-rounded-full tw-bg-orange-400 tw-text-white",
+            "tw-bg-orange-400 tw-text-white tw-aspect-square tw-rounded-full tw-flex tw-justify-center tw-items-center",
             className,
           )}
           style={{
@@ -53,7 +53,7 @@ export const ProfilePlaceholder: React.FC<{
   return (
     <div
       className={mergeClasses(
-        "tw-flex tw-items-center tw-justify-center tw-rounded-full tw-bg-gray-400 tw-text-white",
+        "tw-bg-gray-400 tw-text-white tw-rounded-full tw-flex tw-justify-center tw-items-center",
         className,
       )}
       onClick={onClick}

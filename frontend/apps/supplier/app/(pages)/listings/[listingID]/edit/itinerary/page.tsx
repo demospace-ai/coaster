@@ -82,15 +82,15 @@ export default function Itinerary() {
   return (
     <form className="tw-w-full" onSubmit={handleSubmit(onSubmit)}>
       <div className="tw-flex tw-flex-col">
-        <div className="tw-mb-2 tw-text-2xl tw-font-semibold">Itinerary</div>
+        <div className="tw-text-2xl tw-font-semibold tw-mb-2">Itinerary</div>
         <div className="tw-flex tw-flex-col tw-gap-3">
           {itinerarySteps.map((field, idx) => (
-            <div key={idx} className="tw-mb-4 tw-w-full">
+            <div key={idx} className="tw-w-full tw-mb-4">
               <div className="tw-flex tw-items-center">
                 <div className="tw-w-full">
-                  <h2 className="tw-mb-2 tw-text-xl tw-font-medium">Step {idx + 1}</h2>
+                  <h2 className="tw-font-medium tw-text-xl tw-mb-2">Step {idx + 1}</h2>
                   <div className="tw-flex tw-gap-2">
-                    <div className="tw-flex tw-w-full tw-flex-col">
+                    <div className="tw-flex tw-flex-col tw-w-full">
                       <Input
                         {...register(`itinerarySteps.${idx}.step_label`)}
                         value={field.step_label}
@@ -99,7 +99,7 @@ export default function Itinerary() {
                       />
                       <FormError message={formState.errors.itinerarySteps?.[idx]?.step_label?.message} />
                     </div>
-                    <div className="tw-flex tw-w-full tw-flex-col">
+                    <div className="tw-flex tw-flex-col tw-w-full">
                       <Input
                         {...register(`itinerarySteps.${idx}.title`)}
                         value={field.title}
@@ -117,7 +117,7 @@ export default function Itinerary() {
                         value={field.value}
                         setValue={field.onChange}
                         onBlur={field.onBlur}
-                        className="tw-mt-2 tw-h-[120px] tw-min-h-[120px]"
+                        className="tw-mt-2 tw-min-h-[120px] tw-h-[120px]"
                         label="Description"
                       />
                     )}
@@ -126,7 +126,7 @@ export default function Itinerary() {
                 </div>
                 <div className="tw-flex tw-items-center">
                   <TrashIcon
-                    className="tw-ml-5 tw-h-10 tw-shrink-0 tw-cursor-pointer tw-rounded tw-p-2 hover:tw-bg-gray-100"
+                    className="tw-shrink-0 tw-h-10 tw-rounded tw-ml-5 tw-p-2 tw-cursor-pointer hover:tw-bg-gray-100"
                     onClick={() => remove(idx)}
                   />
                 </div>
@@ -135,16 +135,16 @@ export default function Itinerary() {
           ))}
         </div>
         <Button
-          className="tw-mt-5 tw-flex tw-items-center tw-justify-center tw-border tw-border-solid tw-border-black tw-bg-white tw-py-2 tw-font-medium tw-text-black hover:tw-bg-slate-100"
+          className="tw-flex tw-items-center tw-justify-center tw-bg-white hover:tw-bg-slate-100 tw-text-black tw-font-medium tw-border tw-border-solid tw-border-black tw-py-2 tw-mt-5"
           onClick={() => {
             append({ id: undefined, title: "", description: "", step_label: "" });
           }}
         >
-          <PlusIcon className="tw-mr-1.5 tw-h-4" />
+          <PlusIcon className="tw-h-4 tw-mr-1.5" />
           Add Itinerary Step
         </Button>
       </div>
-      <Button type="submit" className="tw-ml-auto tw-mt-6 tw-h-12 tw-w-full sm:tw-w-32" disabled={!formState.isDirty}>
+      <Button type="submit" className="tw-mt-6 tw-w-full sm:tw-w-32 tw-h-12 tw-ml-auto" disabled={!formState.isDirty}>
         {formState.isSubmitting ? <Loading /> : "Save"}
       </Button>
       <FormError message={formState.errors.root?.message} />

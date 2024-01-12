@@ -14,12 +14,12 @@ export default async function Reservation({ params }: { params: { bookingReferen
 
   return (
     <main className="tw-flex tw-w-full tw-justify-center tw-px-5 sm:tw-px-20">
-      <div className="tw-flex tw-w-full tw-max-w-7xl tw-flex-col tw-items-center tw-pb-24 tw-pt-5 sm:tw-pt-8">
-        <div className="tw-mb-4 tw-flex tw-w-full tw-flex-col tw-justify-start sm:tw-hidden">
-          <div className="tw-text-lg tw-font-semibold tw-text-slate-800">{booking.reference}</div>
-          <div className="tw-text-3xl tw-font-bold">{booking.listing.name}</div>
+      <div className="tw-flex tw-flex-col tw-items-center tw-pt-5 sm:tw-pt-8 tw-pb-24 tw-w-full tw-max-w-7xl">
+        <div className="tw-flex sm:tw-hidden tw-flex-col tw-justify-start tw-w-full tw-mb-4">
+          <div className="tw-font-semibold tw-text-lg tw-text-slate-800">{booking.reference}</div>
+          <div className="tw-font-bold tw-text-3xl">{booking.listing.name}</div>
         </div>
-        <div className="tw-flex tw-w-full tw-flex-row">
+        <div className="tw-flex tw-flex-row tw-w-full">
           <Image
             src={booking.booking_image.url}
             width={booking.booking_image.width}
@@ -31,9 +31,9 @@ export default async function Reservation({ params }: { params: { bookingReferen
             className="tw-w-32 sm:tw-w-48"
           />
           <div className="tw-ml-4">
-            <div className="tw-mb-2 tw-hidden tw-flex-col sm:tw-flex">
-              <div className="tw-text-lg tw-font-semibold tw-text-slate-800">{booking.reference}</div>
-              <div className="tw-text-3xl tw-font-bold">{booking.listing.name}</div>
+            <div className="tw-hidden sm:tw-flex tw-flex-col tw-mb-2">
+              <div className="tw-font-semibold tw-text-lg tw-text-slate-800">{booking.reference}</div>
+              <div className="tw-font-bold tw-text-3xl">{booking.listing.name}</div>
             </div>
             <div className="tw-text-base tw-font-medium">{booking.listing.location}</div>
             <div className="tw-text-base tw-font-medium">
@@ -51,13 +51,13 @@ export default async function Reservation({ params }: { params: { bookingReferen
 
 const YourBooking: React.FC<{ booking: Booking }> = ({ booking }) => {
   return (
-    <div className="tw-mt-10 tw-flex tw-w-full tw-flex-col tw-justify-start">
-      <div className="tw-mb-4 tw-text-2xl tw-font-bold">Your Booking</div>
-      <div className="tw-mb-1 tw-text-base tw-font-semibold">Reference</div>
+    <div className="tw-flex tw-flex-col tw-justify-start tw-w-full tw-mt-10">
+      <div className="tw-text-2xl tw-font-bold tw-mb-4">Your Booking</div>
+      <div className="tw-text-base tw-font-semibold tw-mb-1">Reference</div>
       <div className="tw-mb-4">{booking.reference}</div>
-      <div className="tw-mb-1 tw-text-base tw-font-semibold">Participants</div>
+      <div className="tw-text-base tw-font-semibold tw-mb-1">Participants</div>
       <div className="tw-mb-4">{booking.guests > 1 ? `${booking.guests} guests` : "1 guest"}</div>
-      <div className="tw-mb-1 tw-text-base tw-font-semibold">Total Cost</div>
+      <div className="tw-text-base tw-font-semibold tw-mb-1">Total Cost</div>
       <div className="tw-mb-4">${booking.payments.length > 0 ? booking.payments[0].total_amount / 100 : "Pending"}</div>
     </div>
   );
@@ -69,19 +69,19 @@ const AboutTheTrip: React.FC<{ booking: Booking }> = ({ booking }) => {
     : "";
 
   return (
-    <div className="tw-mt-5 tw-flex tw-w-full tw-flex-col tw-justify-start">
-      <div className="tw-mb-4 tw-text-2xl tw-font-bold">About the trip</div>
-      <div className="tw-mb-1 tw-text-base tw-font-semibold">Activity Type</div>
+    <div className="tw-flex tw-flex-col tw-justify-start tw-w-full tw-mt-5">
+      <div className="tw-text-2xl tw-font-bold tw-mb-4">About the trip</div>
+      <div className="tw-text-base tw-font-semibold tw-mb-1">Activity Type</div>
       <div className="tw-mb-4">{categoriesString}</div>
-      <div className="tw-mb-1 tw-text-base tw-font-semibold">Duration</div>
+      <div className="tw-text-base tw-font-semibold tw-mb-1">Duration</div>
       <div className="tw-mb-4">Approx. {getDuration(booking.listing.duration_minutes)}</div>
       {booking.listing.includes && booking.listing.includes.length > 0 && (
         <div className="tw-mb-5">
-          <div className="tw-mb-2 tw-text-base tw-font-semibold">Includes</div>
+          <div className="tw-text-base tw-font-semibold tw-mb-2">Includes</div>
           <ul>
             {booking.listing.includes.map((item) => (
               <li key={item} className="tw-flex tw-items-center">
-                <CheckIcon className="tw-mr-2 tw-h-4 tw-w-4 tw-text-green-600" />
+                <CheckIcon className="tw-h-4 tw-w-4 tw-text-green-600 tw-mr-2" />
                 {item}
               </li>
             ))}
@@ -90,11 +90,11 @@ const AboutTheTrip: React.FC<{ booking: Booking }> = ({ booking }) => {
       )}
       {booking.listing.not_included && booking.listing.not_included.length > 0 && (
         <div className="tw-mb-5">
-          <div className="tw-mb-2 tw-text-base tw-font-semibold">What's not included</div>
+          <div className="tw-text-base tw-font-semibold tw-mb-2">What's not included</div>
           <ul>
             {booking.listing.not_included.map((item) => (
               <li key={item} className="tw-flex tw-items-center">
-                <XMarkIcon className="tw-mr-2 tw-h-5 tw-w-5 tw-text-red-500" />
+                <XMarkIcon className="tw-h-5 tw-w-5 tw-text-red-500 tw-mr-2" />
                 {item}
               </li>
             ))}

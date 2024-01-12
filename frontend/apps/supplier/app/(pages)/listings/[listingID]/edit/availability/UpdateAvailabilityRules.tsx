@@ -75,9 +75,9 @@ export const ExistingRuleForm: React.FC<{
   }
 
   return (
-    <div className="tw-border-box tw-flex tw-h-[80vh] tw-w-[320px] tw-flex-col tw-px-8 tw-pb-10 sm:tw-h-[70vh] sm:tw-w-[480px] sm:tw-px-12 md:tw-w-[640px] lg:tw-w-[900px] 4xl:tw-h-[65vh]">
-      <div className="tw-mb-2 tw-w-full tw-text-left tw-text-2xl tw-font-semibold">Update Availability Rule</div>
-      <div className="tw-flex tw-w-full tw-flex-grow tw-flex-col tw-overflow-hidden">{existingRuleForm}</div>
+    <div className="tw-flex tw-flex-col tw-w-[320px] sm:tw-w-[480px] md:tw-w-[640px] lg:tw-w-[900px] tw-h-[80vh] sm:tw-h-[70vh] 4xl:tw-h-[65vh] tw-px-8 sm:tw-px-12 tw-pb-10 tw-border-box">
+      <div className="tw-text-left tw-w-full tw-text-2xl tw-font-semibold tw-mb-2">Update Availability Rule</div>
+      <div className="tw-flex tw-flex-col tw-w-full tw-flex-grow tw-overflow-hidden">{existingRuleForm}</div>
     </div>
   );
 };
@@ -142,11 +142,11 @@ const FixedDateRuleUpdateForm: React.FC<{
 
   return (
     <form
-      className="tw-flex tw-flex-grow tw-flex-col tw-items-center tw-overflow-hidden"
+      className="tw-flex tw-flex-col tw-flex-grow tw-items-center tw-overflow-hidden"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <div className="tw-mb-4 tw-flex tw-w-full tw-flex-grow tw-flex-col tw-overflow-y-auto tw-pb-10">
-        <div className="tw-mb-1 tw-mt-5 tw-text-lg tw-font-semibold">Rule Name</div>
+      <div className="tw-flex tw-flex-col tw-w-full tw-flex-grow tw-overflow-y-auto tw-pb-10 tw-mb-4">
+        <div className="tw-text-lg tw-font-semibold tw-mb-1 tw-mt-5">Rule Name</div>
         <Input
           {...register("name")}
           value={watch("name")}
@@ -154,8 +154,8 @@ const FixedDateRuleUpdateForm: React.FC<{
           placeholder="E.g. 2020 Summer Availability"
         />
         <FormError message={errors.name?.message} />
-        <div className="tw-mb-3 tw-mt-8 tw-text-lg tw-font-semibold">Single Date</div>
-        <div className="tw-flex tw-flex-col tw-items-center tw-justify-start sm:tw-items-start">
+        <div className="tw-text-lg tw-font-semibold tw-mb-3 tw-mt-8">Single Date</div>
+        <div className="tw-flex tw-flex-col tw-justify-start tw-items-center sm:tw-items-start">
           <Controller
             name="start_date"
             control={control}
@@ -174,7 +174,7 @@ const FixedDateRuleUpdateForm: React.FC<{
         <FormError message={errors.start_date?.message} />
         {availabilityType === AvailabilityType.Enum.datetime && (
           <>
-            <div className="tw-mb-1 tw-mt-5 tw-text-lg tw-font-semibold">Time Slots</div>
+            <div className="tw-text-lg tw-font-semibold tw-mb-1 tw-mt-5">Time Slots</div>
             <SingleDayTimeSlotFields
               fields={fields as FieldArrayWithId<{ time_slots: SingleDayTimeSlotSchemaType[] }, "time_slots", "id">[]}
               update={update}
@@ -188,7 +188,7 @@ const FixedDateRuleUpdateForm: React.FC<{
         <FormError message={updateAvailability.error?.message} className="tw-mt-1" />
       </div>
       <Button className="tw-mt-3 tw-w-48 tw-py-2" type="submit">
-        {updateAvailability.isLoading ? <Loading light /> : "Submit"}
+        {updateAvailability.isLoading ? <Loading light/> : "Submit"}
       </Button>
     </form>
   );
@@ -275,11 +275,11 @@ const FixedRangeRuleUpdateForm: React.FC<{
 
   return (
     <form
-      className="tw-flex tw-flex-grow tw-flex-col tw-items-center tw-overflow-hidden"
+      className="tw-flex tw-flex-col tw-flex-grow tw-items-center tw-overflow-hidden"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <div className="tw-mb-4 tw-flex tw-w-full tw-flex-grow tw-flex-col tw-overflow-y-auto tw-pb-10">
-        <div className="tw-mb-1 tw-mt-5 tw-text-lg tw-font-semibold">Rule Name</div>
+      <div className="tw-flex tw-flex-col tw-w-full tw-flex-grow tw-overflow-y-auto tw-pb-10 tw-mb-4">
+        <div className="tw-text-lg tw-font-semibold tw-mb-1 tw-mt-5">Rule Name</div>
         <Input
           {...register("name")}
           value={watch("name")}
@@ -287,8 +287,8 @@ const FixedRangeRuleUpdateForm: React.FC<{
           placeholder="E.g. 2020 Summer Availability"
         />
         <FormError message={errors.name?.message} />
-        <div className="tw-mb-3 tw-mt-8 tw-text-lg tw-font-semibold">Date Range</div>
-        <div className="tw-flex tw-flex-col tw-items-center tw-justify-start sm:tw-items-start">
+        <div className="tw-text-lg tw-font-semibold tw-mb-3 tw-mt-8">Date Range</div>
+        <div className="tw-flex tw-flex-col tw-justify-start tw-items-center sm:tw-items-start">
           <Controller
             name="date_range"
             control={control}
@@ -310,7 +310,7 @@ const FixedRangeRuleUpdateForm: React.FC<{
         <FormError className="tw-mb-3" message={errors.date_range?.to?.message} />
         {availabilityType === AvailabilityType.Enum.datetime ? (
           <>
-            <div className="tw-mb-1 tw-mt-5 tw-text-lg tw-font-semibold">Time Slots</div>
+            <div className="tw-text-lg tw-font-semibold tw-mb-1 tw-mt-5">Time Slots</div>
             <div className="tw-divide-y">
               <WeekDayTimeSlotFields
                 fields={fields as FieldArrayWithId<{ time_slots: TimeSlotSchemaType[] }, "time_slots", "id">[]}
@@ -323,8 +323,8 @@ const FixedRangeRuleUpdateForm: React.FC<{
           </>
         ) : (
           // Let the user select which days of the week to repeat on for full day listings
-          <div className="tw-mt-1 tw-flex tw-w-full tw-flex-col">
-            <div className="tw-mb-1 tw-text-lg tw-font-medium">Affected days of the week</div>
+          <div className="tw-flex tw-flex-col tw-w-full tw-mt-1">
+            <div className="tw-text-lg tw-font-medium tw-mb-1">Affected days of the week</div>
             <div className="tw-mb-4">Select which days of the week this availability rule applies to.</div>
             <Controller
               name="recurring_days"
@@ -446,11 +446,11 @@ const RecurringRuleUpdateForm: React.FC<{
 
   return (
     <form
-      className="tw-flex tw-flex-grow tw-flex-col tw-items-center tw-overflow-hidden"
+      className="tw-flex tw-flex-col tw-flex-grow tw-items-center tw-overflow-hidden"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <div className="tw-mb-4 tw-flex tw-w-full tw-flex-grow tw-flex-col tw-overflow-y-auto tw-pb-10">
-        <div className="tw-mb-1 tw-mt-5 tw-text-lg tw-font-semibold">Rule Name</div>
+      <div className="tw-flex tw-flex-col tw-w-full tw-flex-grow tw-overflow-y-auto tw-pb-10 tw-mb-4">
+        <div className="tw-text-lg tw-font-semibold tw-mb-1 tw-mt-5">Rule Name</div>
         <Input
           {...register("name")}
           value={watch("name")}
@@ -458,7 +458,7 @@ const RecurringRuleUpdateForm: React.FC<{
           placeholder="E.g. 2020 Summer Availability"
         />
         <FormError message={errors.name?.message} />
-        <div className="tw-mb-1 tw-mt-6 tw-text-lg tw-font-semibold">Affected years</div>
+        <div className="tw-text-lg tw-font-semibold tw-mb-1 tw-mt-6">Affected years</div>
         <div className="tw-mb-4">Select which year(s) this availability rule applies to.</div>
         <Controller
           name="recurring_years"
@@ -485,7 +485,7 @@ const RecurringRuleUpdateForm: React.FC<{
             />
           )}
         />
-        <div className="tw-mb-1 tw-text-lg tw-font-semibold">Affected months</div>
+        <div className="tw-text-lg tw-font-semibold tw-mb-1">Affected months</div>
         <div className="tw-mb-4">Select which month(s) this availability rule applies to.</div>
         <Controller
           name="recurring_months"
@@ -515,7 +515,7 @@ const RecurringRuleUpdateForm: React.FC<{
         />
         {availabilityType === AvailabilityType.Enum.datetime ? (
           <>
-            <div className="tw-mb-1 tw-mt-5 tw-text-lg tw-font-semibold">Time Slots</div>
+            <div className="tw-text-lg tw-font-semibold tw-mb-1 tw-mt-5">Time Slots</div>
             <div className="tw-divide-y">
               <WeekDayTimeSlotFields
                 fields={fields as FieldArrayWithId<{ time_slots: TimeSlotSchemaType[] }, "time_slots", "id">[]}
@@ -527,8 +527,8 @@ const RecurringRuleUpdateForm: React.FC<{
           </>
         ) : (
           // Let the user select which days of the week to repeat on for full day listings
-          <div className="tw-mt-1 tw-flex tw-w-full tw-flex-col">
-            <div className="tw-mb-1 tw-text-lg tw-font-medium">Affected days of the week</div>
+          <div className="tw-flex tw-flex-col tw-w-full tw-mt-1">
+            <div className="tw-text-lg tw-font-medium tw-mb-1">Affected days of the week</div>
             <div className="tw-mb-4">Select which days of the week this availability rule applies to.</div>
             <Controller
               name="recurring_days"

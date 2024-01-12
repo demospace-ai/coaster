@@ -18,10 +18,10 @@ import { Loading } from "../loading/Loading";
 export const Invite: React.FC = () => {
   const [done, setDone] = useState(false);
   return (
-    <div className="tw-flex tw-h-full tw-w-full tw-flex-row tw-bg-slate-100 tw-pb-20">
-      <div className="tw-mx-auto tw-mb-auto tw-mt-20 tw-w-[400px] sm:tw-mt-32">
-        <div className="tw-flex tw-flex-col tw-items-center tw-rounded-lg tw-px-8 tw-pb-10 tw-pt-12 sm:tw-bg-white sm:tw-shadow-md">
-          <Image src={LongLogo} width={200} height={32} className="tw-mb-4 tw-select-none" alt="coaster logo" />
+    <div className="tw-flex tw-flex-row tw-h-full tw-w-full tw-bg-slate-100 tw-pb-20">
+      <div className="tw-mt-20 sm:tw-mt-32 tw-mb-auto tw-mx-auto tw-w-[400px]">
+        <div className="tw-flex tw-flex-col tw-pt-12 tw-pb-10 tw-px-8 tw-rounded-lg sm:tw-shadow-md sm:tw-bg-white tw-items-center">
+          <Image src={LongLogo} width={200} height={32} className="tw-select-none tw-mb-4" alt="coaster logo" />
           {done ? (
             <div className="tw-flex tw-flex-col tw-items-center">
               <div className="tw-text-xl">Invites sent!</div>
@@ -93,15 +93,15 @@ const InviteForm: React.FC<{ setDone: (done: boolean) => void }> = ({ setDone })
   };
 
   return (
-    <form className="tw-my-2 tw-flex tw-w-full tw-flex-col tw-items-center" onSubmit={handleSubmit(onSubmit)}>
-      <div className="tw-mb-2 tw-text-center tw-text-xl tw-font-semibold">Invite your friends!</div>
-      <div className="tw-ml-5 tw-mt-2 tw-flex tw-w-full tw-flex-col tw-gap-2">
+    <form className="tw-flex tw-flex-col tw-items-center tw-my-2 tw-w-full" onSubmit={handleSubmit(onSubmit)}>
+      <div className="tw-text-xl tw-font-semibold tw-text-center tw-mb-2">Invite your friends!</div>
+      <div className="tw-flex tw-flex-col tw-gap-2 tw-w-full tw-mt-2 tw-ml-5">
         {fields.map((field, idx) => (
           <div key={field.id} className="last:tw-mb-5">
             <div className="tw-flex tw-items-center">
               <Input {...register(`emails.${idx}.email`)} value={field.email} label={`Email ${idx + 1}`} />
               <TrashIcon
-                className="tw-ml-1 tw-h-10 tw-cursor-pointer tw-rounded tw-p-2 hover:tw-bg-gray-100"
+                className="tw-h-10 tw-rounded tw-ml-1 tw-p-2 tw-cursor-pointer hover:tw-bg-gray-100"
                 onClick={() => remove(idx)}
               />
             </div>
@@ -110,15 +110,15 @@ const InviteForm: React.FC<{ setDone: (done: boolean) => void }> = ({ setDone })
         ))}
       </div>
       <Button
-        className="tw-flex tw-h-8 tw-w-40 tw-items-center tw-justify-center tw-border tw-border-solid tw-border-black tw-bg-white tw-font-medium tw-text-black hover:tw-bg-slate-100"
+        className="tw-flex tw-w-40 tw-h-8 tw-items-center tw-justify-center tw-bg-white hover:tw-bg-slate-100 tw-text-black tw-font-medium tw-border tw-border-solid tw-border-black"
         onClick={() => {
           append({ email: "" });
         }}
       >
-        <PlusIcon className="tw-mr-1.5 tw-h-4" />
+        <PlusIcon className="tw-h-4 tw-mr-1.5" />
         Add another
       </Button>
-      <Button type="submit" className="tw-mt-4 tw-h-10 tw-w-40">
+      <Button type="submit" className="tw-mt-4 tw-w-40 tw-h-10">
         {isLoading ? <Loading light /> : "Send invites"}
       </Button>
       <FormError message={submitError?.message} />

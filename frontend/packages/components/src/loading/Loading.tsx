@@ -10,7 +10,7 @@ export const Loading: React.FC<LoadingProps> = (props) => {
   if (props.light) {
     return (
       <svg
-        className={mergeClasses("tw-m-auto tw-h-5 tw-w-5 tw-animate-spin tw-text-slate-100", props.className)}
+        className={mergeClasses("tw-m-auto tw-animate-spin tw-h-5 tw-w-5 tw-text-slate-100", props.className)}
         style={props.style}
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
@@ -27,7 +27,7 @@ export const Loading: React.FC<LoadingProps> = (props) => {
   }
   return (
     <svg
-      className={mergeClasses("tw-m-auto tw-h-5 tw-w-5 tw-animate-spin tw-text-slate-900", props.className)}
+      className={mergeClasses("tw-m-auto tw-animate-spin tw-h-5 tw-w-5 tw-text-slate-900", props.className)}
       style={props.style}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"

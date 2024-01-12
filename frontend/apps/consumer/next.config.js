@@ -1,10 +1,10 @@
 const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true",
-});
+})
 
 module.exports = withBundleAnalyzer({
   reactStrictMode: true,
-  transpilePackages: ["@coaster/components", "@coaster/rpc", "@coaster/utils"],
+  transpilePackages: ["@coaster/components", "@coaster/rpc/client", "@coaster/utils/common"],
   images: {
     remotePatterns: [
       {
@@ -20,26 +20,34 @@ module.exports = withBundleAnalyzer({
         pathname: "/user-images-bucket-us/**",
       },
       {
-        protocol: "https",
-        hostname: "lh3.googleusercontent.com",
-        port: "",
-        pathname: "/**",
+        protocol:"https",
+        hostname:"lh3.googleusercontent.com",
+        port:"",
+        pathname: "/**"
       },
       {
-        protocol: "https",
+        protocol:"https",
         hostname: "cdn.sanity.io",
-        port: "",
-        pathname: "/**",
+        port:"",
+        pathname: "/**"
       },
       {
-        protocol: "https",
+        protocol:"https",
         hostname: "www.trycoaster.com",
-        port: "",
-        pathname: "/**",
-      },
+        port:"",
+        pathname: "/**"
+      }
     ],
   },
-  experimental: {
-    optimizePackageImports: ["@coaster/components", "@coaster/rpc", "@coaster/utils", "@coaster/assets"],
-  },
+  experimental:{
+    optimizePackageImports: [
+      "@coaster/components",
+      "@coaster/rpc/client",
+      "@coaster/rpc/common",
+      "@coaster/rpc/server",
+      "@coaster/utils/client",
+      "@coaster/utils/common",
+      "@coaster/assets",
+    ],
+  }
 });

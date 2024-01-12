@@ -3,7 +3,7 @@
 export const HelpButton: React.FC = () => {
   return (
     <span
-      className="tw-cursor-pointer tw-underline"
+      className="tw-underline tw-cursor-pointer"
       onClick={() => {
         if ((window as any).Atlas) {
           (window as any).Atlas.chat.openWindow();

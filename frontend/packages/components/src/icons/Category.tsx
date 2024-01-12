@@ -252,37 +252,37 @@ export function getCategoryForDisplay(category: CategoryType): string {
 export function getCategoryIcon(category: CategoryType, className?: string) {
   switch (category) {
     case Category.Values.camping:
-      return <CampingIcon className={mergeClasses("tw-h-10 tw-w-10", className)} />;
+      return <CampingIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.climbing:
-      return <ClimbingIcon className={mergeClasses("tw-h-10 tw-w-10", className)} />;
+      return <ClimbingIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.cycling:
-      return <CyclingIcon className={mergeClasses("tw-h-10 tw-w-10", className)} />;
+      return <CyclingIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.diving:
-      return <DivingIcon className={mergeClasses("tw-h-10 tw-w-10", className)} />;
+      return <DivingIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.fishing:
-      return <FishingIcon className={mergeClasses("tw-h-10 tw-w-10", className)} />;
+      return <FishingIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.hiking:
-      return <HikingIcon className={mergeClasses("tw-h-10 tw-w-10", className)} />;
+      return <HikingIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.kayaking:
-      return <KayakIcon className={mergeClasses("tw-h-10 tw-w-10", className)} />;
+      return <KayakIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.surfing:
-      return <SurfingIcon className={mergeClasses("tw-h-10 tw-w-10", className)} />;
+      return <SurfingIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.skiing:
-      return <SkiingIcon className={mergeClasses("tw-h-10 tw-w-10", className)} />;
+      return <SkiingIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.yoga:
-      return <YogaIcon className={mergeClasses("tw-h-10 tw-w-10", className)} />;
+      return <YogaIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.boating:
-      return <BoatingIcon className={mergeClasses("tw-h-10 tw-w-10", className)} />;
+      return <BoatingIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.wakeboard:
-      return <WakeboardingIcon className={mergeClasses("tw-h-10 tw-w-10", className)} />;
+      return <WakeboardingIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.kitesurf:
-      return <KitesurfingIcon className={mergeClasses("tw-h-10 tw-w-10", className)} />;
+      return <KitesurfingIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.sup:
-      return <PaddleboardingIcon className={mergeClasses("tw-h-10 tw-w-10", className)} />;
+      return <PaddleboardingIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.windsurf:
-      return <WindsurfingIcon className={mergeClasses("tw-h-10 tw-w-10", className)} />;
+      return <WindsurfingIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     case Category.Values.wingfoil:
-      return <WingfoilIcon className={mergeClasses("tw-h-10 tw-w-10", className)} />;
+      return <WingfoilIcon className={mergeClasses("tw-w-10 tw-h-10", className)} />;
     default:
       return <></>;
   }

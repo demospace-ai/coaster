@@ -81,14 +81,14 @@ export default function Includes() {
   return (
     <form className="tw-w-full" onSubmit={handleSubmit(onSubmit)}>
       <div className="tw-flex tw-flex-col">
-        <div className="tw-mb-2 tw-text-2xl tw-font-semibold">Included Amenities</div>
+        <div className="tw-text-2xl tw-font-semibold tw-mb-2">Included Amenities</div>
         <div className="tw-flex tw-flex-col tw-gap-3">
           {included.map((field, idx) => (
             <div key={field.id} className="last:tw-mb-5">
               <div className="tw-flex tw-items-center">
                 <Input {...register(`includes.${idx}.value`)} value={field.value} />
                 <TrashIcon
-                  className="tw-ml-1 tw-h-10 tw-cursor-pointer tw-rounded tw-p-2 hover:tw-bg-gray-100"
+                  className="tw-h-10 tw-rounded tw-ml-1 tw-p-2 tw-cursor-pointer hover:tw-bg-gray-100"
                   onClick={() => removeIncluded(idx)}
                 />
               </div>
@@ -97,24 +97,24 @@ export default function Includes() {
           ))}
         </div>
         <Button
-          className="tw-flex tw-items-center tw-justify-center tw-border tw-border-solid tw-border-black tw-bg-white tw-py-2 tw-font-medium tw-text-black hover:tw-bg-slate-100"
+          className="tw-flex tw-items-center tw-justify-center tw-bg-white hover:tw-bg-slate-100 tw-text-black tw-font-medium tw-border tw-border-solid tw-border-black tw-py-2"
           onClick={() => {
             appendIncluded({ value: "" });
           }}
         >
-          <PlusIcon className="tw-mr-1.5 tw-h-4" />
+          <PlusIcon className="tw-h-4 tw-mr-1.5" />
           Add Included Item
         </Button>
       </div>
-      <div className="tw-mt-10 tw-flex tw-flex-col">
-        <div className="tw-mb-2 tw-text-2xl tw-font-semibold">Not Included</div>
+      <div className="tw-flex tw-flex-col tw-mt-10">
+        <div className="tw-text-2xl tw-font-semibold tw-mb-2">Not Included</div>
         <div className="tw-flex tw-flex-col tw-gap-3">
           {notIncluded.map((field, idx) => (
             <div key={field.id} className="last:tw-mb-5">
               <div className="tw-flex tw-items-center">
                 <Input {...register(`not_included.${idx}.value`)} value={field.value} />
                 <TrashIcon
-                  className="tw-ml-1 tw-h-10 tw-cursor-pointer tw-rounded tw-p-2 hover:tw-bg-gray-100"
+                  className="tw-h-10 tw-rounded tw-ml-1 tw-p-2 tw-cursor-pointer hover:tw-bg-gray-100"
                   onClick={() => removeNotIncluded(idx)}
                 />
               </div>
@@ -123,16 +123,16 @@ export default function Includes() {
           ))}
         </div>
         <Button
-          className="tw-flex tw-items-center tw-justify-center tw-border tw-border-solid tw-border-black tw-bg-white tw-py-2 tw-font-medium tw-text-black hover:tw-bg-slate-100"
+          className="tw-flex tw-items-center tw-justify-center tw-bg-white hover:tw-bg-slate-100 tw-text-black tw-font-medium tw-border tw-border-solid tw-border-black tw-py-2"
           onClick={() => {
             appendNotIncluded({ value: "" });
           }}
         >
-          <PlusIcon className="tw-mr-1.5 tw-h-4" />
+          <PlusIcon className="tw-h-4 tw-mr-1.5" />
           Add not Included Item
         </Button>
       </div>
-      <Button type="submit" className="tw-ml-auto tw-mt-6 tw-h-12 tw-w-full sm:tw-w-32" disabled={!formState.isDirty}>
+      <Button type="submit" className="tw-mt-6 tw-w-full sm:tw-w-32 tw-h-12 tw-ml-auto" disabled={!formState.isDirty}>
         {formState.isSubmitting ? <Loading /> : "Save"}
       </Button>
       <FormError message={formState.errors.root?.message} />

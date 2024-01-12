@@ -18,7 +18,7 @@ export const Callout: React.FC<{
         </div>
         {props.tooltip && (
           <Tooltip content={props.tooltip}>
-            <InformationCircleIcon className="tw-ml-auto tw-h-4 tw-text-slate-600" />
+            <InformationCircleIcon className="tw-h-4 tw-text-slate-600 tw-ml-auto" />
           </Tooltip>
         )}
       </div>
