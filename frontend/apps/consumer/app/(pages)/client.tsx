@@ -23,7 +23,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { ReactNode, useCallback, useEffect, useState } from "react";
+import { ReactNode, Suspense, useCallback, useEffect, useState } from "react";
 
 export const ListingsSectionClient: React.FC<{
   title: string;
@@ -297,7 +297,6 @@ export const DynamicNotificationProvider: React.FC<{ children: ReactNode }> = ({
 export const DynamicHeader: React.FC = () => {
   const pathname = usePathname();
   const isHome = pathname === "/";
-  const searchParams = useSearchParams();
 
   const Header = dynamic(() => import("@coaster/components/header/Header").then((mod) => mod.Header), {
     loading: () => (
@@ -319,9 +318,9 @@ export const DynamicHeader: React.FC = () => {
           </div>
           {!isHome && (
             <div className="tw-hidden sm:tw-flex tw-flex-1 tw-justify-between tw-items-center tw-max-w-[400px] tw-h-9 tw-ring-1 tw-ring-slate-300 tw-rounded-[99px]">
-              <span className="tw-text-gray-700 tw-text-base tw-ml-4">
-                {searchParams.get("query") ?? "Search trips"}
-              </span>
+              <Suspense>
+                <FallbackPlaceholder />
+              </Suspense>
               <MagnifyingGlassIcon className="tw-ml-2 tw-mr-4 tw-h-[18px] tw-w-[18px] tw-stroke-gray-600" />
             </div>
           )}
@@ -348,6 +347,11 @@ export const DynamicHeader: React.FC = () => {
   });
 
   return <Header />;
+};
+
+const FallbackPlaceholder = () => {
+  const searchParams = useSearchParams();
+  return <span className="tw-text-gray-700 tw-text-base tw-ml-4">{searchParams.get("query") ?? "Search trips"}</span>;
 };
 
 export const DynamicLoginModal: React.FC = () => {

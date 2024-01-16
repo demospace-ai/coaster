@@ -3,23 +3,15 @@
 import { isProd } from "@coaster/utils/common";
 import { usePathname, useSearchParams } from "next/navigation";
 import Script from "next/script";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 
 export const RudderInit = () => {
   if (!isProd()) return null;
 
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  useEffect(() => {
-    if ((window as any).rudderanalytics) {
-      (window as any).rudderanalytics.page();
-    }
-  }, [pathname, searchParams]);
-
   return (
-    <Script id="rudder-script">
-      {`!function(){"use strict";var sdkBaseUrl="https://cdn.rudderlabs.com/v3";var sdkName="rsa.min.js";var asyncScript=true
+    <>
+      <Script id="rudder-script">
+        {`!function(){"use strict";var sdkBaseUrl="https://cdn.rudderlabs.com/v3";var sdkName="rsa.min.js";var asyncScript=true
         ;window.rudderAnalyticsBuildType="legacy",window.rudderanalytics=[]
         ;var e=["setDefaultInstanceKey","load","ready","page","track","identify","alias","group","reset","setAnonymousId","startSession","endSession"]
         ;for(var t=0;t<e.length;t++){var n=e[t];window.rudderanalytics[n]=function(e){return function(){
@@ -35,6 +27,23 @@ export const RudderInit = () => {
         ;d.src="https://polyfill.io/v3/polyfill.min.js?features=Symbol%2CPromise&callback=rudderAnalyticsMount",
         d.async=asyncScript,document.head?document.head.appendChild(d):document.body.appendChild(d)}else{
         window.rudderAnalyticsMount()}window.rudderanalytics.load("2Va8vvJ85DejVV7jncdVenC6smB","https://trycoasterlyoh.dataplane.rudderstack.com",{plugins:["BeaconQueue", "DeviceModeDestinations", "NativeDestinationQueue", "StorageEncryption", "XhrQueue"]})}();`}
-    </Script>
+      </Script>
+      <Suspense>
+        <RudderInitInner />
+      </Suspense>
+    </>
   );
+};
+
+const RudderInitInner = () => {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if ((window as any).rudderanalytics) {
+      (window as any).rudderanalytics.page();
+    }
+  }, [pathname, searchParams]);
+
+  return null;
 };
