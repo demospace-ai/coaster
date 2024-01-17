@@ -53,6 +53,7 @@ const HostDetails: React.FC<{ listing: ListingType }> = ({ listing }) => {
           className="tw-mr-4"
           width={40}
           height={40}
+          square
         />
         <div>
           <div className="tw-text-xl tw-font-medium">Meet your trip provider: {getHostName(listing.host)}</div>
@@ -151,7 +152,13 @@ const HostOverview: React.FC<{ listing: ListingType }> = ({ listing }) => {
           {languages}
         </div>
       </div>
-      <ProfilePicture url={listing.host.profile_picture_url} name={getHostName(listing.host)} width={54} height={54} />
+      <ProfilePicture
+        url={listing.host.profile_picture_url}
+        name={getHostName(listing.host)}
+        width={54}
+        height={54}
+        square
+      />
     </div>
   );
 };

@@ -8,8 +8,9 @@ export const ProfilePicture: React.FC<{
   className?: string;
   width: number;
   height: number;
+  square?: boolean;
   onClick?: () => void;
-}> = ({ url, name, width, height, className, onClick }) => {
+}> = ({ url, name, width, height, className, square, onClick }) => {
   return (
     <>
       {url ? (
@@ -18,7 +19,8 @@ export const ProfilePicture: React.FC<{
           height={height}
           src={url}
           className={mergeClasses(
-            "tw-aspect-square tw-rounded-full tw-select-none tw-flex tw-items-center tw-justify-center tw-object-cover",
+            "tw-aspect-square tw-select-none tw-flex tw-items-center tw-justify-center tw-object-cover",
+            !square && "tw-rounded-full",
             className,
           )}
           referrerPolicy="no-referrer"
