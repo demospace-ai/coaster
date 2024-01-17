@@ -7,6 +7,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
 
 import "consumer/app/global.css";
+import dynamic from "next/dynamic";
 
 export const metadata: Metadata = {
   title: "Coaster",
@@ -21,6 +22,10 @@ export const viewport: Viewport = {
   maximumScale: 1,
 };
 
+const TrackPage = dynamic(() => import("@coaster/components/rudderstack/TrackPage"), {
+  ssr: false,
+});
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
@@ -29,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <RudderInit />
       <html lang="en" className={worksans.className}>
         <body>
+          <TrackPage />
           <SpeedInsights />
           <div id="root" className="tw-w-full tw-h-full tw-flex tw-flex-col">
             <ErrorBoundary>{children}</ErrorBoundary>
