@@ -2,6 +2,7 @@ import { getCategoryForDisplay } from "@coaster/components/icons/Category";
 import { SearchResult } from "@coaster/components/search/SearchResult";
 import { search } from "@coaster/rpc/server";
 import { Category, CategoryType, Listing } from "@coaster/types";
+import { TrackActivityView } from "app/(pages)/activities/[activity]/client";
 import { CustomResult } from "app/(pages)/search/client";
 
 export default async function Page({ params }: { params: { activity: string } }) {
@@ -10,6 +11,7 @@ export default async function Page({ params }: { params: { activity: string } })
 
   return (
     <div className="tw-flex tw-px-5 sm:tw-px-20">
+      <TrackActivityView activityType={activityType} />
       <div className="tw-flex tw-flex-col tw-items-start tw-pt-5 sm:tw-pt-8 tw-pb-24 tw-w-full tw-max-w-7xl">
         <div className="tw-font-bold tw-text-4xl tw-w-full tw-text-center sm:tw-text-left tw-mb-3">
           {getCategoryForDisplay(activityType)}

@@ -20,8 +20,8 @@ func TrackSignup(userID int64, firstName string, lastName string, email string) 
 		UserId: fmt.Sprintf("%d", userID),
 		Event:  "user_signup",
 		Properties: analytics.NewProperties().
-			Set("firstName", firstName).
-			Set("lastName", lastName).
+			Set("first_name", firstName).
+			Set("last_name", lastName).
 			Set("email", email),
 	})
 
@@ -40,7 +40,7 @@ func TrackSignup(userID int64, firstName string, lastName string, email string) 
 
 func TrackBooking(userID int64, listing models.Listing, revenue int64, numGuests int64) {
 	track(userID, "trip_booked", analytics.NewProperties().
-		Set("listingID", listing.ID).
+		Set("listing_id", listing.ID).
 		Set("revenue", revenue).
 		Set("products", []Product{
 			{
@@ -53,7 +53,7 @@ func TrackBooking(userID int64, listing models.Listing, revenue int64, numGuests
 
 func TrackCheckoutOpen(userID int64, listing models.Listing, revenue int64, numGuests int64) {
 	track(userID, "checkout_open", analytics.NewProperties().
-		Set("listingID", listing.ID).
+		Set("listing_id", listing.ID).
 		Set("revenue", revenue).
 		Set("products", []Product{
 			{

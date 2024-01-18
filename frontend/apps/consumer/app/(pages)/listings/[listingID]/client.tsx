@@ -30,7 +30,7 @@ import { getDateToTimeSlotMap } from "consumer/app/(pages)/listings/[listingID]/
 import { H } from "highlight.run";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 
 const DatePickerPopper = dynamic(
   () => import("@coaster/components/dates/DatePicker").then((mod) => mod.DatePickerPopper),
@@ -59,10 +59,19 @@ const AvailabilityListPopper = dynamic(
 );
 
 export const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) => {
+  const trackEvent = useTrackEvent();
   const { showNotification } = useNotificationContext();
   const categoriesString = listing.categories
     ? listing.categories.map((category) => getCategoryForDisplay(category)).join(" | ")
     : "";
+
+  useEffect(() => {
+    trackEvent("listing_viewed", {
+      listing_id: listing.id,
+      product_id: listing.id,
+      price: listing.price,
+    });
+  }, []);
 
   return (
     <div className="tw-flex tw-flex-row tw-items-start tw-justify-between">
@@ -189,8 +198,8 @@ export const ReserveSlider: React.FC<{
                             {startDate
                               ? startDate.toLocaleDateString()
                               : multiDayDuration
-                              ? "Choose dates"
-                              : "Choose start date"}
+                                ? "Choose dates"
+                                : "Choose start date"}
                           </span>
                           <ChevronUpIcon
                             className={`${open && "tw-rotate-180 tw-transform"} tw-h-5 tw-w-5 tw-text-slate-500`}
@@ -734,7 +743,7 @@ function useBookingState(listing: ListingType, generated: boolean) {
       });
     } else {
       trackEvent("reserve_clicked", {
-        listingID: listing.id,
+        listing_id: listing.id,
         product_id: listing.id,
         price: listing.price,
         quantity: numGuests,
