@@ -10,7 +10,7 @@ export const useRudderAnalytics = () => {
   useEffect(() => {
     if (!isProd()) return;
 
-    if (!analytics) {
+    if (analytics instanceof NoopAnalytics) {
       const initialize = async () => {
         const { RudderAnalytics } = await import("@rudderstack/analytics-js");
         const analyticsInstance = new RudderAnalytics();
