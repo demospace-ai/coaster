@@ -1,5 +1,5 @@
 import { Footer } from "@coaster/components/footer/Footer";
-import { SupplierHeader } from "@coaster/components/header/Header";
+import { SupplierHeader } from "@coaster/components/header/SupplierHeader";
 import { NotFound } from "@coaster/components/pages/NotFound";
 import { AuthProvider } from "@coaster/components/provider/AuthProvider";
 
