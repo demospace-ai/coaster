@@ -388,5 +388,6 @@ export function useLogout(onHostApp?: boolean) {
   return useCallback(async () => {
     await sendRequest(Logout);
     mutate({ CheckSession }, undefined);
+    (window as any).rudderanalytics.reset();
   }, []);
 }
