@@ -12,7 +12,7 @@ export default function TrackPage() {
 
   useEffect(() => {
     rudderstack.page();
-  }, [pathname, searchParams]);
+  }, [rudderstack, pathname, searchParams]);
 
   return null;
 }
