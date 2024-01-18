@@ -21,6 +21,7 @@
     "@highlight-run/react": "^3.2.1",
     "@hookform/resolvers": "^3.3.4",
     "@portabletext/react": "^3.0.11",
+    "@rudderstack/analytics-js": "^3.0.0-beta.19",
     "@rudderstack/rudder-sdk-node": "^2.0.6",
     "@sanity/asset-utils": "^1.3.0",
     "@sanity/client": "^6.11.1",
