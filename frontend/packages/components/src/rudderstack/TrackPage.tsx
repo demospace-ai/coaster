@@ -11,8 +11,8 @@ export default function TrackPage() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    rudderstack.page();
-  }, [rudderstack, pathname, searchParams]);
+    rudderstack?.page();
+  }, [pathname, searchParams]);
 
   return null;
 }

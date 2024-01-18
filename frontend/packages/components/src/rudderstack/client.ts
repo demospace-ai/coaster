@@ -5,12 +5,12 @@ import { RudderAnalytics } from "@rudderstack/analytics-js";
 import { useEffect, useState } from "react";
 
 export const useRudderAnalytics = () => {
-  const [analytics, setAnalytics] = useState<RudderAnalytics>(new NoopAnalytics());
+  const [analytics, setAnalytics] = useState<RudderAnalytics>();
 
   useEffect(() => {
     if (!isProd()) return;
 
-    if (analytics instanceof NoopAnalytics) {
+    if (!analytics) {
       const initialize = async () => {
         const { RudderAnalytics } = await import("@rudderstack/analytics-js");
         const analyticsInstance = new RudderAnalytics();
@@ -30,145 +30,11 @@ export const useRudderAnalytics = () => {
   return analytics;
 };
 
-class NoopAnalytics implements RudderAnalytics {
-  static globalSingleton: any;
-  analyticsInstances: Record<string, any>;
-  defaultAnalyticsKey: string;
-  logger: any;
-  preloadBuffer: any;
-  initialized: boolean;
-  httpClient: any;
-  errorHandler: any;
-  externalSrcLoader: any;
-  capabilitiesManager: any;
-  storeManager?: any;
-  configManager?: any;
-  eventManager?: any;
-  userSessionManager?: any;
-  pluginsManager?: any;
-  clientDataStore?: any;
-
-  constructor() {
-    this.initialized = true;
-    this.analyticsInstances = {};
-    this.defaultAnalyticsKey = "default";
-  }
-
-  setDefaultInstanceKey(writeKey: string) {
-    return;
-  }
-  getAnalyticsInstance(writeKey?: string | undefined) {
-    return this;
-  }
-  load(writeKey: string, dataPlaneUrl: string, loadOptions?: any) {
-    return;
-  }
-  triggerBufferedLoadEvent() {
-    return;
-  }
-  ready(callback: any) {
-    return;
-  }
-  page(category?: any, name?: any, properties?: any, options?: any, callback?: any) {
-    return;
-  }
-  track(event: any, properties?: any, options?: any, callback?: any) {
-    return;
-  }
-  identify(userId?: any, traits?: any, options?: any, callback?: any) {
-    return;
-  }
-  alias(to?: any, from?: any, options?: any, callback?: any) {
-    return;
-  }
-  group(groupId: any, traits?: any, options?: any, callback?: any) {
-    return;
-  }
-  reset(resetAnonymousId?: boolean) {
-    return;
-  }
-  getAnonymousId(options?: any) {
-    return undefined;
-  }
-  setAnonymousId(anonymousId?: string, rudderAmpLinkerParam?: string) {
-    return;
-  }
-  getUserId() {
-    return undefined;
-  }
-  getUserTraits() {
-    return undefined;
-  }
-  getGroupId() {
-    return undefined;
-  }
-  getGroupTraits() {
-    return undefined;
-  }
-  startSession(sessionId?: number) {
-    return;
-  }
-  endSession() {
-    return;
-  }
-  getSessionId() {
-    return null;
-  }
-  setAuthToken(token: string) {
-    return;
-  }
-  consent(options?: any) {
-    return;
-  }
-  startLifecycle() {
-    return;
-  }
-  onMounted() {
-    return;
-  }
-  onBrowserCapabilitiesReady() {
-    return;
-  }
-  enqueuePreloadBufferEvents(bufferedEvents: any[]) {
-    return;
-  }
-  processDataInPreloadBuffer() {
-    return;
-  }
-  prepareInternalServices() {
-    return;
-  }
-  loadConfig() {
-    return;
-  }
-  onPluginsReady() {
-    return;
-  }
-  onConfigured() {
-    return;
-  }
-  onInitialized() {
-    return;
-  }
-  onReady() {
-    return;
-  }
-  processBufferedEvents() {
-    return;
-  }
-  loadDestinations() {
-    return;
-  }
-  onDestinationsReady() {
-    return;
-  }
-}
-
 export function useTrackEvent() {
   const rudderstack = useRudderAnalytics();
 
   return (eventName: string, eventProperties?: any) => {
-    rudderstack.track(eventName, eventProperties);
+    rudderstack?.track(eventName, eventProperties);
   };
 }
 
