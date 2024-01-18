@@ -37,9 +37,10 @@ func TrackSignup(userID int64, firstName string, lastName string, email string) 
 	client.Close()
 }
 
-func TrackBooking(userID int64, listingID int64) {
+func TrackBooking(userID int64, listingID int64, price int64) {
 	track(userID, "trip_booked", analytics.NewProperties().
-		Set("listingID", listingID))
+		Set("listingID", listingID).
+		Set("price", price))
 }
 
 func TrackCheckoutOpen(userID int64) {
