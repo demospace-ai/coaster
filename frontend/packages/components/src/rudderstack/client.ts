@@ -164,12 +164,12 @@ class NoopAnalytics implements RudderAnalytics {
   }
 }
 
-export function trackEvent(eventName: string, eventProperties?: any) {
+export function useTrackEvent() {
   const rudderstack = useRudderAnalytics();
 
-  if (isProd()) {
+  return (eventName: string, eventProperties?: any) => {
     rudderstack.track(eventName, eventProperties);
-  }
+  };
 }
 
 export function getAnonymousID() {
