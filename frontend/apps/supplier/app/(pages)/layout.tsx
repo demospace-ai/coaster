@@ -1,5 +1,5 @@
 import { Footer } from "@coaster/components/footer/Footer";
-import { SupplierHeader } from "@coaster/components/header/Header";
+import { SupplierHeader } from "@coaster/components/header/SupplierHeader";
 import { NotificationProvider } from "@coaster/components/notifications/Notifications";
 import { AuthProvider } from "@coaster/components/provider/AuthProvider";
 import { DynamicLoginModal } from "supplier/app/(pages)/client";
