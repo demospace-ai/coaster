@@ -5,7 +5,7 @@ import { correctToUTC } from "@coaster/components/dates/utils";
 import { getCategoryForDisplay } from "@coaster/components/icons/Category";
 import { GuestNumberInput } from "@coaster/components/input/Input";
 import { Loading } from "@coaster/components/loading/Loading";
-import { useTrackEvent } from "@coaster/components/rudderstack/client";
+import { trackEvent } from "@coaster/components/rudderstack/client";
 import { useAuthContext, useAvailability, useCreateCheckoutLink, useNotificationContext } from "@coaster/rpc/client";
 import {
   Availability,
@@ -59,7 +59,6 @@ const AvailabilityListPopper = dynamic(
 );
 
 export const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) => {
-  const trackEvent = useTrackEvent();
   const { showNotification } = useNotificationContext();
   const categoriesString = listing.categories
     ? listing.categories.map((category) => getCategoryForDisplay(category)).join(" | ")
@@ -698,7 +697,6 @@ export const Itinerary: React.FC<{ listing: ListingType }> = ({ listing }) => {
 };
 
 function useBookingState(listing: ListingType, generated: boolean) {
-  const trackEvent = useTrackEvent();
   const { showNotification } = useNotificationContext();
   const { user, openLoginModal } = useAuthContext();
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);

@@ -5,10 +5,9 @@ import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useSearchParams } from "next/navigation";
 import { Fragment, useRef, useState } from "react";
 import { Button } from "../button/Button";
-import { useTrackEvent } from "../rudderstack/client";
+import { trackEvent } from "../rudderstack/client";
 
 export const SearchModal: React.FC<{ open: boolean; close: () => void }> = ({ open, close }) => {
-  const trackEvent = useTrackEvent();
   const searchParams = useSearchParams();
   const [query, setQuery] = useState<string>(searchParams.get("query") ?? "");
   const inputRef = useRef<HTMLInputElement>(null);

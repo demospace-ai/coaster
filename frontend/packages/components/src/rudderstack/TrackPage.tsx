@@ -1,17 +1,15 @@
 "use client";
 
+import { RudderAnalytics } from "@rudderstack/analytics-js";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
-import { useRudderAnalytics } from "../rudderstack/client";
 
 export default function TrackPage() {
-  const rudderstack = useRudderAnalytics();
-
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    rudderstack?.page();
+    (window.rudderanalytics as RudderAnalytics).page();
   }, [pathname, searchParams]);
 
   return null;
