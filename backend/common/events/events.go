@@ -5,6 +5,7 @@ import (
 
 	"github.com/rudderlabs/analytics-go"
 	"go.fabra.io/server/common/application"
+	"go.fabra.io/server/common/models"
 )
 
 func TrackSignup(userID int64, firstName string, lastName string, email string) {
@@ -37,26 +38,38 @@ func TrackSignup(userID int64, firstName string, lastName string, email string) 
 	client.Close()
 }
 
-func TrackBooking(userID int64, listingID int64, revenue int64) {
+func TrackBooking(userID int64, listing models.Listing, revenue int64, numGuests int64) {
 	track(userID, "trip_booked", analytics.NewProperties().
-		Set("listingID", listingID).
+		Set("listingID", listing.ID).
 		Set("revenue", revenue).
-		Set("products", []analytics.Product{
+		Set("products", []Product{
 			{
-				ID: fmt.Sprintf("%d", listingID),
+				ID:       fmt.Sprintf("%d", listing.ID),
+				Price:    float64(*listing.Price),
+				Quantity: numGuests,
 			},
 		}))
 }
 
-func TrackCheckoutOpen(userID int64, listingID int64, revenue int64) {
+func TrackCheckoutOpen(userID int64, listing models.Listing, revenue int64, numGuests int64) {
 	track(userID, "checkout_open", analytics.NewProperties().
-		Set("listingID", listingID).
+		Set("listingID", listing.ID).
 		Set("revenue", revenue).
-		Set("products", []analytics.Product{
+		Set("products", []Product{
 			{
-				ID: fmt.Sprintf("%d", listingID),
+				ID:       fmt.Sprintf("%d", listing.ID),
+				Price:    float64(*listing.Price),
+				Quantity: numGuests,
 			},
 		}))
+}
+
+type Product struct {
+	ID       string  `json:"id,omitempty"`
+	SKU      string  `json:"sky,omitempty"`
+	Name     string  `json:"name,omitempty"`
+	Price    float64 `json:"price"`
+	Quantity int64   `json:"quantity"`
 }
 
 func track(userID int64, eventName string, properties analytics.Properties) {

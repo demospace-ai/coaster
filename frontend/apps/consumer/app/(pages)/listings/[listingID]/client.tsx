@@ -734,6 +734,9 @@ function useBookingState(listing: ListingType, generated: boolean) {
     } else {
       trackEvent("reserve_clicked", {
         listingID: listing.id,
+        product_id: listing.id,
+        price: listing.price,
+        quantity: numGuests,
       });
     }
 

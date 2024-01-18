@@ -108,7 +108,7 @@ func (s ApiService) CreateCheckoutLink(auth auth.Authentication, w http.Response
 		return errors.Wrap(err, "(api.CreateCheckoutLink) adding checkout link")
 	}
 
-	events.TrackCheckoutOpen(auth.User.ID, listing.ID, checkoutSession.AmountTotal)
+	events.TrackCheckoutOpen(auth.User.ID, listing.Listing, checkoutSession.AmountTotal, booking.Guests)
 
 	return json.NewEncoder(w).Encode(checkoutSession.URL)
 }
