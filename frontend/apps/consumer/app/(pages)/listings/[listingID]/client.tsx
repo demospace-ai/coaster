@@ -70,7 +70,7 @@ export const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) =
       product_id: listing.id,
       price: listing.price,
     });
-  }, []);
+  }, [listing.id, listing.price]);
 
   return (
     <div className="tw-flex tw-flex-row tw-items-start tw-justify-between">
@@ -215,7 +215,7 @@ export const ReserveSlider: React.FC<{
                                   return true;
                                 }
 
-                                // Allow choosing any date if there is no availability, so we don't blocking booking
+                                // Allow choosing any date if there is no availability, so we don&apos;t blocking booking
                                 if (availableDates.length === 0) {
                                   return false;
                                 }
@@ -473,7 +473,7 @@ export const BookingPanel: React.FC<{ listing: ListingType; generated: boolean }
                   return true;
                 }
 
-                // Allow choosing any date if there is no availability, so we don't blocking booking
+                // Allow choosing any date if there is no availability, so we don&apos;t blocking booking
                 if (availableDates.length === 0) {
                   return false;
                 }
@@ -546,11 +546,11 @@ export const BookingPanel: React.FC<{ listing: ListingType; generated: boolean }
           {createCheckoutLink.isLoading ? <Loading light /> : availableDates.length === 0 ? "Send Inquiry" : "Reserve"}
         </Button>
         <div className="tw-w-full tw-text-center tw-text-sm tw-mb-4 tw-pb-3 tw-border-b tw-border-solid tw-border-gray-300">
-          You won't be charged yet
+          You won&apos;t be charged yet
         </div>
         <span className="tw-text-sm">
-          *Likely to sell out: Based on Coaster's booking data and information from the provider, it seems likely this
-          experience will sell out soon.
+          *Likely to sell out: Based on Coaster&apos;s booking data and information from the provider, it seems likely
+          this experience will sell out soon.
         </span>
       </div>
     </div>
@@ -638,7 +638,7 @@ const NullableImage: React.FC<{
   onClick?: () => void;
 }> = ({ image, ...props }) => {
   if (image) {
-    return <Image {...props} src={image.url} fill />;
+    return <Image {...props} src={image.url} fill alt="listing image" />;
   } else {
     return <div />;
   }
@@ -713,17 +713,12 @@ function useBookingState(listing: ListingType, generated: boolean) {
     setFetchEndDate(new Date(month.getFullYear(), month.getMonth() + 6, 1));
   }
 
-  var availability: Availability[] | undefined = [];
-  var loading: boolean = false;
-  if (!generated) {
-    const { availability: fetchedAvailability, loading: fetching } = useAvailability(
-      listing.id,
-      fetchStartDate.toISOString().split("T")[0],
-      fetchEndDate.toISOString().split("T")[0],
-    );
-    availability = fetchedAvailability;
-    loading = fetching;
-  }
+  const { availability, loading } = useAvailability(
+    listing.id,
+    fetchStartDate.toISOString().split("T")[0],
+    fetchEndDate.toISOString().split("T")[0],
+    generated,
+  );
 
   H.consumeError(new Error(JSON.stringify(availability)));
 
@@ -751,13 +746,13 @@ function useBookingState(listing: ListingType, generated: boolean) {
     if (user) {
       if (generated) {
         // TODO: if generated, reserve via special booking endpoint
-        showNotification("success", "Requested to book! You'll hear back from us soon.", 2000);
+        showNotification("success", "Requested to book! You&apos;ll hear back from us soon.", 2000);
         return;
       }
 
       if (availability === undefined || availability.length === 0) {
         // No-op, just send the notification to us and the user
-        showNotification("success", "Requested to book! You'll hear back from us soon.", 2000);
+        showNotification("success", "Requested to book! You&apos;ll hear back from us soon.", 2000);
         return;
       }
 

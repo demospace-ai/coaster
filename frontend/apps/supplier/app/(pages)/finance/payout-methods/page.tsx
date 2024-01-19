@@ -28,7 +28,7 @@ export default function PayoutMethods() {
 
   return (
     <div className="tw-flex tw-flex-col">
-      <div className="tw-text-2xl tw-font-bold tw-mb-2">How you'll get paid</div>
+      <div className="tw-text-2xl tw-font-bold tw-mb-2">How you&apos;ll get paid</div>
       {!payoutMethods ? (
         <Loading />
       ) : (

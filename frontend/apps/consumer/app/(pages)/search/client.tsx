@@ -48,7 +48,7 @@ export const CustomResult: React.FC = () => {
           <div className="tw-flex tw-flex-col tw-items-center tw-px-6 tw-pt-8 tw-pb-16 tw-max-w-lg tw-w-[90vw] ">
             <CheckCircleIcon className="tw-w-10 tw-h-10 tw-stroke-green-600 tw-mb-4" />
             <div className="tw-text-center tw-text-base">
-              We've received your request and will get back to you within 24 hours with some fantastic options!
+              We&apos;ve received your request and will get back to you within 24 hours with some fantastic options!
             </div>
             <Button className="tw-w-24 tw-py-2 tw-mt-6" onClick={() => setShowModal(false)}>
               Close
@@ -56,7 +56,7 @@ export const CustomResult: React.FC = () => {
           </div>
         ) : (
           <div className="tw-px-6 tw-pb-10 tw-max-w-lg tw-w-[90vw]">
-            <h2>Send us a description of what you're looking for and we'll be in touch within 24 hours!</h2>
+            <h2>Send us a description of what you&apos;re looking for and we&apos;ll be in touch within 24 hours!</h2>
             <form onSubmit={handleSubmit(submit)}>
               <Input className="tw-mt-4" value={watch("email")} label="Email" {...register("email")} />
               <FormError message={formState.errors["email"]?.message} />
@@ -76,7 +76,9 @@ export const CustomResult: React.FC = () => {
       </Modal>
       <div className="tw-flex tw-flex-col tw-w-full tw-aspect-square tw-bg-gray-100 tw-rounded-xl tw-items-center tw-justify-center tw-p-5 tw-text-center">
         <span className="tw-text-lg tw-font-semibold tw-mb-1">Looking for something else?</span>
-        <span className="tw-text-sm tw-mb-4">Let us know and we'll do our best to find an adventure you'll love!</span>
+        <span className="tw-text-sm tw-mb-4">
+          Let us know and we&apos;ll do our best to find an adventure you&apos;ll love!
+        </span>
         <Button className="tw-py-2 tw-px-10" onClick={() => setShowModal(true)}>
           Request Trip
         </Button>

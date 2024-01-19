@@ -90,7 +90,7 @@ const AboutTheTrip: React.FC<{ booking: Booking }> = ({ booking }) => {
       )}
       {booking.listing.not_included && booking.listing.not_included.length > 0 && (
         <div className="tw-mb-5">
-          <div className="tw-text-base tw-font-semibold tw-mb-2">What's not included</div>
+          <div className="tw-text-base tw-font-semibold tw-mb-2">What&apos;s not included</div>
           <ul>
             {booking.listing.not_included.map((item) => (
               <li key={item} className="tw-flex tw-items-center">

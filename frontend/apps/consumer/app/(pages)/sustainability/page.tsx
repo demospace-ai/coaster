@@ -21,10 +21,10 @@ export default function Sustainability() {
           engaging with the world firsthand is a transformative journey.
         </div>
         <div>
-          Coaster is not just about facilitating travel; it's about curating opportunities for individuals to embark on
-          meaningful adventures, fostering a sense of wonder that inspires a commitment to climate action, and learning
-          from guides who know their environment best. This commitment is rooted in the understanding that the more
-          intimately people connect with their surroundings, the more passionately they will strive to protect and
+          Coaster is not just about facilitating travel; it&apos;s about curating opportunities for individuals to
+          embark on meaningful adventures, fostering a sense of wonder that inspires a commitment to climate action, and
+          learning from guides who know their environment best. This commitment is rooted in the understanding that the
+          more intimately people connect with their surroundings, the more passionately they will strive to protect and
           preserve our planet for generations to come.
         </div>
         <div>
@@ -85,7 +85,7 @@ export default function Sustainability() {
             </ul>
 
             <div>
-              <h2 className="tw-mt-5 tw-mb-5 tw-font-semibold tw-text-2xl">What's on our roadmap?</h2>
+              <h2 className="tw-mt-5 tw-mb-5 tw-font-semibold tw-text-2xl">What&apos;s on our roadmap?</h2>
               <ul className="tw-flex tw-flex-col tw-list-disc tw-ml-5 tw-gap-2">
                 <li>
                   <span className="tw-font-semibold">Carbon Offsetting</span>: Coaster is committed to offsetting the

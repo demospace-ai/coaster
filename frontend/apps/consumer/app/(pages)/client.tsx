@@ -222,7 +222,7 @@ export const ValuePropSection: React.FC = () => {
               />
               <span className="tw-font-semibold tw-text-lg tw-mb-2">Curated experiences</span>
               <span className="tw-max-w-[240px] tw-text-base">
-                We do the research so you don't have to. Every trip is verified for safety and stoke.
+                We do the research so you don&apos;t have to. Every trip is verified for safety and stoke.
               </span>
             </div>
             <div className="tw-flex tw-flex-col tw-shrink-0 tw-items-center tw-w-[90vw] sm:tw-w-fit tw-text-center">
@@ -252,7 +252,7 @@ export const ValuePropSection: React.FC = () => {
               />
               <span className="tw-font-semibold tw-text-lg tw-mb-2">Adventure Guarantee</span>
               <span className="tw-max-w-[240px] tw-text-base">
-                Didn't have a good time? We'll give you a full refund, no questions asked.
+                Didn&apos;t have a good time? We&apos;ll give you a full refund, no questions asked.
               </span>
             </div>
           </div>

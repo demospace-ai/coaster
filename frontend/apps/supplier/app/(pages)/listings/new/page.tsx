@@ -19,11 +19,12 @@ import { Loading } from "@coaster/components/loading/Loading";
 import { InlineMapSearch, MapComponent, MapsWrapper } from "@coaster/components/maps/Maps";
 import { createListing, updateListing, updateListingImages, useDraftListing } from "@coaster/rpc/client";
 import { AddListingImage, DeleteListingImage, GetDraftListing, GetListing, sendRequest } from "@coaster/rpc/common";
-import { CategoryType, Coordinates, Image, Listing, ListingInput, ListingStatus } from "@coaster/types";
+import { CategoryType, Coordinates, Image as ImageType, Listing, ListingInput, ListingStatus } from "@coaster/types";
 import { forceErrorMessage, isProd } from "@coaster/utils/common";
 import { EyeIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import update from "immutability-helper";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useCallback, useRef, useState } from "react";
@@ -92,7 +93,7 @@ const NewListingInner: React.FC<{ initialStepNumber: number }> = ({ initialStepN
     {
       element: ReviewStep,
       title: "Review your listing",
-      subtitle: "Here's what we'll show to guests. Make sure everything looks good.",
+      subtitle: "Here&apos;s what we&apos;ll show to guests. Make sure everything looks good.",
     },
   ];
 
@@ -250,10 +251,12 @@ const ReviewStep: React.FC<StepProps> = ({ prevStep }) => {
     <>
       <div className="tw-flex tw-flex-col tw-items-center tw-pb-6">
         <div className="tw-p-8 tw-shadow-centered-md tw-rounded-xl tw-w-full sm:tw-w-96">
-          <img
+          <Image
             src={listing.images[0].url}
             alt="preview-cover"
             className="tw-rounded-lg tw-aspect-square tw-object-cover"
+            width={listing.images[0].width}
+            height={listing.images[0].height}
           />
           <div className="tw-mt-4 tw-font-bold tw-text-xl">{listing.name}</div>
           <div className="tw-mt-1 tw-font-medium">{listing.location}</div>
@@ -297,11 +300,14 @@ type LocationParams = {
 
 const LocationStepInner: React.FC<StepProps & LocationParams> = ({ nextStep, prevStep, listing }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const onSelect = useCallback(async (location: string) => {
-    setIsLoading(true);
-    await updateListingWrapped(listing.id, { location });
-    setIsLoading(false);
-  }, []);
+  const onSelect = useCallback(
+    async (location: string) => {
+      setIsLoading(true);
+      await updateListingWrapped(listing.id, { location });
+      setIsLoading(false);
+    },
+    [listing.id],
+  );
   const coordinates = listing.coordinates ? toGoogleCoordinates(listing.coordinates) : null;
   const [error, setError] = useState<string | undefined>(undefined);
   const onSubmit = async () => {
@@ -319,7 +325,7 @@ const LocationStepInner: React.FC<StepProps & LocationParams> = ({ nextStep, pre
         {coordinates ? (
           <MapComponent center={coordinates} zoom={12} marker={coordinates} />
         ) : (
-          <>{isLoading ? <Loading /> : <img className="tw-rounded-lg" src={MapPreview.src} />}</>
+          <>{isLoading ? <Loading /> : <Image className="tw-rounded-lg" src={MapPreview} alt="Map preview" />}</>
         )}
       </div>
       <FormError message={error} />
@@ -388,7 +394,7 @@ type ImageProps = {
 const ImageStepInner: React.FC<StepProps & ImageProps> = ({ nextStep, prevStep, listing }) => {
   const ref = useRef<HTMLInputElement | null>(null);
   const listingID = listing.id;
-  const [images, setImages] = useState<Image[]>(listing.images);
+  const [images, setImages] = useState<ImageType[]>(listing.images);
   const [error, setError] = useState<string | undefined>(undefined);
   const [uploading, setUploading] = useState<boolean>(false);
 
@@ -488,7 +494,13 @@ const ImageStepInner: React.FC<StepProps & ImageProps> = ({ nextStep, prevStep, 
               onDrop={updateImages}
               className="tw-flex tw-relative tw-w-fit tw-h-fit"
             >
-              <img src={image.url} alt="preview-image" className="tw-select-none tw-rounded-lg tw-cursor-grab" />
+              <Image
+                src={image.url}
+                alt="preview-image"
+                className="tw-select-none tw-rounded-lg tw-cursor-grab"
+                width={image.width}
+                height={image.height}
+              />
               <XMarkIcon
                 className="tw-w-8 tw-absolute tw-right-2 tw-top-2 tw-bg-gray-100 tw-p-1 tw-rounded-lg tw-opacity-[90%] tw-cursor-pointer hover:tw-opacity-100"
                 onClick={() => deleteImage(image.id)}

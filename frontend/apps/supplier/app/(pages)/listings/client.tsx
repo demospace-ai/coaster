@@ -121,7 +121,7 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ selected, show, closeModal })
     <Modal show={show} close={closeModal}>
       <div className="tw-flex tw-flex-col tw-items-center tw-max-w-xl tw-px-8 sm:tw-px-12 tw-pb-10 tw-mt-2">
         <div className="tw-text-center tw-w-full tw-text-xl tw-font-medium tw-mb-6 tw-whitespace-nowrap">
-          Permanently delete "{selected.name}"?
+          Permanently delete &quot;{selected.name}&quot;?
         </div>
         <Button className="tw-flex tw-h-10 tw-w-48 tw-items-center tw-justify-center" onClick={deleteListing}>
           {deleting ? <Loading /> : "Delete"}

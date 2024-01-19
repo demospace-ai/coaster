@@ -55,7 +55,7 @@ export default async function Reservations() {
           </div>
         )}
         <div className="tw-text-sm tw-w-full tw-text-center sm:tw-text-left tw-pt-6 tw-mt-16 tw-border-t tw-border-solid tw-border-gray-300">
-          Can't find your reservation? <HelpButton />
+          Can&apos;t find your reservation? <HelpButton />
         </div>
       </div>
     </main>

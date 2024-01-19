@@ -7,8 +7,8 @@ export const Terms: React.FC = () => {
         <br />
         <br />
         The Coaster website, and all of its related web pages and locations (collectively referred to and taken together
-        as the “Site”), provides information with respect to Coaster's business, products and services (together, the
-        “Services”). The following “Terms of Use” between Coaster, Inc. (also referred to as “Coaster,” “Company” or
+        as the “Site”), provides information with respect to Coaster&apos;s business, products and services (together,
+        the “Services”). The following “Terms of Use” between Coaster, Inc. (also referred to as “Coaster,” “Company” or
         “us”) and “you” govern your use of the Site, Materials (defined below) and the Services.
         <br />
         <br />
@@ -38,14 +38,14 @@ export const Terms: React.FC = () => {
         the property of Coaster and is protected by U.S. and international copyright laws. Neither the Site nor the
         Materials may be modified, reproduced, distributed, transmitted, publicly displayed, performed, or otherwise
         used, in whole or in part, without the prior written consent of Coaster. No use of Materials on this Site is
-        allowed except as expressly stated herein. Some Materials may be copyrighted by Coaster's suppliers, licensees
-        and affiliates. Copyright law also applies to other companies' advertisements or information presented on this
-        Site.
+        allowed except as expressly stated herein. Some Materials may be copyrighted by Coaster&apos;s suppliers,
+        licensees and affiliates. Copyright law also applies to other companies&apos; advertisements or information
+        presented on this Site.
         <br />
         <br />
-        3. <em>Trademarks</em>. “Coaster,” “Coaster.io,” and "Coaster, Inc." (including the Coaster's name, logos and
-        Site name) are the trademarks of Coaster (collectively, the “Trademarks”), within the United States as well as
-        in other countries. You may not display, make reference to or use the Trademarks, in any manner without prior
+        3. <em>Trademarks</em>. “Coaster,” “Coaster.io,” and "Coaster, Inc." (including the Coaster&apos;s name, logos
+        and Site name) are the trademarks of Coaster (collectively, the “Trademarks”), within the United States as well
+        as in other countries. You may not display, make reference to or use the Trademarks, in any manner without prior
         written permission by Coaster. All other trademarks, service marks, product and service names and company names
         or logos that appear on the Site are the property of their respective owners. The use of Coaster Trademarks on
         any other website is not allowed. Coaster prohibits the use of Coaster Trademarks as a "hot" link on or to any
@@ -53,7 +53,7 @@ export const Terms: React.FC = () => {
         <br />
         <br />
         4. <em>Age of Users</em>. Services and information intended for users of the Site are not for use by children
-        under 13 years of age. Parents and legal guardians may not agree to these Terms of Use on their children's
+        under 13 years of age. Parents and legal guardians may not agree to these Terms of Use on their children&apos;s
         behalf. If Coaster becomes aware that a child under 13 has provided or attempted to provide Coaster with
         personal information, Coaster will use best efforts to remove the information permanently from our files. If you
         are between the age of 13 and 18 years old, you may use this Site but only under the supervision of a parent or
@@ -89,11 +89,11 @@ export const Terms: React.FC = () => {
         vi. Use any robot, spider, scraper or other automated means to access the Site for any purpose without our
         express written permission;
         <br />
-        vii. Take any action that imposes, or may impose in Coaster's sole discretion, an unreasonable or
+        vii. Take any action that imposes, or may impose in Coaster&apos;s sole discretion, an unreasonable or
         disproportionately large load on our infrastructure;
         <br />
         viii. Use any device, software or routine to interfere or attempt to interfere with the proper working of the
-        Site or with any other person's use of the Site; or
+        Site or with any other person&apos;s use of the Site; or
         <br />
         ix. Bypass any measures Coaster may use to prevent or restrict access to the Site, or otherwise attempt to gain
         unauthorized access to any portion or feature of the Site, by hacking, password “mining” or any other
@@ -112,10 +112,11 @@ export const Terms: React.FC = () => {
         <br />
         <br />
         8. <em>Indemnification</em>. You agree to defend, indemnify, and hold harmless Coaster from all liabilities,
-        claims, and expenses, including attorney's fees, that arise from any claim or demand, made by any third party
-        due to or arising out of your use of the Site and for any violation of these Terms of Use. Coaster reserves the
-        right, at Coaster's expense, to assume the exclusive defense and control of any matter otherwise subject to
-        indemnification by you, in which event you will cooperate with Coaster in asserting any available defenses.
+        claims, and expenses, including attorney&apos;s fees, that arise from any claim or demand, made by any third
+        party due to or arising out of your use of the Site and for any violation of these Terms of Use. Coaster
+        reserves the right, at Coaster&apos;s expense, to assume the exclusive defense and control of any matter
+        otherwise subject to indemnification by you, in which event you will cooperate with Coaster in asserting any
+        available defenses.
         <br />
         <br />
         9. <em>Disclaimer of Warranties</em>. THE SITE, MATERIALS AND SERVICES (TOGETHER, THE “COASTER ASSETS”) ARE
@@ -131,9 +132,9 @@ export const Terms: React.FC = () => {
         <br />
         10. <em>Limitation of Liability</em>. IN NO EVENT WILL COASTER BE LIABLE TO YOU, OR TO ANY PARTY CLAIMING
         THROUGH YOU, FOR ANY INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES OF ANY KIND IN CONNECTION WITH OR
-        ARISING OUT OF THE FURNISHING, PERFORMANCE, OR USE OF THE COASTER ASSETS. COASTER'S MAXIMUM AGGREGATE LIABILITY
-        FOR DAMAGES OR LOSS, HOWSOEVER ARISING OR CAUSED, SHALL IN NO EVENT BE GREATER THAN TWENTY-FIVE UNITED STATES
-        DOLLARS ($25.00). BECAUSE SOME JURISDICTIONS DO NOT ALLOW THE EXCLUSION OR LIMITATION OF LIABILITY FOR
+        ARISING OUT OF THE FURNISHING, PERFORMANCE, OR USE OF THE COASTER ASSETS. COASTER&apos;S MAXIMUM AGGREGATE
+        LIABILITY FOR DAMAGES OR LOSS, HOWSOEVER ARISING OR CAUSED, SHALL IN NO EVENT BE GREATER THAN TWENTY-FIVE UNITED
+        STATES DOLLARS ($25.00). BECAUSE SOME JURISDICTIONS DO NOT ALLOW THE EXCLUSION OR LIMITATION OF LIABILITY FOR
         CONSEQUENTIAL OR INCIDENTAL DAMAGES, THE ABOVE LIMITATION MAY NOT APPLY TO YOU.
         <br />
         <br />

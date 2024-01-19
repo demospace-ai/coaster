@@ -6,8 +6,8 @@ export default function Careers() {
           <h1 className="tw-font-bold tw-text-5xl">Careers</h1>
         </div>
         <div>
-          We're not currently hiring but we're always looking for talented people to join our team. If you're interested
-          in working with us, please send your resume to{" "}
+          We&apos;re not currently hiring but we&apos;re always looking for talented people to join our team. If
+          you&apos;re interested in working with us, please send your resume to{" "}
           <a className="tw-text-blue-600" href="mailto:careers@trycoaster.com">
             careers@trycoaster.com
           </a>

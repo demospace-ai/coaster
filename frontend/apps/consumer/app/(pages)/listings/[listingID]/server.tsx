@@ -89,7 +89,7 @@ const Description: React.FC<{ listing: ListingType }> = ({ listing }) => {
 const Included: React.FC<{ listing: ListingType }> = ({ listing }) => {
   return (
     <div className="tw-pb-6 tw-border-b tw-border-solid tw-border-gray-300">
-      <div className="tw-mt-5 tw-text-xl tw-font-semibold">What's included</div>
+      <div className="tw-mt-5 tw-text-xl tw-font-semibold">What&apos;s included</div>
       <ul className="tw-list-disc tw-list-inside tw-mt-2">
         {listing.includes?.map((included) => <li key={included}>{included}</li>)}
       </ul>

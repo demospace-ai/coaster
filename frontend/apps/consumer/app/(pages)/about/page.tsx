@@ -9,8 +9,8 @@ export default function AboutPage() {
         <Image src={BigSur} alt="Big Sur" className="tw-rounded-xl tw-mb-5 sm:tw-mb-8" sizes="60vw" />
         <h2 className="tw-text-2xl tw-font-semibold tw-mb-4">Find your next adventure</h2>
         <p className="tw-mb-5">
-          At Coaster, we're passionate about transforming regular vacations into unforgettable adventures. Born from a
-          desire to make adventure travel more accessible for everyone, our marketplace is the best way to find
+          At Coaster, we&apos;re passionate about transforming regular vacations into unforgettable adventures. Born
+          from a desire to make adventure travel more accessible for everyone, our marketplace is the best way to find
           hand-selected outdoor experiences without any of the hassle. From iconic peaks to hidden treasures off the
           beaten path, we curate a diverse array of adventures tailored for every adventurer.
         </p>
@@ -18,11 +18,11 @@ export default function AboutPage() {
           <div>
             <h2 className="tw-text-2xl tw-font-semibold tw-mb-4">Unparalleled Convenience, Seamless Travel</h2>
             <p className="tw-mb-5">
-              We understand that trip planning can be overwhelming and time-consuming. That's why Coaster is built to
-              make finding the perfect trip entirely stress-free. Our app lets you find the perfect experience without
-              fretting over logistics. Whether you're seeking a once-in-a-lifetime mountain expedition or just a
-              two-hour surf lesson, our flexible policies and round-the-clock multilingual customer support ensure a
-              smooth journey, leaving you to relish every moment.
+              We understand that trip planning can be overwhelming and time-consuming. That&apos;s why Coaster is built
+              to make finding the perfect trip entirely stress-free. Our app lets you find the perfect experience
+              without fretting over logistics. Whether you&apos;re seeking a once-in-a-lifetime mountain expedition or
+              just a two-hour surf lesson, our flexible policies and round-the-clock multilingual customer support
+              ensure a smooth journey, leaving you to relish every moment.
             </p>
           </div>
         </div>
@@ -34,11 +34,11 @@ export default function AboutPage() {
         </p>
         <h2 className="tw-text-2xl tw-font-semibold tw-mb-4">Your Travel, Your Way</h2>
         <p className="tw-mb-5">
-          Embrace spontaneity or plan ahead — Coaster accommodates every style of travel. We've got your back whether
-          you need help with last-minute decisions or want extra information so you can plan in advance. Enjoy the
-          flexibility to book immediately and relish the freedom of free cancellations up to 24 hours beforehand, no
-          strings attached. Didn't have a good time? Every trip is backed by our Coaster Guarantee— if you're not
-          completely satisfied, we'll refund your entire trip.
+          Embrace spontaneity or plan ahead — Coaster accommodates every style of travel. We&apos;ve got your back
+          whether you need help with last-minute decisions or want extra information so you can plan in advance. Enjoy
+          the flexibility to book immediately and relish the freedom of free cancellations up to 24 hours beforehand, no
+          strings attached. Didn&apos;t have a good time? Every trip is backed by our Coaster Guarantee— if you&apos;re
+          not completely satisfied, we&apos;ll refund your entire trip.
         </p>
         <h2 className="tw-text-2xl tw-font-semibold tw-mb-4">Our Journey</h2>
         <p className="tw-mb-5">

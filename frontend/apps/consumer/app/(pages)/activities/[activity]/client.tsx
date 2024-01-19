@@ -11,7 +11,7 @@ export const TrackActivityView: React.FC<{ activityType: CategoryType }> = ({ ac
       category: activityType,
       content_name: activityType,
     });
-  }, []);
+  }, [activityType]);
 
   return null;
 };

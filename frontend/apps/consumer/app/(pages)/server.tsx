@@ -171,7 +171,7 @@ const FreeCancellationBanner: React.FC = () => {
             <div className="tw-text-xl sm:tw-text-2xl tw-font-semibold">Flexible Booking</div>
             <div className="tw-max-w-md tw-text-base tw-mt-2">
               Book now and only pay once the reservation is confirmed by your guide. Change your mind? On most trips
-              you'll receive a full refund if you cancel in advance.
+              you&apos;ll receive a full refund if you cancel in advance.
             </div>
           </div>
         </div>

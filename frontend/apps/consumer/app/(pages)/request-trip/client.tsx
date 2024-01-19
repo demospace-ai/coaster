@@ -61,7 +61,7 @@ export const RequestTrip: React.FC = () => {
         <div className="tw-flex tw-items-center tw-mt-4 tw-max-w-lg tw-w-[90vw] ">
           <CheckCircleIcon className="tw-w-16 tw-h-16 tw-stroke-green-600 tw-mr-3" />
           <div className="tw-text-left tw-text-base">
-            We've received your request and will get back to you within 24 hours with some fantastic options!
+            We&apos;ve received your request and will get back to you within 24 hours with some fantastic options!
           </div>
         </div>
       )}

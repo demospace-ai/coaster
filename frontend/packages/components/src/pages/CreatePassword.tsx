@@ -103,7 +103,7 @@ export const CreatePassword: React.FC = () => {
           </form>
         </div>
         <div className="tw-text-xs tw-text-center tw-mt-4 tw-text-slate-800 tw-select-none tw-mx-8 sm:tw-mx-0">
-          By continuing you agree to Coaster's{" "}
+          By continuing you agree to Coaster&apos;s{" "}
           <a className="tw-text-blue-500" href="https://trycoaster.com/terms" target="_blank" rel="noreferrer">
             Terms of Use
           </a>{" "}

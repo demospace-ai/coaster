@@ -88,7 +88,7 @@ export function useListing(listingID: number | undefined, initialData?: Listing)
   return { listing: data, mutate, error, loading: isLoading || isValidating };
 }
 
-export function useAvailability(listingID: number, startDate: string, endDate: string) {
+export function useAvailability(listingID: number, startDate: string, endDate: string, generated: boolean) {
   const fetcher: Fetcher<Availability[], { listingID: number; startDate: string; endDate: string }> = ({
     listingID,
     startDate,
@@ -99,8 +99,9 @@ export function useAvailability(listingID: number, startDate: string, endDate: s
       queryParams: { start_date: startDate, end_date: endDate },
     });
 
+  // Don't fetch if the listing is generated since we just say it's always available
   const { data, mutate, error, isLoading, isValidating } = useSWR(
-    { GetAvailability, listingID, startDate, endDate },
+    generated ? null : { GetAvailability, listingID, startDate, endDate },
     fetcher,
   );
   return {

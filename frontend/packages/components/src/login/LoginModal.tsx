@@ -95,7 +95,7 @@ export const LoginModal: React.FC = () => {
               <Image width={200} height={32} src={LongLogo} className="tw-select-none tw-mb-4" alt="coaster logo" />
               <div className="tw-flex tw-flex-col tw-items-center tw-my-2 tw-w-full">{loginContent}</div>
               <div className="tw-text-xs tw-text-center tw-mt-4 tw-text-slate-800 tw-select-none tw-mx-8 sm:tw-mx-0">
-                By continuing you agree to Coaster's{" "}
+                By continuing you agree to Coaster&apos;s{" "}
                 <a className="tw-text-blue-500" href="https://trycoaster.com/terms" target="_blank" rel="noreferrer">
                   Terms of Use
                 </a>{" "}

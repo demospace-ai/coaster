@@ -15,14 +15,14 @@ export default function Page() {
             <h4 className="tw-text-xl tw-font-semibold">Find your Dream Trip</h4>
             <p>
               Pick out your desired experience with the comfort of knowing that your reservation is flexible.
-              Adjustments can be made if there's a change in plans or weather conditions.
+              Adjustments can be made if there&apos;s a change in plans or weather conditions.
             </p>
           </li>
           <li className="tw-mb-4">
             <h4 className="tw-text-xl tw-font-semibold">Reserve </h4>
             <p>
-              Found an exciting trip? Just provide a bit of information, and we'll hold your place for up to four months
-              ahead of time. Rest assured, we won't bill you at this point.
+              Found an exciting trip? Just provide a bit of information, and we&apos;ll hold your place for up to four
+              months ahead of time. Rest assured, we won&apos;t bill you at this point.
             </p>
           </li>
           <li className="tw-mb-4">
@@ -36,8 +36,8 @@ export default function Page() {
           <li className="tw-mb-4">
             <h4 className="tw-text-xl tw-font-semibold">Embark on your Adventure!</h4>
             <p>
-              With your spot confirmed and your itinerary set, all that's left is to look forward to the experience. Get
-              ready to enjoy your adventure or continue to explore more thrilling escapades.
+              With your spot confirmed and your itinerary set, all that&apos;s left is to look forward to the
+              experience. Get ready to enjoy your adventure or continue to explore more thrilling escapades.
             </p>
           </li>
         </ul>
@@ -57,13 +57,13 @@ export default function Page() {
           take advantage of discounts available on our site.
         </p>
         <p className="tw-mb-5">
-          After booking, your reservation is confirmed. We'll remind you to make the full payment 5 days before your
-          travel date, with the full amount due between 2 to 9 days before your journey, depending on the specific
+          After booking, your reservation is confirmed. We&apos;ll remind you to make the full payment 5 days before
+          your travel date, with the full amount due between 2 to 9 days before your journey, depending on the specific
           experience booked.
         </p>
         <p className="tw-mb-5">
-          Upon reserving, you'll receive a confirmation email. Your official ticket will be sent once full payment is
-          received. You'll then get an email with a link to access your ticket.
+          Upon reserving, you&apos;ll receive a confirmation email. Your official ticket will be sent once full payment
+          is received. You&apos;ll then get an email with a link to access your ticket.
         </p>
         <p className="tw-mb-5 tw-italic">*Final payment dates vary with each booking or product.</p>
       </div>

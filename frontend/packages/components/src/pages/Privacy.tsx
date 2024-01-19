@@ -37,7 +37,7 @@ export const Privacy: React.FC = () => {
           <br />
           Our Services enable our customers to connect their own applications (i.e., Customer Applications) with data
           systems (i.e., End Customer data warehouses, databases, and data files) via APIs and Coaster Integrations made
-          available by us. We may collect, store and process, on your and/or your organization's behalf, any data
+          available by us. We may collect, store and process, on your and/or your organization&apos;s behalf, any data
           (including Personal Information) transmitted to Coaster from an End Customer system, Customer Application or
           Partner Application through a Coaster Integration.
         </div>
@@ -54,7 +54,7 @@ export const Privacy: React.FC = () => {
           </li>
           <li>
             About third parties, but solely pursuant to their express permission, collected and processed by an End
-            Customer, Customer, or Partner (e.g., data originally stored within an End Customer's data systems, a
+            Customer, Customer, or Partner (e.g., data originally stored within an End Customer&apos;s data systems, a
             Customer Application or Partner Application); and
           </li>
           <li>
@@ -96,9 +96,9 @@ export const Privacy: React.FC = () => {
           </li>
           <li>
             We automatically collect through the Services information that is often not personally identifying, such as
-            the website from which visitors came to the Services, Services visitors' IP address, browser type and other
-            information relating to the device through which they access the Services. We may combine this information
-            with the Personal Information we have collected from you; and
+            the website from which visitors came to the Services, Services visitors&apos; IP address, browser type and
+            other information relating to the device through which they access the Services. We may combine this
+            information with the Personal Information we have collected from you; and
           </li>
           <li>
             To improve the Services and offerings or services provided by us and to better understand how users access
@@ -156,21 +156,22 @@ export const Privacy: React.FC = () => {
           <em>Cookies</em>
           <br />
           We (including our chosen third-party service providers) use cookies to track visitor activity on the Services.
-          A cookie is a text file that a website transfers to your computer's hard drive for record-keeping purposes.
-          Our cookies assign a random, unique number to each visitor's computer. They do not contain information that
-          would personally identify the visitor, although we can associate a cookie with any identifying information
-          that is or has been provided to us while visiting the Services. We use cookies that remain on your computer
-          for a specified period of time or until they are deleted (persistent cookies). We may also use cookies that
-          exist only temporarily during an online session (session cookies) – these cookies allow us to identify you
-          temporarily as you move through the Services. Most browsers allow users to refuse cookies but doing so may
-          impede the functionality of some portions of our Services.
+          A cookie is a text file that a website transfers to your computer&apos;s hard drive for record-keeping
+          purposes. Our cookies assign a random, unique number to each visitor&apos;s computer. They do not contain
+          information that would personally identify the visitor, although we can associate a cookie with any
+          identifying information that is or has been provided to us while visiting the Services. We use cookies that
+          remain on your computer for a specified period of time or until they are deleted (persistent cookies). We may
+          also use cookies that exist only temporarily during an online session (session cookies) – these cookies allow
+          us to identify you temporarily as you move through the Services. Most browsers allow users to refuse cookies
+          but doing so may impede the functionality of some portions of our Services.
           <br />
           <br />
           <em>Web Beacons</em>
           <br />
           Web beacons are tiny graphics with a unique identifier, similar in function to cookies, that are used to track
-          the online movements of Web users. In contrast to cookies, which are stored on your computer's hard drive, Web
-          beacons are embedded invisibly on webpages and may not be disabled or controlled through your browser.
+          the online movements of Web users. In contrast to cookies, which are stored on your computer&apos;s hard
+          drive, Web beacons are embedded invisibly on webpages and may not be disabled or controlled through your
+          browser.
           <br />
           <br />
           <em>Third Parties</em>
@@ -251,7 +252,7 @@ export const Privacy: React.FC = () => {
         </p>
         <p>
           <br />
-          <em>Children's Privacy</em>
+          <em>Children&apos;s Privacy</em>
           <br />
           We do not knowingly collect, maintain, or use personal information from children under 13 years of age, and no
           parts of our Services are directed to children. If you learn that a child has provided us with personal

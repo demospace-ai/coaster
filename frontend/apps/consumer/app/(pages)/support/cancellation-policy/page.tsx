@@ -8,8 +8,8 @@ export default function Page() {
           <p className="tw-mb-5">
             Each tour or activity has a specific cancellation policy. Please review and understand the cancellation
             policy applicable to your chosen experience before confirming your booking. You can find this information
-            under the "Cancellation Policy" section for each experience. Additionally, existing bookings' policies can
-            be checked on the respective tickets.
+            under the &quot;Cancellation Policy&quot; section for each experience. Additionally, existing bookings&apos;
+            policies can be checked on the respective tickets.
           </p>
           <p className="tw-mb-5">
             To cancel your booking, please follow the instructions <a href="#">here</a>.
@@ -48,7 +48,7 @@ export default function Page() {
               </div>
             </div>
           </div>
-          <p className="tw-italic tw-mb-5">Note: Cut-off times are based on the experience's local time.</p>
+          <p className="tw-italic tw-mb-5">Note: Cut-off times are based on the experience&apos;s local time.</p>
         </div>
       </div>
     </main>
