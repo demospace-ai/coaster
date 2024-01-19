@@ -9,11 +9,6 @@
   "scripts": {
     "lint": "eslint \"**/*.ts*\""
   },
-  "dependencies": {
-    "highlight.run": "^8.3.2",
-    "react-dnd": "^16.0.1",
-    "tailwind-merge": "^2.2.0"
-  },
   "devDependencies": {
     "@coaster/eslint-config-custom": "*",
     "@coaster/tsconfig": "*",

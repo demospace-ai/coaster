@@ -6,7 +6,7 @@
     "./*": "./src/*"
   },
   "scripts": {
-    "lint": "eslint ."
+    "lint": "eslint \"**/*.ts*\""
   },
   "devDependencies": {
     "@coaster/eslint-config-custom": "*",

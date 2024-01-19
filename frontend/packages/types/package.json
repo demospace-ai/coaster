@@ -4,9 +4,6 @@
   "main": "./types.ts",
   "types": "./types.ts",
   "scripts": {
-    "lint": "eslint ."
-  },
-  "dependencies": {
-    "zod": "*"
+    "lint": "eslint \"**/*.ts*\""
   }
 }
