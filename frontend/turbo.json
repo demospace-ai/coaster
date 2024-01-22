@@ -13,7 +13,10 @@
       "cache": false,
       "persistent": true
     },
-    "clean": {
+    "clean-all": {
+      "cache": false
+    },
+    "//#clean-all": {
       "cache": false
     }
   }
