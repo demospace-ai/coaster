@@ -174,7 +174,7 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ listing, imageID, setImages, 
           className="tw-flex tw-h-10 tw-w-48 tw-items-center tw-justify-center tw-whitespace-nowrap"
           onClick={deleteImage}
         >
-          {deleting ? <Loading /> : "Delete"}
+          {deleting ? <Loading light /> : "Delete"}
         </Button>
       </div>
     </Modal>
