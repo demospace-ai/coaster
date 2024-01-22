@@ -134,7 +134,7 @@ export const BlogSectionClient: React.FC<{ posts: Post[] }> = ({ posts }) => {
             <Link
               href={`/blog/${post.slug.current}`}
               key={post._id}
-              className="tw-flex tw-flex-col tw-items-center tw-shrink-0 lg:tw-shrink tw-w-[90vw] sm:tw-w-[50vw] lg:tw-w-1/3 tw-rounded-xl tw-bg-blue-950 tw-p-8 tw-text-white tw-mx-3 lg:tw-mx-0 tw-group"
+              className="tw-flex tw-flex-col tw-items-center tw-shrink-0 lg:tw-shrink tw-w-[90vw] sm:tw-w-[50vw] lg:tw-w-1/3 tw-rounded-xl tw-bg-coaster-blue tw-p-8 tw-text-white tw-mx-3 lg:tw-mx-0 tw-group"
             >
               <Image
                 priority

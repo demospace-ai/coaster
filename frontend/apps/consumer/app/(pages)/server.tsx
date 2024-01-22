@@ -272,7 +272,7 @@ const ExploreTrips: React.FC = () => {
     <div className="tw-flex tw-flex-col tw-w-full tw-justify-center tw-items-center">
       <div className="tw-text-2xl sm:tw-text-3xl tw-font-semibold tw-mt-20 tw-mb-5">Ready to get out there?</div>
       <Link
-        className="tw-flex tw-justify-center tw-items-center tw-bg-blue-950 tw-text-white tw-w-48 tw-h-10 tw-rounded-lg tw-font-medium"
+        className="tw-flex tw-justify-center tw-items-center tw-bg-coaster-blue tw-text-white tw-w-48 tw-h-10 tw-rounded-lg tw-font-medium"
         href="/search"
       >
         Explore trips

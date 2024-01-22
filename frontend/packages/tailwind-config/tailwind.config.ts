@@ -25,6 +25,7 @@ const config: Config = {
         },
         "gray-10": "#fcfdff",
         "gray-350": "#b9bdc3",
+        "coaster-blue": "#001971",
       },
       boxShadow: {
         modal: "0 4px 20px 4px rgba(0, 0, 0, 0.1)",
