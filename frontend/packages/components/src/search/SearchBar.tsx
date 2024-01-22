@@ -34,7 +34,7 @@ export const SearchBar: React.FC = () => {
         placeholder="Search trips"
       />
       <button
-        className="tw-hidden tw-px-5 sm:tw-flex tw-items-center tw-rounded-[99px] tw-h-full tw-bg-coaster-blue tw-text-white tw-text-base tw-font-medium"
+        className="tw-hidden tw-px-5 sm:tw-flex tw-items-center tw-rounded-[99px] tw-h-full tw-bg-blue-950 tw-text-white tw-text-base tw-font-medium"
         onClick={search}
       >
         Search
@@ -113,7 +113,7 @@ export const SearchBarModal: React.FC<{
           <div className="tw-w-full tw-bg-transparent tw-px-2 tw-text-gray-700 tw-text-lg tw-select-none tw-cursor-pointer">
             Search trips
           </div>
-          <div className="tw-hidden tw-px-5 sm:tw-flex tw-items-center tw-rounded-[99px] tw-h-full tw-bg-coaster-blue tw-text-white tw-text-base tw-font-medium">
+          <div className="tw-hidden tw-px-5 sm:tw-flex tw-items-center tw-rounded-[99px] tw-h-full tw-bg-blue-950 tw-text-white tw-text-base tw-font-medium">
             Search
           </div>
         </div>
