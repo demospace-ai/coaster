@@ -1,11 +1,7 @@
 import { FeaturedPage } from "app/(pages)/server";
-import { Metadata, Viewport } from "next";
+import { Metadata } from "next";
 
 export const dynamic = "force-static";
-
-export const viewport: Viewport = {
-  themeColor: "#efedea",
-};
 
 export const metadata: Metadata = {
   title: "Coaster - Book guided outdoor adventures",
