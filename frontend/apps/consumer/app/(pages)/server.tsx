@@ -93,10 +93,7 @@ const ValuePropBanner: React.FC = () => {
 const ValuePropScrollChild: React.FC<{ className?: string }> = ({ className }) => {
   return (
     <div
-      className={mergeClasses(
-        "tw-flex tw-justify-between tw-gap-10 tw-mr-10 tw-font-heading tw-text-base tw-leading-5",
-        className,
-      )}
+      className={mergeClasses("tw-flex tw-justify-between tw-gap-10 tw-mr-10 tw-font-heading tw-text-sm", className)}
     >
       <div className="tw-flex tw-gap-2">
         <StarIcon className="tw-h-5 tw-w-5" />
