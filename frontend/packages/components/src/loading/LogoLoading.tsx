@@ -2,7 +2,7 @@ import LogoLoadingImage from "@coaster/assets/logo-loading.svg";
 import { mergeClasses } from "@coaster/utils/common";
 import Image from "next/image";
 
-export const LogoLoading: React.FC<{ className: string }> = ({ className }) => {
+export const LogoLoading: React.FC<{ className?: string }> = ({ className }) => {
   return (
     <Image
       src={LogoLoadingImage}
