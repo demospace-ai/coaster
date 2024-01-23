@@ -3,7 +3,7 @@ export const Privacy: React.FC = () => {
     <div className="tw-flex tw-px-5 sm:tw-px-20">
       <div className="tw-flex tw-flex-col tw-w-full tw-max-w-7xl tw-mb-64 tw-mt-10">
         <div>
-          <p className="tw-text-5xl tw-font-bold tw-mb-8">Privacy Policy</p>
+          <p className="tw-text-5xl tw-font-bold tw-font-heading tw-mb-8">Privacy Policy</p>
           <strong>Last Updated:</strong> August 7, 2023
           <br />
           <br />
