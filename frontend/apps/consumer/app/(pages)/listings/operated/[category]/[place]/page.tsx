@@ -55,6 +55,7 @@ export default async function GeneratedListing({
     availability_display: "calendar",
     short_description: undefined,
     coordinates: undefined,
+    place_id: undefined,
     cancellation: undefined,
     max_guests: undefined,
     highlights: undefined,
