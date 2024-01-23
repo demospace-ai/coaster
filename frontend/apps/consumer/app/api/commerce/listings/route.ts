@@ -50,8 +50,9 @@ export async function GET(_: NextRequest) {
       var postalCode = componentsMap.get("postal_code") ?? "";
 
       var description = listing.description.replace(/<[^>]*>/g, "");
+      var description = description.replace(/"/g, '"""');
 
-      return `${listing.id},${listing.name},${listing.categories?.[0]},https://www.trycoaster.com/listings/${listing.id},${city},${region},${postalCode},${country},${listing.coordinates?.latitude},${listing.coordinates?.longitude},${listing.images[0].url},${description},${listing.price}`;
+      return `${listing.id},"${listing.name}",${listing.categories?.[0]},https://www.trycoaster.com/listings/${listing.id},${city},${region},${postalCode},${country},${listing.coordinates?.latitude},${listing.coordinates?.longitude},${listing.images[0].url},"${description}",${listing.price}`;
     }),
   );
 
