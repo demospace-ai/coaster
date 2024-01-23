@@ -47,9 +47,10 @@ func (s ApiService) SearchListings(w http.ResponseWriter, r *http.Request) error
 			return errors.Wrap(err, "(api.SearchListings) loading listings filtered by category")
 		}
 	} else {
-		filteredListings, err = listings.LoadFeatured(s.db)
+		// TODO: paginate this eventually
+		filteredListings, err = listings.LoadAllPublished(s.db)
 		if err != nil {
-			return errors.Wrap(err, "(api.SearchListings) getting featured listings")
+			return errors.Wrap(err, "(api.SearchListings) getting all published listings")
 		}
 	}
 

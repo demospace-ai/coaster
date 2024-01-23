@@ -20,7 +20,13 @@ export async function GET(_: NextRequest) {
       const addressComponents = await getAddressComponents(listing.place_id);
       var componentsMap = convertComponentsToMap(addressComponents);
 
-      if (!componentsMap.has("locality") && !componentsMap.has("administrative_area_level_3")) {
+      if (
+        !componentsMap.has("locality") &&
+        !componentsMap.has("administrative_area_level_3") &&
+        !componentsMap.has("administrative_area_level_4") &&
+        !componentsMap.has("archipelago") &&
+        !componentsMap.has("natural_feature")
+      ) {
         return undefined;
       }
 
@@ -32,14 +38,17 @@ export async function GET(_: NextRequest) {
         return undefined;
       }
 
-      if (!componentsMap.has("postal_code")) {
-        return undefined;
-      }
-
-      var city = componentsMap.get("locality") ?? componentsMap.get("administrative_area_level_3");
+      var city =
+        componentsMap.get("locality") ??
+        componentsMap.get("administrative_area_level_3") ??
+        componentsMap.get("administrative_area_level_4") ??
+        componentsMap.get("archipelago") ??
+        componentsMap.get("natural_feature");
       var country = componentsMap.get("country");
       var region = componentsMap.get("administrative_area_level_1");
-      var postalCode = componentsMap.get("postal_code");
+
+      var postalCode = componentsMap.get("postal_code") ?? "";
+
       var description = listing.description.replace(/<[^>]*>/g, "");
 
       return `${listing.id},${listing.name},${listing.categories?.[0]},https://www.trycoaster.com/listings/${listing.id},${city},${region},${postalCode},${country},${listing.coordinates?.latitude},${listing.coordinates?.longitude},${listing.images[0].url},${description},${listing.price}`;

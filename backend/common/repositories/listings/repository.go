@@ -440,6 +440,32 @@ func LoadFeatured(db *gorm.DB) ([]ListingDetails, error) {
 	return LoadListingsByCategory(db, []models.ListingCategoryType{models.CategoryFeatured})
 }
 
+func LoadAllPublished(db *gorm.DB) ([]ListingDetails, error) {
+	var listings []models.Listing
+	result := db.Table("listings").
+		Select("listings.*").
+		Joins("JOIN listing_categories ON listing_categories.listing_id = listings.id").
+		Where("listings.status = ?", models.ListingStatusPublished).
+		Where("listings.deactivated_at IS NULL").
+		Where("listing_categories.deactivated_at IS NULL").
+		Find(&listings)
+	if result.Error != nil {
+		return nil, errors.Wrap(result.Error, "(listings.LoadAllPublished)")
+	}
+
+	listingDetails := make([]ListingDetails, len(listings))
+	for i, listing := range listings {
+		details, err := loadDetailsForListing(db, listing)
+		if err != nil {
+			return nil, errors.Wrap(err, "(listings.LoadAllPublished) loading details")
+		}
+
+		listingDetails[i] = *details
+	}
+
+	return listingDetails, nil
+}
+
 func LoadByDuration(db *gorm.DB, durationMinutes int64) ([]ListingDetails, error) {
 	var listings []models.Listing
 	result := db.Table("listings").
