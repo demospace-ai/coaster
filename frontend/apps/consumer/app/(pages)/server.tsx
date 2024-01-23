@@ -60,10 +60,10 @@ const HeroSection: React.FC = () => {
           </div>
           <div className="tw-flex tw-flex-col tw-justify-center tw-items-center tw-z-[1]">
             <div className="tw-text-white tw-w-full tw-py-5 tw-text-center">
-              <h1 className="tw-font-bold tw-text-5xl sm:tw-text-6xl -tw-mt-5 tw-font-minion">
+              <h1 className="tw-font-bold tw-text-5xl sm:tw-text-6xl -tw-mt-5 tw-font-heading">
                 Discover, Book, Adventure
               </h1>
-              <h2 className="tw-text-lg tw-tracking-tight tw-mt-3 sm:tw-mt-2">
+              <h2 className="tw-text-lg tw-tracking-tight tw-mt-3">
                 Find and reserve outdoor experiences led by local guides
               </h2>
             </div>
@@ -94,7 +94,7 @@ const ValuePropScrollChild: React.FC<{ className?: string }> = ({ className }) =
   return (
     <div
       className={mergeClasses(
-        "tw-flex tw-justify-between tw-gap-10 tw-mr-10 tw-font-minion tw-text-base tw-leading-5",
+        "tw-flex tw-justify-between tw-gap-10 tw-mr-10 tw-font-heading tw-text-base tw-leading-5",
         className,
       )}
     >
@@ -173,7 +173,7 @@ const FreeCancellationBanner: React.FC = () => {
       <div className="tw-flex tw-flex-col tw-items-center tw-w-full tw-max-w-7xl">
         <div className="tw-flex tw-items-center tw-justify-center tw-w-full tw-px-5 sm:tw-px-20 tw-bg-blue-100 tw-py-12 tw-rounded-xl">
           <div className="tw-flex tw-flex-col tw-items-center tw-w-full tw-max-w-7xl tw-text-center">
-            <div className="tw-text-2xl tw-font-minion">Flexible Booking</div>
+            <div className="tw-text-2xl tw-font-bold tw-font-heading">Flexible Booking</div>
             <div className="tw-max-w-md tw-mt-2">
               Book now and only pay once the reservation is confirmed by your guide. Change your mind? On most trips
               you&apos;ll receive a full refund if you cancel in advance.
@@ -230,7 +230,7 @@ const NeedHelpSection: React.FC = () => {
           </div>
           <div className="tw-flex tw-justify-center tw-items-center tw-text-center tw-w-full tw-h-full tw-z-[1] tw-text-white">
             <div className="tw-flex tw-flex-col tw-items-center sm:tw-pb-16">
-              <div className="tw-font-minion tw-text-3xl sm:tw-text-4xl tw-px-5 tw-mb-2 sm:tw-mb-1">
+              <div className="tw-font-bold tw-font-heading tw-text-3xl sm:tw-text-4xl tw-px-5 tw-mb-2 sm:tw-mb-1">
                 Need help finding the perfect trip?
               </div>
               <div className="tw-text-base sm:tw-text-lg tw-tracking-tight sm:tw-mt-2">
@@ -254,7 +254,7 @@ const ExploreByCategory: React.FC = () => {
   return (
     <div className="tw-flex tw-items-center tw-justify-center tw-w-full tw-px-5 sm:tw-px-20 tw-mt-8 sm:tw-mt-16">
       <div className="tw-flex tw-flex-col tw-w-full tw-max-w-7xl">
-        <div className="tw-text-2xl tw-font-minion tw-mb-5">Explore by category</div>
+        <div className="tw-text-2xl tw-font-bold tw-font-heading tw-mb-5">Explore by category</div>
         <div className="tw-grid tw-grid-cols-2 sm:tw-grid-cols-4 tw-w-full tw-gap-y-3">
           {getSearchableCategories().map((category) => (
             <Link
@@ -275,7 +275,9 @@ const ExploreByCategory: React.FC = () => {
 const ExploreTrips: React.FC = () => {
   return (
     <div className="tw-flex tw-flex-col tw-w-full tw-justify-center tw-items-center">
-      <div className="tw-text-2xl sm:tw-text-3xl tw-font-minion tw-mt-20 tw-mb-5">Ready to get out there?</div>
+      <div className="tw-text-2xl sm:tw-text-3xl tw-font-bold tw-font-heading tw-mt-20 tw-mb-5">
+        Ready to get out there?
+      </div>
       <Link
         className="tw-flex tw-justify-center tw-items-center tw-bg-blue-950 tw-text-white tw-w-48 tw-h-10 tw-rounded-lg tw-font-medium"
         href="/search"

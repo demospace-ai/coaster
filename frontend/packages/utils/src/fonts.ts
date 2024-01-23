@@ -5,9 +5,10 @@ export const worksans = Work_Sans({
   display: "swap",
 });
 
-export const lora = Lora({
+export const heading = Lora({
   subsets: ["latin"],
   display: "swap",
+  variable: "--font-heading",
 });
 
 export const lateef = Lateef({

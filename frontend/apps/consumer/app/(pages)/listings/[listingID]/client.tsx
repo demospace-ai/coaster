@@ -75,7 +75,7 @@ export const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) =
   return (
     <div className="tw-flex tw-flex-row tw-items-start tw-justify-between">
       <div>
-        <h1 className="tw-font-semibold sm:tw-font-bold tw-font-minion tw-text-4xl sm:tw-text-[42px] tw-hyphens-auto">
+        <h1 className="tw-font-semibold sm:tw-font-bold tw-font-heading tw-text-4xl sm:tw-text-[42px] tw-hyphens-auto">
           {listing.name}
         </h1>
         <div className="tw-flex tw-items-center tw-mt-3 tw-mb-4 tw-font-medium">
@@ -650,7 +650,7 @@ export const Itinerary: React.FC<{ listing: ListingType }> = ({ listing }) => {
   const stepRefs = useRef<Array<HTMLButtonElement | null>>([]);
   return (
     <div className="tw-pb-8 tw-border-b tw-border-solid tw-border-gray-300">
-      <div className="tw-mt-5 tw-text-2xl tw-font-minion">Itinerary</div>
+      <div className="tw-mt-5 tw-text-2xl tw-font-heading">Itinerary</div>
       <button
         className="tw-mt-2 tw-text-sm tw-font-medium tw-text-blue-600 hover:tw-underline"
         onClick={() => {

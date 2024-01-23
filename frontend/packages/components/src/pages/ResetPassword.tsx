@@ -76,7 +76,7 @@ export const ResetPassword: React.FC = () => {
         <div className="tw-flex tw-flex-col tw-pt-12 tw-pb-10 tw-px-8 tw-rounded-lg sm:tw-shadow-md sm:tw-bg-white tw-items-center">
           <Image src={LongLogo} width={200} height={32} className="tw-select-none tw-mb-4" alt="coaster logo" />
           <form className="tw-flex tw-flex-col tw-items-center tw-my-2 tw-w-full" onSubmit={handleSubmit(onSubmit)}>
-            <div className="tw-text-xl tw-font-semibold tw-font-minion tw-text-center tw-mb-2">Reset Password</div>
+            <div className="tw-text-xl tw-font-semibold tw-font-heading tw-text-center tw-mb-2">Reset Password</div>
             <Input
               className="tw-my-1"
               label="New Password"

@@ -36,7 +36,7 @@ export const SearchResult: React.FC<{ listing: Listing; className?: string }> = 
           src={listing.images[0].url}
         />
       </div>
-      <span className="tw-mt-2 sm:tw-mt-3 tw-font-bold tw-text-lg tw-font-minion">{listing.name}</span>
+      <span className="tw-mt-2 sm:tw-mt-3 tw-font-bold tw-text-lg tw-font-heading">{listing.name}</span>
       <span>{listing.location}</span>
       <span>
         ${listing.price ? Math.floor(listing.price / numDays) : "TBD"}

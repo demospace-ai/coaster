@@ -58,7 +58,7 @@ export const ListingsSectionClient: React.FC<{
   return (
     <div className="tw-flex tw-flex-col tw-w-full tw-mb-5">
       <div className="tw-flex tw-w-full tw-justify-between tw-items-center">
-        <div className="tw-text-xl sm:tw-text-2xl tw-mr-5 tw-font-minion">{title}</div>
+        <div className="tw-text-xl sm:tw-text-2xl tw-mr-5 tw-font-bold tw-font-heading">{title}</div>
         {searchQuery && (
           <Link className="tw-flex tw-font-medium tw-items-center tw-pt-1" href={`/search?${searchQuery}`}>
             <span className="tw-underline tw-whitespace-nowrap">View all</span>
@@ -122,7 +122,7 @@ export const BlogSectionClient: React.FC<{ posts: Post[] }> = ({ posts }) => {
   return (
     <div className="tw-flex tw-flex-col tw-w-full">
       <div className="tw-flex tw-w-full tw-justify-between tw-mb-4">
-        <div className="tw-text-2xl tw-font-minion">Latest blog posts</div>
+        <div className="tw-font-bold tw-text-2xl tw-font-heading">Latest blog posts</div>
         <Link className="tw-flex tw-items-center tw-font-medium" href="/blog">
           <span className="tw-underline">View blog</span>
           <ArrowRightIcon className="tw-ml-2 tw-h-5 tw-w-5" />
@@ -149,7 +149,7 @@ export const BlogSectionClient: React.FC<{ posts: Post[] }> = ({ posts }) => {
               />
               <div className="tw-flex tw-flex-col tw-h-48 tw-text-center">
                 <div className="tw-mt-4 tw-uppercase">By {post.authorName}</div>
-                <div className="tw-mt-1 tw-font-minion tw-text-2xl">{post.title}</div>
+                <div className="tw-mt-1 tw-font-heading tw-text-2xl">{post.title}</div>
               </div>
               <div className="tw-w-fit tw-text-center tw-border-b tw-border-solid tw-border-white group-hover:tw-font-semibold tw-transition-all tw-duration-200">
                 READ NOW
@@ -190,7 +190,7 @@ export const ValuePropSection: React.FC = () => {
   return (
     <div className="tw-flex tw-items-center tw-justify-center tw-w-full tw-px-5 sm:tw-px-20 tw-mt-12 sm:tw-mt-16 tw-mb-5 sm:tw-mb-10">
       <div className="tw-flex tw-flex-col tw-items-center tw-w-full tw-max-w-7xl">
-        <div className="tw-text-2xl sm:tw-text-3xl tw-font-minion tw-mb-6 sm:tw-mb-10">
+        <div className="tw-text-2xl sm:tw-text-3xl tw-font-bold tw-font-heading tw-mb-6 sm:tw-mb-10">
           We make adventure travel easy
         </div>
         <div ref={emblaRef} className="tw-w-full tw-overflow-hidden">
@@ -205,7 +205,7 @@ export const ValuePropSection: React.FC = () => {
                 placeholder="blur"
                 className="tw-w-16 tw-h-16 tw-mb-4"
               />
-              <span className="tw-font-semibold tw-font-minion tw-text-lg tw-mb-1">Free Cancellation</span>
+              <span className="tw-font-semibold tw-font-heading tw-text-lg tw-mb-1">Free Cancellation</span>
               <span className="tw-max-w-[240px]">
                 Booking a trip on Coaster is stress-free thanks to our flexible booking options.
               </span>
@@ -220,7 +220,7 @@ export const ValuePropSection: React.FC = () => {
                 placeholder="blur"
                 className="tw-w-16 tw-h-16 tw-mb-4"
               />
-              <span className="tw-font-semibold tw-font-minion tw-text-lg tw-mb-1">Curated experiences</span>
+              <span className="tw-font-semibold tw-font-heading tw-text-lg tw-mb-1">Curated experiences</span>
               <span className="tw-max-w-[240px]">
                 We do the research so you don&apos;t have to. Every trip is verified for safety and stoke.
               </span>
@@ -235,7 +235,7 @@ export const ValuePropSection: React.FC = () => {
                 placeholder="blur"
                 className="tw-w-16 tw-h-16 tw-mb-4"
               />
-              <span className="tw-font-semibold tw-font-minion tw-text-lg tw-mb-1">Sustainable Travel</span>
+              <span className="tw-font-semibold tw-font-heading tw-text-lg tw-mb-1">Sustainable Travel</span>
               <span className="tw-max-w-[240px]">
                 We care deeply about our planet, and only work with responsible guides.
               </span>
@@ -250,7 +250,7 @@ export const ValuePropSection: React.FC = () => {
                 placeholder="blur"
                 className="tw-w-16 tw-h-16 tw-mb-4"
               />
-              <span className="tw-font-semibold tw-font-minion tw-text-lg tw-mb-1">Adventure Guarantee</span>
+              <span className="tw-font-semibold tw-font-heading tw-text-lg tw-mb-1">Adventure Guarantee</span>
               <span className="tw-max-w-[240px]">
                 Didn&apos;t have a good time? We&apos;ll give you a full refund, no questions asked.
               </span>

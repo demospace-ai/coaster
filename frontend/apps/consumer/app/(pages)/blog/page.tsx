@@ -29,7 +29,7 @@ export default async function AllPosts() {
     <main className="tw-flex tw-items-center tw-justify-center tw-w-full tw-px-5 sm:tw-px-20 tw-mt-6 sm:tw-mt-10 tw-pb-32">
       <div className="tw-w-full tw-max-w-7xl">
         <div className="tw-mb-6 sm:tw-mb-10">
-          <h1 className="tw-font-bold tw-font-minion tw-text-5xl">Blog</h1>
+          <h1 className="tw-font-bold tw-font-heading tw-text-5xl">Blog</h1>
         </div>
         <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-1 sm:tw-grid-cols-2 md:tw-grid-cols-3 tw-gap-12 sm:tw-gap-10 tw-w-full tw-justify-start">
           {posts.map((post) => (
@@ -46,7 +46,7 @@ export default async function AllPosts() {
                 className="tw-shadow-md"
               />
               <div className="tw-mt-4 tw-uppercase">By {post.authorName}</div>
-              <div className="tw-mt-1 tw-font-bold tw-text-2xl tw-font-minion">{post.title}</div>
+              <div className="tw-mt-1 tw-font-bold tw-text-2xl tw-font-heading">{post.title}</div>
               <div className="tw-mt-1">{post.metaDescription}</div>
             </Link>
           ))}

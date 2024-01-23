@@ -13,7 +13,7 @@ export default async function Page({ params }: { params: { activity: string } })
     <div className="tw-flex tw-px-5 sm:tw-px-20">
       <TrackActivityView activityType={activityType} />
       <div className="tw-flex tw-flex-col tw-items-start tw-pt-5 sm:tw-pt-8 tw-pb-24 tw-w-full tw-max-w-7xl">
-        <div className="tw-font-bold tw-font-minion tw-text-4xl tw-w-full tw-text-center sm:tw-text-left tw-mb-3">
+        <div className="tw-font-bold tw-font-heading tw-text-4xl tw-w-full tw-text-center sm:tw-text-left tw-mb-3">
           {getCategoryForDisplay(activityType)}
         </div>
         <div className="tw-mb-5 tw-text-base tw-max-w-2xl">{getDescriptionForCategory(activityType)}</div>

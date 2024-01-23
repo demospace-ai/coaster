@@ -481,7 +481,7 @@ export const SendResetForm: React.FC<{
           setSendingReset(false);
         })}
       >
-        <div className="tw-font-bold tw-font-minion tw-text-xl tw-w-full tw-text-center tw-mb-2">Reset password</div>
+        <div className="tw-font-bold tw-font-heading tw-text-xl tw-w-full tw-text-center tw-mb-2">Reset password</div>
         <div className="tw-w-full tw-text-center tw-mb-2">
           Enter your email to receive a link to reset your password.
         </div>
