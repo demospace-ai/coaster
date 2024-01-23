@@ -4,7 +4,7 @@ import LongLogo from "@coaster/assets/long-logo.svg";
 import { useAuthContext, useResetPassword } from "@coaster/rpc/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
+import { redirect, useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -60,7 +60,7 @@ export const CreatePassword: React.FC = () => {
   }, [router, destination, user]);
 
   if (!token) {
-    return <div>Unexpected error</div>;
+    return redirect("/login");
   }
 
   const onSubmit = (data: CreatePasswordFormSchemaType) => {

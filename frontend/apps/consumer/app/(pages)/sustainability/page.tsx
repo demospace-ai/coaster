@@ -6,7 +6,7 @@ export default function Sustainability() {
   return (
     <main className="tw-flex tw-items-center tw-justify-center tw-w-full tw-px-5 sm:tw-px-20 tw-mt-6 sm:tw-mt-10 tw-pb-16 sm:tw-pb-32">
       <div className="tw-w-full tw-max-w-7xl tw-text-base">
-        <h1 className="tw-font-bold tw-text-5xl tw-mb-6 sm:tw-mb-10">Sustainability</h1>
+        <h1 className="tw-font-bold tw-font-minion tw-text-5xl tw-mb-6 sm:tw-mb-10">Sustainability</h1>
         <Image
           src={SustainableHero}
           alt={"Arch in Moab"}
@@ -14,11 +14,11 @@ export default function Sustainability() {
           sizes="60vw"
         />
         <div className="tw-mb-5">
-          At Coaster, we passionately believe in the unparalleled power of experiential learning through connecting
-          people with their environment. We understand that the most valuable kind of education is the one gained
-          through firsthand experiences, where individuals immerse themselves in nature, create lasting memories, and
-          forge a deep connection with their environment. Unlike reading about nature in a book, stepping outside and
-          engaging with the world firsthand is a transformative journey.
+          At Coaster, we believe in the power of experiential learning by connecting people with their environment. We
+          understand that the most valuable kind of education is the one gained through firsthand experiences, where
+          individuals immerse themselves in nature, create lasting memories, and forge a deep connection with their
+          environment. Unlike reading about nature in a book, stepping outside and engaging with the world firsthand is
+          a transformative journey.
         </div>
         <div>
           Coaster is not just about facilitating travel; it&apos;s about curating opportunities for individuals to
@@ -28,7 +28,7 @@ export default function Sustainability() {
           preserve our planet for generations to come.
         </div>
         <div>
-          <h2 className="tw-mt-5 tw-mb-5 tw-font-semibold tw-text-2xl">What are we currently doing?</h2>
+          <h2 className="tw-mt-8 tw-mb-5 tw-font-semibold tw-font-minion tw-text-2xl">What are we currently doing?</h2>
           <ul className="tw-flex tw-flex-col tw-list-disc tw-ml-5 tw-gap-2">
             <li>
               <span className="tw-font-semibold">Inspiring Responsibility</span>: Coaster recognizes that experiencing
@@ -55,7 +55,7 @@ export default function Sustainability() {
             </li>
           </ul>
           <div>
-            <h2 className="tw-mt-5 tw-mb-5 tw-font-semibold tw-text-2xl">What are we working on?</h2>
+            <h2 className="tw-mt-5 tw-mb-5 tw-font-semibold tw-font-minion tw-text-2xl">What are we working on?</h2>
             <ul className="tw-flex tw-flex-col tw-list-disc tw-ml-5 tw-gap-2">
               <li>
                 <span className="tw-font-semibold">Eco-Friendly Accommodations</span>: We prioritize partnerships with
@@ -85,7 +85,9 @@ export default function Sustainability() {
             </ul>
 
             <div>
-              <h2 className="tw-mt-5 tw-mb-5 tw-font-semibold tw-text-2xl">What&apos;s on our roadmap?</h2>
+              <h2 className="tw-mt-5 tw-mb-5 tw-font-semibold tw-font-minion tw-text-2xl">
+                What&apos;s on our roadmap?
+              </h2>
               <ul className="tw-flex tw-flex-col tw-list-disc tw-ml-5 tw-gap-2">
                 <li>
                   <span className="tw-font-semibold">Carbon Offsetting</span>: Coaster is committed to offsetting the

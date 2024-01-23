@@ -38,7 +38,7 @@ export default async function Listing({ params }: { params: { listingID: string 
 
   return (
     <main className="tw-flex tw-items-center tw-justify-center tw-w-full tw-px-5 sm:tw-px-20">
-      <div className="tw-flex tw-flex-col tw-pt-5 sm:tw-pt-12 tw-pb-10 sm:tw-pb-20 tw-text-base tw-w-full tw-max-w-7xl">
+      <div className="tw-flex tw-flex-col tw-pt-5 sm:tw-pt-10 tw-pb-10 sm:tw-pb-20 tw-text-base tw-w-full tw-max-w-7xl">
         <ListingPage listing={listing} />
       </div>
     </main>

@@ -93,7 +93,7 @@ export const Profile: React.FC = () => {
         className="tw-flex tw-flex-col tw-max-w-full sm:tw-max-w-2xl tw-w-full tw-px-4 sm:tw-px-0"
         onSubmit={handleSubmit(onSubmit)}
       >
-        <div className="tw-text-center sm:tw-text-left tw-w-full tw-text-3xl tw-font-semibold tw-mb-3">
+        <div className="tw-text-center sm:tw-text-left tw-w-full tw-text-3xl tw-font-semibold tw-font-minion tw-mb-3">
           Profile Details
         </div>
         <div className="tw-flex tw-flex-col tw-w-full tw-items-center tw-justify-center tw-mb-5">

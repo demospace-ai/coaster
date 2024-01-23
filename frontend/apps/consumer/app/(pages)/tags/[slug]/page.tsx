@@ -38,7 +38,7 @@ export default async function Tag({ params }: { params: { slug: string } }) {
     <div className="tw-flex tw-px-5 sm:tw-px-20">
       <TrackTagView tag={tag} />
       <div className="tw-flex tw-flex-col tw-items-center tw-pt-5 sm:tw-pt-8 tw-pb-24 tw-w-full tw-max-w-7xl">
-        <div className="tw-mt-3 sm:tw-mt-8 tw-font-bold tw-text-3xl sm:tw-text-4xl tw-w-full tw-text-center">
+        <div className="tw-mt-3 sm:tw-mt-8 tw-font-bold tw-font-minion tw-text-3xl sm:tw-text-4xl tw-w-full tw-text-center">
           {tag.title}
         </div>
         <div className="tw-mt-4 tw-mb-4 sm:tw-mb-10 tw-w-full tw-max-w-xl tw-text-center">{tag.description}</div>

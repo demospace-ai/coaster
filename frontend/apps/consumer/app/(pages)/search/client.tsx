@@ -75,7 +75,7 @@ export const CustomResult: React.FC = () => {
         )}
       </Modal>
       <div className="tw-flex tw-flex-col tw-w-full tw-aspect-square tw-bg-gray-100 tw-rounded-xl tw-items-center tw-justify-center tw-p-5 tw-text-center">
-        <span className="tw-text-lg tw-font-semibold tw-mb-1">Looking for something else?</span>
+        <span className="tw-text-xl tw-font-minion tw-font-semibold tw-mb-1">Looking for something else?</span>
         <span className="tw-text-sm tw-mb-4">
           Let us know and we&apos;ll do our best to find an adventure you&apos;ll love!
         </span>

@@ -1,6 +1,11 @@
-import { Lateef, Work_Sans } from "next/font/google";
+import { Lateef, Lora, Work_Sans } from "next/font/google";
 
 export const worksans = Work_Sans({
+  subsets: ["latin"],
+  display: "swap",
+});
+
+export const lora = Lora({
   subsets: ["latin"],
   display: "swap",
 });

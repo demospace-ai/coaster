@@ -24,22 +24,16 @@ export const SearchBar: React.FC = () => {
         e.preventDefault();
         search();
       }}
-      className="tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[400px] tw-h-14 tw-bg-white tw-shadow-dark-sm tw-p-1.5 tw-rounded-[99px] tw-cursor-text tw-mt-2"
+      className="tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[400px] tw-h-12 tw-bg-white tw-shadow-dark-sm tw-p-1.5 tw-rounded-lg tw-cursor-text tw-mt-1 sm:tw-mt-2 tw-px-4"
     >
       <input
         ref={inputRef}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        className="tw-w-full tw-bg-transparent tw-pl-4 tw-placeholder-gray-700 tw-text-base tw-select-none tw-cursor-text tw-outline-none"
-        placeholder="Search trips"
+        className="tw-w-full tw-bg-transparent tw-placeholder-gray-700 tw-text-base tw-select-none tw-cursor-text tw-outline-none"
+        placeholder="Search for an activity or location"
       />
-      <button
-        className="tw-hidden tw-px-5 sm:tw-flex tw-items-center tw-rounded-[99px] tw-h-full tw-bg-blue-950 tw-text-white tw-text-base tw-font-medium"
-        onClick={search}
-      >
-        Search
-      </button>
-      <MagnifyingGlassIcon className="tw-flex sm:tw-hidden tw-w-6 tw-h-6 tw-mr-4 tw-stroke-gray-600" onClick={search} />
+      <MagnifyingGlassIcon className="tw-flex tw-w-6 tw-h-6 tw-stroke-gray-600 tw-cursor-pointer" onClick={search} />
     </form>
   );
 };

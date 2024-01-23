@@ -63,8 +63,8 @@ export default async function BlogPost({ params }: { params: { slug: string } })
   );
 
   return (
-    <article className="tw-prose tw-mt-12 tw-mb-64 tw-mx-4 sm:tw-mx-10 tw-max-w-4xl">
-      <h1 className="tw-mb-4">{post.title}</h1>
+    <article className="tw-prose prose-headings:tw-font-minion prose-headings:tw-mb-3 tw-mt-12 tw-mb-64 tw-mx-4 sm:tw-mx-10 tw-max-w-4xl">
+      <h1 className="tw-mb-4 tw-font-minion">{post.title}</h1>
       <div className="tw-flex tw-items-center tw-mb-1">
         <div>By {post.authorName}</div>
         <span className="tw-mx-2">|</span>
