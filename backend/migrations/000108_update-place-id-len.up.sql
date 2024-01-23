@@ -1,0 +1,1 @@
+ALTER TABLE listings ALTER COLUMN place_id TYPE VARCHAR(1024);
