@@ -55,7 +55,7 @@ func (s ApiService) UpdateListing(auth auth.Authentication, w http.ResponseWrite
 		}
 
 		// Use the validated location and coordinates for the update
-		updateListingRequest.Location = &place.FormattedAddress
+		updateListingRequest.Location = &place.Name
 		updateListingRequest.Coordinates = &place.Coordinates
 		updateListingRequest.PlaceID = &place.PlaceID
 	}

@@ -11,9 +11,9 @@ import (
 const MAPS_API_KEY = "AIzaSyC8wQgUVXBQNvaPtqq60sPv-LiEIupZZWM"
 
 type Place struct {
-	FormattedAddress string
-	Coordinates      geo.Point
-	PlaceID          string
+	Name        string
+	Coordinates geo.Point
+	PlaceID     string
 }
 
 func GetPlaceFromQuery(query string) (*Place, error) {
@@ -38,7 +38,6 @@ func GetPlaceFromQuery(query string) (*Place, error) {
 	detailsRequest := &maps.PlaceDetailsRequest{
 		PlaceID: autocompleteResponse.Predictions[0].PlaceID,
 		Fields: []maps.PlaceDetailsFieldMask{
-			maps.PlaceDetailsFieldMaskFormattedAddress,
 			maps.PlaceDetailsFieldMaskGeometry,
 		},
 	}
@@ -49,7 +48,7 @@ func GetPlaceFromQuery(query string) (*Place, error) {
 	}
 
 	return &Place{
-		FormattedAddress: detailsResponse.FormattedAddress,
+		Name: autocompleteResponse.Predictions[0].Description,
 		Coordinates: geo.Point{
 			Latitude:  detailsResponse.Geometry.Location.Lat,
 			Longitude: detailsResponse.Geometry.Location.Lng,

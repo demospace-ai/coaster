@@ -40,7 +40,7 @@ func (s ApiService) CreateListing(auth auth.Authentication, w http.ResponseWrite
 			return errors.Wrap(err, "(api.CreateListing) getting location from query")
 		}
 
-		location = &place.FormattedAddress
+		location = &place.Name
 		coordinates = &place.Coordinates
 		placeId = &place.PlaceID
 	}
