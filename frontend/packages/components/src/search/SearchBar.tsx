@@ -31,7 +31,7 @@ export const SearchBar: React.FC = () => {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         className="tw-w-full tw-bg-transparent tw-placeholder-gray-700 tw-text-base tw-select-none tw-cursor-text tw-outline-none"
-        placeholder="Search for an activity or location"
+        placeholder="Search trips"
       />
       <MagnifyingGlassIcon className="tw-flex tw-w-6 tw-h-6 tw-stroke-gray-600 tw-cursor-pointer" onClick={search} />
     </form>
