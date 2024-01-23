@@ -444,10 +444,8 @@ func LoadAllPublished(db *gorm.DB) ([]ListingDetails, error) {
 	var listings []models.Listing
 	result := db.Table("listings").
 		Select("listings.*").
-		Joins("JOIN listing_categories ON listing_categories.listing_id = listings.id").
 		Where("listings.status = ?", models.ListingStatusPublished).
 		Where("listings.deactivated_at IS NULL").
-		Where("listing_categories.deactivated_at IS NULL").
 		Find(&listings)
 	if result.Error != nil {
 		return nil, errors.Wrap(result.Error, "(listings.LoadAllPublished)")
