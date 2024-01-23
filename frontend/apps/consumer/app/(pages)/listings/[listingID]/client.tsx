@@ -75,7 +75,7 @@ export const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) =
   return (
     <div className="tw-flex tw-flex-row tw-items-start tw-justify-between">
       <div>
-        <h1 className="tw-font-semibold sm:tw-font-bold tw-font-heading tw-text-4xl sm:tw-text-[42px] tw-hyphens-auto">
+        <h1 className="tw-font-semibold sm:tw-font-bold tw-font-heading tw-text-3xl sm:tw-text-4xl sm:tw-text-[42px] tw-hyphens-auto sm:!tw-leading-[50px]">
           {listing.name}
         </h1>
         <div className="tw-flex tw-items-center tw-mt-3 tw-mb-4 tw-font-medium">
@@ -83,7 +83,7 @@ export const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) =
         </div>
       </div>
       <div
-        className="tw-cursor-pointer hover:tw-bg-gray-100 tw-rounded-lg tw-p-0.5 sm:tw-p-2"
+        className="tw-cursor-pointer hover:tw-bg-gray-100 tw-rounded-lg tw-p-0.5 sm:tw-p-2 tw-mt-2 sm:tw-mt-0"
         onClick={() => {
           navigator.clipboard.writeText(window.location.href);
           showNotification("success", "Copied link to clipboard", 2000);
