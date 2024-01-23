@@ -1,4 +1,5 @@
 import { SearchListings, sendRequest } from "@coaster/rpc/common";
+import { Coordinates } from "@coaster/types";
 import { NextRequest } from "next/server";
 
 const HEADER =
@@ -14,6 +15,10 @@ export async function GET(_: NextRequest) {
       }
 
       if (!listing.description) {
+        return undefined;
+      }
+
+      if (!listing.coordinates) {
         return undefined;
       }
 
@@ -38,6 +43,11 @@ export async function GET(_: NextRequest) {
         return undefined;
       }
 
+      var postalCode = componentsMap.get("postal_code");
+      if (!postalCode) {
+        postalCode = await getPostalCodeFromCoordinates(listing.coordinates);
+      }
+
       var city =
         componentsMap.get("locality") ??
         componentsMap.get("administrative_area_level_3") ??
@@ -46,8 +56,6 @@ export async function GET(_: NextRequest) {
         componentsMap.get("natural_feature");
       var country = componentsMap.get("country");
       var region = componentsMap.get("administrative_area_level_1");
-
-      var postalCode = componentsMap.get("postal_code") ?? "";
 
       var description = listing.description.replace(/<[^>]*>/g, "");
       var description = description.replace(/"/g, '"""');
@@ -70,6 +78,24 @@ async function getAddressComponents(placeId: string): Promise<any> {
   const response = await fetch(url);
   const results = await response.json();
   return results.result.address_components;
+}
+
+async function getPostalCodeFromCoordinates(coordinates: Coordinates): Promise<string> {
+  const url = new URL("https://maps.googleapis.com/maps/api/geocode/json");
+
+  url.searchParams.append("latlng", coordinates.latitude + "," + coordinates.longitude);
+  url.searchParams.append("key", process.env.NODE_MAPS_API_KEY ?? "");
+  url.searchParams.append("result_type", "postal_code");
+
+  const response = await fetch(url);
+  const results = (await response.json()).results;
+  if (results.length == 0) {
+    return "";
+  }
+
+  const addressComponents = results[0].address_components;
+  const componentsMap = convertComponentsToMap(addressComponents);
+  return componentsMap.get("postal_code") ?? "";
 }
 
 function convertComponentsToMap(components: any[]): Map<string, string> {
