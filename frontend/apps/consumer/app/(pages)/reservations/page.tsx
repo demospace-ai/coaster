@@ -30,7 +30,7 @@ export default async function Reservations() {
         ) : (
           <div className="tw-flex tw-flex-col tw-gap-4">
             {bookings.map((booking) => (
-              <Link key={booking.reference} className="tw-flex tw-text-lg" href={`/reservations/${booking.reference}`}>
+              <Link key={booking.reference} className="tw-flex" href={`/reservations/${booking.reference}`}>
                 <Image
                   src={booking.booking_image.url}
                   width={booking.booking_image.width}
@@ -42,7 +42,7 @@ export default async function Reservations() {
                   className="tw-w-20 sm:tw-w-32"
                 />
                 <div className="tw-flex tw-flex-col tw-ml-5">
-                  <div className="tw-font-bold">
+                  <div className="tw-font-bold tw-text-lg">
                     {booking.reference} - {booking.listing.name}
                   </div>
                   <div>{booking.listing.location}</div>
