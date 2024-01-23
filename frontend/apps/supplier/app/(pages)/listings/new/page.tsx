@@ -93,7 +93,7 @@ const NewListingInner: React.FC<{ initialStepNumber: number }> = ({ initialStepN
     {
       element: ReviewStep,
       title: "Review your listing",
-      subtitle: "Here&apos;s what we&apos;ll show to guests. Make sure everything looks good.",
+      subtitle: "Here's what we'll show to guests. Make sure everything looks good.",
     },
   ];
 

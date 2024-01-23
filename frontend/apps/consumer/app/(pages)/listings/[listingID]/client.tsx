@@ -217,7 +217,7 @@ export const ReserveSlider: React.FC<{
                                   return true;
                                 }
 
-                                // Allow choosing any date if there is no availability, so we don&apos;t blocking booking
+                                // Allow choosing any date if there is no availability, so we don't blocking booking
                                 if (availableDates.length === 0) {
                                   return false;
                                 }
@@ -475,7 +475,7 @@ export const BookingPanel: React.FC<{ listing: ListingType; generated: boolean }
                   return true;
                 }
 
-                // Allow choosing any date if there is no availability, so we don&apos;t blocking booking
+                // Allow choosing any date if there is no availability, so we don't blocking booking
                 if (availableDates.length === 0) {
                   return false;
                 }
@@ -748,13 +748,13 @@ function useBookingState(listing: ListingType, generated: boolean) {
     if (user) {
       if (generated) {
         // TODO: if generated, reserve via special booking endpoint
-        showNotification("success", "Requested to book! You&apos;ll hear back from us soon.", 2000);
+        showNotification("success", "Requested to book! You'll hear back from us soon.", 2000);
         return;
       }
 
       if (availability === undefined || availability.length === 0) {
         // No-op, just send the notification to us and the user
-        showNotification("success", "Requested to book! You&apos;ll hear back from us soon.", 2000);
+        showNotification("success", "Requested to book! You'll hear back from us soon.", 2000);
         return;
       }
 

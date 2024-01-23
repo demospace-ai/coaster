@@ -46,7 +46,7 @@ export default async function GeneratedListing({
       last_name: "",
       profile_picture_url: "https://www.trycoaster.com/icon.png",
       about:
-        "Coaster is on a mission to make outdoor adventures more accessible. We&apos;re accomplishing this goal by delivering top-tier programs that adhere to the highest safety and quality standards that are fully planned and led by experienced guides.",
+        "Coaster is on a mission to make outdoor adventures more accessible. We're accomplishing this goal by delivering top-tier programs that adhere to the highest safety and quality standards that are fully planned and led by experienced guides.",
       email: "trips@trycoaster.com",
     },
     images: getImagesForGeneratedListing(params.category),

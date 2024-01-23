@@ -194,11 +194,11 @@ const SingleDateStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values,
       const payload = {} as AvailabilityRuleInput;
 
       if (!values.name) {
-        return setError("Make sure you&apos;ve provided a name for your rule.");
+        return setError("Make sure you've provided a name for your rule.");
       }
 
       if (!values.type) {
-        return setError("Make sure you&apos;ve selected a rule type.");
+        return setError("Make sure you've selected a rule type.");
       }
 
       payload.name = values.name;
@@ -302,11 +302,11 @@ const WeekdaySelectionStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ v
     const payload = {} as AvailabilityRuleInput;
 
     if (!values.name) {
-      return setError("Make sure you&apos;ve provided a name for your rule.");
+      return setError("Make sure you've provided a name for your rule.");
     }
 
     if (!values.type) {
-      return setError("Make sure you&apos;ve selected a rule type.");
+      return setError("Make sure you've selected a rule type.");
     }
 
     if (!values.start_date || !values.end_date) {
@@ -408,11 +408,11 @@ const RecurringStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, 
       const payload = {} as AvailabilityRuleInput;
 
       if (!values.name) {
-        return setError("Make sure you&apos;ve provided a name for your rule.");
+        return setError("Make sure you've provided a name for your rule.");
       }
 
       if (!values.type) {
-        return setError("Make sure you&apos;ve selected a rule type.");
+        return setError("Make sure you've selected a rule type.");
       }
 
       payload.name = values.name;
@@ -591,11 +591,11 @@ const TimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({ values, s
     }
 
     if (!values.name) {
-      return setError("Make sure you&apos;ve provided a name for your rule.");
+      return setError("Make sure you've provided a name for your rule.");
     }
 
     if (!values.type) {
-      return setError("Make sure you&apos;ve selected a rule type.");
+      return setError("Make sure you've selected a rule type.");
     }
 
     if (!values.time_slots) {
@@ -695,11 +695,11 @@ const SingleDayTimeSlotStep: React.FC<StepProps<NewAvailabilityRuleState>> = ({
     }
 
     if (!values.name) {
-      return setError("Make sure you&apos;ve provided a name for your rule.");
+      return setError("Make sure you've provided a name for your rule.");
     }
 
     if (!values.type) {
-      return setError("Make sure you&apos;ve selected a rule type.");
+      return setError("Make sure you've selected a rule type.");
     }
 
     if (!values.time_slots) {

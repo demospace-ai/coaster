@@ -7,8 +7,8 @@ export const CategoriesSchema = z.array(Category).min(1, "Must have at least one
 
 export const NameSchema = z
   .string()
-  .min(4, "Your listing&apos;s name must be at least 4 characters long.")
-  .max(64, "Your listing&apos;s name can be up to 64 characters long.");
+  .min(4, "Your listing's name must be at least 4 characters long.")
+  .max(64, "Your listing's name can be up to 64 characters long.");
 
 export const DescriptionSchema = z.string().superRefine((data, ctx) => {
   const json = generateText(generateJSON(data, [StarterKit]), [StarterKit]);
