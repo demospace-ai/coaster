@@ -181,6 +181,7 @@ func (s ApiService) filterByAvailability(unfiltered []listings.ListingDetails, s
 
 			if hasAvailability {
 				filteredByAvailability = append(filteredByAvailability, listing)
+				break
 			}
 		}
 	}
