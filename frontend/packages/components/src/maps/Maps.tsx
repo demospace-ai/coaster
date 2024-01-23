@@ -224,8 +224,17 @@ const Suggestions: React.FC<{
   useEffect(() => {
     const autocomplete = new google.maps.places.AutocompleteService();
     if (query.length > 0) {
-      autocomplete.getQueryPredictions(
-        { input: query },
+      autocomplete.getPlacePredictions(
+        {
+          input: query,
+          types: [
+            "locality",
+            "administrative_area_level_4",
+            "administrative_area_level_3",
+            "archipelago",
+            "natural_feature",
+          ],
+        },
         (predictions: google.maps.places.QueryAutocompletePrediction[] | null) =>
           setSuggestions(predictions?.map((p) => p.description) ?? []),
       );

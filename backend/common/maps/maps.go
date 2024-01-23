@@ -24,6 +24,7 @@ func GetPlaceFromQuery(query string) (*Place, error) {
 
 	autocompleteRequest := &maps.PlaceAutocompleteRequest{
 		Input: query,
+		Types: "locality|administrative_area_level_4|administrative_area_level_3|archipelago|natural_feature",
 	}
 	autocompleteResponse, err := c.PlaceAutocomplete(context.TODO(), autocompleteRequest)
 	if err != nil {
