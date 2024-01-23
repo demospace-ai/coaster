@@ -11,11 +11,14 @@ import (
 	_ "image/png"
 
 	_ "golang.org/x/image/webp"
+	"gorm.io/gorm"
 
 	"go.fabra.io/server/common/application"
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/crypto"
 	"go.fabra.io/server/common/database"
+	"go.fabra.io/server/common/maps"
+	"go.fabra.io/server/common/models"
 	"go.fabra.io/server/internal/api"
 	"go.fabra.io/server/internal/router"
 
@@ -42,10 +45,42 @@ func main() {
 		defer highlight.Stop()
 	}
 
+	updateListings(db)
+
 	cryptoService := crypto.NewCryptoService()
 	authService := auth.NewAuthService(db, cryptoService)
 	apiService := api.NewApiService(db, authService, cryptoService)
 
 	router := router.NewRouter(authService)
 	router.RunService(apiService)
+}
+
+func updateListings(db *gorm.DB) {
+	var listings []models.Listing
+	result := db.Table("listings").Select("*").Find(&listings)
+	if result.Error != nil {
+		log.Fatal(result.Error)
+		return
+	}
+
+	for _, listing := range listings {
+		if listing.Location != nil {
+			place, err := maps.GetPlaceFromQuery(*listing.Location)
+			if err != nil {
+				log.Fatal(err)
+				return
+			}
+
+			result := db.Table("listings").Where("id = ?", listing.ID).Updates(map[string]interface{}{
+				"place_id": place.PlaceID,
+			})
+
+			if result.Error != nil {
+				log.Fatal(result.Error)
+				return
+			}
+		}
+
+	}
+
 }

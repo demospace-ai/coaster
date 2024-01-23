@@ -15,6 +15,7 @@ type Listing struct {
 	Price               *int64                     `json:"price"`
 	Location            *string                    `json:"location"`
 	Coordinates         *Coordinates               `json:"coordinates"`
+	PlaceID             *string                    `json:"place_id"`
 	ShortDescription    *string                    `json:"short_description"`
 	Cancellation        models.ListingCancellation `json:"cancellation"`
 	DurationMinutes     *int64                     `json:"duration_minutes"`
@@ -84,6 +85,7 @@ func ConvertListing(listing listings.ListingDetails) Listing {
 		Price:               listing.Price,
 		Location:            listing.Location,
 		Coordinates:         coordinates,
+		PlaceID:             listing.PlaceID,
 		ShortDescription:    listing.ShortDescription,
 		Cancellation:        listing.Cancellation,
 		DurationMinutes:     listing.DurationMinutes,

@@ -25,6 +25,6 @@
 //       "X-Goog-Api-Key": process.env.NODE_MAPS_API_KEY ?? "",
 //     },
 //   });
-//   const responseJSON = await response.json();
-//   return responseJSON.result;
+//   const results = await response.json();
+//   return results;
 // }
