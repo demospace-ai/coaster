@@ -83,7 +83,7 @@ export const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) =
         </div>
       </div>
       <div
-        className="tw-cursor-pointer hover:tw-bg-gray-100 tw-rounded-lg tw-p-0.5 sm:tw-p-2 tw-mt-2 sm:tw-mt-0"
+        className="tw-cursor-pointer hover:tw-bg-gray-100 tw-rounded-lg tw-p-1 sm:tw-p-2 tw-mt-2 sm:tw-mt-0"
         onClick={() => {
           navigator.clipboard.writeText(window.location.href);
           showNotification("success", "Copied link to clipboard", 2000);
