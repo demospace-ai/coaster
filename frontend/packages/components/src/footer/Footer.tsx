@@ -198,7 +198,7 @@ const NewsletterForm: React.FC = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required={true}
-              className="tw-w-50 tw-h-8 tw-text-sm"
+              className="tw-w-50 tw-h-8 [&_input]:tw-text-sm"
             />
             <Button type="submit" className="tw-font-medium tw-text-sm">
               {formState === SUBMITTING ? "Please wait..." : "Subscribe"}
