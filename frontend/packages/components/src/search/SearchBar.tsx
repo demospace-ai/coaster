@@ -61,7 +61,7 @@ export const SearchBarHeader: React.FC<{ show: boolean }> = ({ show }) => {
           e.preventDefault();
           search();
         }}
-        className="tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[400px] tw-h-9 tw-bg-white tw-ring-1 tw-ring-slate-300 tw-rounded-[99px] tw-cursor-text tw-mx-2"
+        className="tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[400px] tw-h-10 tw-bg-white tw-ring-1 tw-ring-slate-300 tw-rounded-[99px] tw-cursor-text tw-mx-2"
       >
         <input
           ref={inputRef}
