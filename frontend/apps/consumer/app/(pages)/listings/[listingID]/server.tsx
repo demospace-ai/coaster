@@ -147,7 +147,7 @@ const HostOverview: React.FC<{ listing: ListingType }> = ({ listing }) => {
   const languages = listing.languages ? listing.languages.join(", ") : "English";
   return (
     <div className="tw-flex tw-items-center tw-pb-6 tw-border-b tw-border-solid tw-border-gray-300 tw-justify-between">
-      <div>
+      <div className="tw-mr-1">
         <div className="tw-text-xl sm:tw-text-2xl tw-font-semibold tw-font-heading">
           Provided by {getHostName(listing.host)}
         </div>
