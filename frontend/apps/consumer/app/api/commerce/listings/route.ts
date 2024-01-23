@@ -1,5 +1,6 @@
 import { SearchListings, sendRequest } from "@coaster/rpc/common";
 import { Coordinates } from "@coaster/types";
+import { convert } from "html-to-text";
 import { NextRequest, NextResponse } from "next/server";
 
 const HEADER =
@@ -74,8 +75,9 @@ export async function GET(req: NextRequest) {
       var country = componentsMap.get("country");
       var region = componentsMap.get("administrative_area_level_1");
 
-      var description = listing.description.replace(/<[^>]*>/g, "");
-      var description = description.replace(/"/g, '"""');
+      var description = convert(listing.description);
+      description = description.replace(/\n+/g, " ");
+      description = description.replace(/"/g, '"""');
 
       return `${listing.id},"${listing.name}",${listing.categories?.[0]},https://www.trycoaster.com/listings/${listing.id},${city},${region},${postalCode},${country},${listing.coordinates?.latitude},${listing.coordinates?.longitude},${listing.images[0].url},"${description}",${listing.price}`;
     }),
