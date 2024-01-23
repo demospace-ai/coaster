@@ -151,6 +151,7 @@ func CreateListing(
 	price *int64,
 	location *string,
 	coordinates *geo.Point,
+	placeId *string,
 ) (*models.Listing, error) {
 	listing := models.Listing{
 		UserID:              userID,
@@ -159,6 +160,7 @@ func CreateListing(
 		Price:               price,
 		Location:            location,
 		Coordinates:         coordinates,
+		PlaceID:             placeId,
 		Status:              models.ListingStatusDraft,
 		Cancellation:        models.ListingCancellationFlexible,
 		Highlights:          []string{},
@@ -203,9 +205,10 @@ func UpdateListing(db *gorm.DB, listing *models.Listing, listingUpdates input.Li
 		listing.Price = listingUpdates.Price
 	}
 
-	if listingUpdates.Location != nil && listingUpdates.Coordinates != nil {
+	if listingUpdates.Location != nil && listingUpdates.Coordinates != nil && listingUpdates.PlaceID != nil {
 		listing.Location = listingUpdates.Location
 		listing.Coordinates = listingUpdates.Coordinates
+		listing.PlaceID = listingUpdates.PlaceID
 	}
 
 	if listingUpdates.ShortDescription != nil {

@@ -10,10 +10,16 @@ import (
 
 const MAPS_API_KEY = "AIzaSyC8wQgUVXBQNvaPtqq60sPv-LiEIupZZWM"
 
-func GetLocationFromQuery(query string) (*string, error) {
+type Place struct {
+	FormattedAddress        string
+	Coordinates geo.Point
+	PlaceID     string
+}
+
+func GetPlaceFromQuery(query string) (*Place, error) {
 	c, err := maps.NewClient(maps.WithAPIKey(MAPS_API_KEY))
 	if err != nil {
-		return nil, errors.Wrap(err, "(maps.GetLocationFromQuery) creating maps client")
+		return nil, errors.Wrap(err, "(maps.GetPlaceFromQuery) creating maps client")
 	}
 
 	autocompleteRequest := &maps.PlaceAutocompleteRequest{
@@ -21,39 +27,32 @@ func GetLocationFromQuery(query string) (*string, error) {
 	}
 	autocompleteResponse, err := c.PlaceAutocomplete(context.TODO(), autocompleteRequest)
 	if err != nil {
-		return nil, errors.Wrap(err, "(maps.GetLocationFromQuery) autocomplete request")
+		return nil, errors.Wrap(err, "(maps.GetPlaceFromQuery) autocomplete request")
 	}
 
 	if len(autocompleteResponse.Predictions) == 0 {
-		return nil, errors.Newf("(maps.GetLocationFromQuery) no predictions for query: %s", query)
+		return nil, errors.Newf("(maps.GetPlaceFromQuery) no predictions for query: %s", query)
 	}
 
-	return &autocompleteResponse.Predictions[0].Description, nil
-}
+	detailsRequest := &maps.PlaceDetailsRequest{
+		PlaceID: autocompleteResponse.Predictions[0].PlaceID,
+		Fields: []maps.PlaceDetailsFieldMask{
+			maps.PlaceDetailsFieldMaskFormattedAddress,
+			maps.PlaceDetailsFieldMaskGeometry,
+		},
+	}
 
-func GetCoordinatesFromLocation(location string) (*geo.Point, error) {
-	c, err := maps.NewClient(maps.WithAPIKey(MAPS_API_KEY))
+	detailsResponse, err := c.PlaceDetails(context.TODO(), detailsRequest)
 	if err != nil {
-		return nil, errors.Wrap(err, "(maps.GetCoordinatesFromLocation) creating maps client")
+		return nil, errors.Wrap(err, "(maps.GetPlaceFromQuery) place details request")
 	}
 
-	geoRequest := &maps.GeocodingRequest{
-		// TODO: right now we just use the first prediction, but we should do something better
-		Address: location,
-	}
-	geoResponse, err := c.Geocode(context.TODO(), geoRequest)
-	if err != nil {
-		return nil, errors.Wrap(err, "(maps.GetCoordinatesFromLocation) geocode request")
-	}
-
-	if len(geoResponse) == 0 {
-		return nil, errors.Newf("(maps.GetCoordinatesFromLocation) no geocode response for location: %s", location)
-	}
-
-	coordinates := geo.Point{
-		Latitude:  geoResponse[0].Geometry.Location.Lat,
-		Longitude: geoResponse[0].Geometry.Location.Lng,
-	}
-
-	return &coordinates, nil
+	return &Place{
+		FormattedAddress: detailsResponse.FormattedAddress,
+		Coordinates: geo.Point{
+			Latitude:  detailsResponse.Geometry.Location.Lat,
+			Longitude: detailsResponse.Geometry.Location.Lng,
+		},
+		PlaceID: detailsResponse.PlaceID,
+	}, nil
 }

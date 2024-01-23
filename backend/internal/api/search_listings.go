@@ -75,19 +75,14 @@ func (s ApiService) loadByLocation(locationParam string, radiusParam string) ([]
 		radius = 100_000 // 100km default radius
 	}
 
-	location, err := maps.GetLocationFromQuery(locationParam)
+	place, err := maps.GetPlaceFromQuery(locationParam)
 	if err != nil {
 		return nil, errors.Wrap(err, "(api.getListingsForLocation) getting location from query")
 	}
 
-	coordinates, err := maps.GetCoordinatesFromLocation(*location)
-	if err != nil {
-		return nil, errors.Wrap(err, "(api.getListingsForLocation) getting coordinates from location")
-	}
-
 	return listings.LoadListingsWithinRadius(
 		s.db,
-		*coordinates,
+		place.Coordinates,
 		radius,
 	)
 }

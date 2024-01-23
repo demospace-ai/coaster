@@ -97,6 +97,7 @@ export interface Listing {
   price: number | undefined;
   location: string | undefined;
   coordinates: Coordinates | undefined;
+  place_id: string | undefined;
   short_description: string | undefined;
   cancellation: CancellationPolicy | undefined;
   duration_minutes: number | undefined;

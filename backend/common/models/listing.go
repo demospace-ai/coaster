@@ -42,6 +42,7 @@ type Listing struct {
 	Price               *int64              `json:"price"`
 	Location            *string             `json:"location"`
 	Coordinates         *geo.Point          `json:"coordinates"`
+	PlaceID             *string             `json:"place_id"`
 	Status              ListingStatus       `json:"status"`
 	ShortDescription    *string             `json:"short_description"`
 	Cancellation        ListingCancellation `json:"cancellation"`

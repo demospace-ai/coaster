@@ -33,16 +33,16 @@ func (s ApiService) CreateListing(auth auth.Authentication, w http.ResponseWrite
 
 	var location *string
 	var coordinates *geo.Point
+	var placeId *string
 	if createListingRequest.Location != nil {
-		location, err = maps.GetLocationFromQuery(*createListingRequest.Location)
+		place, err := maps.GetPlaceFromQuery(*createListingRequest.Location)
 		if err != nil {
 			return errors.Wrap(err, "(api.CreateListing) getting location from query")
 		}
 
-		coordinates, err = maps.GetCoordinatesFromLocation(*location)
-		if err != nil {
-			return errors.Wrap(err, "(api.CreateListing) getting coordinates from query")
-		}
+		location = &place.FormattedAddress
+		coordinates = &place.Coordinates
+		placeId = &place.PlaceID
 	}
 
 	// TODO: pass other fields
@@ -55,6 +55,7 @@ func (s ApiService) CreateListing(auth auth.Authentication, w http.ResponseWrite
 		createListingRequest.Price,
 		location,
 		coordinates,
+		placeId,
 	)
 	if err != nil {
 		return errors.Wrap(err, "(api.CreateListing) creating listing")

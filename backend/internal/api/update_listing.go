@@ -49,19 +49,15 @@ func (s ApiService) UpdateListing(auth auth.Authentication, w http.ResponseWrite
 	}
 
 	if updateListingRequest.Location != nil {
-		location, err := maps.GetLocationFromQuery(*updateListingRequest.Location)
+		place, err := maps.GetPlaceFromQuery(*updateListingRequest.Location)
 		if err != nil {
 			return errors.Wrap(err, "(api.UpdateListing) getting location from query")
 		}
 
-		coordinates, err := maps.GetCoordinatesFromLocation(*location)
-		if err != nil {
-			return errors.Wrap(err, "(api.UpdateListing) getting coordinates from query")
-		}
-
 		// Use the validated location and coordinates for the update
-		updateListingRequest.Location = location
-		updateListingRequest.Coordinates = coordinates
+		updateListingRequest.Location = &place.FormattedAddress
+		updateListingRequest.Coordinates = &place.Coordinates
+		updateListingRequest.PlaceID = &place.PlaceID
 	}
 
 	listingDetails, err := listings.UpdateListing(
