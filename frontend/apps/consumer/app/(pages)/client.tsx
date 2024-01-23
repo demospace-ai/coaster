@@ -205,7 +205,7 @@ export const ValuePropSection: React.FC = () => {
                 placeholder="blur"
                 className="tw-w-16 tw-h-16 tw-mb-4"
               />
-              <span className="tw-font-minion tw-text-lg tw-mb-2">Free Cancellation</span>
+              <span className="tw-font-semibold tw-font-minion tw-text-lg tw-mb-1">Free Cancellation</span>
               <span className="tw-max-w-[240px]">
                 Booking a trip on Coaster is stress-free thanks to our flexible booking options.
               </span>
@@ -220,7 +220,7 @@ export const ValuePropSection: React.FC = () => {
                 placeholder="blur"
                 className="tw-w-16 tw-h-16 tw-mb-4"
               />
-              <span className="tw-font-minion tw-text-lg tw-mb-2">Curated experiences</span>
+              <span className="tw-font-semibold tw-font-minion tw-text-lg tw-mb-1">Curated experiences</span>
               <span className="tw-max-w-[240px]">
                 We do the research so you don&apos;t have to. Every trip is verified for safety and stoke.
               </span>
@@ -235,7 +235,7 @@ export const ValuePropSection: React.FC = () => {
                 placeholder="blur"
                 className="tw-w-16 tw-h-16 tw-mb-4"
               />
-              <span className="tw-font-minion tw-text-lg tw-mb-2">Sustainable Travel</span>
+              <span className="tw-font-semibold tw-font-minion tw-text-lg tw-mb-1">Sustainable Travel</span>
               <span className="tw-max-w-[240px]">
                 We care deeply about our planet, and only work with responsible guides.
               </span>
@@ -250,7 +250,7 @@ export const ValuePropSection: React.FC = () => {
                 placeholder="blur"
                 className="tw-w-16 tw-h-16 tw-mb-4"
               />
-              <span className="tw-font-minion tw-text-lg tw-mb-2">Adventure Guarantee</span>
+              <span className="tw-font-semibold tw-font-minion tw-text-lg tw-mb-1">Adventure Guarantee</span>
               <span className="tw-max-w-[240px]">
                 Didn&apos;t have a good time? We&apos;ll give you a full refund, no questions asked.
               </span>
@@ -337,7 +337,7 @@ export const DynamicHeader: React.FC = () => {
             </div>
             <div className="tw-flex lg:tw-hidden tw-items-center">
               <button className="tw-flex tw-my-auto tw-py-2 tw-px-1 tw-font-medium tw-text-sm">Help</button>
-              <MagnifyingGlassIcon className="tw-flex tw-cursor-pointer tw-ml-3 tw-w-6 tw-h-6" />
+              <MagnifyingGlassIcon className="tw-flex tw-cursor-pointer tw-ml-3 tw-w-5 tw-h-5" />
               <Bars3Icon className="tw-w-7 tw-ml-4" />
             </div>
           </div>
