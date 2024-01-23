@@ -9,7 +9,7 @@ export async function GET(_: NextRequest) {
   const listings = await sendRequest(SearchListings, { revalidate: 3600 });
   const listingRows = await Promise.all(
     listings
-      .filter((listing) => listing.place_id)
+      .filter((listing) => listing.place_id && listing.description)
       .map(async (listing) => {
         const addressComponents = await getAddressComponents(listing.place_id!);
         var componentsMap = convertComponentsToMap(addressComponents);
@@ -22,7 +22,8 @@ export async function GET(_: NextRequest) {
         var country = componentsMap.get("country") ?? "";
         var region = componentsMap.get("administrative_area_level_1") ?? "";
         var postalCode = componentsMap.get("postal_code") ?? "";
-        return `${listing.id},${listing.name},${listing.categories?.[0]},https://www.trycoaster.com/listings/${listing.id},${city},${region},${postalCode},${country},${listing.coordinates?.latitude},${listing.coordinates?.longitude},${listing.images[0].url},${listing.description},${listing.price}`;
+        var description = listing.description!.replace(/<[^>]*>/g, "");
+        return `${listing.id},${listing.name},${listing.categories?.[0]},https://www.trycoaster.com/listings/${listing.id},${city},${region},${postalCode},${country},${listing.coordinates?.latitude},${listing.coordinates?.longitude},${listing.images[0].url},${description},${listing.price}`;
       }),
   );
 
