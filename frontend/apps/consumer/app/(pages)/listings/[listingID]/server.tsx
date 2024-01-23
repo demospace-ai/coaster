@@ -56,7 +56,9 @@ const HostDetails: React.FC<{ listing: ListingType }> = ({ listing }) => {
           square
         />
         <div>
-          <div className="tw-text-2xl tw-font-heading">Meet your trip provider: {getHostName(listing.host)}</div>
+          <div className="tw-text-2xl tw-font-semibold tw-font-heading">
+            Meet your trip provider: {getHostName(listing.host)}
+          </div>
           <div className="tw-flex tw-flex-row tw-items-center">
             <CheckBadgeIcon className="tw-h-4 tw-mr-1 tw-fill-green-600 tw-stroke-white" />
             Identity Verified
@@ -77,7 +79,7 @@ const HostDetails: React.FC<{ listing: ListingType }> = ({ listing }) => {
 const Description: React.FC<{ listing: ListingType }> = ({ listing }) => {
   return (
     <div className="tw-pb-6 tw-border-b tw-border-solid tw-border-gray-300">
-      <div className="tw-mt-5 tw-text-2xl tw-font-heading">About</div>
+      <div className="tw-mt-5 tw-text-2xl tw-font-semibold tw-font-heading">About</div>
       <div
         className="tw-mt-2 tw-whitespace-pre-wrap [&_ul]:tw-list-disc [&_ul]:tw-ml-5 [&_ol]:tw-list-decimal [&_ol]:tw-ml-5 [&_p]:tw-min-h-[1.5rem]"
         dangerouslySetInnerHTML={{ __html: listing.description ?? "" }}
@@ -89,7 +91,7 @@ const Description: React.FC<{ listing: ListingType }> = ({ listing }) => {
 const Included: React.FC<{ listing: ListingType }> = ({ listing }) => {
   return (
     <div className="tw-pb-6 tw-border-b tw-border-solid tw-border-gray-300">
-      <div className="tw-mt-5 tw-text-2xl tw-font-heading">What&apos;s included</div>
+      <div className="tw-mt-5 tw-text-2xl tw-font-semibold tw-font-heading">What&apos;s included</div>
       <ul className="tw-list-disc tw-list-inside tw-mt-2">
         {listing.includes?.map((included) => <li key={included}>{included}</li>)}
       </ul>
@@ -100,7 +102,7 @@ const Included: React.FC<{ listing: ListingType }> = ({ listing }) => {
 const NotIncluded: React.FC<{ listing: ListingType }> = ({ listing }) => {
   return (
     <div className="tw-pb-6 tw-border-b tw-border-solid tw-border-gray-300">
-      <div className="tw-mt-5 tw-text-2xl tw-font-heading">Not Included</div>
+      <div className="tw-mt-5 tw-text-2xl tw-font-semibold tw-font-heading">Not Included</div>
       <ul className="tw-list-disc tw-list-inside tw-mt-2">
         {listing.not_included?.map((notIncluded) => <li key={notIncluded}>{notIncluded}</li>)}
       </ul>
@@ -146,7 +148,9 @@ const HostOverview: React.FC<{ listing: ListingType }> = ({ listing }) => {
   return (
     <div className="tw-flex tw-items-center tw-pb-6 tw-border-b tw-border-solid tw-border-gray-300 tw-justify-between">
       <div>
-        <div className="tw-text-xl sm:tw-text-2xl tw-font-heading">Provided by {getHostName(listing.host)}</div>
+        <div className="tw-text-xl sm:tw-text-2xl tw-font-semibold tw-font-heading">
+          Provided by {getHostName(listing.host)}
+        </div>
         <div className="tw-flex tw-items-center tw-mt-1">
           <GlobeAltIcon className="tw-h-5 tw-mr-1.5" />
           {languages}

@@ -650,7 +650,7 @@ export const Itinerary: React.FC<{ listing: ListingType }> = ({ listing }) => {
   const stepRefs = useRef<Array<HTMLButtonElement | null>>([]);
   return (
     <div className="tw-pb-8 tw-border-b tw-border-solid tw-border-gray-300">
-      <div className="tw-mt-5 tw-text-2xl tw-font-heading">Itinerary</div>
+      <div className="tw-mt-5 tw-text-2xl tw-font-semibold tw-font-heading">Itinerary</div>
       <button
         className="tw-mt-2 tw-text-sm tw-font-medium tw-text-blue-600 hover:tw-underline"
         onClick={() => {
