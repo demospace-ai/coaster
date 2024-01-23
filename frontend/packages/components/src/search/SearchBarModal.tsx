@@ -63,7 +63,7 @@ export const SearchModal: React.FC<{ open: boolean; close: () => void }> = ({ op
                   e.preventDefault();
                   search();
                 }}
-                className="tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[400px] tw-h-14 tw-bg-white tw-border tw-border-slate-200 tw-border-solid tw-p-1.5 tw-rounded-md tw-cursor-pointer"
+                className="tw-flex tw-flex-row tw-items-center tw-w-full tw-max-w-[400px] tw-h-14 tw-bg-white tw-border tw-border-slate-300 tw-border-solid tw-p-1.5 tw-rounded-md tw-cursor-pointer"
               >
                 <input
                   ref={inputRef}
