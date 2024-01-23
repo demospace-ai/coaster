@@ -2,7 +2,9 @@ export default function Loading() {
   return (
     <div className="tw-flex tw-items-center tw-justify-center tw-w-full tw-px-5 sm:tw-px-20 tw-pt-5 sm:tw-pt-8">
       <div className="tw-flex tw-flex-col tw-items-center tw-w-full tw-max-w-7xl">
-        <div className="tw-font-bold tw-text-xl tw-w-full tw-text-center sm:tw-text-left">Searching...</div>
+        <div className="tw-font-bold tw-font-heading tw-text-2xl tw-w-full tw-text-center sm:tw-text-left">
+          Searching...
+        </div>
         <div className="tw-grid tw-grid-flow-row-dense tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-3 xl:tw-grid-cols-4 tw-mt-5 tw-mb-5 tw-font-bold tw-text-3xl tw-gap-10 tw-w-full">
           <LoadingListing />
           <LoadingListing />
