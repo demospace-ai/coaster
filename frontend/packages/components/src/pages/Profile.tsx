@@ -110,6 +110,7 @@ export const Profile: React.FC = () => {
           />
           {user?.profile_picture_url ? (
             <ProfilePicture
+              square
               url={user.profile_picture_url}
               className="tw-cursor-pointer"
               width={96}

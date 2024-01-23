@@ -20,7 +20,7 @@ export const ProfilePicture: React.FC<{
           src={url}
           className={mergeClasses(
             "tw-aspect-square tw-select-none tw-flex tw-items-center tw-justify-center tw-object-cover",
-            !square && "tw-rounded-full",
+            square ? "tw-rounded-md" : "tw-rounded-full",
             className,
           )}
           referrerPolicy="no-referrer"
