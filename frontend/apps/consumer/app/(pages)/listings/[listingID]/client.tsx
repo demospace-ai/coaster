@@ -74,7 +74,7 @@ export const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) =
 
   return (
     <div className="tw-flex tw-flex-row tw-items-start tw-justify-between">
-      <div>
+      <div className="tw-mr-1">
         <h1 className="tw-font-semibold sm:tw-font-bold tw-font-heading tw-text-3xl sm:tw-text-4xl sm:tw-text-[42px] tw-hyphens-auto sm:!tw-leading-[50px]">
           {listing.name}
         </h1>
