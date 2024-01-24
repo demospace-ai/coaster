@@ -139,7 +139,7 @@ const ListingsSection: React.FC<{ type: ListingsSectionType; backsplash?: boolea
       listings = await search({ categories: '["featured"]' });
       break;
     case "skiing":
-      title = "Guided backcountry skiing";
+      title = "Backcountry skiing";
       searchQuery = 'categories=["skiing"]';
       listings = await search({ categories: '["skiing"]' });
       break;
@@ -153,7 +153,7 @@ const ListingsSection: React.FC<{ type: ListingsSectionType; backsplash?: boolea
   return (
     <div
       className={mergeClasses(
-        "tw-flex tw-items-center tw-justify-center tw-w-full tw-px-5 sm:tw-px-20",
+        "tw-flex tw-items-center tw-justify-center tw-w-full tw-px-5 sm:tw-px-20 tw-mb-6",
         backsplash && "tw-bg-[#000721] tw-py-10 tw-text-white",
       )}
     >
@@ -166,7 +166,7 @@ const ListingsSection: React.FC<{ type: ListingsSectionType; backsplash?: boolea
 
 const FreeCancellationBanner: React.FC = () => {
   return (
-    <div className="tw-flex tw-items-center tw-justify-center tw-w-full tw-px-5 sm:tw-px-20 tw-mb-10 sm:tw-mb-16 tw-mt-4 sm:tw-mt-10">
+    <div className="tw-flex tw-items-center tw-justify-center tw-w-full tw-px-5 sm:tw-px-20 tw-mb-16 sm:tw-mb-16">
       <div className="tw-flex tw-flex-col tw-items-center tw-w-full tw-max-w-7xl">
         <div className="tw-flex tw-items-center tw-justify-center tw-w-full tw-px-5 sm:tw-px-20 tw-bg-blue-100 tw-py-12 tw-rounded-xl">
           <div className="tw-flex tw-flex-col tw-items-center tw-w-full tw-max-w-7xl tw-text-center">

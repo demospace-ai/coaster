@@ -117,7 +117,7 @@ export const ListingsSectionClient: React.FC<{
 };
 
 export const BlogSectionClient: React.FC<{ posts: Post[] }> = ({ posts }) => {
-  const [emblaRef] = useEmblaCarousel({ loop: true });
+  const [emblaRef] = useEmblaCarousel({ loop: true, align: "start" });
 
   return (
     <div className="tw-flex tw-flex-col tw-w-full">
@@ -134,7 +134,7 @@ export const BlogSectionClient: React.FC<{ posts: Post[] }> = ({ posts }) => {
             <Link
               href={`/blog/${post.slug.current}`}
               key={post._id}
-              className="tw-flex tw-flex-col tw-items-center tw-shrink-0 lg:tw-shrink tw-w-[90vw] sm:tw-w-[50vw] lg:tw-w-1/3 tw-rounded-xl tw-bg-blue-950 tw-p-8 tw-text-white tw-mx-3 lg:tw-mx-0 tw-group"
+              className="tw-flex tw-flex-col tw-items-center tw-shrink-0 xl:tw-shrink tw-w-[90vw] sm:tw-w-[70vw] md:tw-w-[50vw] lg:tw-w-[40vw] xl:tw-w-1/3 tw-rounded-xl tw-bg-blue-950 tw-p-8 tw-text-white tw-mx-3 lg:tw-mx-0 tw-group"
             >
               <Image
                 priority
@@ -188,7 +188,7 @@ export const ValuePropSection: React.FC = () => {
   }, [emblaApi, onInit, onSelect]);
 
   return (
-    <div className="tw-flex tw-items-center tw-justify-center tw-w-full tw-px-5 sm:tw-px-20 tw-mt-12 sm:tw-mt-16 tw-mb-5 sm:tw-mb-10">
+    <div className="tw-flex tw-items-center tw-justify-center tw-w-full tw-px-5 sm:tw-px-20 tw-mt-4 sm:tw-mt-8 tw-mb-5 sm:tw-mb-10">
       <div className="tw-flex tw-flex-col tw-items-center tw-w-full tw-max-w-7xl">
         <div className="tw-text-2xl sm:tw-text-3xl tw-font-bold tw-font-heading tw-mb-6 sm:tw-mb-10">
           We make adventure travel easy
