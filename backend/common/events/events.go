@@ -18,7 +18,7 @@ func TrackSignup(userID int64, firstName string, lastName string, email string) 
 	// Enqueues a track event that will be sent asynchronously.
 	client.Enqueue(analytics.Track{
 		UserId: fmt.Sprintf("%d", userID),
-		Event:  "user_signup",
+		Event:  "User Signup",
 		Properties: analytics.NewProperties().
 			Set("first_name", firstName).
 			Set("last_name", lastName).
@@ -38,10 +38,12 @@ func TrackSignup(userID int64, firstName string, lastName string, email string) 
 	client.Close()
 }
 
-func TrackBooking(userID int64, listing models.Listing, revenue int64, numGuests int64) {
-	track(userID, "trip_booked", analytics.NewProperties().
+func TrackBooking(userID int64, listing models.Listing, revenue int64, numGuests int64, checkoutID string, bookingID int64) {
+	track(userID, "Order Completed", analytics.NewProperties().
 		Set("listing_id", listing.ID).
 		Set("revenue", revenue).
+		Set("order_id", bookingID).
+		Set("checkout_id", checkoutID).
 		Set("products", []Product{
 			{
 				ID:       fmt.Sprintf("%d", listing.ID),
@@ -51,10 +53,11 @@ func TrackBooking(userID int64, listing models.Listing, revenue int64, numGuests
 		}))
 }
 
-func TrackCheckoutOpen(userID int64, listing models.Listing, revenue int64, numGuests int64) {
-	track(userID, "checkout_open", analytics.NewProperties().
+func TrackCheckoutOpen(userID int64, listing models.Listing, revenue int64, numGuests int64, checkoutID string) {
+	track(userID, "Checkout Started", analytics.NewProperties().
 		Set("listing_id", listing.ID).
 		Set("revenue", revenue).
+		Set("checkout_id", checkoutID).
 		Set("products", []Product{
 			{
 				ID:       fmt.Sprintf("%d", listing.ID),

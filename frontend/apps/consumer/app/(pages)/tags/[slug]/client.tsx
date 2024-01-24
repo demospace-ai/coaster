@@ -6,12 +6,13 @@ import { useEffect } from "react";
 
 export const TrackTagView: React.FC<{ tag: Tag }> = ({ tag }) => {
   useEffect(() => {
-    trackEvent("tag_viewed", {
+    trackEvent("Product List Viewed", {
+      list_id: tag.title,
       tag: tag.title,
-      category: tag,
-      content_name: tag,
+      category: tag.title,
+      content_name: tag.title,
     });
-  }, []);
+  }, [tag]);
 
   return null;
 };

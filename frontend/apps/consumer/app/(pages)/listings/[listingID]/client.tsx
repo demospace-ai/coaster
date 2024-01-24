@@ -65,7 +65,7 @@ export const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) =
     : "";
 
   useEffect(() => {
-    trackEvent("listing_viewed", {
+    trackEvent("Product Viewed", {
       listing_id: listing.id,
       product_id: listing.id,
       price: listing.price,
@@ -732,12 +732,12 @@ function useBookingState(listing: ListingType, generated: boolean) {
 
   const tryToReserve = () => {
     if (generated) {
-      trackEvent("reserve_clicked_operated", {
+      trackEvent("Operated Trip Requested", {
         category: listing.categories ? listing.categories[0] : "unknown",
         location: listing.location,
       });
     } else {
-      trackEvent("reserve_clicked", {
+      trackEvent("Product Added", {
         listing_id: listing.id,
         product_id: listing.id,
         price: listing.price,

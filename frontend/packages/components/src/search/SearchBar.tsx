@@ -12,7 +12,7 @@ export const SearchBar: React.FC = () => {
   const [query, setQuery] = useState<string>("");
   const search = () => {
     if (query.length > 0) {
-      trackEvent("search", { query });
+      trackEvent("Products Searched", { query });
       window.location.href = `/search?query=${query}`;
     }
   };
@@ -44,7 +44,7 @@ export const SearchBarHeader: React.FC<{ show: boolean }> = ({ show }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const search = () => {
     if (query.length > 0) {
-      trackEvent("search", { query });
+      trackEvent("Products Searched", { query });
       window.location.href = `/search?query=${query}`;
     }
   };

@@ -21,7 +21,7 @@ export async function contactUs(email: string, message: string, anonymousID: str
     },
   );
 
-  trackEventServer(anonymousID, "help_requested", {
+  trackEventServer(anonymousID, "Help Requested", {
     email,
   });
 }

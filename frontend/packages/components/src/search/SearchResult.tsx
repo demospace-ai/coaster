@@ -4,6 +4,7 @@ import { Listing } from "@coaster/types";
 import { getDuration, mergeClasses } from "@coaster/utils/common";
 import Image from "next/image";
 import Link from "next/link";
+import { trackEvent } from "../rudderstack/client";
 
 export const SearchResult: React.FC<{ listing: Listing; className?: string }> = ({ listing, className }) => {
   const numDays = listing.duration_minutes ? Math.ceil(listing.duration_minutes / 60 / 24) : 1;
@@ -17,6 +18,13 @@ export const SearchResult: React.FC<{ listing: Listing; className?: string }> = 
       href={`/listings/${listing.id}`}
       target="_blank"
       rel="noreferrer"
+      onClick={() => {
+        trackEvent("Product Clicked", {
+          listing_id: listing.id,
+          product_id: listing.id,
+          price: listing.price,
+        });
+      }}
     >
       {/*
         TODO: when adding wishlist functionality, uncomment this
