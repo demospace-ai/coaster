@@ -63,7 +63,7 @@ const HeroSection: React.FC = () => {
               <h1 className="tw-font-bold tw-text-5xl sm:tw-text-6xl -tw-mt-5 tw-font-heading">
                 Discover, Book, Adventure
               </h1>
-              <h2 className="tw-text-lg tw-tracking-tight tw-mt-3">
+              <h2 className="tw-text-lg tw-font-medium tw-tracking-tight tw-mt-3">
                 Find and reserve outdoor experiences led by local guides
               </h2>
             </div>
