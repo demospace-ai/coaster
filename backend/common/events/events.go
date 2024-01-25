@@ -87,9 +87,6 @@ func track(userID int64, eventName string, properties analytics.Properties) {
 		UserId:     fmt.Sprintf("%d", userID),
 		Event:      eventName,
 		Properties: properties,
-		Integrations: analytics.NewIntegrations().Set("Facebook Pixel", map[string]interface{}{
-			"contentType": "destination",
-		}),
 	})
 
 	// Flushes any queued messages and closes the client.

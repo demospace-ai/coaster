@@ -11,11 +11,6 @@ export function trackEventServer(anonymousID: string, eventName: string, eventPr
       anonymousId: anonymousID,
       event: eventName,
       properties: eventProperties,
-      integrations: {
-        "Facebook Pixel": {
-          contentType: "destination",
-        },
-      },
     });
   }
 }
