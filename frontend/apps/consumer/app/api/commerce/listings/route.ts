@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
 
       var postalCode = componentsMap.get("postal_code");
       if (!postalCode) {
-        postalCode = await getPostalCodeFromCoordinates(listing.coordinates);
+        postalCode = await getPostalCodeFallback(listing.coordinates);
       }
 
       var city =
@@ -88,39 +88,57 @@ export async function GET(req: NextRequest) {
 }
 
 async function getAddressComponents(placeId: string): Promise<any> {
-  const url = new URL("https://maps.googleapis.com/maps/api/place/details/json");
+  const url = new URL(`https://places.googleapis.com/v1/places/${placeId}`);
 
-  url.searchParams.append("place_id", placeId);
-  url.searchParams.append("fields", "address_components");
+  url.searchParams.append("fields", "addressComponents");
+  url.searchParams.append("languageCode", "en");
   url.searchParams.append("key", process.env.NODE_MAPS_API_KEY ?? "");
 
   const response = await fetch(url);
   const results = await response.json();
-  return results.result.address_components;
+  return results.addressComponents;
 }
 
-async function getPostalCodeFromCoordinates(coordinates: Coordinates): Promise<string> {
-  const url = new URL("https://maps.googleapis.com/maps/api/geocode/json");
+async function getPostalCodeFallback(coordinates: Coordinates): Promise<string> {
+  const url = new URL("https://places.googleapis.com/v1/places:searchNearby");
 
-  url.searchParams.append("latlng", coordinates.latitude + "," + coordinates.longitude);
-  url.searchParams.append("key", process.env.NODE_MAPS_API_KEY ?? "");
-  url.searchParams.append("result_type", "postal_code");
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Goog-Api-Key": process.env.NODE_MAPS_API_KEY ?? "",
+      "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.types",
+    },
+    body: JSON.stringify({
+      languageCode: "en",
+      includedTypes: ["postal_code"],
+      maxResultCount: 1,
+      locationRestriction: {
+        circle: {
+          center: {
+            latitude: coordinates.latitude,
+            longitude: coordinates.longitude,
+          },
+          radius: 20000,
+        },
+      },
+    }),
+  });
 
-  const response = await fetch(url);
-  const results = (await response.json()).results;
-  if (results.length == 0) {
+  const results = await response.json();
+  if (!results.places || results.places.length == 0) {
     return "";
   }
 
-  const addressComponents = results[0].address_components;
-  const componentsMap = convertComponentsToMap(addressComponents);
-  return componentsMap.get("postal_code") ?? "";
+  return results.places[0].displayName.text;
 }
 
 function convertComponentsToMap(components: any[]): Map<string, string> {
   const map = new Map();
   components.forEach((component) => {
-    map.set(component.types.filter((type) => type != "political")[0], component.long_name);
+    component.types.forEach((type: string) => {
+      map.set(type, component.shortText);
+    });
   });
   return map;
 }
