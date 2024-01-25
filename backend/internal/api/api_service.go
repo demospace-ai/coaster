@@ -2,23 +2,20 @@ package api
 
 import (
 	"go.fabra.io/server/common/auth"
-	"go.fabra.io/server/common/crypto"
 	"go.fabra.io/server/internal/router"
 
 	"gorm.io/gorm"
 )
 
 type ApiService struct {
-	db            *gorm.DB
-	authService   auth.AuthService
-	cryptoService crypto.CryptoService
+	db          *gorm.DB
+	authService auth.AuthService
 }
 
-func NewApiService(db *gorm.DB, authService auth.AuthService, cryptoService crypto.CryptoService) ApiService {
+func NewApiService(db *gorm.DB, authService auth.AuthService) ApiService {
 	return ApiService{
-		db:            db,
-		authService:   authService,
-		cryptoService: cryptoService,
+		db:          db,
+		authService: authService,
 	}
 }
 

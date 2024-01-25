@@ -24,7 +24,7 @@ func TestRouter(t *testing.T) {
 
 var _ = BeforeSuite(func() {
 	db, cleanup = test.SetupDatabase()
-	authService := auth.NewAuthService(db, test.MockCryptoService{})
+	authService := auth.NewAuthService(db)
 	r = router.NewRouter(authService)
 })
 

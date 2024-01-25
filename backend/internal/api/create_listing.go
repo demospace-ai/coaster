@@ -7,7 +7,6 @@ import (
 	"github.com/go-playground/validator"
 	"go.fabra.io/server/common/auth"
 	"go.fabra.io/server/common/errors"
-	"go.fabra.io/server/common/geo"
 	"go.fabra.io/server/common/input"
 	"go.fabra.io/server/common/maps"
 	"go.fabra.io/server/common/models"
@@ -31,31 +30,32 @@ func (s ApiService) CreateListing(auth auth.Authentication, w http.ResponseWrite
 		return errors.Wrap(err, "(api.CreateListing) validating request")
 	}
 
-	var location *string
-	var coordinates *geo.Point
-	var placeId *string
 	if createListingRequest.Location != nil {
 		place, err := maps.GetPlaceFromQuery(*createListingRequest.Location)
 		if err != nil {
-			return errors.Wrap(err, "(api.CreateListing) getting location from query")
+			return errors.Wrapf(err, "(api.CreateListing) getting location from query for %s", *createListingRequest.Location)
 		}
 
-		location = &place.Name
-		coordinates = &place.Coordinates
-		placeId = &place.PlaceID
+		createListingRequest.Location = &place.Name
+		createListingRequest.Coordinates = &place.Coordinates
+		createListingRequest.PlaceID = &place.PlaceID
+
+		placeDetails, err := maps.GetPlaceDetails(place.PlaceID, place.Coordinates)
+		if err != nil {
+			return errors.Wrapf(err, "(api.CreateListing) getting place details for %s", *createListingRequest.Location)
+		}
+
+		createListingRequest.City = &placeDetails.City
+		createListingRequest.Region = &placeDetails.Region
+		createListingRequest.Country = &placeDetails.Country
+		createListingRequest.PostalCode = placeDetails.PostalCode
 	}
 
 	// TODO: pass other fields
 	listing, err := listings.CreateListing(
 		s.db,
 		auth.User.ID,
-		createListingRequest.Name,
-		createListingRequest.Description,
-		createListingRequest.Categories,
-		createListingRequest.Price,
-		location,
-		coordinates,
-		placeId,
+		createListingRequest,
 	)
 	if err != nil {
 		return errors.Wrap(err, "(api.CreateListing) creating listing")

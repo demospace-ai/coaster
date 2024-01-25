@@ -145,22 +145,20 @@ func SubmitListing(db *gorm.DB, listing *models.Listing) error {
 func CreateListing(
 	db *gorm.DB,
 	userID int64,
-	name *string,
-	description *string,
-	categories []models.ListingCategoryType,
-	price *int64,
-	location *string,
-	coordinates *geo.Point,
-	placeId *string,
+	listingInput input.Listing,
 ) (*models.Listing, error) {
 	listing := models.Listing{
 		UserID:              userID,
-		Name:                name,
-		Description:         input.SanitizePtr(description),
-		Price:               price,
-		Location:            location,
-		Coordinates:         coordinates,
-		PlaceID:             placeId,
+		Name:                listingInput.Name,
+		Description:         input.SanitizePtr(listingInput.Description),
+		Price:               listingInput.Price,
+		Location:            listingInput.Location,
+		Coordinates:         listingInput.Coordinates,
+		PlaceID:             listingInput.PlaceID,
+		City:                listingInput.City,
+		Region:              listingInput.Region,
+		Country:             listingInput.Country,
+		PostalCode:          listingInput.PostalCode,
 		Status:              models.ListingStatusDraft,
 		Cancellation:        models.ListingCancellationFlexible,
 		Highlights:          []string{},
@@ -175,7 +173,7 @@ func CreateListing(
 		return nil, errors.Wrap(result.Error, "(listings.CreateListing)")
 	}
 
-	for _, category := range categories {
+	for _, category := range listingInput.Categories {
 		if slices.Contains(models.SPECIAL_CATEGORIES, category) {
 			continue
 		}
@@ -205,10 +203,23 @@ func UpdateListing(db *gorm.DB, listing *models.Listing, listingUpdates input.Li
 		listing.Price = listingUpdates.Price
 	}
 
-	if listingUpdates.Location != nil && listingUpdates.Coordinates != nil && listingUpdates.PlaceID != nil {
+	if listingUpdates.Location != nil {
+		if listingUpdates.Coordinates == nil ||
+			listingUpdates.PlaceID == nil ||
+			listingUpdates.City == nil ||
+			listingUpdates.Region == nil ||
+			listingUpdates.Country == nil ||
+			listingUpdates.PostalCode == nil {
+			return nil, errors.Newf("(listings.UpdateListing) missing location fields for location %s", *listingUpdates.Location)
+		}
+
 		listing.Location = listingUpdates.Location
 		listing.Coordinates = listingUpdates.Coordinates
 		listing.PlaceID = listingUpdates.PlaceID
+		listing.City = listingUpdates.City
+		listing.Region = listingUpdates.Region
+		listing.Country = listingUpdates.Country
+		listing.PostalCode = listingUpdates.PostalCode
 	}
 
 	if listingUpdates.ShortDescription != nil {

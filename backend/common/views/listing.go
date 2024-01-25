@@ -16,6 +16,10 @@ type Listing struct {
 	Location            *string                    `json:"location"`
 	Coordinates         *Coordinates               `json:"coordinates"`
 	PlaceID             *string                    `json:"place_id"`
+	City                *string                    `json:"city"`
+	Region              *string                    `json:"region"`
+	Country             *string                    `json:"country"`
+	PostalCode          *string                    `json:"postal_code"`
 	ShortDescription    *string                    `json:"short_description"`
 	Cancellation        models.ListingCancellation `json:"cancellation"`
 	DurationMinutes     *int64                     `json:"duration_minutes"`
@@ -86,6 +90,10 @@ func ConvertListing(listing listings.ListingDetails) Listing {
 		Location:            listing.Location,
 		Coordinates:         coordinates,
 		PlaceID:             listing.PlaceID,
+		City:                listing.City,
+		Region:              listing.Region,
+		Country:             listing.Country,
+		PostalCode:          listing.PostalCode,
 		ShortDescription:    listing.ShortDescription,
 		Cancellation:        listing.Cancellation,
 		DurationMinutes:     listing.DurationMinutes,

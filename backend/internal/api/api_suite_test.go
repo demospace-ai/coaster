@@ -23,7 +23,7 @@ func TestHandlers(t *testing.T) {
 
 var _ = BeforeSuite(func() {
 	db, cleanup = test.SetupDatabase()
-	service = api.NewApiService(db, test.MockAuthService{}, test.MockCryptoService{})
+	service = api.NewApiService(db, test.MockAuthService{})
 })
 
 var _ = AfterSuite((func() {

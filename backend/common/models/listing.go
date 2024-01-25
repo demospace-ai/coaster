@@ -43,6 +43,10 @@ type Listing struct {
 	Location            *string             `json:"location"`
 	Coordinates         *geo.Point          `json:"coordinates"`
 	PlaceID             *string             `json:"place_id"`
+	City                *string             `json:"city"`
+	Region              *string             `json:"region"`
+	Country             *string             `json:"country"`
+	PostalCode          *string             `json:"postal_code"`
 	Status              ListingStatus       `json:"status"`
 	ShortDescription    *string             `json:"short_description"`
 	Cancellation        ListingCancellation `json:"cancellation"`

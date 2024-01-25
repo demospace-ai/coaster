@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"go.fabra.io/server/common/application"
-	"go.fabra.io/server/common/crypto"
 	"go.fabra.io/server/common/errors"
 	"go.fabra.io/server/common/repositories/sessions"
 	"go.fabra.io/server/common/repositories/users"
@@ -19,14 +18,12 @@ type AuthService interface {
 }
 
 type AuthServiceImpl struct {
-	db            *gorm.DB
-	cryptoService crypto.CryptoService
+	db *gorm.DB
 }
 
-func NewAuthService(db *gorm.DB, cryptoService crypto.CryptoService) AuthService {
+func NewAuthService(db *gorm.DB) AuthService {
 	return AuthServiceImpl{
-		db:            db,
-		cryptoService: cryptoService,
+		db: db,
 	}
 }
 
