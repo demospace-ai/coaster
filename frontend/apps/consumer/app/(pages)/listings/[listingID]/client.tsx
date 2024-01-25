@@ -209,7 +209,8 @@ export const ReserveSlider: React.FC<{
                           />
                         </Disclosure.Button>
                         <Disclosure.Panel className="tw-flex tw-flex-col tw-w-full tw-items-center tw-pb-4 sm:tw-pb-0">
-                          {listing.availability_display === AvailabilityDisplay.Enum.calendar ? (
+                          {listing.availability_display === AvailabilityDisplay.Enum.calendar ||
+                          availableDates.length === 0 ? (
                             <DateRangePicker
                               mode="single"
                               disabled={(day: Date) => {
@@ -462,7 +463,7 @@ export const BookingPanel: React.FC<{ listing: ListingType; generated: boolean }
           <span className="tw-text-2xl tw-font-semibold tw-mb-3">${listing.price}</span> per person
         </div>
         <div className="tw-flex tw-w-full tw-mt-3">
-          {listing.availability_display === AvailabilityDisplay.Enum.calendar ? (
+          {listing.availability_display === AvailabilityDisplay.Enum.calendar || availableDates.length === 0 ? (
             <DatePickerPopper
               className="tw-w-3/4 tw-mr-2"
               selected={startDate}
