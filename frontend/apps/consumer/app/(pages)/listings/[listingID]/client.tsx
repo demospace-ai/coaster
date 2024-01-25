@@ -741,7 +741,7 @@ function useBookingState(listing: ListingType, generated: boolean) {
     } else {
       trackEvent("Product Added", {
         listing_id: listing.id,
-        product_id: listing.id,
+        product_id: listing.id.toString(),
         price: listing.price,
         name: listing.name,
         category: listing.categories ? listing.categories[0] : undefined,

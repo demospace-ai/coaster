@@ -41,6 +41,7 @@ func TrackSignup(userID int64, firstName string, lastName string, email string) 
 func TrackBooking(userID int64, listing models.Listing, revenue int64, numGuests int64, checkoutID string, bookingID int64) {
 	track(userID, "Order Completed", analytics.NewProperties().
 		Set("listing_id", listing.ID).
+		Set("destination_ids", fmt.Sprintf("%d", listing.ID)).
 		Set("revenue", revenue).
 		Set("order_id", bookingID).
 		Set("checkout_id", checkoutID).
@@ -56,6 +57,7 @@ func TrackBooking(userID int64, listing models.Listing, revenue int64, numGuests
 func TrackCheckoutOpen(userID int64, listing models.Listing, revenue int64, numGuests int64, checkoutID string) {
 	track(userID, "Checkout Started", analytics.NewProperties().
 		Set("listing_id", listing.ID).
+		Set("destination_ids", fmt.Sprintf("%d", listing.ID)).
 		Set("revenue", revenue).
 		Set("checkout_id", checkoutID).
 		Set("products", []Product{
