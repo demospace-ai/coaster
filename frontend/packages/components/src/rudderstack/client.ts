@@ -5,8 +5,10 @@ import { RudderAnalytics } from "@rudderstack/analytics-js";
 
 export function trackEvent(eventName: string, eventProperties?: any) {
   (window.rudderanalytics as RudderAnalytics).track(eventName, eventProperties, {
-    "Facebook Pixel": {
-      contentType: "destination",
+    integrations: {
+      "Facebook Pixel": {
+        contentType: "destination",
+      },
     },
   });
 }
