@@ -83,34 +83,32 @@ func GetPlaceDetails(placeId string, coordinates geo.Point) (*PlaceDetails, erro
 		return nil, errors.Wrap(err, "(maps.GetPlaceFromQuery) place details request")
 	}
 
-	var city, region, country string
-	var postalCode *string
-	for _, component := range detailsResponse.AddressComponents {
-		for _, componentType := range component.Types {
-			switch componentType {
-			case "locality":
-				fallthrough
-			case "administrative_area_level_3":
-				fallthrough
-			case "administrative_area_level_4":
-				fallthrough
-			case "archipelago":
-				fallthrough
-			case "natural_feature":
-				city = component.ShortText
-			case "administrative_area_level_1":
-				region = component.ShortText
-			case "country":
-				country = component.ShortText
-			case "postal_code":
-				postalCode = &component.ShortText
-			}
-		}
+	addressComponentMap := getAddressComponentMap(detailsResponse.AddressComponents)
+
+	city := addressComponentMap["locality"]
+	if city == "" {
+		city = addressComponentMap["archipelago"]
+	}
+	if city == "" {
+		city = addressComponentMap["natural_feature"]
+	}
+	if city == "" {
+		city = addressComponentMap["administrative_area_level_3"]
+	}
+	if city == "" {
+		city = addressComponentMap["administrative_area_level_4"]
 	}
 
-	// TODO: use fallback for other missing fields as well
+	region := addressComponentMap["administrative_area_level_1"]
 
-	if postalCode == nil {
+	country := addressComponentMap["country"]
+
+	// TODO: use fallback for other missing fields as well
+	var postalCode *string
+	postalCodeComponent, ok := addressComponentMap["postal_code"]
+	if ok {
+		postalCode = &postalCodeComponent
+	} else {
 		postalCode, err = getPostalCodeFallback(service, coordinates)
 		if err != nil {
 			return nil, errors.Wrap(err, "(maps.GetPlaceFromQuery) getting postal code fallback")
@@ -156,4 +154,16 @@ func getPostalCodeFallback(service *places.Service, coordinates geo.Point) (*str
 	}
 
 	return &nearbyPlaceResponse.Places[0].DisplayName.Text, nil
+}
+
+func getAddressComponentMap(addressComponents []*places.GoogleMapsPlacesV1PlaceAddressComponent) map[string]string {
+	componentMap := make(map[string]string)
+
+	for _, component := range addressComponents {
+		for _, componentType := range component.Types {
+			componentMap[componentType] = component.ShortText
+		}
+	}
+
+	return componentMap
 }
