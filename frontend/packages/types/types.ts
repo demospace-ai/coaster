@@ -98,6 +98,10 @@ export interface Listing {
   location: string | undefined;
   coordinates: Coordinates | undefined;
   place_id: string | undefined;
+  city: string | undefined;
+  region: string | undefined;
+  country: string | undefined;
+  postal_code: string | undefined;
   short_description: string | undefined;
   cancellation: CancellationPolicy | undefined;
   duration_minutes: number | undefined;
