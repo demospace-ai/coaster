@@ -76,6 +76,7 @@ func GetPlaceDetails(placeId string, coordinates geo.Point) (*PlaceDetails, erro
 
 	detailsCall := c.Get("places/" + placeId)
 	detailsCall.Fields("addressComponents")
+	detailsCall.LanguageCode("en")
 
 	detailsResponse, err := detailsCall.Do()
 	if err != nil {
