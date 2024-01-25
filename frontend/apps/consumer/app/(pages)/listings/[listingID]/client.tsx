@@ -68,9 +68,11 @@ export const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) =
     trackEvent("Product Viewed", {
       listing_id: listing.id,
       product_id: listing.id,
+      name: listing.name,
+      category: listing.categories ? listing.categories[0] : undefined,
       price: listing.price,
     });
-  }, [listing.id, listing.price]);
+  }, [listing]);
 
   return (
     <div className="tw-flex tw-flex-row tw-items-start tw-justify-between">
@@ -741,6 +743,8 @@ function useBookingState(listing: ListingType, generated: boolean) {
         listing_id: listing.id,
         product_id: listing.id,
         price: listing.price,
+        name: listing.name,
+        category: listing.categories ? listing.categories[0] : undefined,
         quantity: numGuests,
       });
     }

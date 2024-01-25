@@ -23,6 +23,8 @@ export const SearchResult: React.FC<{ listing: Listing; className?: string }> = 
           listing_id: listing.id,
           product_id: listing.id,
           price: listing.price,
+          name: listing.name,
+          category: listing.categories ? listing.categories[0] : undefined,
         });
       }}
     >
