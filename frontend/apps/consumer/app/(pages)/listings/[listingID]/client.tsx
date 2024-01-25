@@ -68,7 +68,7 @@ export const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) =
     trackEvent("Product Viewed", {
       listing_id: listing.id,
       product_id: listing.id.toString(),
-      name: listing.name,
+      product_name: listing.name,
       category: listing.categories ? listing.categories[0] : undefined,
       price: listing.price,
     });
@@ -744,7 +744,7 @@ function useBookingState(listing: ListingType, generated: boolean) {
         listing_id: listing.id,
         product_id: listing.id.toString(),
         price: listing.price,
-        name: listing.name,
+        product_name: listing.name,
         category: listing.categories ? listing.categories[0] : undefined,
         quantity: numGuests,
       });
