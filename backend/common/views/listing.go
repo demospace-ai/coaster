@@ -10,20 +10,20 @@ import (
 
 type Listing struct {
 	ID                  int64                      `json:"id"`
-	Name                *string                    `json:"name"`
-	Description         *string                    `json:"description"`
-	Price               *int64                     `json:"price"`
-	Location            *string                    `json:"location"`
-	Coordinates         *Coordinates               `json:"coordinates"`
-	PlaceID             *string                    `json:"place_id"`
-	City                *string                    `json:"city"`
-	Region              *string                    `json:"region"`
-	Country             *string                    `json:"country"`
-	PostalCode          *string                    `json:"postal_code"`
-	ShortDescription    *string                    `json:"short_description"`
-	Cancellation        models.ListingCancellation `json:"cancellation"`
-	DurationMinutes     *int64                     `json:"duration_minutes"`
-	MaxGuests           *int64                     `json:"max_guests"`
+	Name                *string                    `json:"name,omitempty"`
+	Description         *string                    `json:"description,omitempty"`
+	Price               *int64                     `json:"price,omitempty"`
+	Location            *string                    `json:"location,omitempty"`
+	Coordinates         *Coordinates               `json:"coordinates,omitempty"`
+	PlaceID             *string                    `json:"place_id,omitempty"`
+	City                *string                    `json:"city,omitempty"`
+	Region              *string                    `json:"region,omitempty"`
+	Country             *string                    `json:"country,omitempty"`
+	PostalCode          *string                    `json:"postal_code,omitempty"`
+	ShortDescription    *string                    `json:"short_description,omitempty"`
+	Cancellation        models.ListingCancellation `json:"cancellation,omitempty"`
+	DurationMinutes     *int64                     `json:"duration_minutes,omitempty"`
+	MaxGuests           *int64                     `json:"max_guests,omitempty"`
 	Highlights          []string                   `json:"highlights"`
 	Includes            []string                   `json:"includes"`
 	NotIncluded         []string                   `json:"not_included"`
