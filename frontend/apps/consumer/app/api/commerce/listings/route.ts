@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
 
       var description = convert(listing.description);
       description = description.replace(/\n+/g, " ");
-      description = description.replace(/"/g, '"""');
+      description = description.replace(/"/g, '""');
 
       return `${listing.id},"${listing.name}",${listing.categories[0]},https://www.trycoaster.com/listings/${listing.id},${listing.city},${listing.region},${listing.postal_code},${listing.country},${listing.coordinates.latitude},${listing.coordinates.longitude},${listing.images[0].url},"${description}",${listing.price}`;
     }),
