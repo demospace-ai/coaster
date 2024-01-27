@@ -1,0 +1,1 @@
+ALTER TABLE listings ALTER COLUMN place_id DROP NOT NULL;
