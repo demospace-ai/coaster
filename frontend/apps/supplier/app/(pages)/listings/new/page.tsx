@@ -438,6 +438,11 @@ const ImageStepInner: React.FC<StepProps & ImageProps> = ({ nextStep, prevStep, 
     setUploading(true);
     if (e.currentTarget && e.currentTarget.files) {
       for (const file of Array.from(e.currentTarget.files)) {
+        if (file.size > 5 * 1024 * 1024) {
+          setError("Image size must be less than 5MB.");
+          continue;
+        }
+
         const formData = new FormData();
         formData.append("listing_image", file);
         try {
