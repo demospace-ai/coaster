@@ -17,7 +17,7 @@ export const RichTextEditor: React.FC<{
     editorProps: {
       attributes: {
         class:
-          "tw-w-full tw-h-full tw-outline-none tw-text-base [&_ul]:tw-list-disc [&_ul]:tw-ml-5 [&_ol]:tw-list-decimal [&_ol]:tw-ml-5",
+          "tw-w-full tw-h-full tw-outline-none tw-text-base [&_ul]:tw-list-disc [&_ul]:tw-ml-5 [&_ol]:tw-list-decimal [&_ol]:tw-ml-5 [&_a]:tw-text-blue-600",
       },
     },
     extensions: [StarterKit, Link],
