@@ -2,8 +2,9 @@
 
 import { Button } from "@coaster/components/button/Button";
 import { FormError } from "@coaster/components/error/FormError";
-import { Input, RichTextEditor } from "@coaster/components/input/Input";
+import { Input } from "@coaster/components/input/Input";
 import { Loading } from "@coaster/components/loading/Loading";
+import { RichTextEditor } from "@coaster/components/richtext/RichText";
 import { updateItinerarySteps, useNotificationContext } from "@coaster/rpc/client";
 import { ItineraryStepInput } from "@coaster/types";
 import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";

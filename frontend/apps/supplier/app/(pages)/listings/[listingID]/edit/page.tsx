@@ -2,9 +2,10 @@
 
 import { Button } from "@coaster/components/button/Button";
 import { FormError } from "@coaster/components/error/FormError";
-import { Input, MultiSelect, PriceInput, RichTextEditor } from "@coaster/components/input/Input";
+import { Input, MultiSelect, PriceInput } from "@coaster/components/input/Input";
 import { Loading } from "@coaster/components/loading/Loading";
 import { InlineMapSearch } from "@coaster/components/maps/Maps";
+import { RichTextEditor } from "@coaster/components/richtext/RichText";
 import { updateListing, useNotificationContext } from "@coaster/rpc/client";
 import { Category, ListingInput } from "@coaster/types";
 import { toTitleCase } from "@coaster/utils/common";

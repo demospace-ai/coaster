@@ -7,8 +7,8 @@ import { Dispatch, ReactElement, SetStateAction, useState } from "react";
 import { Controller, FieldError, FieldValues, UseFormHandleSubmit, useForm } from "react-hook-form";
 import { ZodArray, ZodEffects, ZodEnum, ZodString, z } from "zod";
 import { FormError } from "../error/FormError";
-import { RichTextEditor } from "../input/Input";
 import { Loading } from "../loading/Loading";
+import { RichTextEditor } from "../richtext/RichText";
 
 export const WizardNavButtons: React.FC<{
   className?: string;

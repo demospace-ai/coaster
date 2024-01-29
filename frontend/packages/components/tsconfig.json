@@ -6,7 +6,7 @@
     "plugins": [{ "name": "next" }],
     "baseUrl": ".",
     "paths": {
-      "@coaster/assets/*": ["../../packages/assets/src/*"]
-    }
-  }
+      "@coaster/assets/*": ["../../packages/assets/src/*"],
+    },
+  },
 }
