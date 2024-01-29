@@ -140,7 +140,7 @@ const ListingsSection: React.FC<{ type: ListingsSectionType; backsplash?: boolea
       break;
     case "skiing":
       title = "Backcountry skiing";
-      searchQuery = 'categories=["featured_skiing"]';
+      searchQuery = 'categories=["skiing"]';
       listings = await search({ categories: '["featured_skiing"]' });
       break;
     case "popular":
