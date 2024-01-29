@@ -17,6 +17,7 @@ import {
 import { Combobox, Listbox, RadioGroup, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { InformationCircleIcon, MinusCircleIcon, PlusCircleIcon, UserIcon } from "@heroicons/react/24/outline";
+import Link from "@tiptap/extension-link";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import React, {
@@ -127,7 +128,7 @@ export const RichTextEditor: React.FC<{
           "tw-w-full tw-h-full tw-outline-none tw-text-base [&_ul]:tw-list-disc [&_ul]:tw-ml-5 [&_ol]:tw-list-decimal [&_ol]:tw-ml-5",
       },
     },
-    extensions: [StarterKit],
+    extensions: [StarterKit, Link],
     content: value,
     onUpdate: ({ editor }) => {
       if (editor.getText() == "") {

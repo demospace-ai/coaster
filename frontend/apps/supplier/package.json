@@ -22,6 +22,7 @@
     "@highlight-run/next": "^7.3.4",
     "@highlight-run/react": "^3.2.1",
     "@hookform/resolvers": "^3.3.4",
+    "@tiptap/extension-link": "^2.2.0",
     "@tiptap/pm": "^2.1.16",
     "@tiptap/react": "^2.1.16",
     "@tiptap/starter-kit": "^2.1.16",
