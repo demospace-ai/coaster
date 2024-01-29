@@ -30,6 +30,9 @@ export default function Includes() {
       includes: listing?.includes?.map((include) => ({
         value: include,
       })),
+      not_included: listing?.not_included?.map((not_included) => ({
+        value: not_included,
+      })),
     },
   });
 
@@ -129,7 +132,7 @@ export default function Includes() {
           }}
         >
           <PlusIcon className="tw-h-4 tw-mr-1.5" />
-          Add not Included Item
+          Add Not Included Item
         </Button>
       </div>
       <Button type="submit" className="tw-mt-6 tw-w-full sm:tw-w-32 tw-h-12 tw-ml-auto" disabled={!formState.isDirty}>
