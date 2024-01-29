@@ -12,7 +12,7 @@ export const NameSchema = z
   .max(64, "Your listing's name can be up to 64 characters long.");
 
 export const DescriptionSchema = z.string().superRefine((data, ctx) => {
-  const json = generateText(generateJSON(data, [StarterKit, Link]), [StarterKit]);
+  const json = generateText(generateJSON(data, [StarterKit, Link]), [StarterKit, Link]);
   if (json.length < 4) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Your description must be at least 4 characters long." });
   }
