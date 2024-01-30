@@ -58,21 +58,28 @@ const AvailabilityListPopper = dynamic(
   },
 );
 
-export const ListingHeader: React.FC<{ listing: ListingType }> = ({ listing }) => {
+export const ListingHeader: React.FC<{ listing: ListingType; generated: boolean }> = ({ listing, generated }) => {
   const { showNotification } = useNotificationContext();
   const categoriesString = listing.categories
     ? listing.categories.map((category) => getCategoryForDisplay(category)).join(" | ")
     : "";
 
   useEffect(() => {
-    trackEvent("Product Viewed", {
-      listing_id: listing.id,
-      product_id: listing.id.toString(),
-      product_name: listing.name,
-      category: listing.categories ? listing.categories[0] : undefined,
-      price: listing.price,
-    });
-  }, [listing]);
+    if (generated) {
+      trackEvent("Operated Trip Viewed", {
+        category: listing.categories ? listing.categories[0] : "unknown",
+        location: listing.location,
+      });
+    } else {
+      trackEvent("Product Viewed", {
+        listing_id: listing.id,
+        product_id: listing.id.toString(),
+        product_name: listing.name,
+        category: listing.categories ? listing.categories[0] : undefined,
+        price: listing.price,
+      });
+    }
+  }, [listing, generated]);
 
   return (
     <div className="tw-flex tw-flex-row tw-items-start tw-justify-between">

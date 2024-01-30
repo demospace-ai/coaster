@@ -3,11 +3,11 @@
 import { isProd } from "@coaster/utils/common";
 import { RudderAnalytics } from "@rudderstack/analytics-js";
 
-export function trackEvent(eventName: string, eventProperties?: any) {
+export function trackEvent(eventName: string, eventProperties?: any, contentType?: string) {
   (window.rudderanalytics as RudderAnalytics).track(eventName, eventProperties, {
     integrations: {
       "Facebook Pixel": {
-        contentType: "destination",
+        contentType: contentType ? contentType : "destination",
       },
     },
   });

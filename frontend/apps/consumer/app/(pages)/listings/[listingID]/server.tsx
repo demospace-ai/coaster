@@ -17,7 +17,7 @@ import { getHostName, getMaxGuests } from "consumer/app/(pages)/listings/[listin
 export const ListingPage: React.FC<{ listing: ListingType; generated?: boolean }> = ({ listing, generated }) => {
   return (
     <>
-      <ListingHeader listing={listing} />
+      <ListingHeader listing={listing} generated={!!generated} />
       <ListingImages listing={listing} />
       <div className="tw-flex tw-mt-8 sm:tw-mt-10">
         <ListingDetails listing={listing} />
