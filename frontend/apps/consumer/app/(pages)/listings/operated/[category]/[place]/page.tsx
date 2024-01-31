@@ -3,7 +3,13 @@ import {
   getImagesForGeneratedListing,
 } from "@coaster/components/generated/GeneratedListings";
 import { getCategoryForDisplay } from "@coaster/components/icons/Category";
-import { GeneratedCategoryType, ListingStatus, Listing as ListingType } from "@coaster/types";
+import {
+  AvailabilityDisplay,
+  AvailabilityType,
+  GeneratedCategoryType,
+  ListingStatus,
+  Listing as ListingType,
+} from "@coaster/types";
 import { isProd } from "@coaster/utils/common";
 import { ListingPage } from "consumer/app/(pages)/listings/[listingID]/server";
 
@@ -42,7 +48,7 @@ export default async function GeneratedListing({
     not_included: [],
     host: {
       id: 1,
-      first_name: "Coaster",
+      first_name: "Coaster Guides",
       last_name: "",
       profile_picture_url: "https://www.trycoaster.com/icon.png",
       about:
@@ -51,8 +57,8 @@ export default async function GeneratedListing({
     },
     images: getImagesForGeneratedListing(params.category),
     status: ListingStatus.Published,
-    availability_type: "datetime",
-    availability_display: "calendar",
+    availability_type: AvailabilityType.Enum.datetime,
+    availability_display: AvailabilityDisplay.Enum.calendar,
     short_description: undefined,
     coordinates: undefined,
     place_id: undefined,

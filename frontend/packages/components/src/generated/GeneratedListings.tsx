@@ -52,7 +52,7 @@ export const GeneratedSearchResult: React.FC<{ listing: GeneratedListing; classN
   return (
     <Link
       className={mergeClasses(
-        "tw-flex tw-flex-col tw-w-full tw-text-base tw-font-medium tw-cursor-pointer tw-text-ellipsis",
+        "tw-flex tw-flex-col tw-w-full tw-text-base tw-font-normal tw-cursor-pointer tw-text-ellipsis",
         className,
       )}
       href={`/listings/operated/${listing.category}/${listing.place}`}
@@ -71,10 +71,10 @@ export const GeneratedSearchResult: React.FC<{ listing: GeneratedListing; classN
           src={image.url}
         />
       </div>
-      <span className="tw-mt-2 sm:tw-mt-3 tw-font-bold tw-text-lg">
+      <span className="tw-mt-2 sm:tw-mt-3 tw-font-bold tw-text-lg tw-font-heading tw-line-clamp-2">
         {getCategoryForDisplay(listing.category) + " Experience by Coaster"}
       </span>
-      <span>{listing.place}</span>
+      <span className="tw-line-clamp-2">{listing.place}</span>
       <span>$100 • 2 hours</span>
     </Link>
   );

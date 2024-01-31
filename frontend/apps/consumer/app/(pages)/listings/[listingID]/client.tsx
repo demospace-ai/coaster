@@ -827,7 +827,7 @@ function useBookingState(listing: ListingType, generated: boolean) {
   }
 
   // We allow setting a dummy booking slot so the user can still click reserve for listings with no availability
-  if (availability && availability.length === 0) {
+  if (!availability || availability.length === 0) {
     if (startDate !== undefined) {
       // Let the user choose any hour from 9 to 6 pm in the listing time
       if (listing.availability_type === AvailabilityType.Enum.datetime) {
