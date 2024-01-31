@@ -71,7 +71,7 @@ func TrackCheckoutOpen(userID int64, listing models.Listing, revenue int64, numG
 
 type Product struct {
 	ID       string  `json:"id,omitempty"`
-	SKU      string  `json:"sky,omitempty"`
+	SKU      string  `json:"sku,omitempty"`
 	Name     string  `json:"name,omitempty"`
 	Price    float64 `json:"price"`
 	Quantity int64   `json:"quantity"`
@@ -89,7 +89,7 @@ func track(userID int64, eventName string, properties analytics.Properties) {
 		UserId:     fmt.Sprintf("%d", userID),
 		Event:      eventName,
 		Properties: properties,
-		Integrations: analytics.NewIntegrations().Set("Facebook Pixel", map[string]interface{}{
+		Integrations: analytics.NewIntegrations().Set("Facebook Conversions", map[string]interface{}{
 			"contentType": "destination",
 		}),
 	})
