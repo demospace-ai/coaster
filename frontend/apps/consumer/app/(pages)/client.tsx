@@ -75,7 +75,7 @@ export const ListingsSectionClient: React.FC<{
                   <SearchResult
                     key={listing.id}
                     listing={listing}
-                    className="tw-w-[75vw] xs:tw-w-[50vw] sm:tw-w-[40vw] md:tw-w-[30vw] lg:tw-w-[25vw] xl:tw-w-[20vw] 2xl:tw-w-[15vw] 4xl:tw-w-[12vw] tw-shrink-0"
+                    className="tw-w-[75vw] xs:tw-w-[50vw] sm:tw-w-[40vw] md:tw-w-[30vw] lg:tw-w-[25vw] xl:tw-w-[20vw] 2xl:tw-w-[18vw] 4xl:tw-w-[15vw] tw-shrink-0"
                   />
                 ))}
               </>
