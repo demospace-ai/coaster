@@ -48,6 +48,5 @@ export async function GET(req: NextRequest) {
   );
 
   const withHeader = [HEADER, ...listingRows.filter((listing) => listing != undefined)];
-  console.log(withHeader.join("\n"));
   return new Response(withHeader.join("\n"));
 }
