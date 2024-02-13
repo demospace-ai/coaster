@@ -2,7 +2,8 @@ import { SearchListings, sendRequest } from "@coaster/rpc/common";
 import { convert } from "html-to-text";
 import { NextRequest, NextResponse } from "next/server";
 
-const HEADER = "id,title,description,availability,link,image_link,price,identifier_exists,brand,product_detail";
+const HEADER =
+  "id\ttitle\tdescription\tavailability\tlink\timage_link\tprice\tidentifier_exists\tbrand\tproduct_detail";
 
 export async function GET(req: NextRequest) {
   const basicAuth = req.headers.get("Authorization");
