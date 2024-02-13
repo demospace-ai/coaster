@@ -2,8 +2,7 @@ import { SearchListings, sendRequest } from "@coaster/rpc/common";
 import { convert } from "html-to-text";
 import { NextRequest, NextResponse } from "next/server";
 
-const HEADER =
-  "id,title,description,availability,link,image link,price,identifier exists,brand,category,Destination address";
+const HEADER = "id,title,description,availability,link,image_link,price,identifier_exists,brand,product_highlight";
 
 export async function GET(req: NextRequest) {
   const basicAuth = req.headers.get("Authorization");
@@ -27,7 +26,16 @@ export async function GET(req: NextRequest) {
   const listings = await sendRequest(SearchListings, { revalidate: 3600 });
   const listingRows = await Promise.all(
     listings.map(async (listing) => {
-      if (!listing.description || !listing.location || !listing.images || !listing.price || !listing.categories) {
+      if (
+        !listing.id ||
+        !listing.name ||
+        !listing.description ||
+        !listing.location ||
+        !listing.images ||
+        !listing.price ||
+        !listing.host ||
+        !listing.categories
+      ) {
         return undefined;
       }
 
