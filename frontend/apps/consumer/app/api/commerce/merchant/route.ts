@@ -41,9 +41,10 @@ export async function GET(req: NextRequest) {
 
       var description = convert(listing.description);
       description = description.replace(/\n+/g, " ");
+      description = description.replace(/\t+/g, " ");
       description = description.replace(/"/g, '""');
 
-      return `${listing.id}\t"${listing.name}"\t"${description}"\tin_stock\thttps://www.trycoaster.com/listings/${listing.id}\t${listing.images[0].url}\t${listing.price}\tno\t${listing.host.first_name}\tGeneral:Activity Type:${listing.categories[0]},General:Location:${listing.location}`;
+      return `${listing.id}\t${listing.name}\t${description}\tin_stock\thttps://www.trycoaster.com/listings/${listing.id}\t${listing.images[0].url}\t${listing.price}\tno\t${listing.host.first_name}\tGeneral:Activity Type:${listing.categories[0]},General:Location:${listing.location}`;
     }),
   );
 
