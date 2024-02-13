@@ -2,7 +2,7 @@ import { SearchListings, sendRequest } from "@coaster/rpc/common";
 import { convert } from "html-to-text";
 import { NextRequest, NextResponse } from "next/server";
 
-const HEADER = "id,title,description,availability,link,image_link,price,identifier_exists,brand,product_highlight";
+const HEADER = "id,title,description,availability,link,image_link,price,identifier_exists,brand,product_detail";
 
 export async function GET(req: NextRequest) {
   const basicAuth = req.headers.get("Authorization");
@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
       description = description.replace(/\n+/g, " ");
       description = description.replace(/"/g, '""');
 
-      return `${listing.id}\t"${listing.name}"\t"${description}"\tin_stock\thttps://www.trycoaster.com/listings/${listing.id}\t${listing.images[0].url}\t${listing.price}\tno\t${listing.host.first_name}\t"${listing.categories[0]}","${listing.location}"`;
+      return `${listing.id}\t"${listing.name}"\t"${description}"\tin_stock\thttps://www.trycoaster.com/listings/${listing.id}\t${listing.images[0].url}\t${listing.price}\tno\t${listing.host.first_name}\tGeneral:Activity Type:${listing.categories[0]},General:Location:${listing.location}`;
     }),
   );
 
