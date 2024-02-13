@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
       description = description.replace(/\t+/g, " ");
       description = description.replace(/"/g, '""');
 
-      return `${listing.id}\t${listing.name}\t${description}\tin_stock\thttps://www.trycoaster.com/listings/${listing.id}\t${listing.images[0].url}\t${listing.price}\tno\t${listing.host.first_name}\tGeneral:Activity Type:${listing.categories[0]}`;
+      return `${listing.id}\t${listing.name}\t${description}\tin_stock\thttps://www.trycoaster.com/listings/${listing.id}\t${listing.images[0].url}\t${listing.price}.00 USD\tno\t${listing.host.first_name}\tGeneral:Activity Type:${listing.categories[0]}`;
     }),
   );
 
