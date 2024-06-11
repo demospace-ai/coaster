@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/lib/pq"
-	"go.fabra.io/server/common/database"
+	"go.coaster.io/server/common/database"
 )
 
 type AvailabilityRuleType string

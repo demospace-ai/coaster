@@ -17,12 +17,12 @@ import (
 	"cloud.google.com/go/storage"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
-	"go.fabra.io/server/common/application"
-	"go.fabra.io/server/common/auth"
-	"go.fabra.io/server/common/errors"
-	"go.fabra.io/server/common/images"
-	"go.fabra.io/server/common/repositories/listings"
-	"go.fabra.io/server/common/views"
+	"go.coaster.io/server/common/application"
+	"go.coaster.io/server/common/auth"
+	"go.coaster.io/server/common/errors"
+	"go.coaster.io/server/common/images"
+	"go.coaster.io/server/common/repositories/listings"
+	"go.coaster.io/server/common/views"
 )
 
 var SUPPORTED_IMAGE_TYPES = map[string]bool{"image/jpeg": true, "image/png": true, "image/gif": true, "image/webp": true}

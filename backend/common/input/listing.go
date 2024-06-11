@@ -1,8 +1,8 @@
 package input
 
 import (
-	"go.fabra.io/server/common/geo"
-	"go.fabra.io/server/common/models"
+	"go.coaster.io/server/common/geo"
+	"go.coaster.io/server/common/models"
 )
 
 type Listing struct {

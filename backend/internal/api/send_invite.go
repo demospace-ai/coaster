@@ -10,13 +10,13 @@ import (
 	"strings"
 
 	"github.com/go-playground/validator"
-	"go.fabra.io/server/common/application"
-	"go.fabra.io/server/common/auth"
-	"go.fabra.io/server/common/emails"
-	"go.fabra.io/server/common/errors"
-	"go.fabra.io/server/common/models"
-	"go.fabra.io/server/common/repositories/reset_tokens"
-	"go.fabra.io/server/common/repositories/users"
+	"go.coaster.io/server/common/application"
+	"go.coaster.io/server/common/auth"
+	"go.coaster.io/server/common/emails"
+	"go.coaster.io/server/common/errors"
+	"go.coaster.io/server/common/models"
+	"go.coaster.io/server/common/repositories/reset_tokens"
+	"go.coaster.io/server/common/repositories/users"
 )
 
 type SendInviteRequest struct {

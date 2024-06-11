@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strings"
 
-	"go.fabra.io/server/common/application"
-	"go.fabra.io/server/common/auth"
-	"go.fabra.io/server/common/errors"
+	"go.coaster.io/server/common/application"
+	"go.coaster.io/server/common/auth"
+	"go.coaster.io/server/common/errors"
 
 	"github.com/gorilla/mux"
 	highlightGorillaMux "github.com/highlight/highlight/sdk/highlight-go/middleware/gorillamux"

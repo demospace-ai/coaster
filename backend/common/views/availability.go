@@ -3,9 +3,9 @@ package views
 import (
 	"time"
 
-	"go.fabra.io/server/common/availability"
-	"go.fabra.io/server/common/database"
-	"go.fabra.io/server/common/models"
+	"go.coaster.io/server/common/availability"
+	"go.coaster.io/server/common/database"
+	"go.coaster.io/server/common/models"
 )
 
 type AvailabilityRule struct {

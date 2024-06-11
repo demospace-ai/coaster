@@ -6,9 +6,9 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"go.fabra.io/server/common/errors"
-	"go.fabra.io/server/common/repositories/listings"
-	"go.fabra.io/server/common/views"
+	"go.coaster.io/server/common/errors"
+	"go.coaster.io/server/common/repositories/listings"
+	"go.coaster.io/server/common/views"
 )
 
 func (s ApiService) GetListing(w http.ResponseWriter, r *http.Request) error {

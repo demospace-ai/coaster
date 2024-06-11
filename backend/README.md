@@ -2,7 +2,7 @@ To create a new migration file run
 migrate create -ext sql -dir migrations -seq <name of your migration>
 
 To connect to prod DB (password in secret manager):
-gcloud sql connect fabra-database-instance -d=fabra-db -u=db_user --quiet
+gcloud sql connect coaster-database-instance -d=coaster-db -u=db_user --quiet
 
 ## Getting Started
 
@@ -10,7 +10,7 @@ gcloud sql connect fabra-database-instance -d=fabra-db -u=db_user --quiet
 
 2. [Install Docker](https://docs.docker.com/get-docker/)
 
-3. Spin up the Dev Postgres Docker instance 
+3. Spin up the Dev Postgres Docker instance
 
 ```sh
 cd server/dev
@@ -21,7 +21,7 @@ chmod go-rwx certs/server.crt
 
 docker compose up -d  # Detaches it so it runs in the background
 
-docker compose logs fabra_db # fabra_db is the service name, use this to view logs of a detached service.
+docker compose logs coaster_db # coaster_db is the service name, use this to view logs of a detached service.
 ```
 
 To spin down the container:
@@ -44,7 +44,7 @@ When adding new migrations, run `make migrate` to apply them.
 
 You'll need to [install the gcloud CLI](https://cloud.google.com/sdk/docs/install).
 
-You'll also need to be added to the Fabra Developer Google Cloud project. Ask Nick for help here.
+You'll also need to be added to the Coaster Developer Google Cloud project. Ask Nick for help here.
 
 Once you've been added, you can login via `gcloud auth application-default login`.
 
@@ -55,17 +55,20 @@ make
 ./bin/server
 ```
 
-
 ## Appendix
 
 ### Notes
+
 When setting up a new GCP project, you may need to run:
+
 ```sh
 gcloud compute project-info add-metadata --metadata serial-port-logging-enable=true
 ```
 
 ### Adding migrations
+
 From the `backend/server` directory, run
+
 ```sh
 migrate create -ext sql -dir migrations -seq the-name-of-your-migration
 ```

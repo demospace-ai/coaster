@@ -9,9 +9,9 @@ import (
 	"strconv"
 
 	"github.com/resend/resend-go/v2"
-	"go.fabra.io/server/common/application"
-	"go.fabra.io/server/common/errors"
-	"go.fabra.io/server/common/secret"
+	"go.coaster.io/server/common/application"
+	"go.coaster.io/server/common/errors"
+	"go.coaster.io/server/common/secret"
 )
 
 const RESEND_PRODUCTION_API_KEY_KEY = "projects/454026596701/secrets/resend-prod-api-key/versions/latest"

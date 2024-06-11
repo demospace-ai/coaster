@@ -3,7 +3,7 @@ package test
 import (
 	"net/http"
 
-	"go.fabra.io/server/common/auth"
+	"go.coaster.io/server/common/auth"
 )
 
 type MockAuthService struct {

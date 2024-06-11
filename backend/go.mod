@@ -1,4 +1,4 @@
-module go.fabra.io/server
+module go.coaster.io/server
 
 go 1.21
 

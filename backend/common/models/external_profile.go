@@ -1,6 +1,6 @@
 package models
 
-import "go.fabra.io/server/common/oauth"
+import "go.coaster.io/server/common/oauth"
 
 type ExternalProfile struct {
 	ExternalID    string

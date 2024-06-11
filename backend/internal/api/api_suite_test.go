@@ -3,8 +3,8 @@ package api_test
 import (
 	"testing"
 
-	"go.fabra.io/server/common/test"
-	"go.fabra.io/server/internal/api"
+	"go.coaster.io/server/common/test"
+	"go.coaster.io/server/internal/api"
 
 	"gorm.io/gorm"
 

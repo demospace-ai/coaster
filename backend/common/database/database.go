@@ -7,16 +7,16 @@ import (
 	"os"
 	"time"
 
-	"go.fabra.io/server/common/application"
-	"go.fabra.io/server/common/errors"
-	"go.fabra.io/server/common/secret"
+	"go.coaster.io/server/common/application"
+	"go.coaster.io/server/common/errors"
+	"go.coaster.io/server/common/secret"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
-const DB_PASSWORD_KEY = "projects/454026596701/secrets/fabra-db-password/versions/latest"
+const DB_PASSWORD_KEY = "projects/454026596701/secrets/coaster-db-password/versions/latest"
 
 func InitDatabase() (*gorm.DB, error) {
 	if application.IsProd() {
@@ -27,7 +27,7 @@ func InitDatabase() (*gorm.DB, error) {
 }
 
 func initDatabaseDev() (*gorm.DB, error) {
-	dbURI := "user=fabra password=fabra database=fabra host=localhost sslmode=require"
+	dbURI := "user=coaster password=coaster database=coaster host=localhost sslmode=require"
 
 	db, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{
 		Logger: logger.New(

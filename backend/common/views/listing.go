@@ -3,9 +3,9 @@ package views
 import (
 	"slices"
 
-	image_lib "go.fabra.io/server/common/images"
-	"go.fabra.io/server/common/models"
-	"go.fabra.io/server/common/repositories/listings"
+	image_lib "go.coaster.io/server/common/images"
+	"go.coaster.io/server/common/models"
+	"go.coaster.io/server/common/repositories/listings"
 )
 
 type Listing struct {

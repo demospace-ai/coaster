@@ -3,26 +3,26 @@ steps:
     name: gcr.io/cloud-builders/curl
     entrypoint: bash
     args:
-      - '-c'
-      - 'curl -L https://github.com/golang-migrate/migrate/releases/download/v4.14.1/migrate.linux-amd64.tar.gz | tar xvz && mv migrate.linux-amd64 /workspace/migrate && chmod +x /workspace/migrate'
-    waitFor: ['-']
+      - "-c"
+      - "curl -L https://github.com/golang-migrate/migrate/releases/download/v4.14.1/migrate.linux-amd64.tar.gz | tar xvz && mv migrate.linux-amd64 /workspace/migrate && chmod +x /workspace/migrate"
+    waitFor: ["-"]
 
   - id: migrate
     name: gcr.io/cloud-builders/docker
     entrypoint: bash
     args:
-      - '-c'
+      - "-c"
       - |
-        /workspace/migrate -path backend/migrations/ -database postgres://db_user:$$DATABASE_PASS@10.55.32.2:5432/fabra-db up && \
+        /workspace/migrate -path backend/migrations/ -database postgres://db_user:$$DATABASE_PASS@10.55.32.2:5432/coaster-db up && \
         echo "MIGRATION COMPLETE"
-    secretEnv: ['DATABASE_PASS']
-    waitFor: ['install-migrate']
+    secretEnv: ["DATABASE_PASS"]
+    waitFor: ["install-migrate"]
 
 options:
   pool:
-    name: 'projects/fabra-prod/locations/us-west1/workerPools/fabra-pool'
+    name: "projects/coaster-prod/locations/us-west1/workerPools/coaster-pool"
 
 availableSecrets:
   secretManager:
-    - versionName: projects/454026596701/secrets/fabra-db-password/versions/latest
+    - versionName: projects/454026596701/secrets/coaster-db-password/versions/latest
       env: DATABASE_PASS

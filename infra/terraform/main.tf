@@ -6,17 +6,17 @@ terraform {
   }
 
   backend "gcs" {
-    bucket = "fabra-prod-tfstate"
+    bucket = "coaster-prod-tfstate"
     prefix = "terraform/state"
   }
 }
 
 provider "google-beta" {
-  project = "fabra-prod"
+  project = "coaster-prod"
 }
 
 provider "google" {
-  project = "fabra-prod"
+  project = "coaster-prod"
 }
 
 resource "google_container_registry" "registry" {
@@ -24,7 +24,7 @@ resource "google_container_registry" "registry" {
 }
 
 resource "google_compute_network" "vpc" {
-  name                    = "fabra-vpc"
+  name                    = "coaster-vpc"
   routing_mode            = "GLOBAL"
   auto_create_subnetworks = true
 }
@@ -47,12 +47,12 @@ resource "google_service_networking_connection" "private_vpc_connection" {
 }
 
 resource "google_sql_database" "main_database" {
-  name     = "fabra-db"
+  name     = "coaster-db"
   instance = google_sql_database_instance.main_instance.name
 }
 
 resource "google_sql_database_instance" "main_instance" {
-  name             = "fabra-database-instance"
+  name             = "coaster-database-instance"
   region           = "us-west1"
   database_version = "POSTGRES_14"
   settings {
@@ -78,7 +78,7 @@ resource "google_sql_database_instance" "main_instance" {
 }
 
 data "google_secret_manager_secret_version" "db_password" {
-  secret = "fabra-db-password"
+  secret = "coaster-db-password"
 }
 
 resource "google_sql_user" "db_user" {
@@ -88,7 +88,7 @@ resource "google_sql_user" "db_user" {
 }
 
 resource "google_cloudbuild_worker_pool" "builder_pool" {
-  name     = "fabra-pool"
+  name     = "coaster-pool"
   location = "us-west1"
   worker_config {
     no_external_ip = false
@@ -106,8 +106,8 @@ resource "google_cloudbuild_trigger" "terraform-build-trigger" {
   included_files = ["infra/terraform/**"]
 
   github {
-    name  = "fabra"
-    owner = "fabra-io"
+    name  = "coaster"
+    owner = "coaster-io"
 
     push {
       branch       = "main"
@@ -125,8 +125,8 @@ resource "google_cloudbuild_trigger" "backend-build-trigger" {
   ignored_files  = ["backend/migrations/**"]
 
   github {
-    name  = "fabra"
-    owner = "fabra-io"
+    name  = "coaster"
+    owner = "coaster-io"
 
     push {
       branch       = "main"
@@ -137,15 +137,15 @@ resource "google_cloudbuild_trigger" "backend-build-trigger" {
   filename = "infra/cloudbuild/backend.yaml"
 }
 
-resource "google_cloud_run_service" "fabra" {
-  name     = "fabra"
+resource "google_cloud_run_service" "coaster" {
+  name     = "coaster"
   location = "us-west1"
 
   template {
     spec {
-      service_account_name = google_service_account.fabra-backend.email
+      service_account_name = google_service_account.coaster-backend.email
       containers {
-        image = "us-docker.pkg.dev/fabra-prod/fabra-server/fabra"
+        image = "us-docker.pkg.dev/coaster-prod/coaster-server/coaster"
         env {
           name  = "DB_USER"
           value = google_sql_user.db_user.name
@@ -207,9 +207,9 @@ resource "google_vpc_access_connector" "connector" {
 }
 
 resource "google_cloud_run_service_iam_member" "all_users_member" {
-  location = google_cloud_run_service.fabra.location
-  project  = google_cloud_run_service.fabra.project
-  service  = google_cloud_run_service.fabra.name
+  location = google_cloud_run_service.coaster.location
+  project  = google_cloud_run_service.coaster.project
+  service  = google_cloud_run_service.coaster.name
   role     = "roles/run.invoker"
   member   = "allUsers"
 }
@@ -220,8 +220,8 @@ resource "google_cloudbuild_trigger" "database-migration-trigger" {
   included_files = ["backend/migrations/**"]
 
   github {
-    name  = "fabra"
-    owner = "fabra-io"
+    name  = "coaster"
+    owner = "coaster-io"
 
     push {
       branch       = "main"
@@ -233,12 +233,12 @@ resource "google_cloudbuild_trigger" "database-migration-trigger" {
 }
 
 resource "google_compute_backend_service" "default" {
-  security_policy                 = google_compute_security_policy.fabra-security-policy.id
+  security_policy                 = google_compute_security_policy.coaster-security-policy.id
   affinity_cookie_ttl_sec         = 0
   connection_draining_timeout_sec = 300
   enable_cdn                      = false
   load_balancing_scheme           = "EXTERNAL"
-  name                            = "fabra-lb-backend-default"
+  name                            = "coaster-lb-backend-default"
   port_name                       = "http"
   protocol                        = "HTTP"
   session_affinity                = "NONE"
@@ -247,7 +247,7 @@ resource "google_compute_backend_service" "default" {
   backend {
     balancing_mode               = "UTILIZATION"
     capacity_scaler              = 1
-    group                        = google_compute_region_network_endpoint_group.fabra_neg.id
+    group                        = google_compute_region_network_endpoint_group.coaster_neg.id
     max_connections              = 0
     max_connections_per_endpoint = 0
     max_connections_per_instance = 0
@@ -260,7 +260,7 @@ resource "google_compute_backend_service" "default" {
 
 resource "google_compute_global_address" "default" {
   address_type  = "EXTERNAL"
-  name          = "fabra-lb-address"
+  name          = "coaster-lb-address"
   prefix_length = 0
 }
 
@@ -268,7 +268,7 @@ resource "google_compute_global_forwarding_rule" "http" {
   ip_address            = google_compute_global_address.default.id
   ip_protocol           = "TCP"
   load_balancing_scheme = "EXTERNAL"
-  name                  = "fabra-lb"
+  name                  = "coaster-lb"
   port_range            = "80"
   target                = google_compute_target_http_proxy.default.id
 }
@@ -277,7 +277,7 @@ resource "google_compute_global_forwarding_rule" "https" {
   ip_address            = google_compute_global_address.default.id
   ip_protocol           = "TCP"
   load_balancing_scheme = "EXTERNAL"
-  name                  = "fabra-lb-https"
+  name                  = "coaster-lb-https"
   port_range            = "443"
   target                = google_compute_target_https_proxy.default.id
 }
@@ -309,36 +309,36 @@ resource "google_compute_managed_ssl_certificate" "cert" {
 }
 
 resource "google_compute_url_map" "default" {
-  name            = "fabra-lb-url-map"
+  name            = "coaster-lb-url-map"
   default_service = google_compute_backend_service.default.id
 
   host_rule {
     hosts = [
       "api.trycoaster.com",
     ]
-    path_matcher = "fabra-api-path-matcher"
+    path_matcher = "coaster-api-path-matcher"
   }
 
   host_rule {
     hosts = [
       "images.trycoaster.com",
     ]
-    path_matcher = "fabra-images-path-matcher"
+    path_matcher = "coaster-images-path-matcher"
   }
 
   path_matcher {
-    name            = "fabra-api-path-matcher"
+    name            = "coaster-api-path-matcher"
     default_service = google_compute_backend_service.default.id
   }
 
   path_matcher {
-    name            = "fabra-images-path-matcher"
+    name            = "coaster-images-path-matcher"
     default_service = google_compute_backend_bucket.user_images_backend.id
   }
 }
 
 resource "google_compute_url_map" "https_redirect" {
-  name = "fabra-lb-https-redirect"
+  name = "coaster-lb-https-redirect"
 
   default_url_redirect {
     https_redirect         = true
@@ -348,13 +348,13 @@ resource "google_compute_url_map" "https_redirect" {
 }
 
 resource "google_compute_target_http_proxy" "default" {
-  name       = "fabra-lb-http-proxy"
+  name       = "coaster-lb-http-proxy"
   proxy_bind = false
   url_map    = google_compute_url_map.https_redirect.id
 }
 
 resource "google_compute_target_https_proxy" "default" {
-  name          = "fabra-lb-https-proxy"
+  name          = "coaster-lb-https-proxy"
   proxy_bind    = false
   quic_override = "NONE"
   ssl_certificates = [
@@ -363,13 +363,13 @@ resource "google_compute_target_https_proxy" "default" {
   url_map = google_compute_url_map.default.id
 }
 
-resource "google_compute_region_network_endpoint_group" "fabra_neg" {
+resource "google_compute_region_network_endpoint_group" "coaster_neg" {
   provider              = google
-  name                  = "fabra-neg"
+  name                  = "coaster-neg"
   network_endpoint_type = "SERVERLESS"
   region                = "us-west1"
   cloud_run {
-    service = google_cloud_run_service.fabra.name
+    service = google_cloud_run_service.coaster.name
   }
 }
 
@@ -392,7 +392,7 @@ resource "google_kms_key_ring_iam_binding" "data-connection-key-ring-binding" {
   key_ring_id = google_kms_key_ring.data-connection-keyring.id
   role        = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
   members = [
-    "serviceAccount:fabra-backend@fabra-prod.iam.gserviceaccount.com"
+    "serviceAccount:coaster-backend@coaster-prod.iam.gserviceaccount.com"
   ]
 }
 
@@ -411,8 +411,8 @@ resource "google_kms_crypto_key" "api-key-key" {
   }
 }
 
-resource "google_compute_router" "fabra-ip-router" {
-  name    = "fabra-ip-router"
+resource "google_compute_router" "coaster-ip-router" {
+  name    = "coaster-ip-router"
   network = google_compute_network.vpc.name
   region  = "us-west1"
 }
@@ -422,9 +422,9 @@ resource "google_compute_address" "egress-ip-address" {
   region = "us-west1"
 }
 
-resource "google_compute_router_nat" "fabra-nat" {
-  name   = "fabra-static-nat"
-  router = google_compute_router.fabra-ip-router.name
+resource "google_compute_router_nat" "coaster-nat" {
+  name   = "coaster-static-nat"
+  router = google_compute_router.coaster-ip-router.name
   region = "us-west1"
 
   min_ports_per_vm       = 64
@@ -436,9 +436,9 @@ resource "google_compute_router_nat" "fabra-nat" {
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
 }
 
-resource "google_service_account" "fabra-backend" {
-  account_id   = "fabra-backend"
-  display_name = "Fabra Backend Service"
+resource "google_service_account" "coaster-backend" {
+  account_id   = "coaster-backend"
+  display_name = "coaster Backend Service"
 }
 
 resource "google_kms_key_ring" "jwt-signing-key-keyring" {
@@ -464,12 +464,12 @@ resource "google_kms_key_ring_iam_binding" "jwt-signing-key-ring-binding" {
   key_ring_id = google_kms_key_ring.jwt-signing-key-keyring.id
   role        = "roles/cloudkms.signerVerifier"
   members = [
-    "serviceAccount:fabra-backend@fabra-prod.iam.gserviceaccount.com"
+    "serviceAccount:coaster-backend@coaster-prod.iam.gserviceaccount.com"
   ]
 }
 
-resource "google_compute_security_policy" "fabra-security-policy" {
-  name = "fabra-cloud-armor"
+resource "google_compute_security_policy" "coaster-security-policy" {
+  name = "coaster-cloud-armor"
 
   adaptive_protection_config {
     layer_7_ddos_defense_config {
@@ -521,15 +521,15 @@ resource "google_compute_security_policy" "fabra-security-policy" {
   timeouts {}
 }
 
-resource "google_artifact_registry_repository" "fabra_server" {
+resource "google_artifact_registry_repository" "coaster_server" {
   location      = "us"
-  repository_id = "fabra-server"
-  description   = "Fabra server image"
+  repository_id = "coaster-server"
+  description   = "coaster server image"
   format        = "DOCKER"
 }
 
 resource "google_project_iam_member" "kms_encrypt_decrypt_role_binding" {
-  project = "fabra-prod"
+  project = "coaster-prod"
   for_each = toset([
     "roles/cloudkms.cryptoKeyEncrypterDecrypter",
     "roles/secretmanager.secretAccessor",
@@ -537,11 +537,11 @@ resource "google_project_iam_member" "kms_encrypt_decrypt_role_binding" {
     "roles/cloudsql.client",
   ])
   role   = each.key
-  member = "serviceAccount:fabra-backend@fabra-prod.iam.gserviceaccount.com"
+  member = "serviceAccount:coaster-backend@coaster-prod.iam.gserviceaccount.com"
 }
 
 resource "google_project_iam_member" "cloud-build-roles" {
-  project  = "fabra-prod"
+  project = "coaster-prod"
   for_each = toset([
     "roles/cloudbuild.workerPoolEditor",
     "roles/cloudsql.admin",
@@ -597,10 +597,10 @@ resource "google_compute_backend_bucket" "user_images_backend" {
 }
 
 resource "google_project_iam_member" "backend_roles" {
-  project  = "fabra-prod"
+  project = "coaster-prod"
   for_each = toset([
     "roles/storage.objectAdmin",
   ])
   role   = each.key
-  member = "serviceAccount:${google_service_account.fabra-backend.email}"
+  member = "serviceAccount:${google_service_account.coaster-backend.email}"
 }

@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/rudderlabs/analytics-go"
-	"go.fabra.io/server/common/application"
-	"go.fabra.io/server/common/models"
+	"go.coaster.io/server/common/application"
+	"go.coaster.io/server/common/models"
 )
 
 func TrackSignup(userID int64, firstName string, lastName string, email string) {

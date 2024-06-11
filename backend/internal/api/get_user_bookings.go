@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"go.fabra.io/server/common/auth"
-	"go.fabra.io/server/common/errors"
-	"go.fabra.io/server/common/images"
-	booking_lib "go.fabra.io/server/common/repositories/bookings"
-	"go.fabra.io/server/common/repositories/listings"
-	"go.fabra.io/server/common/views"
+	"go.coaster.io/server/common/auth"
+	"go.coaster.io/server/common/errors"
+	"go.coaster.io/server/common/images"
+	booking_lib "go.coaster.io/server/common/repositories/bookings"
+	"go.coaster.io/server/common/repositories/listings"
+	"go.coaster.io/server/common/views"
 )
 
 func (s ApiService) GetUserBookings(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {

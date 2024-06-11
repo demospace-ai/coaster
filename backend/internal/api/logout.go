@@ -3,8 +3,8 @@ package api
 import (
 	"net/http"
 
-	"go.fabra.io/server/common/auth"
-	"go.fabra.io/server/common/repositories/sessions"
+	"go.coaster.io/server/common/auth"
+	"go.coaster.io/server/common/repositories/sessions"
 )
 
 func (s ApiService) Logout(a auth.Authentication, w http.ResponseWriter, r *http.Request) error {

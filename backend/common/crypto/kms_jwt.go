@@ -6,11 +6,11 @@ import (
 	kms "cloud.google.com/go/kms/apiv1"
 	"cloud.google.com/go/kms/apiv1/kmspb"
 	"github.com/golang-jwt/jwt/v5"
-	"go.fabra.io/server/common/application"
-	"go.fabra.io/server/common/errors"
+	"go.coaster.io/server/common/application"
+	"go.coaster.io/server/common/errors"
 )
 
-const JWT_SIGNING_KEY_KEY = "projects/fabra-prod/locations/global/keyRings/jwt-signing-key-keyring/cryptoKeys/jwt-signing-key-key/cryptoKeyVersions/1"
+const JWT_SIGNING_KEY_KEY = "projects/coaster-prod/locations/global/keyRings/jwt-signing-key-keyring/cryptoKeys/jwt-signing-key-key/cryptoKeyVersions/1"
 
 // SigningMethodKMS implements the jwt.SiginingMethod interface for Google's Cloud KMS service
 type SigningMethodKMS struct {

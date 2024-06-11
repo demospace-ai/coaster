@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"go.fabra.io/server/common/models"
+	"go.coaster.io/server/common/models"
 )
 
 type Authentication struct {

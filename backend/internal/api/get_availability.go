@@ -8,12 +8,12 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	availability_lib "go.fabra.io/server/common/availability"
-	"go.fabra.io/server/common/errors"
-	"go.fabra.io/server/common/repositories/availability_rules"
-	"go.fabra.io/server/common/repositories/bookings"
-	"go.fabra.io/server/common/repositories/listings"
-	"go.fabra.io/server/common/timeutils"
+	availability_lib "go.coaster.io/server/common/availability"
+	"go.coaster.io/server/common/errors"
+	"go.coaster.io/server/common/repositories/availability_rules"
+	"go.coaster.io/server/common/repositories/bookings"
+	"go.coaster.io/server/common/repositories/listings"
+	"go.coaster.io/server/common/timeutils"
 )
 
 func (s ApiService) GetAvailability(w http.ResponseWriter, r *http.Request) error {

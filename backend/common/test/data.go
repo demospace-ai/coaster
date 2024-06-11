@@ -3,8 +3,8 @@ package test
 import (
 	"time"
 
-	"go.fabra.io/server/common/models"
-	"go.fabra.io/server/common/repositories/sessions"
+	"go.coaster.io/server/common/models"
+	"go.coaster.io/server/common/repositories/sessions"
 
 	"gorm.io/gorm"
 )

@@ -1,6 +1,6 @@
 package views
 
-import "go.fabra.io/server/common/models"
+import "go.coaster.io/server/common/models"
 
 type User struct {
 	ID                   int64                      `json:"id"`

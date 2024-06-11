@@ -3,7 +3,7 @@ package router
 import (
 	"net/http"
 
-	"go.fabra.io/server/common/auth"
+	"go.coaster.io/server/common/auth"
 )
 
 type Method int

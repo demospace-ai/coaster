@@ -5,7 +5,7 @@ import (
 
 	secretmanager "cloud.google.com/go/secretmanager/apiv1"
 	"cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"
-	"go.fabra.io/server/common/errors"
+	"go.coaster.io/server/common/errors"
 )
 
 func FetchSecret(ctx context.Context, name string) (*string, error) {

@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"go.fabra.io/server/common/auth"
-	"go.fabra.io/server/common/errors"
-	"go.fabra.io/server/common/test"
-	"go.fabra.io/server/internal/router"
+	"go.coaster.io/server/common/auth"
+	"go.coaster.io/server/common/errors"
+	"go.coaster.io/server/common/test"
+	"go.coaster.io/server/internal/router"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

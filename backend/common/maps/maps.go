@@ -3,8 +3,8 @@ package maps
 import (
 	"context"
 
-	"go.fabra.io/server/common/errors"
-	"go.fabra.io/server/common/geo"
+	"go.coaster.io/server/common/errors"
+	"go.coaster.io/server/common/geo"
 	"google.golang.org/api/option"
 	"google.golang.org/api/places/v1"
 	"googlemaps.github.io/maps"

@@ -3,10 +3,10 @@ package availability_rules
 import (
 	"time"
 
-	"go.fabra.io/server/common/availability"
-	"go.fabra.io/server/common/errors"
-	"go.fabra.io/server/common/input"
-	"go.fabra.io/server/common/models"
+	"go.coaster.io/server/common/availability"
+	"go.coaster.io/server/common/errors"
+	"go.coaster.io/server/common/input"
+	"go.coaster.io/server/common/models"
 	"gorm.io/gorm"
 )
 

@@ -1,43 +1,43 @@
 steps:
-- id: test-backend
-  name: 'golang:1.21'
-  script: |
-    cd backend;
-    go test -v ./...;
-  env:
-    - 'IS_CLOUD_BUILD=true'
-  waitFor: ['-']
+  - id: test-backend
+    name: "golang:1.21"
+    script: |
+      cd backend;
+      go test -v ./...;
+    env:
+      - "IS_CLOUD_BUILD=true"
+    waitFor: ["-"]
 
-- id: build-backend
-  name: 'ghcr.io/depot/cli:latest'
-  args:
-  - build
-  - '--project'
-  - '3wf60mzkqp'
-  - '-t'
-  - 'us-docker.pkg.dev/fabra-prod/fabra-server/fabra:$COMMIT_SHA'
-  - '-t'
-  - 'us-docker.pkg.dev/fabra-prod/fabra-server/fabra:latest'
-  - '--push'
-  - '--provenance=false'
-  - 'backend/'
-  waitFor: ['test-backend']
-  secretEnv: ['DEPOT_TOKEN']
+  - id: build-backend
+    name: "ghcr.io/depot/cli:latest"
+    args:
+      - build
+      - "--project"
+      - "3wf60mzkqp"
+      - "-t"
+      - "us-docker.pkg.dev/coaster-prod/coaster-server/coaster:$COMMIT_SHA"
+      - "-t"
+      - "us-docker.pkg.dev/coaster-prod/coaster-server/coaster:latest"
+      - "--push"
+      - "--provenance=false"
+      - "backend/"
+    waitFor: ["test-backend"]
+    secretEnv: ["DEPOT_TOKEN"]
 
-- id: deploy-backend
-  name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-  entrypoint: gcloud
-  args:
-  - 'run'
-  - 'deploy'
-  - 'fabra'
-  - '--image'
-  - 'us-docker.pkg.dev/fabra-prod/fabra-server/fabra:latest'
-  - '--region'
-  - 'us-west1'
-  - '--platform'
-  - 'managed'
-  waitFor: ['build-backend']
+  - id: deploy-backend
+    name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: gcloud
+    args:
+      - "run"
+      - "deploy"
+      - "coaster"
+      - "--image"
+      - "us-docker.pkg.dev/coaster-prod/coaster-server/coaster:latest"
+      - "--region"
+      - "us-west1"
+      - "--platform"
+      - "managed"
+    waitFor: ["build-backend"]
 
 availableSecrets:
   secretManager:

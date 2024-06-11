@@ -3,9 +3,9 @@ package router_test
 import (
 	"testing"
 
-	"go.fabra.io/server/common/auth"
-	"go.fabra.io/server/common/test"
-	"go.fabra.io/server/internal/router"
+	"go.coaster.io/server/common/auth"
+	"go.coaster.io/server/common/test"
+	"go.coaster.io/server/internal/router"
 
 	"gorm.io/gorm"
 

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"go.fabra.io/server/common/errors"
+	"go.coaster.io/server/common/errors"
 )
 
 type Date time.Time

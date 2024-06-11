@@ -2,7 +2,7 @@ package models
 
 import (
 	"github.com/lib/pq"
-	"go.fabra.io/server/common/geo"
+	"go.coaster.io/server/common/geo"
 )
 
 type ListingStatus string

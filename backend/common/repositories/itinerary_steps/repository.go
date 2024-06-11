@@ -3,9 +3,9 @@ package itinerary_steps
 import (
 	"time"
 
-	"go.fabra.io/server/common/errors"
-	"go.fabra.io/server/common/input"
-	"go.fabra.io/server/common/models"
+	"go.coaster.io/server/common/errors"
+	"go.coaster.io/server/common/input"
+	"go.coaster.io/server/common/models"
 	"gorm.io/gorm"
 )
 

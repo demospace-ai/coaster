@@ -3,8 +3,8 @@ package input
 import (
 	"time"
 
-	"go.fabra.io/server/common/database"
-	"go.fabra.io/server/common/models"
+	"go.coaster.io/server/common/database"
+	"go.coaster.io/server/common/models"
 )
 
 type TimeSlot struct {

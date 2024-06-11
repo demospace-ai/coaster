@@ -3,7 +3,7 @@ package images
 import (
 	"fmt"
 
-	"go.fabra.io/server/common/application"
+	"go.coaster.io/server/common/application"
 )
 
 func GetGcsImageUrl(storageID string) string {

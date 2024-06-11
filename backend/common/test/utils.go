@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"go.fabra.io/server/common/application"
-	"go.fabra.io/server/common/models"
+	"go.coaster.io/server/common/application"
+	"go.coaster.io/server/common/models"
 
 	"github.com/golang-migrate/migrate"
 	"github.com/ory/dockertest/v3"
@@ -32,9 +32,9 @@ func SetupDatabase() (*gorm.DB, func()) {
 		Repository: "postgis/postgis",
 		Tag:        "15-master",
 		Env: []string{
-			"POSTGRES_PASSWORD=fabratest",
-			"POSTGRES_USER=fabratest",
-			"POSTGRES_DB=fabratest",
+			"POSTGRES_PASSWORD=coastertest",
+			"POSTGRES_USER=coastertest",
+			"POSTGRES_DB=coastertest",
 			"listen_addresses='*'",
 		},
 	}, func(config *docker.HostConfig) {
@@ -58,7 +58,7 @@ func SetupDatabase() (*gorm.DB, func()) {
 		port = resource.GetPort("5432/tcp")
 	}
 
-	dbURI := fmt.Sprintf("user=fabratest password=fabratest database=fabratest host=%s port=%s", host, port)
+	dbURI := fmt.Sprintf("user=coastertest password=coastertest database=coastertest host=%s port=%s", host, port)
 
 	log.Println("Connecting to database with uri:", dbURI)
 
@@ -77,7 +77,7 @@ func SetupDatabase() (*gorm.DB, func()) {
 	}
 
 	log.Println("Running migrations.")
-	migrateURI := fmt.Sprintf("postgres://fabratest:fabratest@%s:%s/fabratest?sslmode=disable", host, port)
+	migrateURI := fmt.Sprintf("postgres://coastertest:coastertest@%s:%s/coastertest?sslmode=disable", host, port)
 
 	wd, err := os.Getwd()
 	if err != nil {

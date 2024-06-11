@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/go-playground/validator"
-	"go.fabra.io/server/common/errors"
-	"go.fabra.io/server/common/repositories/users"
+	"go.coaster.io/server/common/errors"
+	"go.coaster.io/server/common/repositories/users"
 )
 
 type JoinWaitlistRequest struct {

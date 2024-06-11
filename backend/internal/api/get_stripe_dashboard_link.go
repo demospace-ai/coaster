@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"go.fabra.io/server/common/auth"
-	"go.fabra.io/server/common/errors"
-	"go.fabra.io/server/common/models"
-	"go.fabra.io/server/common/stripe"
+	"go.coaster.io/server/common/auth"
+	"go.coaster.io/server/common/errors"
+	"go.coaster.io/server/common/models"
+	"go.coaster.io/server/common/stripe"
 )
 
 func (s ApiService) GetStripeDashboardLink(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {

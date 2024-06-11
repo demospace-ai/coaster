@@ -6,11 +6,11 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"go.fabra.io/server/common/auth"
-	"go.fabra.io/server/common/errors"
-	"go.fabra.io/server/common/repositories/availability_rules"
-	"go.fabra.io/server/common/repositories/listings"
-	"go.fabra.io/server/common/views"
+	"go.coaster.io/server/common/auth"
+	"go.coaster.io/server/common/errors"
+	"go.coaster.io/server/common/repositories/availability_rules"
+	"go.coaster.io/server/common/repositories/listings"
+	"go.coaster.io/server/common/views"
 )
 
 func (s ApiService) GetAvailabilityRules(auth auth.Authentication, w http.ResponseWriter, r *http.Request) error {

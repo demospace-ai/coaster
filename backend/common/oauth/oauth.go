@@ -6,10 +6,10 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"go.fabra.io/server/common/application"
-	"go.fabra.io/server/common/crypto"
-	"go.fabra.io/server/common/errors"
-	"go.fabra.io/server/common/secret"
+	"go.coaster.io/server/common/application"
+	"go.coaster.io/server/common/crypto"
+	"go.coaster.io/server/common/errors"
+	"go.coaster.io/server/common/secret"
 	"golang.org/x/oauth2"
 	"google.golang.org/api/idtoken"
 

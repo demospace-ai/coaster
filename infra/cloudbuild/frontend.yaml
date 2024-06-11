@@ -2,23 +2,23 @@ steps:
   - id: install-frontend
     name: node
     entrypoint: npm
-    args: ['--prefix', 'frontend/', 'install']
-    waitFor: ['-']
+    args: ["--prefix", "frontend/", "install"]
+    waitFor: ["-"]
 
   - id: build-frontend
     name: node
     entrypoint: npm
-    args: ['--prefix', 'frontend/', 'run', 'build']
-    waitFor: ['install-frontend']
+    args: ["--prefix", "frontend/", "run", "build"]
+    waitFor: ["install-frontend"]
 
   - id: copy-config
-    name: 'bash'
+    name: "bash"
     script: cp frontend/app.yaml frontend/build/app.yaml
-    waitFor: ['build-frontend']
+    waitFor: ["build-frontend"]
 
   - id: deploy-frontend
-    name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    dir: 'frontend/build/'
-    entrypoint: 'bash'
-    args: ['-c', 'gcloud app deploy']
-    waitFor: ['copy-config']
+    name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    dir: "frontend/build/"
+    entrypoint: "bash"
+    args: ["-c", "gcloud app deploy"]
+    waitFor: ["copy-config"]

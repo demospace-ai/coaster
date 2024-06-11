@@ -3,8 +3,8 @@ package api
 import (
 	"net/http"
 
-	"go.fabra.io/server/common/errors"
-	"go.fabra.io/server/common/oauth"
+	"go.coaster.io/server/common/errors"
+	"go.coaster.io/server/common/oauth"
 )
 
 var ALLOWED_ORIGINS = []string{"https://www.trycoaster.com", "https://supplier.trycoaster.com", "http://localhost:3000", "http://localhost:3030"}

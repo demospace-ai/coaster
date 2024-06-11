@@ -9,12 +9,12 @@ import (
 	"github.com/stripe/stripe-go/v75"
 	"github.com/stripe/stripe-go/v75/client"
 	"github.com/stripe/stripe-go/v75/webhook"
-	"go.fabra.io/server/common/application"
-	"go.fabra.io/server/common/errors"
-	"go.fabra.io/server/common/images"
-	"go.fabra.io/server/common/models"
-	"go.fabra.io/server/common/repositories/listings"
-	"go.fabra.io/server/common/secret"
+	"go.coaster.io/server/common/application"
+	"go.coaster.io/server/common/errors"
+	"go.coaster.io/server/common/images"
+	"go.coaster.io/server/common/models"
+	"go.coaster.io/server/common/repositories/listings"
+	"go.coaster.io/server/common/secret"
 )
 
 const STRIPE_PROD_API_KEY_KEY = "projects/454026596701/secrets/stripe-api-key/versions/latest"

@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"strings"
 
-	"go.fabra.io/server/common/auth"
-	"go.fabra.io/server/common/errors"
-	"go.fabra.io/server/common/oauth"
-	"go.fabra.io/server/common/repositories/sessions"
-	"go.fabra.io/server/common/repositories/users"
+	"go.coaster.io/server/common/auth"
+	"go.coaster.io/server/common/errors"
+	"go.coaster.io/server/common/oauth"
+	"go.coaster.io/server/common/repositories/sessions"
+	"go.coaster.io/server/common/repositories/users"
 )
 
 func (s ApiService) OAuthLogin(w http.ResponseWriter, r *http.Request) error {

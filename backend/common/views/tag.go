@@ -1,6 +1,6 @@
 package views
 
-import "go.fabra.io/server/common/repositories/tags"
+import "go.coaster.io/server/common/repositories/tags"
 
 type Tag struct {
 	Slug        string `json:"slug"`

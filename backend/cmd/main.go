@@ -12,11 +12,11 @@ import (
 
 	_ "golang.org/x/image/webp"
 
-	"go.fabra.io/server/common/application"
-	"go.fabra.io/server/common/auth"
-	"go.fabra.io/server/common/database"
-	"go.fabra.io/server/internal/api"
-	"go.fabra.io/server/internal/router"
+	"go.coaster.io/server/common/application"
+	"go.coaster.io/server/common/auth"
+	"go.coaster.io/server/common/database"
+	"go.coaster.io/server/internal/api"
+	"go.coaster.io/server/internal/router"
 
 	"github.com/highlight/highlight/sdk/highlight-go"
 )

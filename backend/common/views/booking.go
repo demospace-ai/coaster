@@ -1,9 +1,9 @@
 package views
 
 import (
-	"go.fabra.io/server/common/database"
-	"go.fabra.io/server/common/models"
-	"go.fabra.io/server/common/repositories/bookings"
+	"go.coaster.io/server/common/database"
+	"go.coaster.io/server/common/models"
+	"go.coaster.io/server/common/repositories/bookings"
 )
 
 type Booking struct {

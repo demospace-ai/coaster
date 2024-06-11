@@ -5,16 +5,16 @@ import (
 	"net/http"
 
 	"github.com/go-playground/validator"
-	"go.fabra.io/server/common/auth"
-	"go.fabra.io/server/common/database"
-	"go.fabra.io/server/common/errors"
-	"go.fabra.io/server/common/events"
-	"go.fabra.io/server/common/repositories/availability_rules"
-	"go.fabra.io/server/common/repositories/bookings"
-	"go.fabra.io/server/common/repositories/listings"
-	"go.fabra.io/server/common/repositories/payments"
-	"go.fabra.io/server/common/stripe"
-	"go.fabra.io/server/common/timeutils"
+	"go.coaster.io/server/common/auth"
+	"go.coaster.io/server/common/database"
+	"go.coaster.io/server/common/errors"
+	"go.coaster.io/server/common/events"
+	"go.coaster.io/server/common/repositories/availability_rules"
+	"go.coaster.io/server/common/repositories/bookings"
+	"go.coaster.io/server/common/repositories/listings"
+	"go.coaster.io/server/common/repositories/payments"
+	"go.coaster.io/server/common/stripe"
+	"go.coaster.io/server/common/timeutils"
 )
 
 type CreateCheckoutLinkRequest struct {

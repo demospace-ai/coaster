@@ -3,7 +3,7 @@ package models
 import (
 	"time"
 
-	"go.fabra.io/server/common/database"
+	"go.coaster.io/server/common/database"
 )
 
 type BookingStatus = string

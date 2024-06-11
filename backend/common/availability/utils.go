@@ -3,10 +3,10 @@ package availability
 import (
 	"time"
 
-	"go.fabra.io/server/common/errors"
-	"go.fabra.io/server/common/models"
-	"go.fabra.io/server/common/repositories/bookings"
-	"go.fabra.io/server/common/timeutils"
+	"go.coaster.io/server/common/errors"
+	"go.coaster.io/server/common/models"
+	"go.coaster.io/server/common/repositories/bookings"
+	"go.coaster.io/server/common/timeutils"
 	"gorm.io/gorm"
 )
 
