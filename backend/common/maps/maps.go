@@ -5,12 +5,15 @@ import (
 
 	"go.coaster.io/server/common/errors"
 	"go.coaster.io/server/common/geo"
+	"go.coaster.io/server/common/secret"
 	"google.golang.org/api/option"
 	"google.golang.org/api/places/v1"
 	"googlemaps.github.io/maps"
 )
 
-const MAPS_API_KEY = "AIzaSyC8wQgUVXBQNvaPtqq60sPv-LiEIupZZWM"
+const MAPS_PROD_API_KEY_KEY = "projects/454026596701/secrets/maps-api-key/versions/latest"
+const MAPS_DEV_API_KEY_KEY = "projects/86315250181/secrets/maps-dev-api-key/versions/latest"
+
 
 type Place struct {
 	Name        string
@@ -25,8 +28,21 @@ type PlaceDetails struct {
 	PostalCode *string
 }
 
+func getMapsApiKeyKey() string {
+	if application.IsProd() {
+		return MAPS_PROD_API_KEY_KEY
+	} else {
+		return MAPS_DEV_API_KEY_KEY
+	}
+}
+
 func GetPlaceFromQuery(query string) (*Place, error) {
-	c, err := maps.NewClient(maps.WithAPIKey(MAPS_API_KEY))
+	mapsApiKey, err := secret.FetchSecret(context.TODO(), getMapsApiKeyKey())
+	if err != nil {
+		return nil, errors.Wrap(err, "(maps.GetPlaceFromQuery) fetching secret")
+	}
+	
+	c, err := maps.NewClient(maps.WithAPIKey(*mapsApiKey))
 	if err != nil {
 		return nil, errors.Wrap(err, "(maps.GetPlaceFromQuery) creating maps client")
 	}
